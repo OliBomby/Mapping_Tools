@@ -65,7 +65,7 @@
                 </ControlTemplate>
             </Setter>
             <Style Selector="^:pointerover /template/ Border#PART_RowBorder">
-                <Setter Property="Background" Value="{DynamicResource MaterialDataGridRowHoverBackgroundBrush}" />
+                <Setter Property="Background" Value="{DynamicResource MaterialTextFieldBoxHoverBackgroundBrush}" />
             </Style>
             <Style Selector="^:selected /template/ Border#PART_RowBorder">
                 <Setter Property="Background" Value="{DynamicResource MaterialTextFieldBoxBackgroundBrush}" />

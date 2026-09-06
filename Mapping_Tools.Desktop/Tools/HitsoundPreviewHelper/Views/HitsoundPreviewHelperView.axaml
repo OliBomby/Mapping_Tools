@@ -21,19 +21,15 @@
                           ItemsSource="{Binding Items}"
                           AutoGenerateColumns="False"
                           IsReadOnly="False"
+                          CanUserAddRows="False"
                           CanUserResizeColumns="True"
                           CanUserSortColumns="True"
                           SelectionMode="Extended"
+                          UseLogicalScrollable="True"
                           GridLinesVisibility="Horizontal"
                           ScrollViewer.HorizontalScrollBarVisibility="Auto"
                           ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <DataGrid.Styles>
-                        <Style Selector="DataGridCell">
-                            <Setter Property="Padding" Value="13,8,8,8" />
-                        </Style>
-                        <Style Selector="DataGridColumnHeader">
-                            <Setter Property="Padding" Value="8" />
-                        </Style>
                         <Style Selector="DataGridRow">
                             <Setter Property="IsSelected"
                                     Value="{ReflectionBinding IsSelected, Mode=TwoWay}" />

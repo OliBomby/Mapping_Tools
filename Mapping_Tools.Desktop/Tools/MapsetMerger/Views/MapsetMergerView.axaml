@@ -18,16 +18,12 @@
                           ItemsSource="{Binding Mapsets}"
                           AutoGenerateColumns="False"
                           CanUserSortColumns="True"
+                          CanUserAddRows="False"
                           SelectionMode="Extended"
                           IsReadOnly="False"
+                          UseLogicalScrollable="True"
                           ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <DataGrid.Styles>
-                    <Style Selector="DataGridCell">
-                        <Setter Property="Padding" Value="13,8,8,8" />
-                    </Style>
-                    <Style Selector="DataGridColumnHeader">
-                        <Setter Property="Padding" Value="8" />
-                    </Style>
                     <Style Selector="DataGridRow">
                         <Setter Property="IsSelected"
                                 Value="{ReflectionBinding IsSelected, Mode=TwoWay}" />

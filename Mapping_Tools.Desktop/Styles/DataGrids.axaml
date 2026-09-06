@@ -1,9 +1,82 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <!-- Material.Avalonia gives every DataGrid a visible outer box. Keep the
-         internal header and row separators, but let the surrounding layout
-         provide the surface boundary. -->
+    <!--
+        ProDataGrid intentionally keeps Avalonia's DataGrid control and column
+        API. This dictionary is the application-owned WPF/Material parity
+        layer for that control. Keep it after the ProDataGrid theme include so
+        these values win over the Fluent defaults while the ProDataGrid
+        templates continue to own selection, editing, sorting, and scrolling.
+    -->
     <Style Selector="DataGrid">
+        <Setter Property="Background" Value="{DynamicResource MaterialPaperBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource MaterialDividerBrush}" />
         <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialBodyBrush}" />
+        <Setter Property="GridLinesVisibility" Value="Horizontal" />
+        <Setter Property="HeadersVisibility" Value="Column" />
+        <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource MaterialDividerBrush}" />
+        <Setter Property="VerticalGridLinesBrush" Value="{DynamicResource MaterialDividerBrush}" />
+        <Setter Property="RowBackground" Value="Transparent" />
+    </Style>
+
+    <Style Selector="DataGridCell">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialBodyBrush}" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Padding" Value="13,8,8,8" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+    </Style>
+
+    <Style Selector="DataGridColumnHeader">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource MaterialDividerBrush}" />
+        <Setter Property="BorderThickness" Value="0,0,0,1" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialBodyBrush}" />
+        <Setter Property="Padding" Value="8" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+
+    <Style Selector="DataGridRow">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource MaterialDividerBrush}" />
+        <Setter Property="BorderThickness" Value="0,0,0,1" />
+    </Style>
+
+    <!-- ProDataGrid paints row states through its template's background
+         rectangle. These selectors reproduce the legacy Material row state
+         order: hover is visible on an idle row and selection wins on a
+         selected row, including while the pointer is over it. -->
+    <Style Selector="DataGridRow /template/ Rectangle#BackgroundRectangle">
+        <Setter Property="Fill" Value="Transparent" />
+        <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="DataGridRow:pointerover /template/ Rectangle#BackgroundRectangle">
+        <Setter Property="Fill" Value="{DynamicResource MaterialTextFieldBoxHoverBackgroundBrush}" />
+        <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="DataGridRow:selected /template/ Rectangle#BackgroundRectangle,
+                           DataGridRow:selected:pointerover /template/ Rectangle#BackgroundRectangle">
+        <Setter Property="Fill" Value="{DynamicResource MaterialSelectionBrush}" />
+        <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="DataGridRow /template/ Rectangle#PART_BottomGridLine">
+        <Setter Property="Fill" Value="{DynamicResource MaterialDividerBrush}" />
+    </Style>
+    <Style Selector="DataGrid /template/ Rectangle#PART_ColumnHeadersAndRowsSeparator">
+        <Setter Property="Fill" Value="{DynamicResource MaterialDividerBrush}" />
+    </Style>
+
+    <!-- Cell selection is separate from row selection in ProDataGrid. Keep it
+         aligned with the legacy selected-cell surface when keyboard/cell
+         navigation is used. -->
+    <Style Selector="DataGridCell:cell-selected">
+        <Setter Property="Background" Value="{DynamicResource MaterialSelectionBrush}" />
+    </Style>
+    <Style Selector="DataGridCell:cell-selected:pointerover,
+                           DataGridCell:cell-selected:focus">
+        <Setter Property="Background" Value="{DynamicResource MaterialSelectionBrush}" />
     </Style>
 </Styles>

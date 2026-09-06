@@ -25,9 +25,11 @@ search for an Avalonia `Window`.
 
 ## Intentional platform substitution
 
-The WPF form uses an editable `DataGrid`. The Avalonia view uses the matching
-`Avalonia.Controls.DataGrid` 12.1.0 package and Material.Avalonia.DataGrid
-styles. Text columns use `PropertyChanged` source updates, the checkbox column
+The WPF form uses an editable `DataGrid`. The Avalonia view uses the
+API-compatible `ProDataGrid` 12.1.0.4 package and an application-owned
+WPF/Material parity style. ProDataGrid intentionally exposes the same
+`DataGrid` control and column API, so the XAML control names remain `DataGrid`.
+Text columns use `PropertyChanged` source updates, the checkbox column
 preserves row selection, and template columns provide the enum editors while
 retaining sorting and column resizing. Shift-click add is handled at the
 Avalonia view boundary and delegates to the view model command; object
@@ -54,4 +56,6 @@ package, and analyzer warnings.
 - <https://github.com/AvaloniaUI/Avalonia/releases/tag/12.1.0>
 - <https://docs.avaloniaui.net/controls/data-display/structured-data/datagrid/>
 - <https://docs.avaloniaui.net/docs/how-to/datagrid-how-to>
+- <https://wieslawsoltes.github.io/ProDataGrid/>
+- <https://github.com/wieslawsoltes/ProDataGrid/blob/master/readme.md>
 - <https://learn.microsoft.com/dotnet/communitytoolkit/mvvm/generators/observableproperty>

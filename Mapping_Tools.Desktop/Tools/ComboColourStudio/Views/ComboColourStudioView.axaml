@@ -23,10 +23,9 @@
                           AutoGenerateColumns="False"
                           CanUserSortColumns="True"
                           SelectionMode="Extended" IsReadOnly="False"
+                          CanUserAddRows="False"
+                          UseLogicalScrollable="True"
                           ScrollViewer.VerticalScrollBarVisibility="Auto">
-                    <DataGrid.Styles>
-                        <Style Selector="DataGridRow" />
-                    </DataGrid.Styles>
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Offset"
                                             Binding="{Binding Time, Mode=TwoWay, Converter={StaticResource TimeToStringConverter}}" />
