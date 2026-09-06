@@ -25,7 +25,7 @@
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialBodyBrush}" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-        <Setter Property="Padding" Value="13,8,8,8" />
+        <Setter Property="Padding" Value="0,4,0,5" />
         <Setter Property="VerticalContentAlignment" Value="Stretch" />
     </Style>
 
