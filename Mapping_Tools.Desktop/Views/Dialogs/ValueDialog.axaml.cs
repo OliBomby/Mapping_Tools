@@ -1,4 +1,6 @@
 using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.Threading;
 
 namespace Mapping_Tools.Desktop.Views.Dialogs;
 
@@ -8,15 +10,23 @@ namespace Mapping_Tools.Desktop.Views.Dialogs;
 public partial class ValueDialog : UserControl
 {
     /// <summary>
-    ///     Loads the compiled value-dialog view and selects the initial text when attached.
+    ///     Loads the compiled value-dialog view.
     /// </summary>
     public ValueDialog()
     {
         InitializeComponent();
-        AttachedToVisualTree += (_, _) =>
-        {
-            ValueTextBox.Focus();
-            ValueTextBox.SelectAll();
-        };
+    }
+
+    /// <inheritdoc />
+    protected override void OnLoaded(RoutedEventArgs e)
+    {
+        base.OnLoaded(e);
+        Dispatcher.UIThread.Post(
+            () =>
+            {
+                ValueTextBox.Focus();
+                ValueTextBox.SelectAll();
+            },
+            DispatcherPriority.Input);
     }
 }
