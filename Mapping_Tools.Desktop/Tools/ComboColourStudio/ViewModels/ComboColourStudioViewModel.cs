@@ -115,7 +115,8 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     /// <inheritdoc />
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
+        string path = await workspace.ResolveQuickRunBeatmapAsync(
+            cancellationToken: cancellationToken);
 
         if (string.IsNullOrWhiteSpace(path))
         {

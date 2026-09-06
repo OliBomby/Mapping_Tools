@@ -191,6 +191,8 @@ public sealed class TimingHelperViewModelTests
         RecordingEditorReloadService? reload = null)
     {
         UserNotificationService notifications = new();
+        TestBeatmapWorkspace effectiveWorkspace = workspace ?? new TestBeatmapWorkspace();
+        effectiveWorkspace.QuickRunPath = currentBeatmap?.Path;
         return new TimingHelperViewModel(
             service ?? new RecordingTimingHelper(),
             new ToolExecutionService(
@@ -198,8 +200,7 @@ public sealed class TimingHelperViewModelTests
                 reload ?? new RecordingEditorReloadService(),
                 new DesktopApplicationSettings(),
                 TimeProvider.System),
-            currentBeatmap ?? new RecordingCurrentBeatmapLocator(null),
-            workspace ?? new TestBeatmapWorkspace(),
+            effectiveWorkspace,
             new DesktopApplicationSettings());
     }
 

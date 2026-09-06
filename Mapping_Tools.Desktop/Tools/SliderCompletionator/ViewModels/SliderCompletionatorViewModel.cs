@@ -27,7 +27,6 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
 {
 
     private readonly ISliderCompletionatorService completionator;
-    private readonly ICurrentBeatmapLocator currentBeatmap;
 
     private readonly ProjectDefinition<SliderCompletionatorProject> definition = new(
         "slidercompletionatorproject.json",
@@ -44,19 +43,16 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
     /// </summary>
     /// <param name="completionator">Runs the framework-independent slider transformation.</param>
     /// <param name="execution">Coordinates background execution and notifications.</param>
-    /// <param name="currentBeatmap">Finds the beatmap currently open in osu!.</param>
     /// <param name="workspace">Supplies the shell's selected beatmap paths.</param>
     /// <param name="settings">Supplies QuickRun preferences.</param>
     public SliderCompletionatorViewModel(
         ISliderCompletionatorService completionator,
         IToolExecutionService execution,
-        ICurrentBeatmapLocator currentBeatmap,
         IBeatmapWorkspace workspace,
         DesktopApplicationSettings settings)
         : base(execution, SliderCompletionatorToolDefinition.Definition)
     {
         this.completionator = completionator ?? throw new ArgumentNullException(nameof(completionator));
-        this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
@@ -155,8 +151,8 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
     /// <inheritdoc />
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string path = await currentBeatmap
-            .FindCurrentBeatmapAsync(cancellationToken);
+        string path = await workspace
+            .ResolveQuickRunBeatmapAsync(cancellationToken: cancellationToken);
         await RunWithStateAsync(() => RunPathsAsync(
             [path],
             true,
@@ -179,7 +175,7 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
     protected override async Task RunCoreAsync()
     {
         IReadOnlyList<string> paths = ImportModeSetting == HitObjectSelectionMode.Selected
-            ? [await currentBeatmap.FindCurrentBeatmapAsync()]
+            ? [await workspace.ResolveQuickRunBeatmapAsync()]
             : workspace.SelectedPaths;
         await RunPathsAsync(
             paths,

@@ -23,7 +23,8 @@ public sealed class SliderPicturatorViewModelTests
     {
         // Arrange
         RecordingPicturator service = new() { ResultSegmentCount = 42 };
-        var viewModel = Create(service, new RecordingCurrentBeatmapLocator("current.osu"));
+        TestBeatmapWorkspace workspace = new() { QuickRunPath = "current.osu" };
+        var viewModel = Create(service, workspace);
         viewModel.SegmentCount = 3;
 
         // Act
@@ -37,7 +38,7 @@ public sealed class SliderPicturatorViewModelTests
     public void Install_WithPersistedSelectedSlider_RestoresSelectedSlider()
     {
         // Arrange
-        var viewModel = Create(new RecordingPicturator(), new RecordingCurrentBeatmapLocator("current.osu"));
+        var viewModel = Create(new RecordingPicturator());
         HitObject selectedSlider = new("32,64,100,2,0,L|200:64,1,168");
         SliderPicturatorProject project = new() { SelectedSlider = selectedSlider };
         IShellProjectFeature<SliderPicturatorProject> feature = viewModel;
@@ -54,14 +55,12 @@ public sealed class SliderPicturatorViewModelTests
     public void Activate_WithoutMapComboColors_DoesNotQueryLiveBeatmap()
     {
         // Arrange
-        RecordingCurrentBeatmapLocator currentBeatmap = new();
-        var viewModel = Create(new RecordingPicturator(), currentBeatmap);
+        var viewModel = Create(new RecordingPicturator());
 
         // Act
         viewModel.Activate();
 
         // Assert
-        currentBeatmap.FindCount.Should().Be(0);
     }
 
     [TestMethod]
@@ -72,17 +71,15 @@ public sealed class SliderPicturatorViewModelTests
         {
             AvailableColors = [RgbaColour.FromRgb(255, 0, 0)]
         };
-        RecordingCurrentBeatmapLocator currentBeatmap = new();
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["selected.osu"]);
-        var viewModel = Create(service, currentBeatmap, workspace);
+        var viewModel = Create(service, workspace);
         viewModel.UseMapComboColors = true;
 
         // Act
         viewModel.Activate();
 
         // Assert
-        currentBeatmap.FindCount.Should().Be(0);
         service.ColorPaths.Should().ContainSingle().Which.Should().Be("selected.osu");
         viewModel.AvailableColors.Should().Equal(RgbaColour.FromRgb(255, 0, 0));
     }
@@ -93,13 +90,12 @@ public sealed class SliderPicturatorViewModelTests
         // Arrange
         RgbaColour colour = RgbaColour.FromRgb(255, 0, 0);
         RecordingPicturator service = new() { AvailableColors = [colour] };
-        RecordingCurrentBeatmapLocator currentBeatmap = new();
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["selected.osu"]);
         UserNotificationService notifications = new();
         List<UserNotification> published = [];
         notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
-        var viewModel = Create(service, currentBeatmap, workspace, notifications);
+        var viewModel = Create(service, workspace, notifications);
         viewModel.UseMapComboColors = true;
         viewModel.Activate();
 
@@ -107,7 +103,6 @@ public sealed class SliderPicturatorViewModelTests
         workspace.ClearSelection();
 
         // Assert
-        currentBeatmap.FindCount.Should().Be(0);
         service.ColorPaths.Should().ContainSingle().Which.Should().Be("selected.osu");
         viewModel.AvailableColors.Should().BeEmpty();
         published.Should().BeEmpty();
@@ -115,7 +110,6 @@ public sealed class SliderPicturatorViewModelTests
 
     private static SliderPicturatorViewModel Create(
         RecordingPicturator service,
-        RecordingCurrentBeatmapLocator currentBeatmap,
         TestBeatmapWorkspace? workspace = null,
         UserNotificationService? notifications = null)
     {
@@ -130,7 +124,6 @@ public sealed class SliderPicturatorViewModelTests
                 new RecordingEditorReloadService(),
                 settings,
                 TimeProvider.System),
-            currentBeatmap,
             workspace ?? new TestBeatmapWorkspace(),
             settings,
             notifications);

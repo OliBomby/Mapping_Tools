@@ -333,14 +333,15 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     /// <summary>Gets the graph scaling command.</summary>
     public IAsyncRelayCommand ScaleCompleteCommand { get; }
 
-    /// <summary>Runs the current editor map through the QuickRun import/export path.</summary>
+    /// <summary>Runs the current editor map, falling back to the shell selection.</summary>
     /// <param name="cancellationToken">Cancels editor discovery or generation.</param>
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
         string path;
         try
         {
-            path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
+            path = await workspace.ResolveQuickRunBeatmapAsync(
+                cancellationToken: cancellationToken);
         }
         catch (OperationCanceledException)
         {
@@ -461,7 +462,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         string path;
         try
         {
-            path = await currentBeatmap.FindCurrentBeatmapAsync();
+            path = await workspace.ResolveQuickRunBeatmapAsync();
         }
         catch (OperationCanceledException)
         {
@@ -492,7 +493,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         try
         {
             path = ImportModeSetting == HitObjectSelectionMode.Selected
-                ? await currentBeatmap.FindCurrentBeatmapAsync()
+                ? await workspace.ResolveQuickRunBeatmapAsync(updateSelection: false)
                 : workspace.SelectedPaths.FirstOrDefault();
         }
         catch (OperationCanceledException)

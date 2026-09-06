@@ -210,6 +210,80 @@ public sealed class BeatmapWorkspaceTests
     }
 
     [TestMethod]
+    public async Task ResolveQuickRunBeatmapAsync_WithLiveMap_UsesItAndUpdatesShellSelection()
+    {
+        // Arrange
+        RecordingBeatmapFileSystem fileSystem = new();
+        fileSystem.ExistingPaths.Add("live.osu");
+        RecordingCurrentBeatmapLocator locator = new("live.osu");
+        var workspace = CreateWorkspace(
+            new ApplicationSettings(),
+            fileSystem: fileSystem,
+            locator: locator);
+        workspace.SetSelection(["selected.osu"]);
+
+        // Act
+        string path = await workspace.ResolveQuickRunBeatmapAsync();
+
+        // Assert
+        path.Should().Be("live.osu");
+        workspace.SelectedPaths.ToArray().Should().Equal("live.osu");
+    }
+
+    [TestMethod]
+    public async Task ResolveQuickRunBeatmapAsync_WithoutLiveMap_FallsBackToFirstSelectedPath()
+    {
+        // Arrange
+        var workspace = CreateWorkspace(new ApplicationSettings());
+        workspace.SetSelection(["first.osu", "second.osu"]);
+
+        // Act
+        string path = await workspace.ResolveQuickRunBeatmapAsync();
+
+        // Assert
+        path.Should().Be("first.osu");
+        workspace.SelectedPaths.ToArray().Should().Equal("first.osu", "second.osu");
+    }
+
+    [TestMethod]
+    public async Task ResolveQuickRunBeatmapAsync_WithMissingLiveFile_FallsBackToFirstSelectedPath()
+    {
+        // Arrange
+        RecordingCurrentBeatmapLocator locator = new("stale.osu");
+        var workspace = CreateWorkspace(
+            new ApplicationSettings(),
+            locator: locator);
+        workspace.SetSelection(["first.osu", "second.osu"]);
+
+        // Act
+        string path = await workspace.ResolveQuickRunBeatmapAsync();
+
+        // Assert
+        path.Should().Be("first.osu");
+    }
+
+    [TestMethod]
+    public async Task ResolveQuickRunBeatmapAsync_WithSelectionUpdateDisabled_LeavesShellSelectionUnchanged()
+    {
+        // Arrange
+        RecordingBeatmapFileSystem fileSystem = new();
+        fileSystem.ExistingPaths.Add("live.osu");
+        RecordingCurrentBeatmapLocator locator = new("live.osu");
+        var workspace = CreateWorkspace(
+            new ApplicationSettings(),
+            fileSystem: fileSystem,
+            locator: locator);
+        workspace.SetSelection(["selected.osu"]);
+
+        // Act
+        string path = await workspace.ResolveQuickRunBeatmapAsync(updateSelection: false);
+
+        // Assert
+        path.Should().Be("live.osu");
+        workspace.SelectedPaths.ToArray().Should().Equal("selected.osu");
+    }
+
+    [TestMethod]
     public void RemoveRecent_WithSelectedEntry_RemovesHistoryOnly()
     {
         // Arrange

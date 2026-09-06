@@ -271,7 +271,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             cancellationToken));
     }
 
-    /// <summary>Exports the supplied gallery pattern to the beatmap currently open in osu!.</summary>
+    /// <summary>Exports the supplied gallery pattern to the current editor beatmap or shell selection.</summary>
     /// <param name="item">The gallery item that was double-clicked.</param>
     /// <param name="cancellationToken">Cancels beatmap discovery or export.</param>
     /// <returns>A task that completes after the pattern export finishes.</returns>
@@ -841,7 +841,8 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     {
         try
         {
-            return await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
+            return await workspace.ResolveQuickRunBeatmapAsync(
+                cancellationToken: cancellationToken);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {

@@ -351,7 +351,7 @@ public sealed class SlideratorViewModelTests
         // Assert
         service.ImportPath.Should().BeNull();
         ((MessageDialogRequest<bool>)dialogs.LastMessageRequest!).Message
-            .Should().Contain("Open a beatmap in osu!");
+            .Should().Be("No beatmap is open in osu!.");
     }
 
     [DataTestMethod]
@@ -430,6 +430,10 @@ public sealed class SlideratorViewModelTests
         TestDialogService? dialogs = null,
         TestBeatmapWorkspace? workspace = null)
     {
+        RecordingCurrentBeatmapLocator effectiveCurrentBeatmap =
+            currentBeatmap ?? new RecordingCurrentBeatmapLocator(null);
+        TestBeatmapWorkspace effectiveWorkspace = workspace ?? new TestBeatmapWorkspace();
+        effectiveWorkspace.QuickRunPath = effectiveCurrentBeatmap.Path;
         return new SlideratorViewModel(
             service,
             new ToolExecutionService(
@@ -437,8 +441,8 @@ public sealed class SlideratorViewModelTests
                 new RecordingEditorReloadService(),
                 new DesktopApplicationSettings(),
                 TimeProvider.System),
-            currentBeatmap ?? new RecordingCurrentBeatmapLocator(null),
-            workspace ?? new TestBeatmapWorkspace(),
+            effectiveCurrentBeatmap,
+            effectiveWorkspace,
             new DesktopApplicationSettings(),
             dialogs ?? new TestDialogService());
     }

@@ -30,6 +30,7 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
 
     private readonly IHitsoundCopierService copier;
     private readonly ICurrentBeatmapLocator currentBeatmap;
+    private readonly IBeatmapWorkspace workspace;
 
     private readonly ProjectDefinition<HitsoundCopierProject> definition = new(
         "hitsoundcopierproject.json",
@@ -43,11 +44,13 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     private readonly ApplicationSettings settings;
 
     /// <summary>Creates the Hitsound Copier presentation model.</summary>
+    /// <param name="workspace">Supplies the shell's selected beatmap for QuickRun fallback.</param>
     public HitsoundCopierViewModel(
         IHitsoundCopierService copier,
         IToolExecutionService execution,
         IFilePicker filePicker,
         ICurrentBeatmapLocator currentBeatmap,
+        IBeatmapWorkspace workspace,
         IUserNotificationService notifications,
         ApplicationSettings settings)
         : base(execution, HitsoundCopierToolDefinition.Definition)
@@ -55,6 +58,7 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
         this.copier = copier ?? throw new ArgumentNullException(nameof(copier));
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
@@ -181,7 +185,8 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     /// <inheritdoc />
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
+        string path = await workspace.ResolveQuickRunBeatmapAsync(
+            cancellationToken: cancellationToken);
 
         if (string.IsNullOrWhiteSpace(path))
         {

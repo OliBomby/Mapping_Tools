@@ -38,8 +38,6 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     IShellFeatureActivation,
     IDisposable
 {
-    private readonly ICurrentBeatmapLocator currentBeatmap;
-
     private readonly ProjectDefinition<TumourGeneratorProject> definition = new(
         "tumourgeneratorproject.json",
         "Tumour Generator Projects",
@@ -65,21 +63,18 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     /// </summary>
     /// <param name="generator">Imports maps and runs ordinary Core generation through Application ports.</param>
     /// <param name="execution">Coordinates cancellation, progress, and reload.</param>
-    /// <param name="currentBeatmap">Finds the beatmap currently open in osu!.</param>
     /// <param name="workspace">Supplies ordinary-run map selection.</param>
     /// <param name="settings">Supplies the AlwaysQuickRun preference.</param>
     /// <param name="dialogs">Presents empty-selection and error messages.</param>
     public TumourGeneratorViewModel(
         ITumourGeneratorService generator,
         IToolExecutionService execution,
-        ICurrentBeatmapLocator currentBeatmap,
         IBeatmapWorkspace workspace,
         DesktopApplicationSettings settings,
         IDialogService dialogs)
         : base(execution, TumourGeneratorToolDefinition.Definition)
     {
         this.generator = generator ?? throw new ArgumentNullException(nameof(generator));
-        this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         this.dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
@@ -272,14 +267,15 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         foreach (var layer in TumourLayers) layer.PropertyChanged -= OnLayerChanged;
     }
 
-    /// <summary>Runs the current editor map through the QuickRun path.</summary>
+    /// <summary>Runs the current editor map, falling back to the shell selection.</summary>
     /// <param name="cancellationToken">Cancels lookup, generation, or saving.</param>
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
         string path;
         try
         {
-            path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
+            path = await workspace.ResolveQuickRunBeatmapAsync(
+                cancellationToken: cancellationToken);
         }
         catch (OperationCanceledException)
         {
@@ -345,7 +341,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         try
         {
             path = ImportModeSetting == HitObjectSelectionMode.Selected
-                ? await currentBeatmap.FindCurrentBeatmapAsync()
+                ? await workspace.ResolveQuickRunBeatmapAsync(updateSelection: false)
                 : workspace.SelectedPaths.FirstOrDefault();
         }
         catch (OperationCanceledException)
@@ -463,7 +459,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
             string path;
             try
             {
-                path = await currentBeatmap.FindCurrentBeatmapAsync();
+                path = await workspace.ResolveQuickRunBeatmapAsync();
             }
             catch (OperationCanceledException)
             {

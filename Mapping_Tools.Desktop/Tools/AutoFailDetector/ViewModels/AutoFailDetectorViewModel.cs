@@ -20,7 +20,6 @@ namespace Mapping_Tools.Desktop.Tools.AutoFailDetector.ViewModels;
 public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, IQuickRun
 {
     private readonly IAutoFailService autoFail;
-    private readonly ICurrentBeatmapLocator currentBeatmap;
     private readonly IDialogService dialogs;
     private readonly IPlatformLauncher launcher;
     private readonly DesktopApplicationSettings settings;
@@ -30,7 +29,6 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
     /// <param name="autoFail">Analyzes beatmaps and applies repairs.</param>
     /// <param name="execution">Coordinates cancellation, backup, and notifications.</param>
     /// <param name="workspace">Supplies the shell's selected beatmap.</param>
-    /// <param name="currentBeatmap">Finds the beatmap open in osu! for QuickRun.</param>
     /// <param name="settings">Supplies QuickRun behavior preferences.</param>
     /// <param name="dialogs">Presents repair choices.</param>
     /// <param name="launcher">Navigates osu! to selected timeline markers.</param>
@@ -38,7 +36,6 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
         IAutoFailService autoFail,
         IToolExecutionService execution,
         IBeatmapWorkspace workspace,
-        ICurrentBeatmapLocator currentBeatmap,
         DesktopApplicationSettings settings,
         IDialogService dialogs,
         IPlatformLauncher launcher)
@@ -46,7 +43,6 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
     {
         this.autoFail = autoFail ?? throw new ArgumentNullException(nameof(autoFail));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
-        this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         this.dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
         this.launcher = launcher ?? throw new ArgumentNullException(nameof(launcher));
@@ -101,12 +97,13 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
     public partial string ResultSummary { get; private set; } =
         "Run the detector to inspect this beatmap.";
 
-    /// <summary>Analyzes the beatmap currently open in osu! through the QuickRun path.</summary>
+    /// <summary>Analyzes the current editor beatmap, falling back to the shell selection.</summary>
     /// <param name="cancellationToken">Cancels beatmap discovery or analysis.</param>
     /// <returns>A task that completes after QuickRun finishes.</returns>
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
+        string path = await workspace.ResolveQuickRunBeatmapAsync(
+            cancellationToken: cancellationToken);
         await RunWithStateAsync(() => RunPathAsync(path, cancellationToken));
     }
 
@@ -114,7 +111,7 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
     protected override async Task RunCoreAsync()
     {
         string? path = settings.AlwaysQuickRun
-            ? await currentBeatmap.FindCurrentBeatmapAsync()
+            ? await workspace.ResolveQuickRunBeatmapAsync()
             : workspace.SelectedPaths.FirstOrDefault();
 
         await RunPathAsync(path, CancellationToken.None);

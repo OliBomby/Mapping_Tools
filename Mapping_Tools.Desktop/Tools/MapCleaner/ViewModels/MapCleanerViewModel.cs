@@ -25,7 +25,6 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
     IShellProjectFeature<MapCleanerProject>
 {
     private readonly IMapCleanerService cleaner;
-    private readonly ICurrentBeatmapLocator currentBeatmap;
 
     private readonly ProjectDefinition<MapCleanerProject> definition = new(
         "mapcleanerproject.json",
@@ -42,21 +41,18 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
     /// <param name="cleaner">Runs framework-independent cleanup operations.</param>
     /// <param name="execution">Coordinates cancellation, backup, and notifications.</param>
     /// <param name="workspace">Supplies selected beatmaps for ordinary runs.</param>
-    /// <param name="currentBeatmap">Finds the beatmap open in osu! for QuickRun.</param>
     /// <param name="settings">Supplies shared execution preferences.</param>
     /// <param name="launcher">Navigates osu! to selected timeline markers.</param>
     public MapCleanerViewModel(
         IMapCleanerService cleaner,
         IToolExecutionService execution,
         IBeatmapWorkspace workspace,
-        ICurrentBeatmapLocator currentBeatmap,
         DesktopApplicationSettings settings,
         IPlatformLauncher launcher)
         : base(execution, MapCleanerToolDefinition.Definition)
     {
         this.cleaner = cleaner ?? throw new ArgumentNullException(nameof(cleaner));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
-        this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         this.launcher = launcher ?? throw new ArgumentNullException(nameof(launcher));
     }
@@ -123,12 +119,13 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
     [ObservableProperty]
     public partial bool HasRun { get; private set; }
 
-    /// <summary>Cleans the beatmap currently open in osu! through the QuickRun path.</summary>
+    /// <summary>Cleans the current editor beatmap, falling back to the shell selection.</summary>
     /// <param name="cancellationToken">Cancels beatmap discovery or cleanup.</param>
     /// <returns>A task that completes after QuickRun finishes.</returns>
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
+        string path = await workspace.ResolveQuickRunBeatmapAsync(
+            cancellationToken: cancellationToken);
 
         await RunWithStateAsync(() => RunPathsAsync(
             string.IsNullOrWhiteSpace(path) ? [] : [path],
@@ -153,7 +150,7 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
     {
         if (settings.AlwaysQuickRun)
         {
-            string path = await currentBeatmap.FindCurrentBeatmapAsync();
+            string path = await workspace.ResolveQuickRunBeatmapAsync();
             await RunPathsAsync(
                 string.IsNullOrWhiteSpace(path) ? [] : [path],
                 true,

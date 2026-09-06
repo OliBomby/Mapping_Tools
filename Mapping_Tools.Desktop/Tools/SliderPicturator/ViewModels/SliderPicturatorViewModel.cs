@@ -29,8 +29,6 @@ namespace Mapping_Tools.Desktop.Tools.SliderPicturator.ViewModels;
 public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, IQuickRun, IShellProjectFeature<SliderPicturatorProject>,
     IShellFeatureActivation
 {
-    private readonly ICurrentBeatmapLocator currentBeatmap;
-
     private readonly ProjectDefinition<SliderPicturatorProject> definition = new(
         "sliderpicturatorproject.json", "Slider Picturator Projects", static () => new SliderPicturatorProject(),
         "slider-picturator-project.json",
@@ -54,19 +52,17 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     /// <param name="images">Decodes source images for preview generation.</param>
     /// <param name="filePicker">Presents the native image picker.</param>
     /// <param name="execution">Coordinates execution, cancellation, and completion messages.</param>
-    /// <param name="currentBeatmap">Finds the current osu! beatmap.</param>
     /// <param name="workspace">Supplies shell-selected paths.</param>
     /// <param name="settings">Supplies the legacy Always QuickRun setting.</param>
     /// <param name="notifications">Publishes picker and preview failures.</param>
     public SliderPicturatorViewModel(ISliderPicturatorService picturator, IImageFileService images,
-        IFilePicker filePicker, IToolExecutionService execution, ICurrentBeatmapLocator currentBeatmap,
-        IBeatmapWorkspace workspace, DesktopApplicationSettings settings, IUserNotificationService notifications)
+        IFilePicker filePicker, IToolExecutionService execution, IBeatmapWorkspace workspace,
+        DesktopApplicationSettings settings, IUserNotificationService notifications)
         : base(execution, SliderPicturatorToolDefinition.Definition)
     {
         this.picturator = picturator ?? throw new ArgumentNullException(nameof(picturator));
         this.images = images ?? throw new ArgumentNullException(nameof(images));
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
-        this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
@@ -205,7 +201,9 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
         string path;
         try
         {
-            path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken).ConfigureAwait(false);
+            path = await workspace
+                .ResolveQuickRunBeatmapAsync(cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {
@@ -283,7 +281,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     {
         try
         {
-            string path = await currentBeatmap.FindCurrentBeatmapAsync();
+            string path = await workspace.ResolveQuickRunBeatmapAsync(updateSelection: false);
             SelectedSlider = await picturator.GetSelectedSliderAsync(path);
         }
         catch (Exception exception) { await PublishFailureAsync("Could not import slider", "The selected hit object could not be read.", exception); }
@@ -324,7 +322,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
-        string path = await currentBeatmap.FindCurrentBeatmapAsync();
+        string path = await workspace.ResolveQuickRunBeatmapAsync();
         await RunPathAsync(path, settings.AlwaysQuickRun, CancellationToken.None);
     }
 

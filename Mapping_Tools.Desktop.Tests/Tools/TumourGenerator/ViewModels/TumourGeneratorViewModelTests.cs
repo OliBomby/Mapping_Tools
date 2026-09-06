@@ -29,11 +29,12 @@ public sealed class TumourGeneratorViewModelTests
         // Arrange
         RecordingGenerator service = new();
         RecordingEditorReloadService reload = new();
+        TestBeatmapWorkspace workspace = new() { QuickRunPath = "current.osu" };
         var viewModel = Create(
             service,
-            new RecordingCurrentBeatmapLocator("current.osu"),
             reload,
-            true);
+            true,
+            workspace: workspace);
 
         // Act
         await viewModel.RunQuickAsync(CancellationToken.None);
@@ -53,10 +54,11 @@ public sealed class TumourGeneratorViewModelTests
         // Arrange
         RecordingGenerator service = new() { ReturnEmptyImport = true };
         TestDialogService dialogs = new();
+        TestBeatmapWorkspace workspace = new() { QuickRunPath = "current.osu" };
         var viewModel = Create(
             service,
-            new RecordingCurrentBeatmapLocator("current.osu"),
-            dialogs: dialogs);
+            dialogs: dialogs,
+            workspace: workspace);
         var original = viewModel.PreviewHitObject;
 
         // Act
@@ -78,12 +80,10 @@ public sealed class TumourGeneratorViewModelTests
     {
         // Arrange
         RecordingGenerator service = new();
-        RecordingCurrentBeatmapLocator currentBeatmap = new();
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["selected.osu"]);
         var viewModel = Create(
             service,
-            currentBeatmap,
             workspace: workspace);
         viewModel.ImportModeSetting = mode;
 
@@ -92,7 +92,6 @@ public sealed class TumourGeneratorViewModelTests
 
         // Assert
         service.ImportPath.Should().Be("selected.osu");
-        currentBeatmap.FindCount.Should().Be(0);
     }
 
     [TestMethod]
@@ -101,10 +100,11 @@ public sealed class TumourGeneratorViewModelTests
         // Arrange
         RecordingGenerator service = new() { ImportException = new IOException("import failed") };
         TestDialogService dialogs = new();
+        TestBeatmapWorkspace workspace = new() { QuickRunPath = "current.osu" };
         var viewModel = Create(
             service,
-            new RecordingCurrentBeatmapLocator("current.osu"),
-            dialogs: dialogs);
+            dialogs: dialogs,
+            workspace: workspace);
 
         // Act
         await viewModel.ImportCommand.ExecuteAsync(null);
@@ -122,9 +122,9 @@ public sealed class TumourGeneratorViewModelTests
         RecordingGenerator service = new();
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["selected.osu"]);
+        workspace.QuickRunPath = "current.osu";
         var viewModel = Create(
             service,
-            new RecordingCurrentBeatmapLocator("current.osu"),
             workspace: workspace);
 
         // Act
@@ -136,21 +136,19 @@ public sealed class TumourGeneratorViewModelTests
     }
 
     [TestMethod]
-    public async Task RunQuickAsync_WhenCurrentBeatmapIsMissing_ShowsCurrentBeatmapError()
+    public async Task RunQuickAsync_WhenOsuIsClosed_UsesSelectedWorkspaceMap()
     {
         // Arrange
-        TestDialogService dialogs = new();
-        var viewModel = Create(
-            new RecordingGenerator(),
-            new RecordingCurrentBeatmapLocator(null),
-            dialogs: dialogs);
+        RecordingGenerator service = new();
+        TestBeatmapWorkspace workspace = new();
+        workspace.SetSelection(["selected.osu"]);
+        var viewModel = Create(service, workspace: workspace);
 
         // Act
         await viewModel.RunQuickAsync(CancellationToken.None);
 
         // Assert
-        ((MessageDialogRequest<bool>)dialogs.LastMessageRequest!).Message
-            .Should().Contain("Open a beatmap in osu!");
+        service.RunPaths.Should().Equal("selected.osu");
     }
 
     [TestMethod]
@@ -260,7 +258,6 @@ public sealed class TumourGeneratorViewModelTests
 
     private static TumourGeneratorViewModel Create(
         RecordingGenerator service,
-        RecordingCurrentBeatmapLocator? locator = null,
         RecordingEditorReloadService? reload = null,
         bool autoReload = false,
         TestDialogService? dialogs = null,
@@ -275,7 +272,6 @@ public sealed class TumourGeneratorViewModelTests
                 reload ?? new RecordingEditorReloadService(),
                 settings,
                 TimeProvider.System),
-            locator ?? new RecordingCurrentBeatmapLocator(null),
             workspace ?? new TestBeatmapWorkspace(),
             settings,
             dialogs ?? new TestDialogService());

@@ -25,8 +25,6 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
     IQuickRun,
     IShellProjectFeature<SliderMergerProject>
 {
-    private readonly ICurrentBeatmapLocator currentBeatmap;
-
     private readonly ProjectDefinition<SliderMergerProject> definition = new(
         "slidermergerproject.json",
         "Slider Merger Projects",
@@ -43,19 +41,16 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
     /// </summary>
     /// <param name="merger">Runs the framework-independent merge transformation.</param>
     /// <param name="execution">Coordinates background execution, cancellation, and reload.</param>
-    /// <param name="currentBeatmap">Finds the beatmap currently open in osu!.</param>
     /// <param name="workspace">Supplies the shell's selected beatmap paths.</param>
     /// <param name="settings">Supplies the legacy Always QuickRun preference.</param>
     public SliderMergerViewModel(
         ISliderMergerService merger,
         IToolExecutionService execution,
-        ICurrentBeatmapLocator currentBeatmap,
         IBeatmapWorkspace workspace,
         DesktopApplicationSettings settings)
         : base(execution, SliderMergerToolDefinition.Definition)
     {
         this.merger = merger ?? throw new ArgumentNullException(nameof(merger));
-        this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
@@ -102,8 +97,8 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
     /// <inheritdoc />
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string path = await currentBeatmap
-            .FindCurrentBeatmapAsync(cancellationToken);
+        string path = await workspace
+            .ResolveQuickRunBeatmapAsync(cancellationToken: cancellationToken);
         await RunWithStateAsync(() => RunPathsAsync(
             [path],
             true,
@@ -126,7 +121,7 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
     protected override async Task RunCoreAsync()
     {
         IReadOnlyList<string> paths = ImportModeSetting == HitObjectSelectionMode.Selected
-            ? [await currentBeatmap.FindCurrentBeatmapAsync()]
+            ? [await workspace.ResolveQuickRunBeatmapAsync()]
             : workspace.SelectedPaths;
         await RunPathsAsync(
             paths,

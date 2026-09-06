@@ -224,11 +224,12 @@ public sealed class MapCleanerViewModelTests
     {
         UserNotificationService notifications = new();
         DesktopApplicationSettings settings = new() { AutoReload = autoReload };
+        TestBeatmapWorkspace effectiveWorkspace = workspace ?? new TestBeatmapWorkspace();
+        effectiveWorkspace.QuickRunPath = currentPath;
         return new MapCleanerViewModel(
             cleaner,
             new ToolExecutionService(notifications, reload ?? new RecordingEditorReloadService(), settings, TimeProvider.System),
-            workspace ?? new TestBeatmapWorkspace(),
-            new RecordingCurrentBeatmapLocator(currentPath),
+            effectiveWorkspace,
             settings,
             new RecordingPlatformLauncher());
     }

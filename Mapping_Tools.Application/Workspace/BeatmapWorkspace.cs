@@ -174,6 +174,45 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
             path);
     }
 
+    /// <inheritdoc />
+    public async Task<string> ResolveQuickRunBeatmapAsync(
+        bool updateSelection = true,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        string? currentPath = null;
+        bool hasCurrentBeatmap = false;
+        try
+        {
+            currentPath = await currentBeatmapLocator
+                .FindCurrentBeatmapAsync(cancellationToken)
+                .ConfigureAwait(false);
+            hasCurrentBeatmap = !string.IsNullOrWhiteSpace(currentPath)
+                                && fileSystem.FileExists(currentPath);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception)
+        {
+            // QuickRun intentionally falls back to the shell selection when osu!
+            // is closed or the live reader cannot resolve a current map.
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
+
+        if (hasCurrentBeatmap)
+        {
+            if (updateSelection) SetSelection([currentPath!], BeatmapSelectionSource.CurrentEditor);
+
+            return currentPath!;
+        }
+
+        return selectedPaths.FirstOrDefault() ?? string.Empty;
+    }
+
     private string? GetPickerStartLocation()
     {
         if (!settings.CurrentBeatmapDefaultFolder) return null;

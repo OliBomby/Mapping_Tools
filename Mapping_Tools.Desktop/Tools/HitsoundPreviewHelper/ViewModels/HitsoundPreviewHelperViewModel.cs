@@ -120,8 +120,8 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     /// <inheritdoc />
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string path = await currentBeatmap
-            .FindCurrentBeatmapAsync(cancellationToken)
+        string path = await workspace
+            .ResolveQuickRunBeatmapAsync(cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
         await RunWithStateAsync(() => RunPathsAsync(

@@ -77,6 +77,10 @@ internal sealed class TestBeatmapWorkspace : IBeatmapWorkspace
     public CurrentBeatmapSelectionResult CurrentBeatmapResult { get; set; } =
         new(CurrentBeatmapSelectionStatus.Unavailable, null);
 
+    public string? QuickRunPath { get; set; }
+
+    public Func<CancellationToken, Task<string>>? QuickRunResolver { get; set; }
+
     public event EventHandler<BeatmapSelectionChangedEventArgs>? SelectionChanged;
 
     public IReadOnlyList<string> SelectedPaths => selectedPaths.ToArray();
@@ -132,6 +136,19 @@ internal sealed class TestBeatmapWorkspace : IBeatmapWorkspace
         CancellationToken cancellationToken = default)
     {
         return Task.FromResult(CurrentBeatmapResult);
+    }
+
+    public async Task<string> ResolveQuickRunBeatmapAsync(
+        bool updateSelection = true,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        string path = QuickRunResolver is null
+            ? QuickRunPath ?? selectedPaths.FirstOrDefault() ?? string.Empty
+            : await QuickRunResolver(cancellationToken);
+        if (updateSelection && !string.IsNullOrWhiteSpace(QuickRunPath))
+            SetSelection([path], BeatmapSelectionSource.CurrentEditor);
+        return path;
     }
 
     public void SetRecentMaps(params RecentBeatmap[] recentMaps)

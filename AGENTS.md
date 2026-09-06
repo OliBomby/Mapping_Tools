@@ -46,6 +46,8 @@ Try to honor the dev's intent in both a minimal and realistic fashion.
 
 - **osu!** - A rhythm game where players click circles, slide sliders, and spin spinners to the beat of a song. The game has a large community of mappers who create beatmaps for others to play.
 - **Map/Beatmap** - A file that contains the timing, hit objects, and other data for a chart in osu!. Beatmaps are created by mappers and can be played by other players.
+- **Current beatmap** - The beatmap currently open in osu!'s editor.
+- **Selected beatmap** - The beatmap selected in the Mapping Tools shell.
 - **Mapset/Beatmapset** - A collection of beatmaps, songs, backgrounds, storyboards, hitsound samples, and other assets that are grouped together.
 - **Mapper** - A person who creates beatmaps for osu!.
 - **Mapping** - The process of creating beatmaps for osu!.

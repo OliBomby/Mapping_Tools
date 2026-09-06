@@ -99,11 +99,12 @@ public sealed class AutoFailDetectorViewModelTests
             new RecordingEditorReloadService(),
             new DesktopApplicationSettings(),
             TimeProvider.System);
+        TestBeatmapWorkspace effectiveWorkspace = workspace ?? new TestBeatmapWorkspace();
+        effectiveWorkspace.QuickRunPath = currentPath;
         return new AutoFailDetectorViewModel(
             service,
             execution,
-            workspace ?? new TestBeatmapWorkspace(),
-            new RecordingCurrentBeatmapLocator(currentPath),
+            effectiveWorkspace,
             new DesktopApplicationSettings(),
             new TestDialogService(),
             new RecordingPlatformLauncher());

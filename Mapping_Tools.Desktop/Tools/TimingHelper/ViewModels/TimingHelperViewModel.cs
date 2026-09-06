@@ -24,8 +24,6 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
     IQuickRun,
     IShellProjectFeature<TimingHelperProject>
 {
-    private readonly ICurrentBeatmapLocator currentBeatmap;
-
     private readonly ProjectDefinition<TimingHelperProject> definition = new(
         "timinghelperproject.json",
         "Timing Helper Projects",
@@ -43,19 +41,16 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
     /// </summary>
     /// <param name="timingHelper">Runs the framework-independent timing transformation.</param>
     /// <param name="execution">Coordinates background execution, cancellation, and notifications.</param>
-    /// <param name="currentBeatmap">Finds the beatmap currently open in osu!.</param>
     /// <param name="workspace">Supplies the shell's selected beatmap paths.</param>
     /// <param name="settings">Supplies QuickRun and automatic-reload preferences.</param>
     public TimingHelperViewModel(
         ITimingHelperService timingHelper,
         IToolExecutionService execution,
-        ICurrentBeatmapLocator currentBeatmap,
         IBeatmapWorkspace workspace,
         DesktopApplicationSettings settings)
         : base(execution, TimingHelperToolDefinition.Definition)
     {
         this.timingHelper = timingHelper ?? throw new ArgumentNullException(nameof(timingHelper));
-        this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
@@ -98,13 +93,13 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
     public partial IBeatDivisor[] BeatDivisors { get; set; } =
         RationalBeatDivisor.GetDefaultBeatDivisors();
 
-    /// <summary>Runs Timing Helper against the beatmap currently open in osu!.</summary>
+    /// <summary>Runs Timing Helper against the current editor beatmap or shell selection.</summary>
     /// <param name="cancellationToken">Cancels beatmap discovery or timing adjustment.</param>
     /// <returns>A task that completes after QuickRun reaches a terminal state.</returns>
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string path = await currentBeatmap
-            .FindCurrentBeatmapAsync(cancellationToken)
+        string path = await workspace
+            .ResolveQuickRunBeatmapAsync(cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
         await RunWithStateAsync(() => RunPathsAsync(
@@ -130,7 +125,7 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
     {
         if (settings.AlwaysQuickRun)
         {
-            string path = await currentBeatmap.FindCurrentBeatmapAsync();
+            string path = await workspace.ResolveQuickRunBeatmapAsync();
             await RunPathsAsync(
                 string.IsNullOrWhiteSpace(path) ? [] : [path],
                 true,

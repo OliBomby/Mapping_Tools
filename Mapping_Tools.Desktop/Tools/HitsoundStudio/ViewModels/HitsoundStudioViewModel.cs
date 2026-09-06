@@ -400,7 +400,8 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     /// <inheritdoc />
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
+        string path = await workspace.ResolveQuickRunBeatmapAsync(
+            cancellationToken: cancellationToken);
 
         if (!string.IsNullOrWhiteSpace(path)) BaseBeatmap = path;
         await RunWithStateAsync(() => RunExportAsync([path ?? string.Empty], cancellationToken));

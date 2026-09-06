@@ -48,10 +48,8 @@ public sealed class SliderCompletionatorViewModelTests
     {
         // Arrange
         RecordingCompletionator service = new();
-        var viewModel = Create(
-            service,
-            new TestBeatmapWorkspace(),
-            new RecordingCurrentBeatmapLocator("current.osu"));
+        TestBeatmapWorkspace workspace = new() { QuickRunPath = "current.osu" };
+        var viewModel = Create(service, workspace);
 
         // Act
         await viewModel.RunQuickAsync(CancellationToken.None);
@@ -62,21 +60,19 @@ public sealed class SliderCompletionatorViewModelTests
     }
 
     [TestMethod]
-    public async Task RunCommand_WithSelectedModeAndUnavailableCurrentBeatmap_ThrowsWithoutInvokingService()
+    public async Task RunCommand_WithSelectedModeAndNoLiveBeatmap_UsesEmptyWorkspaceFallback()
     {
         // Arrange
         RecordingCompletionator service = new();
-        var viewModel = Create(
-            service,
-            currentBeatmap: new RecordingCurrentBeatmapLocator(null));
+        TestBeatmapWorkspace workspace = new();
+        workspace.SetSelection(["selected.osu"]);
+        var viewModel = Create(service, workspace);
 
         // Act
-        Func<Task> act = () => viewModel.RunCommand.ExecuteAsync(null);
-        var exception = await act.Should().ThrowAsync<InvalidOperationException>();
+        await viewModel.RunCommand.ExecuteAsync(null);
 
         // Assert
-        service.Paths.Should().BeNull();
-        exception.Which.Message.Should().Contain("Open a beatmap in osu!");
+        service.Paths.Should().Equal("selected.osu");
     }
 
     [TestMethod]
@@ -91,9 +87,9 @@ public sealed class SliderCompletionatorViewModelTests
         {
             RecordingCompletionator service = new();
             AsynchronousCurrentBeatmapLocator currentBeatmap = new("current.osu");
-            var viewModel = Create(
-                service,
-                currentBeatmap: currentBeatmap);
+            TestBeatmapWorkspace workspace = new();
+            workspace.QuickRunResolver = currentBeatmap.FindCurrentBeatmapAsync;
+            var viewModel = Create(service, workspace);
             viewModel.UseEndTime = true;
             viewModel.UseCurrentEditorTime = true;
             List<int> stateChangeThreads = [];
@@ -194,7 +190,6 @@ public sealed class SliderCompletionatorViewModelTests
     private static SliderCompletionatorViewModel Create(
         RecordingCompletionator service,
         TestBeatmapWorkspace? workspace = null,
-        ICurrentBeatmapLocator? currentBeatmap = null,
         DesktopApplicationSettings? settings = null)
     {
         return new SliderCompletionatorViewModel(
@@ -204,7 +199,6 @@ public sealed class SliderCompletionatorViewModelTests
                 new RecordingEditorReloadService(),
                 new DesktopApplicationSettings(),
                 TimeProvider.System),
-            currentBeatmap ?? new RecordingCurrentBeatmapLocator(null),
             workspace ?? new TestBeatmapWorkspace(),
             settings ?? new DesktopApplicationSettings());
     }

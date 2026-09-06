@@ -124,8 +124,12 @@ public sealed class HitsoundPreviewHelperViewModelTests
             notifications,
             reloadService ?? new RecordingEditorReloadService(),
             new DesktopApplicationSettings(),
-            TimeProvider.System);
+        TimeProvider.System);
         var windows = windowService ?? new RecordingRhythmGuideWindowService();
+        TestBeatmapWorkspace effectiveWorkspace = workspace ?? new TestBeatmapWorkspace
+        {
+            QuickRunPath = "current.osu",
+        };
         RhythmGuideViewModel rhythmGuide = new(
             new StubRhythmGuideService(),
             execution,
@@ -136,7 +140,7 @@ public sealed class HitsoundPreviewHelperViewModelTests
         return new HitsoundPreviewHelperViewModel(
             preview ?? new RecordingPreviewService(),
             execution,
-            workspace ?? new TestBeatmapWorkspace(),
+            effectiveWorkspace,
             new RecordingCurrentBeatmapLocator("current.osu"),
             new DesktopApplicationSettings(),
             notifications,

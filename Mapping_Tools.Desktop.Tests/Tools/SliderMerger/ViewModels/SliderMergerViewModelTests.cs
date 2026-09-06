@@ -46,10 +46,8 @@ public sealed class SliderMergerViewModelTests
     {
         // Arrange
         RecordingMerger service = new();
-        var viewModel = Create(
-            service,
-            new TestBeatmapWorkspace(),
-            new RecordingCurrentBeatmapLocator("current.osu"));
+        TestBeatmapWorkspace workspace = new() { QuickRunPath = "current.osu" };
+        var viewModel = Create(service, workspace);
 
         // Act
         await viewModel.RunQuickAsync(CancellationToken.None);
@@ -60,21 +58,19 @@ public sealed class SliderMergerViewModelTests
     }
 
     [TestMethod]
-    public async Task RunCommand_WithSelectedModeAndUnavailableCurrentBeatmap_ThrowsWithoutInvokingService()
+    public async Task RunCommand_WithSelectedModeAndNoLiveBeatmap_UsesSelectedWorkspaceFallback()
     {
         // Arrange
         RecordingMerger service = new();
-        var viewModel = Create(
-            service,
-            currentBeatmap: new RecordingCurrentBeatmapLocator(null));
+        TestBeatmapWorkspace workspace = new();
+        workspace.SetSelection(["selected.osu"]);
+        var viewModel = Create(service, workspace);
 
         // Act
-        Func<Task> act = () => viewModel.RunCommand.ExecuteAsync(null);
-        var exception = await act.Should().ThrowAsync<InvalidOperationException>();
+        await viewModel.RunCommand.ExecuteAsync(null);
 
         // Assert
-        service.Paths.Should().BeNull();
-        exception.Which.Message.Should().Contain("Open a beatmap in osu!");
+        service.Paths.Should().Equal("selected.osu");
     }
 
     [TestMethod]
@@ -84,9 +80,10 @@ public sealed class SliderMergerViewModelTests
         RecordingMerger service = new();
         RecordingEditorReloadService reload = new();
         DesktopApplicationSettings settings = new() { AutoReload = true };
+        TestBeatmapWorkspace workspace = new() { QuickRunPath = "current.osu" };
         var viewModel = Create(
             service,
-            currentBeatmap: new RecordingCurrentBeatmapLocator("current.osu"),
+            workspace: workspace,
             settings: settings,
             reload: reload);
 
@@ -134,7 +131,6 @@ public sealed class SliderMergerViewModelTests
     private static SliderMergerViewModel Create(
         RecordingMerger service,
         TestBeatmapWorkspace? workspace = null,
-        RecordingCurrentBeatmapLocator? currentBeatmap = null,
         DesktopApplicationSettings? settings = null,
         RecordingEditorReloadService? reload = null)
     {
@@ -146,7 +142,6 @@ public sealed class SliderMergerViewModelTests
                 reload ?? new RecordingEditorReloadService(),
                 effectiveSettings,
                 TimeProvider.System),
-            currentBeatmap ?? new RecordingCurrentBeatmapLocator(null),
             workspace ?? new TestBeatmapWorkspace(),
             effectiveSettings);
     }

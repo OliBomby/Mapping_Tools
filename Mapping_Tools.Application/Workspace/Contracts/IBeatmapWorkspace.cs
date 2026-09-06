@@ -90,5 +90,21 @@ public interface IBeatmapWorkspace
     /// <returns>A status distinguishing selection, unavailable lookup, and a stale path.</returns>
     Task<CurrentBeatmapSelectionResult> SelectCurrentBeatmapAsync(
         CancellationToken cancellationToken = default);
-}
 
+    /// <summary>
+    ///     Resolves the beatmap used by legacy-compatible QuickRun. The beatmap
+    ///     currently open in osu! wins when it can be resolved to an existing
+    ///     file; otherwise the first shell-selected beatmap is returned.
+    /// </summary>
+    /// <param name="updateSelection">
+    ///     Whether a resolved current beatmap should replace the shell selection.
+    /// </param>
+    /// <param name="cancellationToken">Cancels live beatmap discovery.</param>
+    /// <returns>
+    ///     The current editor beatmap, the first selected beatmap as fallback, or
+    ///     an empty string when neither is available.
+    /// </returns>
+    Task<string> ResolveQuickRunBeatmapAsync(
+        bool updateSelection = true,
+        CancellationToken cancellationToken = default);
+}
