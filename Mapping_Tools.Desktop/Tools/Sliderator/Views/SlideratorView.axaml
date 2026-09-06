@@ -225,7 +225,7 @@
                         ToolTip.Tip="Beat snap divisor."
                         Margin="0,5,0,0" />
 
-                <StackPanel Grid.Row="2"
+                <WrapPanel Grid.Row="2"
                             Orientation="Horizontal"
                             HorizontalAlignment="Left"
                             Margin="5,10,5,0">
@@ -236,7 +236,7 @@
                     <CheckBox IsChecked="{Binding ShowGraphAnchors}"
                               Content="Show graph anchors"
                               ToolTip.Tip="Show the positions of graph anchors in the preview." />
-                </StackPanel>
+                </WrapPanel>
             </Grid>
 
             <controls:ToolRunButton Grid.Row="1"

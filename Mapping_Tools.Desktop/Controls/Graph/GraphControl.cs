@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Media;
+using DialogHostAvalonia;
 using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.Graph.Interpolation;
 using Mapping_Tools.Core.Graph.Interpolation.Interpolators;
@@ -22,7 +23,7 @@ namespace Mapping_Tools.Desktop.Controls.Graph;
 /// <summary>
 ///     Draws and edits a normalized value graph while keeping graph mathematics in Core.
 /// </summary>
-public sealed class GraphControl : Control
+public sealed class GraphControl : Decorator
 {
     private const double minimum_view_size = 1e-9;
     private const double anchor_hit_radius = 10;
@@ -175,6 +176,7 @@ public sealed class GraphControl : Control
     private Cursor? hiddenCursor;
     private Cursor? panCursor;
     private Cursor? verticalResizeCursor;
+    private readonly string dialogIdentifier = $"GraphDialog_{Guid.NewGuid():N}";
 
     static GraphControl()
     {
@@ -209,6 +211,13 @@ public sealed class GraphControl : Control
         Focusable = true;
         IsTabStop = true;
         ClipToBounds = false;
+        Child = new DialogHost
+        {
+            Identifier = dialogIdentifier,
+            CloseOnClickAway = true,
+            ClipToBounds = false,
+            Content = new Border { Background = Brushes.Transparent },
+        };
     }
 
     /// <summary>Suppresses state-change notifications while a host batches anchor updates.</summary>
@@ -1578,13 +1587,13 @@ public sealed class GraphControl : Control
                     CommitState(state);
                 }
 
-                DialogHostInteraction.Close(DialogHostInteraction.GraphIdentifier);
+                DialogHostInteraction.Close(dialogIdentifier);
             },
-            () => DialogHostInteraction.Close(DialogHostInteraction.GraphIdentifier));
+            () => DialogHostInteraction.Close(dialogIdentifier));
         dialog.DataContext = viewModel;
         await DialogHostInteraction.ShowAsync(
             dialog,
-            DialogHostInteraction.GraphIdentifier);
+            dialogIdentifier);
     }
 
     private static double Distance(Point first, Point second)
