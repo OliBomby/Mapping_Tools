@@ -221,9 +221,13 @@
                 <Slider Grid.Row="1"
                         Minimum="1"
                         Maximum="16"
+                        Classes="Discrete"
+                        IsSnapToTickEnabled="True"
+                        TickFrequency="1"
+                        TickPlacement="BottomRight"
                         Value="{Binding BeatSnapDivisor}"
                         ToolTip.Tip="Beat snap divisor."
-                        Margin="0,5,0,0" />
+                        Margin="8,15,8,5" />
 
                 <WrapPanel Grid.Row="2"
                             Orientation="Horizontal"
