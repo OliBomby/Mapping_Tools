@@ -1,5 +1,6 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:fluent="clr-namespace:Avalonia.Themes.Fluent;assembly=Avalonia.Themes.Fluent"
              xmlns:material="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
              xmlns:materialDataGrid="clr-namespace:Material.Avalonia.DataGrid;assembly=Material.Avalonia.DataGrid"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
@@ -32,6 +33,8 @@
     </Application.Resources>
 
     <Application.Styles>
+        <!-- Supplies templates for Avalonia controls not currently covered by Material.Avalonia. -->
+        <fluent:FluentTheme />
         <material:MaterialTheme BaseTheme="Dark"
                                 PrimaryColor="Blue"
                                 SecondaryColor="Lime" />

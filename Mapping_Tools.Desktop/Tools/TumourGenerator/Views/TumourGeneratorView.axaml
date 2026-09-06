@@ -65,27 +65,47 @@
                         </ListBox.ItemTemplate>
                     </ListBox>
 
-                    <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*,*">
-                        <Button Grid.Column="0" Command="{Binding AddCommand}" ToolTip.Tip="Add a new tumour layer.">
-                            <materialIcons:MaterialIcon Kind="Plus" Width="22" Height="22" />
-                        </Button>
-                        <Button Grid.Column="1" Command="{Binding RemoveCommand}"
-                                ToolTip.Tip="Remove the selected tumour layer.">
-                            <materialIcons:MaterialIcon Kind="TrashCan" Width="22" Height="22" />
-                        </Button>
-                        <Button Grid.Column="2" Command="{Binding CopyCommand}"
-                                ToolTip.Tip="Copy the selected tumour layer.">
-                            <materialIcons:MaterialIcon Kind="ContentCopy" Width="22" Height="22" />
-                        </Button>
-                        <Button Grid.Column="3" Command="{Binding RaiseCommand}"
-                                ToolTip.Tip="Move selected layer to higher in the list.">
-                            <materialIcons:MaterialIcon Kind="KeyboardArrowUp" Width="22" Height="22" />
-                        </Button>
-                        <Button Grid.Column="4" Command="{Binding LowerCommand}"
-                                ToolTip.Tip="Move selected layer to lower in the list.">
-                            <materialIcons:MaterialIcon Kind="KeyboardArrowDown" Width="22" Height="22" />
-                        </Button>
-                    </Grid>
+                    <CommandBar Grid.Row="1"
+                                IsDynamicOverflowEnabled="True"
+                                DefaultLabelPosition="Collapsed">
+                        <CommandBar.PrimaryCommands>
+                            <CommandBarButton Label="Add layer"
+                                              Command="{Binding AddCommand}"
+                                              ToolTip.Tip="Add a new tumour layer.">
+                                <CommandBarButton.Icon>
+                                    <materialIcons:MaterialIcon Kind="Plus" Width="22" Height="22" />
+                                </CommandBarButton.Icon>
+                            </CommandBarButton>
+                            <CommandBarButton Label="Remove layer"
+                                              Command="{Binding RemoveCommand}"
+                                              ToolTip.Tip="Remove the selected tumour layer.">
+                                <CommandBarButton.Icon>
+                                    <materialIcons:MaterialIcon Kind="TrashCan" Width="22" Height="22" />
+                                </CommandBarButton.Icon>
+                            </CommandBarButton>
+                            <CommandBarButton Label="Copy layer"
+                                              Command="{Binding CopyCommand}"
+                                              ToolTip.Tip="Copy the selected tumour layer.">
+                                <CommandBarButton.Icon>
+                                    <materialIcons:MaterialIcon Kind="ContentCopy" Width="22" Height="22" />
+                                </CommandBarButton.Icon>
+                            </CommandBarButton>
+                            <CommandBarButton Label="Move layer up"
+                                              Command="{Binding RaiseCommand}"
+                                              ToolTip.Tip="Move selected layer to higher in the list.">
+                                <CommandBarButton.Icon>
+                                    <materialIcons:MaterialIcon Kind="KeyboardArrowUp" Width="22" Height="22" />
+                                </CommandBarButton.Icon>
+                            </CommandBarButton>
+                            <CommandBarButton Label="Move layer down"
+                                              Command="{Binding LowerCommand}"
+                                              ToolTip.Tip="Move selected layer to lower in the list.">
+                                <CommandBarButton.Icon>
+                                    <materialIcons:MaterialIcon Kind="KeyboardArrowDown" Width="22" Height="22" />
+                                </CommandBarButton.Icon>
+                            </CommandBarButton>
+                        </CommandBar.PrimaryCommands>
+                    </CommandBar>
 
                     <StackPanel Grid.Row="2" Margin="0,0,0,10">
                         <Slider Minimum="0" Maximum="1" TickFrequency="0.1" Margin="5,10"
@@ -95,6 +115,7 @@
                                 Value="{Binding CircleSize, Mode=TwoWay}" ToolTip.Tip="Circle Size" />
                         <StackPanel Orientation="Horizontal" Margin="0,5,0,15">
                             <ToggleSwitch IsChecked="{Binding AdvancedOptions}"
+                                          Classes="accent"
                                           ToolTip.Tip="Show advanced controls. Allows for fine control of parameters and changes over time." />
                             <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Text="Advanced" />
                         </StackPanel>
@@ -284,7 +305,9 @@
                              materialAssists:TextFieldAssist.Label="Time code"
                              ToolTip.Tip="Input a time code here. Example time code: 00:56:823 (1) - " />
                     <Button Grid.Column="2"
-                            Margin="5,0,0,0"
+                            Theme="{StaticResource MaterialOutlineButton}"
+                            Classes="primary"
+                            Margin="5,10,0,0"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Top"
                             Command="{Binding ImportCommand}"

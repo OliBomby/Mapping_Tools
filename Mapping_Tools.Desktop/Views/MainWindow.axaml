@@ -134,9 +134,10 @@
     </Window.Styles>
 
     <Grid x:Name="RootGrid">
-        <dialogHost:DialogHost Identifier="RootDialog"
-                               CloseOnClickAway="True"
-                               OverlayBackground="{DynamicResource MappingToolsDialogOverlayBrush}">
+            <dialogHost:DialogHost Identifier="RootDialog"
+                                   CloseOnClickAway="True"
+                                   Background="{DynamicResource MaterialPaperBrush}"
+                                   OverlayBackground="{DynamicResource MappingToolsDialogOverlayBrush}">
         <Grid>
         <Grid RowDefinitions="Auto,*">
             <materialControls:ColorZone Grid.Row="0"

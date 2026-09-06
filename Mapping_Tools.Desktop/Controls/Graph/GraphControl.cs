@@ -221,6 +221,9 @@ public sealed class GraphControl : Decorator
             Content = new Border { Background = Brushes.Transparent },
         };
         dialogHost.Bind(
+            DialogHost.BackgroundProperty,
+            new DynamicResourceExtension("MaterialPaperBrush"));
+        dialogHost.Bind(
             DialogHost.OverlayBackgroundProperty,
             new DynamicResourceExtension("MappingToolsDialogOverlayBrush"));
         Child = dialogHost;
