@@ -147,6 +147,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     /// <summary>Gets or sets whether advanced layer controls are visible.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(TumourStartSliderMin))]
+    [NotifyPropertyChangedFor(nameof(TumourParameterGraphVisible))]
     public partial bool AdvancedOptions { get; set; }
 
     /// <summary>Gets or sets whether reconstruction diagnostics are enabled.</summary>
@@ -157,7 +158,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     public bool TimeCodeVisible => ImportModeSetting == HitObjectSelectionMode.Time;
 
     /// <summary>Gets whether the parameter graph is shown for the current template.</summary>
-    public bool TumourParameterGraphVisible => AdvancedOptions || CurrentLayer?.TumourTemplate.NeedsParameter == true;
+    public bool TumourParameterGraphVisible => AdvancedOptions && CurrentLayer?.TumourTemplate.NeedsParameter == true;
 
     /// <summary>Gets or sets the slider displayed in the preview.</summary>
     public HitObject PreviewHitObject
