@@ -329,6 +329,8 @@ internal sealed class TestDialogService : IDialogService
 {
     public bool BooleanResult { get; set; }
 
+    public object? ValueResult { get; set; }
+
     public int MessageCount { get; private set; }
 
     public object? LastMessageRequest { get; private set; }
@@ -346,7 +348,9 @@ internal sealed class TestDialogService : IDialogService
         ValueDialogRequest<TValue> request,
         CancellationToken cancellationToken = default)
     {
-        return Task.FromResult(new ValueDialogResult<TValue>(false, default));
+        return Task.FromResult(ValueResult is TValue value
+            ? new ValueDialogResult<TValue>(true, value)
+            : new ValueDialogResult<TValue>(false, default));
     }
 }
 

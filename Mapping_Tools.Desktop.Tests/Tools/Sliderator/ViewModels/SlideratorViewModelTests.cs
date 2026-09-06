@@ -249,9 +249,37 @@ public sealed class SlideratorViewModelTests
         await viewModel.ClearGraphCommand.ExecuteAsync(null);
 
         // Assert
+        var request = ((MessageDialogRequest<bool>)dialogs.LastMessageRequest!);
+        request.Choices.Select(choice => choice.Label).Should().Equal("YES", "NO");
         viewModel.GraphState.Anchors.Should().HaveCount(2);
         viewModel.GraphState.Anchors[0].Pos.Should().Be(new Vector2(0, 0));
         viewModel.GraphState.Anchors[1].Pos.Should().Be(new Vector2((float)viewModel.GraphBeats, 1));
+    }
+
+    [TestMethod]
+    public async Task ScaleCompleteCommand_InVelocityMode_UsesSliderCompletionConversion()
+    {
+        // Arrange
+        TestDialogService dialogs = new() { ValueResult = 1d };
+        var viewModel = Create(new RecordingSliderator(), dialogs: dialogs);
+        viewModel.GlobalSv = 0.7;
+        viewModel.GraphModeSetting = SlideratorGraphMode.Velocity;
+        viewModel.GraphState = new GraphState(
+            [
+                new GraphAnchor(new Vector2(0, 1)),
+                new GraphAnchor(new Vector2(1, 1)),
+            ],
+            0,
+            -10,
+            1,
+            10);
+
+        // Act
+        await viewModel.ScaleCompleteCommand.ExecuteAsync(null);
+
+        // Assert
+        double completion = viewModel.GraphState.GetIntegral(0, viewModel.GraphBeats) * viewModel.SvGraphMultiplier;
+        completion.Should().BeApproximately(1, 0.000001);
     }
 
     [TestMethod]

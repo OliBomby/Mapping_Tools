@@ -1125,9 +1125,13 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
     private async Task ScaleCompleteAsync()
     {
-        double maximum = GraphModeSetting == SlideratorGraphMode.Velocity
-            ? GraphState.GetMaxIntegral()
-            : GraphState.GetMaxValue();
+        double maximum = SlideratorEngine.GetMaxCompletion(new SlideratorEngineOptions
+        {
+            GlobalSv = GlobalSv,
+            PixelLength = PixelLength,
+            GraphModeSetting = GraphModeSetting,
+            GraphState = GraphState,
+        });
         if (Math.Abs(maximum) < Precision.DOUBLE_EPSILON) return;
 
         var result = await dialogs.ShowValueAsync(
