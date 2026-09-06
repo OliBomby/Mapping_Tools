@@ -45,11 +45,10 @@
                                        MarkerSnappingRangeVertical="0.01" />
             </dialogHost:DialogHost>
 
-            <Border Grid.Row="1"
+            <materialDesign:Card Grid.Row="1"
                     Grid.Column="2"
                     Margin="0"
                     Padding="10"
-                    Background="{DynamicResource MaterialPaperBrush}"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
                     ToolTip.Tip="Result preview">
@@ -64,7 +63,7 @@
                                                   Stroke="YellowGreen"
                                                   SliderBallStroke="White"
                                                   ToolTip.Tip="Preview the sliderball motion and generated path." />
-            </Border>
+            </materialDesign:Card>
 
             <ScrollViewer Grid.Row="0"
                           Grid.RowSpan="2"
