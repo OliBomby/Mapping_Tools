@@ -4,7 +4,9 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Input;
+using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
+using Avalonia.VisualTree;
 using DialogHostAvalonia;
 using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.Graph.Interpolation;
@@ -211,13 +213,37 @@ public sealed class GraphControl : Decorator
         Focusable = true;
         IsTabStop = true;
         ClipToBounds = false;
-        Child = new DialogHost
+        var dialogHost = new DialogHost
         {
             Identifier = dialogIdentifier,
             CloseOnClickAway = true,
             ClipToBounds = false,
             Content = new Border { Background = Brushes.Transparent },
         };
+        dialogHost.Bind(
+            DialogHost.OverlayBackgroundProperty,
+            new DynamicResourceExtension("MappingToolsDialogOverlayBrush"));
+        Child = dialogHost;
+    }
+
+    /// <inheritdoc />
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        return VisualRoot is null ? new Size() : base.MeasureOverride(availableSize);
+    }
+
+    /// <inheritdoc />
+    protected override Size ArrangeOverride(Size finalSize)
+    {
+        return VisualRoot is null ? finalSize : base.ArrangeOverride(finalSize);
+    }
+
+    /// <inheritdoc />
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        InvalidateMeasure();
+        InvalidateArrange();
     }
 
     /// <summary>Suppresses state-change notifications while a host batches anchor updates.</summary>

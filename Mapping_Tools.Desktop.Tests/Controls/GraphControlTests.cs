@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Input;
+using DialogHostAvalonia;
 using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.Graph.Interpolation.Interpolators;
 using Mapping_Tools.Core.Graph.Markers;
@@ -12,6 +13,20 @@ namespace Mapping_Tools.Desktop.Tests.Controls;
 [TestClass]
 public sealed class GraphControlTests
 {
+    [TestMethod]
+    public void Constructor_CreatesDialogHostChild()
+    {
+        // Arrange
+        GraphControl control = new();
+
+        // Act
+        var dialogHost = control.Child;
+
+        // Assert
+        dialogHost.Should().BeOfType<DialogHost>();
+        ((DialogHost)dialogHost!).CloseOnClickAway.Should().BeTrue();
+    }
+
     [TestMethod]
     public void DefaultState_UsesCenteredUnitAnchors()
     {

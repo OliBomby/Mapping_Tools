@@ -12,9 +12,6 @@
         MinHeight="300"
         HorizontalAlignment="Center"
         VerticalAlignment="Center">
-    <dialogHost:DialogHost Identifier="GraphDialog"
-                           CloseOnClickAway="True"
-                           OverlayBackground="{DynamicResource MappingToolsDialogOverlayBrush}">
         <Grid RowDefinitions="*,Auto" Margin="10">
             <graph:GraphControl x:Name="GraphControlElement"
                                    GraphState="{Binding GraphState, Mode=TwoWay}"
@@ -40,5 +37,4 @@
                         MinHeight="36" />
             </StackPanel>
         </Grid>
-    </dialogHost:DialogHost>
 </UserControl>

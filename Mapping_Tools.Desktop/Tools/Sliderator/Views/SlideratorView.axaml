@@ -23,27 +23,22 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="90" />
             </Grid.ColumnDefinitions>
-            <dialogHost:DialogHost Grid.Row="0"
-                                   Grid.Column="1"
-                                   Grid.ColumnSpan="3"
-                                   Identifier="GraphDialog"
-                                   ClipToBounds="False"
-                                   CloseOnClickAway="True"
-                                   OverlayBackground="{DynamicResource MappingToolsDialogOverlayBrush}">
-                <graph:GraphControl x:Name="GraphControlElement"
-                                       GraphState="{Binding GraphState, Mode=TwoWay}"
-                                       MinMarkerSpacing="20"
-                                       Margin="43,0,0,43"
-                                       HorizontalAlignment="Stretch"
-                                       VerticalAlignment="Stretch"
-                                       HorizontalAxisVisible="{Binding HorizontalAxisVisible}"
-                                       VerticalAxisVisible="{Binding VerticalAxisVisible}"
-                                       StartPointLockedY="{Binding StartPointLockedY}"
-                                       IsEditable="True"
-                                       MarkerSnappingHorizontal="True"
-                                       MarkerSnappingVertical="True"
-                                       MarkerSnappingRangeVertical="0.01" />
-            </dialogHost:DialogHost>
+            <graph:GraphControl Grid.Row="0"
+                                Grid.Column="1"
+                                Grid.ColumnSpan="3"
+                                x:Name="GraphControlElement"
+                                GraphState="{Binding GraphState, Mode=TwoWay}"
+                                MinMarkerSpacing="20"
+                                Margin="43,0,0,43"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                HorizontalAxisVisible="{Binding HorizontalAxisVisible}"
+                                VerticalAxisVisible="{Binding VerticalAxisVisible}"
+                                StartPointLockedY="{Binding StartPointLockedY}"
+                                IsEditable="True"
+                                MarkerSnappingHorizontal="True"
+                                MarkerSnappingVertical="True"
+                                MarkerSnappingRangeVertical="0.01" />
 
             <materialDesign:Card Grid.Row="1"
                     Grid.Column="2"
