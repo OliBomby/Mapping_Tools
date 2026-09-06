@@ -211,8 +211,13 @@
                         <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="0,0,5,0" Command="{Binding ClearGraphCommand}" ToolTip.Tip="Reset graph.">
                             <materialIcons:MaterialIcon Kind="Rocket" Width="24" Height="24" />
                         </materialDesign:FloatingButton>
-                        <materialDesign:FloatingButton Classes="mini accent no-transitions" Margin="5,0,0,0" Command="{Binding GraphToggleCommand}" ToolTip.Tip="Toggle graph mode.">
-                            <TextBlock Text="{Binding GraphModeText}" FontWeight="Bold" Width="24" Height="24"
+                        <materialDesign:FloatingButton Classes="mini Accent no-transitions" Margin="5,0,0,0" Command="{Binding GraphToggleCommand}" ToolTip.Tip="Toggle graph mode.">
+                            <TextBlock Text="{Binding GraphModeText}" FontWeight="Bold"
+                                       Width="24" Height="24"
+                                       TextAlignment="Center"
+                                       LineHeight="24"
+                                       FontSize="20"
+                                       VerticalAlignment="Center"
                                        HorizontalAlignment="Center" />
                         </materialDesign:FloatingButton>
                     </StackPanel>
