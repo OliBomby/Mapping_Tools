@@ -1,0 +1,65 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:patternGallery="clr-namespace:Mapping_Tools.Desktop.Tools.PatternGallery.Interactions"
+             x:Class="Mapping_Tools.Desktop.Tools.PatternGallery.Views.PatternGalleryCodeImportDialog"
+             x:DataType="patternGallery:PatternGalleryInputViewModel">
+    <Grid Margin="8" RowDefinitions="*,*">
+        <ScrollViewer Grid.Row="0"
+                      MaxHeight="480"
+                      HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <TextBox materialAssists:TextFieldAssist.Label="Name"
+                         Text="{Binding Name, Mode=TwoWay}"
+                         MinWidth="100"
+                         Margin="0,0,0,5"
+                         ToolTip.Tip="The name for the pattern." />
+                <TextBox materialAssists:TextFieldAssist.Label="Hit objects"
+                         Text="{Binding HitObjects, Mode=TwoWay}"
+                         AcceptsReturn="True"
+                         TextWrapping="NoWrap"
+                         MinWidth="100"
+                         Margin="0,0,0,5"
+                         ToolTip.Tip="The hit objects for the pattern." />
+                <TextBox materialAssists:TextFieldAssist.Label="Timing points"
+                         Text="{Binding TimingPoints, Mode=TwoWay}"
+                         AcceptsReturn="True"
+                         TextWrapping="NoWrap"
+                         MinWidth="100"
+                         Margin="0,0,0,5"
+                         ToolTip.Tip="The timing points for the pattern. Tip: Include a redline so timing scaling works during export." />
+                <TextBox materialAssists:TextFieldAssist.Label="Global SV"
+                         Text="{Binding GlobalSvText, Mode=TwoWay}"
+                         MinWidth="100"
+                         Margin="0,0,0,5"
+                         ToolTip.Tip="The global slider multiplier for the pattern." />
+                <ComboBox materialAssists:ComboBoxAssist.Label="Game mode"
+                          ItemsSource="{Binding GameModes}"
+                          SelectedItem="{Binding GameMode, Mode=TwoWay}"
+                          MinWidth="100"
+                          Margin="0,0,0,5"
+                          ToolTip.Tip="The game mode for the pattern." />
+                <TextBlock Text="{Binding Error}"
+                           Foreground="{DynamicResource MaterialValidationErrorBrush}"
+                           TextWrapping="Wrap" />
+            </StackPanel>
+        </ScrollViewer>
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    Margin="0,16,0,0">
+            <Button Classes="dialog-action primary"
+                    Theme="{StaticResource MaterialFlatButton}"
+                    Content="ACCEPT"
+                    Command="{Binding AcceptCommand}"
+                    IsDefault="True" />
+            <Button Classes="dialog-action primary"
+                    Theme="{StaticResource MaterialFlatButton}"
+                    Content="CANCEL"
+                    Command="{Binding CancelCommand}"
+                    Margin="8,0,0,0"
+                    IsCancel="True" />
+        </StackPanel>
+    </Grid>
+</UserControl>

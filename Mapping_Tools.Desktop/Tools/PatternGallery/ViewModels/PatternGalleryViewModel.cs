@@ -371,17 +371,8 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task AddFileAsync()
     {
-        var selected = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
-        {
-            Title = "Import pattern file",
-            AllowMultiple = false,
-            Filters = [CommonFilePickerFilters.Beatmaps],
-        });
-        string? path = selected.FirstOrDefault();
-        if (string.IsNullOrWhiteSpace(path)) return;
-
         var input = await ShowFileDialogAsync(
-            $"Pattern {Project.Patterns.Count + 1}", path);
+            $"Pattern {Project.Patterns.Count + 1}", string.Empty);
         if (input is null) return;
 
         try
@@ -409,6 +400,9 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task AddSelectedAsync()
     {
+        var name = await ShowSelectedDialogAsync($"Pattern {Project.Patterns.Count + 1}");
+        if (string.IsNullOrWhiteSpace(name)) return;
+
         string sourcePath;
         try
         {
@@ -428,18 +422,11 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             return;
         }
 
-        var name = await dialogs.ShowValueAsync(new ValueDialogRequest<string>(
-            "Import selected objects",
-            "Pattern name",
-            $"Pattern {Project.Patterns.Count + 1}",
-            new StringConverter()));
-        if (!name.Accepted || string.IsNullOrWhiteSpace(name.Value)) return;
-
         try
         {
             var pattern = await gallery.ImportSelectedAsync(
                 sourcePath,
-                name.Value,
+                name,
                 Paths,
                 CancellationToken.None);
             Project.Patterns.Add(pattern);
@@ -530,7 +517,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     private static async Task<PatternGalleryCodeInput?> ShowCodeDialogAsync(string defaultName)
     {
         var viewModel = PatternGalleryInputViewModel.ForCode(defaultName);
-        PatternGalleryInputDialog dialog = new() { DataContext = viewModel };
+        PatternGalleryCodeImportDialog dialog = new() { DataContext = viewModel };
         viewModel.Close = value => DialogHostInteraction.Close(
             DialogHostInteraction.RootIdentifier,
             value);
@@ -540,12 +527,16 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         return result is PatternGalleryCodeInput input ? input : null;
     }
 
-    private static async Task<PatternGalleryFileInput?> ShowFileDialogAsync(
+    private async Task<PatternGalleryFileInput?> ShowFileDialogAsync(
         string defaultName,
         string defaultPath)
     {
-        var viewModel = PatternGalleryInputViewModel.ForFile(defaultName, defaultPath);
-        PatternGalleryInputDialog dialog = new() { DataContext = viewModel };
+        var viewModel = PatternGalleryInputViewModel.ForFile(
+            defaultName,
+            defaultPath,
+            filePicker,
+            currentBeatmap);
+        PatternGalleryFileImportDialog dialog = new() { DataContext = viewModel };
         viewModel.Close = value => DialogHostInteraction.Close(
             DialogHostInteraction.RootIdentifier,
             value);
@@ -553,6 +544,19 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             dialog,
             DialogHostInteraction.RootIdentifier);
         return result is PatternGalleryFileInput input ? input : null;
+    }
+
+    private static async Task<string?> ShowSelectedDialogAsync(string defaultName)
+    {
+        var viewModel = new PatternGallerySelectedInputViewModel(defaultName);
+        PatternGalleryNameDialog dialog = new() { DataContext = viewModel };
+        viewModel.Close = value => DialogHostInteraction.Close(
+            DialogHostInteraction.RootIdentifier,
+            value);
+        object? result = await DialogHostInteraction.ShowAsync(
+            dialog,
+            DialogHostInteraction.RootIdentifier);
+        return result as string;
     }
 
     private static async Task<string?> ShowDetailsDialogAsync(PatternGalleryPattern pattern)

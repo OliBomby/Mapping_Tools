@@ -1,6 +1,8 @@
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mapping_Tools.Application.Platform.FilePicker;
+using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.SystemTools;
 
@@ -9,9 +11,21 @@ namespace Mapping_Tools.Desktop.Tools.PatternGallery.Interactions;
 /// <summary>Owns validation and binding state for a Pattern Gallery import form.</summary>
 public sealed partial class PatternGalleryInputViewModel : ObservableValidator
 {
-    private PatternGalleryInputViewModel(bool isCode, string defaultName, string? defaultPath)
+    private readonly ICurrentBeatmapLocator? currentBeatmap;
+    private readonly IFilePicker? filePicker;
+    private IAsyncRelayCommand? browseCommand;
+    private IAsyncRelayCommand? useCurrentCommand;
+
+    private PatternGalleryInputViewModel(
+        bool isCode,
+        string defaultName,
+        string? defaultPath,
+        IFilePicker? filePicker,
+        ICurrentBeatmapLocator? currentBeatmap)
     {
         IsCode = isCode;
+        this.filePicker = filePicker;
+        this.currentBeatmap = currentBeatmap;
         Name = defaultName;
         FilePath = defaultPath ?? string.Empty;
         AcceptCommand = new RelayCommand(Accept);
@@ -73,6 +87,12 @@ public sealed partial class PatternGalleryInputViewModel : ObservableValidator
     /// <summary>Gets the command that dismisses the form.</summary>
     public IRelayCommand CancelCommand { get; }
 
+    /// <summary>Gets the command that opens the pattern-file picker.</summary>
+    public IAsyncRelayCommand BrowseCommand => browseCommand ??= new AsyncRelayCommand(BrowseAsync);
+
+    /// <summary>Gets the command that fills the path from the current osu! beatmap.</summary>
+    public IAsyncRelayCommand UseCurrentCommand => useCurrentCommand ??= new AsyncRelayCommand(UseCurrentAsync);
+
     /// <summary>Gets or sets the window-close callback installed by the adapter.</summary>
     internal Action<object?> Close { get; set; } = _ => { };
 
@@ -81,16 +101,69 @@ public sealed partial class PatternGalleryInputViewModel : ObservableValidator
     /// <returns>The initialized form state.</returns>
     public static PatternGalleryInputViewModel ForCode(string defaultName)
     {
-        return new PatternGalleryInputViewModel(true, defaultName, null);
+        return new PatternGalleryInputViewModel(true, defaultName, null, null, null);
     }
 
     /// <summary>Creates a source-file import form.</summary>
     /// <param name="defaultName">The suggested display name.</param>
     /// <param name="defaultPath">The selected source path.</param>
+    /// <param name="filePicker">Presents the native pattern-file picker.</param>
+    /// <param name="currentBeatmap">Locates the beatmap currently open in osu!.</param>
     /// <returns>The initialized form state.</returns>
-    public static PatternGalleryInputViewModel ForFile(string defaultName, string defaultPath)
+    public static PatternGalleryInputViewModel ForFile(
+        string defaultName,
+        string defaultPath,
+        IFilePicker? filePicker = null,
+        ICurrentBeatmapLocator? currentBeatmap = null)
     {
-        return new PatternGalleryInputViewModel(false, defaultName, defaultPath);
+        return new PatternGalleryInputViewModel(
+            false,
+            defaultName,
+            defaultPath,
+            filePicker,
+            currentBeatmap);
+    }
+
+    private async Task UseCurrentAsync()
+    {
+        if (currentBeatmap is null) return;
+
+        try
+        {
+            FilePath = await currentBeatmap.FindCurrentBeatmapAsync();
+            Error = string.Empty;
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception exception)
+        {
+            Error = exception.Message;
+        }
+    }
+
+    private async Task BrowseAsync()
+    {
+        if (filePicker is null) return;
+
+        try
+        {
+            var selected = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
+            {
+                Title = "Import pattern file",
+                AllowMultiple = false,
+                Filters = [CommonFilePickerFilters.Beatmaps],
+            });
+            if (selected.Count > 0)
+            {
+                FilePath = selected[0];
+                Error = string.Empty;
+            }
+        }
+        catch (Exception exception)
+        {
+            Error = exception.Message;
+        }
     }
 
     private void Accept()
@@ -154,4 +227,3 @@ public sealed partial class PatternGalleryInputViewModel : ObservableValidator
         }
     }
 }
-

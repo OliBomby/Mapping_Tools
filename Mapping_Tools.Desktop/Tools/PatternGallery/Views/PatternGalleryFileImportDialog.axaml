@@ -1,0 +1,80 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:materialIcons="using:Material.Icons.Avalonia"
+             xmlns:patternGallery="clr-namespace:Mapping_Tools.Desktop.Tools.PatternGallery.Interactions"
+             x:Class="Mapping_Tools.Desktop.Tools.PatternGallery.Views.PatternGalleryFileImportDialog"
+             x:DataType="patternGallery:PatternGalleryInputViewModel">
+    <Grid Margin="8" RowDefinitions="*,*">
+        <StackPanel Grid.Row="0">
+            <TextBox materialAssists:TextFieldAssist.Label="Name"
+                     Text="{Binding Name, Mode=TwoWay}"
+                     MinWidth="100"
+                     Margin="0,0,0,5"
+                     ToolTip.Tip="The name for the pattern." />
+            <Grid ColumnDefinitions="*,5,Auto,5,Auto"
+                  Margin="0,0,0,5">
+                <TextBox Grid.Column="0"
+                         materialAssists:TextFieldAssist.Label="Pattern file path"
+                         Text="{Binding FilePath, Mode=TwoWay}"
+                         MinWidth="100"
+                         MaxWidth="200"
+                         ToolTip.Tip="The path to the pattern file to import." />
+                <Button Grid.Column="2"
+                        Classes="flat path-picker"
+                        Cursor="Hand"
+                        VerticalAlignment="Bottom"
+                        Command="{Binding UseCurrentCommand}"
+                        ToolTip.Tip="Fetch the selected beatmap from your osu! client.">
+                    <materialIcons:MaterialIcon Width="30"
+                                                Height="30"
+                                                Kind="RestoreFromTrash" />
+                </Button>
+                <Button Grid.Column="4"
+                        Classes="flat path-picker"
+                        Cursor="Hand"
+                        VerticalAlignment="Bottom"
+                        Command="{Binding BrowseCommand}"
+                        ToolTip.Tip="Select beatmaps with File Explorer.">
+                    <materialIcons:MaterialIcon Width="30"
+                                                Height="30"
+                                                Kind="Folder" />
+                </Button>
+            </Grid>
+            <TextBox materialAssists:TextFieldAssist.Label="Filter"
+                     Text="{Binding Filter, Mode=TwoWay}"
+                     MinWidth="100"
+                     Margin="0,0,0,5"
+                     ToolTip.Tip="Input an optional time code here. Example time code: 00:56:823 (1,2,1,2) - " />
+            <TextBox materialAssists:TextFieldAssist.Label="Start time"
+                     Text="{Binding StartTimeText, Mode=TwoWay}"
+                     MinWidth="100"
+                     Margin="0,0,0,5"
+                     ToolTip.Tip="Optional lower bound time. All objects before this time will be ignored." />
+            <TextBox materialAssists:TextFieldAssist.Label="End time"
+                     Text="{Binding EndTimeText, Mode=TwoWay}"
+                     MinWidth="100"
+                     Margin="0,0,0,5"
+                     ToolTip.Tip="Optional upper bound time. All objects after this time will be ignored." />
+            <TextBlock Text="{Binding Error}"
+                       Foreground="{DynamicResource MaterialValidationErrorBrush}"
+                       TextWrapping="Wrap" />
+        </StackPanel>
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    Margin="0,16,0,0">
+            <Button Classes="dialog-action primary"
+                    Theme="{StaticResource MaterialFlatButton}"
+                    Content="ACCEPT"
+                    Command="{Binding AcceptCommand}"
+                    IsDefault="True" />
+            <Button Classes="dialog-action primary"
+                    Theme="{StaticResource MaterialFlatButton}"
+                    Content="CANCEL"
+                    Command="{Binding CancelCommand}"
+                    Margin="8,0,0,0"
+                    IsCancel="True" />
+        </StackPanel>
+    </Grid>
+</UserControl>

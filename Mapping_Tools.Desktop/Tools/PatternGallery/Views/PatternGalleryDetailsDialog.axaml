@@ -4,7 +4,7 @@
         xmlns:patternGallery="clr-namespace:Mapping_Tools.Desktop.Tools.PatternGallery.Interactions"
         x:Class="Mapping_Tools.Desktop.Tools.PatternGallery.Views.PatternGalleryDetailsDialog"
         x:DataType="patternGallery:PatternGalleryDetailsViewModel">
-    <Grid Margin="16" RowDefinitions="*,*">
+    <Grid Margin="8" RowDefinitions="*,*">
         <StackPanel Grid.Row="0">
             <TextBox materialAssists:TextFieldAssist.Label="Name"
                      Text="{Binding Name, Mode=TwoWay}"
