@@ -1,7 +1,9 @@
 using CommunityToolkit.Mvvm.Input;
+using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
+using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.ComboColourStudio;
 using Mapping_Tools.Core.BeatmapHelper;
@@ -34,6 +36,75 @@ public sealed class ComboColourStudioViewModelTests
         viewModel.SelectedColourPoint.Should().NotBeNull();
         viewModel.SelectedColourPoint!.Model.Time.Should().Be(viewModel.Project.ColourPoints[0].Time);
         viewModel.SelectedColourPoint.ColourSequence.Should().ContainSingle();
+    }
+
+    [TestMethod]
+    public async Task AddColourPointAtEditorTimeCommand_WithLiveEditorTimestamp_AddsPointAtThatTime()
+    {
+        // Arrange
+        const double editorTime = 1234;
+        var liveReader = new RecordingLiveBeatmapReader(new LiveBeatmapSnapshot(
+            "C:/Songs/map/map.osu",
+            [],
+            [],
+            [],
+            0,
+            1.4,
+            1,
+            5,
+            4,
+            editorTime));
+        var viewModel = CreateViewModel(liveReader);
+
+        // Act
+        await viewModel.AddColourPointAtEditorTimeCommand.ExecuteAsync(null);
+
+        // Assert
+        viewModel.Project.ColourPoints.Should().ContainSingle()
+            .Which.Time.Should().Be(editorTime);
+    }
+
+    [TestMethod]
+    public async Task AddColourPointAtEditorTimeCommand_WhenEditorIsUnavailable_PublishesErrorWithoutAddingPoint()
+    {
+        // Arrange
+        UserNotificationService notifications = new();
+        List<UserNotification> published = [];
+        notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
+        var viewModel = CreateViewModel(
+            new RecordingLiveBeatmapReader((LiveBeatmapSnapshot?)null),
+            notifications);
+
+        // Act
+        await viewModel.AddColourPointAtEditorTimeCommand.ExecuteAsync(null);
+
+        // Assert
+        published.Should().ContainSingle();
+        published[0].Severity.Should().Be(UserNotificationSeverity.Error);
+        published[0].Message.Should().Contain("Open osu!");
+        viewModel.Project.ColourPoints.Should().BeEmpty();
+    }
+
+    [TestMethod]
+    public async Task AddColourPointAtEditorTimeCommand_WhenEditorReaderThrows_PublishesErrorWithoutAddingPoint()
+    {
+        // Arrange
+        Exception failure = new InvalidOperationException("osu! is not running.");
+        UserNotificationService notifications = new();
+        List<UserNotification> published = [];
+        notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
+        var viewModel = CreateViewModel(
+            new RecordingLiveBeatmapReader(failure),
+            notifications);
+
+        // Act
+        await viewModel.AddColourPointAtEditorTimeCommand.ExecuteAsync(null);
+
+        // Assert
+        UserNotification notification = published.Should().ContainSingle().Which;
+        notification.Severity.Should().Be(UserNotificationSeverity.Error);
+        notification.Exception.Should().BeSameAs(failure);
+        viewModel.Project.ColourPoints.Should().BeEmpty();
     }
 
     [TestMethod]
@@ -117,18 +188,22 @@ public sealed class ComboColourStudioViewModelTests
         point.ColourSequence[0].Name.Should().Be("Combo2");
     }
 
-    private static ComboColourStudioViewModel CreateViewModel()
+    private static ComboColourStudioViewModel CreateViewModel(
+        ILiveBeatmapReader? liveReader = null,
+        IUserNotificationService? notifications = null)
     {
+        IUserNotificationService notificationService = notifications ?? new UserNotificationService();
         return new ComboColourStudioViewModel(
             new StubComboColourStudioService(),
             new ToolExecutionService(
-                new UserNotificationService(),
+                notificationService,
                 new RecordingEditorReloadService(),
                 new ApplicationSettings(),
                 TimeProvider.System),
+            notificationService,
             new TestBeatmapWorkspace(),
             new RecordingCurrentBeatmapLocator(),
-            new RecordingLiveBeatmapReader((LiveBeatmapSnapshot?)null),
+            liveReader ?? new RecordingLiveBeatmapReader((LiveBeatmapSnapshot?)null),
             new TestFilePicker());
     }
 

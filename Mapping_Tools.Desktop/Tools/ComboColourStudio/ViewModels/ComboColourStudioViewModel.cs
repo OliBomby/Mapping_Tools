@@ -4,6 +4,8 @@ using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
+using Mapping_Tools.Application.Execution.UserNotification;
+using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Application.Tools.ComboColourStudio;
@@ -38,6 +40,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
 
     private readonly IFilePicker filePicker;
     private readonly ILiveBeatmapReader liveReader;
+    private readonly IUserNotificationService notifications;
 
     private readonly IComboColourStudioService studio;
     private readonly IBeatmapWorkspace workspace;
@@ -46,6 +49,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     /// <summary>Creates the Combo Colour Studio presentation model.</summary>
     /// <param name="studio">Runs framework-neutral imports and transformations.</param>
     /// <param name="execution">Coordinates cancellation and notifications.</param>
+    /// <param name="notifications">Publishes user-facing operation failures.</param>
     /// <param name="workspace">Supplies ordinary-run target maps.</param>
     /// <param name="currentBeatmap">Finds the map open in osu! for QuickRun.</param>
     /// <param name="liveReader">Supplies the current editor time for point insertion.</param>
@@ -53,6 +57,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     public ComboColourStudioViewModel(
         IComboColourStudioService studio,
         IToolExecutionService execution,
+        IUserNotificationService notifications,
         IBeatmapWorkspace workspace,
         ICurrentBeatmapLocator currentBeatmap,
         ILiveBeatmapReader liveReader,
@@ -60,6 +65,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         : base(execution, ComboColourStudioToolDefinition.Definition)
     {
         this.studio = studio ?? throw new ArgumentNullException(nameof(studio));
+        this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
         this.liveReader = liveReader ?? throw new ArgumentNullException(nameof(liveReader));
@@ -178,18 +184,34 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task AddColourPointAtEditorTimeAsync()
     {
-        double time = 0;
         try
         {
             var snapshot = await liveReader.ReadAsync();
-            if (snapshot?.EditorTime is { } editorTime) time = editorTime;
-        }
-        catch
-        {
-            // The legacy action falls back to zero when the editor cannot be read.
-        }
+            if (snapshot?.EditorTime is { } editorTime)
+            {
+                SelectedColourPoint = AddPresentationPoint(Project.AddColourPoint(editorTime));
+                return;
+            }
 
-        SelectedColourPoint = AddPresentationPoint(Project.AddColourPoint(time));
+            await PublishEditorTimeReadFailureAsync();
+        }
+        catch (Exception exception)
+        {
+            await PublishEditorTimeReadFailureAsync(exception);
+        }
+    }
+
+    private Task PublishEditorTimeReadFailureAsync(Exception? exception = null)
+    {
+        string message = exception is null
+            ? "Open osu! before adding a colour point at the current editor time."
+            : $"Could not read the current osu! editor time: {exception.Message}";
+        return notifications.PublishAsync(
+            new UserNotification(
+                UserNotificationSeverity.Error,
+                "Could not read current editor time",
+                message,
+                exception));
     }
 
     /// <summary>Removes selected points or the last point.</summary>

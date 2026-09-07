@@ -142,7 +142,7 @@
                             <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="5"
                                                            x:Name="AddColourPointButton"
                                                            Click="AddColourPointButtonClick"
-                                                           ToolTip.Tip="Add a new colour point.">
+                                                           ToolTip.Tip="Add a new colour point. Hold shift to add current editor time.">
                                 <materialIcons:MaterialIcon Kind="Plus" Width="24" Height="24" />
                             </materialDesign:FloatingButton>
                             <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="5"

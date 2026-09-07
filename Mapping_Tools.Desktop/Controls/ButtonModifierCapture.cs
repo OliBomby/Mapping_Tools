@@ -1,3 +1,4 @@
+using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 
@@ -20,9 +21,10 @@ internal sealed class ButtonModifierCapture
             OnPointerPressed,
             RoutingStrategies.Tunnel,
             handledEventsToo: true);
+        // Button raises Click from its release handler, so modifiers must survive pointer release.
         target.AddHandler(
-            InputElement.PointerReleasedEvent,
-            OnPointerReleased,
+            Button.ClickEvent,
+            OnClick,
             RoutingStrategies.Bubble,
             handledEventsToo: true);
         target.AddHandler(
@@ -62,12 +64,12 @@ internal sealed class ButtonModifierCapture
             : KeyModifiers.None;
     }
 
-    private void OnPointerReleased(object? sender, PointerReleasedEventArgs eventArgs)
+    private void OnPointerCaptureLost(object? sender, PointerCaptureLostEventArgs eventArgs)
     {
         pendingModifiers = KeyModifiers.None;
     }
 
-    private void OnPointerCaptureLost(object? sender, PointerCaptureLostEventArgs eventArgs)
+    private void OnClick(object? sender, RoutedEventArgs eventArgs)
     {
         pendingModifiers = KeyModifiers.None;
     }
