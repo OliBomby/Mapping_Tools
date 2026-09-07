@@ -47,9 +47,20 @@ internal sealed class PeriodicBackupHostedService : BackgroundService
 
             try
             {
-                string? path = await currentBeatmapLocator
-                    .FindCurrentBeatmapAsync(stoppingToken)
-                    .ConfigureAwait(false);
+                string? path;
+                try
+                {
+                    path = await currentBeatmapLocator
+                        .FindCurrentBeatmapAsync(stoppingToken)
+                        .ConfigureAwait(false);
+                }
+                catch (InvalidOperationException)
+                {
+                    logger.LogInformation(
+                        "Periodic beatmap backup skipped because no beatmap is open in osu!.");
+                    continue;
+                }
+
                 if (string.IsNullOrWhiteSpace(path)) continue;
 
                 var session = await editingGateway
