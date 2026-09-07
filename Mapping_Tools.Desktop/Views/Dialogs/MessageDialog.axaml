@@ -81,7 +81,7 @@
         </ScrollViewer>
         <ItemsControl x:Name="ActionPanel"
                       Grid.Row="2"
-                      Margin="16,0,16,16"
+                      Margin="8,0,8,8"
                       HorizontalAlignment="Right"
                       ItemsSource="{Binding Choices}">
             <ItemsControl.ItemsPanel>
