@@ -1,7 +1,12 @@
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives.PopupPositioning;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using Avalonia.VisualTree;
+using CommunityToolkit.Mvvm.Input;
+using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels.Adapters;
@@ -50,5 +55,54 @@ public partial class ComboColourStudioView : UserControl
 
         int index = listBox.IndexFromContainer(item);
         if (index >= 0) viewModel.RemoveSequenceColourAt(index);
+    }
+
+    private void AddSequenceColourButtonClick(object? sender, RoutedEventArgs eventArgs)
+    {
+        if (DataContext is not ComboColourStudioViewModel viewModel
+            || sender is not Button button
+            || button.DataContext is not ObservableColourPoint point)
+            return;
+
+        ContextMenu contextMenu = new()
+        {
+            Placement = PlacementMode.Bottom,
+        };
+
+        if (viewModel.ComboColours.Count == 0)
+        {
+            contextMenu.Items.Add(new MenuItem
+            {
+                Header = "Add at least one combo colour before adding colours to this sequence.",
+                IsEnabled = false,
+            });
+        }
+        else
+        {
+            foreach (var colour in viewModel.ComboColours)
+            {
+                contextMenu.Items.Add(new MenuItem
+                {
+                    Header = colour.Name ?? string.Empty,
+                    Icon = CreateColourMenuIcon(colour.Color),
+                    Command = new RelayCommand(() => viewModel.AddSequenceColour(point, colour)),
+                });
+            }
+        }
+
+        button.ContextMenu = contextMenu;
+        contextMenu.Open(button);
+        eventArgs.Handled = true;
+    }
+
+    private static Border CreateColourMenuIcon(RgbaColour colour)
+    {
+        return new Border
+        {
+            Width = 16,
+            Height = 16,
+            CornerRadius = new CornerRadius(8),
+            Background = new SolidColorBrush(Color.FromArgb(colour.A, colour.R, colour.G, colour.B)),
+        };
     }
 }

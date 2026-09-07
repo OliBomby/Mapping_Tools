@@ -5,18 +5,16 @@ using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
 using Mapping_Tools.Application.Platform.FilePicker;
-using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
-using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.ComboColourStudio;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper;
-using Mapping_Tools.Core.Tools.ComboColourStudio;
 using Mapping_Tools.Core.Tools.ComboColourStudio.Models;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.Models;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels.Adapters;
+using Mapping_Tools.Desktop.Tools.ComboColourStudio.Views;
+using Mapping_Tools.Desktop.Utilities;
 using Mapping_Tools.Desktop.ViewModels;
 
 namespace Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels;
@@ -243,7 +241,20 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         point ??= SelectedColourPoint;
         if (point is null || SelectedSequenceColour is null) return;
 
-        point.ColourSequence.Add(SelectedSequenceColour);
+        AddSequenceColour(point, SelectedSequenceColour);
+    }
+
+    /// <summary>Adds a specific palette colour to a point's ordered sequence.</summary>
+    /// <param name="point">The destination colour point.</param>
+    /// <param name="colour">The palette colour to append.</param>
+    public void AddSequenceColour(
+        ObservableColourPoint point,
+        ObservableSpecialColour colour)
+    {
+        ArgumentNullException.ThrowIfNull(point);
+        ArgumentNullException.ThrowIfNull(colour);
+
+        point.ColourSequence.Add(colour);
         SyncProjectFromPresentation();
         OnPropertyChanged(nameof(SelectedSequence));
     }
@@ -300,7 +311,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         await ImportAsync(true);
     }
 
-    /// <summary>Uses the current osu! map as the import source.</summary>
+    /// <summary>Uses the current osu! map as the retained import path.</summary>
     [RelayCommand]
     private async Task UseCurrentImportAsync()
     {
@@ -329,20 +340,11 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
 
     private async Task ImportAsync(bool colourHax)
     {
-        string path = ImportPath;
-        if (string.IsNullOrWhiteSpace(path))
-        {
-            var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
-            {
-                Title = colourHax ? "Import colour hax" : "Import colours",
-                AllowMultiple = false,
-                Filters = [CommonFilePickerFilters.BeatmapsAndStoryboards],
-            });
-            path = paths.FirstOrDefault() ?? string.Empty;
-            if (!string.IsNullOrWhiteSpace(path)) ImportPath = path;
-        }
+        string? path = await ShowImportDialogAsync();
 
         if (string.IsNullOrWhiteSpace(path)) return;
+
+        ImportPath = path;
 
         try
         {
@@ -360,6 +362,34 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         {
             ResultSummary = exception.Message;
         }
+    }
+
+    private async Task<string?> ShowImportDialogAsync()
+    {
+        string defaultPath = ImportPath;
+        if (string.IsNullOrWhiteSpace(defaultPath))
+        {
+            try
+            {
+                defaultPath = await currentBeatmap.FindCurrentBeatmapAsync();
+            }
+            catch (InvalidOperationException)
+            {
+                // The dialog still provides an explicit browse and current-map action.
+            }
+        }
+
+        ComboColourStudioImportDialogViewModel viewModel =
+            new(defaultPath, currentBeatmap, filePicker);
+        ComboColourStudioImportDialog dialog = new() { DataContext = viewModel };
+        viewModel.Close = value => DialogHostInteraction.Close(
+            DialogHostInteraction.RootIdentifier,
+            value);
+
+        object? result = await DialogHostInteraction.ShowAsync(
+            dialog,
+            DialogHostInteraction.RootIdentifier);
+        return result as string;
     }
 
     private void InstallImportedProject(ComboColourEngineOptions imported, bool replaceColourPoints)

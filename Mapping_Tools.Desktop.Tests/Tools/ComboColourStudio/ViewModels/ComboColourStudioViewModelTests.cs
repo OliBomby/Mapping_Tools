@@ -98,6 +98,25 @@ public sealed class ComboColourStudioViewModelTests
             .Equal("Combo1", "Combo2");
     }
 
+    [TestMethod]
+    public void AddSequenceColour_WithExplicitPaletteColour_AppendsThatColour()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+        viewModel.AddComboColourCommand.Execute(null);
+        viewModel.AddComboColourCommand.Execute(null);
+        ((IRelayCommand)viewModel.AddColourPointCommand).Execute(null);
+        var point = viewModel.SelectedColourPoint!;
+        var colour = viewModel.ComboColours[1];
+
+        // Act
+        viewModel.AddSequenceColour(point, colour);
+
+        // Assert
+        point.ColourSequence.Should().ContainSingle().Which.Should().BeSameAs(colour);
+        point.ColourSequence[0].Name.Should().Be("Combo2");
+    }
+
     private static ComboColourStudioViewModel CreateViewModel()
     {
         return new ComboColourStudioViewModel(

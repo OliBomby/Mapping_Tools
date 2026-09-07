@@ -1,0 +1,60 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:materialIcons="using:Material.Icons.Avalonia"
+             xmlns:viewModels="clr-namespace:Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels"
+             x:Class="Mapping_Tools.Desktop.Tools.ComboColourStudio.Views.ComboColourStudioImportDialog"
+             x:DataType="viewModels:ComboColourStudioImportDialogViewModel"
+             HorizontalAlignment="Center"
+             VerticalAlignment="Center">
+    <Grid Margin="8" RowDefinitions="Auto,Auto,Auto,Auto">
+        <TextBlock Text="Import from beatmap:" />
+
+        <Grid Grid.Row="1" Margin="0,6,0,0" ColumnDefinitions="*,Auto,5,Auto">
+            <TextBox Grid.Column="0"
+                     Width="200"
+                     MaxWidth="200"
+                     materialAssists:TextFieldAssist.Label="Path"
+                     Text="{Binding Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <Button Grid.Column="1"
+                    Classes="flat path-picker"
+                    Cursor="Hand"
+                    VerticalAlignment="Bottom"
+                    Command="{Binding UseCurrentCommand}"
+                    ToolTip.Tip="Fetch the selected beatmap from your osu! client.">
+                <materialIcons:MaterialIcon Width="30" Height="30" Kind="RestoreFromTrash" />
+            </Button>
+            <Button Grid.Column="3"
+                    Classes="flat path-picker"
+                    Cursor="Hand"
+                    VerticalAlignment="Bottom"
+                    Command="{Binding BrowseCommand}"
+                    ToolTip.Tip="Select beatmaps with File Explorer.">
+                <materialIcons:MaterialIcon Width="30" Height="30" Kind="Folder" />
+            </Button>
+        </Grid>
+
+        <TextBlock Grid.Row="2"
+                   Margin="0,8,0,0"
+                   Foreground="{DynamicResource MaterialValidationErrorBrush}"
+                   Text="{Binding Error}"
+                   TextWrapping="Wrap" />
+
+        <StackPanel Grid.Row="3"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    Margin="0,16,0,0">
+            <Button Classes="dialog-action primary"
+                    Theme="{StaticResource MaterialFlatButton}"
+                    Content="ACCEPT"
+                    Command="{Binding AcceptCommand}"
+                    IsDefault="True" />
+            <Button Classes="dialog-action primary"
+                    Theme="{StaticResource MaterialFlatButton}"
+                    Content="CANCEL"
+                    Command="{Binding CancelCommand}"
+                    Margin="8,0,0,0"
+                    IsCancel="True" />
+        </StackPanel>
+    </Grid>
+</UserControl>
