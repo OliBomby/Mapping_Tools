@@ -21,6 +21,7 @@
                           ItemsSource="{Binding Items}"
                           AutoGenerateColumns="False"
                           IsReadOnly="False"
+                          EditTriggers="CellClick"
                           CanUserAddRows="False"
                           CanUserResizeColumns="True"
                           CanUserSortColumns="True"
@@ -36,77 +37,31 @@
                         </Style>
                     </DataGrid.Styles>
                     <DataGrid.Columns>
-                        <DataGridCheckBoxColumn Binding="{ReflectionBinding IsSelected, Mode=TwoWay}">
-                            <DataGridCheckBoxColumn.HeaderTemplate>
-                                <DataTemplate>
-                                    <Border Background="Transparent"
-                                            Padding="6,0"
-                                            HorizontalAlignment="Center">
-                                        <CheckBox HorizontalAlignment="Center"
-                                                  IsChecked="{Binding #Root.((vm:HitsoundPreviewHelperViewModel)DataContext).IsAllItemsSelected, Mode=TwoWay}"
-                                                  ToolTip.Tip="Select or deselect all hitsound zones." />
-                                    </Border>
-                                </DataTemplate>
-                            </DataGridCheckBoxColumn.HeaderTemplate>
-                        </DataGridCheckBoxColumn>
-                        <DataGridTextColumn Header="Name"
-                                            Binding="{ReflectionBinding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <DataGridTextColumn Header="Filename"
-                                            Binding="{ReflectionBinding Filename, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <DataGridTextColumn Header="X position"
-                                            Binding="{ReflectionBinding XPos, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}" />
-                        <DataGridTextColumn Header="Y position"
-                                            Binding="{ReflectionBinding YPos, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}" />
-                        <DataGridTemplateColumn Header="Hitsound"
-                                                SortMemberPath="Hitsound">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate x:DataType="adapter:ObservableHitsoundZone">
-                                    <TextBlock VerticalAlignment="Center" Text="{Binding Hitsound}" />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                            <DataGridTemplateColumn.CellEditingTemplate>
-                                <DataTemplate x:DataType="adapter:ObservableHitsoundZone">
-                                    <ComboBox Classes="compact"
-                                              ItemsSource="{Binding #Root.((vm:HitsoundPreviewHelperViewModel)DataContext).Hitsounds}"
-                                              SelectedItem="{Binding Hitsound, Mode=TwoWay}"
-                                              ToolTip.Tip="Hitsound layer." />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellEditingTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTemplateColumn Header="SampleSet"
-                                                SortMemberPath="SampleSet">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate x:DataType="adapter:ObservableHitsoundZone">
-                                    <TextBlock VerticalAlignment="Center" Text="{Binding SampleSet}" />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                            <DataGridTemplateColumn.CellEditingTemplate>
-                                <DataTemplate x:DataType="adapter:ObservableHitsoundZone">
-                                    <ComboBox Classes="compact"
-                                              ItemsSource="{Binding #Root.((vm:HitsoundPreviewHelperViewModel)DataContext).SampleSets}"
-                                              SelectedItem="{Binding SampleSet, Mode=TwoWay}"
-                                              ToolTip.Tip="Normal sample set." />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellEditingTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTemplateColumn Header="Additions"
-                                                SortMemberPath="AdditionsSet">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate x:DataType="adapter:ObservableHitsoundZone">
-                                    <TextBlock VerticalAlignment="Center" Text="{Binding AdditionsSet}" />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                            <DataGridTemplateColumn.CellEditingTemplate>
-                                <DataTemplate x:DataType="adapter:ObservableHitsoundZone">
-                                    <ComboBox Classes="compact"
-                                              ItemsSource="{Binding #Root.((vm:HitsoundPreviewHelperViewModel)DataContext).SampleSets}"
-                                              SelectedItem="{Binding AdditionsSet, Mode=TwoWay}"
-                                              ToolTip.Tip="Addition sample set." />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellEditingTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="Custom index"
-                                            Binding="{ReflectionBinding CustomIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvariantInt32Converter}, ConverterParameter=0}" />
+                        <controls:CompactDataGridTextColumn Header="Name"
+                                                            Binding="{ReflectionBinding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <controls:CompactDataGridTextColumn Header="Filename"
+                                                            Binding="{ReflectionBinding Filename, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <controls:CompactDataGridTextColumn Header="X position"
+                                                            Binding="{ReflectionBinding XPos, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}" />
+                        <controls:CompactDataGridTextColumn Header="Y position"
+                                                            Binding="{ReflectionBinding YPos, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}" />
+                        <controls:CompactDataGridComboBoxColumn Header="Hitsound"
+                                                                ItemsSource="{Binding Hitsounds}"
+                                                                SelectedItemBinding="{ReflectionBinding Hitsound, Mode=TwoWay}"
+                                                                SortMemberPath="Hitsound"
+                                                                IsReadOnly="False" />
+                        <controls:CompactDataGridComboBoxColumn Header="SampleSet"
+                                                                ItemsSource="{Binding SampleSets}"
+                                                                SelectedItemBinding="{ReflectionBinding SampleSet, Mode=TwoWay}"
+                                                                SortMemberPath="SampleSet"
+                                                                IsReadOnly="False" />
+                        <controls:CompactDataGridComboBoxColumn Header="Additions"
+                                                                ItemsSource="{Binding SampleSets}"
+                                                                SelectedItemBinding="{ReflectionBinding AdditionsSet, Mode=TwoWay}"
+                                                                SortMemberPath="AdditionsSet"
+                                                                IsReadOnly="False" />
+                        <controls:CompactDataGridTextColumn Header="Custom index"
+                                                            Binding="{ReflectionBinding CustomIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvariantInt32Converter}, ConverterParameter=0}" />
                     </DataGrid.Columns>
                 </DataGrid>
 

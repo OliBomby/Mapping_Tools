@@ -82,6 +82,10 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     /// <summary>Gets the palette entries shown by the sequence editor.</summary>
     public ObservableCollection<ObservableSpecialColour> ComboColours { get; } = [];
 
+    /// <summary>Gets the modes available in the colour-point combo column.</summary>
+    public IReadOnlyList<ColourPointMode> ColourPointModes { get; } =
+        Enum.GetValues<ColourPointMode>();
+
     /// <summary>Gets or sets the optional source path used by imports.</summary>
     [ObservableProperty]
     public partial string ImportPath { get; set; } = string.Empty;

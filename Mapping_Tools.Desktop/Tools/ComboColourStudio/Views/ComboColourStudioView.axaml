@@ -23,25 +23,18 @@
                           AutoGenerateColumns="False"
                           CanUserSortColumns="True"
                           SelectionMode="Extended" IsReadOnly="False"
+                          EditTriggers="CellClick"
                           CanUserAddRows="False"
                           UseLogicalScrollable="True"
                           ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Offset"
-                                            Binding="{Binding Time, Mode=TwoWay, Converter={StaticResource TimeToStringConverter}}" />
-                        <DataGridTemplateColumn Header="Mode">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate x:DataType="adapter:ObservableColourPoint">
-                                    <TextBlock Text="{Binding Mode}" VerticalAlignment="Center" />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                            <DataGridTemplateColumn.CellEditingTemplate>
-                                <DataTemplate x:DataType="adapter:ObservableColourPoint">
-                                    <ComboBox ItemsSource="{Binding ColourPointModes}"
-                                              SelectedItem="{Binding Mode, Mode=TwoWay}" Classes="compact" />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellEditingTemplate>
-                        </DataGridTemplateColumn>
+                        <controls:CompactDataGridTextColumn Header="Offset"
+                                                            Binding="{Binding Time, Mode=TwoWay, Converter={StaticResource TimeToStringConverter}}" />
+                        <controls:CompactDataGridComboBoxColumn Header="Mode"
+                                                                ItemsSource="{Binding ColourPointModes}"
+                                                                SelectedItemBinding="{ReflectionBinding Mode, Mode=TwoWay}"
+                                                                SortMemberPath="Mode"
+                                                                IsReadOnly="False" />
                         <DataGridTemplateColumn Header="Colour Sequence">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate x:DataType="adapter:ObservableColourPoint">

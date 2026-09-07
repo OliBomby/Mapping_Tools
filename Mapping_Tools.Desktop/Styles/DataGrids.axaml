@@ -1,12 +1,6 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <!--
-        ProDataGrid intentionally keeps Avalonia's DataGrid control and column
-        API. This dictionary is the application-owned WPF/Material parity
-        layer for that control. Keep it after the ProDataGrid theme include so
-        these values win over the Fluent defaults while the ProDataGrid
-        templates continue to own selection, editing, sorting, and scrolling.
-    -->
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles">
     <Style Selector="DataGrid">
         <Setter Property="Background" Value="{DynamicResource MaterialPaperBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource MaterialDividerBrush}" />
@@ -25,8 +19,30 @@
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialBodyBrush}" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-        <Setter Property="Padding" Value="0,4,0,5" />
+        <Setter Property="Padding" Value="5,4,10,5" />
         <Setter Property="VerticalContentAlignment" Value="Stretch" />
+    </Style>
+
+    <Style Selector="DataGridCell TextBox">
+        <Setter Property="MinHeight" Value="26" />
+        <Setter Property="Margin" Value="12 0 0 0" />
+        <Setter Property="UseFloatingPlaceholder" Value="False" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="DataGridCell ComboBox">
+        <Setter Property="Height" Value="26" />
+        <Setter Property="MinHeight" Value="26" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="DataGridCell ComboBox controls|MaterialUnderline#PART_Underline">
+        <Setter Property="IdleBrush" Value="Transparent" />
+        <Setter Property="ActiveBrush" Value="Transparent" />
+    </Style>
+    <Style Selector="DataGridCell CheckBox">
+        <Setter Property="IsEnabled" Value="True" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
 
     <Style Selector="DataGridColumnHeader">
