@@ -3,6 +3,7 @@
              xmlns:vm="using:Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
              xmlns:converters="using:Mapping_Tools.Desktop.Converters"
+             xmlns:hsConverters="using:Mapping_Tools.Desktop.Tools.HitsoundStudio.Converters"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:materialIcons="using:Material.Icons.Avalonia"
@@ -10,6 +11,7 @@
              x:DataType="vm:HitsoundStudioViewModel">
     <UserControl.Resources>
         <converters:DoubleArrayToStringConverter x:Key="DoubleArrayToStringConverter" />
+        <hsConverters:HitsoundStudioSampleVolumeConverter x:Key="HitsoundStudioSampleVolumeConverter" />
     </UserControl.Resources>
     <Grid ColumnDefinitions="*,260"
           RowDefinitions="Auto,*,Auto">
@@ -416,7 +418,7 @@
                                      Classes="compact"
                                      Width="50"
                                      Margin="0,14,5,0"
-                                     Text="{Binding DefaultSampleVolume, Mode=TwoWay}"
+                                     Text="{Binding DefaultSample.SampleArgs.Volume, Mode=TwoWay, Converter={StaticResource HitsoundStudioSampleVolumeConverter}}"
                                      ToolTip.Tip="Volume % of the default sample. Use -1 for invariant volume." />
                             <Button Grid.Column="4"
                                     Classes="flat path-picker"

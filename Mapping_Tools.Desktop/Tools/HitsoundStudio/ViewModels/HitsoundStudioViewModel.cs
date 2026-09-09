@@ -131,10 +131,6 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     public partial ObservableSample DefaultSample { get; set; } =
         new(new Sample { Priority = int.MaxValue });
 
-    /// <summary>Gets or sets the default sample volume as a percentage.</summary>
-    [ObservableProperty]
-    public partial string DefaultSampleVolume { get; set; } = "100";
-
     /// <summary>Gets or sets the export directory.</summary>
     [ObservableProperty]
     public partial string ExportFolder { get; set; } = string.Empty;
@@ -1161,23 +1157,6 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     private static string Format<T>(T? value, T fallback) where T : struct
     {
         return Convert.ToString(value ?? fallback, CultureInfo.InvariantCulture) ?? string.Empty;
-    }
-
-    partial void OnDefaultSampleVolumeChanged(string value)
-    {
-        if (TryDouble(value, 100, out double parsed)) DefaultSample.SampleArgs.Volume = Math.Abs(parsed + 1) < 1e-9 ? -0.01 : parsed / 100;
-    }
-
-    partial void OnDefaultSampleChanged(ObservableSample value)
-    {
-        if (value is not null) DefaultSampleVolume = FormatDefaultSampleVolume(value.SampleArgs.Volume);
-    }
-
-    private static string FormatDefaultSampleVolume(double volume)
-    {
-        return Math.Abs(volume + 0.01) < 1e-9
-            ? "-1"
-            : (volume * 100).ToString("0.###", CultureInfo.InvariantCulture);
     }
 
     private async Task RunExportAsync(IReadOnlyList<string> selectedPaths, CancellationToken cancellationToken)
