@@ -3,6 +3,7 @@ using Mapping_Tools.Application.Audio.Contracts;
 using Mapping_Tools.Application.Audio.Models;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
+using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.HitsoundStudio.Contracts;
@@ -30,13 +31,14 @@ public sealed class HitsoundStudioViewModelTests
         RecordingAudioGenerator audioGenerator = new();
         RecordingPlaybackService playback = new();
         HitsoundStudioViewModel viewModel = CreateViewModel(service, audioGenerator, playback);
-        viewModel.SelectedLayer = new ObservableHitsoundLayer(
+        ObservableHitsoundLayer layer = new(
             new HitsoundLayer(
                 "layer",
                 SampleSet.Normal,
                 Hitsound.Normal,
                 new SampleGeneratingArgs("sample.wav"),
                 new LayerImportArgs()));
+        viewModel.SetSelection([layer]);
 
         // Act
         Task firstPreview = viewModel.PreviewCommand.ExecuteAsync(null);
@@ -51,18 +53,178 @@ public sealed class HitsoundStudioViewModelTests
         playback.Sessions.Should().HaveCount(2);
         playback.Sessions[0].StopCount.Should().Be(1);
         playback.Sessions[1].StopCount.Should().Be(0);
-        viewModel.ResultSummary.Should().Be("Playing selected layer.");
 
         await viewModel.DisposeAsync();
         playback.Sessions[1].StopCount.Should().Be(1);
     }
 
+    [TestMethod]
+    public void SetSelection_WithMixedLayerValues_ShowsNeutralEditorValues()
+    {
+        // Arrange
+        var (viewModel, _, _) = CreateMixedSelection();
+
+        // Act
+        viewModel.SetSelection(viewModel.Layers);
+
+        // Assert
+        viewModel.EditName.Should().BeEmpty();
+        viewModel.EditSampleSet.Should().BeNull();
+        viewModel.EditHitsound.Should().BeNull();
+        viewModel.EditTimes.Should().BeEmpty();
+        viewModel.EditSamplePath.Should().BeEmpty();
+        viewModel.EditSampleVolume.Should().BeEmpty();
+        viewModel.EditImportType.Should().BeNull();
+        viewModel.EditImportDiscriminateVolumes.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void SetSelection_WithEquivalentTimeLists_ShowsCommonTimes()
+    {
+        // Arrange
+        var (viewModel, first, second) = CreateMixedSelection();
+        second.Times = first.Times.ToList();
+
+        // Act
+        viewModel.SetSelection(viewModel.Layers);
+
+        // Assert
+        viewModel.EditTimes.Should().Equal(100);
+    }
+
+    [TestMethod]
+    public void SetSelection_WhenSelectionGrowsWithoutChangingFirstSelectedLayer_RefreshesEditorValues()
+    {
+        // Arrange
+        var (viewModel, first, second) = CreateMixedSelection();
+        viewModel.SetSelection([first]);
+
+        // Act
+        viewModel.SetSelection([first, second]);
+
+        // Assert
+        viewModel.EditName.Should().BeEmpty();
+        viewModel.EditTimes.Should().BeEmpty();
+    }
+
+    [TestMethod]
+    public void EditSharedValues_WithMultipleSelectedLayers_UpdatesEveryLayer()
+    {
+        // Arrange
+        var (viewModel, first, second) = CreateMixedSelection();
+        viewModel.SetSelection(viewModel.Layers);
+
+        // Act
+        viewModel.EditName = "shared";
+        viewModel.EditSampleSet = SampleSet.Soft;
+        viewModel.EditHitsound = Hitsound.Clap;
+        viewModel.EditTimes = [300, 100];
+        viewModel.EditSampleVolume = "25";
+        viewModel.EditImportType = ImportType.Storyboard;
+        viewModel.EditImportDiscriminateVolumes = true;
+
+        // Assert
+        first.Name.Should().Be("shared");
+        second.Name.Should().Be("shared");
+        first.SampleSet.Should().Be(SampleSet.Soft);
+        second.SampleSet.Should().Be(SampleSet.Soft);
+        first.Hitsound.Should().Be(Hitsound.Clap);
+        second.Hitsound.Should().Be(Hitsound.Clap);
+        first.Times.Should().Equal(100, 300);
+        second.Times.Should().Equal(100, 300);
+        first.SampleArgs.Volume.Should().BeApproximately(0.25, 0.0001);
+        second.SampleArgs.Volume.Should().BeApproximately(0.25, 0.0001);
+        first.ImportArgs.ImportType.Should().Be(ImportType.Storyboard);
+        second.ImportArgs.ImportType.Should().Be(ImportType.Storyboard);
+        first.ImportArgs.DiscriminateVolumes.Should().BeTrue();
+        second.ImportArgs.DiscriminateVolumes.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task LoadBaseBeatmapCommand_WhenCurrentBeatmapIsAvailable_SetsBaseBeatmap()
+    {
+        // Arrange
+        RecordingCurrentBeatmapLocator currentBeatmap = new("current.osu");
+        HitsoundStudioViewModel viewModel = CreateViewModel(
+            new RecordingHitsoundStudioService(),
+            new RecordingAudioGenerator(),
+            new RecordingPlaybackService(),
+            currentBeatmap);
+
+        // Act
+        await viewModel.LoadBaseBeatmapCommand.ExecuteAsync(null);
+
+        // Assert
+        viewModel.BaseBeatmap.Should().Be("current.osu");
+        currentBeatmap.FindCount.Should().Be(1);
+    }
+
+    [TestMethod]
+    public async Task LoadBaseBeatmapCommand_WhenCurrentBeatmapIsUnavailable_PreservesBaseBeatmapAndReportsError()
+    {
+        // Arrange
+        RecordingCurrentBeatmapLocator currentBeatmap = new();
+        UserNotificationService notifications = new();
+        List<UserNotification> published = [];
+        notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
+        HitsoundStudioViewModel viewModel = CreateViewModel(
+            new RecordingHitsoundStudioService(),
+            new RecordingAudioGenerator(),
+            new RecordingPlaybackService(),
+            currentBeatmap,
+            notifications);
+        viewModel.BaseBeatmap = "existing.osu";
+
+        // Act
+        await viewModel.LoadBaseBeatmapCommand.ExecuteAsync(null);
+
+        // Assert
+        viewModel.BaseBeatmap.Should().Be("existing.osu");
+        UserNotification notification = published.Should().ContainSingle().Which;
+        notification.Severity.Should().Be(UserNotificationSeverity.Error);
+        notification.Title.Should().Be("Load current beatmap failed");
+        notification.Message.Should().Be(
+            "Open a beatmap in osu! before using the current editor state.");
+    }
+
+    private static (HitsoundStudioViewModel ViewModel, ObservableHitsoundLayer First, ObservableHitsoundLayer Second)
+        CreateMixedSelection()
+    {
+        HitsoundStudioViewModel viewModel = CreateViewModel(
+            new RecordingHitsoundStudioService(),
+            new RecordingAudioGenerator(),
+            new RecordingPlaybackService());
+        ObservableHitsoundLayer first = new(new HitsoundLayer(
+            "first",
+            SampleSet.Normal,
+            Hitsound.Normal,
+            new SampleGeneratingArgs("first.wav", 0.5, 0, 0, -1, -1, -1, -1, -1),
+            new LayerImportArgs()));
+        first.Times = [100];
+        ObservableHitsoundLayer second = new(new HitsoundLayer(
+            "second",
+            SampleSet.Drum,
+            Hitsound.Whistle,
+            new SampleGeneratingArgs("second.wav", 0.75, 0, 0, -1, -1, -1, -1, -1),
+            new LayerImportArgs(ImportType.Hitsounds)
+            {
+                DiscriminateVolumes = true,
+            }));
+        second.Times = [200];
+        viewModel.Layers.Add(first);
+        viewModel.Layers.Add(second);
+
+        return (viewModel, first, second);
+    }
+
     private static HitsoundStudioViewModel CreateViewModel(
         RecordingHitsoundStudioService service,
         RecordingAudioGenerator audioGenerator,
-        RecordingPlaybackService playback)
+        RecordingPlaybackService playback,
+        RecordingCurrentBeatmapLocator? currentBeatmap = null,
+        UserNotificationService? notifications = null)
     {
-        UserNotificationService notifications = new();
+        notifications ??= new UserNotificationService();
         ToolExecutionService execution = new(
             notifications,
             new RecordingEditorReloadService(),
@@ -73,14 +235,16 @@ public sealed class HitsoundStudioViewModelTests
             audioGenerator,
             playback,
             new TestDialogService(),
+            notifications,
             execution,
-            new RecordingCurrentBeatmapLocator(),
+            currentBeatmap ?? new RecordingCurrentBeatmapLocator(),
             new TestBeatmapWorkspace(),
             new TestFilePicker(),
             new StubHitsoundStudioFileSystem(),
             new StubProjectStore(),
             new DesktopApplicationSettings(),
-            new TestApplicationDirectories());
+            new TestApplicationDirectories(),
+            static () => null!);
     }
 
     private sealed class RecordingHitsoundStudioService : IHitsoundStudioService

@@ -1,115 +1,287 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:hitsoundStudio="clr-namespace:Mapping_Tools.Desktop.Tools.HitsoundStudio.Interactions"
         xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
         xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+        xmlns:materialIcons="using:Material.Icons.Avalonia"
         x:Class="Mapping_Tools.Desktop.Tools.HitsoundStudio.Views.HitsoundStudioImportDialog"
         x:DataType="hitsoundStudio:HitsoundStudioImportDialogViewModel"
-        Width="500" Height="540"
-        HorizontalAlignment="Center"
-        VerticalAlignment="Center">
+        Width="500"
+        Height="540"
+        Title=""
+        WindowDecorations="BorderOnly"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="35"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        CanResize="True"
+        Background="{DynamicResource MaterialPaperBrush}"
+        Foreground="{DynamicResource MaterialBodyBrush}"
+        FontFamily="avares://Mapping_Tools.Desktop/Assets/Fonts#Roboto"
+        FontSize="14"
+        FontWeight="Medium">
     <Grid RowDefinitions="35,*,60">
-        <TextBlock Grid.Row="0"
-                   Margin="10,0,0,0"
-                   VerticalAlignment="Center"
-                   FontSize="14"
-                   FontWeight="Medium"
-                   Text="Import Hitsound Layer" />
-        <ScrollViewer Grid.Row="1"
-                      ClipToBounds="True"
-                      HorizontalScrollBarVisibility="Auto"
-                      VerticalScrollBarVisibility="Auto">
-            <StackPanel Margin="10" Spacing="0">
-                <TextBox Margin="0,5,0,0"
-                         Text="{Binding Name, Mode=TwoWay}"
-                         materialAssists:TextFieldAssist.Label="Name"
-                         ToolTip.Tip="The convenient name shown in the layer list." />
-                <ComboBox Margin="0,5,0,0"
-                          ItemsSource="{Binding ImportTypes}"
-                          SelectedItem="{Binding ImportType, Mode=TwoWay}"
-                          materialAssists:ComboBoxAssist.Label="Import type"
-                          ToolTip.Tip="Choose a simple layer, stack, hitsound, MIDI, or storyboard import." />
-                <ComboBox Margin="0,5,0,0"
-                          IsVisible="{Binding IsSimpleOrStackImport}"
-                          ItemsSource="{Binding SampleSets}"
-                          SelectedItem="{Binding SampleSet, Mode=TwoWay}"
-                          materialAssists:ComboBoxAssist.Label="Sample set"
-                          ToolTip.Tip="Sample set used by a simple or stack layer." />
-                <ComboBox Margin="0,5,0,0"
-                          IsVisible="{Binding IsSimpleOrStackImport}"
-                          ItemsSource="{Binding Hitsounds}"
-                          SelectedItem="{Binding Hitsound, Mode=TwoWay}"
-                          materialAssists:ComboBoxAssist.Label="Hitsound"
-                          ToolTip.Tip="Hitsound used by a simple or stack layer." />
-                <Grid Margin="0,15,0,0"
-                      IsVisible="{Binding IsSimpleOrStackImport}"
-                      ColumnDefinitions="*,Auto">
-                    <TextBox Text="{Binding SamplePath, Mode=TwoWay}" materialAssists:TextFieldAssist.Label="Hitsound sample or SoundFont"
-                             ToolTip.Tip="Audio file or SoundFont used by a simple layer or SoundFont note." />
-                    <Button Grid.Column="1"
-                            VerticalAlignment="Bottom"
-                            Content="…"
-                            Command="{Binding PickSampleCommand}"
-                            ToolTip.Tip="Choose a sample or SoundFont." />
-                </Grid>
-                <Grid Margin="0,15,0,0"
-                      IsVisible="{Binding HasImportSource}"
-                      ColumnDefinitions="*,Auto">
-                    <TextBox Text="{Binding SourcePaths, Mode=TwoWay}" AcceptsReturn="True" Height="90"
-                             materialAssists:TextFieldAssist.Label="Source path(s)"
-                             ToolTip.Tip="Beatmap, MIDI, or storyboard source paths. Multiple paths are supported for hitsound/storyboard imports." />
-                    <Button Grid.Column="1"
-                            VerticalAlignment="Bottom"
-                            Content="…"
-                            Command="{Binding PickSourceCommand}"
-                            ToolTip.Tip="Choose one or more import sources." />
-                </Grid>
-                <Grid IsVisible="{Binding IsStackImport}" ColumnDefinitions="*,5,*">
-                    <TextBox Text="{Binding XText, Mode=TwoWay}" materialAssists:TextFieldAssist.Label="X coordinate (-1 = any)" />
-                    <TextBox Grid.Column="2" Text="{Binding YText, Mode=TwoWay}" materialAssists:TextFieldAssist.Label="Y coordinate (-1 = any)" />
-                </Grid>
-                <TextBox Margin="0,15,0,0"
-                         IsVisible="{Binding IsMidiImport}"
-                         Text="{Binding OffsetText, Mode=TwoWay}"
-                         materialAssists:TextFieldAssist.Label="MIDI offset (ms)" />
-                <CheckBox Margin="0,15,0,0"
-                          IsVisible="{Binding IsSampleImport}"
-                          Content="Discriminate volumes"
-                          IsChecked="{Binding DiscriminateVolumes, Mode=TwoWay}"
-                          ToolTip.Tip="Keep source volume differences as separate layers." />
-                <CheckBox IsVisible="{Binding IsHitsoundsImport}" Content="Detect duplicate samples"
-                          IsChecked="{Binding DetectDuplicateSamples, Mode=TwoWay}"
-                          ToolTip.Tip="Canonicalize identical audio files in the source mapset." />
-                <CheckBox IsVisible="{Binding IsSampleImport}" Content="Remove duplicate events"
-                          IsChecked="{Binding RemoveDuplicates, Mode=TwoWay}"
-                          ToolTip.Tip="Remove repeated events at the same millisecond." />
-                <CheckBox IsVisible="{Binding IsHitsoundsImport}" Content="Include storyboard sounds"
-                          IsChecked="{Binding IncludeStoryboard, Mode=TwoWay}"
-                          ToolTip.Tip="Include storyboard samples during hitsound import." />
-                <CheckBox Margin="0,15,0,0"
-                          IsVisible="{Binding IsMidiImport}"
-                          Content="Discriminate MIDI instruments"
-                          IsChecked="{Binding DiscriminateInstruments, Mode=TwoWay}" />
-                <CheckBox IsVisible="{Binding IsMidiImport}" Content="Discriminate MIDI keys"
-                          IsChecked="{Binding DiscriminateKeys, Mode=TwoWay}" />
-                <CheckBox IsVisible="{Binding IsMidiImport}" Content="Discriminate MIDI lengths"
-                          IsChecked="{Binding DiscriminateLengths, Mode=TwoWay}" />
-                <TextBox Margin="0,8,0,8"
-                         IsVisible="{Binding IsLengthSettingsVisible}"
-                         Text="{Binding LengthRoughnessText, Mode=TwoWay}"
-                         materialAssists:TextFieldAssist.Label="Length rounding roughness" />
-                <CheckBox IsVisible="{Binding IsMidiImport}"
-                          Content="Discriminate MIDI velocities"
-                          IsChecked="{Binding DiscriminateVelocities, Mode=TwoWay}" />
-                <TextBox Margin="0,8,0,8"
-                         IsVisible="{Binding IsVelocitySettingsVisible}"
-                         Text="{Binding VelocityRoughnessText, Mode=TwoWay}"
-                         materialAssists:TextFieldAssist.Label="Velocity rounding roughness" />
-                <TextBlock Foreground="OrangeRed"
-                           Text="{Binding Error}"
-                           TextWrapping="Wrap" />
-            </StackPanel>
-        </ScrollViewer>
+        <Grid Grid.Row="0"
+              HorizontalAlignment="Stretch">
+            <Border Margin="0,0,35,0"
+                    Background="Transparent"
+                    PointerPressed="DragWindow" />
+            <Button HorizontalAlignment="Right"
+                    Width="35"
+                    Height="35"
+                    Padding="0"
+                    Background="Transparent"
+                    Foreground="{DynamicResource MaterialDarkForegroundBrush}"
+                    Theme="{StaticResource MaterialFlatButton}"
+                    Command="{Binding CancelCommand}"
+                    ToolTip.Tip="Close">
+                <materialIcons:MaterialIcon Width="20"
+                                             Height="20"
+                                             Kind="Close" />
+            </Button>
+        </Grid>
+
+        <TabbedPage Grid.Row="1"
+                    TabPlacement="Left"
+                    SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}"
+                    Foreground="{DynamicResource MaterialDarkForegroundBrush}">
+            <ContentPage Header="Simple layer">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="10">
+                        <TextBox Margin="0,5,0,0"
+                                 Text="{Binding Name, Mode=TwoWay}"
+                                 materialAssists:TextFieldAssist.Label="Name"
+                                 ToolTip.Tip="The convenient name shown in the layer list." />
+                        <ComboBox Margin="0,5,0,0"
+                                  ItemsSource="{Binding SampleSets}"
+                                  SelectedItem="{Binding SampleSet, Mode=TwoWay}"
+                                  materialAssists:ComboBoxAssist.Label="Sampleset"
+                                  ToolTip.Tip="Sample set used by the new layer." />
+                        <ComboBox Margin="0,5,0,0"
+                                  ItemsSource="{Binding Hitsounds}"
+                                  SelectedItem="{Binding Hitsound, Mode=TwoWay}"
+                                  materialAssists:ComboBoxAssist.Label="Hitsound"
+                                  ToolTip.Tip="Hitsound used by the new layer." />
+                        <Grid Margin="0,15,0,0" ColumnDefinitions="*,Auto">
+                            <TextBox Text="{Binding SamplePath, Mode=TwoWay}"
+                                     materialAssists:TextFieldAssist.Label="Hitsound sample"
+                                     ToolTip.Tip="Audio file or SoundFont used by the new layer." />
+                            <Button Grid.Column="1"
+                                    Classes="flat path-picker"
+                                    Cursor="Hand"
+                                    VerticalAlignment="Bottom"
+                                    Command="{Binding PickSampleCommand}"
+                                    ToolTip.Tip="Choose a sample or SoundFont.">
+                                <materialIcons:MaterialIcon Width="30" Height="30" Kind="Folder" />
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+                </ScrollViewer>
+            </ContentPage>
+
+            <ContentPage Header="Import layer stack">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="10">
+                        <TextBox Margin="0,5,0,0"
+                                 Text="{Binding Name, Mode=TwoWay}"
+                                 materialAssists:TextFieldAssist.Label="Name"
+                                 ToolTip.Tip="The convenient name shown in the layer list." />
+                        <ComboBox Margin="0,5,0,0"
+                                  ItemsSource="{Binding SampleSets}"
+                                  SelectedItem="{Binding SampleSet, Mode=TwoWay}"
+                                  materialAssists:ComboBoxAssist.Label="Sampleset"
+                                  ToolTip.Tip="Sample set used by the new layer." />
+                        <ComboBox Margin="0,5,0,0"
+                                  ItemsSource="{Binding Hitsounds}"
+                                  SelectedItem="{Binding Hitsound, Mode=TwoWay}"
+                                  materialAssists:ComboBoxAssist.Label="Hitsound"
+                                  ToolTip.Tip="Hitsound used by the new layer." />
+                        <Grid Margin="0,15,0,0" ColumnDefinitions="*,Auto">
+                            <TextBox Text="{Binding SamplePath, Mode=TwoWay}"
+                                     materialAssists:TextFieldAssist.Label="Hitsound sample"
+                                     ToolTip.Tip="Audio file or SoundFont used by the imported stack." />
+                            <Button Grid.Column="1"
+                                    Classes="flat path-picker"
+                                    Cursor="Hand"
+                                    VerticalAlignment="Bottom"
+                                    Command="{Binding PickSampleCommand}"
+                                    ToolTip.Tip="Choose a sample or SoundFont.">
+                                <materialIcons:MaterialIcon Width="30" Height="30" Kind="Folder" />
+                            </Button>
+                        </Grid>
+                        <Grid Margin="0,15,0,0" ColumnDefinitions="*,Auto,5,Auto">
+                            <TextBox Text="{Binding SourcePaths, Mode=TwoWay}"
+                                     materialAssists:TextFieldAssist.Label="Source beatmap"
+                                     ToolTip.Tip="The source beatmap to import the hitsound stack from." />
+                            <Button Grid.Column="1"
+                                    Classes="flat path-picker"
+                                    Cursor="Hand"
+                                    VerticalAlignment="Bottom"
+                                    Command="{Binding LoadSourceCommand}"
+                                    ToolTip.Tip="Fetch the selected beatmap from your osu! client.">
+                                <materialIcons:MaterialIcon Width="30" Height="30" Kind="RestoreFromTrash" />
+                            </Button>
+                            <Button Grid.Column="3"
+                                    Classes="flat path-picker"
+                                    Cursor="Hand"
+                                    VerticalAlignment="Bottom"
+                                    Command="{Binding PickSourceCommand}"
+                                    ToolTip.Tip="Select a beatmap with File Explorer.">
+                                <materialIcons:MaterialIcon Width="30" Height="30" Kind="Folder" />
+                            </Button>
+                        </Grid>
+                        <Grid Margin="0,5,0,0" ColumnDefinitions="*,5,*">
+                            <TextBox Text="{Binding XText, Mode=TwoWay}"
+                                     materialAssists:TextFieldAssist.Label="X coordinate"
+                                     ToolTip.Tip="The X coordinate of the stack in the source beatmap which dictates all the times when the sound has to be played." />
+                            <TextBox Grid.Column="2"
+                                     Text="{Binding YText, Mode=TwoWay}"
+                                     materialAssists:TextFieldAssist.Label="Y coordinate"
+                                     ToolTip.Tip="The Y coordinate of the stack in the source beatmap which dictates all the times when the sound has to be played." />
+                        </Grid>
+                    </StackPanel>
+                </ScrollViewer>
+            </ContentPage>
+
+            <ContentPage Header="Import hitsounds">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="10">
+                        <TextBox Margin="0,5,0,0"
+                                 Text="{Binding Name, Mode=TwoWay}"
+                                 materialAssists:TextFieldAssist.Label="Name"
+                                 ToolTip.Tip="The name prefix for imported hitsound layers." />
+                        <Grid Margin="0,15,0,0" ColumnDefinitions="*,Auto,5,Auto">
+                            <TextBox Text="{Binding SourcePaths, Mode=TwoWay}"
+                                     materialAssists:TextFieldAssist.Label="Source beatmap"
+                                     ToolTip.Tip="One or more beatmaps to import hitsounds from." />
+                            <Button Grid.Column="1"
+                                    Classes="flat path-picker"
+                                    Cursor="Hand"
+                                    VerticalAlignment="Bottom"
+                                    Command="{Binding LoadSourceCommand}"
+                                    ToolTip.Tip="Fetch the selected beatmap from your osu! client.">
+                                <materialIcons:MaterialIcon Width="30" Height="30" Kind="RestoreFromTrash" />
+                            </Button>
+                            <Button Grid.Column="3"
+                                    Classes="flat path-picker"
+                                    Cursor="Hand"
+                                    VerticalAlignment="Bottom"
+                                    Command="{Binding PickSourceCommand}"
+                                    ToolTip.Tip="Select beatmaps with File Explorer.">
+                                <materialIcons:MaterialIcon Width="30" Height="30" Kind="Folder" />
+                            </Button>
+                        </Grid>
+                        <CheckBox Margin="0,15,0,0"
+                                  Content="Discriminate volumes"
+                                  IsChecked="{Binding DiscriminateVolumes, Mode=TwoWay}"
+                                  ToolTip.Tip="Keep source volume differences as separate layers." />
+                        <CheckBox Content="Detect duplicate samples"
+                                  IsChecked="{Binding DetectDuplicateSamples, Mode=TwoWay}"
+                                  ToolTip.Tip="Canonicalize identical audio files in the source mapset." />
+                        <CheckBox Content="Remove duplicate hitsounds"
+                                  IsChecked="{Binding RemoveDuplicates, Mode=TwoWay}"
+                                  ToolTip.Tip="Remove repeated events at the same millisecond." />
+                        <CheckBox Content="Include storyboarded samples"
+                                  IsChecked="{Binding IncludeStoryboard, Mode=TwoWay}"
+                                  ToolTip.Tip="Include storyboard samples during hitsound import." />
+                    </StackPanel>
+                </ScrollViewer>
+            </ContentPage>
+
+            <ContentPage Header="Import MIDI">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="10">
+                        <TextBox Margin="0,5,0,0"
+                                 Text="{Binding Name, Mode=TwoWay}"
+                                 materialAssists:TextFieldAssist.Label="Name"
+                                 ToolTip.Tip="The name prefix for imported MIDI layers." />
+                        <Grid Margin="0,15,0,0" ColumnDefinitions="*,Auto">
+                            <TextBox Text="{Binding MidiPath, Mode=TwoWay}"
+                                     materialAssists:TextFieldAssist.Label="Source MIDI"
+                                     ToolTip.Tip="The MIDI file to import." />
+                            <Button Grid.Column="1"
+                                    Classes="flat path-picker"
+                                    Cursor="Hand"
+                                    VerticalAlignment="Bottom"
+                                    Command="{Binding PickSourceCommand}"
+                                    ToolTip.Tip="Select a MIDI file with File Explorer.">
+                                <materialIcons:MaterialIcon Width="30" Height="30" Kind="Folder" />
+                            </Button>
+                        </Grid>
+                        <TextBox Margin="0,15,0,0"
+                                 Text="{Binding OffsetText, Mode=TwoWay}"
+                                 materialAssists:TextFieldAssist.Label="Offset"
+                                 ToolTip.Tip="The start time offset of the MIDI in milliseconds." />
+                        <CheckBox Margin="0,15,0,0"
+                                  Content="Discriminate instruments"
+                                  IsChecked="{Binding DiscriminateInstruments, Mode=TwoWay}"
+                                  ToolTip.Tip="Make separate hitsound layers for different instruments." />
+                        <CheckBox Content="Discriminate keysounds"
+                                  IsChecked="{Binding DiscriminateKeys, Mode=TwoWay}"
+                                  ToolTip.Tip="Make separate hitsound layers for different keys." />
+                        <CheckBox Content="Discriminate lengths"
+                                  IsChecked="{Binding DiscriminateLengths, Mode=TwoWay}"
+                                  ToolTip.Tip="Make separate hitsound layers for different note lengths." />
+                        <TextBox Margin="0,8,0,8"
+                                 IsVisible="{Binding IsLengthSettingsVisible}"
+                                 Text="{Binding LengthRoughnessText, Mode=TwoWay}"
+                                 materialAssists:TextFieldAssist.Label="Length rounding roughness" />
+                        <CheckBox Content="Discriminate velocities"
+                                  IsChecked="{Binding DiscriminateVelocities, Mode=TwoWay}"
+                                  ToolTip.Tip="Make separate hitsound layers for different note velocities." />
+                        <TextBox Margin="0,8,0,8"
+                                 IsVisible="{Binding IsVelocitySettingsVisible}"
+                                 Text="{Binding VelocityRoughnessText, Mode=TwoWay}"
+                                 materialAssists:TextFieldAssist.Label="Velocity rounding roughness" />
+                    </StackPanel>
+                </ScrollViewer>
+            </ContentPage>
+
+            <ContentPage Header="Import storyboard">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="10">
+                        <TextBox Margin="0,5,0,0"
+                                 Text="{Binding Name, Mode=TwoWay}"
+                                 materialAssists:TextFieldAssist.Label="Name"
+                                 ToolTip.Tip="The name prefix for imported storyboard layers." />
+                        <Grid Margin="0,15,0,0" ColumnDefinitions="*,Auto,5,Auto">
+                            <TextBox Text="{Binding SourcePaths, Mode=TwoWay}"
+                                     materialAssists:TextFieldAssist.Label="Source beatmap"
+                                     ToolTip.Tip="The source beatmap to import the storyboarded samples from." />
+                            <Button Grid.Column="1"
+                                    Classes="flat path-picker"
+                                    Cursor="Hand"
+                                    VerticalAlignment="Bottom"
+                                    Command="{Binding LoadSourceCommand}"
+                                    ToolTip.Tip="Fetch the selected beatmap from your osu! client.">
+                                <materialIcons:MaterialIcon Width="30" Height="30" Kind="RestoreFromTrash" />
+                            </Button>
+                            <Button Grid.Column="3"
+                                    Classes="flat path-picker"
+                                    Cursor="Hand"
+                                    VerticalAlignment="Bottom"
+                                    Command="{Binding PickSourceCommand}"
+                                    ToolTip.Tip="Select beatmaps or storyboards with File Explorer.">
+                                <materialIcons:MaterialIcon Width="30" Height="30" Kind="Folder" />
+                            </Button>
+                        </Grid>
+                        <CheckBox Margin="0,15,0,0"
+                                  Content="Discriminate volumes"
+                                  IsChecked="{Binding DiscriminateVolumes, Mode=TwoWay}"
+                                  ToolTip.Tip="Keep source volume differences as separate layers." />
+                        <CheckBox Content="Remove duplicate samples"
+                                  IsChecked="{Binding RemoveDuplicates, Mode=TwoWay}"
+                                  ToolTip.Tip="Remove duplicate values in the imported times." />
+                    </StackPanel>
+                </ScrollViewer>
+            </ContentPage>
+        </TabbedPage>
+
         <materialControls:ColorZone Grid.Row="2"
                                     Padding="14"
                                     Mode="PrimaryLight"
@@ -136,4 +308,4 @@
             </Grid>
         </materialControls:ColorZone>
     </Grid>
-</UserControl>
+</Window>

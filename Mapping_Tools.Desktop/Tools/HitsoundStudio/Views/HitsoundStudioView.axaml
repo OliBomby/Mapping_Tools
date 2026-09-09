@@ -2,11 +2,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:converters="using:Mapping_Tools.Desktop.Converters"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:materialIcons="using:Material.Icons.Avalonia"
              x:Class="Mapping_Tools.Desktop.Tools.HitsoundStudio.Views.HitsoundStudioView"
              x:DataType="vm:HitsoundStudioViewModel">
+    <UserControl.Resources>
+        <converters:DoubleArrayToStringConverter x:Key="DoubleArrayToStringConverter" />
+    </UserControl.Resources>
     <Grid ColumnDefinitions="*,260"
           RowDefinitions="Auto,*,Auto">
         <controls:ToolViewHeader Grid.ColumnSpan="2"
@@ -14,7 +18,8 @@
                                  IsQuickRunSupported="True"
                                  HelpText="Hitsound Studio is the tool that lets you import data from multiple outside sources and convert them to osu! standard hitsounds in the form of a hitsounding difficulty that you can copy to other beatmaps.&#x0a;&#x0a;It represents hitsounds as a list of layers (hitsound layers). One layer contains a unique sound, the sampleset and hitsound that accompany that sound and a list of times that sound has to be played." />
 
-        <Grid Grid.Row="1"
+        <Grid x:Name="EditorAndLayersGrid"
+              Grid.Row="1"
               Grid.ColumnSpan="2"
               ColumnDefinitions="*,Auto,2*">
             <Grid Grid.Column="0"
@@ -52,7 +57,7 @@
                                   IsChecked="{Binding ShowTimes, Mode=TwoWay}"
                                   ToolTip.Tip="Show the times when the sound of this hitsound layer has to be played." />
                         <StackPanel IsVisible="{Binding ShowTimes}">
-                            <TextBox Text="{Binding EditTimes, Mode=TwoWay}"
+                            <TextBox Text="{Binding EditTimes, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource DoubleArrayToStringConverter}}"
                                      TextWrapping="Wrap"
                                      materialAssists:TextFieldAssist.Label="Times"
                                      ToolTip.Tip="Times in milliseconds, separated by commas." />
@@ -245,10 +250,12 @@
                 </ScrollViewer>
             </Grid>
 
-            <GridSplitter Grid.Column="1"
+            <GridSplitter
+                          Grid.Column="1"
                           Width="1"
                           Margin="0,10,0,10"
                           Background="{DynamicResource MaterialDividerBrush}"
+                          IsVisible="{Binding HasLayers}"
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
                           ResizeDirection="Columns"
@@ -302,10 +309,6 @@
                         HorizontalAlignment="Right"
                         VerticalAlignment="Top"
                         Orientation="Horizontal">
-                <Button Margin="5"
-                        Content="Preview"
-                        Command="{Binding PreviewCommand}"
-                        ToolTip.Tip="Preview the selected layer." />
                 <materialDesign:FloatingButton Classes="mini light no-transitions"
                                                Margin="5"
                                                Command="{Binding AddCommand}"
@@ -355,62 +358,70 @@
               Grid.Column="0">
             <Grid RowDefinitions="*,20">
                 <materialDesign:Card Grid.Row="0"
-                                     Padding="10"
+                                     Padding="20, 5, 10, 15"
                                      Margin="0,10">
                     <StackPanel HorizontalAlignment="Stretch"
                                 VerticalAlignment="Top">
-                        <Grid Margin="5"
-                              ColumnDefinitions="Auto,*,5,Auto">
+                        <Grid ColumnDefinitions="Auto,*,Auto,5,Auto">
                             <TextBlock FontSize="14"
-                                       Margin="0,8,0,0"
+                                       VerticalAlignment="Bottom"
+                                       Margin="0, 0, 0, 5"
                                        Text="Base beatmap:"
                                        ToolTip.Tip="Beatmap used as the export baseline and MIDI timing source." />
                             <TextBox Grid.Column="1"
                                      Classes="compact"
-                                     Margin="5,0,5,0"
+                                     Margin="5,14,5,0"
                                      Text="{Binding BaseBeatmap, Mode=TwoWay}"
                                      ToolTip.Tip="Choose the base beatmap used as the export baseline and MIDI timing source." />
-                            <Button Grid.Column="3"
+                            <Button Grid.Column="2"
+                                    Classes="flat path-picker"
+                                    Cursor="Hand"
+                                    Command="{Binding LoadBaseBeatmapCommand}"
+                                    ToolTip.Tip="Load the beatmap currently open in osu!.">
+                                <materialIcons:MaterialIcon Width="30"
+                                                            Height="30"
+                                                            Kind="RestoreFromTrash" />
+                            </Button>
+                            <Button Grid.Column="4"
                                     Classes="flat path-picker"
                                     Cursor="Hand"
                                     Command="{Binding PickBaseBeatmapCommand}"
-                                    VerticalAlignment="Bottom"
                                     ToolTip.Tip="Choose the base beatmap.">
                                 <materialIcons:MaterialIcon Width="30"
                                                             Height="30"
                                                             Kind="Folder" />
                             </Button>
                         </Grid>
-                        <Grid Margin="5"
-                              ColumnDefinitions="Auto,*,Auto,Auto,Auto">
+                        <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto">
                             <TextBlock FontSize="14"
-                                       Margin="0,8,0,0"
+                                       VerticalAlignment="Bottom"
+                                       Margin="0, 0, 0, 5"
                                        Text="Default sample:"
                                        ToolTip.Tip="Normal sample added to packages that contain only additions." />
                             <TextBox Grid.Column="1"
                                      Classes="compact"
-                                     Margin="5,0,5,0"
+                                     Margin="5,14,5,0"
                                      Text="{Binding DefaultSample.SampleArgs.Path, Mode=TwoWay}"
                                      ToolTip.Tip="Choose the default sample added to packages that contain only additions." />
                             <ComboBox Grid.Column="2"
                                       Classes="compact"
                                       Width="70"
-                                      Margin="0,0,5,0"
+                                      Margin="0,14,5,-1"
+                                      VerticalAlignment="Bottom"
                                       Cursor="Hand"
                                       ItemsSource="{Binding DefaultSampleSets}"
                                       SelectedItem="{Binding DefaultSample.SampleSet, Mode=TwoWay}"
                                       ToolTip.Tip="Sample set of the default normal sample." />
                             <TextBox Grid.Column="3"
+                                     Classes="compact"
                                      Width="50"
-                                     Margin="0,0,5,0"
+                                     Margin="0,14,5,0"
                                      Text="{Binding DefaultSampleVolume, Mode=TwoWay}"
-                                     materialAssists:TextFieldAssist.Label="Volume"
                                      ToolTip.Tip="Volume % of the default sample. Use -1 for invariant volume." />
                             <Button Grid.Column="4"
                                     Classes="flat path-picker"
                                     Cursor="Hand"
                                     Command="{Binding PickDefaultSampleCommand}"
-                                    VerticalAlignment="Bottom"
                                     ToolTip.Tip="Choose the default sample.">
                                 <materialIcons:MaterialIcon Width="30"
                                                             Height="30"
@@ -421,7 +432,7 @@
                 </materialDesign:Card>
 
                 <Grid Grid.Row="1"
-                      ColumnDefinitions="Auto,*,Auto">
+                      ColumnDefinitions="Auto,*">
                     <Grid Grid.Column="0">
                         <WrapPanel VerticalAlignment="Bottom">
                             <TextBlock TextWrapping="NoWrap"
@@ -430,12 +441,7 @@
                                        Text="Made by OliBomby" />
                         </WrapPanel>
                     </Grid>
-                    <TextBlock Grid.Column="1"
-                               Margin="5,0"
-                               VerticalAlignment="Center"
-                               Text="{Binding ResultSummary}"
-                               TextWrapping="Wrap" />
-                    <Grid Grid.Column="2">
+                    <Grid Grid.Column="1">
                         <controls:ToolProgressBar Height="20"
                                                   Width="220"
                                                   Margin="5,0,5,0"

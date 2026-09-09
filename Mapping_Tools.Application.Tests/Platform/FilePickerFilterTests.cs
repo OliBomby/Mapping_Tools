@@ -44,6 +44,7 @@ public sealed class FilePickerFilterTests
         var beatmapBackups = CommonFilePickerFilters.BeatmapBackups;
         var projects = CommonFilePickerFilters.MappingToolsProjects;
         var configuration = CommonFilePickerFilters.OsuConfiguration;
+        var sampleFiles = CommonFilePickerFilters.SampleFiles;
 
         // Assert
         beatmaps.Name.Should().Be("osu! beatmap");
@@ -58,5 +59,7 @@ public sealed class FilePickerFilterTests
         projects.Patterns.Should().Equal("*.json");
         configuration.Name.Should().Be("osu! user configuration");
         configuration.Patterns.Should().Equal("osu!.*.cfg");
+        sampleFiles.Name.Should().Be("Sample files");
+        sampleFiles.Patterns.Should().Equal("*.wav", "*.ogg", "*.sf2");
     }
 }

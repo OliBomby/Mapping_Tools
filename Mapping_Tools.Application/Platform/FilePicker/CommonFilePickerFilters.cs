@@ -46,4 +46,11 @@ public static class CommonFilePickerFilters
     public static FilePickerFilter OsuConfiguration { get; } = new(
         "osu! user configuration",
         ["osu!.*.cfg"]);
+
+    /// <summary>
+    ///     Matches audio and SoundFont sample files.
+    /// </summary>
+    public static FilePickerFilter SampleFiles { get; } = new(
+        "Sample files",
+        ["*.wav", "*.ogg", "*.sf2"]);
 }

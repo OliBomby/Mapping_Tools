@@ -2,6 +2,7 @@ using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Platform.FilePicker;
+using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
@@ -12,13 +13,21 @@ namespace Mapping_Tools.Desktop.Tools.HitsoundStudio.Interactions;
 public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObject
 {
     private readonly IFilePicker filePicker;
+    private readonly ICurrentBeatmapLocator currentBeatmap;
     private IAsyncRelayCommand? pickSampleCommand;
     private IAsyncRelayCommand? pickSourceCommand;
+    private IAsyncRelayCommand? loadSourceCommand;
 
     /// <summary>Creates an import form with WPF-compatible defaults.</summary>
     /// <param name="defaultName">The suggested layer name.</param>
-    public HitsoundStudioImportDialogViewModel(string defaultName, IFilePicker filePicker)
+    /// <param name="currentBeatmap">Locates the beatmap currently open in osu!.</param>
+    /// <param name="filePicker">Presents the native file picker.</param>
+    public HitsoundStudioImportDialogViewModel(
+        string defaultName,
+        ICurrentBeatmapLocator currentBeatmap,
+        IFilePicker filePicker)
     {
+        this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         Name = defaultName;
         AcceptCommand = new RelayCommand(Accept);
@@ -32,6 +41,10 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
     /// <summary>Gets or sets the import kind.</summary>
     [ObservableProperty]
     public partial ImportType ImportType { get; set; } = ImportType.None;
+
+    /// <summary>Gets or sets the selected legacy import tab.</summary>
+    [ObservableProperty]
+    public partial int SelectedTabIndex { get; set; }
 
     /// <summary>Gets or sets the sample family.</summary>
     [ObservableProperty]
@@ -48,6 +61,10 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
     /// <summary>Gets or sets source paths separated by newlines.</summary>
     [ObservableProperty]
     public partial string SourcePaths { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets the MIDI source path.</summary>
+    [ObservableProperty]
+    public partial string MidiPath { get; set; } = string.Empty;
 
     /// <summary>Gets or sets the stack X filter text.</summary>
     [ObservableProperty]
@@ -151,6 +168,9 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
     /// <summary>Gets the source picker command.</summary>
     public IAsyncRelayCommand PickSourceCommand => pickSourceCommand ??= new AsyncRelayCommand(PickSourceAsync);
 
+    /// <summary>Gets the command that fills source paths from the current osu! beatmap.</summary>
+    public IAsyncRelayCommand LoadSourceCommand => loadSourceCommand ??= new AsyncRelayCommand(LoadSourceAsync);
+
     /// <summary>Gets the sample picker command.</summary>
     public IAsyncRelayCommand PickSampleCommand => pickSampleCommand ??= new AsyncRelayCommand(PickSampleAsync);
 
@@ -159,6 +179,12 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
 
     partial void OnImportTypeChanged(ImportType value)
     {
+        int tabIndex = GetTabIndex(value);
+        if (SelectedTabIndex != tabIndex)
+        {
+            SelectedTabIndex = tabIndex;
+        }
+
         OnPropertyChanged(nameof(IsSimpleImport));
         OnPropertyChanged(nameof(IsSimpleOrStackImport));
         OnPropertyChanged(nameof(IsStackImport));
@@ -168,6 +194,18 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
         OnPropertyChanged(nameof(IsLengthSettingsVisible));
         OnPropertyChanged(nameof(IsVelocitySettingsVisible));
         OnPropertyChanged(nameof(HasImportSource));
+    }
+
+    partial void OnSelectedTabIndexChanged(int value)
+    {
+        ImportType = value switch
+        {
+            1 => ImportType.Stack,
+            2 => ImportType.Hitsounds,
+            3 => ImportType.MIDI,
+            4 => ImportType.Storyboard,
+            _ => ImportType.None,
+        };
     }
 
     partial void OnDiscriminateLengthsChanged(bool value)
@@ -185,10 +223,32 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
         var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
             Title = "Choose Hitsound Studio source",
-            AllowMultiple = true,
-            Filters = [new FilePickerFilter("Beatmaps, MIDI, and storyboards", [".osu", ".mid", ".midi", ".osb"])],
+            AllowMultiple = false,
+            Filters = ImportType == ImportType.MIDI
+                ? [new FilePickerFilter("MIDI files", ["*.mid"])]
+                : [CommonFilePickerFilters.BeatmapsAndStoryboards],
         }).ConfigureAwait(false);
-        if (paths.Count > 0) SourcePaths = string.Join(Environment.NewLine, paths);
+        if (paths.Count == 0) return;
+        if (ImportType == ImportType.MIDI)
+            MidiPath = paths[0];
+        else
+            SourcePaths = string.Join(Environment.NewLine, paths);
+    }
+
+    private async Task LoadSourceAsync()
+    {
+        try
+        {
+            SourcePaths = await currentBeatmap.FindCurrentBeatmapAsync();
+            Error = string.Empty;
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception exception)
+        {
+            Error = exception.Message;
+        }
     }
 
     private async Task PickSampleAsync()
@@ -197,7 +257,7 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
         {
             Title = "Choose sample",
             AllowMultiple = false,
-            Filters = [new FilePickerFilter("Audio and SoundFont files", [".wav", ".ogg", ".mp3", ".sf2"])],
+            Filters = [CommonFilePickerFilters.SampleFiles],
         }).ConfigureAwait(false);
         if (paths.Count > 0) SamplePath = paths[0];
     }
@@ -215,7 +275,8 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
             return;
         }
 
-        string[] paths = SourcePaths.Split(
+        string sourceText = ImportType == ImportType.MIDI ? MidiPath : SourcePaths;
+        string[] paths = sourceText.Split(
             ['\r', '\n', '|'],
             StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         if (ImportType != ImportType.None && paths.Length == 0)
@@ -255,5 +316,16 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
             : double.TryParse(text, NumberStyles.Float,
                 CultureInfo.InvariantCulture, out value);
     }
-}
 
+    private static int GetTabIndex(ImportType importType)
+    {
+        return importType switch
+        {
+            ImportType.Stack => 1,
+            ImportType.Hitsounds => 2,
+            ImportType.MIDI => 3,
+            ImportType.Storyboard => 4,
+            _ => 0,
+        };
+    }
+}

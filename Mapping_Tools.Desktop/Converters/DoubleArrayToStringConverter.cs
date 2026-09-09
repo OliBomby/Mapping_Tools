@@ -6,7 +6,7 @@ using Mapping_Tools.Core.SystemTools;
 namespace Mapping_Tools.Desktop.Converters;
 
 /// <summary>
-///     Formats comma-separated double values for Property Transformer filters.
+///     Formats double arrays as comma-separated text and parses edited text back to double arrays.
 /// </summary>
 public sealed class DoubleArrayToStringConverter : IValueConverter
 {

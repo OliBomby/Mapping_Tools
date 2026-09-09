@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
+using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Abstractions;
@@ -7,6 +8,8 @@ using Mapping_Tools.Application.Audio.Contracts;
 using Mapping_Tools.Application.Audio.Models;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
+using Mapping_Tools.Application.Execution.UserNotification;
+using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.Projects.Contracts;
@@ -50,8 +53,10 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     private readonly IFilePicker filePicker;
     private readonly IBeatmapsetFileSystem files;
     private readonly IDialogService messageDialogs;
+    private readonly IUserNotificationService notifications;
     private readonly IAudioPlaybackService playback;
     private readonly IProjectStore projectStore;
+    private readonly Func<Window> owner;
 
     private readonly IHitsoundStudioService service;
     private readonly DesktopApplicationSettings settings;
@@ -69,6 +74,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     /// <param name="audioGenerator">Generates audio clips for the UI preview.</param>
     /// <param name="playback">Starts and owns the UI preview playback session.</param>
     /// <param name="messageDialogs">Shows typed confirmations and diagnostics.</param>
+    /// <param name="notifications">Publishes user-visible operation outcomes.</param>
     /// <param name="execution">Coordinates keyed cancellation and completion.</param>
     /// <param name="currentBeatmap">Finds the beatmap open in osu!.</param>
     /// <param name="workspace">Provides ordinary selected beatmaps.</param>
@@ -77,11 +83,13 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     /// <param name="projectStore">Loads standalone sample schemas.</param>
     /// <param name="settings">Supplies QuickRun preferences.</param>
     /// <param name="directories">Provides the default application export directory.</param>
+    /// <param name="owner">Returns the shell window that owns the import dialog.</param>
     public HitsoundStudioViewModel(
         IHitsoundStudioService service,
         IAudioGenerator audioGenerator,
         IAudioPlaybackService playback,
         IDialogService messageDialogs,
+        IUserNotificationService notifications,
         IToolExecutionService execution,
         ICurrentBeatmapLocator currentBeatmap,
         IBeatmapWorkspace workspace,
@@ -89,19 +97,22 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         IBeatmapsetFileSystem files,
         IProjectStore projectStore,
         DesktopApplicationSettings settings,
-        IApplicationDirectories directories)
+        IApplicationDirectories directories,
+        Func<Window> owner)
         : base(execution, HitsoundStudioToolDefinition.Definition)
     {
         this.service = service ?? throw new ArgumentNullException(nameof(service));
         this.audioGenerator = audioGenerator ?? throw new ArgumentNullException(nameof(audioGenerator));
         this.playback = playback ?? throw new ArgumentNullException(nameof(playback));
         this.messageDialogs = messageDialogs ?? throw new ArgumentNullException(nameof(messageDialogs));
+        this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
         this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         this.files = files ?? throw new ArgumentNullException(nameof(files));
         this.projectStore = projectStore ?? throw new ArgumentNullException(nameof(projectStore));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.owner = owner ?? throw new ArgumentNullException(nameof(owner));
         directories = directories ?? throw new ArgumentNullException(nameof(directories));
         ExportFolder = directories.Exports;
         definition = new ProjectDefinition<HitsoundStudioProject>(
@@ -132,13 +143,9 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     [ObservableProperty]
     public partial ObservableCollection<ObservableHitsoundLayer> Layers { get; set; } = [];
 
-    /// <summary>Gets or sets the currently focused layer after a list selection.</summary>
+    /// <summary>Gets or sets the timestamps common to the selected layers in milliseconds.</summary>
     [ObservableProperty]
-    public partial ObservableHitsoundLayer? SelectedLayer { get; set; }
-
-    /// <summary>Gets or sets the invariant comma-separated timestamps of the focused layer.</summary>
-    [ObservableProperty]
-    public partial string EditTimes { get; set; } = string.Empty;
+    public partial double[] EditTimes { get; set; } = [];
 
     /// <summary>Gets or sets whether the potentially long timestamp list is shown.</summary>
     [ObservableProperty]
@@ -150,11 +157,11 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets the selected layers' shared sample family.</summary>
     [ObservableProperty]
-    public partial SampleSet EditSampleSet { get; set; } = SampleSet.Normal;
+    public partial SampleSet? EditSampleSet { get; set; } = SampleSet.Normal;
 
     /// <summary>Gets or sets the selected layers' shared hitsound.</summary>
     [ObservableProperty]
-    public partial Hitsound EditHitsound { get; set; } = Hitsound.Normal;
+    public partial Hitsound? EditHitsound { get; set; } = Hitsound.Normal;
 
     /// <summary>Gets or sets the selected layers' shared source path.</summary>
     [ObservableProperty]
@@ -198,7 +205,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets the selected import kind.</summary>
     [ObservableProperty]
-    public partial ImportType EditImportType { get; set; } = ImportType.None;
+    public partial ImportType? EditImportType { get; set; } = ImportType.None;
 
     /// <summary>Gets or sets the selected import source path.</summary>
     [ObservableProperty]
@@ -264,7 +271,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     public ObservableCollection<ObservableHitsoundLayer> SelectedLayers { get; } = [];
 
     /// <summary>Gets whether the layer editor has a selected layer to edit.</summary>
-    public bool HasSelectedLayer => SelectedLayer is not null;
+    public bool HasSelectedLayer => SelectedLayers.Count > 0;
 
     /// <summary>Gets whether the layer editor has any layer to edit.</summary>
     public bool HasLayers => Layers.Count > 0;
@@ -290,10 +297,6 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     /// <summary>Gets whether SoundFont fields apply to the selection.</summary>
     public bool IsSoundFontSample => SelectedLayers.Any(layer =>
         layer.SampleArgs.UsesSoundFont || string.IsNullOrEmpty(layer.SampleArgs.GetExtension()));
-
-    /// <summary>Gets or sets a concise status message for validation and completion.</summary>
-    [ObservableProperty]
-    public partial string ResultSummary { get; private set; } = "Add or import a hitsound layer.";
 
     /// <summary>Gets every supported layer import kind.</summary>
     public IReadOnlyList<ImportType> ImportTypes { get; } = Enum.GetValues<ImportType>();
@@ -458,15 +461,25 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
 
             SetSelection(Layers.Skip(Math.Max(0, Layers.Count - imported.Count)));
             OnPropertyChanged(nameof(HasLayers));
-            ResultSummary = $"Imported {imported.Count} layer{(imported.Count == 1 ? string.Empty : "s")}.";
+            await PublishNotificationAsync(
+                UserNotificationSeverity.Success,
+                "Hitsound Studio import",
+                $"Imported {imported.Count} layer{(imported.Count == 1 ? string.Empty : "s")}.");
         }
         catch (OperationCanceledException)
         {
-            ResultSummary = "Import canceled.";
+            await PublishNotificationAsync(
+                UserNotificationSeverity.Information,
+                "Hitsound Studio import",
+                "Import canceled.");
         }
         catch (Exception exception)
         {
-            ResultSummary = $"Import failed: {exception.Message}";
+            await PublishNotificationAsync(
+                UserNotificationSeverity.Error,
+                "Hitsound Studio import failed",
+                exception.Message,
+                exception);
         }
     }
 
@@ -504,22 +517,35 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     {
         if (SelectedLayers.Count == 0)
         {
-            ResultSummary = "Select at least one imported layer.";
+            await PublishNotificationAsync(
+                UserNotificationSeverity.Warning,
+                "Reload layers",
+                "Select at least one imported layer.");
             return;
         }
 
         try
         {
             await service.ReloadAsync(SelectedLayers.Select(layer => layer.Model).ToArray());
-            ResultSummary = "Reloaded selected layers.";
+            await PublishNotificationAsync(
+                UserNotificationSeverity.Success,
+                "Reload layers",
+                "Reloaded selected layers.");
         }
         catch (OperationCanceledException)
         {
-            ResultSummary = "Reload canceled.";
+            await PublishNotificationAsync(
+                UserNotificationSeverity.Information,
+                "Reload layers",
+                "Reload canceled.");
         }
         catch (Exception exception)
         {
-            ResultSummary = $"Reload failed: {exception.Message}";
+            await PublishNotificationAsync(
+                UserNotificationSeverity.Error,
+                "Reload layers failed",
+                exception.Message,
+                exception);
         }
     }
 
@@ -527,9 +553,13 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     [RelayCommand(AllowConcurrentExecutions = true)]
     private async Task PreviewAsync()
     {
-        if (SelectedLayer is null)
+        ObservableHitsoundLayer? selectedLayer = SelectedLayers.FirstOrDefault();
+        if (selectedLayer is null)
         {
-            ResultSummary = "Select a layer to preview.";
+            await PublishNotificationAsync(
+                UserNotificationSeverity.Warning,
+                "Preview layer",
+                "Select a layer to preview.");
             return;
         }
 
@@ -545,7 +575,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
             await StopPreviewSessionAsync();
             cancellation.Token.ThrowIfCancellationRequested();
             var clip = await audioGenerator.GenerateAsync(
-                new AudioGenerationRequest(SelectedLayer.SampleArgs.Snapshot()),
+                new AudioGenerationRequest(selectedLayer.SampleArgs.Snapshot()),
                 cancellation.Token);
             var session = await playback.PlayAsync(clip, cancellationToken: cancellation.Token);
             if (cancellation.IsCancellationRequested)
@@ -556,24 +586,38 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
 
             var previousSession = Interlocked.Exchange(ref previewSession, session);
             if (previousSession is not null) await previousSession.StopAsync();
-            ResultSummary = "Playing selected layer.";
+            await PublishNotificationAsync(
+                UserNotificationSeverity.Information,
+                "Preview layer",
+                "Playing selected layer.");
         }
         catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
         {
         }
         catch (FileNotFoundException)
         {
-            if (!cancellation.IsCancellationRequested) ResultSummary = "Could not find the specified sample.";
+            if (!cancellation.IsCancellationRequested)
+                await PublishNotificationAsync(
+                    UserNotificationSeverity.Error,
+                    "Preview layer failed",
+                    "Could not find the specified sample.");
         }
         catch (DirectoryNotFoundException)
         {
             if (!cancellation.IsCancellationRequested)
-                ResultSummary = "Could not find the specified sample's directory.";
+                await PublishNotificationAsync(
+                    UserNotificationSeverity.Error,
+                    "Preview layer failed",
+                    "Could not find the specified sample's directory.");
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
             if (!cancellation.IsCancellationRequested)
-                ResultSummary = $"Could not load the specified sample: {exception.Message}";
+                await PublishNotificationAsync(
+                    UserNotificationSeverity.Error,
+                    "Preview layer failed",
+                    exception.Message,
+                    exception);
         }
         finally
         {
@@ -605,17 +649,27 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         {
             var failures = await service.ValidateSamplesAsync(
                 Layers.Select(layer => layer.SampleArgs.Snapshot()).ToArray());
-            ResultSummary = failures.Count == 0
-                ? "All sample sources are valid."
-                : $"{failures.Count} sample source{(failures.Count == 1 ? " is" : "s are")} invalid.";
+            await PublishNotificationAsync(
+                failures.Count == 0 ? UserNotificationSeverity.Success : UserNotificationSeverity.Warning,
+                "Validate samples",
+                failures.Count == 0
+                    ? "All sample sources are valid."
+                    : $"{failures.Count} sample source{(failures.Count == 1 ? " is" : "s are")} invalid.");
         }
         catch (OperationCanceledException)
         {
-            ResultSummary = "Sample validation canceled.";
+            await PublishNotificationAsync(
+                UserNotificationSeverity.Information,
+                "Validate samples",
+                "Sample validation canceled.");
         }
         catch (Exception exception)
         {
-            ResultSummary = $"Sample validation failed: {exception.Message}";
+            await PublishNotificationAsync(
+                UserNotificationSeverity.Error,
+                "Sample validation failed",
+                exception.Message,
+                exception);
         }
     }
 
@@ -627,9 +681,27 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         {
             Title = "Choose base beatmap",
             AllowMultiple = false,
-            Filters = [new FilePickerFilter("osu! beatmaps", [".osu"])],
+            Filters = [CommonFilePickerFilters.BeatmapsAndStoryboards],
         });
         if (paths.Count > 0) BaseBeatmap = paths[0];
+    }
+
+    /// <summary>Loads the beatmap currently selected by the osu! client as the export baseline.</summary>
+    [RelayCommand]
+    private async Task LoadBaseBeatmapAsync()
+    {
+        try
+        {
+            BaseBeatmap = await currentBeatmap.FindCurrentBeatmapAsync();
+        }
+        catch (InvalidOperationException exception)
+        {
+            await PublishNotificationAsync(
+                UserNotificationSeverity.Error,
+                "Load current beatmap failed",
+                exception.Message,
+                exception);
+        }
     }
 
     /// <summary>Chooses the fallback sample file.</summary>
@@ -640,12 +712,12 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         {
             Title = "Choose default sample",
             AllowMultiple = false,
-            Filters = [new FilePickerFilter("Audio and SoundFont files", [".wav", ".ogg", ".mp3", ".sf2"])],
+            Filters = [CommonFilePickerFilters.SampleFiles],
         });
         if (paths.Count > 0) DefaultSample.SampleArgs.Path = paths[0];
     }
 
-    /// <summary>Chooses the focused layer's generated sample source.</summary>
+    /// <summary>Chooses the selected layers' generated sample source.</summary>
     [RelayCommand]
     private async Task PickEditSamplePathAsync()
     {
@@ -653,12 +725,12 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         {
             Title = "Choose layer sample",
             AllowMultiple = false,
-            Filters = [new FilePickerFilter("Audio and SoundFont files", [".wav", ".ogg", ".mp3", ".sf2"])],
+            Filters = [CommonFilePickerFilters.SampleFiles],
         });
         if (paths.Count > 0) EditSamplePath = paths[0];
     }
 
-    /// <summary>Chooses the focused layer's import source.</summary>
+    /// <summary>Chooses the selected layers' import source.</summary>
     [RelayCommand]
     private async Task PickEditImportPathAsync()
     {
@@ -666,7 +738,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         {
             Title = "Choose import source",
             AllowMultiple = false,
-            Filters = [new FilePickerFilter("Beatmaps, MIDI, and storyboards", [".osu", ".mid", ".midi", ".osb"])],
+            Filters = [],
         });
         if (paths.Count > 0) EditImportPath = paths[0];
     }
@@ -681,11 +753,15 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         }
         catch (InvalidOperationException exception)
         {
-            ResultSummary = $"Could not load the current beatmap: {exception.Message}";
+            await PublishNotificationAsync(
+                UserNotificationSeverity.Error,
+                "Load current beatmap failed",
+                exception.Message,
+                exception);
         }
     }
 
-    /// <summary>Chooses the focused layer's imported source sample.</summary>
+    /// <summary>Chooses the selected layers' imported source sample.</summary>
     [RelayCommand]
     private async Task PickEditImportSamplePathAsync()
     {
@@ -693,7 +769,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         {
             Title = "Choose imported sample",
             AllowMultiple = false,
-            Filters = [new FilePickerFilter("Audio and SoundFont files", [".wav", ".ogg", ".mp3", ".sf2"])],
+            Filters = [CommonFilePickerFilters.SampleFiles],
         });
         if (paths.Count > 0) EditImportSamplePath = paths[0];
     }
@@ -718,12 +794,15 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         {
             Title = "Load sample schema",
             AllowMultiple = false,
-            Filters = [new FilePickerFilter("JSON files", [".json"])],
+            Filters = [new FilePickerFilter("JSON files", ["*.json"])],
         });
         if (paths.Count == 0) return;
         PreviousSampleSchema = await projectStore.LoadAsync<SampleSchema>(paths[0]);
         UsePreviousSampleSchema = true;
-        ResultSummary = "Loaded previous sample schema.";
+        await PublishNotificationAsync(
+            UserNotificationSeverity.Success,
+            "Load sample schema",
+            "Loaded previous sample schema.");
     }
 
     /// <summary>
@@ -737,7 +816,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         {
             Title = "Bulk assign samples",
             AllowMultiple = true,
-            Filters = [new FilePickerFilter("Audio and SoundFont files", [".wav", ".ogg", ".mp3", ".sf2"])],
+            Filters = [new FilePickerFilter("Audio files", ["*.wav", "*.ogg"])],
         });
         int assigned = 0;
         foreach (string path in paths)
@@ -762,7 +841,10 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
             }
         }
 
-        ResultSummary = $"Assigned {assigned} sample{(assigned == 1 ? string.Empty : "s")}.";
+        await PublishNotificationAsync(
+            UserNotificationSeverity.Success,
+            "Bulk assign samples",
+            $"Assigned {assigned} sample{(assigned == 1 ? string.Empty : "s")}.");
     }
 
     partial void OnSingleSampleExportFormatChanged(HitsoundStudioSampleExportFormat value)
@@ -779,113 +861,107 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         else if (SingleSampleExportFormat == HitsoundStudioSampleExportFormat.MidiChords) SingleSampleExportFormat = value;
     }
 
-    /// <summary>Allows the view to update the focused item after an extended selection change.</summary>
+    /// <summary>Allows the view to update the layer selection after an extended selection change.</summary>
     /// <param name="selected">The selected layers in list order.</param>
     public void SetSelection(IEnumerable<ObservableHitsoundLayer> selected)
     {
+        ObservableHitsoundLayer[] selection = selected.ToArray();
         SelectedLayers.Clear();
-        foreach (var layer in selected) SelectedLayers.Add(layer);
-        SelectedLayer = SelectedLayers.FirstOrDefault();
-    }
+        foreach (var layer in selection) SelectedLayers.Add(layer);
 
-    partial void OnSelectedLayerChanged(ObservableHitsoundLayer? value)
-    {
         OnPropertyChanged(nameof(HasSelectedLayer));
         RefreshEditorVisibility();
+        RefreshEditorFromSelection();
+    }
+
+    private void RefreshEditorFromSelection()
+    {
+        List<ObservableHitsoundLayer> selected = SelectedLayers.ToList();
         syncingEditor = true;
-        EditTimes = value is null
-            ? string.Empty
-            : string.Join(", ", value.Times.Select(time => time.ToString("0.###", CultureInfo.InvariantCulture)));
-        EditName = value?.Name ?? string.Empty;
-        EditSampleSet = value?.SampleSet ?? SampleSet.Normal;
-        EditHitsound = value?.Hitsound ?? Hitsound.Normal;
-        EditSamplePath = value?.SampleArgs.Path ?? string.Empty;
-        EditSampleVolume = Format(value?.SampleArgs.Volume * 100, 100);
-        EditSamplePanning = Format(value?.SampleArgs.Panning, 0);
-        EditSamplePitchShift = Format(value?.SampleArgs.PitchShift, 0);
-        EditSampleBank = Format(value?.SampleArgs.Bank, -1);
-        EditSamplePatch = Format(value?.SampleArgs.Patch, -1);
-        EditSampleInstrument = Format(value?.SampleArgs.Instrument, -1);
-        EditSampleKey = Format(value?.SampleArgs.Key, -1);
-        EditSampleLength = Format(value?.SampleArgs.Length, -1);
-        EditSampleVelocity = Format(value?.SampleArgs.Velocity, 127);
-        EditImportType = value?.ImportArgs.ImportType ?? ImportType.None;
-        EditImportPath = value?.ImportArgs.Path ?? string.Empty;
-        EditImportX = Format(value?.ImportArgs.X, -1);
-        EditImportY = Format(value?.ImportArgs.Y, -1);
-        EditImportSamplePath = value?.ImportArgs.SamplePath ?? string.Empty;
-        EditImportDiscriminateVolumes = value?.ImportArgs.DiscriminateVolumes ?? false;
-        EditImportDetectDuplicates = value?.ImportArgs.DetectDuplicateSamples ?? false;
-        EditImportRemoveDuplicates = value?.ImportArgs.RemoveDuplicates ?? false;
-        EditImportBank = Format(value?.ImportArgs.Bank, -1);
-        EditImportPatch = Format(value?.ImportArgs.Patch, -1);
-        EditImportKey = Format(value?.ImportArgs.Key, -1);
-        EditImportLength = Format(value?.ImportArgs.Length, -1);
-        EditImportLengthRoughness = Format(value?.ImportArgs.LengthRoughness, 1);
-        EditImportVelocity = Format(value?.ImportArgs.Velocity, -1);
-        EditImportVelocityRoughness = Format(value?.ImportArgs.VelocityRoughness, 1);
-        EditImportOffset = Format(value?.ImportArgs.Offset, 0);
+        EditTimes = CommonTimes(selected);
+        EditName = selected.AllToStringOrDefault(layer => layer.Name);
+        EditSampleSet = CommonValue(selected, layer => layer.SampleSet);
+        EditHitsound = CommonValue(selected, layer => layer.Hitsound);
+        EditSamplePath = selected.AllToStringOrDefault(layer => layer.SampleArgs.Path);
+        EditSampleVolume = selected.AllToStringOrDefault(layer => layer.SampleArgs.Volume * 100, volume => Format(volume, 100d));
+        EditSamplePanning = selected.AllToStringOrDefault(layer => layer.SampleArgs.Panning, panning => Format(panning, 0d));
+        EditSamplePitchShift = selected.AllToStringOrDefault(layer => layer.SampleArgs.PitchShift, pitchShift => Format(pitchShift, 0d));
+        EditSampleBank = selected.AllToStringOrDefault(layer => layer.SampleArgs.Bank, bank => Format(bank, -1));
+        EditSamplePatch = selected.AllToStringOrDefault(layer => layer.SampleArgs.Patch, patch => Format(patch, -1));
+        EditSampleInstrument = selected.AllToStringOrDefault(layer => layer.SampleArgs.Instrument, instrument => Format(instrument, -1));
+        EditSampleKey = selected.AllToStringOrDefault(layer => layer.SampleArgs.Key, key => Format(key, -1));
+        EditSampleLength = selected.AllToStringOrDefault(layer => layer.SampleArgs.Length, length => Format(length, -1d));
+        EditSampleVelocity = selected.AllToStringOrDefault(layer => layer.SampleArgs.Velocity, velocity => Format(velocity, 127));
+        EditImportType = CommonValue(selected, layer => layer.ImportArgs.ImportType);
+        EditImportPath = selected.AllToStringOrDefault(layer => layer.ImportArgs.Path);
+        EditImportX = selected.AllToStringOrDefault(layer => layer.ImportArgs.X, x => Format(x, -1d));
+        EditImportY = selected.AllToStringOrDefault(layer => layer.ImportArgs.Y, y => Format(y, -1d));
+        EditImportSamplePath = selected.AllToStringOrDefault(layer => layer.ImportArgs.SamplePath);
+        EditImportDiscriminateVolumes = selected.Count > 0 && selected.All(layer => layer.ImportArgs.DiscriminateVolumes);
+        EditImportDetectDuplicates = selected.Count > 0 && selected.All(layer => layer.ImportArgs.DetectDuplicateSamples);
+        EditImportRemoveDuplicates = selected.Count > 0 && selected.All(layer => layer.ImportArgs.RemoveDuplicates);
+        EditImportBank = selected.AllToStringOrDefault(layer => layer.ImportArgs.Bank, bank => Format(bank, -1));
+        EditImportPatch = selected.AllToStringOrDefault(layer => layer.ImportArgs.Patch, patch => Format(patch, -1));
+        EditImportKey = selected.AllToStringOrDefault(layer => layer.ImportArgs.Key, key => Format(key, -1));
+        EditImportLength = selected.AllToStringOrDefault(layer => layer.ImportArgs.Length, length => Format(length, -1d));
+        EditImportLengthRoughness = selected.AllToStringOrDefault(layer => layer.ImportArgs.LengthRoughness, roughness => Format(roughness, 1d));
+        EditImportVelocity = selected.AllToStringOrDefault(layer => layer.ImportArgs.Velocity, velocity => Format(velocity, -1));
+        EditImportVelocityRoughness = selected.AllToStringOrDefault(layer => layer.ImportArgs.VelocityRoughness, roughness => Format(roughness, 1d));
+        EditImportOffset = selected.AllToStringOrDefault(layer => layer.ImportArgs.Offset, offset => Format(offset, 0d));
         syncingEditor = false;
     }
 
-    partial void OnEditTimesChanged(string value)
+    partial void OnEditTimesChanged(double[] value)
     {
-        if (syncingEditor) return;
-        string[] fields = value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        List<double> times = [];
-        foreach (string field in fields)
-        {
-            if (!double.TryParse(field, NumberStyles.Float,
-                    CultureInfo.InvariantCulture, out double time)) return;
-            times.Add(time);
-        }
+        if (syncingEditor)
+            return;
 
-        times.Sort();
+        double[] times = value.Order().ToArray();
 
-        foreach (var layer in SelectedLayers.Count > 0 ? SelectedLayers : SelectedLayer is null ? [] : [SelectedLayer]) layer.Times = times.ToList();
+        foreach (var layer in SelectedLayers) layer.Times = times.ToList();
     }
 
     partial void OnEditNameChanged(string value)
     {
         if (syncingEditor) return;
-        foreach (var layer in Targets()) layer.Name = value;
+        foreach (var layer in SelectedLayers) layer.Name = value;
     }
 
-    partial void OnEditSampleSetChanged(SampleSet value)
+    partial void OnEditSampleSetChanged(SampleSet? value)
     {
-        if (syncingEditor) return;
-        foreach (var layer in Targets()) layer.SampleSet = value;
+        if (syncingEditor || value is null) return;
+        foreach (var layer in SelectedLayers) layer.SampleSet = value.Value;
     }
 
-    partial void OnEditHitsoundChanged(Hitsound value)
+    partial void OnEditHitsoundChanged(Hitsound? value)
     {
-        if (syncingEditor) return;
-        foreach (var layer in Targets()) layer.Hitsound = value;
+        if (syncingEditor || value is null) return;
+        foreach (var layer in SelectedLayers) layer.Hitsound = value.Value;
     }
 
     partial void OnEditSamplePathChanged(string value)
     {
         if (syncingEditor) return;
-        foreach (var layer in Targets()) layer.SampleArgs.Path = value;
+        foreach (var layer in SelectedLayers) layer.SampleArgs.Path = value;
         RefreshEditorVisibility();
     }
 
     partial void OnEditSampleVolumeChanged(string value)
     {
         if (syncingEditor || !TryDouble(value, 100, out double parsed)) return;
-        foreach (var layer in Targets()) layer.SampleArgs.Volume = parsed / 100;
+        foreach (var layer in SelectedLayers) layer.SampleArgs.Volume = parsed / 100;
     }
 
     partial void OnEditSamplePanningChanged(string value)
     {
         if (syncingEditor || !TryDouble(value, 0, out double parsed)) return;
-        foreach (var layer in Targets()) layer.SampleArgs.Panning = parsed;
+        foreach (var layer in SelectedLayers) layer.SampleArgs.Panning = parsed;
     }
 
     partial void OnEditSamplePitchShiftChanged(string value)
     {
         if (syncingEditor || !TryDouble(value, 0, out double parsed)) return;
-        foreach (var layer in Targets()) layer.SampleArgs.PitchShift = parsed;
+        foreach (var layer in SelectedLayers) layer.SampleArgs.PitchShift = parsed;
     }
 
     partial void OnEditSampleBankChanged(string value)
@@ -911,19 +987,19 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     partial void OnEditSampleLengthChanged(string value)
     {
         if (syncingEditor || !TryDouble(value, -1, out double parsed)) return;
-        foreach (var layer in Targets()) layer.SampleArgs.Length = parsed;
+        foreach (var layer in SelectedLayers) layer.SampleArgs.Length = parsed;
     }
 
     partial void OnEditSampleVelocityChanged(string value)
     {
         if (syncingEditor || !TryInt(value, 127, out int parsed)) return;
-        foreach (var layer in Targets()) layer.SampleArgs.Velocity = parsed;
+        foreach (var layer in SelectedLayers) layer.SampleArgs.Velocity = parsed;
     }
 
-    partial void OnEditImportTypeChanged(ImportType value)
+    partial void OnEditImportTypeChanged(ImportType? value)
     {
-        if (syncingEditor) return;
-        foreach (var layer in Targets()) layer.ImportArgs.ImportType = value;
+        if (syncingEditor || value is null) return;
+        foreach (var layer in SelectedLayers) layer.ImportArgs.ImportType = value.Value;
         RefreshEditorVisibility();
     }
 
@@ -1002,9 +1078,27 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         SetImportBool(value, (args, parsed) => args.RemoveDuplicates = parsed);
     }
 
-    private IEnumerable<ObservableHitsoundLayer> Targets()
+    private static TValue? CommonValue<TValue>(
+        IReadOnlyList<ObservableHitsoundLayer> selected,
+        Func<ObservableHitsoundLayer, TValue> selector)
+        where TValue : struct
     {
-        return SelectedLayers.Count > 0 ? SelectedLayers : SelectedLayer is null ? [] : [SelectedLayer];
+        if (selected.Count == 0) return null;
+
+        TValue first = selector(selected[0]);
+        return selected.Skip(1).All(layer => EqualityComparer<TValue>.Default.Equals(selector(layer), first))
+            ? first
+            : null;
+    }
+
+    private static double[] CommonTimes(IReadOnlyList<ObservableHitsoundLayer> selected)
+    {
+        if (selected.Count == 0) return [];
+
+        List<double> first = selected[0].Times;
+        return selected.Skip(1).All(layer => layer.Times.SequenceEqual(first))
+            ? first.ToArray()
+            : [];
     }
 
     private void RefreshEditorVisibility()
@@ -1021,31 +1115,31 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     private void SetSampleInt(string value, int fallback, Action<ObservableSampleGeneratingArgs, int> setter)
     {
         if (syncingEditor || !TryInt(value, fallback, out int parsed)) return;
-        foreach (var layer in Targets()) setter(layer.SampleArgs, parsed);
+        foreach (var layer in SelectedLayers) setter(layer.SampleArgs, parsed);
     }
 
     private void SetImportString(string value, Action<LayerImportArgs, string> setter)
     {
         if (syncingEditor) return;
-        foreach (var layer in Targets()) setter(layer.ImportArgs, value);
+        foreach (var layer in SelectedLayers) setter(layer.ImportArgs, value);
     }
 
     private void SetImportDouble(string value, double fallback, Action<LayerImportArgs, double> setter)
     {
         if (syncingEditor || !TryDouble(value, fallback, out double parsed)) return;
-        foreach (var layer in Targets()) setter(layer.ImportArgs, parsed);
+        foreach (var layer in SelectedLayers) setter(layer.ImportArgs, parsed);
     }
 
     private void SetImportInt(string value, int fallback, Action<LayerImportArgs, int> setter)
     {
         if (syncingEditor || !TryInt(value, fallback, out int parsed)) return;
-        foreach (var layer in Targets()) setter(layer.ImportArgs, parsed);
+        foreach (var layer in SelectedLayers) setter(layer.ImportArgs, parsed);
     }
 
     private void SetImportBool(bool value, Action<LayerImportArgs, bool> setter)
     {
         if (syncingEditor) return;
-        foreach (var layer in Targets()) setter(layer.ImportArgs, value);
+        foreach (var layer in SelectedLayers) setter(layer.ImportArgs, value);
     }
 
     private static bool TryDouble(string value, double fallback, out double parsed)
@@ -1135,22 +1229,39 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         if (result.Status == ToolExecutionStatus.Succeeded && result.Value is not null)
         {
             if (HitsoundExportModeSetting != HitsoundStudioExportMode.Midi) PreviousSampleSchema = result.Value.Schema;
-            ResultSummary = ShowResults
-                ? result.Value.DetailedSummary
-                : "Hitsound Studio export complete.";
+            if (ShowResults)
+            {
+                await PublishNotificationAsync(
+                    UserNotificationSeverity.Success,
+                    "Hitsound Studio export",
+                    result.Value.DetailedSummary);
+            }
         }
+    }
+
+    private Task PublishNotificationAsync(
+        UserNotificationSeverity severity,
+        string title,
+        string message,
+        Exception? exception = null)
+    {
+        return notifications.PublishAsync(new UserNotification(severity, title, message, exception));
     }
 
     private async Task<HitsoundStudioImportRequest?> ShowImportDialogAsync(string defaultName)
     {
-        HitsoundStudioImportDialogViewModel viewModel = new(defaultName, filePicker);
+        HitsoundStudioImportDialogViewModel viewModel = new(defaultName, currentBeatmap, filePicker);
+        try
+        {
+            viewModel.SourcePaths = await currentBeatmap.FindCurrentBeatmapAsync();
+        }
+        catch (InvalidOperationException)
+        {
+            // A current beatmap is a convenience default, not a prerequisite for opening the dialog.
+        }
         HitsoundStudioImportDialog dialog = new() { DataContext = viewModel };
-        viewModel.Close = value => DialogHostInteraction.Close(
-            DialogHostInteraction.RootIdentifier,
-            value);
-        object? result = await DialogHostInteraction.ShowAsync(
-            dialog,
-            DialogHostInteraction.RootIdentifier);
+        viewModel.Close = dialog.Close;
+        object? result = await dialog.ShowDialog<object?>(owner());
         return result as HitsoundStudioImportRequest;
     }
 
