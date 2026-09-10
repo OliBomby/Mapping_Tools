@@ -418,7 +418,7 @@
                                      Classes="compact"
                                      Width="50"
                                      Margin="0,14,5,0"
-                                     Text="{Binding DefaultSample.SampleArgs.Volume, Mode=TwoWay, Converter={StaticResource HitsoundStudioSampleVolumeConverter}}"
+                                     Text="{Binding DefaultSample.SampleArgs.Volume, Mode=TwoWay, UpdateSourceTrigger=LostFocus, ConverterParameter=-1, Converter={StaticResource HitsoundStudioSampleVolumeConverter}}"
                                      ToolTip.Tip="Volume % of the default sample. Use -1 for invariant volume." />
                             <Button Grid.Column="4"
                                     Classes="flat path-picker"
