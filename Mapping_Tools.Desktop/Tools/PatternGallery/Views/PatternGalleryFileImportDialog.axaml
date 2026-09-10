@@ -4,7 +4,7 @@
              xmlns:materialIcons="using:Material.Icons.Avalonia"
              xmlns:patternGallery="clr-namespace:Mapping_Tools.Desktop.Tools.PatternGallery.Interactions"
              x:Class="Mapping_Tools.Desktop.Tools.PatternGallery.Views.PatternGalleryFileImportDialog"
-             x:DataType="patternGallery:PatternGalleryInputViewModel">
+             x:DataType="patternGallery:PatternGalleryFileImportViewModel">
     <Grid Margin="8" RowDefinitions="*,*">
         <StackPanel Grid.Row="0">
             <TextBox materialAssists:TextFieldAssist.Label="Name"
@@ -47,18 +47,15 @@
                      Margin="0,0,0,5"
                      ToolTip.Tip="Input an optional time code here. Example time code: 00:56:823 (1,2,1,2) - " />
             <TextBox materialAssists:TextFieldAssist.Label="Start time"
-                     Text="{Binding StartTimeText, Mode=TwoWay}"
+                     Text="{Binding StartTime, Mode=TwoWay, Converter={StaticResource TimeToStringConverter}, ConverterParameter=-1}"
                      MinWidth="100"
                      Margin="0,0,0,5"
                      ToolTip.Tip="Optional lower bound time. All objects before this time will be ignored." />
             <TextBox materialAssists:TextFieldAssist.Label="End time"
-                     Text="{Binding EndTimeText, Mode=TwoWay}"
+                     Text="{Binding EndTime, Mode=TwoWay, Converter={StaticResource TimeToStringConverter}, ConverterParameter=-1}"
                      MinWidth="100"
                      Margin="0,0,0,5"
                      ToolTip.Tip="Optional upper bound time. All objects after this time will be ignored." />
-            <TextBlock Text="{Binding Error}"
-                       Foreground="{DynamicResource MaterialValidationErrorBrush}"
-                       TextWrapping="Wrap" />
         </StackPanel>
         <StackPanel Grid.Row="1"
                     Orientation="Horizontal"

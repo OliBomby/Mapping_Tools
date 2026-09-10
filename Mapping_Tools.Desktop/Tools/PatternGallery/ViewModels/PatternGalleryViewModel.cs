@@ -516,7 +516,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
 
     private static async Task<PatternGalleryCodeInput?> ShowCodeDialogAsync(string defaultName)
     {
-        var viewModel = PatternGalleryInputViewModel.ForCode(defaultName);
+        var viewModel = new PatternGalleryCodeImportViewModel(defaultName);
         PatternGalleryCodeImportDialog dialog = new() { DataContext = viewModel };
         viewModel.Close = value => DialogHostInteraction.Close(
             DialogHostInteraction.RootIdentifier,
@@ -531,7 +531,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         string defaultName,
         string defaultPath)
     {
-        var viewModel = PatternGalleryInputViewModel.ForFile(
+        var viewModel = new PatternGalleryFileImportViewModel(
             defaultName,
             defaultPath,
             filePicker,

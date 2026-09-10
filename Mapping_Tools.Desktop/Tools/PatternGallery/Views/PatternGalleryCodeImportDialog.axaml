@@ -3,7 +3,7 @@
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:patternGallery="clr-namespace:Mapping_Tools.Desktop.Tools.PatternGallery.Interactions"
              x:Class="Mapping_Tools.Desktop.Tools.PatternGallery.Views.PatternGalleryCodeImportDialog"
-             x:DataType="patternGallery:PatternGalleryInputViewModel">
+             x:DataType="patternGallery:PatternGalleryCodeImportViewModel">
     <Grid Margin="8" RowDefinitions="*,*">
         <ScrollViewer Grid.Row="0"
                       MaxHeight="480"
@@ -30,7 +30,7 @@
                          Margin="0,0,0,5"
                          ToolTip.Tip="The timing points for the pattern. Tip: Include a redline so timing scaling works during export." />
                 <TextBox materialAssists:TextFieldAssist.Label="Global SV"
-                         Text="{Binding GlobalSvText, Mode=TwoWay}"
+                         Text="{Binding GlobalSv, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
                          MinWidth="100"
                          Margin="0,0,0,5"
                          ToolTip.Tip="The global slider multiplier for the pattern." />
@@ -40,9 +40,6 @@
                           MinWidth="100"
                           Margin="0,0,0,5"
                           ToolTip.Tip="The game mode for the pattern." />
-                <TextBlock Text="{Binding Error}"
-                           Foreground="{DynamicResource MaterialValidationErrorBrush}"
-                           TextWrapping="Wrap" />
             </StackPanel>
         </ScrollViewer>
         <StackPanel Grid.Row="1"

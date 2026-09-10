@@ -23,11 +23,11 @@ public sealed class PatternGalleryCollectionRenameViewModelTests
         var input = result.Should().BeOfType<PatternGalleryCollectionRenameInput>().Subject;
         input.NewName.Should().Be("Renamed collection");
         input.NewFolderName.Should().Be("renamed-directory");
-        viewModel.Error.Should().BeEmpty();
+        viewModel.HasErrors.Should().BeFalse();
     }
 
     [TestMethod]
-    public void AcceptCommand_WithBlankDirectoryName_LeavesDialogOpenAndExposesError()
+    public void AcceptCommand_WithBlankDirectoryName_LeavesDialogOpenAndReportsDirectoryValidation()
     {
         // Arrange
         PatternGalleryCollectionRenameViewModel viewModel = new("Collection", "Directory");
@@ -40,7 +40,10 @@ public sealed class PatternGalleryCollectionRenameViewModelTests
 
         // Assert
         result.Should().BeNull();
-        viewModel.Error.Should().Be("A collection directory name is required.");
+        viewModel.GetErrors(nameof(PatternGalleryCollectionRenameViewModel.NewFolderName))
+            .Select(error => error.ErrorMessage)
+            .Should()
+            .Equal("A collection directory name is required.");
     }
 
     [TestMethod]

@@ -39,9 +39,6 @@
                 <TextBlock Width="150" Text="File name" />
                 <TextBlock Text="{Binding FileName}" TextWrapping="Wrap" />
             </StackPanel>
-            <TextBlock Text="{Binding Error}"
-                       Foreground="{DynamicResource MaterialValidationErrorBrush}"
-                       TextWrapping="Wrap" />
         </StackPanel>
         <StackPanel Grid.Row="1"
                     Orientation="Horizontal"

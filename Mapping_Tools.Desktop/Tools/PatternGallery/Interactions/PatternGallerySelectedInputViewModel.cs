@@ -1,10 +1,11 @@
+using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace Mapping_Tools.Desktop.Tools.PatternGallery.Interactions;
 
 /// <summary>Owns the name form for importing selected hit objects.</summary>
-public sealed partial class PatternGallerySelectedInputViewModel : ObservableObject
+public sealed partial class PatternGallerySelectedInputViewModel : ObservableValidator
 {
     /// <summary>Creates a selected-object import form.</summary>
     /// <param name="defaultName">The suggested display name.</param>
@@ -17,11 +18,9 @@ public sealed partial class PatternGallerySelectedInputViewModel : ObservableObj
 
     /// <summary>Gets or sets the pattern display name.</summary>
     [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Required(ErrorMessage = "A pattern name is required.")]
     public partial string Name { get; set; }
-
-    /// <summary>Gets the latest correction message.</summary>
-    [ObservableProperty]
-    public partial string Error { get; private set; } = string.Empty;
 
     /// <summary>Gets the command that validates and accepts the form.</summary>
     public IRelayCommand AcceptCommand { get; }
@@ -34,13 +33,9 @@ public sealed partial class PatternGallerySelectedInputViewModel : ObservableObj
 
     private void Accept()
     {
-        if (string.IsNullOrWhiteSpace(Name))
-        {
-            Error = "A pattern name is required.";
-            return;
-        }
+        ValidateAllProperties();
+        if (HasErrors) return;
 
-        Error = string.Empty;
         Close(Name);
     }
 }

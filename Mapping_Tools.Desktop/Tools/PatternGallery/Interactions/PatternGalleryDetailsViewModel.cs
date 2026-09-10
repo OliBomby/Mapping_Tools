@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -27,6 +28,8 @@ public sealed partial class PatternGalleryDetailsViewModel : ObservableValidator
 
     /// <summary>Gets or sets the editable display name.</summary>
     [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Required(ErrorMessage = "A pattern name is required.")]
     public partial string Name { get; set; }
 
     /// <summary>Gets the formatted creation timestamp.</summary>
@@ -50,10 +53,6 @@ public sealed partial class PatternGalleryDetailsViewModel : ObservableValidator
     /// <summary>Gets the persisted pattern filename.</summary>
     public string FileName { get; }
 
-    /// <summary>Gets the latest correction message.</summary>
-    [ObservableProperty]
-    public partial string Error { get; private set; } = string.Empty;
-
     /// <summary>Gets the command that validates and accepts the form.</summary>
     public IRelayCommand AcceptCommand { get; }
 
@@ -65,13 +64,9 @@ public sealed partial class PatternGalleryDetailsViewModel : ObservableValidator
 
     private void Accept()
     {
-        if (string.IsNullOrWhiteSpace(Name))
-        {
-            Error = "A pattern name is required.";
-            return;
-        }
+        ValidateAllProperties();
+        if (HasErrors) return;
 
-        Error = string.Empty;
         Close(Name);
     }
 }
