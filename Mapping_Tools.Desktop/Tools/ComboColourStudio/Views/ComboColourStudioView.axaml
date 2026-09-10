@@ -92,7 +92,7 @@
                                             <materialIcons:MaterialIcon Kind="Plus" Width="22" Height="22" />
                                         </materialDesign:FloatingButton>
                                         <materialDesign:FloatingButton Classes="mini light no-transitions"
-                                                                        Command="{Binding DataContext.RemoveSequenceColourCommand, ElementName=Root}"
+                                                                        Command="{Binding $parent[DataGrid].((vm:ComboColourStudioViewModel)DataContext)?.RemoveSequenceColourCommand}"
                                                                         ToolTip.Tip="Remove the last colour from this sequence.">
                                             <materialIcons:MaterialIcon Kind="Minus" Width="22" Height="22" />
                                         </materialDesign:FloatingButton>
