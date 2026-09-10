@@ -272,6 +272,9 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     /// <summary>Gets whether the layer editor has any layer to edit.</summary>
     public bool HasLayers => Layers.Count > 0;
 
+    /// <summary>Gets the width of the layer editor column based on whether layers exist.</summary>
+    public GridLength EditorColumnWidth => HasLayers ? GridLength.Star : new GridLength(0);
+
     /// <summary>Gets whether the selected layer can be reloaded from a source.</summary>
     public bool HasImport => SelectedLayers.Any(layer => layer.ImportArgs.ImportType != ImportType.None);
 
@@ -456,7 +459,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
             }
 
             SetSelection(Layers.Skip(Math.Max(0, Layers.Count - imported.Count)));
-            OnPropertyChanged(nameof(HasLayers));
+            NotifyLayerStateChanged();
             await PublishNotificationAsync(
                 UserNotificationSeverity.Success,
                 "Hitsound Studio import",
@@ -504,7 +507,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         foreach (var layer in SelectedLayers.ToArray()) Layers.Remove(layer);
         RecalculatePriorities();
         SetSelection(Layers.Skip(Math.Max(0, Math.Min(firstSelectedIndex - 1, Layers.Count - 1))).Take(1));
-        OnPropertyChanged(nameof(HasLayers));
+        NotifyLayerStateChanged();
     }
 
     /// <summary>Reloads selected layers from their persisted import source.</summary>
@@ -522,7 +525,10 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
 
         try
         {
-            await service.ReloadAsync(SelectedLayers.Select(layer => layer.Model).ToArray());
+            ObservableHitsoundLayer[] selectedLayers = SelectedLayers.ToArray();
+            await service.ReloadAsync(selectedLayers.Select(layer => layer.Model).ToArray());
+            foreach (ObservableHitsoundLayer layer in selectedLayers) layer.RefreshTimes();
+            RefreshEditorFromSelection();
             await PublishNotificationAsync(
                 UserNotificationSeverity.Success,
                 "Reload layers",
@@ -1108,6 +1114,12 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         OnPropertyChanged(nameof(IsSoundFontSample));
     }
 
+    private void NotifyLayerStateChanged()
+    {
+        OnPropertyChanged(nameof(HasLayers));
+        OnPropertyChanged(nameof(EditorColumnWidth));
+    }
+
     private void SetSampleInt(string value, int fallback, Action<ObservableSampleGeneratingArgs, int> setter)
     {
         if (syncingEditor || !TryInt(value, fallback, out int parsed)) return;
@@ -1201,19 +1213,22 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
                         snapshot,
                         new Progress<double>(value => context.ReportProgress(value, "Exporting hitsounds")),
                         context.CancellationToken);
-                    return new ToolExecutionOutput<HitsoundStudioExportResult>(output, "Hitsound Studio export complete.");
+                    return new ToolExecutionOutput<HitsoundStudioExportResult>(
+                        output,
+                        snapshot.ShowResults ? null : "Hitsound Studio export complete.");
                 }),
             CreateProgress(),
             cancellationToken);
         if (result.Status == ToolExecutionStatus.Succeeded && result.Value is not null)
         {
             if (HitsoundExportModeSetting != HitsoundStudioExportMode.Midi) PreviousSampleSchema = result.Value.Schema;
-            if (ShowResults)
+            if (snapshot.ShowResults)
             {
-                await PublishNotificationAsync(
-                    UserNotificationSeverity.Success,
+                await messageDialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
                     "Hitsound Studio export",
-                    result.Value.DetailedSummary);
+                    result.Value.DetailedSummary,
+                    [new DialogChoice<bool>("OK", true, IsDefault: true, IsCancel: true)],
+                    true));
             }
         }
     }
@@ -1310,7 +1325,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         Layers = new ObservableCollection<ObservableHitsoundLayer>(
             copy.HitsoundLayers.Select(layer => new ObservableHitsoundLayer(layer)));
         SetSelection(Layers.Take(1));
-        OnPropertyChanged(nameof(HasLayers));
+        NotifyLayerStateChanged();
     }
 
     /// <summary>

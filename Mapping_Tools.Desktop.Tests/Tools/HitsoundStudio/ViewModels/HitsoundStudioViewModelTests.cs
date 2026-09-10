@@ -1,3 +1,4 @@
+using Avalonia.Controls;
 using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.Audio.Contracts;
 using Mapping_Tools.Application.Audio.Models;
@@ -108,6 +109,31 @@ public sealed class HitsoundStudioViewModelTests
     }
 
     [TestMethod]
+    public void EditorColumnWidth_WhenLayersAreAbsentOrPresent_UsesCollapsedOrStarSizing()
+    {
+        // Arrange
+        HitsoundStudioViewModel viewModel = CreateViewModel(
+            new RecordingHitsoundStudioService(),
+            new RecordingAudioGenerator(),
+            new RecordingPlaybackService());
+        ObservableHitsoundLayer layer = new(new HitsoundLayer(
+            "layer",
+            SampleSet.Normal,
+            Hitsound.Normal,
+            new SampleGeneratingArgs("sample.wav"),
+            new LayerImportArgs()));
+
+        // Act
+        GridLength emptyWidth = viewModel.EditorColumnWidth;
+        viewModel.Layers.Add(layer);
+        GridLength populatedWidth = viewModel.EditorColumnWidth;
+
+        // Assert
+        emptyWidth.Should().Be(new GridLength(0));
+        populatedWidth.Should().Be(GridLength.Star);
+    }
+
+    [TestMethod]
     public void EditSharedValues_WithMultipleSelectedLayers_UpdatesEveryLayer()
     {
         // Arrange
@@ -138,6 +164,37 @@ public sealed class HitsoundStudioViewModelTests
         second.ImportArgs.ImportType.Should().Be(ImportType.Storyboard);
         first.ImportArgs.DiscriminateVolumes.Should().BeTrue();
         second.ImportArgs.DiscriminateVolumes.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task ReloadCommand_WhenSourceChangesTimes_RefreshesLayerAndEditorState()
+    {
+        // Arrange
+        RecordingHitsoundStudioService service = new();
+        HitsoundStudioViewModel viewModel = CreateViewModel(
+            service,
+            new RecordingAudioGenerator(),
+            new RecordingPlaybackService());
+        ObservableHitsoundLayer layer = new(new HitsoundLayer(
+            "layer",
+            SampleSet.Normal,
+            Hitsound.Normal,
+            new SampleGeneratingArgs("sample.wav"),
+            new LayerImportArgs()));
+        layer.Times = [100];
+        List<string?> changedProperties = [];
+        layer.PropertyChanged += (_, args) => changedProperties.Add(args.PropertyName);
+        viewModel.Layers.Add(layer);
+        viewModel.SetSelection([layer]);
+        service.ReloadAction = layers => layers[0].Times = [200, 400];
+
+        // Act
+        await viewModel.ReloadCommand.ExecuteAsync(null);
+
+        // Assert
+        layer.Times.Should().Equal(200, 400);
+        viewModel.EditTimes.Should().Equal(200, 400);
+        changedProperties.Should().Contain(nameof(ObservableHitsoundLayer.Times));
     }
 
     [TestMethod]
@@ -249,6 +306,8 @@ public sealed class HitsoundStudioViewModelTests
 
     private sealed class RecordingHitsoundStudioService : IHitsoundStudioService
     {
+        public Action<IReadOnlyList<HitsoundLayer>>? ReloadAction { get; set; }
+
         public Task<IReadOnlyList<HitsoundLayer>> ImportAsync(
             HitsoundStudioImportRequest request,
             CancellationToken cancellationToken = default)
@@ -260,7 +319,8 @@ public sealed class HitsoundStudioViewModelTests
             IReadOnlyList<HitsoundLayer> layers,
             CancellationToken cancellationToken = default)
         {
-            return Task.FromResult<IReadOnlyList<HitsoundLayer>>([]);
+            ReloadAction?.Invoke(layers);
+            return Task.FromResult(layers);
         }
 
         public Task<IReadOnlyDictionary<SampleGeneratingArgs, Exception>> ValidateSamplesAsync(

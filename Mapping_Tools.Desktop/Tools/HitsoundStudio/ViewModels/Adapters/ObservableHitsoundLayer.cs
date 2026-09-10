@@ -63,6 +63,12 @@ public sealed partial class ObservableHitsoundLayer : ObservableObject
             Model.Times.ToList());
     }
 
+    /// <summary>Refreshes the observable timestamps after the model was changed externally.</summary>
+    public void RefreshTimes()
+    {
+        Times = Model.Times.ToList();
+    }
+
     private static LayerImportArgs CloneImportArgs(LayerImportArgs source)
     {
         return new LayerImportArgs(source.ImportType)

@@ -1,7 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using System.ComponentModel;
 using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels;
 using Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels.Adapters;
@@ -14,46 +13,19 @@ public sealed partial class HitsoundStudioView : UserControl
 {
     private readonly ButtonModifierCapture raiseButtonModifiers;
     private readonly ButtonModifierCapture lowerButtonModifiers;
-    private INotifyPropertyChanged? observedViewModel;
+    private bool suppressLayerSelectionChanges;
 
     /// <summary>Creates the Hitsound Studio view.</summary>
     public HitsoundStudioView()
     {
         InitializeComponent();
-        DataContextChanged += ViewDataContextChanged;
         raiseButtonModifiers = new ButtonModifierCapture(RaiseButton);
         lowerButtonModifiers = new ButtonModifierCapture(LowerButton);
-        UpdateEditorLayout(DataContext as HitsoundStudioViewModel);
-    }
-
-    private void ViewDataContextChanged(object? sender, EventArgs e)
-    {
-        if (observedViewModel is not null)
-            observedViewModel.PropertyChanged -= ViewModelPropertyChanged;
-
-        observedViewModel = DataContext as INotifyPropertyChanged;
-        if (observedViewModel is not null)
-            observedViewModel.PropertyChanged += ViewModelPropertyChanged;
-
-        UpdateEditorLayout(DataContext as HitsoundStudioViewModel);
-    }
-
-    private void ViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(HitsoundStudioViewModel.HasLayers))
-            UpdateEditorLayout(DataContext as HitsoundStudioViewModel);
-    }
-
-    private void UpdateEditorLayout(HitsoundStudioViewModel? viewModel)
-    {
-        var hasLayers = viewModel?.HasLayers == true;
-        EditorAndLayersGrid.ColumnDefinitions[0].Width = hasLayers
-            ? new GridLength(1, GridUnitType.Star)
-            : new GridLength(0);
     }
 
     private void LayersSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
+        if (suppressLayerSelectionChanges) return;
         if (DataContext is HitsoundStudioViewModel viewModel && sender is MaterialGridListView grid)
             viewModel.SetSelection(grid.SelectedItems?.OfType<ObservableHitsoundLayer>() ?? []);
     }
@@ -77,6 +49,25 @@ public sealed partial class HitsoundStudioView : UserControl
 
     private void MoveLayers(int direction, KeyModifiers modifiers)
     {
-        if (DataContext is HitsoundStudioViewModel viewModel) viewModel.MoveSelectedLayers(direction, (modifiers & KeyModifiers.Shift) != 0);
+        if (DataContext is not HitsoundStudioViewModel viewModel) return;
+
+        ObservableHitsoundLayer[] selectedLayers = viewModel.SelectedLayers.ToArray();
+        suppressLayerSelectionChanges = true;
+        try
+        {
+            viewModel.MoveSelectedLayers(direction, (modifiers & KeyModifiers.Shift) != 0);
+            var selectedItems = LayersGrid.SelectedItems;
+            if (selectedItems is not null)
+            {
+                selectedItems.Clear();
+                foreach (var layer in selectedLayers) selectedItems.Add(layer);
+            }
+
+            viewModel.SetSelection(selectedLayers);
+        }
+        finally
+        {
+            suppressLayerSelectionChanges = false;
+        }
     }
 }

@@ -20,10 +20,13 @@
                                  IsQuickRunSupported="True"
                                  HelpText="Hitsound Studio is the tool that lets you import data from multiple outside sources and convert them to osu! standard hitsounds in the form of a hitsounding difficulty that you can copy to other beatmaps.&#x0a;&#x0a;It represents hitsounds as a list of layers (hitsound layers). One layer contains a unique sound, the sampleset and hitsound that accompany that sound and a list of times that sound has to be played." />
 
-        <Grid x:Name="EditorAndLayersGrid"
-              Grid.Row="1"
-              Grid.ColumnSpan="2"
-              ColumnDefinitions="*,Auto,2*">
+        <Grid Grid.Row="1"
+              Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="{Binding EditorColumnWidth}" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="2*" />
+            </Grid.ColumnDefinitions>
             <Grid Grid.Column="0"
                   Margin="0,0,10,0"
                   RowDefinitions="*,Auto">
@@ -263,7 +266,8 @@
                           ResizeDirection="Columns"
                           ResizeBehavior="PreviousAndNext" />
 
-            <controls:MaterialGridListView Grid.Column="2"
+            <controls:MaterialGridListView x:Name="LayersGrid"
+                                           Grid.Column="2"
                                            Margin="10,0,0,0"
                                            ItemsSource="{Binding Layers}"
                                            SelectionMode="Multiple"
