@@ -1,0 +1,9 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Style Selector="TabItem">
+        <Setter Property="Foreground" Value="{DynamicResource MaterialDarkForegroundBrush}" />
+    </Style>
+    <Style Selector="TabItem /template/ Panel ContentPresenter#PART_SelectedPipe Border:not(:disabled)">
+        <Setter Property="Background" Value="{DynamicResource MaterialDarkForegroundBrush}" />
+    </Style>
+</Styles>
