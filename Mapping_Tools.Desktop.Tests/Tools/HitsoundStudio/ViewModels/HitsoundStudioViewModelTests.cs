@@ -109,6 +109,36 @@ public sealed class HitsoundStudioViewModelTests
     }
 
     [TestMethod]
+    public void SelectedLayers_WhenCollectionChangesDirectly_RefreshesEditorState()
+    {
+        // Arrange
+        var (viewModel, first, _) = CreateMixedSelection();
+
+        // Act
+        viewModel.SelectedLayers.Add(first);
+
+        // Assert
+        viewModel.HasSelectedLayer.Should().BeTrue();
+        viewModel.EditName.Should().Be("first");
+        viewModel.EditTimes.Should().Equal(100);
+    }
+
+    [TestMethod]
+    public void MoveSelectedLayers_WhenSelectedLayerMovesDown_PreservesSelection()
+    {
+        // Arrange
+        var (viewModel, first, second) = CreateMixedSelection();
+        viewModel.SetSelection([first]);
+
+        // Act
+        viewModel.MoveSelectedLayers(1);
+
+        // Assert
+        viewModel.Layers.Should().Equal(second, first);
+        viewModel.SelectedLayers.Should().Equal(first);
+    }
+
+    [TestMethod]
     public void EditorColumnWidth_WhenLayersAreAbsentOrPresent_UsesCollapsedOrStarSizing()
     {
         // Arrange

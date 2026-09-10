@@ -266,12 +266,11 @@
                           ResizeDirection="Columns"
                           ResizeBehavior="PreviousAndNext" />
 
-            <controls:MaterialGridListView x:Name="LayersGrid"
-                                           Grid.Column="2"
+            <controls:MaterialGridListView Grid.Column="2"
                                            Margin="10,0,0,0"
                                            ItemsSource="{Binding Layers}"
+                                           SelectedItems="{Binding SelectedLayers, Mode=TwoWay}"
                                            SelectionMode="Multiple"
-                                           SelectionChanged="LayersSelectionChanged"
                                            DoubleTapped="LayersDoubleTapped"
                                            CanUserResizeColumns="True"
                                            ScrollViewer.VerticalScrollBarVisibility="Visible"

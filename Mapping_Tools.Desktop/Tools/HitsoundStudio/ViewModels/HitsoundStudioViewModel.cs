@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Globalization;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -64,6 +65,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     private readonly SemaphoreSlim previewGate = new(1, 1);
     private CancellationTokenSource? previewCancellation;
     private IAudioPlaybackSession? previewSession;
+    private bool syncingSelection;
     private bool syncingEditor;
 
     /// <summary>
@@ -120,6 +122,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
             "Hitsound Studio Projects",
             () => new HitsoundStudioProject { ExportFolder = directories.Exports },
             configSchema: ToolConfigSchema.ForTool(HitsoundStudioToolDefinition.Definition.Id));
+        SelectedLayers.CollectionChanged += SelectedLayersCollectionChanged;
     }
 
     /// <summary>Gets or sets the beatmap used as the export baseline.</summary>
@@ -390,6 +393,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
+        SelectedLayers.CollectionChanged -= SelectedLayersCollectionChanged;
         await StopPreviewAsync().ConfigureAwait(false);
     }
 
@@ -868,9 +872,28 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     public void SetSelection(IEnumerable<ObservableHitsoundLayer> selected)
     {
         ObservableHitsoundLayer[] selection = selected.ToArray();
-        SelectedLayers.Clear();
-        foreach (var layer in selection) SelectedLayers.Add(layer);
+        syncingSelection = true;
+        try
+        {
+            SelectedLayers.Clear();
+            foreach (var layer in selection) SelectedLayers.Add(layer);
+        }
+        finally
+        {
+            syncingSelection = false;
+        }
 
+        RefreshSelectedLayerState();
+    }
+
+    private void SelectedLayersCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (syncingSelection) return;
+        RefreshSelectedLayerState();
+    }
+
+    private void RefreshSelectedLayerState()
+    {
         OnPropertyChanged(nameof(HasSelectedLayer));
         RefreshEditorVisibility();
         RefreshEditorFromSelection();
@@ -1338,18 +1361,25 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         if (direction is not (-1 or 1)) throw new ArgumentOutOfRangeException(nameof(direction), "Direction must be -1 or 1.");
 
         int repetitions = repeat ? 10 : 1;
+        ObservableHitsoundLayer[] selectedLayers = SelectedLayers.ToArray();
         var indices = SelectedLayers.Select(Layers.IndexOf).Where(index => index >= 0).OrderBy(index => index).ToList();
         if (indices.Count == 0) return;
+        bool moved = false;
         for (int repetition = 0; repetition < repetitions; repetition++)
         {
             if (direction < 0 && indices[0] == 0) break;
             if (direction > 0 && indices[^1] == Layers.Count - 1) break;
-            foreach (int index in direction < 0 ? indices : indices.AsEnumerable().Reverse()) Layers.Move(index, index + direction);
+            foreach (int index in direction < 0 ? indices : indices.AsEnumerable().Reverse())
+            {
+                Layers.Move(index, index + direction);
+                moved = true;
+            }
 
             for (int index = 0; index < indices.Count; index++) indices[index] += direction;
         }
 
         RecalculatePriorities();
+        if (moved) SetSelection(selectedLayers);
     }
 
     private void RecalculatePriorities()
