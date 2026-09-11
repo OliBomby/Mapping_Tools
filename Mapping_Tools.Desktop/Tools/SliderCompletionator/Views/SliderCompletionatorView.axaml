@@ -30,10 +30,10 @@
                     <CheckBox Margin="0,20,0,0" Content="Move anchors to new length"
                               IsChecked="{Binding MoveAnchors}"
                               ToolTip.Tip="Move the anchors such that the last anchor is exactly on the slider end. Much like using Ctrl+G twice in the editor, but better." />
-                    <CheckBox Content="Use slider end time" IsChecked="{Binding UseEndTime}"
+                    <CheckBox Content="Use slider end time" IsChecked="{Binding UseEndTime, Mode=TwoWay}"
                               ToolTip.Tip="Lets you input the slider end time instead of the duration. This will replace the duration field with the end time field." />
-                    <CheckBox Content="Use current editor time" IsEnabled="{Binding UseEndTime}"
-                              IsChecked="{Binding UseCurrentEditorTime}"
+                    <CheckBox Content="Use current editor time" IsEnabled="{Binding UseEndTime, Mode=OneWay}"
+                              IsChecked="{Binding UseCurrentEditorTime, Mode=TwoWay}"
                               ToolTip.Tip="Snap the slider ends to the current editor time." />
                     <CheckBox Content="Delegate SV to BPM" IsChecked="{Binding DelegateToBpm}"
                               ToolTip.Tip="Use BPM to determine the velocity of the slider instead of greenline SV." />
@@ -50,11 +50,11 @@
                               SelectedItem="{Binding FreeVariableSetting}"
                               materialAssists:ComboBoxAssist.Label="Free variable"
                               ToolTip.Tip="Choose which variable will be calculated by Slider Completionator." />
-                    <TextBox Margin="0,20,0,0" IsVisible="{Binding DurationVisible}"
+                    <TextBox Margin="0,20,0,0" IsVisible="{Binding DurationVisible, Mode=OneWay}"
                              Text="{Binding Duration, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}"
                              materialAssists:TextFieldAssist.Label="Duration (beats)"
                              ToolTip.Tip="Wanted duration of the slider in beats. Input -1 for no change." />
-                    <TextBox Margin="0,20,0,0" IsVisible="{Binding EndTimeVisible}"
+                    <TextBox Margin="0,20,0,0" IsVisible="{Binding EndTimeVisible, Mode=OneWay}"
                              Text="{Binding EndTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource TimeToStringConverter}, ConverterParameter=-1}"
                              materialAssists:TextFieldAssist.Label="End time (ms)"
                              ToolTip.Tip="Wanted slider end time in milliseconds. Input -1 for no change. You can also input osu! timestamps like '00:56:823'." />

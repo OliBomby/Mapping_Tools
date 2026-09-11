@@ -1,3 +1,5 @@
+using Avalonia.Controls;
+using Avalonia.VisualTree;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Settings.Models;
@@ -8,6 +10,7 @@ using Mapping_Tools.Core.Tools.SliderCompletionator.Models;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.SliderCompletionator.ViewModels;
+using Mapping_Tools.Desktop.Tools.SliderCompletionator.Views;
 using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -171,6 +174,35 @@ public sealed class SliderCompletionatorViewModelTests
     }
 
     [TestMethod]
+    public void View_WhenEndTimeIsEnabled_SwapsDurationInputForEndTimeInput()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingCompletionator());
+        SliderCompletionatorView view = new() { DataContext = viewModel };
+        Window window = new() { Content = view };
+        window.Show();
+        CheckBox endTimeOption = view.GetVisualDescendants()
+            .OfType<CheckBox>()
+            .Single(option => HasToolTip(option, "Lets you input the slider end time"));
+        TextBox[] inputs = view.GetVisualDescendants()
+            .OfType<TextBox>()
+            .Where(input => ToolTip.GetTip(input) is string)
+            .ToArray();
+
+        // Act
+        endTimeOption.IsChecked = true;
+
+        // Assert
+        inputs.Where(input => HasToolTip(input, "Wanted duration"))
+            .Should().ContainSingle(input => !input.IsVisible);
+        inputs.Where(input => HasToolTip(input, "Wanted slider end time"))
+            .Should().ContainSingle(input => input.IsVisible);
+        viewModel.UseEndTime.Should().BeTrue();
+
+        window.Close();
+    }
+
+    [TestMethod]
     public void Visibility_WhenCurrentEditorTimeAndLengthAreSelected_HidesEndTimeAndLength()
     {
         // Arrange
@@ -201,6 +233,11 @@ public sealed class SliderCompletionatorViewModelTests
                 TimeProvider.System),
             workspace ?? new TestBeatmapWorkspace(),
             settings ?? new DesktopApplicationSettings());
+    }
+
+    private static bool HasToolTip(Control control, string prefix)
+    {
+        return ToolTip.GetTip(control) is string tip && tip.StartsWith(prefix, StringComparison.Ordinal);
     }
 
     private sealed class AsynchronousCurrentBeatmapLocator(string path) : ICurrentBeatmapLocator
