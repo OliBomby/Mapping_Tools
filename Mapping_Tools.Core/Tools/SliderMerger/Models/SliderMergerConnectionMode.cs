@@ -10,8 +10,4 @@ public enum SliderMergerConnectionMode
 
     /// <summary>Adds a straight Bézier-encoded gap between the two paths.</summary>
     Linear,
-
-    /// <summary>Leaves the converted control polygons to form a Bézier bridge.</summary>
-    Bezier,
 }
-

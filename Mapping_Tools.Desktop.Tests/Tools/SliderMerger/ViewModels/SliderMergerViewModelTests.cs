@@ -16,7 +16,7 @@ namespace Mapping_Tools.Desktop.Tests.Tools.SliderMerger.ViewModels;
 public sealed class SliderMergerViewModelTests
 {
     [TestMethod]
-    public async Task RunCommand_WithEverythingAndBezierMode_PassesProjectValuesAndWorkspacePaths()
+    public async Task RunCommand_WithEverythingAndLinearMode_PassesProjectValuesAndWorkspacePaths()
     {
         // Arrange
         RecordingMerger service = new();
@@ -24,7 +24,7 @@ public sealed class SliderMergerViewModelTests
         workspace.SetSelection(["one.osu", "two.osu"]);
         var viewModel = Create(service, workspace);
         viewModel.ImportModeSetting = HitObjectSelectionMode.Everything;
-        viewModel.ConnectionModeSetting = SliderMergerConnectionMode.Bezier;
+        viewModel.ConnectionModeSetting = SliderMergerConnectionMode.Linear;
         viewModel.Leniency = 512;
         viewModel.MergeOnSliderEnd = false;
 
@@ -35,7 +35,7 @@ public sealed class SliderMergerViewModelTests
         service.Paths.Should().Equal("one.osu", "two.osu");
         service.Options.Should().NotBeNull();
         service.Options!.ImportModeSetting.Should().Be(HitObjectSelectionMode.Everything);
-        service.Options.ConnectionModeSetting.Should().Be(SliderMergerConnectionMode.Bezier);
+        service.Options.ConnectionModeSetting.Should().Be(SliderMergerConnectionMode.Linear);
         service.Options.Leniency.Should().Be(512);
         service.Options.MergeOnSliderEnd.Should().BeFalse();
         viewModel.IsRunning.Should().BeFalse();
@@ -105,7 +105,9 @@ public sealed class SliderMergerViewModelTests
 
         // Assert
         viewModel.TimeCodeVisible.Should().BeTrue();
-        viewModel.ConnectionModes.Should().Contain(SliderMergerConnectionMode.Bezier);
+        viewModel.ConnectionModes.Should().Equal(
+            SliderMergerConnectionMode.Move,
+            SliderMergerConnectionMode.Linear);
     }
 
     [TestMethod]

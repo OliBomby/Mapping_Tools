@@ -59,31 +59,6 @@ public sealed class SliderMergerEngineTests
         slider.GetAllCurvePoints().Should().Contain(new Vector2(200, 64));
     }
 
-    [TestMethod]
-    public void Merge_TwoSliders_WithBezierConnectionUsesRawBezierBridge()
-    {
-        // Arrange
-        HitObject first = new("64,64,0,2,0,L|164:64,1,100");
-        HitObject second = new("200,100,100,2,0,L|300:100,1,100");
-        var beatmap = CreateBeatmap(first, second);
-        SliderMergerEngineOptions options = new()
-        {
-            Leniency = 100,
-            MergeOnSliderEnd = false,
-            ConnectionModeSetting = SliderMergerConnectionMode.Bezier,
-            LinearOnLinear = true,
-        };
-
-        // Act
-        SliderMergerEngine.Merge(beatmap, beatmap.HitObjects, options);
-
-        // Assert
-        var slider = beatmap.HitObjects.Should().ContainSingle().Subject;
-        slider.SliderType.Should().Be(PathType.Bezier);
-        slider.GetAllCurvePoints().Should().Contain(new Vector2(200, 100));
-        slider.EdgeHitsounds.Should().Equal(0, 0);
-    }
-
     [DataTestMethod]
     [DataRow(PathType.PerfectCurve)]
     [DataRow(PathType.Catmull)]

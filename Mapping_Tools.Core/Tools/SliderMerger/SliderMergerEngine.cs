@@ -145,16 +145,13 @@ public static class SliderMergerEngine
                 firstPath.Add(secondPath.First());
                 extraLength = (first.CurvePoints.Last() - second.Pos).Length;
                 break;
-            case SliderMergerConnectionMode.Bezier:
-                extraLength = Vector2.Distance(firstPath.Last(), secondPath.First());
-                break;
             default:
                 throw new ArgumentException("Unexpected slider connection mode.", nameof(options));
         }
 
         var mergedPath = firstPath.Concat(secondPath).ToList();
         mergedPath.Round();
-        bool linear = options.ConnectionModeSetting != SliderMergerConnectionMode.Bezier && options.LinearOnLinear && IsLinearBezier(firstPath) && IsLinearBezier(secondPath);
+        bool linear = options.LinearOnLinear && IsLinearBezier(firstPath) && IsLinearBezier(secondPath);
         if (linear) RemoveDuplicateAnchors(mergedPath);
 
         first.SetAllCurvePoints(mergedPath);
