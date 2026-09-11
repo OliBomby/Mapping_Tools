@@ -67,9 +67,10 @@ public sealed class SliderPicturatorViewModelTests
     public void Activate_WithMapComboColors_UsesSelectedWorkspaceMapWithoutLiveLookup()
     {
         // Arrange
+        RgbaColour colour = RgbaColour.FromRgb(255, 0, 0);
         RecordingPicturator service = new()
         {
-            AvailableColors = [RgbaColour.FromRgb(255, 0, 0)]
+            AvailableColors = [colour]
         };
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["selected.osu"]);
@@ -81,11 +82,27 @@ public sealed class SliderPicturatorViewModelTests
 
         // Assert
         service.ColorPaths.Should().ContainSingle().Which.Should().Be("selected.osu");
-        viewModel.AvailableColors.Should().Equal(RgbaColour.FromRgb(255, 0, 0));
+        viewModel.AvailableColors.Should().Equal(colour);
+        viewModel.ComboColor.Should().Be(colour);
     }
 
     [TestMethod]
-    public void WorkspaceSelectionChanged_WhenSelectionCleared_ClearsPaletteWithoutError()
+    public void UseMapComboColors_WhenEnabledWithoutLoadedMap_UsesDefaultPaletteSelection()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingPicturator());
+        RgbaColour defaultColour = ComboColour.GetDefaultComboColours()[0].Color;
+
+        // Act
+        viewModel.UseMapComboColors = true;
+
+        // Assert
+        viewModel.AvailableColors.Should().Equal(ComboColour.GetDefaultComboColours().Select(colour => colour.Color));
+        viewModel.ComboColor.Should().Be(defaultColour);
+    }
+
+    [TestMethod]
+    public void WorkspaceSelectionChanged_WhenSelectionCleared_UsesDefaultPaletteWithoutError()
     {
         // Arrange
         RgbaColour colour = RgbaColour.FromRgb(255, 0, 0);
@@ -104,7 +121,8 @@ public sealed class SliderPicturatorViewModelTests
 
         // Assert
         service.ColorPaths.Should().ContainSingle().Which.Should().Be("selected.osu");
-        viewModel.AvailableColors.Should().BeEmpty();
+        viewModel.AvailableColors.Should().Equal(ComboColour.GetDefaultComboColours().Select(item => item.Color));
+        viewModel.ComboColor.Should().Be(ComboColour.GetDefaultComboColours()[0].Color);
         published.Should().BeEmpty();
     }
 

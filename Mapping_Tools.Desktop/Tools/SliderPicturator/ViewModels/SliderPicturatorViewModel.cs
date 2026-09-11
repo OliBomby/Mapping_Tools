@@ -46,6 +46,8 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     private CancellationTokenSource? previewCancellation;
     private Bitmap? previewImage;
     private RgbaImage? sourceImage;
+    private static readonly RgbaColour[] defaultComboColors =
+        [.. ComboColour.GetDefaultComboColours().Select(colour => colour.Color)];
 
     /// <summary>Creates the Slider Picturator presentation model.</summary>
     /// <param name="picturator">Runs the framework-independent operation.</param>
@@ -72,7 +74,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     public IReadOnlyList<long> ViewportSizes { get; } = [16384, 32768];
 
     /// <summary>Gets the current beatmap palette.</summary>
-    public ObservableCollection<RgbaColour> AvailableColors { get; } = [];
+    public ObservableCollection<RgbaColour> AvailableColors { get; } = [.. defaultComboColors];
 
     /// <summary>Gets whether the map palette selector is visible.</summary>
     public bool ShouldShowCcPicker => UseMapComboColors;
@@ -137,7 +139,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
 
     /// <summary>Gets or sets the selected combo colour.</summary>
     [ObservableProperty]
-    public partial RgbaColour ComboColor { get; set; } = RgbaColour.FromRgb(0, 0, 0);
+    public partial RgbaColour ComboColor { get; set; } = defaultComboColors[0];
 
     /// <summary>Gets or sets the effective track colour.</summary>
     [ObservableProperty]
@@ -299,15 +301,18 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
         colorRefreshCancellation?.Cancel();
         CancellationTokenSource cancellation = new();
         colorRefreshCancellation = cancellation;
-        AvailableColors.Clear();
         try
         {
             string? path = workspace.SelectedPaths.FirstOrDefault();
-            if (string.IsNullOrWhiteSpace(path)) return;
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                SetAvailableColors(defaultComboColors);
+                return;
+            }
+
             var colours = await picturator.GetAvailableColorsAsync(path, cancellation.Token);
             cancellation.Token.ThrowIfCancellationRequested();
-            foreach (var colour in colours) AvailableColors.Add(colour);
-            if (AvailableColors.Count > 0 && UseMapComboColors && !AvailableColors.Contains(ComboColor)) ComboColor = AvailableColors[0];
+            SetAvailableColors(colours);
         }
         catch (OperationCanceledException) { }
         catch (Exception exception) { await PublishFailureAsync("Could not read map colours", "The current beatmap palette could not be loaded.", exception); }
@@ -338,6 +343,12 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
 
     partial void OnUseMapComboColorsChanged(bool value)
     {
+        if (value)
+        {
+            if (AvailableColors.Count == 0) SetAvailableColors(defaultComboColors);
+            else if (!AvailableColors.Contains(ComboColor)) ComboColor = AvailableColors[0];
+        }
+
         CurrentTrackColor = value ? ComboColor : TrackColorPickerColor;
         OnPropertyChanged(nameof(ShouldShowCcPicker));
         OnPropertyChanged(nameof(ShouldShowPalette));
@@ -503,6 +514,56 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     private void OnWorkspaceSelectionChanged(object? sender, BeatmapSelectionChangedEventArgs eventArgs)
     {
         _ = RefreshColorsAsync();
+    }
+
+    private void SetAvailableColors(IReadOnlyList<RgbaColour> colours)
+    {
+        IReadOnlyList<RgbaColour> nextColors = colours.Count > 0 ? colours : defaultComboColors;
+        Dictionary<RgbaColour, int> desiredCounts = [];
+        foreach (RgbaColour colour in nextColors)
+        {
+            desiredCounts[colour] = desiredCounts.GetValueOrDefault(colour) + 1;
+        }
+
+        foreach ((RgbaColour colour, int desiredCount) in desiredCounts)
+        {
+            for (int existingCount = AvailableColors.Count(item => item == colour);
+                 existingCount < desiredCount;
+                 existingCount++)
+            {
+                AvailableColors.Add(colour);
+            }
+        }
+
+        if (!nextColors.Contains(ComboColor)) ComboColor = nextColors[0];
+
+        Dictionary<RgbaColour, int> remainingCounts = new(desiredCounts);
+        for (int index = AvailableColors.Count - 1; index >= 0; index--)
+        {
+            RgbaColour colour = AvailableColors[index];
+            if (!remainingCounts.TryGetValue(colour, out int remaining) || remaining == 0)
+            {
+                AvailableColors.RemoveAt(index);
+                continue;
+            }
+
+            remainingCounts[colour] = remaining - 1;
+        }
+
+        for (int index = 0; index < nextColors.Count; index++)
+        {
+            int currentIndex = -1;
+            for (int candidateIndex = index; candidateIndex < AvailableColors.Count; candidateIndex++)
+            {
+                if (AvailableColors[candidateIndex] == nextColors[index])
+                {
+                    currentIndex = candidateIndex;
+                    break;
+                }
+            }
+
+            if (currentIndex > index) AvailableColors.Move(currentIndex, index);
+        }
     }
 
     private SliderPicturatorProject Snapshot()
