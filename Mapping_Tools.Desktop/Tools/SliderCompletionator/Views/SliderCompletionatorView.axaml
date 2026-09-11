@@ -44,7 +44,8 @@
                 </StackPanel>
 
                 <StackPanel Width="258" HorizontalAlignment="Left">
-                    <ComboBox
+                    <ComboBox Theme="{StaticResource MaterialOutlineComboBox}"
+                              Classes="outline"
                               ItemsSource="{Binding FreeVariables}"
                               SelectedItem="{Binding FreeVariableSetting}"
                               materialAssists:ComboBoxAssist.Label="Free variable"

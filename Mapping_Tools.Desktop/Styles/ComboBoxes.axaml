@@ -18,7 +18,7 @@
             <Setter Property="HorizontalAlignment" Value="Left" />
             <Setter Property="VerticalAlignment" Value="Top" />
         </Style>
-        <Style Selector="^ /template/ Border#splitBorder">
+        <Style Selector="^:not(.outline) /template/ Border#splitBorder">
             <Setter Property="Margin" Value="0,0,0,12" />
             <Setter Property="VerticalAlignment" Value="Bottom" />
         </Style>
@@ -39,7 +39,23 @@
             <Setter Property="IdleBrush" Value="{DynamicResource MaterialPrimaryMidBrush}" />
         </Style>
         <Style
-            Selector="^:pointerover /template/ Path#arrow,
+            Selector="^:focus-within /template/ Border#PART_Border,
+                         ^[IsDropDownOpen=True] /template/ Border#PART_Border">
+            <Setter Property="BorderBrush" Value="{DynamicResource MaterialPrimaryMidBrush}" />
+        </Style>
+        <Style
+            Selector="^:pointerover /template/ Border#PART_Border,
+                         ^:focus-within /template/ Border#PART_Border,
+                         ^[IsDropDownOpen=True] /template/ Border#PART_Border">
+            <Setter Property="BorderThickness" Value="2" />
+        </Style>
+        <Style
+            Selector="^:focus-within /template/ TextBlock#floatingWatermark,
+                         ^[IsDropDownOpen=True] /template/ TextBlock#floatingWatermark">
+            <Setter Property="Foreground" Value="{DynamicResource MaterialPrimaryMidBrush}" />
+        </Style>
+        <Style
+            Selector="^:pointerover:not(.outline) /template/ Path#arrow,
                          ^:focus-within /template/ Path#arrow,
                          ^[IsDropDownOpen=True] /template/ Path#arrow">
             <Setter Property="Fill" Value="{DynamicResource MaterialPrimaryMidBrush}" />
