@@ -116,7 +116,10 @@
                                   ToolTip.Tip="Use the image's Alpha channel when determining closest pixel color." />
                         <CheckBox Content="Set beatmap colors" IsChecked="{Binding SetBeatmapColors}"
                                   ToolTip.Tip="Whether to set the beatmap's slider track and border color to the specified colors." />
-                        <Slider Value="{Binding Quality}" Margin="5,10,15,10" Minimum="1" Maximum="101"
+                        <Slider Value="{Binding Quality}"
+                                Margin="5,10,15,10" Minimum="1" Maximum="101"
+                                Classes="Discrete"
+                                TickPlacement="BottomRight"
                                 TickFrequency="10" IsSnapToTickEnabled="True" ToolTip.Tip="Image Quality" />
                         <TextBlock Margin="5" Text="{Binding SegmentCount, StringFormat='Segment Count: {0}'}"
                                    ToolTip.Tip="The approximate number of slider segments required for this picture. Lower is better." />
