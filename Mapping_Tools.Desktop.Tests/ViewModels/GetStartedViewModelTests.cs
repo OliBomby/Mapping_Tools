@@ -120,5 +120,10 @@ public sealed class GetStartedViewModelTests
         {
             action();
         }
+
+        public void PostBackground(Action action)
+        {
+            action();
+        }
     }
 }

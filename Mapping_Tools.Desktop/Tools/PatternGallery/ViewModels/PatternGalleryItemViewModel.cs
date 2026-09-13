@@ -8,6 +8,7 @@ namespace Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels;
 public sealed partial class PatternGalleryItemViewModel : ObservableObject
 {
     private bool isSelected;
+    private bool thumbnailLoadAttempted;
 
     /// <summary>Creates a gallery item for the supplied persisted pattern.</summary>
     /// <param name="pattern">The pattern metadata owned by the project.</param>
@@ -33,10 +34,14 @@ public sealed partial class PatternGalleryItemViewModel : ObservableObject
     [ObservableProperty]
     public partial Beatmap? ThumbnailBeatmap { get; private set; }
 
+    /// <summary>Gets whether loading this item's thumbnail has already been attempted.</summary>
+    internal bool ThumbnailLoadAttempted => thumbnailLoadAttempted;
+
     /// <summary>Publishes a newly loaded thumbnail beatmap.</summary>
     /// <param name="beatmap">The beatmap loaded from the stored pattern, or <see langword="null" /> on failure.</param>
     internal void SetThumbnail(Beatmap? beatmap)
     {
+        thumbnailLoadAttempted = true;
         ThumbnailBeatmap = beatmap;
     }
 
@@ -52,4 +57,3 @@ public sealed partial class PatternGalleryItemViewModel : ObservableObject
         OnPropertyChanged(nameof(IsSelected));
     }
 }
-

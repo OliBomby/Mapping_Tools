@@ -39,12 +39,17 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
     private readonly IQuickRunCommandRegistry quickRunRegistry;
     private readonly IShellFeatureRegistry registry;
     private readonly DesktopApplicationSettings settings;
+    private readonly IUiDispatcher dispatcher;
     private readonly IUpdaterInteractionService? updaterInteraction;
+    private CancellationTokenSource? featureActivationCancellation;
+    private long featureActivationVersion;
+    private bool featureActivationReady;
+    private bool featureActivationStarted;
     private string searchText = string.Empty;
     private Task? shutdownTask;
 
     /// <summary>
-    ///     Creates the desktop shell and activates the first explicit registration.
+    ///     Creates the desktop shell and prepares the first explicit registration for activation.
     /// </summary>
     /// <param name="registry">Supplies explicitly registered features in navigation order.</param>
     /// <param name="quickRunRegistry">Tracks the command for the active QuickRun-capable feature.</param>
@@ -55,6 +60,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
     /// <param name="betterSave">Saves the current live editor state through the shared safety gateway.</param>
     /// <param name="dialogs">Presents shell-owned information dialogs.</param>
     /// <param name="projectCoordinator">Owns project menus and feature autosave lifecycle.</param>
+    /// <param name="dispatcher">Schedules deferred UI work after the shell can render its loading state.</param>
     /// <param name="updaterInteraction">
     ///     Shows update decisions and owns update shutdown interaction when supplied by runtime
     ///     composition.
@@ -69,6 +75,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
         IBetterSaveService betterSave,
         IDialogService dialogs,
         ProjectAutosaveCoordinator projectCoordinator,
+        IUiDispatcher dispatcher,
         IUpdaterInteractionService? updaterInteraction = null)
     {
         this.registry = registry ?? throw new ArgumentNullException(nameof(registry));
@@ -80,6 +87,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
         this.betterSave = betterSave ?? throw new ArgumentNullException(nameof(betterSave));
         this.dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
         this.projectCoordinator = projectCoordinator ?? throw new ArgumentNullException(nameof(projectCoordinator));
+        this.dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
         this.updaterInteraction = updaterInteraction;
 
         FeatureItems = registry.Features
@@ -136,6 +144,14 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
     [ObservableProperty]
     public partial ObservableObject? CurrentFeature { get; private set; }
 
+    /// <summary>Gets whether the selected feature is currently being prepared.</summary>
+    [ObservableProperty]
+    public partial bool IsFeatureLoading { get; private set; } = true;
+
+    /// <summary>Gets the selected feature loading error, if preparation failed.</summary>
+    [ObservableProperty]
+    public partial string? FeatureLoadError { get; private set; }
+
     /// <summary>Gets the title of the currently activated feature.</summary>
     [ObservableProperty]
     public partial string Header { get; private set; } = "Mapping Tools";
@@ -181,6 +197,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
 
     private async Task DisposeCoreAsync()
     {
+        featureActivationCancellation?.Cancel();
+
         Task[] saveTasks = featureViewModels.Values
             .OfType<IShellProjectFeature>()
             .Select(projectCoordinator.SaveOnShutdown)
@@ -205,8 +223,22 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
         projectCoordinator.SuppressSave();
     }
 
-    private void Activate(ShellFeatureItemViewModel item)
+    internal Task InitializeAsync()
     {
+        if (featureActivationStarted) return Task.CompletedTask;
+
+        featureActivationStarted = true;
+        featureActivationReady = true;
+        return SelectedFeature is null ? Task.CompletedTask : ActivateAsync(SelectedFeature);
+    }
+
+    private async Task ActivateAsync(ShellFeatureItemViewModel item)
+    {
+        featureActivationCancellation?.Cancel();
+        CancellationTokenSource cancellation = new();
+        featureActivationCancellation = cancellation;
+        long activationVersion = ++featureActivationVersion;
+
         HighlightedFeature = item;
 
         foreach (var featureItem in FeatureItems) featureItem.IsActive = ReferenceEquals(featureItem, item);
@@ -216,24 +248,56 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
 
         var registration = registry.Find(item.Id)
                            ?? throw new InvalidOperationException($"Feature '{item.Id}' is not registered.");
-        if (!featureViewModels.TryGetValue(item.Id, out var viewModel))
-        {
-            viewModel = registration.CreateViewModel();
-            featureViewModels.Add(item.Id, viewModel);
-        }
-
-        CurrentFeature = viewModel;
+        CurrentFeature = null;
         ContentHorizontalScrollBarVisibility = registration.HorizontalScrollBarVisibility;
         ContentVerticalScrollBarVisibility = registration.VerticalScrollBarVisibility;
-        HasProjectMenu = viewModel is IShellProjectFeature;
-        ProjectMenuItems = CreateProjectMenuItems(viewModel);
-        OnPropertyChanged(nameof(ProjectMenuItems));
         Header = item.DisplayName == "Get started"
             ? "Mapping Tools"
             : $"Mapping Tools - {item.DisplayName}";
-        if (viewModel is IShellFeatureActivation current) current.Activate();
-        if (viewModel is IShellProjectFeature projectFeature) projectCoordinator.Activate(projectFeature);
-        if (viewModel is IQuickRun) quickRunRegistry.SelectCurrent(registration.Id);
+        FeatureLoadError = null;
+        IsFeatureLoading = true;
+
+        try
+        {
+            if (!featureViewModels.TryGetValue(item.Id, out var viewModel))
+            {
+                // Let the shell paint its loading state before running synchronous constructors.
+                TaskCompletionSource<bool> renderCompletion = new();
+                dispatcher.PostBackground(() => renderCompletion.TrySetResult(true));
+                await renderCompletion.Task;
+                cancellation.Token.ThrowIfCancellationRequested();
+
+                viewModel = registration.CreateViewModel();
+                featureViewModels.Add(item.Id, viewModel);
+            }
+
+            if (activationVersion != featureActivationVersion || !ReferenceEquals(SelectedFeature, item)) return;
+
+            CurrentFeature = viewModel;
+            HasProjectMenu = viewModel is IShellProjectFeature;
+            ProjectMenuItems = CreateProjectMenuItems(viewModel);
+            OnPropertyChanged(nameof(ProjectMenuItems));
+            if (viewModel is IShellFeatureActivation current) current.Activate();
+            if (viewModel is IShellProjectFeature projectFeature) projectCoordinator.Activate(projectFeature);
+            if (viewModel is IQuickRun) quickRunRegistry.SelectCurrent(registration.Id);
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception exception)
+        {
+            if (activationVersion == featureActivationVersion && ReferenceEquals(SelectedFeature, item))
+            {
+                FeatureLoadError = exception.Message;
+                ClearProjectMenu();
+            }
+        }
+        finally
+        {
+            if (activationVersion == featureActivationVersion) IsFeatureLoading = false;
+            if (ReferenceEquals(featureActivationCancellation, cancellation)) featureActivationCancellation = null;
+            cancellation.Dispose();
+        }
     }
 
     private IReadOnlyList<ShellProjectMenuItem> CreateProjectMenuItems(ObservableObject viewModel)
@@ -251,9 +315,16 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
         return items;
     }
 
+    private void ClearProjectMenu()
+    {
+        HasProjectMenu = false;
+        ProjectMenuItems = [];
+        OnPropertyChanged(nameof(ProjectMenuItems));
+    }
+
     partial void OnSelectedFeatureChanged(ShellFeatureItemViewModel? value)
     {
-        if (value is not null) Activate(value);
+        if (value is not null && featureActivationReady) _ = ActivateAsync(value);
     }
 
     [RelayCommand]

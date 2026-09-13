@@ -361,6 +361,128 @@ public sealed class DesktopShellTests
     }
 
     [TestMethod]
+    public void MainViewModel_Constructor_DoesNotCreateInitialFeature()
+    {
+        // Arrange
+        int factoryCalls = 0;
+
+        // Act
+        using var viewModel = CreateMainViewModel(
+            [Registration("first", "First", () =>
+            {
+                factoryCalls++;
+                return new StubFeatureViewModel();
+            })],
+            initialize: false);
+
+        // Assert
+        factoryCalls.Should().Be(0);
+        viewModel.CurrentFeature.Should().BeNull();
+        viewModel.IsFeatureLoading.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task MainViewModel_InitializeAsync_CreatesAndActivatesInitialFeature()
+    {
+        // Arrange
+        StubFeatureViewModel feature = new();
+        using var viewModel = CreateMainViewModel(
+            [Registration("first", "First", () => feature)],
+            initialize: false);
+
+        // Act
+        await viewModel.InitializeAsync();
+
+        // Assert
+        viewModel.CurrentFeature.Should().BeSameAs(feature);
+        feature.ActivationCount.Should().Be(1);
+        viewModel.IsFeatureLoading.Should().BeFalse();
+        viewModel.FeatureLoadError.Should().BeNull();
+    }
+
+    [TestMethod]
+    public async Task MainViewModel_SwitchingBetweenProjectFeatures_PreservesMenuVisibilityWhileLoading()
+    {
+        // Arrange
+        QueuedTestDispatcher dispatcher = new();
+        using var viewModel = CreateMainViewModel(
+            [
+                Registration("first", "First", () => new StubProjectFeatureViewModel()),
+                Registration("second", "Second", () => new StubProjectFeatureViewModel()),
+            ],
+            dispatcher: dispatcher,
+            initialize: false);
+        Task initialActivation = viewModel.InitializeAsync();
+        dispatcher.RunAll();
+        await initialActivation;
+        var second = viewModel.FeatureItems.Single(item => item.Id == "second");
+
+        // Act
+        second.ActivateCommand.Execute(null);
+
+        // Assert
+        viewModel.IsFeatureLoading.Should().BeTrue();
+        viewModel.HasProjectMenu.Should().BeTrue();
+
+        // Act
+        dispatcher.RunAll();
+
+        // Assert
+        viewModel.IsFeatureLoading.Should().BeFalse();
+        viewModel.CurrentFeature.Should().BeOfType<StubProjectFeatureViewModel>();
+        viewModel.HasProjectMenu.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task MainViewModel_FeatureFactoryThrows_ExposesRecoverableLoadingError()
+    {
+        // Arrange
+        using var viewModel = CreateMainViewModel(
+            [Registration("broken", "Broken", () => throw new InvalidOperationException("factory failed"))],
+            initialize: false);
+
+        // Act
+        await viewModel.InitializeAsync();
+
+        // Assert
+        viewModel.CurrentFeature.Should().BeNull();
+        viewModel.IsFeatureLoading.Should().BeFalse();
+        viewModel.HasProjectMenu.Should().BeFalse();
+        viewModel.FeatureLoadError.Should().Contain("factory failed");
+    }
+
+    [TestMethod]
+    public void MainViewModel_SupersededActivation_DoesNotPublishTheStaleFeature()
+    {
+        // Arrange
+        QueuedTestDispatcher dispatcher = new();
+        int firstFactoryCalls = 0;
+        StubFeatureViewModel second = new();
+        using var viewModel = CreateMainViewModel(
+            [
+                Registration("first", "First", () =>
+                {
+                    firstFactoryCalls++;
+                    return new StubFeatureViewModel();
+                }),
+                Registration("second", "Second", () => second),
+            ],
+            dispatcher: dispatcher,
+            initialize: false);
+
+        // Act
+        _ = viewModel.InitializeAsync();
+        viewModel.FeatureItems.Single(item => item.Id == "second").ActivateCommand.Execute(null);
+        dispatcher.RunAll();
+
+        // Assert
+        firstFactoryCalls.Should().Be(0);
+        viewModel.CurrentFeature.Should().BeSameAs(second);
+        second.ActivationCount.Should().Be(1);
+        viewModel.IsFeatureLoading.Should().BeFalse();
+    }
+
+    [TestMethod]
     public async Task MainViewModel_OpenWebsiteCommand_WhenExecuted_OpensWebsite()
     {
         // Arrange
@@ -542,14 +664,16 @@ public sealed class DesktopShellTests
         IBetterSaveService? betterSave = null,
         TestDialogService? dialogs = null,
         IQuickRunCommandRegistry? quickRunRegistry = null,
-        RecordingProjectService? projectService = null)
+        RecordingProjectService? projectService = null,
+        IUiDispatcher? dispatcher = null,
+        bool initialize = true)
     {
         var resolvedSettings = settings ?? new DesktopApplicationSettings();
         var resolvedNotifications = notifications ?? new UserNotificationService();
         var resolvedDialogs = dialogs ?? new TestDialogService();
         var resolvedQuickRunRegistry = quickRunRegistry ?? new QuickRunCommandRegistry();
         projectService ??= new RecordingProjectService();
-        ImmediateTestDispatcher dispatcher = new();
+        ImmediateTestDispatcher workspaceDispatcher = new();
         BeatmapWorkspaceViewModel workspace = new(
             new TestBeatmapWorkspace(),
             new TestBeatmapBackupService(),
@@ -560,8 +684,8 @@ public sealed class DesktopShellTests
             resolvedSettings,
             new TestDialogService(),
             resolvedNotifications,
-            dispatcher);
-        return new MainViewModel(
+            workspaceDispatcher);
+        MainViewModel viewModel = new(
             new ShellFeatureRegistry(registrations ?? [Registration("get-started", "Get started")]),
             resolvedQuickRunRegistry,
             resolvedSettings,
@@ -573,7 +697,10 @@ public sealed class DesktopShellTests
             new ProjectAutosaveCoordinator(
                 projectService,
                 resolvedDialogs,
-                resolvedNotifications));
+                resolvedNotifications),
+            dispatcher ?? workspaceDispatcher);
+        if (initialize) viewModel.InitializeAsync().GetAwaiter().GetResult();
+        return viewModel;
     }
 
     private static ShellFeatureRegistration Registration(
@@ -598,6 +725,26 @@ public sealed class DesktopShellTests
     private static Task ExecuteAsync(IAsyncRelayCommand command)
     {
         return command.ExecuteAsync(null);
+    }
+
+    private sealed class QueuedTestDispatcher : IUiDispatcher
+    {
+        private readonly Queue<Action> backgroundActions = new();
+
+        public void Post(Action action)
+        {
+            action();
+        }
+
+        public void PostBackground(Action action)
+        {
+            backgroundActions.Enqueue(action);
+        }
+
+        public void RunAll()
+        {
+            while (backgroundActions.Count > 0) backgroundActions.Dequeue()();
+        }
     }
 
     private sealed class StubFeatureViewModel : ObservableObject, IShellFeatureActivation

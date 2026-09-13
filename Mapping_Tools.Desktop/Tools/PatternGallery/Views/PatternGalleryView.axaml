@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:panels="clr-namespace:Avalonia.Labs.Controls;assembly=Mapping_Tools.Desktop"
              xmlns:patternGalleryControls="using:Mapping_Tools.Desktop.Tools.PatternGallery.Controls"
              xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
@@ -84,10 +85,8 @@
                                             </ListBox.ItemContainerTheme>
                                             <ListBox.ItemsPanel>
                                                 <ItemsPanelTemplate>
-                                                    <WrapPanel Orientation="Horizontal"
-                                                                ItemWidth="166"
-                                                                ItemHeight="166"
-                                                                ItemsAlignment="Start" />
+                                                    <panels:VirtualizingWrapPanel ItemSize="166,166"
+                                                                                  SpacingMode="None" />
                                                 </ItemsPanelTemplate>
                                             </ListBox.ItemsPanel>
                                             <ListBox.ItemTemplate>

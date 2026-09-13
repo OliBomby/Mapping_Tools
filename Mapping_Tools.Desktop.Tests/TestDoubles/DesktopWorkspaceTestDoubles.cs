@@ -380,4 +380,10 @@ internal sealed class ImmediateTestDispatcher : IUiDispatcher
         PostCount++;
         action();
     }
+
+    public void PostBackground(Action action)
+    {
+        PostCount++;
+        action();
+    }
 }

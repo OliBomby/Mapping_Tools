@@ -1,0 +1,15 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Name="Root"
+             x:Class="Mapping_Tools.Desktop.Controls.FeatureLoading.FeatureLoadErrorView">
+    <StackPanel Spacing="20"
+                VerticalAlignment="Top">
+        <TextBlock Text="Could not load this tool"
+                   FontSize="32"
+                   FontWeight="Bold"
+                   Foreground="{DynamicResource MaterialPrimaryMidBrush}" />
+        <TextBlock Text="{Binding Message, ElementName=Root}"
+                   TextWrapping="Wrap"
+                   Foreground="{DynamicResource MaterialBodyLightBrush}" />
+    </StackPanel>
+</UserControl>

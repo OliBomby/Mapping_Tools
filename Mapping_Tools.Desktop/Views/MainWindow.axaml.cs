@@ -95,7 +95,11 @@ public partial class MainWindow : Window, INotificationSurface
     {
         base.OnOpened(eventArgs);
         RestoreWindowPlacement();
-        if (DataContext is MainViewModel viewModel) _ = viewModel.CheckForUpdatesOnStartupAsync();
+        if (DataContext is MainViewModel viewModel)
+        {
+            _ = viewModel.InitializeAsync();
+            _ = viewModel.CheckForUpdatesOnStartupAsync();
+        }
     }
 
     /// <inheritdoc />

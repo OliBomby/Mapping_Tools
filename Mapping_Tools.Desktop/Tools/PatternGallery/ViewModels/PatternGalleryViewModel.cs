@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.ComponentModel.DataAnnotations;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -11,12 +12,11 @@ using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
-using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.PatternGallery;
 using Mapping_Tools.Application.Tools.PatternGallery.Contracts;
 using Mapping_Tools.Application.Tools.PatternGallery.Models;
 using Mapping_Tools.Application.Workspace.Contracts;
+using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Tools.PatternGallery.Models;
 using Mapping_Tools.Desktop.Models;
@@ -27,7 +27,6 @@ using Mapping_Tools.Desktop.Tools.PatternGallery.Models;
 using Mapping_Tools.Desktop.Tools.PatternGallery.Views;
 using Mapping_Tools.Desktop.Utilities;
 using Mapping_Tools.Desktop.ViewModels;
-using Mapping_Tools.Desktop.Views.Dialogs;
 using Material.Icons;
 
 namespace Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels;
@@ -64,6 +63,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     private readonly IFileRevealService reveal;
     private readonly IProjectSerializer serializer;
     private readonly DesktopApplicationSettings settings;
+    private readonly IUiDispatcher dispatcher;
     private readonly IBeatmapWorkspace workspace;
     private static readonly TimeSpan SearchDebounceInterval = TimeSpan.FromMilliseconds(150);
     private readonly DispatcherTimer searchFilterTimer = new(
@@ -88,6 +88,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     /// <param name="dialogs">Presents typed confirmations and value fields.</param>
     /// <param name="settings">Provides the shared QuickRun preference.</param>
     /// <param name="notifications">Publishes operation results to the shell notification surface.</param>
+    /// <param name="dispatcher">Publishes prepared thumbnail batches on the UI thread.</param>
     public PatternGalleryViewModel(
         IPatternGalleryService gallery,
         IPatternGalleryFileService files,
@@ -102,7 +103,8 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         IApplicationDirectories directories,
         IDialogService dialogs,
         DesktopApplicationSettings settings,
-        IUserNotificationService notifications)
+        IUserNotificationService notifications,
+        IUiDispatcher dispatcher)
         : base(execution, PatternGalleryToolDefinition.Definition)
     {
         this.gallery = gallery ?? throw new ArgumentNullException(nameof(gallery));
@@ -118,6 +120,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         this.dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
+        this.dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
         searchFilterTimer.Tick += SearchFilterTimerTick;
         ConfigureProject();
         RebuildGroups();
@@ -1056,8 +1059,17 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     private void StartThumbnailRefresh()
     {
         CancelThumbnailRefresh();
+
+        PatternGalleryProject project = Project;
+        PatternGalleryCollectionPaths projectPaths = Paths;
+        PatternGalleryItemViewModel[] pending = project.Patterns
+            .Select(GetItem)
+            .Where(item => !item.ThumbnailLoadAttempted)
+            .ToArray();
+        if (pending.Length == 0) return;
+
         thumbnailCancellation = new CancellationTokenSource();
-        _ = RefreshThumbnailsAsync(thumbnailCancellation.Token);
+        _ = RefreshThumbnailsAsync(pending, project, projectPaths, thumbnailCancellation.Token);
     }
 
     private void CancelThumbnailRefresh()
@@ -1067,33 +1079,58 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         thumbnailCancellation = null;
     }
 
-    private async Task RefreshThumbnailsAsync(CancellationToken cancellationToken)
+    private async Task RefreshThumbnailsAsync(
+        IReadOnlyList<PatternGalleryItemViewModel> pending,
+        PatternGalleryProject project,
+        PatternGalleryCollectionPaths projectPaths,
+        CancellationToken cancellationToken)
     {
-        var project = Project;
-        var paths = Paths;
-        foreach (var pattern in project.Patterns.ToArray())
+        try
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            var item = GetItem(pattern);
-            try
-            {
-                var beatmap = await gallery.LoadBeatmapAsync(pattern, paths, cancellationToken);
-                if (cancellationToken.IsCancellationRequested || !ReferenceEquals(Project, project) || !project.Patterns.Contains(pattern))
-                    return;
+            ConcurrentBag<(PatternGalleryItemViewModel Item, Beatmap? Beatmap)> results = [];
+            await Parallel.ForEachAsync(
+                pending,
+                new ParallelOptions
+                {
+                    CancellationToken = cancellationToken,
+                    MaxDegreeOfParallelism = 2,
+                },
+                async (item, token) =>
+                {
+                    Beatmap? beatmap = null;
+                    try
+                    {
+                        beatmap = await gallery.LoadBeatmapAsync(item.Pattern, projectPaths, token)
+                            .ConfigureAwait(false);
+                    }
+                    catch (OperationCanceledException) when (token.IsCancellationRequested)
+                    {
+                        throw;
+                    }
+                    catch
+                    {
+                        // A failed file is still marked as attempted so navigation does not retry it forever.
+                    }
 
-                item.SetThumbnail(beatmap);
-            }
-            catch (OperationCanceledException)
-            {
-                return;
-            }
-            catch
-            {
-                if (cancellationToken.IsCancellationRequested || !ReferenceEquals(Project, project) || !project.Patterns.Contains(pattern))
-                    return;
+                    results.Add((item, beatmap));
+                });
 
-                item.SetThumbnail(null);
+            foreach (var batch in results.Chunk(4))
+            {
+                if (cancellationToken.IsCancellationRequested) return;
+
+                (PatternGalleryItemViewModel Item, Beatmap? Beatmap)[] completed = batch.ToArray();
+                dispatcher.Post(() =>
+                {
+                    if (cancellationToken.IsCancellationRequested || !ReferenceEquals(Project, project)) return;
+
+                    foreach (var result in completed)
+                        if (project.Patterns.Contains(result.Item.Pattern)) result.Item.SetThumbnail(result.Beatmap);
+                });
             }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
         }
     }
 
