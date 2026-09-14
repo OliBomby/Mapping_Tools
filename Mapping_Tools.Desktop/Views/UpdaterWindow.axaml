@@ -24,7 +24,8 @@
     <Grid RowDefinitions="35,*">
         <Grid Grid.Row="0" Background="{DynamicResource MaterialCardBackgroundBrush}">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" IsHitTestVisible="False">
-                <Border Width="24" Height="24" Margin="9,5,0,0"
+                <Border Width="24" Height="24" Margin="9,0,0,0"
+                        VerticalAlignment="Center"
                         Background="{DynamicResource MaterialBodyBrush}">
                     <Border.OpacityMask>
                         <ImageBrush Source="/Assets/mt_logo_white_24.png" Stretch="Uniform" />
