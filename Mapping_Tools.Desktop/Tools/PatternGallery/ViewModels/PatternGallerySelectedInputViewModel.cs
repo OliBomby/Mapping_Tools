@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
-namespace Mapping_Tools.Desktop.Tools.PatternGallery.Interactions;
+namespace Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels;
 
 /// <summary>Owns the name form for importing selected hit objects.</summary>
 public sealed partial class PatternGallerySelectedInputViewModel : ObservableValidator

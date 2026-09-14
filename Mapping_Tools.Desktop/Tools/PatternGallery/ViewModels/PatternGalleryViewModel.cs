@@ -22,7 +22,6 @@ using Mapping_Tools.Core.Tools.PatternGallery.Models;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
-using Mapping_Tools.Desktop.Tools.PatternGallery.Interactions;
 using Mapping_Tools.Desktop.Tools.PatternGallery.Models;
 using Mapping_Tools.Desktop.Tools.PatternGallery.Views;
 using Mapping_Tools.Desktop.Utilities;

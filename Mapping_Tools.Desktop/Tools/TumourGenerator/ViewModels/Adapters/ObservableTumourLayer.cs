@@ -5,7 +5,7 @@ using Mapping_Tools.Core.Tools.TumourGenerator.Models;
 using Mapping_Tools.Core.Tools.TumourGenerator.Templates;
 using Mapping_Tools.Desktop.Converters;
 
-namespace Mapping_Tools.Desktop.Tools.TumourGenerator.Adapters;
+namespace Mapping_Tools.Desktop.Tools.TumourGenerator.ViewModels.Adapters;
 
 /// <summary>Adapts one plain tumour layer for Desktop editing and preview refresh.</summary>
 public sealed partial class ObservableTumourLayer : ObservableObject

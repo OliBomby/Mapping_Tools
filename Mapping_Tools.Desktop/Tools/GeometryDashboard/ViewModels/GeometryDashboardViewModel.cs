@@ -20,7 +20,6 @@ using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGen
 using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
-using Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.Views;
 using Material.Icons;

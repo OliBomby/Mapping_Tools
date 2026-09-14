@@ -1,7 +1,7 @@
-using Mapping_Tools.Desktop.Tools.PatternGallery.Interactions;
+using Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Desktop.Tests.Tools.PatternGallery.Interactions;
+namespace Mapping_Tools.Desktop.Tests.Tools.PatternGallery.ViewModels;
 
 [TestClass]
 public sealed class PatternGallerySelectedInputViewModelTests

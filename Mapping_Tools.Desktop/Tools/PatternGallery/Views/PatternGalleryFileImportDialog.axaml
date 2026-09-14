@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:materialIcons="using:Material.Icons.Avalonia"
-             xmlns:patternGallery="clr-namespace:Mapping_Tools.Desktop.Tools.PatternGallery.Interactions"
+             xmlns:patternGallery="clr-namespace:Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels"
              x:Class="Mapping_Tools.Desktop.Tools.PatternGallery.Views.PatternGalleryFileImportDialog"
              x:DataType="patternGallery:PatternGalleryFileImportViewModel">
     <Grid Margin="8" RowDefinitions="*,*">

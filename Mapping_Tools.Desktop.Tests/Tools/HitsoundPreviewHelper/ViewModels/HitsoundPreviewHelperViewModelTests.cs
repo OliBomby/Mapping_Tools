@@ -8,7 +8,7 @@ using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.ViewModels;
 using Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.ViewModels.Adapters;
-using Mapping_Tools.Desktop.Tools.RhythmGuide.Interactions;
+using Mapping_Tools.Desktop.Tools.RhythmGuide.Services;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.ViewModels;
 using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

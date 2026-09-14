@@ -7,7 +7,7 @@ using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
 
-namespace Mapping_Tools.Desktop.Tools.HitsoundStudio.Interactions;
+namespace Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels;
 
 /// <summary>Owns the typed fields of the layer import form.</summary>
 public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObject

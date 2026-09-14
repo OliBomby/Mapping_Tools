@@ -2,8 +2,9 @@ using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Desktop.Tools.PatternGallery.Models;
 
-namespace Mapping_Tools.Desktop.Tools.PatternGallery.Interactions;
+namespace Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels;
 
 /// <summary>Owns the raw osu! code import dialog state.</summary>
 public sealed partial class PatternGalleryCodeImportViewModel : ObservableValidator

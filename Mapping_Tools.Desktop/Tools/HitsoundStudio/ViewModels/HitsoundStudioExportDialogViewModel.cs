@@ -5,7 +5,7 @@ using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Desktop.Tools.HitsoundStudio.Models;
 
-namespace Mapping_Tools.Desktop.Tools.HitsoundStudio.Interactions;
+namespace Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels;
 
 /// <summary>Owns the fields of the Hitsound Studio export dialog.</summary>
 public sealed partial class HitsoundStudioExportDialogViewModel : ObservableObject

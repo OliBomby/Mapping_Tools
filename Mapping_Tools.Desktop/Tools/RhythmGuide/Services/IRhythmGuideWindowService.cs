@@ -1,7 +1,7 @@
 using Mapping_Tools.Desktop.Tools.RhythmGuide.ViewModels;
 using Mapping_Tools.Desktop.ViewModels;
 
-namespace Mapping_Tools.Desktop.Tools.RhythmGuide.Interactions;
+namespace Mapping_Tools.Desktop.Tools.RhythmGuide.Services;
 
 /// <summary>Shows the reusable modeless Rhythm Guide surface without view-model window construction.</summary>
 public interface IRhythmGuideWindowService

@@ -22,7 +22,7 @@ using Mapping_Tools.Core.Tools.TumourGenerator.Templates;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
-using Mapping_Tools.Desktop.Tools.TumourGenerator.Adapters;
+using Mapping_Tools.Desktop.Tools.TumourGenerator.ViewModels.Adapters;
 using Mapping_Tools.Desktop.Tools.TumourGenerator.Models;
 using Mapping_Tools.Desktop.ViewModels;
 

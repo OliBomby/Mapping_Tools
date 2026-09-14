@@ -1,6 +1,6 @@
 using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 
-namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions;
+namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.Models;
 
 /// <summary>Contains the accepted Desktop-owned dashboard preferences.</summary>
 /// <param name="Preferences">The accepted engine preferences.</param>

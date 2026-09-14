@@ -1,8 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mapping_Tools.Desktop.Tools.PatternGallery.Models;
 
-namespace Mapping_Tools.Desktop.Tools.PatternGallery.Interactions;
+namespace Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels;
 
 /// <summary>Owns the two names edited by the Pattern Gallery collection rename form.</summary>
 public sealed partial class PatternGalleryCollectionRenameViewModel : ObservableValidator

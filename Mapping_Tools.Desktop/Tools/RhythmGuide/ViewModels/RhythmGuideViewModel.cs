@@ -13,7 +13,7 @@ using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.RhythmGuide.Models;
 using Mapping_Tools.Desktop.Shell;
-using Mapping_Tools.Desktop.Tools.RhythmGuide.Interactions;
+using Mapping_Tools.Desktop.Tools.RhythmGuide.Services;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.Models;
 using Mapping_Tools.Desktop.ViewModels;
 

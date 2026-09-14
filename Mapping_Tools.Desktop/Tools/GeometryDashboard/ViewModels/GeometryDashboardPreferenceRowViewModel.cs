@@ -5,7 +5,7 @@ using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.GeometryDashboard;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject;
 
-namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions;
+namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 
 /// <summary>Edits one neutral geometry appearance group.</summary>
 public sealed class GeometryDashboardPreferenceRowViewModel : ObservableObject

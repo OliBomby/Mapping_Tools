@@ -18,7 +18,7 @@ using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.Models;
 using Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.ViewModels.Adapters;
-using Mapping_Tools.Desktop.Tools.RhythmGuide.Interactions;
+using Mapping_Tools.Desktop.Tools.RhythmGuide.Services;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.ViewModels;
 using Mapping_Tools.Desktop.ViewModels;
 

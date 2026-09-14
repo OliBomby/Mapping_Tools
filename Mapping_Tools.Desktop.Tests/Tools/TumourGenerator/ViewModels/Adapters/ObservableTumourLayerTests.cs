@@ -1,10 +1,10 @@
 using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.TumourGenerator.Models;
-using Mapping_Tools.Desktop.Tools.TumourGenerator.Adapters;
+using Mapping_Tools.Desktop.Tools.TumourGenerator.ViewModels.Adapters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Desktop.Tests.Tools.TumourGenerator.Adapters;
+namespace Mapping_Tools.Desktop.Tests.Tools.TumourGenerator.ViewModels.Adapters;
 
 [TestClass]
 public sealed class ObservableTumourLayerTests

@@ -1,4 +1,4 @@
-namespace Mapping_Tools.Desktop.Tools.PatternGallery.Interactions;
+namespace Mapping_Tools.Desktop.Tools.PatternGallery.Models;
 
 /// <summary> Carries submitted source-file import values.</summary>
 public sealed record PatternGalleryFileInput(
@@ -7,4 +7,3 @@ public sealed record PatternGalleryFileInput(
     string Filter,
     double StartTime,
     double EndTime);
-

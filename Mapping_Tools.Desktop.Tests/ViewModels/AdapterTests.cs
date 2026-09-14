@@ -7,7 +7,7 @@ using Mapping_Tools.Core.Tools.TumourGenerator.Models;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels.Adapters;
 using Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.ViewModels.Adapters;
 using Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels.Adapters;
-using Mapping_Tools.Desktop.Tools.TumourGenerator.Adapters;
+using Mapping_Tools.Desktop.Tools.TumourGenerator.ViewModels.Adapters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.ViewModels;

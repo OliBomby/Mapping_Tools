@@ -4,7 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.Models;
 
-namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions;
+namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 
 /// <summary>Edits ordered Geometry Dashboard save slots.</summary>
 public sealed partial class GeometryDashboardSavestatesViewModel : ObservableObject

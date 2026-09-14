@@ -26,7 +26,6 @@ using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
-using Mapping_Tools.Desktop.Tools.HitsoundStudio.Interactions;
 using Mapping_Tools.Desktop.Tools.HitsoundStudio.Models;
 using Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels.Adapters;
 using Mapping_Tools.Desktop.Tools.HitsoundStudio.Views;

@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
 
-namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions;
+namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 
 /// <summary>Edits one ordered selection-predicate collection in the generator settings dialog.</summary>
 public sealed partial class GeometryDashboardPredicateCollectionViewModel : ObservableObject

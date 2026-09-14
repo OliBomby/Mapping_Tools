@@ -2,7 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
-using Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions;
+using Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 
 namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.Views;
 

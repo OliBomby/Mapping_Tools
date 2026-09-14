@@ -4,7 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Core.Tools.PatternGallery.Models;
 
-namespace Mapping_Tools.Desktop.Tools.PatternGallery.Interactions;
+namespace Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels;
 
 /// <summary>Owns the editable and read-only values shown by the properties dialog.</summary>
 public sealed partial class PatternGalleryDetailsViewModel : ObservableValidator

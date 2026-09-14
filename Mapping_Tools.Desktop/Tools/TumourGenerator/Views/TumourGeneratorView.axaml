@@ -1,7 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Mapping_Tools.Desktop.Tools.TumourGenerator.ViewModels"
-             xmlns:adapter="using:Mapping_Tools.Desktop.Tools.TumourGenerator.Adapters"
+                            xmlns:adapter="using:Mapping_Tools.Desktop.Tools.TumourGenerator.ViewModels.Adapters"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
              xmlns:toolControls="using:Mapping_Tools.Desktop.Tools.TumourGenerator.Controls"
              xmlns:converters="using:Mapping_Tools.Desktop.Converters"

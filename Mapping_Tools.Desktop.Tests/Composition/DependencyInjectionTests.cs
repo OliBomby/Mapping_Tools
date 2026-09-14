@@ -40,7 +40,7 @@ using Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.ViewModels;
 using Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels;
 using Mapping_Tools.Desktop.Tools.MapCleaner.ViewModels;
 using Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels;
-using Mapping_Tools.Desktop.Tools.RhythmGuide.Interactions;
+using Mapping_Tools.Desktop.Tools.RhythmGuide.Services;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.ViewModels;
 using Mapping_Tools.Desktop.Tools.Sliderator.ViewModels;
 using Mapping_Tools.Desktop.Tools.TumourGenerator.ViewModels;

@@ -3,7 +3,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 using Mapping_Tools.Desktop.Controls;
-using Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions;
+using Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 
 namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.Views;
 

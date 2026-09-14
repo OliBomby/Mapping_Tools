@@ -4,7 +4,7 @@ using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators;
 
-namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions;
+namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 
 /// <summary>Provides a reflected generator property to Avalonia bindings.</summary>
 public sealed class GeometryDashboardGeneratorSettingRowViewModel : ObservableObject

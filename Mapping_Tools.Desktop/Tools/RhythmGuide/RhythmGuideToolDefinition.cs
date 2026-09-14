@@ -1,7 +1,7 @@
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.RhythmGuide;
 using Mapping_Tools.Desktop.Plugin;
-using Mapping_Tools.Desktop.Tools.RhythmGuide.Interactions;
+using Mapping_Tools.Desktop.Tools.RhythmGuide.Services;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.ViewModels;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.Views;
 using Mapping_Tools.Desktop.Views;
