@@ -18,6 +18,7 @@ internal sealed class WindowsGeometryDashboardOverlayHost
 {
     private const uint extended_style_tool_window = 0x00000080;
     private const uint extended_style_transparent = 0x00000020;
+    private const uint extended_style_layered = 0x00080000;
     private const uint extended_style_no_activate = 0x08000000;
     private const uint window_style_popup = 0x80000000;
     private static readonly SKColor green_yellow = new(173, 255, 47);
@@ -75,7 +76,10 @@ internal sealed class WindowsGeometryDashboardOverlayHost
         DestroyNativeWindow();
         EnsureWindowClass();
         window = WindowsNativeMethods.CreateWindowEx(
-            extended_style_tool_window | extended_style_transparent | extended_style_no_activate,
+            extended_style_tool_window
+            | extended_style_transparent
+            | extended_style_layered
+            | extended_style_no_activate,
             className,
             string.Empty,
             window_style_popup,
@@ -145,9 +149,6 @@ internal sealed class WindowsGeometryDashboardOverlayHost
                 state.PhysicalBounds = physicalBounds;
         }
 
-        WindowsNativeMethods.ShowWindow(
-            window,
-            WindowsNativeMethods.SHOW_NO_ACTIVATE);
         if (!WindowsNativeMethods.SetWindowPos(
                 window,
                 WindowsNativeMethods.TopMostWindow,
@@ -160,6 +161,16 @@ internal sealed class WindowsGeometryDashboardOverlayHost
             HideNativeWindow();
             return;
         }
+
+        if (!RedrawNativeWindow())
+        {
+            HideNativeWindow();
+            return;
+        }
+
+        WindowsNativeMethods.ShowWindow(
+            window,
+            WindowsNativeMethods.SHOW_NO_ACTIVATE);
 
         IsVisible = true;
     }
@@ -202,7 +213,7 @@ internal sealed class WindowsGeometryDashboardOverlayHost
     internal void Invalidate()
     {
         ThrowIfDisposed();
-        if (window != 0) WindowsNativeMethods.InvalidateRect(window, 0, false);
+        if (window != 0) RedrawNativeWindow();
     }
 
     internal void Dispose()
@@ -323,30 +334,15 @@ internal sealed class WindowsGeometryDashboardOverlayHost
     {
         if (message == WindowsNativeMethods.WINDOW_MESSAGE_NC_HIT_TEST) return WindowsNativeMethods.HIT_TEST_TRANSPARENT;
 
+        if (message == WindowsNativeMethods.WINDOW_MESSAGE_MOUSE_ACTIVATE)
+            return WindowsNativeMethods.MOUSE_ACTIVATE_NO_ACTIVATE;
+
         if (message == WindowsNativeMethods.WINDOW_MESSAGE_ERASE_BACKGROUND) return 1;
 
         if (message == WindowsNativeMethods.WINDOW_MESSAGE_PAINT)
         {
             WindowsNativeMethods.Paintstruct paint;
             nint deviceContext = WindowsNativeMethods.BeginPaint(window, out paint);
-            lock (classGate)
-            {
-                paintStates.TryGetValue(window, out var paintState);
-                bool drawBorder = borderStates.TryGetValue(window, out bool border) && border;
-                if (paintState is not null || drawBorder)
-                {
-                    if (WindowsNativeMethods.GetClientRect(window, out var rectangle))
-                    {
-                        DrawOverlay(
-                            deviceContext,
-                            rectangle.Right - rectangle.Left,
-                            rectangle.Bottom - rectangle.Top,
-                            paintState,
-                            drawBorder);
-                    }
-                }
-            }
-
             WindowsNativeMethods.EndPaint(window, ref paint);
             return 0;
         }
@@ -397,16 +393,35 @@ internal sealed class WindowsGeometryDashboardOverlayHost
         ObjectDisposedException.ThrowIf(disposed, this);
     }
 
-    private static void DrawOverlay(
-        nint deviceContext,
+    private bool RedrawNativeWindow()
+    {
+        nint currentWindow = window;
+        if (!isWindows() || currentWindow == 0) return false;
+        if (!WindowsNativeMethods.GetClientRect(currentWindow, out var rectangle)) return false;
+
+        int width = rectangle.Right - rectangle.Left;
+        int height = rectangle.Bottom - rectangle.Top;
+        if (width <= 0 || height <= 0) return false;
+
+        lock (classGate)
+        {
+            paintStates.TryGetValue(currentWindow, out var paintState);
+            bool drawBorder = borderStates.TryGetValue(currentWindow, out bool border) && border;
+            return DrawOverlay(currentWindow, width, height, paintState, drawBorder);
+        }
+    }
+
+    private static bool DrawOverlay(
+        nint window,
         int width,
         int height,
         OverlayPaintState? state,
         bool drawBorder)
     {
-        if (width <= 0 || height <= 0) return;
+        if (width <= 0 || height <= 0) return false;
 
-        nint memoryDeviceContext = WindowsNativeMethods.CreateCompatibleDC(deviceContext);
+        nint screenDeviceContext = WindowsNativeMethods.CreateCompatibleDC(0);
+        nint memoryDeviceContext = screenDeviceContext;
         if (memoryDeviceContext == 0)
             throw new InvalidOperationException("Windows could not create the Geometry Dashboard overlay buffer.");
 
@@ -424,7 +439,7 @@ internal sealed class WindowsGeometryDashboardOverlayHost
                 Compression = WindowsNativeMethods.BI_RGB,
             };
             bitmap = WindowsNativeMethods.CreateDibSection(
-                deviceContext,
+                screenDeviceContext,
                 ref bitmapInfo,
                 WindowsNativeMethods.DIB_RGB_COLORS,
                 out nint pixels,
@@ -450,25 +465,40 @@ internal sealed class WindowsGeometryDashboardOverlayHost
 
             WindowsNativeMethods.BlendFunction blend = new()
             {
-                BlendOp = WindowsNativeMethods.AC_SRC_OVER,
+                BlendOp = WindowsNativeMethods.BLEND_OP_SOURCE_OVER,
                 SourceConstantAlpha = byte.MaxValue,
                 AlphaFormat = WindowsNativeMethods.AC_SRC_ALPHA,
             };
-            if (!WindowsNativeMethods.AlphaBlend(
-                    deviceContext,
-                    0,
-                    0,
-                    width,
-                    height,
-                    memoryDeviceContext,
-                    0,
-                    0,
-                    width,
-                    height,
-                    blend))
+
+            if (!WindowsNativeMethods.GetWindowRect(window, out var windowRectangle))
+                return false;
+
+            WindowsNativeMethods.Point destination = new()
             {
-                throw new InvalidOperationException("Windows could not copy the Geometry Dashboard overlay buffer.");
+                X = windowRectangle.Left,
+                Y = windowRectangle.Top,
+            };
+            WindowsNativeMethods.Point source = new();
+            WindowsNativeMethods.Size size = new()
+            {
+                Width = width,
+                Height = height,
+            };
+            if (!WindowsNativeMethods.UpdateLayeredWindow(
+                    window,
+                    0,
+                    ref destination,
+                    ref size,
+                    memoryDeviceContext,
+                    ref source,
+                    0,
+                    ref blend,
+                    WindowsNativeMethods.UPDATE_LAYERED_WINDOW_ALPHA))
+            {
+                return false;
             }
+
+            return true;
         }
         finally
         {

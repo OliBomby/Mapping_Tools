@@ -14,13 +14,16 @@ internal static class WindowsNativeMethods
     internal const uint SET_WINDOW_POS_NO_SEND_CHANGING = 0x0400;
     internal const uint WINDOW_MESSAGE_PAINT = 0x000F;
     internal const uint WINDOW_MESSAGE_ERASE_BACKGROUND = 0x0014;
+    internal const uint WINDOW_MESSAGE_MOUSE_ACTIVATE = 0x0021;
     internal const uint WINDOW_MESSAGE_NC_DESTROY = 0x0082;
     internal const uint WINDOW_MESSAGE_NC_HIT_TEST = 0x0084;
     internal const nint HIT_TEST_TRANSPARENT = -1;
+    internal const nint MOUSE_ACTIVATE_NO_ACTIVATE = 3;
     internal const uint DIB_RGB_COLORS = 0;
     internal const uint BI_RGB = 0;
-    internal const byte AC_SRC_OVER = 0;
+    internal const byte BLEND_OP_SOURCE_OVER = 0;
     internal const byte AC_SRC_ALPHA = 1;
+    internal const uint UPDATE_LAYERED_WINDOW_ALPHA = 0x00000002;
     internal const uint INPUT_KEYBOARD = 1;
     internal const uint KEYBOARD_KEY_UP = 0x0002;
 
@@ -166,10 +169,6 @@ internal static class WindowsNativeMethods
         uint flags);
 
     [DllImport("user32.dll")]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    internal static extern bool InvalidateRect(nint window, nint rectangle, bool erase);
-
-    [DllImport("user32.dll")]
     internal static extern nint DefWindowProc(nint window, uint message, nint wParam, nint lParam);
 
     [DllImport("user32.dll")]
@@ -206,20 +205,18 @@ internal static class WindowsNativeMethods
     [return: MarshalAs(UnmanagedType.Bool)]
     internal static extern bool DeleteObject(nint objectHandle);
 
-    [DllImport("msimg32.dll", SetLastError = true)]
+    [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    internal static extern bool AlphaBlend(
-        nint destination,
-        int destinationX,
-        int destinationY,
-        int destinationWidth,
-        int destinationHeight,
-        nint source,
-        int sourceX,
-        int sourceY,
-        int sourceWidth,
-        int sourceHeight,
-        BlendFunction blendFunction);
+    internal static extern bool UpdateLayeredWindow(
+        nint window,
+        nint destinationDeviceContext,
+        ref Point destination,
+        ref Size size,
+        nint sourceDeviceContext,
+        ref Point source,
+        uint colorKey,
+        ref BlendFunction blendFunction,
+        uint flags);
 
     [UnmanagedFunctionPointer(CallingConvention.Winapi)]
     internal delegate bool EnumWindowsCallback(nint window, nint data);
@@ -244,6 +241,13 @@ internal static class WindowsNativeMethods
         internal int Top;
         internal int Right;
         internal int Bottom;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct Size
+    {
+        internal int Width;
+        internal int Height;
     }
 
     [StructLayout(LayoutKind.Sequential)]
