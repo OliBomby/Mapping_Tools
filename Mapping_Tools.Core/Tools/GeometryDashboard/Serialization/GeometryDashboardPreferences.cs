@@ -9,7 +9,7 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 /// <summary>Stores the persistent appearance and input settings of one dashboard.</summary>
 public sealed class GeometryDashboardPreferences : ICloneable
 {
-    /// <summary>Creates the legacy default Geometry Dashboard settings.</summary>
+    /// <summary>Creates the default Geometry Dashboard settings.</summary>
     public GeometryDashboardPreferences()
     {
         RelevantObjectPreferences = new Dictionary<string, RelevantObjectPreferences>
@@ -44,8 +44,6 @@ public sealed class GeometryDashboardPreferences : ICloneable
         LockHotkey = new HotkeySettings(57, 4);
         InheritHotkey = new HotkeySettings(57, 1);
         RefreshHotkey = new HotkeySettings(45, 0);
-        OffsetTop = 1;
-        OffsetBottom = 1;
         AcceptableDifference = 2;
         KeyDownViewMode = ViewMode.Parents;
         KeyUpViewMode = ViewMode.Everything;

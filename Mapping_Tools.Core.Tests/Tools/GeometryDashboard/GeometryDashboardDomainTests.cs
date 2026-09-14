@@ -27,6 +27,10 @@ public sealed class GeometryDashboardDomainTests
         // Assert
         preferences.AcceptableDifference.Should().Be(2);
         preferences.InceptionLevel.Should().Be(5);
+        preferences.OffsetLeft.Should().Be(0);
+        preferences.OffsetTop.Should().Be(0);
+        preferences.OffsetRight.Should().Be(0);
+        preferences.OffsetBottom.Should().Be(0);
         preferences.SelectedHitObjectMode.Should().Be(SelectedHitObjectMode.AllwaysAllVisible);
         preferences.UpdateMode.Should().Be(UpdateMode.TimeChange);
         preferences.SnapHotkey!.Key.Should().Be(56);

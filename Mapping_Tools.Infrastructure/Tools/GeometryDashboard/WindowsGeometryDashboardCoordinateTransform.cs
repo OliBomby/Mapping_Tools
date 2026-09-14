@@ -13,6 +13,7 @@ internal sealed class WindowsGeometryDashboardCoordinateTransform
     private readonly bool fullscreen;
     private readonly Vector2 dpiMultiplier;
     private readonly Box2 editorBoxOffset;
+    private readonly Box2? clientBox;
     private readonly bool letterboxing;
     private readonly Vector2 letterboxingPosition;
     private readonly Vector2 osuResolution;
@@ -29,6 +30,7 @@ internal sealed class WindowsGeometryDashboardCoordinateTransform
         ArgumentNullException.ThrowIfNull(display);
 
         this.editorBoxOffset = editorBoxOffset;
+        clientBox = window.ClientBounds;
         dpiMultiplier = window.DpiScale;
         dpiSourceAvailable = window.DpiSourceAvailable;
         fullscreen = display.Fullscreen;
@@ -104,7 +106,9 @@ internal sealed class WindowsGeometryDashboardCoordinateTransform
 
     private double WindowChromeHeight => 24 * dpiMultiplier.Y;
 
-    private bool OsuFillsScreen => fullscreen || letterboxing || osuResolution == new Vector2(screenBox.Right, screenBox.Bottom);
+    private bool OsuFillsScreen => fullscreen
+                                   || letterboxing
+                                   || (osuResolution.X == screenBox.Width && osuResolution.Y == screenBox.Height);
 
     private Box2 GetOsuWindowBox()
     {
@@ -112,7 +116,9 @@ internal sealed class WindowsGeometryDashboardCoordinateTransform
         return letterboxing
             ? screenBox
             : OsuFillsScreen
-                ? new Box2(Vector2.Zero, osuResolution)
+                ? new Box2(
+                    new Vector2(screenBox.Left, screenBox.Top),
+                    new Vector2(screenBox.Left + osuResolution.X, screenBox.Top + osuResolution.Y))
                 : new Box2(osuWindowPosition, osuWindowPosition + osuResolution + chromeAddition);
     }
 
@@ -135,6 +141,8 @@ internal sealed class WindowsGeometryDashboardCoordinateTransform
 
     private Box2 GetOsuWindowBoxWithoutChrome()
     {
+        if (clientBox is Box2 actualClientBox) return actualClientBox;
+
         var osuWindow = GetOsuWindowBox();
         if (OsuFillsScreen) return osuWindow;
 

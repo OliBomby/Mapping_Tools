@@ -55,7 +55,10 @@ public sealed class WindowsGeometryDashboardWindowService : IGeometryDashboardWi
             WindowsNativeMethods.IsWindowVisible(nativeWindow),
             WindowsNativeMethods.GetForegroundWindow() == nativeWindow,
             ReadDpi(nativeWindow, out bool dpiAvailable),
-            dpiAvailable);
+            dpiAvailable)
+        {
+            ClientBounds = ReadClientBounds(nativeWindow),
+        };
     }
 
     /// <inheritdoc />
@@ -93,6 +96,20 @@ public sealed class WindowsGeometryDashboardWindowService : IGeometryDashboardWi
         StringBuilder title = new(Math.Max(length + 1, 1));
         WindowsNativeMethods.GetWindowText(window, title, title.Capacity);
         return title.ToString();
+    }
+
+    private static Box2? ReadClientBounds(nint window)
+    {
+        if (!WindowsNativeMethods.GetClientRect(window, out var rectangle)) return null;
+
+        int width = rectangle.Right - rectangle.Left;
+        int height = rectangle.Bottom - rectangle.Top;
+        if (width <= 0 || height <= 0) return null;
+
+        WindowsNativeMethods.Point origin = new();
+        if (!WindowsNativeMethods.ClientToScreen(window, ref origin)) return null;
+
+        return Box2.FromDimensions(origin.X, origin.Y, width, height);
     }
 
     private static Vector2 ReadDpi(nint window, out bool available)

@@ -19,4 +19,11 @@ public sealed record GeometryDashboardWindow(
     bool IsVisible,
     bool IsActivated,
     Vector2 DpiScale,
-    bool DpiSourceAvailable);
+    bool DpiSourceAvailable)
+{
+    /// <summary>
+    ///     Gets the client rectangle translated into physical desktop coordinates,
+    ///     when the platform supplied it.
+    /// </summary>
+    public Box2? ClientBounds { get; init; }
+}

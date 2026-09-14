@@ -18,7 +18,7 @@ public sealed class WindowsGeometryDashboardCoordinateContext
     private readonly IGeometryDashboardWindowService windows;
     private readonly Func<bool> isWindows;
     private readonly object refreshGate = new();
-    private Box2 editorBoxOffset = new(0, 1, 0, 1);
+    private Box2 editorBoxOffset = new(0, 0, 0, 0);
     private WindowsGeometryDashboardCoordinateSnapshot? current;
 
     /// <summary>

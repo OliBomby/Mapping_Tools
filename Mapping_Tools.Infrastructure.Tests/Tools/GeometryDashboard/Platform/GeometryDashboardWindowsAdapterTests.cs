@@ -132,6 +132,87 @@ public sealed class GeometryDashboardWindowsAdapterTests
     }
 
     [TestMethod]
+    public void CoordinateTransform_Windowed_UsesActualClientBounds()
+    {
+        // Arrange
+        var window = new GeometryDashboardWindow(
+            new PlatformWindowId(42),
+            7,
+            "map.osu",
+            new Box2(100, 50, 902, 676),
+            true,
+            true,
+            Vector2.One,
+            true)
+        {
+            ClientBounds = new Box2(102, 76, 902, 676),
+        };
+        WindowsGeometryDashboardCoordinateTransform sut = new(
+            window,
+            new GeometryDashboardScreen(
+                1,
+                new Box2(0, 0, 1920, 1080),
+                new Box2(0, 0, 1920, 1040),
+                true,
+                Vector2.One,
+                true),
+            new WindowsGeometryDashboardOsuDisplaySettings(
+                new Vector2(800, 600),
+                false,
+                false,
+                new Vector2(0.5, 0.5)),
+            new Box2(0, 0, 0, 0));
+
+        // Act
+        var editorBox = sut.EditorBox;
+
+        // Assert
+        editorBox.Left.Should().Be(102);
+        editorBox.Top.Should().Be(100);
+        editorBox.Right.Should().Be(902);
+        editorBox.Bottom.Should().Be(676);
+    }
+
+    [TestMethod]
+    public void CoordinateTransform_BorderlessMonitorWithNonZeroOrigin_UsesMonitorDimensions()
+    {
+        // Arrange
+        var window = new GeometryDashboardWindow(
+            new PlatformWindowId(42),
+            7,
+            "map.osu",
+            new Box2(100, 200, 3540, 1640),
+            true,
+            true,
+            Vector2.One,
+            true);
+        WindowsGeometryDashboardCoordinateTransform sut = new(
+            window,
+            new GeometryDashboardScreen(
+                1,
+                new Box2(100, 200, 3540, 1640),
+                new Box2(100, 200, 3540, 1600),
+                false,
+                Vector2.One,
+                true),
+            new WindowsGeometryDashboardOsuDisplaySettings(
+                new Vector2(3440, 1440),
+                false,
+                false,
+                new Vector2(0.5, 0.5)),
+            new Box2(0, 0, 0, 0));
+
+        // Act
+        var editorBox = sut.EditorBox;
+
+        // Assert
+        editorBox.Left.Should().Be(100);
+        editorBox.Top.Should().Be(224);
+        editorBox.Right.Should().Be(3540);
+        editorBox.Bottom.Should().Be(1640);
+    }
+
+    [TestMethod]
     public void CoordinateContext_Refresh_ReplacesTransformWhenWindowMoves()
     {
         // Arrange
