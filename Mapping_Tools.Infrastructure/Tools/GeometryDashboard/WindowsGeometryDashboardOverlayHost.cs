@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Core.BeatmapHelper;
@@ -16,6 +17,7 @@ namespace Mapping_Tools.Infrastructure.Tools.GeometryDashboard;
 /// </summary>
 internal sealed class WindowsGeometryDashboardOverlayHost
 {
+    private const uint extended_style_topmost = 0x00000008;
     private const uint extended_style_tool_window = 0x00000080;
     private const uint extended_style_transparent = 0x00000020;
     private const uint extended_style_layered = 0x00080000;
@@ -62,6 +64,8 @@ internal sealed class WindowsGeometryDashboardOverlayHost
 
     internal PlatformWindowId? TargetWindow { get; private set; }
 
+    internal bool HasNativeWindow => window != 0 && WindowsNativeMethods.IsWindow(window);
+
     internal void Initialize(PlatformWindowId targetWindow)
     {
         ThrowIfDisposed();
@@ -75,8 +79,12 @@ internal sealed class WindowsGeometryDashboardOverlayHost
         TargetWindow = null;
         DestroyNativeWindow();
         EnsureWindowClass();
+        // Like the legacy WPF Topmost window, establish this at creation.
+        // A replacement is created while osu! is foreground; SetWindowPos can
+        // report success without promoting that new background window.
         window = WindowsNativeMethods.CreateWindowEx(
-            extended_style_tool_window
+            extended_style_topmost
+            | extended_style_tool_window
             | extended_style_transparent
             | extended_style_layered
             | extended_style_no_activate,
@@ -234,18 +242,6 @@ internal sealed class WindowsGeometryDashboardOverlayHost
         }
     }
 
-    ~WindowsGeometryDashboardOverlayHost()
-    {
-        try
-        {
-            Dispose();
-        }
-        catch
-        {
-            // Finalization must not surface native cleanup failures.
-        }
-    }
-
     private static Vector2 ToDpi(
         Vector2 coordinate,
         Vector2 dpiMultiplier,
@@ -378,7 +374,8 @@ internal sealed class WindowsGeometryDashboardOverlayHost
         }
 
         HideNativeWindow();
-        WindowsNativeMethods.DestroyWindow(window);
+        if (WindowsNativeMethods.IsWindow(window) && !WindowsNativeMethods.DestroyWindow(window))
+            throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not destroy the Geometry Dashboard overlay.");
         lock (classGate)
         {
             borderStates.Remove(window);

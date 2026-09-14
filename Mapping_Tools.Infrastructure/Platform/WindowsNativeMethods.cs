@@ -29,6 +29,42 @@ internal static class WindowsNativeMethods
 
     internal static readonly nint TopMostWindow = new(-1);
 
+    [DllImport("kernel32.dll")]
+    internal static extern uint GetCurrentThreadId();
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static extern bool PostThreadMessage(uint threadId, uint message, nint wParam, nint lParam);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    internal static extern int GetMessage(out Message message, nint window, uint minimum, uint maximum);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static extern bool PeekMessage(out Message message, nint window, uint minimum, uint maximum, uint remove);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static extern bool TranslateMessage(ref Message message);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    internal static extern nint DispatchMessage(ref Message message);
+
+    [DllImport("user32.dll")]
+    internal static extern void PostQuitMessage(int exitCode);
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct Message
+    {
+        internal nint Window;
+        internal uint Id;
+        internal nuint WParam;
+        internal nint LParam;
+        internal uint Time;
+        internal Point Point;
+        internal uint Private;
+    }
+
     internal static int NativeInputSize => Marshal.SizeOf<Input>();
 
     [DllImport("user32.dll", SetLastError = true)]
