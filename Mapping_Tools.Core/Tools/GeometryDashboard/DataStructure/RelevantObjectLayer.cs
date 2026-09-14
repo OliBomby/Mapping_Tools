@@ -126,7 +126,11 @@ public sealed class RelevantObjectLayer
     /// <param name="forcePropagate">Whether to regenerate descendants even without new objects.</param>
     public void GenerateNewObjects(bool forcePropagate = false)
     {
-        if (GeneratorCollection is null) return;
+        if (GeneratorCollection is null)
+        {
+            NextLayer?.GenerateNewObjects(forcePropagate);
+            return;
+        }
 
         // Get all active generators for this layer
         var activeGenerators = GeneratorCollection.GetActiveGenerators().ToArray();

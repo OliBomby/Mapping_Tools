@@ -36,8 +36,8 @@ public sealed class GeometryDashboardServiceTests
         var snapshots = new RuntimeStub(
         [
             CreateRuntimeSnapshot(initialHitObject, 0, []),
-            CreateRuntimeSnapshot(selectedHitObject, 1, [selectedHitObject]),
-            CreateRuntimeSnapshot(finalHitObject, 2, []),
+            CreateRuntimeSnapshot(selectedHitObject, 0, [selectedHitObject]),
+            CreateRuntimeSnapshot(finalHitObject, 0, []),
         ]);
         using var service = CreateService(new InputStub(true), snapshots);
 
@@ -52,6 +52,40 @@ public sealed class GeometryDashboardServiceTests
         unselectedCount.Should().Be(0);
         selectedCount.Should().BeGreaterThan(0);
         service.State.SelectedCount.Should().Be(0);
+    }
+
+    [TestMethod]
+    public async Task RefreshOnceAsync_WhenVirtualPointsAreSelectedWithoutTimeChange_ReconcilesGeneratedChildrenImmediately()
+    {
+        // Arrange
+        HitObject first = new("64,96,1000,1,0,0:0:0:0:");
+        HitObject second = new("320,192,1000,1,0,0:0:0:0:");
+        var snapshot = CreateRuntimeSnapshot([first, second], 0, []);
+        var runtime = new RuntimeStub(snapshot) { RepeatedSnapshot = snapshot };
+        var input = new InputStub(true);
+        var overlay = new OverlayStub();
+        using var service = CreateService(input, runtime, overlay);
+
+        // Act
+        await service.RefreshOnceAsync();
+        int initialLineCount = CountLineShapes(overlay.LastScene);
+        input.SelectHotkeyDown = true;
+        input.CursorPosition = first.Pos;
+        await service.RefreshOnceAsync();
+        input.CursorPosition = second.Pos;
+        await service.RefreshOnceAsync();
+        int selectedLineCount = CountLineShapes(overlay.LastScene);
+        input.SelectHotkeyDown = false;
+        await service.RefreshOnceAsync();
+        input.SelectHotkeyDown = true;
+        input.CursorPosition = first.Pos;
+        await service.RefreshOnceAsync();
+        int clearedLineCount = CountLineShapes(overlay.LastScene);
+
+        // Assert
+        initialLineCount.Should().Be(0);
+        selectedLineCount.Should().BeGreaterThan(0);
+        clearedLineCount.Should().Be(0);
     }
 
     [TestMethod]
@@ -162,9 +196,31 @@ public sealed class GeometryDashboardServiceTests
         service.State.Status.Should().Be("Waiting for the osu! editor...");
     }
 
+    [TestMethod]
+    public async Task Start_WhenSnapHotkeyIsHeld_UpdatesCursorAtLegacyFrequency()
+    {
+        // Arrange
+        var input = new InputStub(true) { SnapHotkeyDown = true };
+        var snapshot = CreateRuntimeSnapshot(
+            new HitObject("64,96,1000,1,0,0:0:0:0:"),
+            0,
+            []);
+        var runtime = new RuntimeStub(snapshot) { RepeatedSnapshot = snapshot };
+        using var service = CreateService(input, runtime);
+
+        // Act
+        service.Start();
+        await input.CursorSetReached.WaitAsync(TimeSpan.FromMilliseconds(250));
+        service.Stop();
+
+        // Assert
+        input.CursorSetCount.Should().BeGreaterThanOrEqualTo(4);
+    }
+
     private static GeometryDashboardService CreateService(
         InputStub input,
         RuntimeStub? runtime = null,
+        OverlayStub? overlay = null,
         ApplicationSettings? settings = null)
     {
         return new GeometryDashboardService(
@@ -172,11 +228,19 @@ public sealed class GeometryDashboardServiceTests
             new GeometryDashboardServiceOptions(),
             runtime ?? new RuntimeStub(),
             input,
-            new OverlayStub());
+            overlay ?? new OverlayStub());
     }
 
     private static GeometryDashboardRuntimeSnapshot CreateRuntimeSnapshot(
         HitObject hitObject,
+        int editorTime,
+        IReadOnlyList<HitObject> selectedHitObjects)
+    {
+        return CreateRuntimeSnapshot([hitObject], editorTime, selectedHitObjects);
+    }
+
+    private static GeometryDashboardRuntimeSnapshot CreateRuntimeSnapshot(
+        IReadOnlyList<HitObject> hitObjects,
         int editorTime,
         IReadOnlyList<HitObject> selectedHitObjects)
     {
@@ -185,7 +249,7 @@ public sealed class GeometryDashboardServiceTests
                 "C:/Songs/map/map.osu",
                 [],
                 [],
-                [hitObject],
+                hitObjects,
                 0,
                 1.4,
                 1,
@@ -196,6 +260,11 @@ public sealed class GeometryDashboardServiceTests
             true);
     }
 
+    private static int CountLineShapes(GeometryDashboardOverlayScene scene)
+    {
+        return scene.Shapes.Count(shape => shape.Kind == GeometryDashboardOverlayShapeKind.Line);
+    }
+
     private sealed class RuntimeStub(params GeometryDashboardRuntimeSnapshot?[] snapshots)
         : IGeometryDashboardRuntime
     {
@@ -203,22 +272,33 @@ public sealed class GeometryDashboardServiceTests
 
         public bool IsProcessRunning { get; set; } = true;
         public Exception? ReadException { get; set; }
+        public GeometryDashboardRuntimeSnapshot? RepeatedSnapshot { get; set; }
 
         public Task<GeometryDashboardRuntimeSnapshot?> ReadAsync(
             CancellationToken cancellationToken = default)
         {
             if (ReadException is { } exception) throw exception;
-            return Task.FromResult(snapshots.Count == 0 ? null : snapshots.Dequeue());
+            return Task.FromResult(snapshots.Count == 0 ? RepeatedSnapshot : snapshots.Dequeue());
         }
     }
 
     private sealed class InputStub(bool isSupported) : IGeometryDashboardInputService
     {
+        private readonly TaskCompletionSource cursorSetReached = new(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+        private int cursorSetCount;
+
         public bool IsSupported => isSupported;
+        public bool SnapHotkeyDown { get; set; }
+        public bool SelectHotkeyDown { get; set; }
+        public Vector2 CursorPosition { get; set; }
+        public int CursorSetCount => Volatile.Read(ref cursorSetCount);
+        public Task CursorSetReached => cursorSetReached.Task;
 
         public bool IsHotkeyDown(HotkeySettings? hotkey)
         {
-            return false;
+            return SnapHotkeyDown && hotkey is { Key: 56, Modifiers: 0 }
+                   || SelectHotkeyDown && hotkey is { Key: 57, Modifiers: 0 };
         }
 
         public bool IsMouseButtonDown(GeometryDashboardMouseButton button)
@@ -228,13 +308,14 @@ public sealed class GeometryDashboardServiceTests
 
         public bool TryGetCursorPosition(out Vector2 position)
         {
-            position = Vector2.Zero;
-            return false;
+            position = CursorPosition;
+            return true;
         }
 
         public bool TrySetCursorPosition(Vector2 position)
         {
-            return false;
+            if (Interlocked.Increment(ref cursorSetCount) >= 4) cursorSetReached.TrySetResult();
+            return true;
         }
     }
 
@@ -243,7 +324,14 @@ public sealed class GeometryDashboardServiceTests
         public bool IsSupported => true;
         public bool IsVisible { get; private set; }
         public string? ConfigurationStatus => null;
-        public void Update(GeometryDashboardOverlayScene scene, GeometryDashboardOverlayOptions options) => IsVisible = true;
+        public GeometryDashboardOverlayScene LastScene { get; private set; } = GeometryDashboardOverlayScene.Empty;
+
+        public void Update(GeometryDashboardOverlayScene scene, GeometryDashboardOverlayOptions options)
+        {
+            LastScene = scene;
+            IsVisible = true;
+        }
+
         public void Hide() => IsVisible = false;
         public void Dispose() { }
     }

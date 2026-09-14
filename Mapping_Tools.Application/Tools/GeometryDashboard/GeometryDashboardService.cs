@@ -23,6 +23,7 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
     private const double points_bias = 3;
     private const double special_bias = 2;
     private const double selection_range = 80;
+    private const int snapping_interval_milliseconds = 16;
     private static readonly HitObjectComparer hitObjectComparer = new();
 
     private readonly GeometryDashboardServiceOptions project;
@@ -44,6 +45,7 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
         0);
     private CancellationTokenSource? runCancellation;
     private Task? runLoop;
+    private Task? snappingLoop;
     private GeometryDashboardRuntimeSnapshot? runtimeSnapshot;
     private RelevantHitObject? heldHitObject;
     private IRelevantObject[] heldHitObjects = [];
@@ -119,6 +121,7 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
             runCancellation = new CancellationTokenSource();
             CancellationToken cancellationToken = runCancellation.Token;
             runLoop = Task.Run(() => RunLoopAsync(cancellationToken));
+            snappingLoop = Task.Run(() => SnappingLoopAsync(cancellationToken));
         }
     }
 
@@ -126,19 +129,25 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
     public void Stop()
     {
         Task? worker;
+        Task? snappingWorker;
         CancellationTokenSource? cancellation;
         lock (lifecycleGate)
         {
             cancellation = runCancellation;
             worker = runLoop;
+            snappingWorker = snappingLoop;
             runCancellation = null;
             runLoop = null;
+            snappingLoop = null;
             cancellation?.Cancel();
         }
 
         try
         {
-            worker?.GetAwaiter().GetResult();
+            List<Task> workers = [];
+            if (worker is not null) workers.Add(worker);
+            if (snappingWorker is not null) workers.Add(snappingWorker);
+            if (workers.Count > 0) Task.WhenAll(workers).GetAwaiter().GetResult();
         }
         catch (OperationCanceledException)
         {
@@ -309,6 +318,33 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
         }
     }
 
+    private async Task SnappingLoopAsync(CancellationToken cancellationToken)
+    {
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            try
+            {
+                UpdateSnapping();
+            }
+            catch (Exception exception)
+            {
+                PublishUnavailableState($"Error: {exception.Message} Retrying...");
+            }
+
+            try
+            {
+                await Task.Delay(
+                        TimeSpan.FromMilliseconds(snapping_interval_milliseconds),
+                        cancellationToken)
+                    .ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+        }
+    }
+
     private async Task RefreshOnceCoreAsync(CancellationToken cancellationToken)
     {
         if (!input.IsSupported)
@@ -340,6 +376,9 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
         }
 
         bool shouldUpdateRoots = previousSnapshot is null
+                                 || SelectionChanged(
+                                     previousSnapshot.Editor.SelectedHitObjects,
+                                     snapshot.Editor.SelectedHitObjects)
                                  || Preferences.UpdateMode switch
                                  {
                                      UpdateMode.AnyChange => true,
@@ -409,6 +448,13 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
         }
     }
 
+    private static bool SelectionChanged(
+        IReadOnlyList<HitObject> previousSelection,
+        IReadOnlyList<HitObject> currentSelection)
+    {
+        return !previousSelection.SequenceEqual(currentSelection, hitObjectComparer);
+    }
+
     private static bool SynchronizeRootSelection(
         IEnumerable<RelevantHitObject> roots,
         IReadOnlyList<HitObject> selectedHitObjects)
@@ -434,47 +480,6 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
     {
         lock (stateGate)
         {
-            Vector2 cursor;
-            if (input.IsMouseButtonDown(GeometryDashboardMouseButton.Left)
-                && input.TryGetCursorPosition(out cursor))
-            {
-                var selected = layers.GetRootRelevantHitObjects()
-                    .Where(objectModel => objectModel.IsSelected)
-                    .ToArray();
-                heldHitObjects = selected;
-                heldHitObject = selected
-                    .OrderBy(objectModel => Vector2.Distance(objectModel.HitObject.Pos, cursor))
-                    .FirstOrDefault(objectModel =>
-                        Vector2.Distance(objectModel.HitObject.Pos, cursor)
-                        <= Beatmap.GetHitObjectRadius(runtimeSnapshot?.Editor.CircleSize ?? 5));
-                heldMouseOffset = heldHitObject is null
-                    ? Vector2.Zero
-                    : heldHitObject.HitObject.Pos - cursor;
-            }
-            else
-            {
-                heldHitObject = null;
-                heldHitObjects = [];
-                heldMouseOffset = Vector2.Zero;
-            }
-
-            bool snap = input.IsHotkeyDown(Preferences.SnapHotkey);
-            if (!snap) lastSnapped = null;
-            if (snap && input.TryGetCursorPosition(out cursor))
-            {
-                var nearest = GetNearestDrawable(
-                    cursor + heldMouseOffset,
-                    heldObjects: heldHitObjects,
-                    specialPriority: static objectModel =>
-                        objectModel.IsSelected || objectModel.IsLocked || objectModel.IsInheritable);
-                if (nearest is not null)
-                {
-                    lastSnapped = nearest;
-                    input.TrySetCursorPosition(
-                        nearest.NearestPoint(cursor + heldMouseOffset) - heldMouseOffset);
-                }
-            }
-
             if (input.IsHotkeyDown(Preferences.SelectHotkey))
                 ApplyNearestToggle(
                     selectedDrawables,
@@ -495,6 +500,70 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
                     static objectModel => objectModel.IsInheritable,
                     static (objectModel, value) => objectModel.IsInheritable = value);
             else inheritableDrawables.Clear();
+        }
+    }
+
+    private void UpdateSnapping()
+    {
+        lock (stateGate)
+        {
+            if (runtimeSnapshot is not { IsEditorActive: true })
+            {
+                heldHitObject = null;
+                heldHitObjects = [];
+                heldMouseOffset = Vector2.Zero;
+                lastSnapped = null;
+                return;
+            }
+
+            bool snap = input.IsHotkeyDown(Preferences.SnapHotkey);
+            if (!snap)
+            {
+                heldHitObject = null;
+                heldHitObjects = [];
+                heldMouseOffset = Vector2.Zero;
+                lastSnapped = null;
+                return;
+            }
+
+            Vector2 cursor;
+            if (input.IsMouseButtonDown(GeometryDashboardMouseButton.Left)
+                && input.TryGetCursorPosition(out cursor))
+            {
+                var selected = layers.GetRootRelevantHitObjects()
+                    .Where(objectModel => objectModel.IsSelected)
+                    .ToArray();
+                heldHitObjects = selected;
+                heldHitObject = selected
+                    .OrderBy(objectModel => Vector2.Distance(objectModel.HitObject.Pos, cursor))
+                    .FirstOrDefault(objectModel =>
+                        Vector2.Distance(objectModel.HitObject.Pos, cursor)
+                        <= Beatmap.GetHitObjectRadius(runtimeSnapshot.Editor.CircleSize));
+                heldMouseOffset = heldHitObject is null
+                    ? Vector2.Zero
+                    : heldHitObject.HitObject.Pos - cursor;
+            }
+            else
+            {
+                heldHitObject = null;
+                heldHitObjects = [];
+                heldMouseOffset = Vector2.Zero;
+            }
+
+            if (input.TryGetCursorPosition(out cursor))
+            {
+                var nearest = GetNearestDrawable(
+                    cursor + heldMouseOffset,
+                    heldObjects: heldHitObjects,
+                    specialPriority: static objectModel =>
+                        objectModel.IsSelected || objectModel.IsLocked || objectModel.IsInheritable);
+                if (nearest is not null)
+                {
+                    lastSnapped = nearest;
+                    input.TrySetCursorPosition(
+                        nearest.NearestPoint(cursor + heldMouseOffset) - heldMouseOffset);
+                }
+            }
         }
     }
 
