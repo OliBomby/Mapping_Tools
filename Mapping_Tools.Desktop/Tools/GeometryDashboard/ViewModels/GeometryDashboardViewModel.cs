@@ -108,6 +108,11 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     [ObservableProperty]
     public partial string Status { get; private set; } = "Stopped";
 
+    /// <summary>Gets the visual state used by the dashboard status indicator.</summary>
+    [ObservableProperty]
+    public partial GeometryDashboardStatusIndicatorState StatusIndicatorState { get; private set; } =
+        GeometryDashboardStatusIndicatorState.Waiting;
+
     /// <summary>Gets or sets the case-insensitive generator search query.</summary>
     public string Filter
     {
@@ -374,10 +379,22 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         {
             if (disposed) return;
             Status = state.Status;
+            StatusIndicatorState = GetStatusIndicatorState(state.Status);
             OnPropertyChanged(nameof(DrawableCount));
             OnPropertyChanged(nameof(SelectedCount));
             OnPropertyChanged(nameof(IsConnected));
         });
+    }
+
+    private static GeometryDashboardStatusIndicatorState GetStatusIndicatorState(string status)
+    {
+        if (status.StartsWith("Error:", StringComparison.OrdinalIgnoreCase)
+            || status.StartsWith("Unable to run:", StringComparison.OrdinalIgnoreCase))
+            return GeometryDashboardStatusIndicatorState.Error;
+
+        return status.StartsWith("Running:", StringComparison.OrdinalIgnoreCase)
+            ? GeometryDashboardStatusIndicatorState.Running
+            : GeometryDashboardStatusIndicatorState.Waiting;
     }
 
     private void LoadSaveSlot(GeometryDashboardSaveSlot slot)

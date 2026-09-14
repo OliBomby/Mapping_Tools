@@ -18,4 +18,7 @@
     <SolidColorBrush x:Key="MappingToolsTimelineAccentOuterBrush" Color="#FFAC38BE" />
     <SolidColorBrush x:Key="MappingToolsTimelineAccentInnerBrush" Color="#FF9125AF" />
     <SolidColorBrush x:Key="MappingToolsMaterialToolToggleListBoxBackgroundBrush" Color="#FF212121"/>
+    <SolidColorBrush x:Key="MappingToolsStatusErrorBrush" Color="#FFF44336" />
+    <SolidColorBrush x:Key="MappingToolsStatusWaitingBrush" Color="#FFFFC107" />
+    <SolidColorBrush x:Key="MappingToolsStatusRunningBrush" Color="#FF4CAF50" />
 </ResourceDictionary>
