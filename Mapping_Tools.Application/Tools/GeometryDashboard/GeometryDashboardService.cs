@@ -376,9 +376,6 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
         }
 
         bool shouldUpdateRoots = previousSnapshot is null
-                                 || SelectionChanged(
-                                     previousSnapshot.Editor.SelectedHitObjects,
-                                     snapshot.Editor.SelectedHitObjects)
                                  || Preferences.UpdateMode switch
                                  {
                                      UpdateMode.AnyChange => true,
@@ -446,13 +443,6 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
             layers.GetRootLayer().GenerateNewObjects(true);
             return true;
         }
-    }
-
-    private static bool SelectionChanged(
-        IReadOnlyList<HitObject> previousSelection,
-        IReadOnlyList<HitObject> currentSelection)
-    {
-        return !previousSelection.SequenceEqual(currentSelection, hitObjectComparer);
     }
 
     private static bool SynchronizeRootSelection(

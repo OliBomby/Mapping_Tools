@@ -6,6 +6,7 @@ using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Settings.Models;
+using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Application.Tests.Tools.GeometryDashboard;
@@ -27,7 +28,7 @@ public sealed class GeometryDashboardServiceTests
     }
 
     [TestMethod]
-    public async Task RefreshOnceAsync_WhenEditorSelectionChanges_SynchronizesRootSelectionState()
+    public async Task RefreshOnceAsync_WhenEditorSelectionChangesWithoutConfiguredRefresh_WaitsForConfiguredUpdate()
     {
         // Arrange
         HitObject initialHitObject = new("64,96,1000,1,0,0:0:0:0:");
@@ -37,9 +38,11 @@ public sealed class GeometryDashboardServiceTests
         [
             CreateRuntimeSnapshot(initialHitObject, 0, []),
             CreateRuntimeSnapshot(selectedHitObject, 0, [selectedHitObject]),
-            CreateRuntimeSnapshot(finalHitObject, 0, []),
+            CreateRuntimeSnapshot(finalHitObject, 1, [finalHitObject]),
         ]);
-        using var service = CreateService(new InputStub(true), snapshots);
+        GeometryDashboardServiceOptions project = new();
+        project.CurrentPreferences.UpdateMode = UpdateMode.TimeChange;
+        using var service = CreateService(new InputStub(true), snapshots, project: project);
 
         // Act
         await service.RefreshOnceAsync();
@@ -47,11 +50,12 @@ public sealed class GeometryDashboardServiceTests
         await service.RefreshOnceAsync();
         int selectedCount = service.State.SelectedCount;
         await service.RefreshOnceAsync();
+        int refreshedSelectedCount = service.State.SelectedCount;
 
         // Assert
         unselectedCount.Should().Be(0);
-        selectedCount.Should().BeGreaterThan(0);
-        service.State.SelectedCount.Should().Be(0);
+        selectedCount.Should().Be(0);
+        refreshedSelectedCount.Should().BeGreaterThan(0);
     }
 
     [TestMethod]
@@ -221,11 +225,12 @@ public sealed class GeometryDashboardServiceTests
         InputStub input,
         RuntimeStub? runtime = null,
         OverlayStub? overlay = null,
-        ApplicationSettings? settings = null)
+        ApplicationSettings? settings = null,
+        GeometryDashboardServiceOptions? project = null)
     {
         return new GeometryDashboardService(
             settings ?? new ApplicationSettings(),
-            new GeometryDashboardServiceOptions(),
+            project ?? new GeometryDashboardServiceOptions(),
             runtime ?? new RuntimeStub(),
             input,
             overlay ?? new OverlayStub());
