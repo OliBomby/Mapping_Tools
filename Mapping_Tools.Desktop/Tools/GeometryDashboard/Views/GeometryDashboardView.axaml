@@ -39,10 +39,12 @@
                     <materialIcons:MaterialIcon Kind="Pizza" Width="22" Height="22" />
                 </materialDesign:FloatingButton>
                 <materialDesign:FloatingButton Classes="mini no-transitions" Margin="0,0,8,0"
+                                               Foreground="{DynamicResource MaterialDarkForegroundBrush}"
                                                ToolTip.Tip="Savestates..." Click="ShowProjects">
                     <materialIcons:MaterialIcon Kind="ContentSaveAll" Width="22" Height="22" />
                 </materialDesign:FloatingButton>
                 <materialDesign:FloatingButton Classes="mini no-transitions" ToolTip.Tip="Preferences..."
+                                               Foreground="{DynamicResource MaterialDarkForegroundBrush}"
                                                Click="ShowPreferences">
                     <materialIcons:MaterialIcon Kind="SettingsOutline" Width="22" Height="22" />
                 </materialDesign:FloatingButton>
@@ -51,55 +53,91 @@
             </StackPanel>
 
             <Grid Grid.Row="1" RowDefinitions="Auto,*" MinHeight="0">
-                <Grid Grid.Row="0" ColumnDefinitions="55,90,500,90,50">
+                <Grid Grid.Row="0" ColumnDefinitions="70,110,*,100,100" Margin="16,0,16,8">
                     <TextBlock Text="Active" />
                     <TextBlock Grid.Column="1" Text="Settings" />
                     <TextBlock Grid.Column="2" Text="Name" />
                     <TextBlock Grid.Column="3" Text="Sequential" />
-                    <TextBlock Grid.Column="4" Text="Relevancy" />
+                    <TextBlock Grid.Column="4" Text="Relevancy" TextTrimming="CharacterEllipsis" />
                 </Grid>
                 <ScrollViewer Grid.Row="1" x:Name="GeneratorsScrollViewer"
-                              VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled"
+                              VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                              AllowAutoHide="False"
+                              HorizontalContentAlignment="Stretch"
                               ScrollChanged="GeneratorsScrollChanged" PointerPressed="GeneratorsPointerPressed"
                               PointerWheelChanged="GeneratorsPointerWheelChanged">
-                    <ItemsControl ItemsSource="{Binding GeneratorGroups}">
+                    <ItemsControl ItemsSource="{Binding GeneratorGroups}"
+                                  Margin="0,0,16,0"
+                                  HorizontalAlignment="Stretch"
+                                  ClipToBounds="False">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="geometryDashboard:GeometryDashboardGeneratorGroupViewModel">
-                                <Expander IsExpanded="True">
+                                <Expander IsExpanded="True" Margin="0,0,0,5"
+                                          HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
                                     <Expander.Header>
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="{Binding Name}" FontSize="22" FontWeight="Bold"
-                                                       Foreground="Gray" VerticalAlignment="Bottom" />
+                                                       Foreground="Gray"
+                                                       VerticalAlignment="Bottom" />
                                             <TextBlock Text="{Binding ItemCount}" FontSize="22" FontWeight="Bold"
-                                                       FontStyle="Italic" Foreground="Green" Margin="10,0,0,0"
+                                                       FontStyle="Italic"
+                                                       Foreground="Green"
+                                                       Margin="10,0,0,0"
                                                        VerticalAlignment="Bottom" />
                                             <TextBlock Text=" item(s)" FontSize="22" FontStyle="Italic" Foreground="Silver"
                                                        VerticalAlignment="Bottom" />
                                         </StackPanel>
                                     </Expander.Header>
-                                    <ItemsControl ItemsSource="{Binding Generators}">
-                                        <ItemsControl.ItemTemplate>
+                                    <ListBox ItemsSource="{Binding Generators}"
+                                             HorizontalAlignment="Stretch"
+                                             SelectionMode="Single"
+                                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                             ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                                        <ListBox.Styles>
+                                            <Style Selector="ListBoxItem">
+                                                <Setter Property="Padding" Value="8, 2" />
+                                                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                                            </Style>
+                                            <Style Selector="ListBoxItem /template/ Border#PART_RootBorder:not(:nothing)">
+                                                <Setter Property="BorderThickness" Value="0, 0, 0, 1"/>
+                                                <Setter Property="BorderBrush" Value="{DynamicResource MaterialCardBackgroundBrush}" />
+                                            </Style>
+                                        </ListBox.Styles>
+                                        <ListBox.ItemTemplate>
                                             <DataTemplate x:DataType="geometryDashboard:GeometryDashboardGeneratorViewModel">
-                                                <Grid ColumnDefinitions="55,90,500,90,50" Margin="0,2">
-                                                    <ToggleSwitch IsChecked="{Binding Settings.IsActive, Mode=TwoWay}"
+                                                <Grid ColumnDefinitions="70,110,*,100,100"
+                                                      HorizontalAlignment="Stretch"
+                                                      Margin="0,2">
+                                                    <ToggleSwitch IsChecked="{Binding IsActive, Mode=TwoWay}"
+                                                                  OnContent="" OffContent=""
+                                                                  VerticalAlignment="Center"
                                                                   Cursor="Hand" />
-                                                    <Button Grid.Column="1" Content="Configure" Width="82"
+                                                    <Button Grid.Column="1" Content="Configure" Width="100"
+                                                            Margin="0,0,10,0"
+                                                            VerticalAlignment="Center"
+                                                            CornerRadius="7"
                                                             Command="{Binding OpenSettingsCommand}"
                                                             ToolTip.Tip="Generator settings..." />
                                                     <TextBlock Grid.Column="2" Text="{Binding Name}"
                                                                VerticalAlignment="Center"
+                                                               TextTrimming="CharacterEllipsis"
                                                                ToolTip.Tip="{Binding Tooltip}" />
                                                     <ToggleSwitch Grid.Column="3"
-                                                                  IsChecked="{Binding Settings.IsSequential, Mode=TwoWay}"
+                                                                  IsChecked="{Binding IsSequential, Mode=TwoWay}"
+                                                                  OnContent="" OffContent=""
+                                                                  VerticalAlignment="Center"
                                                                   Cursor="Hand" />
-                                                    <TextBox Grid.Column="4" Classes="compact" Width="50"
-                                                             Text="{Binding Settings.RelevancyRatio, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
+                                                    <TextBox Grid.Column="4" Classes="compact" Width="60"
+                                                             VerticalAlignment="Center"
+                                                             Text="{Binding RelevancyRatio, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
                                                              Cursor="Hand"
                                                              ToolTip.Tip="The relevance multiplier applied to generated objects." />
                                                 </Grid>
                                             </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
                                 </Expander>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>

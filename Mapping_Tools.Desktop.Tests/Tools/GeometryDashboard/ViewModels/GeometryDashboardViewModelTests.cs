@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Avalonia.Input;
 using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.BeatmapEditing.Models;
@@ -12,9 +13,11 @@ using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Settings.Models;
+using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard;
+using Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -39,6 +42,65 @@ public sealed class GeometryDashboardViewModelTests
         // Assert
         viewModel.GeneratorGroups.SelectMany(group => group.Generators)
             .Should().OnlyContain(generator => generator.Name.Contains("circle", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [TestMethod]
+    public void NotifySettingsChanged_AfterGeneratorSettingsChange_NotifiesGeneratorRowBindings()
+    {
+        // Arrange
+        using var viewModel = CreateViewModel();
+        var generator = viewModel.Generators.First();
+        var changedProperties = new List<string?>();
+        generator.PropertyChanged += (_, eventArgs) => changedProperties.Add(eventArgs.PropertyName);
+        bool expectedSequential = !generator.IsSequential;
+        const double expectedRelevancyRatio = 0.75;
+
+        // Act
+        generator.Model.Settings.IsSequential = expectedSequential;
+        generator.Model.Settings.RelevancyRatio = expectedRelevancyRatio;
+        generator.NotifySettingsChanged();
+
+        // Assert
+        generator.IsSequential.Should().Be(expectedSequential);
+        generator.RelevancyRatio.Should().Be(expectedRelevancyRatio);
+        changedProperties.Should().Contain(nameof(generator.IsSequential));
+        changedProperties.Should().Contain(nameof(generator.RelevancyRatio));
+    }
+
+    [TestMethod]
+    public void Apply_AfterGeneratorSettingChanges_CopiesValuesToOriginalSettings()
+    {
+        // Arrange
+        var originalSettings = new GeneratorSettings
+        {
+            IsSequential = false,
+            RelevancyRatio = 0.4,
+        };
+        var dialog = new GeometryDashboardGeneratorSettingsDialogViewModel(originalSettings);
+        var sequentialRow = dialog.Rows.Single(row => row.Name == "Sequential");
+        var relevancyRow = dialog.Rows.Single(row => row.Name == "Relevancy Ratio");
+        sequentialRow.BooleanValue = true;
+        relevancyRow.ValueText = "0.75";
+
+        // Act
+        dialog.ApplyCommand.Execute(null);
+
+        // Assert
+        originalSettings.IsSequential.Should().BeTrue();
+        originalSettings.RelevancyRatio.Should().Be(0.75);
+    }
+
+    [TestMethod]
+    public void Constructor_WithDerivedSettings_UsesDeclaredReflectionOrder()
+    {
+        // Arrange
+        var settings = new GeneratorSettingsWithUnmappedProperty();
+
+        // Act
+        var dialog = new GeometryDashboardGeneratorSettingsDialogViewModel(settings);
+
+        // Assert
+        dialog.SpecificRows.Select(row => row.Name).Should().Equal("Unmapped", "Angle");
     }
 
     [TestMethod]
@@ -310,6 +372,24 @@ public sealed class GeometryDashboardViewModelTests
         {
             Published?.Invoke(this, new UserNotificationPublishedEventArgs(notification));
             return Task.CompletedTask;
+        }
+    }
+
+    private sealed class GeneratorSettingsWithUnmappedProperty : GeneratorSettings
+    {
+        [DisplayName("Unmapped")]
+        public double Unmapped { get; set; }
+
+        [DisplayName("Angle")]
+        public double Angle { get; set; }
+
+        public override object Clone()
+        {
+            return new GeneratorSettingsWithUnmappedProperty
+            {
+                Unmapped = Unmapped,
+                Angle = Angle,
+            };
         }
     }
 

@@ -38,31 +38,24 @@
                                       ClipToBounds="False">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="patternGallery:PatternGalleryGroupViewModel">
-                                    <Expander IsExpanded="True" Margin="0,0,0,10"
-                                              Background="Transparent">
-                                        <Expander.Styles>
-                                            <Style Selector="Expander /template/ ToggleButton#PART_ToggleButton">
-                                                <Setter Property="Background" Value="{DynamicResource MaterialCardBackgroundBrush}" />
-                                            </Style>
-                                        </Expander.Styles>
+                                    <Expander IsExpanded="True" Margin="0,0,0,10">
                                         <Expander.Header>
                                             <StackPanel Orientation="Horizontal">
                                                 <TextBlock FontSize="22"
                                                            FontWeight="Bold"
-                                                           Foreground="{DynamicResource MaterialBodyLightBrush}"
+                                                           Foreground="Gray"
                                                            VerticalAlignment="Bottom"
                                                            Text="{Binding Name}" />
                                                 <TextBlock Margin="10,0,0,0"
                                                            FontSize="22"
                                                            FontWeight="Bold"
                                                            FontStyle="Italic"
-                                                           Foreground="{DynamicResource MappingToolsTimelineAddedInnerBrush}"
+                                                           Foreground="Green"
                                                            VerticalAlignment="Bottom"
                                                            Text="{Binding ItemCount}" />
                                                 <TextBlock FontSize="22"
                                                            FontStyle="Italic"
-                                                           Foreground="{DynamicResource MaterialBodyLightBrush}"
-                                                           Opacity="0.75"
+                                                           Foreground="Silver"
                                                            VerticalAlignment="Bottom"
                                                            Text=" item(s)" />
                                             </StackPanel>

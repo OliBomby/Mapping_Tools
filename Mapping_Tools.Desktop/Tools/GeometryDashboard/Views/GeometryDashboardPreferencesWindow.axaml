@@ -2,7 +2,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="using:Mapping_Tools.Desktop.Controls"
         xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
-        xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
         xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         xmlns:geometryDashboard="clr-namespace:Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions"
         x:Class="Mapping_Tools.Desktop.Tools.GeometryDashboard.Views.GeometryDashboardPreferencesWindow"
@@ -15,13 +14,15 @@
     <Grid RowDefinitions="Auto,*,Auto">
         <Grid x:Name="FirstGrid" Grid.Row="0">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" IsHitTestVisible="False">
-                <Border Width="24" Height="24" Margin="9,6,0,0"
+                <Border Width="24" Height="24" Margin="9,0,0,0"
+                        VerticalAlignment="Center"
                         Background="{DynamicResource MaterialBodyBrush}">
                     <Border.OpacityMask>
                         <ImageBrush Source="/Assets/mt_logo_white_24.png" Stretch="Uniform" />
                     </Border.OpacityMask>
                 </Border>
-                <TextBlock Text="Preferences" Margin="8,11,0,0"
+                <TextBlock Text="Preferences" Margin="8,0,0,0"
+                           VerticalAlignment="Center"
                            FontWeight="Normal" />
             </StackPanel>
             <Border Margin="0,0,47,0" Background="Transparent"
@@ -39,17 +40,24 @@
                       HorizontalScrollBarVisibility="Hidden">
             <Border Padding="10">
                 <StackPanel>
+                    <StackPanel.Styles>
+                        <Style Selector="TextBlock">
+                            <Setter Property="FontWeight" Value="Bold" />
+                        </Style>
+                    </StackPanel.Styles>
                     <Border Padding="5,10">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
                                 <TextBlock Width="100" Text="Snap key" VerticalAlignment="Bottom" Margin="0,0,0,6"
                                            ToolTip.Tip="Press and hold this key to snap your cursor to the closest virtual object." />
                                 <controls:HotkeyEditor Width="150" VerticalAlignment="Bottom"
+                                                       Classes="compact"
                                                        Hotkey="{Binding Preferences.SnapHotkey, Mode=TwoWay}"
                                                        ToolTip.Tip="Press and hold this key to snap your cursor to the closest virtual object." />
                                 <TextBlock Width="100" Text="Select key" VerticalAlignment="Bottom" Margin="10,0,0,6"
                                            ToolTip.Tip="Press or hold this key to select virtual objects." />
                                 <controls:HotkeyEditor Width="150" VerticalAlignment="Bottom"
+                                                       Classes="compact"
                                                        Hotkey="{Binding Preferences.SelectHotkey, Mode=TwoWay}"
                                                        ToolTip.Tip="Press or hold this key to select virtual objects." />
                             </StackPanel>
@@ -58,11 +66,13 @@
                                 <TextBlock Width="100" Text="Lock key" VerticalAlignment="Bottom" Margin="0,0,0,6"
                                            ToolTip.Tip="Press or hold this key to lock virtual objects." />
                                 <controls:HotkeyEditor Width="150" VerticalAlignment="Bottom"
+                                                       Classes="compact"
                                                        Hotkey="{Binding Preferences.LockHotkey, Mode=TwoWay}"
                                                        ToolTip.Tip="Press or hold this key to lock virtual objects." />
                                 <TextBlock Width="100" Text="Usability key" VerticalAlignment="Bottom" Margin="10,0,0,6"
                                            ToolTip.Tip="Press or hold this key to select which virtual objects can get used by generators." />
                                 <controls:HotkeyEditor Width="150" VerticalAlignment="Bottom"
+                                                       Classes="compact"
                                                        Hotkey="{Binding Preferences.InheritHotkey, Mode=TwoWay}"
                                                        ToolTip.Tip="Press or hold this key to select which virtual objects can get used by generators." />
                             </StackPanel>
@@ -71,6 +81,7 @@
                                 <TextBlock Width="100" Text="Refresh key" VerticalAlignment="Bottom" Margin="0,0,0,6"
                                            ToolTip.Tip="Press and hold this key to continuously refresh the hit objects in the root layer of the object tree." />
                                 <controls:HotkeyEditor Width="150" VerticalAlignment="Bottom"
+                                                       Classes="compact"
                                                        Hotkey="{Binding Preferences.RefreshHotkey, Mode=TwoWay}"
                                                        ToolTip.Tip="Press and hold this key to continuously refresh the hit objects in the root layer of the object tree." />
                             </StackPanel>
@@ -108,18 +119,28 @@
                             <StackPanel Orientation="Horizontal" Margin="10">
                                 <TextBlock Width="100" Text="Downkey" VerticalAlignment="Center" Margin="0,0,0,6"
                                            ToolTip.Tip="Customize what gets displayed while the Snap Key is pressed." />
-                                <WrapPanel>
-                                    <CheckBox Content="Everything" IsChecked="{Binding KeyDownEverything, Mode=TwoWay}"
-                                              Margin="0,0,12,0" ToolTip.Tip="Everything" />
-                                    <CheckBox Content="P" IsChecked="{Binding KeyDownParents, Mode=TwoWay}"
-                                              Margin="0,0,12,0" ToolTip.Tip="Parents and parents of parents" />
-                                    <CheckBox Content="DP" IsChecked="{Binding KeyDownDirectParents, Mode=TwoWay}"
-                                              Margin="0,0,12,0" ToolTip.Tip="Direct parents" />
-                                    <CheckBox Content="C" IsChecked="{Binding KeyDownChildren, Mode=TwoWay}"
-                                              Margin="0,0,12,0" ToolTip.Tip="Children and children of children" />
-                                    <CheckBox Content="DC" IsChecked="{Binding KeyDownDirectChildren, Mode=TwoWay}"
-                                              ToolTip.Tip="Direct children" />
-                                </WrapPanel>
+                                <ListBox Classes="material-tool-toggle-list" SelectionMode="Multiple,Toggle"
+                                         HorizontalAlignment="Left" VerticalAlignment="Center"
+                                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                         ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                                    <ListBox.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal" />
+                                        </ItemsPanelTemplate>
+                                    </ListBox.ItemsPanel>
+                                    <ListBoxItem IsSelected="{Binding KeyDownEverything, Mode=TwoWay}"
+                                                 ToolTip.Tip="Everything">
+                                        <materialIcons:MaterialIcon Kind="AllInclusive" Width="20" Height="20" />
+                                    </ListBoxItem>
+                                    <ListBoxItem Content="P" IsSelected="{Binding KeyDownParents, Mode=TwoWay}"
+                                                 ToolTip.Tip="Parents and parents of parents" />
+                                    <ListBoxItem Content="DP" IsSelected="{Binding KeyDownDirectParents, Mode=TwoWay}"
+                                                 ToolTip.Tip="Direct parents" />
+                                    <ListBoxItem Content="C" IsSelected="{Binding KeyDownChildren, Mode=TwoWay}"
+                                                 ToolTip.Tip="Children and children of children" />
+                                    <ListBoxItem Content="DC" IsSelected="{Binding KeyDownDirectChildren, Mode=TwoWay}"
+                                                 ToolTip.Tip="Direct children" />
+                                </ListBox>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" Margin="10">
@@ -178,22 +199,25 @@
                             <StackPanel Orientation="Horizontal" Margin="10">
                                 <TextBlock Width="100" Text="Keep running" VerticalAlignment="Center" Margin="0,0,0,6"
                                            ToolTip.Tip="Keep the tool running when another tool is selected." />
-                                <CheckBox IsChecked="{Binding KeepRunning, Mode=TwoWay}"
-                                          ToolTip.Tip="Keep the tool running when another tool is selected." />
+                                <ToggleSwitch OnContent="" OffContent=""
+                                              IsChecked="{Binding KeepRunning, Mode=TwoWay}"
+                                              ToolTip.Tip="Keep the tool running when another tool is selected." />
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" Margin="10">
                                 <TextBlock Width="100" Text="See playfield" VerticalAlignment="Center" Margin="0,0,0,6"
                                            ToolTip.Tip="Show the osu! playfield boundary." />
-                                <CheckBox IsChecked="{Binding Preferences.VisiblePlayfieldBoundary, Mode=TwoWay}"
-                                          ToolTip.Tip="Show the osu! playfield boundary." />
+                                <ToggleSwitch OnContent="" OffContent=""
+                                              IsChecked="{Binding Preferences.VisiblePlayfieldBoundary, Mode=TwoWay}"
+                                              ToolTip.Tip="Show the osu! playfield boundary." />
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" Margin="10">
                                 <TextBlock Width="100" Text="Debug" VerticalAlignment="Center" Margin="0,0,0,6"
                                            ToolTip.Tip="Show the Geometry Dashboard debug border." />
-                                <CheckBox IsChecked="{Binding Preferences.DebugEnabled, Mode=TwoWay}"
-                                          ToolTip.Tip="Show the Geometry Dashboard debug border." />
+                                <ToggleSwitch OnContent="" OffContent=""
+                                              IsChecked="{Binding Preferences.DebugEnabled, Mode=TwoWay}"
+                                              ToolTip.Tip="Show the Geometry Dashboard debug border." />
                             </StackPanel>
                         </StackPanel>
                     </Border>
@@ -201,52 +225,48 @@
                     <ItemsControl ItemsSource="{Binding Appearance}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <materialDesign:Card Margin="0,0,0,5">
-                                    <Expander Header="{Binding Name}" IsExpanded="False">
-                                        <StackPanel Margin="20">
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBox Width="100" Height="50" Margin="2,0,10,2" VerticalAlignment="Top"
-                                                         Text="{Binding ColorText, Mode=TwoWay}"
-                                                         ToolTip.Tip="{Binding ColorTextError}" />
-                                                <ColorPicker Width="300" Height="100"
-                                                             Color="{Binding Color, Mode=TwoWay}" />
-                                            </StackPanel>
+                                <Expander Header="{Binding Name}" IsExpanded="False" Margin="0,0,0,5"
+                                          HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                                    <StackPanel Margin="20, 10">
+                                        <Grid ColumnDefinitions="130,*,70" MinHeight="35">
+                                            <TextBlock Text="Colour" Grid.Column="0" VerticalAlignment="Center" />
+                                            <ColorPicker Grid.Column="1" HorizontalAlignment="Left"
+                                                         Color="{Binding Color, Mode=TwoWay}" />
+                                        </Grid>
 
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBlock Text="Opacity" Width="120" VerticalAlignment="Center" />
-                                                <Slider Width="300" TickFrequency="0.01" Orientation="Horizontal"
-                                                        Minimum="0" Maximum="1" Value="{Binding Opacity, Mode=TwoWay}"
-                                                        Margin="5,0" />
-                                                <TextBox Width="40"
-                                                         Text="{Binding Opacity, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}" />
-                                            </StackPanel>
-
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBlock Text="Thickness" Width="120" VerticalAlignment="Center" />
-                                                <Slider Width="300" TickFrequency="1" Orientation="Horizontal"
-                                                        Minimum="1" Maximum="10" Value="{Binding Thickness, Mode=TwoWay}"
-                                                        Margin="5,0" />
-                                                <TextBox Width="40"
-                                                         Text="{Binding Thickness, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}" />
-                                            </StackPanel>
-
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBlock Text="DashStyle" Width="120" VerticalAlignment="Center" />
-                                                <ComboBox Width="300" Margin="11,0" ItemsSource="{Binding DashStyles}"
-                                                          SelectedItem="{Binding DashStyle, Mode=TwoWay}" />
-                                            </StackPanel>
-
-                                            <StackPanel Orientation="Horizontal" IsVisible="{Binding HasSizeOption}">
-                                                <TextBlock Text="Size" Width="120" VerticalAlignment="Center" />
-                                                <Slider Width="300" TickFrequency="1" Orientation="Horizontal"
-                                                        Minimum="1" Maximum="10" Value="{Binding Size, Mode=TwoWay}"
-                                                        Margin="5,0" />
-                                                <TextBox Width="40"
-                                                         Text="{Binding Size, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}" />
-                                            </StackPanel>
+                                        <StackPanel Orientation="Horizontal" MinHeight="35" Spacing="10">
+                                            <TextBlock Text="Opacity" Width="120" VerticalAlignment="Center" />
+                                            <Slider Width="300" VerticalAlignment="Center" TickFrequency="0.01" Orientation="Horizontal"
+                                                    Minimum="0" Maximum="1" Value="{Binding Opacity, Mode=TwoWay}"/>
+                                            <TextBox Classes="compact" Width="40" VerticalAlignment="Center"
+                                                     Text="{Binding Opacity, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}" />
                                         </StackPanel>
-                                    </Expander>
-                                </materialDesign:Card>
+
+                                        <StackPanel Orientation="Horizontal" MinHeight="35" Spacing="10">
+                                            <TextBlock Text="Thickness" Width="120" VerticalAlignment="Center" />
+                                            <Slider Width="300" VerticalAlignment="Center" TickFrequency="1" Orientation="Horizontal"
+                                                    Minimum="1" Maximum="10" Value="{Binding Thickness, Mode=TwoWay}"/>
+                                            <TextBox Classes="compact" Width="40" VerticalAlignment="Center"
+                                                     Text="{Binding Thickness, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}" />
+                                        </StackPanel>
+
+                                        <StackPanel Orientation="Horizontal" MinHeight="35" Spacing="10">
+                                            <TextBlock Text="DashStyle" Width="120" VerticalAlignment="Center" />
+                                            <ComboBox Classes="compact" Width="305" VerticalAlignment="Center" ItemsSource="{Binding DashStyles}"
+                                                      Margin="5, 0, 0, 0"
+                                                      SelectedItem="{Binding DashStyle, Mode=TwoWay}" />
+                                        </StackPanel>
+
+                                        <StackPanel Orientation="Horizontal" MinHeight="35" Spacing="10"
+                                                    IsVisible="{Binding HasSizeOption}">
+                                            <TextBlock Text="Size" Width="120" VerticalAlignment="Center" />
+                                            <Slider Width="300" VerticalAlignment="Center" TickFrequency="1" Orientation="Horizontal"
+                                                    Minimum="1" Maximum="10" Value="{Binding Size, Mode=TwoWay}"/>
+                                            <TextBox Classes="compact" Width="40" VerticalAlignment="Center"
+                                                     Text="{Binding Size, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Expander>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
@@ -256,8 +276,8 @@
 
         <Border Grid.Row="2" Padding="10">
             <Grid ColumnDefinitions="*,*">
-                <Button Width="200" Content="Apply" Command="{Binding ApplyCommand}" />
-                <Button Grid.Column="1" Width="200" Content="Cancel" Command="{Binding CancelCommand}" />
+                <Button Width="200" Content="Apply" CornerRadius="10" Command="{Binding ApplyCommand}" />
+                <Button Grid.Column="1" Width="200" Content="Cancel" CornerRadius="10" Command="{Binding CancelCommand}" />
             </Grid>
         </Border>
     </Grid>

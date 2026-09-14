@@ -1,0 +1,125 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+        xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+        xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+        xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+        xmlns:geometryDashboard="clr-namespace:Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions"
+        xmlns:model="clr-namespace:Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;assembly=Mapping_Tools.Core"
+        x:Class="Mapping_Tools.Desktop.Tools.GeometryDashboard.Views.GeometryDashboardSavestatesWindow"
+        x:DataType="geometryDashboard:GeometryDashboardSavestatesViewModel"
+        Title="Geometry Dashboard Savestates" Width="570" Height="500" MinWidth="575" MinHeight="360"
+        CanResize="True" WindowStartupLocation="CenterScreen" WindowDecorations="BorderOnly"
+        ExtendClientAreaToDecorationsHint="True" ExtendClientAreaTitleBarHeightHint="35"
+        Background="{DynamicResource MaterialPaperBrush}" Foreground="{DynamicResource MaterialBodyBrush}">
+    <Grid RowDefinitions="Auto,*,Auto,Auto">
+        <Grid x:Name="FirstGrid" Grid.Row="0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" IsHitTestVisible="False">
+                <Border Width="24" Height="24" Margin="9,0,0,0"
+                        VerticalAlignment="Center"
+                        Background="{DynamicResource MaterialBodyBrush}">
+                    <Border.OpacityMask>
+                        <ImageBrush Source="/Assets/mt_logo_white_24.png" Stretch="Uniform" />
+                    </Border.OpacityMask>
+                </Border>
+                <TextBlock Text="Savestates" Margin="8,0,0,0"
+                           VerticalAlignment="Center" FontWeight="Normal" />
+            </StackPanel>
+            <Border Margin="0,0,47,0" Background="Transparent"
+                    PointerPressed="DragWindow" DoubleTapped="ToggleMaximizeWindow" />
+            <Button Width="47" Height="35" Padding="0" HorizontalAlignment="Right"
+                    Theme="{StaticResource MaterialFlatButton}"
+                    Click="CloseWindow">
+                <materialIcons:MaterialIcon Kind="Close" Width="22" Height="22" />
+            </Button>
+        </Grid>
+
+        <controls:MaterialGridListView x:Name="SaveSlotsGrid"
+                                       Grid.Row="1" Grid.RowSpan="2"
+                                       ItemsSource="{Binding SaveSlots}"
+                                       SelectionMode="Multiple"
+                                       SelectedItem="{Binding SelectedSlot, Mode=OneWayToSource}"
+                                       SelectionChanged="SaveSlotsSelectionChanged"
+                                       CanUserResizeColumns="True"
+                                       ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                       ScrollViewer.HorizontalScrollBarVisibility="Auto">
+            <controls:MaterialGridListView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Duplicate" Command="{Binding DuplicateCommand}"
+                              ToolTip.Tip="Duplicate selected saves." />
+                    <MenuItem Header="Remove" Command="{Binding RemoveCommand}"
+                              ToolTip.Tip="Remove all selected saves." />
+                </ContextMenu>
+            </controls:MaterialGridListView.ContextMenu>
+
+            <controls:MaterialGridListView.Columns>
+                <TableViewColumn Width="150" HorizontalContentAlignment="Stretch">
+                    <TableViewColumn.Header>Name</TableViewColumn.Header>
+                    <TableViewColumn.CellTemplate>
+                        <DataTemplate x:DataType="model:GeometryDashboardSaveSlot">
+                            <TextBox HorizontalAlignment="Stretch"
+                                     Margin="5, 0"
+                                     Classes="compact"
+                                     Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </DataTemplate>
+                    </TableViewColumn.CellTemplate>
+                </TableViewColumn>
+
+                <TableViewColumn Width="130" HorizontalContentAlignment="Center">
+                    <TableViewColumn.Header>Hotkey</TableViewColumn.Header>
+                    <TableViewColumn.CellTemplate>
+                        <DataTemplate x:DataType="model:GeometryDashboardSaveSlot">
+                            <controls:HotkeyEditor Width="130"
+                                                   Margin="5, 0"
+                                                   Classes="compact"
+                                                   HorizontalAlignment="Center"
+                                                   Hotkey="{Binding ProjectHotkey, Mode=TwoWay}" />
+                        </DataTemplate>
+                    </TableViewColumn.CellTemplate>
+                </TableViewColumn>
+
+                <TableViewColumn Width="Auto" HorizontalContentAlignment="Left">
+                    <TableViewColumn.CellTemplate>
+                        <DataTemplate x:DataType="model:GeometryDashboardSaveSlot">
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Save"
+                                        Width="60"
+                                        Padding="0, 6"
+                                        CornerRadius="7"
+                                        Command="{Binding $parent[Window].((geometryDashboard:GeometryDashboardSavestatesViewModel)DataContext).SaveCommand}"
+                                        CommandParameter="{Binding}"
+                                        Margin="0,0,8,0"
+                                        ToolTip.Tip="Save current settings to this slot." />
+                                <Button Content="Load"
+                                        Width="60"
+                                        Padding="0, 6"
+                                        CornerRadius="7"
+                                        Command="{Binding $parent[Window].((geometryDashboard:GeometryDashboardSavestatesViewModel)DataContext).LoadCommand}"
+                                        CommandParameter="{Binding}"
+                                        Margin="0,0,8,0"
+                                        ToolTip.Tip="Load settings from this slot." />
+                            </StackPanel>
+                        </DataTemplate>
+                    </TableViewColumn.CellTemplate>
+                </TableViewColumn>
+            </controls:MaterialGridListView.Columns>
+        </controls:MaterialGridListView>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,10">
+            <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="0,0,8,0"
+                                           ToolTip.Tip="Re-register hotkeys in case something broke."
+                                           Command="{Binding RefreshHotkeysCommand}">
+                <materialIcons:MaterialIcon Kind="Reload" Width="22" Height="22" />
+            </materialDesign:FloatingButton>
+            <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="0,0,8,0"
+                                           ToolTip.Tip="Add a new save slot." Command="{Binding AddCommand}">
+                <materialIcons:MaterialIcon Kind="Plus" Width="22" Height="22" />
+            </materialDesign:FloatingButton>
+            <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="0,0,8,0"
+                                           ToolTip.Tip="Remove all selected save slots or the last save if nothing is selected."
+                                           Command="{Binding RemoveCommand}">
+                <materialIcons:MaterialIcon Kind="Minus" Width="22" Height="22" />
+            </materialDesign:FloatingButton>
+        </StackPanel>
+    </Grid>
+</Window>

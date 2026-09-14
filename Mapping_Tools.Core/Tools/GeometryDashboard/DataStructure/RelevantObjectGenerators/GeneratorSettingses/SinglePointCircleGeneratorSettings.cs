@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
 
 namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettingses;
@@ -6,6 +7,7 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 public sealed class SinglePointCircleGeneratorSettings : GeneratorSettings
 {
     /// <summary>Gets or sets the circle radius in editor pixels.</summary>
+    [DisplayName("Radius")]
     public double Radius { get; set; }
 
     /// <inheritdoc />
@@ -19,4 +21,3 @@ public sealed class SinglePointCircleGeneratorSettings : GeneratorSettings
         };
     }
 }
-

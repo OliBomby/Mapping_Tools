@@ -28,6 +28,50 @@ public sealed partial class GeometryDashboardGeneratorViewModel : ObservableObje
     /// <summary>Gets the settings object shown in the row.</summary>
     public GeneratorSettings Settings => Model.Settings;
 
+    /// <summary>Gets or sets whether this generator participates in calculation.</summary>
+    public bool IsActive
+    {
+        get => Settings.IsActive;
+        set
+        {
+            if (Settings.IsActive == value) return;
+            Settings.IsActive = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>Gets or sets whether inputs must be selected in sequence.</summary>
+    public bool IsSequential
+    {
+        get => Settings.IsSequential;
+        set
+        {
+            if (Settings.IsSequential == value) return;
+            Settings.IsSequential = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>Gets or sets the multiplier applied to parent relevance.</summary>
+    public double RelevancyRatio
+    {
+        get => Settings.RelevancyRatio;
+        set
+        {
+            if (Settings.RelevancyRatio.Equals(value)) return;
+            Settings.RelevancyRatio = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>Notifies bindings that the underlying generator settings were updated.</summary>
+    public void NotifySettingsChanged()
+    {
+        OnPropertyChanged(nameof(IsActive));
+        OnPropertyChanged(nameof(IsSequential));
+        OnPropertyChanged(nameof(RelevancyRatio));
+    }
+
     /// <summary>Shows this generator's settings dialog.</summary>
     [RelayCommand]
     private Task OpenSettingsAsync()

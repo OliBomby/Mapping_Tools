@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
 
 namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettingses;
@@ -6,15 +7,19 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 public sealed class ScaleRotateGeneratorSettings : GeneratorSettings
 {
     /// <summary>Gets or sets the rotation angle in degrees.</summary>
+    [DisplayName("Angle")]
     public double Angle { get; set; }
 
     /// <summary>Gets or sets the uniform scale factor.</summary>
+    [DisplayName("Scalar")]
     public double Scalar { get; set; } = 1;
 
     /// <summary>Gets or sets the predicate for origin lines/points.</summary>
+    [DisplayName("Origin Input Selection")]
     public SelectionPredicateCollection OriginInputPredicate { get; set; } = new();
 
     /// <summary>Gets or sets the predicate for transformed objects.</summary>
+    [DisplayName("Other Input Selection")]
     public SelectionPredicateCollection OtherInputPredicate { get; set; } = new();
 
     /// <inheritdoc />
@@ -30,4 +35,3 @@ public sealed class ScaleRotateGeneratorSettings : GeneratorSettings
         };
     }
 }
-

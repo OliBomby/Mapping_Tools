@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
 
 namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettingses;
@@ -6,9 +7,11 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 public sealed class SymmetryGeneratorSettings : GeneratorSettings
 {
     /// <summary>Gets or sets the predicate for axis lines.</summary>
+    [DisplayName("Axis Input Selection")]
     public SelectionPredicateCollection AxisInputPredicate { get; set; } = new();
 
     /// <summary>Gets or sets the predicate for objects to reflect.</summary>
+    [DisplayName("Other Input Selection")]
     public SelectionPredicateCollection OtherInputPredicate { get; set; } = new();
 
     /// <inheritdoc />

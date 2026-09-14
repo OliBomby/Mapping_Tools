@@ -7,13 +7,13 @@ using Mapping_Tools.Desktop.Tools.GeometryDashboard.Models;
 namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions;
 
 /// <summary>Edits ordered Geometry Dashboard save slots.</summary>
-public sealed partial class GeometryDashboardProjectSlotsViewModel : ObservableObject
+public sealed partial class GeometryDashboardSavestatesViewModel : ObservableObject
 {
     private readonly Action<GeometryDashboardSaveSlot> loadSlot;
     private readonly Action refreshHotkeys;
 
     /// <summary>Creates the save-slot editor over the live project.</summary>
-    public GeometryDashboardProjectSlotsViewModel(
+    public GeometryDashboardSavestatesViewModel(
         GeometryDashboardProject project,
         Action<GeometryDashboardSaveSlot> loadSlot,
         Action refreshHotkeys)
@@ -21,10 +21,14 @@ public sealed partial class GeometryDashboardProjectSlotsViewModel : ObservableO
         Project = project ?? throw new ArgumentNullException(nameof(project));
         this.loadSlot = loadSlot ?? throw new ArgumentNullException(nameof(loadSlot));
         this.refreshHotkeys = refreshHotkeys ?? throw new ArgumentNullException(nameof(refreshHotkeys));
+        SaveSlots = new ObservableCollection<GeometryDashboardSaveSlot>(Project.SaveSlots);
     }
 
     /// <summary>Gets the live project slots.</summary>
     public GeometryDashboardProject Project { get; }
+
+    /// <summary>Gets the observable save-slot rows displayed by the Avalonia list.</summary>
+    public ObservableCollection<GeometryDashboardSaveSlot> SaveSlots { get; }
 
     /// <summary>Gets or sets the selected slot.</summary>
     [ObservableProperty]
@@ -55,6 +59,7 @@ public sealed partial class GeometryDashboardProjectSlotsViewModel : ObservableO
             slot = new GeometryDashboardSaveSlot { Name = $"Save {Project.SaveSlots.Count + 1}" };
             Project.SaveToSlot(slot);
             Project.SaveSlots.Add(slot);
+            SaveSlots.Add(slot);
         }
 
         refreshHotkeys();
@@ -73,15 +78,21 @@ public sealed partial class GeometryDashboardProjectSlotsViewModel : ObservableO
         if (slots.Length == 0 && Project.SaveSlots.Count > 0) slots = [Project.SaveSlots[^1]];
         lock (Project)
         {
-            foreach (var slot in slots) Project.SaveSlots.Remove(slot);
+            foreach (var slot in slots)
+            {
+                if (Project.SaveSlots.Remove(slot)) SaveSlots.Remove(slot);
+            }
         }
 
         refreshHotkeys();
         SelectedSlots.Clear();
+        GeometryDashboardSaveSlot? lastSlot;
         lock (Project)
         {
-            SelectedSlot = Project.SaveSlots.LastOrDefault();
+            lastSlot = Project.SaveSlots.LastOrDefault();
         }
+
+        SelectedSlot = lastSlot;
     }
 
     /// <summary>Duplicates the selected slot using the legacy copy suffix.</summary>
@@ -96,11 +107,15 @@ public sealed partial class GeometryDashboardProjectSlotsViewModel : ObservableO
         GeometryDashboardSaveSlot? lastCopy = null;
         lock (Project)
         {
-            foreach (var slot in slots)
+            foreach (var slot in slots.OrderBy(slot => Project.SaveSlots.IndexOf(slot)))
             {
                 var copy = (GeometryDashboardSaveSlot)slot.Clone();
                 copy.Name += " - Copy";
-                Project.SaveSlots.Insert(Project.SaveSlots.IndexOf(slot) + 1, copy);
+                int index = Project.SaveSlots.IndexOf(slot);
+                if (index < 0) continue;
+
+                Project.SaveSlots.Insert(index + 1, copy);
+                SaveSlots.Insert(index + 1, copy);
                 lastCopy = copy;
             }
         }

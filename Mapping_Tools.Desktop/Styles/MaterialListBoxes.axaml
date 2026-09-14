@@ -1,5 +1,6 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles">
     <Style Selector="ListBox.material-list-view">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
@@ -11,7 +12,55 @@
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
-    <Style Selector="ListBox.material-list-view ListBoxItem:pointerover /template/ Border#PART_HoverEffect">
-        <Setter Property="Opacity" Value="0.05" />
+    <Style Selector="ListBox.material-list-view ListBoxItem:pointerover">
+        <Setter Property="Background" Value="{DynamicResource MaterialTextFieldBoxHoverBackgroundBrush}" />
+    </Style>
+    <Style Selector="ListBox.material-list-view ListBoxItem:selected">
+        <Setter Property="Background" Value="{DynamicResource MaterialSelectionBrush}" />
+    </Style>
+
+    <!--
+        Avalonia equivalent of the legacy MaterialDesignToolToggleListBox.
+        The ListBox remains the semantic selectable control while this class
+        supplies the legacy horizontal tool-toggle surface and density.
+    -->
+    <Style Selector="ListBox.material-tool-toggle-list">
+        <Setter Property="Background" Value="{DynamicResource MappingToolsMaterialToolToggleListBoxBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialBodyBrush}" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="materialAssists:ShadowAssist.ShadowDepth" Value="Depth1" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+        <Setter Property="ItemsPanel">
+            <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal" />
+            </ItemsPanelTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="ListBox.material-tool-toggle-list /template/ Border#PART_RootBorder">
+        <Setter Property="ClipToBounds" Value="True" />
+    </Style>
+
+    <Style Selector="ListBox.material-tool-toggle-list ListBoxItem">
+        <Setter Property="Width" Value="48" />
+        <Setter Property="Height" Value="38" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialBodyBrush}" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="ListBox.material-tool-toggle-list ListBoxItem:pointerover">
+        <Setter Property="Background" Value="{DynamicResource MaterialTextFieldBoxHoverBackgroundBrush}" />
+    </Style>
+    <Style Selector="ListBox.material-tool-toggle-list ListBoxItem:selected">
+        <Setter Property="Background" Value="{DynamicResource MaterialSelectionBrush}" />
     </Style>
 </Styles>

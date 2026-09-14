@@ -263,8 +263,8 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     /// <summary>Shows the modeless save-slot dialog for the current project.</summary>
     public Task ShowProjectSlotsAsync()
     {
-        GeometryDashboardProjectSlotsViewModel viewModel = new(Project, LoadSaveSlot, RefreshSaveSlotHotkeys);
-        GeometryDashboardProjectWindow window = new() { DataContext = viewModel };
+        GeometryDashboardSavestatesViewModel viewModel = new(Project, LoadSaveSlot, RefreshSaveSlotHotkeys);
+        GeometryDashboardSavestatesWindow window = new() { DataContext = viewModel };
         viewModel.Close = window.Close;
         window.Show(owner());
         return Task.CompletedTask;
@@ -279,7 +279,11 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         GeometryDashboardGeneratorSettingsWindow window = new() { DataContext = viewModel };
         viewModel.Close = result => window.Close(result);
         object? result = await window.ShowDialog<object?>(owner());
-        if (result is true) dashboardService.Regenerate();
+        if (result is true)
+        {
+            generator.NotifySettingsChanged();
+            dashboardService.Regenerate();
+        }
     }
 
     /// <summary>Exports detached locked virtual objects using a native save picker.</summary>

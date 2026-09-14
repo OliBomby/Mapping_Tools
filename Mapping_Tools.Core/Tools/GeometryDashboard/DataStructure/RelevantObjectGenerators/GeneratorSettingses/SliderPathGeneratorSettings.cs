@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
 
 namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettingses;
@@ -6,6 +7,7 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 public sealed class SliderPathGeneratorSettings : GeneratorSettings
 {
     /// <summary>Gets or sets the number of generated points per path pixel.</summary>
+    [DisplayName("Point Density")]
     public double PointDensity { get; set; }
 
     /// <inheritdoc />
@@ -19,4 +21,3 @@ public sealed class SliderPathGeneratorSettings : GeneratorSettings
         };
     }
 }
-

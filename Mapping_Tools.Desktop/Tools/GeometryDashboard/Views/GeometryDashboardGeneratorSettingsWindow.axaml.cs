@@ -17,8 +17,12 @@ public sealed partial class GeometryDashboardGeneratorSettingsWindow : Window
 
     private void PredicatesSelectionChanged(object? sender, SelectionChangedEventArgs eventArgs)
     {
-        if (DataContext is GeometryDashboardGeneratorSettingsDialogViewModel viewModel && sender is ListBox listBox)
-            viewModel.SetSelectedPredicates(listBox.SelectedItems?.OfType<SelectionPredicate>() ?? []);
+        if (eventArgs.Source != sender
+            || sender is not ListBox listBox
+            || listBox.DataContext is not GeometryDashboardPredicateCollectionViewModel collectionViewModel)
+            return;
+
+        collectionViewModel.SetSelectedPredicates(listBox.SelectedItems?.OfType<SelectionPredicate>() ?? []);
     }
 
     private void CloseWindow(object? sender, RoutedEventArgs eventArgs)

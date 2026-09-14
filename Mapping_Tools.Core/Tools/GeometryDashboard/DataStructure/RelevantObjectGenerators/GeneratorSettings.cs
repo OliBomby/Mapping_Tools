@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Reflection;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
 using Newtonsoft.Json;
@@ -26,21 +27,27 @@ public class GeneratorSettings : ICloneable
     public RelevantObjectsGenerator? Generator { get; set; }
 
     /// <summary>Gets or sets whether this generator participates in calculation.</summary>
+    [DisplayName("Active")]
     public bool IsActive { get; set; }
 
     /// <summary>Gets or sets whether inputs must be selected in sequence.</summary>
+    [DisplayName("Sequential")]
     public bool IsSequential { get; set; }
 
     /// <summary>Gets or sets whether all preceding layers may supply inputs.</summary>
+    [DisplayName("Deep")]
     public bool IsDeep { get; set; }
 
     /// <summary>Gets or sets the multiplier applied to parent relevance.</summary>
+    [DisplayName("Relevancy Ratio")]
     public double RelevancyRatio { get; set; } = 0.4;
 
     /// <summary>Gets or sets whether generated objects can be inherited by later layers.</summary>
+    [DisplayName("Generates Inheritable")]
     public bool GeneratesInheritable { get; set; } = true;
 
     /// <summary>Gets or sets the OR-combined input selection predicates.</summary>
+    [DisplayName("Input Selection")]
     public SelectionPredicateCollection InputPredicate { get => inputPredicate; set => inputPredicate = value ?? new SelectionPredicateCollection(); }
 
     /// <inheritdoc />
