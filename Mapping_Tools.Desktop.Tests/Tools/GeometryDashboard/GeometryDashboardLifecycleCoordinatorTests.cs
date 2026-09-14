@@ -84,6 +84,8 @@ public sealed class GeometryDashboardLifecycleCoordinatorTests
 
     private sealed class RuntimeStub : IGeometryDashboardRuntime
     {
+        public bool IsProcessRunning => true;
+
         public Task<GeometryDashboardRuntimeSnapshot?> ReadAsync(
             CancellationToken cancellationToken = default)
         {

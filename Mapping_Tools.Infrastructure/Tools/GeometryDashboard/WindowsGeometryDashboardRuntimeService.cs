@@ -30,11 +30,15 @@ public sealed class WindowsGeometryDashboardRuntimeService : IGeometryDashboardR
     }
 
     /// <inheritdoc />
+    public bool IsProcessRunning { get; private set; }
+
+    /// <inheritdoc />
     public async Task<GeometryDashboardRuntimeSnapshot?> ReadAsync(
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         var process = await processes.FindAsync(cancellationToken).ConfigureAwait(false);
+        IsProcessRunning = process is not null;
         if (process is null) return null;
 
         var window = windows.GetMainWindow(process);

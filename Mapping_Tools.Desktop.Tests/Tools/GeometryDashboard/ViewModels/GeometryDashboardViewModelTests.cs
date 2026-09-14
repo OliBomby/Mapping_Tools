@@ -112,7 +112,24 @@ public sealed class GeometryDashboardViewModelTests
         await viewModel.RefreshOnceAsync();
 
         // Assert
-        viewModel.Status.Should().Be("Geometry Dashboard requires Windows.");
+        viewModel.Status.Should().Be("Unable to run: Geometry Dashboard requires Windows.");
+    }
+
+    [TestMethod]
+    public async Task Deactivate_AfterRuntimeRefresh_UpdatesStatusThroughServiceEvent()
+    {
+        // Arrange
+        using var viewModel = CreateViewModel();
+        await viewModel.RefreshOnceAsync();
+        var changedProperties = new List<string?>();
+        viewModel.PropertyChanged += (_, args) => changedProperties.Add(args.PropertyName);
+
+        // Act
+        viewModel.Deactivate();
+
+        // Assert
+        viewModel.Status.Should().Be("Stopped");
+        changedProperties.Should().Contain(nameof(viewModel.Status));
     }
 
     [TestMethod]
@@ -259,6 +276,8 @@ public sealed class GeometryDashboardViewModelTests
 
     private sealed class RuntimeStub(IEnumerable<GeometryDashboardRuntimeSnapshot?> snapshots) : IGeometryDashboardRuntime
     {
+        public bool IsProcessRunning => true;
+
         private readonly Queue<GeometryDashboardRuntimeSnapshot?> snapshots = new(snapshots);
 
         public Task<GeometryDashboardRuntimeSnapshot?> ReadAsync(CancellationToken cancellationToken = default)

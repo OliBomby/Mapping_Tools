@@ -1,3 +1,5 @@
+using Mapping_Tools.Application.BeatmapEditing.Contracts;
+using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
@@ -17,6 +19,28 @@ namespace Mapping_Tools.Infrastructure.Tests.Tools.GeometryDashboard.Platform;
 [TestClass]
 public sealed class GeometryDashboardWindowsAdapterTests
 {
+    [TestMethod]
+    [DataRow(false, "osu!")]
+    [DataRow(true, "osu!")]
+    [DataRow(true, "map.osu")]
+    public async Task ReadAsync_WhenEditorIsUnavailable_ReportsWhetherProcessWasFound(bool processRunning, string title)
+    {
+        // Arrange
+        var process = new GeometryDashboardProcess(7, new PlatformWindowId(42), title);
+        var window = new GeometryDashboardWindow(process.MainWindow, process.ProcessId, title,
+            new Box2(0, 0, 1920, 1080), true, true, Vector2.One, true);
+        var runtime = new WindowsGeometryDashboardRuntimeService(
+            new FixedProcessDiscovery(processRunning ? process : null),
+            new EmptyLiveBeatmapReader(), new MutableWindowService(window));
+
+        // Act
+        var snapshot = await runtime.ReadAsync();
+
+        // Assert
+        snapshot.Should().BeNull();
+        runtime.IsProcessRunning.Should().Be(processRunning);
+    }
+
     [TestMethod]
     public async Task FindAsync_WhenPlatformIsUnavailable_ReturnsNoProcess()
     {
@@ -417,7 +441,13 @@ public sealed class GeometryDashboardWindowsAdapterTests
         public string CombinePath(string parent, string child) => child;
     }
 
-    private sealed class FixedProcessDiscovery(GeometryDashboardProcess process) : IGeometryDashboardProcessDiscovery
+    private sealed class EmptyLiveBeatmapReader : ILiveBeatmapReader
+    {
+        public Task<LiveBeatmapSnapshot?> ReadAsync(CancellationToken cancellationToken = default) =>
+            Task.FromResult<LiveBeatmapSnapshot?>(null);
+    }
+
+    private sealed class FixedProcessDiscovery(GeometryDashboardProcess? process) : IGeometryDashboardProcessDiscovery
     {
         public Task<GeometryDashboardProcess?> FindAsync(CancellationToken cancellationToken = default) => Task.FromResult<GeometryDashboardProcess?>(process);
     }

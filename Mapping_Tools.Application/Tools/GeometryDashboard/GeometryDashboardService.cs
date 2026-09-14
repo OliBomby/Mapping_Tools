@@ -38,7 +38,7 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
     private readonly List<IRelevantDrawable> lockedDrawables = [];
     private readonly List<IRelevantDrawable> selectedDrawables = [];
     private GeometryDashboardServiceState state = new(
-        "Waiting for osu!...",
+        "Stopped",
         false,
         0,
         0);
@@ -51,7 +51,6 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
     private Vector2 heldMouseOffset;
     private bool lockedToggle;
     private bool unlockedSomething;
-    private int readerFailures;
     private bool disposed;
 
     /// <summary>
@@ -115,6 +114,7 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
             ThrowIfDisposed();
             if (runLoop is { IsCompleted: false }) return;
 
+            PublishState("Starting...");
             runCancellation?.Dispose();
             runCancellation = new CancellationTokenSource();
             CancellationToken cancellationToken = runCancellation.Token;
@@ -148,8 +148,7 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
             cancellation?.Dispose();
         }
 
-        overlayService.Hide();
-        PublishState(State.Status);
+        PublishUnavailableState("Stopped");
     }
 
     /// <inheritdoc />
@@ -295,11 +294,7 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
             }
             catch (Exception exception)
             {
-                readerFailures++;
-                PublishState(readerFailures >= 3
-                    ? "Editor Reader seems to be failing a lot..."
-                    : exception.Message);
-                overlayService.Hide();
+                PublishUnavailableState($"Error: {exception.Message} Retrying...");
             }
 
             try
@@ -318,24 +313,22 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
     {
         if (!input.IsSupported)
         {
-            PublishState("Geometry Dashboard requires Windows.");
-            overlayService.Hide();
+            PublishUnavailableState("Unable to run: Geometry Dashboard requires Windows.");
             return;
         }
 
         if (!applicationSettings.UseEditorReader)
         {
-            PublishState("Enable Editor Reader in Preferences to use Geometry Dashboard.");
-            overlayService.Hide();
+            PublishUnavailableState("Unable to run: enable Editor Reader in Preferences.");
             return;
         }
 
         var snapshot = await runtime.ReadAsync(cancellationToken).ConfigureAwait(false);
         if (snapshot is null)
         {
-            PublishState("Waiting for an open editor...");
-            lock (stateGate) runtimeSnapshot = null;
-            overlayService.Hide();
+            PublishUnavailableState(runtime.IsProcessRunning
+                ? "Waiting for the osu! editor..."
+                : "Waiting for osu! to start...");
             return;
         }
 
@@ -355,7 +348,6 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
                                      UpdateMode.HotkeyDown => false,
                                      _ => true,
                                  };
-        readerFailures = 0;
         UpdatePreferences();
         if (shouldUpdateRoots || input.IsHotkeyDown(Preferences.RefreshHotkey)) UpdateRootObjects(snapshot.Editor);
         if (!snapshot.IsEditorActive)
@@ -367,10 +359,9 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
 
         UpdateHotkeys();
         UpdateOverlay();
-        PublishState(overlayService.ConfigurationStatus
-                     ?? (layers.GetAllRelevantObjects().Any()
-                         ? $"{State.DrawableCount} virtual object(s)"
-                         : "No visible hit objects."));
+        PublishState(overlayService.ConfigurationStatus is { } configurationStatus
+            ? $"Unable to run: {configurationStatus}"
+            : $"Running: {layers.GetAllRelevantDrawables().Count()} virtual object(s)");
     }
 
     private void UpdatePreferences()
@@ -753,6 +744,13 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
                            && type.GetConstructor(Type.EmptyTypes) is not null)
             .Select(type => (RelevantObjectsGenerator)Activator.CreateInstance(type)!)
             .ToArray();
+    }
+
+    private void PublishUnavailableState(string status)
+    {
+        lock (stateGate) runtimeSnapshot = null;
+        overlayService.Hide();
+        PublishState(status);
     }
 
     private void PublishState(string status)

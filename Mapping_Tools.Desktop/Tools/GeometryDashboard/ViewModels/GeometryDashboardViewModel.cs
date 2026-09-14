@@ -92,6 +92,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
             dashboardService.Generators.Select(generator => new GeometryDashboardGeneratorViewModel(generator, this)));
         RebuildGroups();
         dashboardService.StateChanged += OnDashboardStateChanged;
+        ApplyDashboardState(dashboardService.State);
     }
 
     /// <summary>Gets the serializable project currently edited by the dashboard.</summary>
@@ -105,7 +106,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
 
     /// <summary>Gets the current connection, validation, or empty-state message.</summary>
     [ObservableProperty]
-    public partial string Status { get; private set; } = "Waiting for osu!...";
+    public partial string Status { get; private set; } = "Stopped";
 
     /// <summary>Gets or sets the case-insensitive generator search query.</summary>
     public string Filter

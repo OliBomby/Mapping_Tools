@@ -8,6 +8,9 @@ namespace Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
 /// </summary>
 public interface IGeometryDashboardRuntime
 {
+    /// <summary>Gets whether the most recent runtime read found an osu! process.</summary>
+    bool IsProcessRunning { get; }
+
     /// <summary>
     ///     Attempts to read a complete runtime snapshot in legacy dependency order.
     /// </summary>
@@ -19,4 +22,3 @@ public interface IGeometryDashboardRuntime
     Task<GeometryDashboardRuntimeSnapshot?> ReadAsync(
         CancellationToken cancellationToken = default);
 }
-
