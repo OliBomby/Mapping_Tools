@@ -102,7 +102,7 @@
                                             </Style>
                                             <Style Selector="ListBoxItem /template/ Border#PART_RootBorder:not(:nothing)">
                                                 <Setter Property="BorderThickness" Value="0, 0, 0, 1"/>
-                                                <Setter Property="BorderBrush" Value="{DynamicResource MaterialCardBackgroundBrush}" />
+                                                <Setter Property="BorderBrush" Value="{DynamicResource MaterialDividerBrush}" />
                                             </Style>
                                         </ListBox.Styles>
                                         <ListBox.ItemTemplate>
