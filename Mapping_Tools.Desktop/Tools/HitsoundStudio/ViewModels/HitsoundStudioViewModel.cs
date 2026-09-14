@@ -654,12 +654,26 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         {
             var failures = await service.ValidateSamplesAsync(
                 Layers.Select(layer => layer.SampleArgs.Snapshot()).ToArray());
-            await PublishNotificationAsync(
-                failures.Count == 0 ? UserNotificationSeverity.Success : UserNotificationSeverity.Warning,
-                "Validate samples",
-                failures.Count == 0
-                    ? "All sample sources are valid."
-                    : $"{failures.Count} sample source{(failures.Count == 1 ? " is" : "s are")} invalid.");
+            if (failures.Count == 0)
+            {
+                await ShowSampleValidationMessageAsync("All samples are valid!");
+                return;
+            }
+
+            Dictionary<SampleGeneratingArgs, Exception> failuresBySample =
+                new(failures, new SampleGeneratingArgsComparer());
+            List<(ObservableHitsoundLayer Layer, Exception Exception)> invalidLayers = [];
+            foreach (ObservableHitsoundLayer layer in Layers)
+            {
+                if (failuresBySample.TryGetValue(layer.SampleArgs.Snapshot(), out Exception? exception))
+                    invalidLayers.Add((layer, exception));
+            }
+
+            string message = FormatSampleValidationMessage(invalidLayers);
+            string? details = invalidLayers.Count > 0
+                ? invalidLayers[0].Exception.ToString()
+                : null;
+            await ShowSampleValidationMessageAsync(message, details);
         }
         catch (OperationCanceledException)
         {
@@ -676,6 +690,54 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
                 exception.Message,
                 exception);
         }
+    }
+
+    private Task ShowSampleValidationMessageAsync(string message, string? details = null)
+    {
+        return messageDialogs.ShowMessageAsync(
+            new MessageDialogRequest<bool>(
+                "Validate samples",
+                message,
+                [new DialogChoice<bool>("OK", true, IsDefault: true, IsCancel: true)],
+                true,
+                details));
+    }
+
+    private static string FormatSampleValidationMessage(
+        IReadOnlyList<(ObservableHitsoundLayer Layer, Exception Exception)> invalidLayers)
+    {
+        List<string> sections = [];
+        AddSection(
+            sections,
+            "Could not find the following samples:",
+            invalidLayers
+                .Where(item => item.Exception is FileNotFoundException)
+                .Select(item => item.Layer.Name));
+        AddSection(
+            sections,
+            "The following samples have an invalid extension:",
+            invalidLayers
+                .Where(item => item.Exception is InvalidDataException)
+                .Select(item => item.Layer.Name));
+        AddSection(
+            sections,
+            "Could not load the following samples because of an exception:",
+            invalidLayers
+                .Where(item => item.Exception is not FileNotFoundException and not InvalidDataException)
+                .Select(item => $"{item.Layer.Name}: {item.Exception.Message}"));
+
+        return string.Join(Environment.NewLine + Environment.NewLine, sections);
+    }
+
+    private static void AddSection(
+        ICollection<string> sections,
+        string heading,
+        IEnumerable<string> entries)
+    {
+        string[] names = entries.ToArray();
+        if (names.Length == 0) return;
+
+        sections.Add(heading + Environment.NewLine + string.Join(Environment.NewLine, names));
     }
 
     /// <summary>Chooses a base beatmap through the standard workspace picker.</summary>

@@ -13,6 +13,7 @@ using Mapping_Tools.Core.Audio;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels;
 using Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels.Adapters;
@@ -274,6 +275,153 @@ public sealed class HitsoundStudioViewModelTests
             "Open a beatmap in osu! before using the current editor state.");
     }
 
+    [TestMethod]
+    public async Task ValidateSamplesCommand_WithInvalidLayers_ShowsAffectedLayerNames()
+    {
+        // Arrange
+        RecordingHitsoundStudioService service = new();
+        TestDialogService dialogs = new();
+        HitsoundStudioViewModel viewModel = CreateViewModel(
+            service,
+            new RecordingAudioGenerator(),
+            new RecordingPlaybackService(),
+            dialogs: dialogs);
+        ObservableHitsoundLayer invalidLayer = new(new HitsoundLayer(
+            "missing layer",
+            SampleSet.Normal,
+            Hitsound.Normal,
+            new SampleGeneratingArgs("missing.wav"),
+            new LayerImportArgs()));
+        ObservableHitsoundLayer validLayer = new(new HitsoundLayer(
+            "valid layer",
+            SampleSet.Normal,
+            Hitsound.Clap,
+            new SampleGeneratingArgs("valid.wav"),
+            new LayerImportArgs()));
+        viewModel.Layers.Add(invalidLayer);
+        viewModel.Layers.Add(validLayer);
+        service.ValidationFailures = new Dictionary<SampleGeneratingArgs, Exception>(
+            new SampleGeneratingArgsComparer())
+        {
+            [invalidLayer.SampleArgs.Snapshot()] = new FileNotFoundException("missing.wav"),
+        };
+
+        // Act
+        await viewModel.ValidateSamplesCommand.ExecuteAsync(null);
+
+        // Assert
+        MessageDialogRequest<bool> request = dialogs.LastMessageRequest
+            .Should()
+            .BeOfType<MessageDialogRequest<bool>>()
+            .Subject;
+        request.Message.Should().Contain("Could not find the following samples:")
+            .And.Contain("missing layer")
+            .And.NotContain("valid layer");
+    }
+
+    [TestMethod]
+    public async Task ValidateSamplesCommand_WhenAllLayersAreValid_ShowsSuccessMessage()
+    {
+        // Arrange
+        TestDialogService dialogs = new();
+        HitsoundStudioViewModel viewModel = CreateViewModel(
+            new RecordingHitsoundStudioService(),
+            new RecordingAudioGenerator(),
+            new RecordingPlaybackService(),
+            dialogs: dialogs);
+
+        // Act
+        await viewModel.ValidateSamplesCommand.ExecuteAsync(null);
+
+        // Assert
+        MessageDialogRequest<bool> request = dialogs.LastMessageRequest
+            .Should()
+            .BeOfType<MessageDialogRequest<bool>>()
+            .Subject;
+        request.Message.Should().Be("All samples are valid!");
+        request.Details.Should().BeNull();
+    }
+
+    [TestMethod]
+    public async Task ValidateSamplesCommand_WithSingleDecoderFailure_ShowsExceptionDetails()
+    {
+        // Arrange
+        RecordingHitsoundStudioService service = new();
+        TestDialogService dialogs = new();
+        HitsoundStudioViewModel viewModel = CreateViewModel(
+            service,
+            new RecordingAudioGenerator(),
+            new RecordingPlaybackService(),
+            dialogs: dialogs);
+        ObservableHitsoundLayer layer = new(new HitsoundLayer(
+            "broken layer",
+            SampleSet.Normal,
+            Hitsound.Normal,
+            new SampleGeneratingArgs("broken.wav"),
+            new LayerImportArgs()));
+        viewModel.Layers.Add(layer);
+        service.ValidationFailures = new Dictionary<SampleGeneratingArgs, Exception>(
+            new SampleGeneratingArgsComparer())
+        {
+            [layer.SampleArgs.Snapshot()] = new InvalidOperationException("decoder failed"),
+        };
+
+        // Act
+        await viewModel.ValidateSamplesCommand.ExecuteAsync(null);
+
+        // Assert
+        MessageDialogRequest<bool> request = dialogs.LastMessageRequest
+            .Should()
+            .BeOfType<MessageDialogRequest<bool>>()
+            .Subject;
+        request.Message.Should().Contain("broken layer: decoder failed");
+        request.Details.Should().Contain("decoder failed");
+    }
+
+    [TestMethod]
+    public async Task ValidateSamplesCommand_WithMultipleDecoderFailures_ShowsFirstExceptionDetails()
+    {
+        // Arrange
+        RecordingHitsoundStudioService service = new();
+        TestDialogService dialogs = new();
+        HitsoundStudioViewModel viewModel = CreateViewModel(
+            service,
+            new RecordingAudioGenerator(),
+            new RecordingPlaybackService(),
+            dialogs: dialogs);
+        ObservableHitsoundLayer firstLayer = new(new HitsoundLayer(
+            "first broken layer",
+            SampleSet.Normal,
+            Hitsound.Normal,
+            new SampleGeneratingArgs("first-broken.wav"),
+            new LayerImportArgs()));
+        ObservableHitsoundLayer secondLayer = new(new HitsoundLayer(
+            "second broken layer",
+            SampleSet.Normal,
+            Hitsound.Normal,
+            new SampleGeneratingArgs("second-broken.wav"),
+            new LayerImportArgs()));
+        viewModel.Layers.Add(firstLayer);
+        viewModel.Layers.Add(secondLayer);
+        service.ValidationFailures = new Dictionary<SampleGeneratingArgs, Exception>(
+            new SampleGeneratingArgsComparer())
+        {
+            [firstLayer.SampleArgs.Snapshot()] = new InvalidOperationException("first decoder failure"),
+            [secondLayer.SampleArgs.Snapshot()] = new InvalidOperationException("second decoder failure"),
+        };
+
+        // Act
+        await viewModel.ValidateSamplesCommand.ExecuteAsync(null);
+
+        // Assert
+        MessageDialogRequest<bool> request = dialogs.LastMessageRequest
+            .Should()
+            .BeOfType<MessageDialogRequest<bool>>()
+            .Subject;
+        request.Details.Should().Contain("first decoder failure")
+            .And.NotContain("second decoder failure");
+    }
+
     private static (HitsoundStudioViewModel ViewModel, ObservableHitsoundLayer First, ObservableHitsoundLayer Second)
         CreateMixedSelection()
     {
@@ -309,7 +457,8 @@ public sealed class HitsoundStudioViewModelTests
         RecordingAudioGenerator audioGenerator,
         RecordingPlaybackService playback,
         RecordingCurrentBeatmapLocator? currentBeatmap = null,
-        UserNotificationService? notifications = null)
+        UserNotificationService? notifications = null,
+        TestDialogService? dialogs = null)
     {
         notifications ??= new UserNotificationService();
         ToolExecutionService execution = new(
@@ -321,7 +470,7 @@ public sealed class HitsoundStudioViewModelTests
             service,
             audioGenerator,
             playback,
-            new TestDialogService(),
+            dialogs ?? new TestDialogService(),
             notifications,
             execution,
             currentBeatmap ?? new RecordingCurrentBeatmapLocator(),
@@ -337,6 +486,9 @@ public sealed class HitsoundStudioViewModelTests
     private sealed class RecordingHitsoundStudioService : IHitsoundStudioService
     {
         public Action<IReadOnlyList<HitsoundLayer>>? ReloadAction { get; set; }
+
+        public IReadOnlyDictionary<SampleGeneratingArgs, Exception> ValidationFailures { get; set; } =
+            new Dictionary<SampleGeneratingArgs, Exception>(new SampleGeneratingArgsComparer());
 
         public Task<IReadOnlyList<HitsoundLayer>> ImportAsync(
             HitsoundStudioImportRequest request,
@@ -357,8 +509,7 @@ public sealed class HitsoundStudioViewModelTests
             IReadOnlyList<SampleGeneratingArgs> samples,
             CancellationToken cancellationToken = default)
         {
-            return Task.FromResult<IReadOnlyDictionary<SampleGeneratingArgs, Exception>>(
-                new Dictionary<SampleGeneratingArgs, Exception>());
+            return Task.FromResult(ValidationFailures);
         }
 
         public Task<HitsoundStudioExportResult> ExportAsync(
