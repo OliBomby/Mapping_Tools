@@ -392,7 +392,7 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
         if (!snapshot.IsEditorActive)
         {
             UpdateOverlay();
-            PublishState("Waiting for osu! to become active...");
+            PublishState($"Unfocused: {layers.GetAllRelevantDrawables().Count()} virtual object(s)");
             return;
         }
 

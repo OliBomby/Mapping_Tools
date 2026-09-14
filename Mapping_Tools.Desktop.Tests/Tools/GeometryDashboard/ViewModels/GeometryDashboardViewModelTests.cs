@@ -116,6 +116,22 @@ public sealed class GeometryDashboardViewModelTests
     }
 
     [TestMethod]
+    public async Task RefreshOnceAsync_WhenEditorIsUnfocused_ShowsGreenUnfocusedStatus()
+    {
+        // Arrange
+        var editor = CreateRuntimeSnapshot(new HitObject("64,96,1000,1,0,0:0:0:0:"), 0, []).Editor;
+        using var viewModel = CreateViewModel(
+            snapshots: new GeometryDashboardRuntimeSnapshot(editor, false));
+
+        // Act
+        await viewModel.RefreshOnceAsync();
+
+        // Assert
+        viewModel.Status.Should().Be($"Unfocused: {viewModel.DrawableCount} virtual object(s)");
+        viewModel.StatusIndicatorState.Should().Be(GeometryDashboardStatusIndicatorState.Running);
+    }
+
+    [TestMethod]
     public async Task Deactivate_AfterRuntimeRefresh_UpdatesStatusThroughServiceEvent()
     {
         // Arrange

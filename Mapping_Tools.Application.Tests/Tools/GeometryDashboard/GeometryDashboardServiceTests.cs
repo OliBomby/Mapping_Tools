@@ -147,7 +147,7 @@ public sealed class GeometryDashboardServiceTests
     [TestMethod]
     [DataRow(true)]
     [DataRow(false)]
-    public async Task RefreshOnceAsync_WithEditorSnapshot_ReportsRunningOrWaitingForFocus(bool active)
+    public async Task RefreshOnceAsync_WithEditorSnapshot_ReportsRunningOrUnfocusedState(bool active)
     {
         // Arrange
         var editor = CreateRuntimeSnapshot(new HitObject("64,96,1000,1,0,0:0:0:0:"), 0, []).Editor;
@@ -160,7 +160,7 @@ public sealed class GeometryDashboardServiceTests
         // Assert
         service.State.Status.Should().Be(active
             ? $"Running: {service.State.DrawableCount} virtual object(s)"
-            : "Waiting for osu! to become active...");
+            : $"Unfocused: {service.State.DrawableCount} virtual object(s)");
     }
 
     [TestMethod]

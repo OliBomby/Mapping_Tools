@@ -393,6 +393,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
             return GeometryDashboardStatusIndicatorState.Error;
 
         return status.StartsWith("Running:", StringComparison.OrdinalIgnoreCase)
+            || status.StartsWith("Unfocused:", StringComparison.OrdinalIgnoreCase)
             ? GeometryDashboardStatusIndicatorState.Running
             : GeometryDashboardStatusIndicatorState.Waiting;
     }
