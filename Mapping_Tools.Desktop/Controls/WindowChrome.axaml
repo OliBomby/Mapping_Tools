@@ -1,0 +1,54 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+xmlns:converters="using:Avalonia.Data.Converters"
+xmlns:materialIcons="using:Material.Icons.Avalonia"
+             x:Class="Mapping_Tools.Desktop.Controls.WindowChrome"
+             x:Name="Root"
+             x:DataType="controls:WindowChrome"
+             Height="35"
+             MinHeight="35"
+             MaxHeight="35">
+    <Grid ColumnDefinitions="*,Auto"
+          Height="35">
+        <Border Grid.Column="0"
+                Background="Transparent"
+                DoubleTapped="ToggleMaximizeWindow"
+                PointerPressed="DragWindow" />
+
+        <StackPanel Grid.Column="0"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Left"
+                    IsHitTestVisible="False"
+IsVisible="{Binding Title, ElementName=Root, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}">
+            <Border Width="24"
+                    Height="24"
+                    Margin="6,0,0,0"
+                    VerticalAlignment="Center"
+                    Background="{DynamicResource MaterialBodyBrush}">
+                <Border.OpacityMask>
+                    <ImageBrush Source="/Assets/mt_logo_white_24.png"
+                                Stretch="Uniform" />
+                </Border.OpacityMask>
+            </Border>
+            <TextBlock Margin="8,0,0,0"
+                       VerticalAlignment="Center"
+                       FontWeight="Normal"
+                       Text="{Binding Title, ElementName=Root}" />
+        </StackPanel>
+
+        <Button Grid.Column="1"
+                Width="47"
+                Height="35"
+                Padding="0"
+                HorizontalAlignment="Right"
+                Theme="{StaticResource MaterialFlatButton}"
+                AutomationProperties.Name="Close"
+                Click="CloseWindow"
+                ToolTip.Tip="Close dialog.">
+            <materialIcons:MaterialIcon Width="22"
+                                        Height="22"
+                                        Kind="WindowClose" />
+        </Button>
+    </Grid>
+</UserControl>

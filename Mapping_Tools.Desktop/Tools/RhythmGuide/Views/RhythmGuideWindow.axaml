@@ -2,7 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Mapping_Tools.Desktop.Tools.RhythmGuide.ViewModels"
         xmlns:views="using:Mapping_Tools.Desktop.Tools.RhythmGuide.Views"
-        xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+        xmlns:controls="using:Mapping_Tools.Desktop.Controls"
         x:Class="Mapping_Tools.Desktop.Tools.RhythmGuide.Views.RhythmGuideWindow"
         x:DataType="vm:RhythmGuideViewModel"
         Title="Rhythm Guide"
@@ -19,29 +19,8 @@
         FontSize="14"
         FontWeight="Medium">
     <Grid RowDefinitions="Auto,*">
-        <Grid Grid.Row="0">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" IsHitTestVisible="False">
-                <Border Width="24" Height="24" Margin="6,0,0,0"
-                        VerticalAlignment="Center"
-                        Background="{DynamicResource MaterialBodyBrush}">
-                    <Border.OpacityMask>
-                    <ImageBrush Source="/Assets/mt_logo_white_24.png" Stretch="Uniform" />
-                    </Border.OpacityMask>
-                </Border>
-                <TextBlock Text="Rhythm Guide" Margin="8,0,0,0" VerticalAlignment="Center"
-                           FontWeight="Normal" />
-            </StackPanel>
-            <Border Margin="0,0,47,0"
-                    Background="Transparent"
-                    PointerPressed="DragWindow"
-                    DoubleTapped="ToggleMaximizeWindow" />
-            <Button Width="47" Height="35" Padding="0"
-                    HorizontalAlignment="Right"
-                    Theme="{StaticResource MaterialFlatButton}"
-                    Click="CloseWindow">
-                <materialIcons:MaterialIcon Width="22" Height="22" Kind="WindowClose" />
-            </Button>
-        </Grid>
+        <controls:WindowChrome Grid.Row="0"
+                               Title="Rhythm Guide" />
 
         <Grid Grid.Row="1">
             <ContentControl Margin="10">

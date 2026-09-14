@@ -25,19 +25,4 @@ public sealed partial class GeometryDashboardGeneratorSettingsWindow : Window
         collectionViewModel.SetSelectedPredicates(listBox.SelectedItems?.OfType<SelectionPredicate>() ?? []);
     }
 
-    private void CloseWindow(object? sender, RoutedEventArgs eventArgs)
-    {
-        Close(false);
-    }
-
-    private void DragWindow(object? sender, PointerPressedEventArgs eventArgs)
-    {
-        if (eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed) BeginMoveDrag(eventArgs);
-    }
-
-    private void ToggleMaximizeWindow(object? sender, TappedEventArgs eventArgs)
-    {
-        WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
-    }
-
 }

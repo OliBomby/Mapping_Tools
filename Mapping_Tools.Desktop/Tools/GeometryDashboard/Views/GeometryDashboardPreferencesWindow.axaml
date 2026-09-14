@@ -12,29 +12,8 @@
         FontSize="14"
         Background="{DynamicResource MaterialPaperBrush}" Foreground="{DynamicResource MaterialBodyBrush}">
     <Grid RowDefinitions="Auto,*,Auto">
-        <Grid x:Name="FirstGrid" Grid.Row="0">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" IsHitTestVisible="False">
-                <Border Width="24" Height="24" Margin="9,0,0,0"
-                        VerticalAlignment="Center"
-                        Background="{DynamicResource MaterialBodyBrush}">
-                    <Border.OpacityMask>
-                        <ImageBrush Source="/Assets/mt_logo_white_24.png" Stretch="Uniform" />
-                    </Border.OpacityMask>
-                </Border>
-                <TextBlock Text="Preferences" Margin="8,0,0,0"
-                           VerticalAlignment="Center"
-                           FontWeight="Normal" />
-            </StackPanel>
-            <Border Margin="0,0,47,0" Background="Transparent"
-                    PointerPressed="DragWindow" DoubleTapped="ToggleMaximizeWindow" />
-            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                <Button Width="47" Height="35" Padding="0"
-                        Theme="{StaticResource MaterialFlatButton}"
-                        Click="CloseWindow" ToolTip.Tip="Close preferences.">
-                    <materialIcons:MaterialIcon Kind="Close" Width="22" Height="22" />
-                </Button>
-            </StackPanel>
-        </Grid>
+        <controls:WindowChrome Grid.Row="0"
+                               Title="Preferences" />
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Hidden">

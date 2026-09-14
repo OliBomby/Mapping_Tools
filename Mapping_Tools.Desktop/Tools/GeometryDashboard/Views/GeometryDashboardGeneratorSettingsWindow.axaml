@@ -1,5 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:Mapping_Tools.Desktop.Controls"
         xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
         xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         xmlns:geometryDashboard="clr-namespace:Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions"
@@ -94,26 +95,9 @@
         </DataTemplate>
     </Window.Resources>
     <Grid RowDefinitions="Auto,*,Auto">
-        <Grid Grid.Row="0" VerticalAlignment="Top">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" IsHitTestVisible="False">
-                <Border Width="24" Height="24" Margin="6,0,0,0"
-                        VerticalAlignment="Center"
-                        Background="{DynamicResource MaterialBodyBrush}">
-                    <Border.OpacityMask>
-                        <ImageBrush Source="/Assets/mt_logo_white_24.png" Stretch="Uniform" />
-                    </Border.OpacityMask>
-                </Border>
-                <TextBlock Text="Generator Settings" Margin="8,0,0,0" VerticalAlignment="Center"
-                           FontWeight="Normal" />
-            </StackPanel>
-            <Border Margin="0,0,47,0" Background="Transparent"
-                    PointerPressed="DragWindow" DoubleTapped="ToggleMaximizeWindow" />
-            <Button Width="47" Height="35" Padding="0" HorizontalAlignment="Right"
-                    Theme="{StaticResource MaterialFlatButton}"
-                    Click="CloseWindow" ToolTip.Tip="Close generator settings.">
-                <materialIcons:MaterialIcon Kind="Close" Width="22" Height="22" />
-            </Button>
-        </Grid>
+        <controls:WindowChrome Grid.Row="0"
+                               Title="Generator Settings"
+                               CloseResult="False" />
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Hidden">
             <Border Padding="15,10">
                 <StackPanel>

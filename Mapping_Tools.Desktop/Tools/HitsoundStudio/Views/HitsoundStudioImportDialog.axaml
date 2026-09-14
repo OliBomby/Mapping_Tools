@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:hitsoundStudio="clr-namespace:Mapping_Tools.Desktop.Tools.HitsoundStudio.Interactions"
+        xmlns:controls="using:Mapping_Tools.Desktop.Controls"
         xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
         xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
         xmlns:materialIcons="using:Material.Icons.Avalonia"
@@ -20,26 +21,8 @@
         FontFamily="avares://Mapping_Tools.Desktop/Assets/Fonts#Roboto"
         FontSize="14"
         FontWeight="Medium">
-    <Grid RowDefinitions="35,*,60">
-        <Grid Grid.Row="0"
-              HorizontalAlignment="Stretch">
-            <Border Margin="0,0,35,0"
-                    Background="Transparent"
-                    PointerPressed="DragWindow" />
-            <Button HorizontalAlignment="Right"
-                    Width="35"
-                    Height="35"
-                    Padding="0"
-                    Background="Transparent"
-                    Foreground="{DynamicResource MaterialDarkForegroundBrush}"
-                    Theme="{StaticResource MaterialFlatButton}"
-                    Command="{Binding CancelCommand}"
-                    ToolTip.Tip="Close">
-                <materialIcons:MaterialIcon Width="20"
-                                             Height="20"
-                                             Kind="Close" />
-            </Button>
-        </Grid>
+    <Grid RowDefinitions="Auto,*,60">
+        <controls:WindowChrome Grid.Row="0" />
 
         <TabbedPage Grid.Row="1"
                     TabPlacement="Left"

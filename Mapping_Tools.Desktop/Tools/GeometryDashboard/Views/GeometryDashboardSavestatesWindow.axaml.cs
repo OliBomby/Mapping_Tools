@@ -22,18 +22,4 @@ public sealed partial class GeometryDashboardSavestatesWindow : Window
             viewModel.SetSelectedSlots(listView.SelectedItems?.OfType<GeometryDashboardSaveSlot>() ?? []);
     }
 
-    private void CloseWindow(object? sender, RoutedEventArgs eventArgs)
-    {
-        Close();
-    }
-
-    private void DragWindow(object? sender, PointerPressedEventArgs eventArgs)
-    {
-        if (eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed) BeginMoveDrag(eventArgs);
-    }
-
-    private void ToggleMaximizeWindow(object? sender, TappedEventArgs eventArgs)
-    {
-        WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
-    }
 }

@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using Avalonia.Input;
 
 namespace Mapping_Tools.Desktop.Tools.HitsoundStudio.Views;
 
@@ -12,8 +11,4 @@ public sealed partial class HitsoundStudioImportDialog : Window
         InitializeComponent();
     }
 
-    private void DragWindow(object? sender, PointerPressedEventArgs eventArgs)
-    {
-        if (eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed) BeginMoveDrag(eventArgs);
-    }
 }
