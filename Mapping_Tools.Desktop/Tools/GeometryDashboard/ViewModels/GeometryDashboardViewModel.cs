@@ -483,8 +483,8 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
 
     private static GeometryDashboardTargetingMode ToTargetingMode(KeyModifiers modifiers)
     {
-        if (modifiers.HasFlag(KeyModifiers.Control)) return GeometryDashboardTargetingMode.Disable;
         if (modifiers.HasFlag(KeyModifiers.Shift)) return GeometryDashboardTargetingMode.Enable;
+        if (modifiers.HasFlag(KeyModifiers.Control)) return GeometryDashboardTargetingMode.Disable;
         return GeometryDashboardTargetingMode.Toggle;
     }
 }
