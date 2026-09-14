@@ -15,7 +15,7 @@
 
                 <Grid Margin="10,0,10,16" ColumnDefinitions="Auto,*">
                     <TextBlock Text="Service status" FontWeight="SemiBold" Margin="0,0,12,0" />
-                    <TextBlock Grid.Column="1" Text="{Binding Status}" TextWrapping="Wrap" />
+                    <SelectableTextBlock Grid.Column="1" Text="{Binding Status}" TextWrapping="Wrap" />
                 </Grid>
 
                 <Grid Margin="0,0,0,10" ColumnDefinitions="Auto,*,Auto">
@@ -119,8 +119,9 @@
                                                                   OnContent="" OffContent=""
                                                                   VerticalAlignment="Center"
                                                                   Cursor="Hand" />
-                                                    <Button Grid.Column="1" Content="Configure" Width="100"
-                                                            Margin="0,0,10,0"
+                                                    <Button Grid.Column="1" Content="Configure"
+                                                            Margin="0,2,20,2"
+                                                            Padding="10, 6"
                                                             VerticalAlignment="Center"
                                                             CornerRadius="7"
                                                             Command="{Binding OpenSettingsCommand}"
