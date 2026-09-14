@@ -190,7 +190,7 @@ internal static class WindowsNativeMethods
     [return: MarshalAs(UnmanagedType.Bool)]
     internal static extern bool DeleteDC(nint deviceContext);
 
-    [DllImport("gdi32.dll", SetLastError = true)]
+    [DllImport("gdi32.dll", EntryPoint = "CreateDIBSection", SetLastError = true)]
     internal static extern nint CreateDibSection(
         nint deviceContext,
         ref BitmapInfoHeader bitmapInfo,
