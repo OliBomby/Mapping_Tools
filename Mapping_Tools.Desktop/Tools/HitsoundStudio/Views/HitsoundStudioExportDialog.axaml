@@ -18,7 +18,7 @@
         <StackPanel Grid.Row="0" Margin="0,6,0,0">
             <Grid ColumnDefinitions="*,Auto">
                 <TextBox MinWidth="220" Margin="0,0,5,0"
-                         Text="{Binding ExportFolder, Mode=TwoWay}"
+                         Text="{Binding ExportFolder, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          materialAssists:TextFieldAssist.Label="Export folder"
                          ToolTip.Tip="Folder where the map, samples, or MIDI file are written." />
                 <Button Grid.Column="1"
@@ -31,7 +31,7 @@
                 </Button>
             </Grid>
             <TextBox Margin="0,0,5,0"
-                     Text="{Binding HitsoundDiffName, Mode=TwoWay}"
+                     Text="{Binding HitsoundDiffName, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                      materialAssists:TextFieldAssist.Label="Hitsound map name"
                      ToolTip.Tip="Version name written to the exported difficulty." />
             <CheckBox Margin="0,15,0,0"
@@ -64,12 +64,12 @@
                       ToolTip.Tip="Choose standard custom indices, coinciding samples, storyboard, or MIDI export." />
             <TextBox Margin="0,5,0,0"
                      IsVisible="{Binding StandardExtraSettingsVisible}"
-                     Text="{Binding ZipLayersLeniency, Mode=TwoWay}"
+                     Text="{Binding ZipLayersLeniency, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                      materialAssists:TextFieldAssist.Label="Note grouping leniency"
                      ToolTip.Tip="Maximum timestamp distance for combining layers." />
             <TextBox Margin="0,5,5,0"
                      IsVisible="{Binding StandardExtraSettingsVisible}"
-                     Text="{Binding FirstCustomIndex, Mode=TwoWay}"
+                     Text="{Binding FirstCustomIndex, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                      materialAssists:TextFieldAssist.Label="First custom index"
                      ToolTip.Tip="First index assigned to a new sample schema." />
             <CheckBox Margin="0,5,0,0"

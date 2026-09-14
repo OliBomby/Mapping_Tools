@@ -33,7 +33,7 @@
                               VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="10">
                         <TextBox Margin="0,5,0,0"
-                                 Text="{Binding Name, Mode=TwoWay}"
+                                 Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                  materialAssists:TextFieldAssist.Label="Name"
                                  ToolTip.Tip="The convenient name shown in the layer list." />
                         <ComboBox Margin="0,5,0,0"
@@ -47,7 +47,7 @@
                                   materialAssists:ComboBoxAssist.Label="Hitsound"
                                   ToolTip.Tip="Hitsound used by the new layer." />
                         <Grid Margin="0,15,0,0" ColumnDefinitions="*,Auto">
-                            <TextBox Text="{Binding SamplePath, Mode=TwoWay}"
+                            <TextBox Text="{Binding SamplePath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      materialAssists:TextFieldAssist.Label="Hitsound sample"
                                      ToolTip.Tip="Audio file or SoundFont used by the new layer." />
                             <Button Grid.Column="1"
@@ -68,7 +68,7 @@
                               VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="10">
                         <TextBox Margin="0,5,0,0"
-                                 Text="{Binding Name, Mode=TwoWay}"
+                                 Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                  materialAssists:TextFieldAssist.Label="Name"
                                  ToolTip.Tip="The convenient name shown in the layer list." />
                         <ComboBox Margin="0,5,0,0"
@@ -82,7 +82,7 @@
                                   materialAssists:ComboBoxAssist.Label="Hitsound"
                                   ToolTip.Tip="Hitsound used by the new layer." />
                         <Grid Margin="0,15,0,0" ColumnDefinitions="*,Auto">
-                            <TextBox Text="{Binding SamplePath, Mode=TwoWay}"
+                            <TextBox Text="{Binding SamplePath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      materialAssists:TextFieldAssist.Label="Hitsound sample"
                                      ToolTip.Tip="Audio file or SoundFont used by the imported stack." />
                             <Button Grid.Column="1"
@@ -95,7 +95,7 @@
                             </Button>
                         </Grid>
                         <Grid Margin="0,15,0,0" ColumnDefinitions="*,Auto,5,Auto">
-                            <TextBox Text="{Binding SourcePaths, Mode=TwoWay}"
+                            <TextBox Text="{Binding SourcePaths, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      materialAssists:TextFieldAssist.Label="Source beatmap"
                                      ToolTip.Tip="The source beatmap to import the hitsound stack from." />
                             <Button Grid.Column="1"
@@ -116,11 +116,11 @@
                             </Button>
                         </Grid>
                         <Grid Margin="0,5,0,0" ColumnDefinitions="*,5,*">
-                            <TextBox Text="{Binding XText, Mode=TwoWay}"
+                            <TextBox Text="{Binding XText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      materialAssists:TextFieldAssist.Label="X coordinate"
                                      ToolTip.Tip="The X coordinate of the stack in the source beatmap which dictates all the times when the sound has to be played." />
                             <TextBox Grid.Column="2"
-                                     Text="{Binding YText, Mode=TwoWay}"
+                                     Text="{Binding YText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      materialAssists:TextFieldAssist.Label="Y coordinate"
                                      ToolTip.Tip="The Y coordinate of the stack in the source beatmap which dictates all the times when the sound has to be played." />
                         </Grid>
@@ -133,11 +133,11 @@
                               VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="10">
                         <TextBox Margin="0,5,0,0"
-                                 Text="{Binding Name, Mode=TwoWay}"
+                                 Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                  materialAssists:TextFieldAssist.Label="Name"
                                  ToolTip.Tip="The name prefix for imported hitsound layers." />
                         <Grid Margin="0,15,0,0" ColumnDefinitions="*,Auto,5,Auto">
-                            <TextBox Text="{Binding SourcePaths, Mode=TwoWay}"
+                            <TextBox Text="{Binding SourcePaths, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      materialAssists:TextFieldAssist.Label="Source beatmap"
                                      ToolTip.Tip="One or more beatmaps to import hitsounds from." />
                             <Button Grid.Column="1"
@@ -179,11 +179,11 @@
                               VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="10">
                         <TextBox Margin="0,5,0,0"
-                                 Text="{Binding Name, Mode=TwoWay}"
+                                 Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                  materialAssists:TextFieldAssist.Label="Name"
                                  ToolTip.Tip="The name prefix for imported MIDI layers." />
                         <Grid Margin="0,15,0,0" ColumnDefinitions="*,Auto">
-                            <TextBox Text="{Binding MidiPath, Mode=TwoWay}"
+                            <TextBox Text="{Binding MidiPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      materialAssists:TextFieldAssist.Label="Source MIDI"
                                      ToolTip.Tip="The MIDI file to import." />
                             <Button Grid.Column="1"
@@ -196,7 +196,7 @@
                             </Button>
                         </Grid>
                         <TextBox Margin="0,15,0,0"
-                                 Text="{Binding OffsetText, Mode=TwoWay}"
+                                 Text="{Binding OffsetText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                  materialAssists:TextFieldAssist.Label="Offset"
                                  ToolTip.Tip="The start time offset of the MIDI in milliseconds." />
                         <CheckBox Margin="0,15,0,0"
@@ -211,14 +211,14 @@
                                   ToolTip.Tip="Make separate hitsound layers for different note lengths." />
                         <TextBox Margin="0,8,0,8"
                                  IsVisible="{Binding IsLengthSettingsVisible}"
-                                 Text="{Binding LengthRoughnessText, Mode=TwoWay}"
+                                 Text="{Binding LengthRoughnessText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                  materialAssists:TextFieldAssist.Label="Length rounding roughness" />
                         <CheckBox Content="Discriminate velocities"
                                   IsChecked="{Binding DiscriminateVelocities, Mode=TwoWay}"
                                   ToolTip.Tip="Make separate hitsound layers for different note velocities." />
                         <TextBox Margin="0,8,0,8"
                                  IsVisible="{Binding IsVelocitySettingsVisible}"
-                                 Text="{Binding VelocityRoughnessText, Mode=TwoWay}"
+                                 Text="{Binding VelocityRoughnessText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                  materialAssists:TextFieldAssist.Label="Velocity rounding roughness" />
                     </StackPanel>
                 </ScrollViewer>
@@ -229,11 +229,11 @@
                               VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="10">
                         <TextBox Margin="0,5,0,0"
-                                 Text="{Binding Name, Mode=TwoWay}"
+                                 Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                  materialAssists:TextFieldAssist.Label="Name"
                                  ToolTip.Tip="The name prefix for imported storyboard layers." />
                         <Grid Margin="0,15,0,0" ColumnDefinitions="*,Auto,5,Auto">
-                            <TextBox Text="{Binding SourcePaths, Mode=TwoWay}"
+                            <TextBox Text="{Binding SourcePaths, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      materialAssists:TextFieldAssist.Label="Source beatmap"
                                      ToolTip.Tip="The source beatmap to import the storyboarded samples from." />
                             <Button Grid.Column="1"

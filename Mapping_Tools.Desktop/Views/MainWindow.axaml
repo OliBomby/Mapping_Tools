@@ -430,7 +430,7 @@
                                      AutomationProperties.Name="Tool search"
                                      UseFloatingPlaceholder="True"
                                      materialAssists:TextFieldAssist.Label="Search"
-                                     Text="{Binding SearchText, Mode=TwoWay}"
+                                     Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                      ToolTip.Tip="Search registered features">
                                 <TextBox.KeyBindings>
                                     <KeyBinding Gesture="Enter"

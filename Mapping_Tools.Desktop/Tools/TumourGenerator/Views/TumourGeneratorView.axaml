@@ -214,7 +214,7 @@
                               Margin="0 1 0 0"
                               IsVisible="{Binding CurrentLayer.TumourSidedness, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Random}">
                             <TextBox
-                                Text="{Binding CurrentLayer.RandomSeed, Mode=TwoWay, Converter={StaticResource InvariantInt32Converter}}"
+                                Text="{Binding CurrentLayer.RandomSeed, Mode=TwoWay, Converter={StaticResource InvariantInt32Converter}, UpdateSourceTrigger=LostFocus}"
                                 materialAssists:TextFieldAssist.Label="Random seed"
                                 ToolTip.Tip="The random seed which determines the sequence of tumour sidedness for this layer." />
                             <Button Grid.Column="1" Command="{Binding RandomizeCommand}" Margin="5,0,0,0"
@@ -237,7 +237,7 @@
                                 ToolTip.Tip="The tumour distance determines the distance between the centre of each tumour." />
                         <TextBlock Margin="0,10,0,0" FontWeight="Bold" Text="Count" />
                         <TextBox
-                            Text="{Binding CurrentLayer.TumourCount, Mode=TwoWay, Converter={StaticResource InvariantInt32Converter}}"
+                            Text="{Binding CurrentLayer.TumourCount, Mode=TwoWay, Converter={StaticResource InvariantInt32Converter}, UpdateSourceTrigger=LostFocus}"
                             Classes="compact"
                             IsVisible="{Binding AdvancedOptions}"
                             ToolTip.Tip="The number of tumours to place on the slider. If 0 this count will be automatically determined using the distance and slider length." />
@@ -248,7 +248,7 @@
                                 ToolTip.Tip="The number of tumours to place on the slider. If 0 this count will be automatically determined using the distance and slider length." />
                         <TextBlock Margin="0,10,0,0" FontWeight="Bold" Text="Start" />
                         <TextBox
-                            Text="{Binding CurrentLayer.TumourStart, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
+                            Text="{Binding CurrentLayer.TumourStart, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
                             IsVisible="{Binding AdvancedOptions}"
                             Classes="compact"
                             ToolTip.Tip="The progression along the slider where to start the placement of tumours. 0 is the slider head, 1 is the slider end. If 'Absolute range' is checked, then this distance is expressed in osu! pixels." />
@@ -259,7 +259,7 @@
                                 ToolTip.Tip="The progression along the slider where to start the placement of tumours. 0 is the slider head, 1 is the slider end. If 'Absolute range' is checked, then this distance is expressed in osu! pixels." />
                         <TextBlock Margin="0,10,0,0" FontWeight="Bold" Text="End" />
                         <TextBox
-                            Text="{Binding CurrentLayer.TumourEnd, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
+                            Text="{Binding CurrentLayer.TumourEnd, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
                             IsVisible="{Binding AdvancedOptions}"
                             Classes="compact"
                             ToolTip.Tip="The progression along the slider where to end the placement of tumours. 0 is the slider head, 1 is the slider end. If 'Absolute range' is checked, then this distance is expressed in osu! pixels." />

@@ -42,7 +42,7 @@
                                    FontWeight="Bold"
                                    Text="General" />
                         <TextBox Margin="0,5,0,0"
-                                 Text="{Binding EditName, Mode=TwoWay}"
+                                 Text="{Binding EditName, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                  materialAssists:TextFieldAssist.Label="Name"
                                  ToolTip.Tip="The name of this hitsound layer." />
                         <ComboBox Margin="0,5,0,0"
@@ -75,7 +75,7 @@
                         <Grid Margin="0,5,0,0"
                               ColumnDefinitions="*,Auto">
                             <TextBox Margin="0,0,5,0"
-                                     Text="{Binding EditSamplePath, Mode=TwoWay}"
+                                     Text="{Binding EditSamplePath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      materialAssists:TextFieldAssist.Label="Path"
                                      ToolTip.Tip="Audio or SoundFont source used to generate this layer." />
                             <Button Grid.Column="1"
@@ -90,40 +90,40 @@
                             </Button>
                         </Grid>
                         <TextBox Margin="0,5,0,0"
-                                 Text="{Binding EditSampleVolume, Mode=TwoWay}"
+                                 Text="{Binding EditSampleVolume, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                  materialAssists:TextFieldAssist.Label="Volume %"
                                  ToolTip.Tip="The volume at which the sound of this hitsound layer has to play. Ranges from 0 to 100." />
                         <TextBox Margin="0,5,0,0"
-                                 Text="{Binding EditSamplePanning, Mode=TwoWay}"
+                                 Text="{Binding EditSamplePanning, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                  materialAssists:TextFieldAssist.Label="Panning"
                                  ToolTip.Tip="Panning of the sound. -1 means all left and 1 means all right." />
                         <TextBox Margin="0,5,0,0"
-                                 Text="{Binding EditSamplePitchShift, Mode=TwoWay}"
+                                 Text="{Binding EditSamplePitchShift, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                  materialAssists:TextFieldAssist.Label="Pitch shift"
                                  ToolTip.Tip="Pitch shift of the sound in keys. 12 is plus one octave. -12 is minus one octave." />
                         <StackPanel IsVisible="{Binding IsSoundFontSample}">
                             <TextBox Margin="0,5,0,0"
-                                     Text="{Binding EditSampleBank, Mode=TwoWay}"
+                                     Text="{Binding EditSampleBank, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      materialAssists:TextFieldAssist.Label="Bank"
                                      ToolTip.Tip="The bank number of the sample." />
                             <TextBox Margin="0,5,0,0"
-                                     Text="{Binding EditSamplePatch, Mode=TwoWay}"
+                                     Text="{Binding EditSamplePatch, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      materialAssists:TextFieldAssist.Label="Patch"
                                      ToolTip.Tip="The patch number of the sample." />
                             <TextBox Margin="0,5,0,0"
-                                     Text="{Binding EditSampleInstrument, Mode=TwoWay}"
+                                     Text="{Binding EditSampleInstrument, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      materialAssists:TextFieldAssist.Label="Instrument"
                                      ToolTip.Tip="The layer index in the sound font preset or instrument index." />
                             <TextBox Margin="0,5,0,0"
-                                     Text="{Binding EditSampleKey, Mode=TwoWay}"
+                                     Text="{Binding EditSampleKey, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      materialAssists:TextFieldAssist.Label="Key"
                                      ToolTip.Tip="The key number of the sample." />
                             <TextBox Margin="0,5,0,0"
-                                     Text="{Binding EditSampleLength, Mode=TwoWay}"
+                                     Text="{Binding EditSampleLength, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      materialAssists:TextFieldAssist.Label="Length"
                                      ToolTip.Tip="The length in milliseconds of the sample." />
                             <TextBox Margin="0,5,0,0"
-                                     Text="{Binding EditSampleVelocity, Mode=TwoWay}"
+                                     Text="{Binding EditSampleVelocity, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      materialAssists:TextFieldAssist.Label="Velocity"
                                      ToolTip.Tip="The velocity of the sample. Synonymous with the volume field." />
                         </StackPanel>
@@ -143,7 +143,7 @@
                             <Grid Margin="0,5,0,0"
                                   ColumnDefinitions="*,Auto,5,Auto">
                                 <TextBox Margin="0,0,5,0"
-                                         Text="{Binding EditImportPath, Mode=TwoWay}"
+                                         Text="{Binding EditImportPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                          materialAssists:TextFieldAssist.Label="Source path"
                                          ToolTip.Tip="The source of this hitsound layer." />
                                 <Button Grid.Column="1"
@@ -170,11 +170,11 @@
                             <StackPanel IsVisible="{Binding IsStackImport}">
                                 <Grid Margin="0,5,0,0"
                                       ColumnDefinitions="*,5,*">
-                                    <TextBox Text="{Binding EditImportX, Mode=TwoWay}"
+                                    <TextBox Text="{Binding EditImportX, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                              materialAssists:TextFieldAssist.Label="X coordinate"
                                              ToolTip.Tip="The X coordinate of the stack in the source beatmap." />
                                     <TextBox Grid.Column="2"
-                                             Text="{Binding EditImportY, Mode=TwoWay}"
+                                             Text="{Binding EditImportY, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                              materialAssists:TextFieldAssist.Label="Y coordinate"
                                              ToolTip.Tip="The Y coordinate of the stack in the source beatmap." />
                                 </Grid>
@@ -183,7 +183,7 @@
                                 <Grid Margin="0,5,0,0"
                                       ColumnDefinitions="*,Auto">
                                     <TextBox Margin="0,0,5,0"
-                                             Text="{Binding EditImportSamplePath, Mode=TwoWay}"
+                                             Text="{Binding EditImportSamplePath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                              materialAssists:TextFieldAssist.Label="Sample path"
                                              ToolTip.Tip="Unique sample which this layer imported from the source beatmap." />
                                     <Button Grid.Column="1"
@@ -213,34 +213,34 @@
                             </StackPanel>
                             <StackPanel IsVisible="{Binding IsMidiImport}">
                                 <TextBox Margin="0,5,0,0"
-                                         Text="{Binding EditImportBank, Mode=TwoWay}"
+                                         Text="{Binding EditImportBank, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                          materialAssists:TextFieldAssist.Label="Bank"
                                          ToolTip.Tip="SoundFont bank filter, or -1 for any bank." />
                                 <TextBox Margin="0,5,0,0"
-                                         Text="{Binding EditImportPatch, Mode=TwoWay}"
+                                         Text="{Binding EditImportPatch, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                          materialAssists:TextFieldAssist.Label="Patch"
                                          ToolTip.Tip="SoundFont patch filter, or -1 for any patch." />
                                 <TextBox Margin="0,5,0,0"
-                                         Text="{Binding EditImportKey, Mode=TwoWay}"
+                                         Text="{Binding EditImportKey, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                          materialAssists:TextFieldAssist.Label="Key"
                                          ToolTip.Tip="MIDI key filter, or -1 for any key." />
                                 <TextBox Margin="0,5,0,0"
-                                         Text="{Binding EditImportLength, Mode=TwoWay}"
+                                         Text="{Binding EditImportLength, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                          materialAssists:TextFieldAssist.Label="Length"
                                          ToolTip.Tip="MIDI length filter, or -1 for any length." />
-                                <TextBox Text="{Binding EditImportLengthRoughness, Mode=TwoWay}"
+                                <TextBox Text="{Binding EditImportLengthRoughness, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                          materialAssists:TextFieldAssist.Label="Length roughness"
                                          ToolTip.Tip="Quantization used when importing MIDI note lengths." />
                                 <TextBox Margin="0,5,0,0"
-                                         Text="{Binding EditImportVelocity, Mode=TwoWay}"
+                                         Text="{Binding EditImportVelocity, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                          materialAssists:TextFieldAssist.Label="Velocity"
                                          ToolTip.Tip="MIDI velocity filter, or -1 for any velocity." />
                                 <TextBox Margin="0,5,0,0"
-                                         Text="{Binding EditImportVelocityRoughness, Mode=TwoWay}"
+                                         Text="{Binding EditImportVelocityRoughness, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                          materialAssists:TextFieldAssist.Label="Velocity roughness"
                                          ToolTip.Tip="Quantization used when importing MIDI velocities." />
                                 <TextBox Margin="0,5,0,0"
-                                         Text="{Binding EditImportOffset, Mode=TwoWay}"
+                                         Text="{Binding EditImportOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                          materialAssists:TextFieldAssist.Label="Offset"
                                          ToolTip.Tip="Millisecond offset applied to imported events." />
                             </StackPanel>
@@ -376,7 +376,7 @@
                             <TextBox Grid.Column="1"
                                      Classes="compact"
                                      Margin="5,14,5,0"
-                                     Text="{Binding BaseBeatmap, Mode=TwoWay}"
+                                     Text="{Binding BaseBeatmap, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      ToolTip.Tip="Choose the base beatmap used as the export baseline and MIDI timing source." />
                             <Button Grid.Column="2"
                                     Classes="flat path-picker"
@@ -406,7 +406,7 @@
                             <TextBox Grid.Column="1"
                                      Classes="compact"
                                      Margin="5,14,5,0"
-                                     Text="{Binding DefaultSample.SampleArgs.Path, Mode=TwoWay}"
+                                     Text="{Binding DefaultSample.SampleArgs.Path, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      ToolTip.Tip="Choose the default sample added to packages that contain only additions." />
                             <ComboBox Grid.Column="2"
                                       Classes="compact"

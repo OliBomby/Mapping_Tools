@@ -160,7 +160,7 @@
                                      Width="120"
                                      Height="24"
                                      Margin="5"
-                                     Text="{Binding SearchFilter, Mode=TwoWay}"
+                                     Text="{Binding SearchFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                      ToolTip.Tip="Search for a pattern." />
                             <ComboBox Width="120"
                                       Height="24"
@@ -198,15 +198,15 @@
                         <TextBox Margin="0,5,0,0"
                                  IsVisible="{Binding CustomExportTimeVisible}"
                                  materialAssists:TextFieldAssist.Label="Custom export offset"
-                                 Text="{Binding CustomExportTime, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
+                                 Text="{Binding CustomExportTime, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
                                  ToolTip.Tip="Determines at what time to put the pattern for the custom offset mode." />
                         <TextBox Margin="0,5,0,0"
                                  materialAssists:TextFieldAssist.Label="Deletion margin"
-                                 Text="{Binding Padding, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
+                                 Text="{Binding Padding, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
                                  ToolTip.Tip="Extra time in milliseconds around the patterns for deleting parts of the original map." />
                         <TextBox Margin="0,5,0,0"
                                  materialAssists:TextFieldAssist.Label="Parting distance"
-                                 Text="{Binding PartingDistance, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
+                                 Text="{Binding PartingDistance, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
                                  ToolTip.Tip="Minimum number of beats required in a gap to split a pattern into smaller parts." />
                         <TextBox Margin="0,5,0,0"
                                  materialAssists:TextFieldAssist.Label="Beat divisors"
@@ -214,11 +214,11 @@
                                  ToolTip.Tip="Input any number of beat divisors here separated with commas. Example: 1/4, 1/12, 1/7, 4/5, 0.13435622499" />
                         <Grid Margin="0,5,0,0" ColumnDefinitions="*,5,*">
                             <TextBox materialAssists:TextFieldAssist.Label="Scale"
-                                     Text="{Binding CustomScale, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
+                                     Text="{Binding CustomScale, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
                                      ToolTip.Tip="Scalar to change the size of the pattern." />
                             <TextBox Grid.Column="2"
                                      materialAssists:TextFieldAssist.Label="Rotate (degrees)"
-                                     Text="{Binding CustomRotate, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
+                                     Text="{Binding CustomRotate, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
                                      ToolTip.Tip="Degrees to rotate the pattern clockwise." />
                         </Grid>
                         <ComboBox Margin="0,5,0,0"

@@ -11,26 +11,26 @@
                       VerticalScrollBarVisibility="Auto">
             <StackPanel>
                 <TextBox materialAssists:TextFieldAssist.Label="Name"
-                         Text="{Binding Name, Mode=TwoWay}"
+                         Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          MinWidth="100"
                          Margin="0,0,0,5"
                          ToolTip.Tip="The name for the pattern." />
                 <TextBox materialAssists:TextFieldAssist.Label="Hit objects"
-                         Text="{Binding HitObjects, Mode=TwoWay}"
+                         Text="{Binding HitObjects, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          AcceptsReturn="True"
                          TextWrapping="NoWrap"
                          MinWidth="100"
                          Margin="0,0,0,5"
                          ToolTip.Tip="The hit objects for the pattern." />
                 <TextBox materialAssists:TextFieldAssist.Label="Timing points"
-                         Text="{Binding TimingPoints, Mode=TwoWay}"
+                         Text="{Binding TimingPoints, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          AcceptsReturn="True"
                          TextWrapping="NoWrap"
                          MinWidth="100"
                          Margin="0,0,0,5"
                          ToolTip.Tip="The timing points for the pattern. Tip: Include a redline so timing scaling works during export." />
                 <TextBox materialAssists:TextFieldAssist.Label="Global SV"
-                         Text="{Binding GlobalSv, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
+                         Text="{Binding GlobalSv, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
                          MinWidth="100"
                          Margin="0,0,0,5"
                          ToolTip.Tip="The global slider multiplier for the pattern." />

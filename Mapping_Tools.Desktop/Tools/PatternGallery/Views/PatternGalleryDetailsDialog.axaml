@@ -7,7 +7,7 @@
     <Grid Margin="8" RowDefinitions="*,*">
         <StackPanel Grid.Row="0">
             <TextBox materialAssists:TextFieldAssist.Label="Name"
-                     Text="{Binding Name, Mode=TwoWay}"
+                     Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                      MinWidth="100"
                      Margin="0,0,0,5"
                      ToolTip.Tip="The name shown for this pattern." />

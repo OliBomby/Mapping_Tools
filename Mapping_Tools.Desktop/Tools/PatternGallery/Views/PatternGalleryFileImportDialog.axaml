@@ -8,7 +8,7 @@
     <Grid Margin="8" RowDefinitions="*,*">
         <StackPanel Grid.Row="0">
             <TextBox materialAssists:TextFieldAssist.Label="Name"
-                     Text="{Binding Name, Mode=TwoWay}"
+                     Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                      MinWidth="100"
                      Margin="0,0,0,5"
                      ToolTip.Tip="The name for the pattern." />
@@ -16,7 +16,7 @@
                   Margin="0,0,0,5">
                 <TextBox Grid.Column="0"
                          materialAssists:TextFieldAssist.Label="Pattern file path"
-                         Text="{Binding FilePath, Mode=TwoWay}"
+                         Text="{Binding FilePath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          MinWidth="100"
                          MaxWidth="200"
                          ToolTip.Tip="The path to the pattern file to import." />
@@ -42,17 +42,17 @@
                 </Button>
             </Grid>
             <TextBox materialAssists:TextFieldAssist.Label="Filter"
-                     Text="{Binding Filter, Mode=TwoWay}"
+                     Text="{Binding Filter, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                      MinWidth="100"
                      Margin="0,0,0,5"
                      ToolTip.Tip="Input an optional time code here. Example time code: 00:56:823 (1,2,1,2) - " />
             <TextBox materialAssists:TextFieldAssist.Label="Start time"
-                     Text="{Binding StartTime, Mode=TwoWay, Converter={StaticResource TimeToStringConverter}, ConverterParameter=-1}"
+                     Text="{Binding StartTime, Mode=TwoWay, Converter={StaticResource TimeToStringConverter}, ConverterParameter=-1, UpdateSourceTrigger=LostFocus}"
                      MinWidth="100"
                      Margin="0,0,0,5"
                      ToolTip.Tip="Optional lower bound time. All objects before this time will be ignored." />
             <TextBox materialAssists:TextFieldAssist.Label="End time"
-                     Text="{Binding EndTime, Mode=TwoWay, Converter={StaticResource TimeToStringConverter}, ConverterParameter=-1}"
+                     Text="{Binding EndTime, Mode=TwoWay, Converter={StaticResource TimeToStringConverter}, ConverterParameter=-1, UpdateSourceTrigger=LostFocus}"
                      MinWidth="100"
                      Margin="0,0,0,5"
                      ToolTip.Tip="Optional upper bound time. All objects after this time will be ignored." />

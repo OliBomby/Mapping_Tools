@@ -70,19 +70,19 @@
                                            ToolTip.Tip="Offsets the overlay box. Use these fields when the automatic editor-to-screen coordinate conversion seems to fail." />
                                 <TextBox Width="95" VerticalAlignment="Bottom" Margin="0,0,10,0"
                                          materialAssists:TextFieldAssist.Label="Left offset"
-                                         Text="{Binding Preferences.OffsetLeft, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
+                                         Text="{Binding Preferences.OffsetLeft, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
                                          ToolTip.Tip="Offset the left side of the overlay in osu! pixels." />
                                 <TextBox Width="95" VerticalAlignment="Bottom" Margin="0,0,10,0"
                                          materialAssists:TextFieldAssist.Label="Top offset"
-                                         Text="{Binding Preferences.OffsetTop, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
+                                         Text="{Binding Preferences.OffsetTop, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
                                          ToolTip.Tip="Offset the top side of the overlay in osu! pixels." />
                                 <TextBox Width="95" VerticalAlignment="Bottom" Margin="0,0,10,0"
                                          materialAssists:TextFieldAssist.Label="Right offset"
-                                         Text="{Binding Preferences.OffsetRight, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
+                                         Text="{Binding Preferences.OffsetRight, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
                                          ToolTip.Tip="Offset the right side of the overlay in osu! pixels." />
                                 <TextBox Width="95" VerticalAlignment="Bottom"
                                          materialAssists:TextFieldAssist.Label="Bottom offset"
-                                         Text="{Binding Preferences.OffsetBottom, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
+                                         Text="{Binding Preferences.OffsetBottom, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
                                          ToolTip.Tip="Offset the bottom side of the overlay in osu! pixels." />
                             </StackPanel>
 
@@ -91,7 +91,7 @@
                                            ToolTip.Tip="Specifies how many layers of virtual objects can be used. More layers means more recursion of generating virtual objects." />
                                 <TextBox Width="120" VerticalAlignment="Bottom"
                                          materialAssists:TextFieldAssist.Label="Inception level"
-                                         Text="{Binding Preferences.InceptionLevel, Mode=TwoWay, Converter={StaticResource InvariantInt32Converter}}"
+                                         Text="{Binding Preferences.InceptionLevel, Mode=TwoWay, Converter={StaticResource InvariantInt32Converter}, UpdateSourceTrigger=LostFocus}"
                                          ToolTip.Tip="Specifies how many layers of virtual objects can be used. More layers means more recursion of generating virtual objects. It is recommended to use between 2 and 10 layers." />
                             </StackPanel>
 
@@ -171,7 +171,7 @@
                                            ToolTip.Tip="Similar virtual objects get merged together to reduce clutter. This field sets the minimal difference that two objects must have to not get merged together." />
                                 <TextBox Width="150" VerticalAlignment="Bottom"
                                          materialAssists:TextFieldAssist.Label="Minimal difference"
-                                         Text="{Binding Preferences.AcceptableDifference, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
+                                         Text="{Binding Preferences.AcceptableDifference, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
                                          ToolTip.Tip="Similar virtual objects get merged together to reduce clutter. This field sets the minimal difference that two objects must have to not get merged together." />
                             </StackPanel>
 
@@ -218,7 +218,7 @@
                                             <Slider Width="300" VerticalAlignment="Center" TickFrequency="0.01" Orientation="Horizontal"
                                                     Minimum="0" Maximum="1" Value="{Binding Opacity, Mode=TwoWay}"/>
                                             <TextBox Classes="compact" Width="40" VerticalAlignment="Center"
-                                                     Text="{Binding Opacity, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}" />
+                                                     Text="{Binding Opacity, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=PropertyChanged}" />
                                         </StackPanel>
 
                                         <StackPanel Orientation="Horizontal" MinHeight="35" Spacing="10">
@@ -226,7 +226,7 @@
                                             <Slider Width="300" VerticalAlignment="Center" TickFrequency="1" Orientation="Horizontal"
                                                     Minimum="1" Maximum="10" Value="{Binding Thickness, Mode=TwoWay}"/>
                                             <TextBox Classes="compact" Width="40" VerticalAlignment="Center"
-                                                     Text="{Binding Thickness, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}" />
+                                                     Text="{Binding Thickness, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=PropertyChanged}" />
                                         </StackPanel>
 
                                         <StackPanel Orientation="Horizontal" MinHeight="35" Spacing="10">
@@ -242,7 +242,7 @@
                                             <Slider Width="300" VerticalAlignment="Center" TickFrequency="1" Orientation="Horizontal"
                                                     Minimum="1" Maximum="10" Value="{Binding Size, Mode=TwoWay}"/>
                                             <TextBox Classes="compact" Width="40" VerticalAlignment="Center"
-                                                     Text="{Binding Size, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}" />
+                                                     Text="{Binding Size, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=PropertyChanged}" />
                                         </StackPanel>
                                     </StackPanel>
                                 </Expander>

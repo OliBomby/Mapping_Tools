@@ -8,12 +8,12 @@
         <StackPanel Grid.Row="0">
             <TextBox x:Name="NewNameTextBox"
                      materialAssists:TextFieldAssist.Label="New name"
-                     Text="{Binding NewName, Mode=TwoWay}"
+                     Text="{Binding NewName, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                      MinWidth="100"
                      Margin="0,0,0,5"
                      ToolTip.Tip="The new name for the collection." />
             <TextBox materialAssists:TextFieldAssist.Label="New directory name"
-                     Text="{Binding NewFolderName, Mode=TwoWay}"
+                     Text="{Binding NewFolderName, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                      MinWidth="100"
                      Margin="0,0,0,5"
                      ToolTip.Tip="The new name for the collection's directory in the Pattern Files directory." />
