@@ -39,6 +39,50 @@ public sealed class AutoFailDetectorEngineTests
         result.PotentialUnloadingObjects.Should().BeEmpty();
     }
 
+    [TestMethod]
+    public void GetFixPlans_WithSimpleUnloadingPattern_ReturnsGuideAndRepairsAutoFail()
+    {
+        // Arrange
+        List<HitObject> hitObjects =
+        [
+            new()
+            {
+                Pos = new(256, 192),
+                Time = 1000,
+                ObjectType = 2,
+                Repeat = 1,
+                EndTime = 5000,
+            },
+            new()
+            {
+                Pos = new(256, 192),
+                Time = 1200,
+                EndTime = 1200,
+                ObjectType = 1,
+            },
+        ];
+        var detector = new AutoFailDetectorEngine(
+            hitObjects,
+            0,
+            10000,
+            9000,
+            750,
+            150,
+            9);
+
+        detector.Analyze();
+
+        // Act
+        var plan = detector.GetFixPlans().First();
+        detector.ApplyFix(plan);
+        var repaired = detector.Analyze();
+
+        // Assert
+        plan.Guide.Should().StartWith("Auto-fail fix guide. Place these extra objects to fix auto-fail:");
+        plan.Padding.Should().HaveCount(2);
+        repaired.HasAutoFail.Should().BeFalse();
+    }
+
     private static AutoFailDetectorEngine CreateDetector(Beatmap beatmap)
     {
         double approachRate = beatmap.Difficulty["ApproachRate"].DoubleValue;

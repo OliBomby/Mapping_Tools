@@ -104,7 +104,7 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
     {
         string path = await workspace.ResolveQuickRunBeatmapAsync(
             cancellationToken: cancellationToken);
-        await RunWithStateAsync(() => RunPathAsync(path, cancellationToken));
+        await RunWithStateAsync(() => RunPathAsync(path, true, cancellationToken));
     }
 
         /// <inheritdoc />
@@ -114,7 +114,7 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
             ? await workspace.ResolveQuickRunBeatmapAsync()
             : workspace.SelectedPaths.FirstOrDefault();
 
-        await RunPathAsync(path, CancellationToken.None);
+        await RunPathAsync(path, settings.AlwaysQuickRun, CancellationToken.None);
     }
 
     [RelayCommand]
@@ -124,7 +124,7 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
             new Uri($"osu://edit/{Math.Round(time)}"));
     }
 
-    private async Task RunPathAsync(string? path, CancellationToken cancellationToken)
+    private async Task RunPathAsync(string? path, bool quick, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(path))
         {
@@ -155,7 +155,7 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
         if (result.Status != ToolExecutionStatus.Succeeded || result.Value is null) return;
 
         InstallResult(result.Value);
-        if (GetAutoFailFix) await OfferFixesAsync(result.Value, cancellationToken);
+        if (GetAutoFailFix) await OfferFixesAsync(result.Value, quick, cancellationToken);
     }
 
     private void InstallResult(AutoFailRun run)
@@ -176,46 +176,66 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
         Markers = markers.OrderBy(marker => marker.Time).ToArray();
     }
 
-    private async Task OfferFixesAsync(AutoFailRun run, CancellationToken cancellationToken)
+    private async Task OfferFixesAsync(AutoFailRun run, bool quick, CancellationToken cancellationToken)
     {
-        foreach (var plan in autoFail.GetFixPlans(run, cancellationToken))
+        try
         {
-            var choice = await dialogs.ShowMessageAsync(
-                new MessageDialogRequest<FixChoice>(
-                    "Auto-fail fix",
-                    plan.Guide,
-                    AutoPlaceFix
-                        ?
-                        [
-                            new DialogChoice<FixChoice>("Apply", FixChoice.Apply, true),
-                            new DialogChoice<FixChoice>("Next solution", FixChoice.Next),
-                            new DialogChoice<FixChoice>("Cancel", FixChoice.Cancel, IsCancel: true),
-                        ]
-                        :
-                        [
-                            new DialogChoice<FixChoice>("Done", FixChoice.Done, true),
-                            new DialogChoice<FixChoice>("Next solution", FixChoice.Next),
-                            new DialogChoice<FixChoice>("Cancel", FixChoice.Cancel, IsCancel: true),
-                        ],
-                    FixChoice.Cancel),
+            // Plan enumeration is lazy; keep the solver off the UI thread like the legacy worker did.
+            using var plans = await Task.Run(
+                () => autoFail.GetFixPlans(run, cancellationToken).GetEnumerator(),
                 cancellationToken);
-            if (choice == FixChoice.Next) continue;
-            if (choice == FixChoice.Apply)
+            int solutionCount = 0;
+            while (await Task.Run(plans.MoveNext, cancellationToken))
             {
-                var applied = await Execution.ExecuteAsync(
-                    new ToolExecutionRequest<bool>(
-                Tool.Id + "-fix",
-                        "Auto-fail Fix",
-                        async context =>
-                        {
-                            await autoFail.ApplyFixAsync(run, plan, context.CancellationToken);
-                            return new ToolExecutionOutput<bool>(true, "Applied the auto-fail fix.", true);
-                        }),
-                    cancellationToken: cancellationToken);
-                if (applied.Status == ToolExecutionStatus.Succeeded) ResultSummary += " Fix applied.";
-            }
+                var plan = plans.Current;
+                var choice = await dialogs.ShowMessageAsync(
+                    new MessageDialogRequest<FixChoice>(
+                        $"Solution {++solutionCount}",
+                        $"{plan.Guide}{Environment.NewLine}{Environment.NewLine}Do you want to use this solution?",
+                        AutoPlaceFix
+                            ?
+                            [
+                                new DialogChoice<FixChoice>("Yes", FixChoice.Apply, true),
+                                new DialogChoice<FixChoice>("No", FixChoice.Next),
+                                new DialogChoice<FixChoice>("Cancel", FixChoice.Cancel, IsCancel: true),
+                            ]
+                            :
+                            [
+                                new DialogChoice<FixChoice>("Yes", FixChoice.Done, true),
+                                new DialogChoice<FixChoice>("No", FixChoice.Next),
+                                new DialogChoice<FixChoice>("Cancel", FixChoice.Cancel, IsCancel: true),
+                            ],
+                        FixChoice.Cancel),
+                    cancellationToken);
+                if (choice == FixChoice.Next) continue;
+                if (choice == FixChoice.Apply)
+                {
+                    var applied = await Execution.ExecuteAsync(
+                        new ToolExecutionRequest<bool>(
+                            Tool.Id + "-fix",
+                            "Auto-fail Fix",
+                            async context =>
+                            {
+                                await autoFail.ApplyFixAsync(run, plan, context.CancellationToken);
+                                return new ToolExecutionOutput<bool>(true, "Applied the auto-fail fix.", quick);
+                            }),
+                        cancellationToken: cancellationToken);
+                    if (applied.Status == ToolExecutionStatus.Succeeded) ResultSummary += " Fix applied.";
+                }
 
-            return;
+                return;
+            }
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            await dialogs.ShowMessageAsync(
+                new MessageDialogRequest<bool>(
+                    "Auto-fail fix",
+                    "Could not create an auto-fail fix guide.",
+                    [new DialogChoice<bool>("OK", true, IsDefault: true, IsCancel: true)],
+                    false,
+                    exception.Message),
+                cancellationToken);
         }
     }
 

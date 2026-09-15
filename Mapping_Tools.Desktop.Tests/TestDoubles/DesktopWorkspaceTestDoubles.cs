@@ -79,6 +79,8 @@ internal sealed class TestBeatmapWorkspace : IBeatmapWorkspace
 
     public string? QuickRunPath { get; set; }
 
+    public string? BeatmapPickerStartLocation { get; set; }
+
     public Func<CancellationToken, Task<string>>? QuickRunResolver { get; set; }
 
     public event EventHandler<BeatmapSelectionChangedEventArgs>? SelectionChanged;
@@ -130,6 +132,11 @@ internal sealed class TestBeatmapWorkspace : IBeatmapWorkspace
         CancellationToken cancellationToken = default)
     {
         return Task.FromResult(false);
+    }
+
+    public string? GetBeatmapPickerStartLocation(string? currentDirectory = null)
+    {
+        return BeatmapPickerStartLocation ?? currentDirectory;
     }
 
     public Task<CurrentBeatmapSelectionResult> SelectCurrentBeatmapAsync(
@@ -346,11 +353,19 @@ internal sealed class TestDialogService : IDialogService
 {
     public bool BooleanResult { get; set; }
 
+    public object? MessageResult { get; set; }
+
     public object? ValueResult { get; set; }
 
     public int MessageCount { get; private set; }
 
     public object? LastMessageRequest { get; private set; }
+
+    public string? LastMessageTitle { get; private set; }
+
+    public string? LastMessage { get; private set; }
+
+    public IReadOnlyList<string> LastMessageChoiceLabels { get; private set; } = [];
 
     public Task<TResult> ShowMessageAsync<TResult>(
         MessageDialogRequest<TResult> request,
@@ -358,7 +373,13 @@ internal sealed class TestDialogService : IDialogService
     {
         MessageCount++;
         LastMessageRequest = request;
-        return Task.FromResult((TResult)(object)BooleanResult);
+        LastMessageTitle = request.Title;
+        LastMessage = request.Message;
+        LastMessageChoiceLabels = request.Choices.Select(choice => choice.Label).ToArray();
+        if (MessageResult is TResult result) return Task.FromResult(result);
+        if (typeof(TResult) == typeof(bool)) return Task.FromResult((TResult)(object)BooleanResult);
+
+        return Task.FromResult(request.Choices.Single(choice => choice.IsDefault).Result);
     }
 
     public Task<ValueDialogResult<TValue>> ShowValueAsync<TValue>(

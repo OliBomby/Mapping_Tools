@@ -88,15 +88,118 @@ public sealed class AutoFailDetectorViewModelTests
         viewModel.Progress.Should().Be(0);
     }
 
+    [TestMethod]
+    public async Task RunCommand_WithFixGuideEnabled_ShowsLegacyFixGuideDialog()
+    {
+        // Arrange
+        RecordingAutoFailService service = new()
+        {
+            FixPlans = [new AutoFailFixPlan([1], "Auto-fail fix guide. Place these extra objects to fix auto-fail:")],
+        };
+        TestDialogService dialogs = new();
+        TestBeatmapWorkspace workspace = new();
+        workspace.SetSelection(["selected.osu"]);
+        var viewModel = CreateViewModel(service, workspace, dialogs: dialogs);
+        viewModel.GetAutoFailFix = true;
+
+        // Act
+        await viewModel.RunCommand.ExecuteAsync(null);
+
+        // Assert
+        dialogs.MessageCount.Should().Be(1);
+        dialogs.LastMessageTitle.Should().Be("Solution 1");
+        dialogs.LastMessage.Should().Contain("Auto-fail fix guide");
+        dialogs.LastMessage.Should().Contain("Do you want to use this solution?");
+        dialogs.LastMessageChoiceLabels.Should().Equal("Yes", "No", "Cancel");
+        service.ApplyFixRequestCount.Should().Be(0);
+    }
+
+    [TestMethod]
+    public async Task RunCommand_WithAutoInsertEnabled_AppliesAcceptedFixPlan()
+    {
+        // Arrange
+        RecordingAutoFailService service = new()
+        {
+            FixPlans = [new AutoFailFixPlan([1], "Auto-fail fix guide")],
+        };
+        TestDialogService dialogs = new();
+        TestBeatmapWorkspace workspace = new();
+        workspace.SetSelection(["selected.osu"]);
+        RecordingEditorReloadService reload = new();
+        var viewModel = CreateViewModel(service, workspace, dialogs: dialogs, reload: reload);
+        viewModel.GetAutoFailFix = true;
+        viewModel.AutoPlaceFix = true;
+
+        // Act
+        await viewModel.RunCommand.ExecuteAsync(null);
+
+        // Assert
+        service.ApplyFixRequestCount.Should().Be(1);
+        viewModel.ResultSummary.Should().EndWith(" Fix applied.");
+        reload.ReloadCount.Should().Be(0);
+    }
+
+    [TestMethod]
+    public async Task RunQuickAsync_WithAutoInsertEnabled_ReloadsAfterAcceptedFixPlan()
+    {
+        // Arrange
+        RecordingAutoFailService service = new()
+        {
+            FixPlans = [new AutoFailFixPlan([1], "Auto-fail fix guide")],
+        };
+        TestDialogService dialogs = new();
+        RecordingEditorReloadService reload = new();
+        var viewModel = CreateViewModel(
+            service,
+            currentPath: "current.osu",
+            dialogs: dialogs,
+            reload: reload);
+        viewModel.GetAutoFailFix = true;
+        viewModel.AutoPlaceFix = true;
+
+        // Act
+        await viewModel.RunQuickAsync(CancellationToken.None);
+
+        // Assert
+        service.ApplyFixRequestCount.Should().Be(1);
+        reload.ReloadCount.Should().Be(1);
+    }
+
+    [TestMethod]
+    public async Task RunCommand_WhenFixPlanningFails_ShowsFixPlanningErrorDialog()
+    {
+        // Arrange
+        RecordingAutoFailService service = new()
+        {
+            FixPlanException = new InvalidOperationException("No fix solution."),
+        };
+        TestDialogService dialogs = new();
+        TestBeatmapWorkspace workspace = new();
+        workspace.SetSelection(["selected.osu"]);
+        var viewModel = CreateViewModel(service, workspace, dialogs: dialogs);
+        viewModel.GetAutoFailFix = true;
+
+        // Act
+        await viewModel.RunCommand.ExecuteAsync(null);
+
+        // Assert
+        dialogs.MessageCount.Should().Be(1);
+        dialogs.LastMessageTitle.Should().Be("Auto-fail fix");
+        dialogs.LastMessage.Should().Be("Could not create an auto-fail fix guide.");
+    }
+
     private static AutoFailDetectorViewModel CreateViewModel(
         RecordingAutoFailService service,
         TestBeatmapWorkspace? workspace = null,
-        string? currentPath = null)
+        string? currentPath = null,
+        TestDialogService? dialogs = null,
+        RecordingEditorReloadService? reload = null)
     {
         UserNotificationService notifications = new();
+        reload ??= new RecordingEditorReloadService();
         ToolExecutionService execution = new(
             notifications,
-            new RecordingEditorReloadService(),
+            reload,
             new DesktopApplicationSettings(),
             TimeProvider.System);
         TestBeatmapWorkspace effectiveWorkspace = workspace ?? new TestBeatmapWorkspace();
@@ -106,7 +209,7 @@ public sealed class AutoFailDetectorViewModelTests
             execution,
             effectiveWorkspace,
             new DesktopApplicationSettings(),
-            new TestDialogService(),
+            dialogs ?? new TestDialogService(),
             new RecordingPlatformLauncher());
     }
 
@@ -118,6 +221,12 @@ public sealed class AutoFailDetectorViewModelTests
             new(true, [1000], [1000, 2000], [1500]);
 
         public int FixPlanRequestCount { get; private set; }
+
+        public IReadOnlyList<AutoFailFixPlan> FixPlans { get; init; } = [];
+
+        public Exception? FixPlanException { get; init; }
+
+        public int ApplyFixRequestCount { get; private set; }
 
         public Task<AutoFailRun> AnalyzeAsync(
             AutoFailServiceOptions options,
@@ -134,7 +243,9 @@ public sealed class AutoFailDetectorViewModelTests
             CancellationToken cancellationToken = default)
         {
             FixPlanRequestCount++;
-            return [];
+            if (FixPlanException is not null) throw FixPlanException;
+
+            return FixPlans;
         }
 
         public Task ApplyFixAsync(
@@ -142,6 +253,7 @@ public sealed class AutoFailDetectorViewModelTests
             AutoFailFixPlan plan,
             CancellationToken cancellationToken = default)
         {
+            ApplyFixRequestCount++;
             return Task.CompletedTask;
         }
     }
