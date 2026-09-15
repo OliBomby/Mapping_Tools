@@ -168,8 +168,7 @@ public sealed class TransformationFixtureTests
             case "hitsound-copier":
                 await new HitsoundCopierService(
                         gateway,
-                        new EmptyHitsoundSampleService(),
-                        new ApplicationSettings { AutoReload = false })
+                        new EmptyHitsoundSampleService())
                     .CopyAsync(
                         ReadTransformationProject<HitsoundCopierServiceOptions>(fixtureRoot, fixtureName),
                         cancellationToken: cancellationToken);

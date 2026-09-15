@@ -87,6 +87,29 @@ public sealed class ToolExecutionServiceTests
     }
 
     [TestMethod]
+    public async Task ExecuteAsync_WithOrdinaryToolOutput_DoesNotReload()
+    {
+        // Arrange
+        RecordingEditorReloadService reload = new();
+        var service = CreateService(
+            new UserNotificationService(),
+            reload,
+            new ApplicationSettings { AutoReload = true });
+        ToolExecutionRequest<int> request = new(
+            "tool",
+            "Tool",
+            _ => Task.FromResult(new ToolExecutionOutput<int>(1)));
+
+        // Act
+        var result = await service.ExecuteAsync(request);
+
+        // Assert
+        result.Status.Should().Be(ToolExecutionStatus.Succeeded);
+        reload.ReloadCount.Should().Be(0);
+        result.EditorReloaded.Should().BeFalse();
+    }
+
+    [TestMethod]
     public async Task ExecuteAsync_WhenToolFails_ReturnsFailureAndNotification()
     {
         // Arrange

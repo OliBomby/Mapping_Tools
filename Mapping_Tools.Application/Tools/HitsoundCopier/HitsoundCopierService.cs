@@ -1,6 +1,5 @@
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
-using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Core.Progress;
@@ -16,20 +15,16 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
 {
     private readonly IBeatmapEditingGateway editingGateway;
     private readonly IHitsoundSampleService samples;
-    private readonly ApplicationSettings settings;
 
     /// <summary>Creates the Hitsound Copier application service.</summary>
     /// <param name="editingGateway">Loads live-aware maps and saves through the backup boundary.</param>
     /// <param name="samples">Supplies file/audio sample discovery and export.</param>
-    /// <param name="settings">Supplies the Editor Reader preference.</param>
     public HitsoundCopierService(
         IBeatmapEditingGateway editingGateway,
-        IHitsoundSampleService samples,
-        ApplicationSettings settings)
+        IHitsoundSampleService samples)
     {
         this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
         this.samples = samples ?? throw new ArgumentNullException(nameof(samples));
-        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
     /// <inheritdoc />
@@ -101,7 +96,7 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
                 cancellationToken);
             await editingGateway.SaveAsync(
                 targetSession,
-                settings.AutoReload,
+                reloadEditor: false,
                 cancellationToken).ConfigureAwait(false);
             processed.Add(targetPaths[index]);
             matched += result.MatchedHitsoundCount;

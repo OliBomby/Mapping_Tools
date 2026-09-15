@@ -1,6 +1,5 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Models;
-using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.HitsoundCopier;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
@@ -20,7 +19,7 @@ public sealed class HitsoundCopierServiceTests
         string fixture = Path.Combine(
             AppContext.BaseDirectory, "Fixtures", "Beatmaps", "standard-feature-rich.osu");
         RecordingBeatmapEditingGateway gateway = CreateGateway(fixture);
-        HitsoundCopierService service = new(gateway, new StubSampleService(), new ApplicationSettings());
+        HitsoundCopierService service = new(gateway, new StubSampleService());
         HitsoundCopierServiceOptions options = new()
         {
             PathFrom = "source.osu",
@@ -36,6 +35,7 @@ public sealed class HitsoundCopierServiceTests
             .Should().Equal("source.osu", "first.osu", "second.osu");
         gateway.SessionSaveRequests.Select(request => request.Session.Editor.Path)
             .Should().Equal("first.osu", "second.osu");
+        gateway.SessionSaveRequests.Should().OnlyContain(request => !request.ReloadEditor);
     }
 
     private sealed class StubSampleService : IHitsoundSampleService
