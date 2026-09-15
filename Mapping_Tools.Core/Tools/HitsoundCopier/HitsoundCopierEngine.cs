@@ -408,7 +408,13 @@ public static class HitsoundCopierEngine
                     // Make sure the slider with the slider ticks uses auto sampleset so the customized greenlines control the hitsounds
                     tickSlider!.SampleSet = SampleSet.None;
                     // Add timingpointschange
-                    AddCustomTimingChanges(changes, sourceItem, tickTime, assignment, options);
+                    AddCustomTimingChanges(
+                        changes,
+                        sourceItem,
+                        tickTime,
+                        assignment,
+                        options,
+                        addRevert: true);
                     generatedCount += assignment.Schema.Count;
                 }
             }
@@ -441,7 +447,13 @@ public static class HitsoundCopierEngine
             // Add a new custom sample to this slider slide to represent the hitsounds
             generatedSamples.MergeWith(assignment.Schema);
             // Add timingpointschange
-            AddCustomTimingChanges(changes, sourceItem, sourceItem.Time, assignment, options);
+            AddCustomTimingChanges(
+                changes,
+                sourceItem,
+                sourceItem.Time,
+                assignment,
+                options,
+                addRevert: false);
             // Make sure the slider with the slider ticks uses auto sampleset so the customized greenlines control the hitsounds
             slider!.SampleSet = SampleSet.None;
             generatedCount += assignment.Schema.Count;
@@ -544,7 +556,8 @@ public static class HitsoundCopierEngine
         TimelineObject source,
         double targetTime,
         HitsoundSampleAssignment assignment,
-        HitsoundCopierEngineOptions options)
+        HitsoundCopierEngineOptions options,
+        bool addRevert)
     {
         var point = source.HitsoundTimingPoint.Copy();
         point.Offset = targetTime;
@@ -556,14 +569,17 @@ public static class HitsoundCopierEngine
             sampleSet: options.CopySampleSets,
             index: options.CopySampleSets,
             volume: options.CopyVolumes));
-        var revert = source.HitsoundTimingPoint.Copy();
-        revert.Offset = targetTime + 5;
-        // Add a timingpoint change 5ms later to revert the values to their original state.
-        changes.Add(new TimingPointChange(
-            revert,
-            sampleSet: options.CopySampleSets,
-            index: options.CopySampleSets,
-            volume: options.CopyVolumes));
+        if (addRevert)
+        {
+            var revert = source.HitsoundTimingPoint.Copy();
+            revert.Offset = targetTime + 5;
+            // Add a timingpoint change 5ms later to revert the values to their original state.
+            changes.Add(new TimingPointChange(
+                revert,
+                sampleSet: options.CopySampleSets,
+                index: options.CopySampleSets,
+                volume: options.CopyVolumes));
+        }
     }
 
     private static TimelineObject? FindMatch(

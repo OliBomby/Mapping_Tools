@@ -2,6 +2,7 @@ using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.BeatmapHelper.Events;
+using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Core.Tools.HitsoundCopier;
 using Mapping_Tools.Core.Tools.HitsoundCopier.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -116,6 +117,49 @@ public sealed class HitsoundCopierEngineTests
             .Where(point => point.Offset is 1100 or 3100)
             .Should().HaveCount(2)
             .And.OnlyContain(point => point.SampleSet == SampleSet.Drum && point.Volume == 5);
+    }
+
+    [TestMethod]
+    public void Apply_CopyToSliderSlides_DoesNotAddFiveMillisecondRevertGreenline()
+    {
+        // Arrange
+        TimingPoint sourceTiming = new(0, 1000, 4, SampleSet.Normal, 0, 100, true, false, false);
+        HitObject sourceObject = new(500, 1, SampleSet.Normal, SampleSet.None)
+        {
+            CustomIndex = 1,
+        };
+        Beatmap source = new([sourceObject], [sourceTiming], sourceTiming, 1.4);
+        TimingPoint targetTiming = sourceTiming.Copy();
+        Beatmap target = new(
+        [
+            new HitObject("256,192,0,2,0,L|396:192,1,140,0|0:0,0:0:0:0:"),
+        ],
+        [targetTiming],
+        targetTiming,
+        1.4);
+        HitsoundCopierEngineOptions options = new()
+        {
+            CopyMode = HitsoundCopierCopyMode.OverwriteOnlyDefined,
+            CopyToSliderSlides = true,
+            CopyBodyHitsounds = false,
+        };
+        SampleSchema assignmentSchema = new();
+        assignmentSchema.Add("normal-sliderslide100", []);
+
+        // Act
+        var result = HitsoundCopierEngine.Apply(
+            target,
+            source,
+            options,
+            @"C:\maps",
+            sourceMapDirectory: @"C:\source",
+            assignSample: _ => new HitsoundSampleAssignment(100, SampleSet.Normal, assignmentSchema));
+
+        // Assert
+        result.GeneratedSampleCount.Should().Be(1);
+        target.BeatmapTiming.Greenlines.Should().Contain(point => point.Offset == 500);
+        target.BeatmapTiming.Greenlines.Should().NotContain(point => point.Offset == 505);
+        target.BeatmapTiming.GetGreenlineAtTime(500).SampleIndex.Should().Be(100);
     }
 
     private static Beatmap LoadFixture()
