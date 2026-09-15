@@ -17,6 +17,35 @@ public sealed class BeatmapEditingGatewayTests
     private const string map_path = @"C:\osu!\Songs\123 Artist - Title\map.osu";
 
     [TestMethod]
+    public async Task SaveAsync_WithFractionalLiveCircle_ReloadsRoundedPosition()
+    {
+        // Arrange
+        var store = CreateStore();
+        HitObject circle = new()
+        {
+            Pos = new Vector2(256.6, 192),
+            Time = 1500,
+            ObjectType = 1,
+        };
+        LiveBeatmapSnapshot snapshot = new(
+            map_path,
+            [],
+            [new TimingPoint(0, 500, 4, SampleSet.Normal, 0, 70, true, false, false)],
+            [circle],
+            -1, 1.4, 1, 5, 5);
+        var gateway = CreateGateway(store, new RecordingLiveBeatmapReader(snapshot));
+        var session = await gateway.OpenBeatmapAsync(map_path, LiveBeatmapPreference.RequireLive);
+
+        // Act
+        await gateway.SaveAsync(session);
+        var reloaded = await gateway.OpenBeatmapAsync(map_path, LiveBeatmapPreference.DiskOnly);
+
+        // Assert
+        reloaded.Editor.Beatmap.HitObjects.Should().ContainSingle()
+            .Which.Pos.X.Should().Be(257);
+    }
+
+    [TestMethod]
     public async Task OpenBeatmapAsync_WithMatchingLiveState_OverlaysAndPreservesSelection()
     {
         // Arrange

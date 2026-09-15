@@ -17,6 +17,8 @@ public sealed class WindowsBetterSaveOverrideService : IBetterSaveOverrideServic
     private readonly IBetterSaveService betterSave;
     private readonly object configurationGate = new();
     private readonly ICurrentBeatmapLocator currentBeatmapLocator;
+    private readonly Func<bool> isOsuForeground;
+    private readonly Func<bool> isWindows;
     private readonly IUserNotificationService notifications;
     private readonly SemaphoreSlim saveGate = new(1, 1);
 
@@ -24,11 +26,13 @@ public sealed class WindowsBetterSaveOverrideService : IBetterSaveOverrideServic
     {
         Filter = "*.osu",
         IncludeSubdirectories = true,
-        NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size,
+        NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.Size,
     };
 
     private bool disposed;
     private string? lastBetterSaveHash;
+    private string? lastBetterSavePath;
+    private CancellationTokenSource? observation;
 
     /// <summary>
     ///     Creates a disabled watcher over current-map lookup and the shared BetterSave command.
@@ -40,12 +44,26 @@ public sealed class WindowsBetterSaveOverrideService : IBetterSaveOverrideServic
         ICurrentBeatmapLocator currentBeatmapLocator,
         IBetterSaveService betterSave,
         IUserNotificationService notifications)
+        : this(currentBeatmapLocator, betterSave, notifications, OperatingSystem.IsWindows, IsOsuForegroundWindow)
+    {
+    }
+
+    internal WindowsBetterSaveOverrideService(
+        ICurrentBeatmapLocator currentBeatmapLocator,
+        IBetterSaveService betterSave,
+        IUserNotificationService notifications,
+        Func<bool> isWindows,
+        Func<bool> isOsuForeground)
     {
         this.currentBeatmapLocator = currentBeatmapLocator
                                      ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
         this.betterSave = betterSave ?? throw new ArgumentNullException(nameof(betterSave));
         this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
+        this.isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
+        this.isOsuForeground = isOsuForeground ?? throw new ArgumentNullException(nameof(isOsuForeground));
         watcher.Changed += OnBeatmapChanged;
+        watcher.Created += OnBeatmapChanged;
+        watcher.Renamed += OnBeatmapChanged;
     }
 
     /// <inheritdoc />
@@ -55,10 +73,14 @@ public sealed class WindowsBetterSaveOverrideService : IBetterSaveOverrideServic
         {
             ThrowIfDisposed();
             watcher.EnableRaisingEvents = false;
+            observation?.Cancel();
+            observation?.Dispose();
+            observation = null;
             lastBetterSaveHash = null;
+            lastBetterSavePath = null;
             if (!enabled) return;
 
-            if (!OperatingSystem.IsWindows())
+            if (!isWindows())
             {
                 _ = PublishFailureAsync(new PlatformNotSupportedException(
                     "Automatic BetterSave override is currently supported only on Windows."));
@@ -73,6 +95,7 @@ public sealed class WindowsBetterSaveOverrideService : IBetterSaveOverrideServic
             }
 
             watcher.Path = Path.GetFullPath(songsPath);
+            observation = new CancellationTokenSource();
             watcher.EnableRaisingEvents = true;
         }
     }
@@ -82,7 +105,10 @@ public sealed class WindowsBetterSaveOverrideService : IBetterSaveOverrideServic
     {
         lock (configurationGate)
         {
-            if (!disposed) watcher.EnableRaisingEvents = false;
+            if (disposed) return;
+
+            watcher.EnableRaisingEvents = false;
+            observation?.Cancel();
         }
     }
 
@@ -95,28 +121,62 @@ public sealed class WindowsBetterSaveOverrideService : IBetterSaveOverrideServic
 
             disposed = true;
             watcher.EnableRaisingEvents = false;
+            observation?.Cancel();
+            observation?.Dispose();
             watcher.Changed -= OnBeatmapChanged;
+            watcher.Created -= OnBeatmapChanged;
+            watcher.Renamed -= OnBeatmapChanged;
             watcher.Dispose();
         }
     }
 
     private async void OnBeatmapChanged(object sender, FileSystemEventArgs eventArgs)
     {
-        if (!await saveGate.WaitAsync(0).ConfigureAwait(false)) return;
+        CancellationToken cancellationToken;
+        lock (configurationGate)
+        {
+            if (disposed || observation is null || observation.IsCancellationRequested) return;
 
+            cancellationToken = observation.Token;
+        }
+
+        bool lockTaken = false;
         try
         {
+            if (!isOsuForeground()) return;
+
+            // Saves can replace a temporary file, or report several changes before
+            // the writer closes. Let the burst settle and retain events arriving
+            // during an earlier save instead of dropping them.
+            await Task.Delay(50, cancellationToken).ConfigureAwait(false);
+            await saveGate.WaitAsync(cancellationToken).ConfigureAwait(false);
+            lockTaken = true;
             string? currentPath = await currentBeatmapLocator
-                .FindCurrentBeatmapAsync()
+                .FindCurrentBeatmapAsync(cancellationToken)
                 .ConfigureAwait(false);
-            if (!string.Equals(currentPath, eventArgs.FullPath, StringComparison.OrdinalIgnoreCase) || !IsOsuForegroundWindow())
+            if (!string.Equals(currentPath, eventArgs.FullPath, StringComparison.OrdinalIgnoreCase) || !isOsuForeground())
                 return;
 
-            string? currentHash = await TryGetHashAsync(eventArgs.FullPath).ConfigureAwait(false);
-            if (currentHash is not null && currentHash == lastBetterSaveHash) return;
+            string currentHash = await GetCompletedSaveHashAsync(eventArgs.FullPath, cancellationToken).ConfigureAwait(false);
+            if (string.Equals(lastBetterSavePath, eventArgs.FullPath, StringComparison.OrdinalIgnoreCase)
+                && currentHash == lastBetterSaveHash) return;
 
-            var result = await betterSave.ExecuteAsync().ConfigureAwait(false);
-            if (result.Status == BetterSaveStatus.Saved) lastBetterSaveHash = await TryGetHashAsync(eventArgs.FullPath).ConfigureAwait(false);
+            cancellationToken.ThrowIfCancellationRequested();
+            var result = await betterSave.ExecuteAsync(cancellationToken).ConfigureAwait(false);
+            if (result.Status == BetterSaveStatus.Saved)
+            {
+                string savedHash = await GetCompletedSaveHashAsync(eventArgs.FullPath, cancellationToken).ConfigureAwait(false);
+                lock (configurationGate)
+                {
+                    if (cancellationToken.IsCancellationRequested) return;
+
+                    lastBetterSavePath = eventArgs.FullPath;
+                    lastBetterSaveHash = savedHash;
+                }
+            }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
         }
         catch (ObjectDisposedException) when (disposed)
         {
@@ -127,7 +187,7 @@ public sealed class WindowsBetterSaveOverrideService : IBetterSaveOverrideServic
         }
         finally
         {
-            saveGate.Release();
+            if (lockTaken) saveGate.Release();
         }
     }
 
@@ -137,7 +197,21 @@ public sealed class WindowsBetterSaveOverrideService : IBetterSaveOverrideServic
         return process is not null && process.MainWindowHandle != nint.Zero && WindowsNativeMethods.GetForegroundWindow() == process.MainWindowHandle;
     }
 
-    private static async Task<string?> TryGetHashAsync(string path)
+    private static async Task<string> GetCompletedSaveHashAsync(string path, CancellationToken cancellationToken)
+    {
+        for (int attempt = 0; attempt < 100; attempt++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            string? hash = await TryGetHashAsync(path, cancellationToken).ConfigureAwait(false);
+            if (hash is not null) return hash;
+
+            await Task.Delay(20, cancellationToken).ConfigureAwait(false);
+        }
+
+        throw new IOException("The osu! save did not finish in time for BetterSave to replace it.");
+    }
+
+    private static async Task<string?> TryGetHashAsync(string path, CancellationToken cancellationToken)
     {
         try
         {
@@ -145,10 +219,10 @@ public sealed class WindowsBetterSaveOverrideService : IBetterSaveOverrideServic
                 path,
                 FileMode.Open,
                 FileAccess.Read,
-                FileShare.ReadWrite | FileShare.Delete,
+                FileShare.Read,
                 4096,
                 FileOptions.Asynchronous | FileOptions.SequentialScan);
-            byte[] hash = await SHA256.HashDataAsync(stream).ConfigureAwait(false);
+            byte[] hash = await SHA256.HashDataAsync(stream, cancellationToken).ConfigureAwait(false);
             return Convert.ToHexString(hash);
         }
         catch (IOException)
