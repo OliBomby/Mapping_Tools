@@ -7,7 +7,7 @@ using Mapping_Tools.Application.Workspace.Contracts;
 namespace Mapping_Tools.Application.BeatmapEditing;
 
 /// <summary>
-///     Coordinates current-map lookup, live-state loading, mandatory backup, and user notification.
+///     Coordinates current-map lookup, live-state loading, configured backup, and user notification.
 /// </summary>
 public sealed class BetterSaveService : IBetterSaveService
 {
@@ -19,7 +19,7 @@ public sealed class BetterSaveService : IBetterSaveService
     ///     Creates BetterSave over the shared current-map, editing, and notification boundaries.
     /// </summary>
     /// <param name="currentBeatmapLocator">Finds the beatmap currently open in osu!.</param>
-    /// <param name="editingGateway">Requires live state and enforces backup-before-save.</param>
+    /// <param name="editingGateway">Requires live state and applies the configured backup-before-save policy.</param>
     /// <param name="notifications">Reports completion and captured failures.</param>
     public BetterSaveService(
         ICurrentBeatmapLocator currentBeatmapLocator,

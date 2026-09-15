@@ -36,7 +36,7 @@ public class ApplicationSettings
     public string OsuConfigPath { get; set; } = "";
 
     /// <summary>
-    ///     Requires destructive tools to create safety backups before modifying maps.
+    ///     Controls whether tool runs create automatic safety backups before modifying maps.
     /// </summary>
     public bool MakeBackups { get; set; } = true;
 

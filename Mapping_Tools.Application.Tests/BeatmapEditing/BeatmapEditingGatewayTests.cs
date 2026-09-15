@@ -192,7 +192,34 @@ public sealed class BeatmapEditingGatewayTests
     }
 
     [TestMethod]
-    public async Task SaveAsync_WhenMandatoryBackupFails_DoesNotWriteOrReload()
+    public async Task SaveAsync_WhenAutomaticBackupsDisabled_SavesWithoutBackup()
+    {
+        // Arrange
+        var store = CreateStore();
+        ApplicationSettings settings = new() { MakeBackups = false };
+        RecordingBackupService backup = new(store, settings: settings);
+        var gateway = CreateGateway(
+            store,
+            new RecordingLiveBeatmapReader((LiveBeatmapSnapshot?)null),
+            settings,
+            backupService: backup);
+        var session = await gateway.OpenBeatmapAsync(
+            map_path,
+            LiveBeatmapPreference.DiskOnly);
+        session.Editor.Beatmap.Metadata["Version"] = new StringValue("Edited");
+
+        // Act
+        await gateway.SaveAsync(session);
+
+        // Assert
+        backup.LastForce.Should().BeFalse();
+        backup.ArtifactCount.Should().Be(0);
+        store.WriteCount.Should().Be(1);
+        store.Files[map_path].Any(line => line == "Version:Edited").Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task SaveAsync_WhenBackupFails_DoesNotWriteOrReload()
     {
         // Arrange
         var store = CreateStore();
@@ -277,19 +304,26 @@ public sealed class BeatmapEditingGatewayTests
     private sealed class RecordingBackupService : IBeatmapBackupService
     {
         private readonly Exception? failure;
+        private readonly ApplicationSettings? settings;
         private readonly RecordingTextFileStore store;
 
         public RecordingBackupService(
             RecordingTextFileStore store,
-            Exception? failure = null)
+            Exception? failure = null,
+            ApplicationSettings? settings = null)
         {
             this.store = store;
             this.failure = failure;
+            this.settings = settings;
         }
 
         public int CreateCount { get; private set; }
 
+        public int ArtifactCount { get; private set; }
+
         public bool BackupPrecededWrite { get; private set; }
+
+        public bool? LastForce { get; private set; }
 
         public Task<BeatmapBackupResult> CreateAsync(
             IEnumerable<string> sourcePaths,
@@ -299,8 +333,11 @@ public sealed class BeatmapEditingGatewayTests
         {
             cancellationToken.ThrowIfCancellationRequested();
             CreateCount++;
+            LastForce = force;
             BackupPrecededWrite = store.WriteCount == 0;
             if (failure is not null) return Task.FromException<BeatmapBackupResult>(failure);
+            if (!force && settings is not null && !settings.MakeBackups)
+                return Task.FromResult(new BeatmapBackupResult([], true));
 
             BeatmapBackupArtifact artifact = new(
                 "backup.osu",
@@ -308,6 +345,7 @@ public sealed class BeatmapEditingGatewayTests
                 reason,
                 false,
                 DateTimeOffset.UnixEpoch);
+            ArtifactCount++;
             return Task.FromResult(
                 new BeatmapBackupResult([artifact], false));
         }
@@ -320,8 +358,11 @@ public sealed class BeatmapEditingGatewayTests
         {
             cancellationToken.ThrowIfCancellationRequested();
             CreateCount++;
+            LastForce = force;
             BackupPrecededWrite = store.WriteCount == 0;
             if (failure is not null) return Task.FromException<BeatmapBackupResult>(failure);
+            if (!force && settings is not null && !settings.MakeBackups)
+                return Task.FromResult(new BeatmapBackupResult([], true));
 
             BeatmapBackupArtifact artifact = new(
                 "backup.osu",
@@ -329,6 +370,7 @@ public sealed class BeatmapEditingGatewayTests
                 reason,
                 session.Source == BeatmapEditingSource.LiveEditor,
                 DateTimeOffset.UnixEpoch);
+            ArtifactCount++;
             return Task.FromResult(
                 new BeatmapBackupResult([artifact], false));
         }

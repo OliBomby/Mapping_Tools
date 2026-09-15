@@ -3,7 +3,7 @@ using Mapping_Tools.Application.BeatmapEditing.Models;
 namespace Mapping_Tools.Application.BeatmapEditing.Contracts;
 
 /// <summary>
-///     Saves the exact live osu! editor state through the mandatory backup gateway.
+///     Saves the exact live osu! editor state through the configured backup gateway.
 /// </summary>
 public interface IBetterSaveService
 {
@@ -14,4 +14,3 @@ public interface IBetterSaveService
     /// <returns>A typed outcome; ordinary integration and persistence failures are captured.</returns>
     Task<BetterSaveResult> ExecuteAsync(CancellationToken cancellationToken = default);
 }
-

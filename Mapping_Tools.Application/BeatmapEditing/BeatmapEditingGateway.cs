@@ -27,7 +27,7 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
     /// </summary>
     /// <param name="fileStore">Persistence used by every returned document editor.</param>
     /// <param name="backupService">
-    ///     Creates the durable pre-save snapshot that must succeed before an existing document is overwritten.
+    ///     Creates the configured durable pre-save snapshot before an existing document is overwritten.
     /// </param>
     /// <param name="liveReader">The platform adapter that reads osu!'s editor memory.</param>
     /// <param name="reloadService">The platform adapter that refreshes osu! after a save.</param>
@@ -152,15 +152,13 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
             await backupService.CreateAsync(
                     [editor.Path],
                     BeatmapBackupReason.Automatic,
-                    true,
-                    cancellationToken)
+                    cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
         else
             await backupService.CreateAsync(
                     session,
                     BeatmapBackupReason.Automatic,
-                    true,
-                    cancellationToken)
+                    cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
         cancellationToken.ThrowIfCancellationRequested();

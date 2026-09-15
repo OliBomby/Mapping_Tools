@@ -32,8 +32,8 @@ public interface IBeatmapEditingGateway
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    ///     Persists the editor's current document only after a mandatory safety
-    ///     backup succeeds, then optionally asks osu! to reload it.
+    ///     Persists the editor's current document after the configured safety
+    ///     backup attempt, then optionally asks osu! to reload it.
     /// </summary>
     /// <param name="editor">The beatmap or storyboard editor to save.</param>
     /// <param name="reloadEditor">Whether an active osu! editor should be refreshed after the write.</param>
@@ -69,4 +69,3 @@ public interface IBeatmapEditingGateway
         bool reloadEditor = false,
         CancellationToken cancellationToken = default);
 }
-

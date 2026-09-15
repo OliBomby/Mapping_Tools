@@ -115,7 +115,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
         private set => SetProperty(ref multipleQuickRunTools, value);
     }
 
-    /// <summary>Gets or sets whether destructive tools create safety backups.</summary>
+    /// <summary>Gets or sets whether tool runs create automatic safety backups.</summary>
     public bool MakeBackups
     {
         get => settings.MakeBackups;
