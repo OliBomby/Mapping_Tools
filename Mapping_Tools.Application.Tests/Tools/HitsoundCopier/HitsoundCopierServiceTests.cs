@@ -39,7 +39,7 @@ public sealed class HitsoundCopierServiceTests
         result.ProcessedPaths.Should().Equal("first.osu", "second.osu");
         gateway.OpenRequests.Select(request => request.Path)
             .Should().Equal("source.osu", "first.osu", "second.osu");
-        gateway.SessionSaveRequests.Select(request => request.Editor.Path)
+        gateway.SessionSaveRequests.Select(request => request.Session.Editor.Path)
             .Should().Equal("first.osu", "second.osu");
     }
 
