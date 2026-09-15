@@ -168,7 +168,9 @@ public sealed class TransformationFixtureTests
             case "hitsound-copier":
                 await new HitsoundCopierService(
                         gateway,
-                        new EmptyHitsoundSampleService())
+                        new EmptyHitsoundSampleService(),
+                        new ApplicationDirectories(Path.GetTempPath()),
+                        new NoopFileRevealService())
                     .CopyAsync(
                         ReadTransformationProject<HitsoundCopierServiceOptions>(fixtureRoot, fixtureName),
                         cancellationToken: cancellationToken);
@@ -559,9 +561,9 @@ public sealed class TransformationFixtureTests
             return null;
         }
 
-        public Task ExportAsync(SampleSchema schema, CancellationToken cancellationToken = default)
+        public Task<int> ExportAsync(SampleSchema schema, CancellationToken cancellationToken = default)
         {
-            return Task.CompletedTask;
+            return Task.FromResult(0);
         }
     }
 

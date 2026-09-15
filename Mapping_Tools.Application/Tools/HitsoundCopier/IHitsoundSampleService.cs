@@ -38,5 +38,6 @@ public interface IHitsoundSampleService
     /// <summary>Exports generated sample requirements to the application's default Exports directory.</summary>
     /// <param name="schema">The output names and source transformations to render.</param>
     /// <param name="cancellationToken">Cancels export preparation or audio rendering.</param>
-    Task ExportAsync(SampleSchema schema, CancellationToken cancellationToken = default);
+    /// <returns>The number of sample files written to the export directory.</returns>
+    Task<int> ExportAsync(SampleSchema schema, CancellationToken cancellationToken = default);
 }

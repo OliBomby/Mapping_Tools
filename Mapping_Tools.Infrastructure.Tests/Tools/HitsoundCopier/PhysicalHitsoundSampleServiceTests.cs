@@ -1,6 +1,5 @@
 using Mapping_Tools.Application.Audio.Contracts;
 using Mapping_Tools.Application.Audio.Models;
-using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Tools.HitsoundStudio.Contracts;
 using Mapping_Tools.Application.Tools.MapCleaner;
 using Mapping_Tools.Core.Audio;
@@ -87,7 +86,7 @@ public sealed class PhysicalHitsoundSampleServiceTests
         };
 
         // Act
-        await service.ExportAsync(schema);
+        int exportedCount = await service.ExportAsync(schema);
 
         // Assert
         generator.Requests.Should().HaveCount(2);
@@ -97,6 +96,7 @@ public sealed class PhysicalHitsoundSampleServiceTests
         exporter.Request!.Path.Should().Be(
             Path.Combine(directory.Root, "Mapping Tools", "Exports", "normal-slidertick100.wav"));
         exporter.Request.Format.Should().Be(AudioExportFormat.WaveIeeeFloat);
+        exportedCount.Should().Be(1);
     }
 
     [TestMethod]
@@ -122,7 +122,7 @@ public sealed class PhysicalHitsoundSampleServiceTests
         };
 
         // Act
-        await service.ExportAsync(schema);
+        int exportedCount = await service.ExportAsync(schema);
 
         // Assert
         string destination = Path.Combine(
@@ -133,6 +133,7 @@ public sealed class PhysicalHitsoundSampleServiceTests
         File.ReadAllBytes(destination).Should().Equal(sourceBytes);
         File.Exists(stalePath).Should().BeFalse();
         exporter.Request.Should().BeNull();
+        exportedCount.Should().Be(1);
     }
 
     private static PhysicalHitsoundSampleService CreateService(

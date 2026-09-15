@@ -1,5 +1,6 @@
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Core.Progress;
@@ -14,17 +15,25 @@ namespace Mapping_Tools.Application.Tools.HitsoundCopier;
 public sealed class HitsoundCopierService : IHitsoundCopierService
 {
     private readonly IBeatmapEditingGateway editingGateway;
+    private readonly IApplicationDirectories directories;
     private readonly IHitsoundSampleService samples;
+    private readonly IFileRevealService reveal;
 
     /// <summary>Creates the Hitsound Copier application service.</summary>
     /// <param name="editingGateway">Loads live-aware maps and saves through the backup boundary.</param>
     /// <param name="samples">Supplies file/audio sample discovery and export.</param>
+    /// <param name="directories">Provides the default sample export directory.</param>
+    /// <param name="reveal">Reveals the completed sample export directory.</param>
     public HitsoundCopierService(
         IBeatmapEditingGateway editingGateway,
-        IHitsoundSampleService samples)
+        IHitsoundSampleService samples,
+        IApplicationDirectories directories,
+        IFileRevealService reveal)
     {
         this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
         this.samples = samples ?? throw new ArgumentNullException(nameof(samples));
+        this.directories = directories ?? throw new ArgumentNullException(nameof(directories));
+        this.reveal = reveal ?? throw new ArgumentNullException(nameof(reveal));
     }
 
     /// <inheritdoc />
@@ -108,7 +117,9 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
 
         if (schema.Count > 0)
         {
-            await samples.ExportAsync(schema, cancellationToken).ConfigureAwait(false);
+            int exportedSampleCount = await samples.ExportAsync(schema, cancellationToken).ConfigureAwait(false);
+            if (exportedSampleCount > 0)
+                await reveal.RevealAsync(directories.Exports, cancellationToken).ConfigureAwait(false);
         }
 
         return new HitsoundCopierResult(processed, matched, generated, muted, schema);

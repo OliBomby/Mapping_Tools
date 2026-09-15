@@ -98,7 +98,7 @@ public sealed class PhysicalHitsoundSampleService : IHitsoundSampleService
     }
 
     /// <inheritdoc />
-    public async Task ExportAsync(SampleSchema schema, CancellationToken cancellationToken = default)
+    public async Task<int> ExportAsync(SampleSchema schema, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(schema);
         cancellationToken.ThrowIfCancellationRequested();
@@ -110,14 +110,17 @@ public sealed class PhysicalHitsoundSampleService : IHitsoundSampleService
             File.Delete(path);
         }
 
+        int exportedCount = 0;
         foreach ((string name, List<SampleGeneratingArgs> source) in schema)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            await ExportSourceGroupAsync(name, source, cancellationToken).ConfigureAwait(false);
+            exportedCount += await ExportSourceGroupAsync(name, source, cancellationToken).ConfigureAwait(false);
         }
+
+        return exportedCount;
     }
 
-    private async Task ExportSourceGroupAsync(
+    private async Task<int> ExportSourceGroupAsync(
         string name,
         IReadOnlyList<SampleGeneratingArgs> source,
         CancellationToken cancellationToken)
@@ -126,13 +129,13 @@ public sealed class PhysicalHitsoundSampleService : IHitsoundSampleService
             .Where(sample => File.Exists(sample.Path))
             .Distinct(new SampleGeneratingArgsComparer())
             .ToList();
-        if (valid.Count == 0) return;
+        if (valid.Count == 0) return 0;
 
         if (valid.Count == 1 && valid[0].CanCopyPaste)
         {
             string destination = Path.Combine(directories.Exports, name + valid[0].GetExtension());
             File.Copy(valid[0].Path, destination, true);
-            return;
+            return 1;
         }
 
         List<AudioClip> clips = [];
@@ -155,5 +158,7 @@ public sealed class PhysicalHitsoundSampleService : IHitsoundSampleService
                     AudioExportFormat.WaveIeeeFloat),
                 cancellationToken)
             .ConfigureAwait(false);
+
+        return 1;
     }
 }
