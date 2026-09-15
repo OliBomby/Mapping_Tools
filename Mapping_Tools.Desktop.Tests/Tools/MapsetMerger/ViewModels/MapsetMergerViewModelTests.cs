@@ -32,7 +32,50 @@ public sealed class MapsetMergerViewModelTests
         service.Project!.Mapsets.Select(item => item.Name).Should().Equal("Pack", "Pack1");
     }
 
-    private static MapsetMergerViewModel CreateViewModel(RecordingMapsetMergerService service)
+    [TestMethod]
+    public async Task BrowseExportPathCommand_WithCurrentFolderDisabled_UsesCurrentExportPath()
+    {
+        // Arrange
+        TestFilePicker filePicker = new() { Folders = [@"D:\Chosen"] };
+        TestBeatmapWorkspace workspace = new();
+        var viewModel = CreateViewModel(
+            new RecordingMapsetMergerService(),
+            filePicker,
+            workspace);
+
+        // Act
+        await viewModel.BrowseExportPathCommand.ExecuteAsync(null);
+
+        // Assert
+        filePicker.LastFolderRequest!.SuggestedStartLocation.Should().Be(
+            @"C:\Local\Mapping Tools\Exports");
+    }
+
+    [TestMethod]
+    public async Task BrowseExportPathCommand_WithCurrentFolderEnabled_UsesSelectedBeatmapDirectory()
+    {
+        // Arrange
+        TestFilePicker filePicker = new() { Folders = [@"D:\Chosen"] };
+        TestBeatmapWorkspace workspace = new()
+        {
+            BeatmapPickerStartLocation = @"C:\Maps",
+        };
+        var viewModel = CreateViewModel(
+            new RecordingMapsetMergerService(),
+            filePicker,
+            workspace);
+
+        // Act
+        await viewModel.BrowseExportPathCommand.ExecuteAsync(null);
+
+        // Assert
+        filePicker.LastFolderRequest!.SuggestedStartLocation.Should().Be(@"C:\Maps");
+    }
+
+    private static MapsetMergerViewModel CreateViewModel(
+        RecordingMapsetMergerService service,
+        TestFilePicker? filePicker = null,
+        TestBeatmapWorkspace? workspace = null)
     {
         UserNotificationService notifications = new();
         ToolExecutionService execution = new(
@@ -43,8 +86,8 @@ public sealed class MapsetMergerViewModelTests
         return new MapsetMergerViewModel(
             service,
             execution,
-            new TestFilePicker(),
-            new TestBeatmapWorkspace(),
+            filePicker ?? new TestFilePicker(),
+            workspace ?? new TestBeatmapWorkspace(),
             new RecordingCurrentBeatmapLocator(),
             new TestApplicationDirectories());
     }

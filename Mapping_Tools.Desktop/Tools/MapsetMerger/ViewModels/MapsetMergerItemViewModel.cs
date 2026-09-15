@@ -39,7 +39,6 @@ public sealed partial class MapsetMergerItemViewModel : ObservableObject
         var paths = await filePicker.PickFoldersAsync(new OpenFolderPickerRequest
         {
             Title = "Select mapset",
-            SuggestedStartLocation = Directory.Exists(Path) ? Path : null,
             AllowMultiple = false,
         });
         string? path = paths.FirstOrDefault();

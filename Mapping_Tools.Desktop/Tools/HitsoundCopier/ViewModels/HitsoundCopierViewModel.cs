@@ -9,7 +9,6 @@ using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.HitsoundCopier;
 using Mapping_Tools.Application.Workspace.Contracts;
@@ -41,7 +40,6 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
 
     private readonly IFilePicker filePicker;
     private readonly IUserNotificationService notifications;
-    private readonly ApplicationSettings settings;
 
     /// <summary>Creates the Hitsound Copier presentation model.</summary>
     /// <param name="workspace">Supplies the shell's selected beatmap for QuickRun fallback.</param>
@@ -51,8 +49,7 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
         IFilePicker filePicker,
         ICurrentBeatmapLocator currentBeatmap,
         IBeatmapWorkspace workspace,
-        IUserNotificationService notifications,
-        ApplicationSettings settings)
+        IUserNotificationService notifications)
         : base(execution, HitsoundCopierToolDefinition.Definition)
     {
         this.copier = copier ?? throw new ArgumentNullException(nameof(copier));
@@ -60,7 +57,6 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
         this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
-        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
     /// <summary>Gets or sets the optional source beatmap path.</summary>
@@ -240,7 +236,10 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     private async Task ImportBrowseAsync()
     {
         await PickAsync(
-            "Copy hitsounds from", PathFrom, false, paths => PathFrom = paths[0]);
+            "Copy hitsounds from",
+            workspace.GetBeatmapPickerStartLocation(Path.GetDirectoryName(PathFrom)),
+            false,
+            paths => PathFrom = paths[0]);
     }
 
     /// <summary>Opens a multi-map target picker.</summary>
@@ -248,7 +247,7 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     private async Task ExportBrowseAsync()
     {
         await PickAsync(
-            "Copy hitsounds to", FirstTargetDirectory(), true, paths => PathTo = string.Join('|', paths));
+            "Copy hitsounds to", GetExportPickerStartLocation(), true, paths => PathTo = string.Join('|', paths));
     }
 
     /// <inheritdoc />
@@ -378,11 +377,20 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
         }
     }
 
-    private string? FirstTargetDirectory()
+    private string? GetExportPickerStartLocation()
     {
-        string? target = PathTo.Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+        string? sourceDirectory = Path.GetDirectoryName(PathFrom);
+        return string.IsNullOrWhiteSpace(sourceDirectory)
+            ? workspace.GetBeatmapPickerStartLocation(GetFirstPathDirectory(PathTo))
+            : sourceDirectory;
+    }
+
+    private static string? GetFirstPathDirectory(string paths)
+    {
+        string? path = paths
+            .Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
             .FirstOrDefault();
-        return string.IsNullOrWhiteSpace(target) ? settings.SongsPath : Path.GetDirectoryName(target);
+        return Path.GetDirectoryName(path);
     }
 
     private Task PublishFailureAsync(string title, Exception exception)

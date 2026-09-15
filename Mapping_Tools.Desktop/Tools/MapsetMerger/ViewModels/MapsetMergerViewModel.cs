@@ -170,7 +170,7 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
             var paths = await filePicker.PickFoldersAsync(new OpenFolderPickerRequest
             {
                 Title = "Select export path",
-                SuggestedStartLocation = Directory.Exists(ExportPath) ? ExportPath : null,
+                SuggestedStartLocation = workspace.GetBeatmapPickerStartLocation(ExportPath),
                 AllowMultiple = false,
             });
             string? path = paths.FirstOrDefault();

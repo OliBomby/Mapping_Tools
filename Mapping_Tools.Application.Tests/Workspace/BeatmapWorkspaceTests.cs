@@ -160,6 +160,57 @@ public sealed class BeatmapWorkspaceTests
     }
 
     [TestMethod]
+    public void GetBeatmapPickerStartLocation_WithSelectedMap_UsesItsParentDirectory()
+    {
+        // Arrange
+        ApplicationSettings settings = new() { SongsPath = @"D:\Songs" };
+        var workspace = CreateWorkspace(settings);
+        workspace.SetSelection([@"C:\Maps\selected.osu"]);
+
+        // Act
+        string? location = workspace.GetBeatmapPickerStartLocation();
+
+        // Assert
+        location.Should().Be(@"C:\Maps");
+    }
+
+    [TestMethod]
+    public void GetBeatmapPickerStartLocation_WithPreferenceDisabled_UsesNativePickerRestoration()
+    {
+        // Arrange
+        ApplicationSettings settings = new()
+        {
+            SongsPath = @"D:\Songs",
+            CurrentBeatmapDefaultFolder = false,
+        };
+        var workspace = CreateWorkspace(settings);
+        workspace.SetSelection([@"C:\Maps\selected.osu"]);
+
+        // Act
+        string? location = workspace.GetBeatmapPickerStartLocation();
+
+        // Assert
+        location.Should().BeNull();
+    }
+
+    [TestMethod]
+    public void GetBeatmapPickerStartLocation_WithPreferenceDisabled_UsesCurrentDirectory()
+    {
+        // Arrange
+        ApplicationSettings settings = new()
+        {
+            CurrentBeatmapDefaultFolder = false,
+        };
+        var workspace = CreateWorkspace(settings);
+
+        // Act
+        string? location = workspace.GetBeatmapPickerStartLocation(@"D:\Current");
+
+        // Assert
+        location.Should().Be(@"D:\Current");
+    }
+
+    [TestMethod]
     public void GetMissingSelectedPaths_WithMissingFiles_ReportsWithoutRemoval()
     {
         // Arrange

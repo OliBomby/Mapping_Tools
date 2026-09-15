@@ -658,9 +658,7 @@ public static class HitsoundCopierEngine
             || item.Repeat != 1
             || item.Whistle
             || item.Finish
-            || item.Clap
-            || (options.MutedSampleSet != SampleSet.None
-                && item.FenoSampleSet != options.MutedSampleSet))
+            || item.Clap)
             return false;
 
         // Check filter snap

@@ -131,7 +131,7 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
             new OpenFilePickerRequest
             {
                 Title = "Open beatmap",
-                SuggestedStartLocation = GetPickerStartLocation(),
+                SuggestedStartLocation = GetBeatmapPickerStartLocation(),
                 AllowMultiple = allowMultiple,
                 Filters = [CommonFilePickerFilters.BeatmapsAndStoryboards],
             },
@@ -141,6 +141,19 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
 
         SetSelection(paths, BeatmapSelectionSource.FilePicker);
         return true;
+    }
+
+    /// <inheritdoc />
+    public string? GetBeatmapPickerStartLocation(string? currentDirectory = null)
+    {
+        if (!settings.CurrentBeatmapDefaultFolder) return currentDirectory;
+
+        string? selectedParent = selectedPaths.Length == 0
+            ? null
+            : fileSystem.GetParentDirectory(selectedPaths[0]);
+        return string.IsNullOrWhiteSpace(selectedParent)
+            ? settings.SongsPath
+            : selectedParent;
     }
 
     /// <inheritdoc />
@@ -211,18 +224,6 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
         }
 
         return selectedPaths.FirstOrDefault() ?? string.Empty;
-    }
-
-    private string? GetPickerStartLocation()
-    {
-        if (!settings.CurrentBeatmapDefaultFolder) return null;
-
-        string? selectedParent = selectedPaths.Length == 0
-            ? null
-            : fileSystem.GetParentDirectory(selectedPaths[0]);
-        return string.IsNullOrWhiteSpace(selectedParent)
-            ? settings.SongsPath
-            : selectedParent;
     }
 
     private void RemoveInvalidRecentEntries()

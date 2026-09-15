@@ -10,17 +10,21 @@ public sealed partial class ComboColourStudioImportDialogViewModel : ObservableO
 {
     private readonly ICurrentBeatmapLocator currentBeatmap;
     private readonly IFilePicker filePicker;
+    private readonly IBeatmapWorkspace workspace;
 
     /// <summary>Creates an import dialog with an optional initial beatmap path.</summary>
     /// <param name="initialPath">The path initially shown in the dialog.</param>
     /// <param name="currentBeatmap">Locates the beatmap currently open in osu!.</param>
+    /// <param name="workspace">Supplies the shared default beatmap picker location.</param>
     /// <param name="filePicker">Presents the native beatmap file picker.</param>
     public ComboColourStudioImportDialogViewModel(
         string? initialPath,
         ICurrentBeatmapLocator currentBeatmap,
+        IBeatmapWorkspace workspace,
         IFilePicker filePicker)
     {
         this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         Path = initialPath ?? string.Empty;
         AcceptCommand = new RelayCommand(Accept);
@@ -87,6 +91,8 @@ public sealed partial class ComboColourStudioImportDialogViewModel : ObservableO
             var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
             {
                 Title = "Select beatmap to import",
+                SuggestedStartLocation = workspace.GetBeatmapPickerStartLocation(
+                    System.IO.Path.GetDirectoryName(Path)),
                 AllowMultiple = false,
                 Filters = [CommonFilePickerFilters.BeatmapsAndStoryboards],
             });

@@ -84,6 +84,20 @@ public interface IBeatmapWorkspace
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    ///     Gets the initial directory for a default beatmap picker. When the
+    ///     current-beatmap preference is enabled, this is the first selected
+    ///     beatmap's parent directory, or the configured Songs directory when
+    ///     no selected beatmap directory is available. When the preference is
+    ///     disabled, the supplied current picker directory is retained.
+    /// </summary>
+    /// <param name="currentDirectory">
+    ///     The directory represented by the picker's current value, or
+    ///     <see langword="null" /> when it has no current directory.
+    /// </param>
+    /// <returns>The shared default picker directory, or <see langword="null" />.</returns>
+    string? GetBeatmapPickerStartLocation(string? currentDirectory = null);
+
+    /// <summary>
     ///     Attempts to replace the selection with the beatmap reported by osu!.
     /// </summary>
     /// <param name="cancellationToken">Cancels live beatmap discovery.</param>

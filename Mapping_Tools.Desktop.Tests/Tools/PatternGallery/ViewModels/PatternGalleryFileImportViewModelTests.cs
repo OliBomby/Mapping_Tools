@@ -53,9 +53,14 @@ public sealed class PatternGalleryFileImportViewModelTests
     {
         // Arrange
         TestFilePicker filePicker = new() { OpenFiles = ["selected.osu"] };
+        TestBeatmapWorkspace workspace = new()
+        {
+            BeatmapPickerStartLocation = @"C:\Maps",
+        };
         PatternGalleryFileImportViewModel viewModel = CreateViewModel(
             "initial.osu",
-            filePicker);
+            filePicker,
+            workspace: workspace);
 
         // Act
         await viewModel.BrowseCommand.ExecuteAsync(null);
@@ -63,6 +68,7 @@ public sealed class PatternGalleryFileImportViewModelTests
         // Assert
         viewModel.FilePath.Should().Be("selected.osu");
         filePicker.LastOpenRequest!.Filters.Should().ContainSingle();
+        filePicker.LastOpenRequest.SuggestedStartLocation.Should().Be(@"C:\Maps");
     }
 
     [TestMethod]
@@ -85,12 +91,14 @@ public sealed class PatternGalleryFileImportViewModelTests
     private static PatternGalleryFileImportViewModel CreateViewModel(
         string path,
         TestFilePicker? filePicker = null,
-        RecordingCurrentBeatmapLocator? currentBeatmap = null)
+        RecordingCurrentBeatmapLocator? currentBeatmap = null,
+        TestBeatmapWorkspace? workspace = null)
     {
         return new PatternGalleryFileImportViewModel(
             "Pattern",
             path,
             filePicker ?? new TestFilePicker(),
-            currentBeatmap ?? new RecordingCurrentBeatmapLocator());
+            currentBeatmap ?? new RecordingCurrentBeatmapLocator(),
+            workspace ?? new TestBeatmapWorkspace());
     }
 }

@@ -7,7 +7,6 @@ using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
-using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.TimingCopier;
 using Mapping_Tools.Application.Workspace.Contracts;
@@ -36,7 +35,6 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
 
     private readonly IFilePicker filePicker;
     private readonly IUserNotificationService notifications;
-    private readonly ApplicationSettings settings;
 
     private readonly ITimingCopierService timingCopier;
     private readonly IBeatmapWorkspace workspace;
@@ -50,15 +48,13 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
     /// <param name="currentBeatmapLocator">Finds the beatmap currently open in osu!.</param>
     /// <param name="notifications">Publishes picker and current-map failures.</param>
     /// <param name="workspace">Supplies the current shell map selection for picker locations.</param>
-    /// <param name="settings">Supplies the legacy picker-folder preference and Songs fallback.</param>
     public TimingCopierViewModel(
         ITimingCopierService timingCopier,
         IToolExecutionService execution,
         IFilePicker filePicker,
         ICurrentBeatmapLocator currentBeatmapLocator,
         IUserNotificationService notifications,
-        IBeatmapWorkspace workspace,
-        ApplicationSettings settings)
+        IBeatmapWorkspace workspace)
         : base(execution, TimingCopierToolDefinition.Definition)
     {
         this.timingCopier = timingCopier ?? throw new ArgumentNullException(nameof(timingCopier));
@@ -67,7 +63,6 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
                                      ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
         this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
-        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
     /// <summary>Gets the three object-placement choices in display order.</summary>
@@ -143,7 +138,7 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
     {
         await PickBeatmapsAsync(
             "Copy timing from",
-            GetCurrentPickerStartLocation(),
+            workspace.GetBeatmapPickerStartLocation(Path.GetDirectoryName(ImportPath)),
             false,
             paths => ImportPath = paths[0]);
     }
@@ -174,7 +169,14 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
     private async Task ExportBrowseAsync()
     {
         string? suggestedStartLocation = Path.GetDirectoryName(ImportPath);
-        if (string.IsNullOrWhiteSpace(suggestedStartLocation)) suggestedStartLocation = settings.SongsPath;
+        if (string.IsNullOrWhiteSpace(suggestedStartLocation))
+        {
+            string? currentDirectory = ExportPath
+                .Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+                .Select(Path.GetDirectoryName)
+                .FirstOrDefault();
+            suggestedStartLocation = workspace.GetBeatmapPickerStartLocation(currentDirectory);
+        }
 
         await PickBeatmapsAsync(
             "Copy timing to",
@@ -253,15 +255,6 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
                 "The file picker could not return local beatmap paths.",
                 exception);
         }
-    }
-
-    private string? GetCurrentPickerStartLocation()
-    {
-        if (!settings.CurrentBeatmapDefaultFolder) return null;
-
-        string? currentPath = workspace.SelectedPaths.FirstOrDefault();
-        string? directory = Path.GetDirectoryName(currentPath);
-        return string.IsNullOrWhiteSpace(directory) ? settings.SongsPath : directory;
     }
 
     private Task PublishFailureAsync(string title, string message, Exception exception)

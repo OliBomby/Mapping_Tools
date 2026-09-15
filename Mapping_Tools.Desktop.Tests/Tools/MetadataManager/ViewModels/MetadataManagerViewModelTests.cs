@@ -19,7 +19,12 @@ public sealed class MetadataManagerViewModelTests
     {
         // Arrange
         TestFilePicker picker = new() { OpenFiles = ["first.osu", "second.osu"] };
-        var viewModel = CreateViewModel(filePicker: picker);
+        TestBeatmapWorkspace workspace = new()
+        {
+            BeatmapPickerStartLocation = @"C:\Maps",
+        };
+        var viewModel = CreateViewModel(filePicker: picker, workspace: workspace);
+        viewModel.ImportPath = @"E:\Source\source.osu";
 
         // Act
         await ExecuteAsync(viewModel.BrowseExportCommand);
@@ -29,6 +34,7 @@ public sealed class MetadataManagerViewModelTests
         viewModel.ExportMapCountText.Should().Be("(2) maps total");
         picker.LastOpenRequest.Should().NotBeNull();
         picker.LastOpenRequest!.AllowMultiple.Should().BeTrue();
+        picker.LastOpenRequest.SuggestedStartLocation.Should().Be(@"E:\Source");
     }
 
     [TestMethod]
@@ -45,6 +51,24 @@ public sealed class MetadataManagerViewModelTests
         // Assert
         viewModel.ImportPath.Should().Be("source.osu");
         viewModel.ExportPath.Should().Be("existing-target.osu");
+    }
+
+    [TestMethod]
+    public async Task BrowseImportCommand_UsesSharedBeatmapPickerLocation()
+    {
+        // Arrange
+        TestFilePicker picker = new() { OpenFiles = ["source.osu"] };
+        TestBeatmapWorkspace workspace = new()
+        {
+            BeatmapPickerStartLocation = @"C:\Maps",
+        };
+        var viewModel = CreateViewModel(filePicker: picker, workspace: workspace);
+
+        // Act
+        await ExecuteAsync(viewModel.BrowseImportCommand);
+
+        // Assert
+        picker.LastOpenRequest!.SuggestedStartLocation.Should().Be(@"C:\Maps");
     }
 
     [TestMethod]
@@ -73,7 +97,8 @@ public sealed class MetadataManagerViewModelTests
 
     private static MetadataManagerViewModel CreateViewModel(
         RecordingMetadataManagerService? metadataManager = null,
-        TestFilePicker? filePicker = null)
+        TestFilePicker? filePicker = null,
+        TestBeatmapWorkspace? workspace = null)
     {
         UserNotificationService notifications = new();
         ToolExecutionService execution = new(
@@ -86,6 +111,7 @@ public sealed class MetadataManagerViewModelTests
             execution,
             filePicker ?? new TestFilePicker(),
             new RecordingCurrentBeatmapLocator(),
+            workspace ?? new TestBeatmapWorkspace(),
             notifications,
             new TestApplicationDirectories());
     }

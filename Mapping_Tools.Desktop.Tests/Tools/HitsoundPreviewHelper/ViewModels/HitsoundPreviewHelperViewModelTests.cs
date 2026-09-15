@@ -135,6 +135,7 @@ public sealed class HitsoundPreviewHelperViewModelTests
             execution,
             new TestFilePicker(),
             new RecordingCurrentBeatmapLocator("current.osu"),
+            effectiveWorkspace,
             windows,
             new TestApplicationDirectories());
         return new HitsoundPreviewHelperViewModel(

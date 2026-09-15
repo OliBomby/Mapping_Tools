@@ -30,7 +30,10 @@ public sealed class ComboColourStudioImportDialogViewModelTests
         // Arrange
         TestFilePicker filePicker = new() { OpenFiles = ["selected.osu"] };
         ComboColourStudioImportDialogViewModel viewModel =
-            new("initial.osu", new RecordingCurrentBeatmapLocator(), filePicker);
+            new("initial.osu", new RecordingCurrentBeatmapLocator(), new TestBeatmapWorkspace
+            {
+                BeatmapPickerStartLocation = @"C:\Maps",
+            }, filePicker);
 
         // Act
         await viewModel.BrowseCommand.ExecuteAsync(null);
@@ -38,6 +41,7 @@ public sealed class ComboColourStudioImportDialogViewModelTests
         // Assert
         viewModel.Path.Should().Be("selected.osu");
         filePicker.LastOpenRequest!.Filters.Should().ContainSingle();
+        filePicker.LastOpenRequest.SuggestedStartLocation.Should().Be(@"C:\Maps");
     }
 
     [TestMethod]
@@ -46,7 +50,7 @@ public sealed class ComboColourStudioImportDialogViewModelTests
         // Arrange
         var currentBeatmap = new RecordingCurrentBeatmapLocator("current.osu");
         ComboColourStudioImportDialogViewModel viewModel =
-            new("initial.osu", currentBeatmap, new TestFilePicker());
+            new("initial.osu", currentBeatmap, new TestBeatmapWorkspace(), new TestFilePicker());
 
         // Act
         await viewModel.UseCurrentCommand.ExecuteAsync(null);
@@ -61,6 +65,7 @@ public sealed class ComboColourStudioImportDialogViewModelTests
         return new ComboColourStudioImportDialogViewModel(
             string.Empty,
             new RecordingCurrentBeatmapLocator(),
+            new TestBeatmapWorkspace(),
             new TestFilePicker());
     }
 }

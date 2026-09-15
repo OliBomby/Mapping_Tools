@@ -45,6 +45,24 @@ public sealed class TimingCopierViewModelTests
     }
 
     [TestMethod]
+    public async Task ImportBrowseCommand_UsesSharedBeatmapPickerLocation()
+    {
+        // Arrange
+        TestFilePicker picker = new() { OpenFiles = ["source.osu"] };
+        TestBeatmapWorkspace workspace = new()
+        {
+            BeatmapPickerStartLocation = @"C:\Maps",
+        };
+        var viewModel = Create(filePicker: picker, workspace: workspace);
+
+        // Act
+        await viewModel.ImportBrowseCommand.ExecuteAsync(null);
+
+        // Assert
+        picker.LastOpenRequest!.SuggestedStartLocation.Should().Be(@"C:\Maps");
+    }
+
+    [TestMethod]
     public async Task RunCommand_WithConfiguredPaths_PassesSnapshotAndResetsProgress()
     {
         // Arrange
@@ -84,7 +102,8 @@ public sealed class TimingCopierViewModelTests
 
     private static TimingCopierViewModel Create(
         RecordingTimingCopier? service = null,
-        TestFilePicker? filePicker = null)
+        TestFilePicker? filePicker = null,
+        TestBeatmapWorkspace? workspace = null)
     {
         return new TimingCopierViewModel(
             service ?? new RecordingTimingCopier(),
@@ -96,8 +115,7 @@ public sealed class TimingCopierViewModelTests
             filePicker ?? new TestFilePicker(),
             new RecordingCurrentBeatmapLocator(),
             new UserNotificationService(),
-            new TestBeatmapWorkspace(),
-            new ApplicationSettings());
+            workspace ?? new TestBeatmapWorkspace());
     }
 
     private sealed class RecordingTimingCopier : ITimingCopierService

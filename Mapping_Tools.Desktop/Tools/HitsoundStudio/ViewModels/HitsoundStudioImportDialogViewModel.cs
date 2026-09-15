@@ -14,6 +14,7 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
 {
     private readonly IFilePicker filePicker;
     private readonly ICurrentBeatmapLocator currentBeatmap;
+    private readonly IBeatmapWorkspace workspace;
     private IAsyncRelayCommand? pickSampleCommand;
     private IAsyncRelayCommand? pickSourceCommand;
     private IAsyncRelayCommand? loadSourceCommand;
@@ -21,13 +22,16 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
     /// <summary>Creates an import form with WPF-compatible defaults.</summary>
     /// <param name="defaultName">The suggested layer name.</param>
     /// <param name="currentBeatmap">Locates the beatmap currently open in osu!.</param>
+    /// <param name="workspace">Supplies the shared default beatmap picker location.</param>
     /// <param name="filePicker">Presents the native file picker.</param>
     public HitsoundStudioImportDialogViewModel(
         string defaultName,
         ICurrentBeatmapLocator currentBeatmap,
+        IBeatmapWorkspace workspace,
         IFilePicker filePicker)
     {
         this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         Name = defaultName;
         AcceptCommand = new RelayCommand(Accept);
@@ -223,6 +227,12 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
         var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
             Title = "Choose Hitsound Studio source",
+            SuggestedStartLocation = ImportType == ImportType.MIDI
+                ? null
+                : workspace.GetBeatmapPickerStartLocation(
+                    Path.GetDirectoryName(SourcePaths
+                        .Split(['\r', '\n', '|'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                        .FirstOrDefault())),
             AllowMultiple = false,
             Filters = ImportType == ImportType.MIDI
                 ? [new FilePickerFilter("MIDI files", ["*.mid"])]

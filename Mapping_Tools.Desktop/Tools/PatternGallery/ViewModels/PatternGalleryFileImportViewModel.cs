@@ -12,20 +12,24 @@ public sealed partial class PatternGalleryFileImportViewModel : ObservableValida
 {
     private readonly ICurrentBeatmapLocator currentBeatmap;
     private readonly IFilePicker filePicker;
+    private readonly IBeatmapWorkspace workspace;
 
     /// <summary>Creates a source-file import form.</summary>
     /// <param name="defaultName">The suggested display name.</param>
     /// <param name="defaultPath">The selected source path.</param>
     /// <param name="filePicker">Presents the native pattern-file picker.</param>
     /// <param name="currentBeatmap">Locates the beatmap currently open in osu!.</param>
+    /// <param name="workspace">Supplies the shared default beatmap picker location.</param>
     public PatternGalleryFileImportViewModel(
         string defaultName,
         string defaultPath,
         IFilePicker filePicker,
-        ICurrentBeatmapLocator currentBeatmap)
+        ICurrentBeatmapLocator currentBeatmap,
+        IBeatmapWorkspace workspace)
     {
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         Name = defaultName;
         FilePath = defaultPath;
         AcceptCommand = new RelayCommand(Accept);
@@ -91,6 +95,8 @@ public sealed partial class PatternGalleryFileImportViewModel : ObservableValida
         var selected = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
             Title = "Import pattern file",
+            SuggestedStartLocation = workspace.GetBeatmapPickerStartLocation(
+                Path.GetDirectoryName(FilePath)),
             AllowMultiple = false,
             Filters = [CommonFilePickerFilters.Beatmaps],
         });

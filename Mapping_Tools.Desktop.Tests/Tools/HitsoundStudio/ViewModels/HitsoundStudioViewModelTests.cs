@@ -276,6 +276,30 @@ public sealed class HitsoundStudioViewModelTests
     }
 
     [TestMethod]
+    public async Task PickBaseBeatmapCommand_UsesSharedBeatmapPickerLocation()
+    {
+        // Arrange
+        TestFilePicker filePicker = new() { OpenFiles = ["base.osu"] };
+        TestBeatmapWorkspace workspace = new()
+        {
+            BeatmapPickerStartLocation = @"C:\Maps",
+        };
+        HitsoundStudioViewModel viewModel = CreateViewModel(
+            new RecordingHitsoundStudioService(),
+            new RecordingAudioGenerator(),
+            new RecordingPlaybackService(),
+            workspace: workspace,
+            filePicker: filePicker);
+
+        // Act
+        await viewModel.PickBaseBeatmapCommand.ExecuteAsync(null);
+
+        // Assert
+        viewModel.BaseBeatmap.Should().Be("base.osu");
+        filePicker.LastOpenRequest!.SuggestedStartLocation.Should().Be(@"C:\Maps");
+    }
+
+    [TestMethod]
     public async Task ValidateSamplesCommand_WithInvalidLayers_ShowsAffectedLayerNames()
     {
         // Arrange
@@ -458,7 +482,9 @@ public sealed class HitsoundStudioViewModelTests
         RecordingPlaybackService playback,
         RecordingCurrentBeatmapLocator? currentBeatmap = null,
         UserNotificationService? notifications = null,
-        TestDialogService? dialogs = null)
+        TestDialogService? dialogs = null,
+        TestBeatmapWorkspace? workspace = null,
+        TestFilePicker? filePicker = null)
     {
         notifications ??= new UserNotificationService();
         ToolExecutionService execution = new(
@@ -474,8 +500,8 @@ public sealed class HitsoundStudioViewModelTests
             notifications,
             execution,
             currentBeatmap ?? new RecordingCurrentBeatmapLocator(),
-            new TestBeatmapWorkspace(),
-            new TestFilePicker(),
+            workspace ?? new TestBeatmapWorkspace(),
+            filePicker ?? new TestFilePicker(),
             new StubHitsoundStudioFileSystem(),
             new StubProjectStore(),
             new DesktopApplicationSettings(),

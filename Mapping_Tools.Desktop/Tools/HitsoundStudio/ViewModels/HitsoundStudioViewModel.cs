@@ -747,6 +747,8 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
             Title = "Choose base beatmap",
+            SuggestedStartLocation = workspace.GetBeatmapPickerStartLocation(
+                Path.GetDirectoryName(BaseBeatmap)),
             AllowMultiple = false,
             Filters = [CommonFilePickerFilters.BeatmapsAndStoryboards],
         });
@@ -1328,7 +1330,8 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
 
     private async Task<HitsoundStudioImportRequest?> ShowImportDialogAsync(string defaultName)
     {
-        HitsoundStudioImportDialogViewModel viewModel = new(defaultName, currentBeatmap, filePicker);
+        HitsoundStudioImportDialogViewModel viewModel =
+            new(defaultName, currentBeatmap, workspace, filePicker);
         try
         {
             viewModel.SourcePaths = await currentBeatmap.FindCurrentBeatmapAsync();

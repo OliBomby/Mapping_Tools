@@ -22,7 +22,11 @@ public sealed class RhythmGuideViewModelTests
     {
         // Arrange
         TestFilePicker picker = new() { OpenFiles = ["first.osu", "second.osu"] };
-        var viewModel = CreateViewModel(filePicker: picker);
+        TestBeatmapWorkspace workspace = new()
+        {
+            BeatmapPickerStartLocation = @"C:\Maps",
+        };
+        var viewModel = CreateViewModel(filePicker: picker, workspace: workspace);
 
         // Act
         await ExecuteAsync(viewModel.BrowseSourcesCommand);
@@ -31,6 +35,7 @@ public sealed class RhythmGuideViewModelTests
         viewModel.SourcePaths.Should().Equal("first.osu", "second.osu");
         viewModel.SourceCount.Should().Be(2);
         picker.LastOpenRequest!.AllowMultiple.Should().BeTrue();
+        picker.LastOpenRequest.SuggestedStartLocation.Should().Be(@"C:\Maps");
     }
 
     [TestMethod]
@@ -57,7 +62,11 @@ public sealed class RhythmGuideViewModelTests
     {
         // Arrange
         TestFilePicker picker = new() { OpenFiles = ["target.osu"] };
-        var viewModel = CreateViewModel(filePicker: picker);
+        TestBeatmapWorkspace workspace = new()
+        {
+            BeatmapPickerStartLocation = @"C:\Maps",
+        };
+        var viewModel = CreateViewModel(filePicker: picker, workspace: workspace);
         viewModel.ExportMode = RhythmGuideExportMode.NewMap;
 
         // Act
@@ -66,6 +75,7 @@ public sealed class RhythmGuideViewModelTests
         // Assert
         picker.LastOpenRequest.Should().NotBeNull();
         picker.LastOpenRequest!.AllowMultiple.Should().BeFalse();
+        picker.LastOpenRequest.SuggestedStartLocation.Should().Be(@"C:\Maps");
         viewModel.ExportPath.Should().Be("target.osu");
     }
 
@@ -96,7 +106,8 @@ public sealed class RhythmGuideViewModelTests
         RecordingRhythmGuideService? rhythmGuide = null,
         TestFilePicker? filePicker = null,
         UserNotificationService? notifications = null,
-        IEditorReloadService? reload = null)
+        IEditorReloadService? reload = null,
+        TestBeatmapWorkspace? workspace = null)
     {
         notifications ??= new UserNotificationService();
         ToolExecutionService execution = new(
@@ -109,6 +120,7 @@ public sealed class RhythmGuideViewModelTests
             execution,
             filePicker ?? new TestFilePicker(),
             new RecordingCurrentBeatmapLocator(),
+            workspace ?? new TestBeatmapWorkspace(),
             new StubRhythmGuideWindowService(),
             new TestApplicationDirectories());
     }

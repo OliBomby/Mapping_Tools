@@ -32,6 +32,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     private readonly ICurrentBeatmapLocator currentBeatmapLocator;
     private readonly ProjectDefinition<MetadataManagerProject> definition;
     private readonly IFilePicker filePicker;
+    private readonly IBeatmapWorkspace workspace;
 
     private readonly IMetadataManagerService metadataManager;
     private readonly IUserNotificationService notifications;
@@ -41,6 +42,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     /// <param name="execution">Coordinates background execution, cancellation, and notifications.</param>
     /// <param name="filePicker">Presents native beatmap file dialogs.</param>
     /// <param name="currentBeatmapLocator">Finds the beatmap currently open in osu!.</param>
+    /// <param name="workspace">Supplies the shared default beatmap picker location.</param>
     /// <param name="notifications">Publishes project and picker failures.</param>
     /// <param name="directories">Supplies the default export directory.</param>
     public MetadataManagerViewModel(
@@ -48,6 +50,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         IToolExecutionService execution,
         IFilePicker filePicker,
         ICurrentBeatmapLocator currentBeatmapLocator,
+        IBeatmapWorkspace workspace,
         IUserNotificationService notifications,
         IApplicationDirectories directories)
         : base(execution, MetadataManagerToolDefinition.Definition)
@@ -55,6 +58,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         this.metadataManager = metadataManager ?? throw new ArgumentNullException(nameof(metadataManager));
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         this.currentBeatmapLocator = currentBeatmapLocator ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
+        this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
         ArgumentNullException.ThrowIfNull(directories);
 
@@ -186,7 +190,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     {
         await PickBeatmapsAsync(
             "Import metadata from",
-            ImportPath,
+            workspace.GetBeatmapPickerStartLocation(Path.GetDirectoryName(ImportPath)),
             false,
             paths => ImportPath = paths[0]);
     }
@@ -253,7 +257,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     {
         await PickBeatmapsAsync(
             "Export metadata to",
-            FirstExportPathOrNull(),
+            GetExportPickerStartLocation(),
             true,
             paths => ExportPath = string.Join('|', paths));
     }
@@ -434,12 +438,12 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
             exception));
     }
 
-    private string? FirstExportPathOrNull()
+    private string? GetExportPickerStartLocation()
     {
-        string? path = ExportPath
-            .Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
-            .FirstOrDefault();
-        return string.IsNullOrWhiteSpace(path) ? null : Path.GetDirectoryName(path);
+        string? importDirectory = Path.GetDirectoryName(ImportPath);
+        return string.IsNullOrWhiteSpace(importDirectory)
+            ? workspace.GetBeatmapPickerStartLocation(Path.GetDirectoryName(ExportPath))
+            : importDirectory;
     }
 
     private static MetadataManagerProject CreateDefaultProject(string exportPath)

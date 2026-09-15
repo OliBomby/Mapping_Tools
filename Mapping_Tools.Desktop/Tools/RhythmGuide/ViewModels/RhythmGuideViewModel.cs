@@ -26,6 +26,7 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
     private readonly ICurrentBeatmapLocator currentBeatmapLocator;
     private readonly ProjectDefinition<RhythmGuideProject> definition;
     private readonly IFilePicker filePicker;
+    private readonly IBeatmapWorkspace workspace;
 
     private readonly IRhythmGuideService rhythmGuide;
     private readonly IRhythmGuideWindowService windowService;
@@ -36,6 +37,7 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
     /// <param name="execution">Coordinates cancellation, backup, and notifications.</param>
     /// <param name="filePicker">Selects source and destination beatmap files.</param>
     /// <param name="currentBeatmapLocator">Finds the beatmap open in osu!.</param>
+    /// <param name="workspace">Supplies the shared default beatmap picker location.</param>
     /// <param name="windowService">Opens the auxiliary Rhythm Guide window.</param>
     /// <param name="directories">Supplies the default export directory.</param>
     public RhythmGuideViewModel(
@@ -43,6 +45,7 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
         IToolExecutionService execution,
         IFilePicker filePicker,
         ICurrentBeatmapLocator currentBeatmapLocator,
+        IBeatmapWorkspace workspace,
         IRhythmGuideWindowService windowService,
         IApplicationDirectories directories)
         : base(execution, RhythmGuideToolDefinition.Definition)
@@ -50,6 +53,7 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
         this.rhythmGuide = rhythmGuide ?? throw new ArgumentNullException(nameof(rhythmGuide));
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         this.currentBeatmapLocator = currentBeatmapLocator ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
+        this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         this.windowService = windowService ?? throw new ArgumentNullException(nameof(windowService));
         ArgumentNullException.ThrowIfNull(directories);
         ExportPath = Path.Combine(directories.Exports, "rhythm_guide.osu");
@@ -125,7 +129,8 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
             new OpenFilePickerRequest
             {
                 Title = "Copy rhythm from",
-                SuggestedStartLocation = FirstPathOrNull(),
+                SuggestedStartLocation = workspace.GetBeatmapPickerStartLocation(
+                    Path.GetDirectoryName(SourcePaths.FirstOrDefault())),
                 AllowMultiple = true,
                 Filters = [CommonFilePickerFilters.Beatmaps],
             });
@@ -151,7 +156,8 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
             new OpenFilePickerRequest
             {
                 Title = "Copy rhythm to",
-                SuggestedStartLocation = ExportPath,
+                SuggestedStartLocation = workspace.GetBeatmapPickerStartLocation(
+                    Path.GetDirectoryName(ExportPath)),
                 AllowMultiple = false,
                 Filters = [CommonFilePickerFilters.Beatmaps],
             });
@@ -233,11 +239,6 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
         NcEverything = options.NcEverything;
         SelectionMode = options.SelectionMode;
         beatDivisors = options.BeatDivisors?.ToArray() ?? [];
-    }
-
-    private string? FirstPathOrNull()
-    {
-        return SourcePaths.FirstOrDefault();
     }
 
     private static RhythmGuideProject CreateDefaultProject(string exportPath)

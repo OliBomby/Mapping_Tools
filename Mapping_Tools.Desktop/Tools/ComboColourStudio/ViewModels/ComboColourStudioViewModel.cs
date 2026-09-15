@@ -402,7 +402,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         }
 
         ComboColourStudioImportDialogViewModel viewModel =
-            new(defaultPath, currentBeatmap, filePicker);
+            new(defaultPath, currentBeatmap, workspace, filePicker);
         ComboColourStudioImportDialog dialog = new() { DataContext = viewModel };
         viewModel.Close = value => DialogHostInteraction.Close(
             DialogHostInteraction.RootIdentifier,

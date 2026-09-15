@@ -537,7 +537,8 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             defaultName,
             defaultPath,
             filePicker,
-            currentBeatmap);
+            currentBeatmap,
+            workspace);
         PatternGalleryFileImportDialog dialog = new() { DataContext = viewModel };
         viewModel.Close = value => DialogHostInteraction.Close(
             DialogHostInteraction.RootIdentifier,
