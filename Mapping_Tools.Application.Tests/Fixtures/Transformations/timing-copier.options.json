@@ -1,8 +1,0 @@
-{
-  "Source": "../Beatmaps/standard-feature-rich.osu",
-  "Target": "../Beatmaps/ComplicatedTestMap.osu",
-  "ResnapMode": "Just resnap",
-  "BeatDivisors": ["1/3", "1/4"],
-  "UseEditorReader": false,
-  "MakeBackups": true
-}

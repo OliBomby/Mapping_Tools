@@ -1,0 +1,19 @@
+{
+  "Source": "../../../Beatmaps/standard-feature-rich.osu",
+  "Target": "../../../Beatmaps/ComplicatedTestMap.osu",
+  "Artist": "E2E Fixture Artist",
+  "RomanisedArtist": "E2E Fixture Artist",
+  "Title": "E2E Metadata Fixture",
+  "RomanisedTitle": "E2E Metadata Fixture",
+  "BeatmapCreator": "Fixture Mapper",
+  "SourceMetadata": "E2E Fixture",
+  "Tags": "e2e fixture e2e",
+  "DoRemoveDuplicateTags": true,
+  "ResetIds": true,
+  "PreviewTime": 12345.0,
+  "UseComboColours": true,
+  "ComboColours": ["#FFFF3366", "#FF33CCFF", "#FFFFCC33"],
+  "SpecialColours": [],
+  "UseEditorReader": false,
+  "MakeBackups": true
+}
