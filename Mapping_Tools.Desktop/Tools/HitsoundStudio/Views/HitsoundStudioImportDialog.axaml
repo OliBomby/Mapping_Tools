@@ -29,7 +29,7 @@
                     SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}"
                     Foreground="{DynamicResource MaterialDarkForegroundBrush}">
             <ContentPage Header="Simple layer">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="10">
                         <TextBox Margin="0,5,0,0"
@@ -64,7 +64,7 @@
             </ContentPage>
 
             <ContentPage Header="Import layer stack">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="10">
                         <TextBox Margin="0,5,0,0"
@@ -129,7 +129,7 @@
             </ContentPage>
 
             <ContentPage Header="Import hitsounds">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="10">
                         <TextBox Margin="0,5,0,0"
@@ -175,7 +175,7 @@
             </ContentPage>
 
             <ContentPage Header="Import MIDI">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="10">
                         <TextBox Margin="0,5,0,0"
@@ -225,7 +225,7 @@
             </ContentPage>
 
             <ContentPage Header="Import storyboard">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="10">
                         <TextBox Margin="0,5,0,0"
