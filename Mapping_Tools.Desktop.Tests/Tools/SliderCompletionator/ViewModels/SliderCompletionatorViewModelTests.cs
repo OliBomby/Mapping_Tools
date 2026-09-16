@@ -228,8 +228,6 @@ public sealed class SliderCompletionatorViewModelTests
             service,
             new ToolExecutionService(
                 new UserNotificationService(),
-                new RecordingEditorReloadService(),
-                new DesktopApplicationSettings(),
                 TimeProvider.System),
             workspace ?? new TestBeatmapWorkspace(),
             settings ?? new DesktopApplicationSettings());
@@ -297,6 +295,7 @@ public sealed class SliderCompletionatorViewModelTests
         public Task<SliderCompletionatorResult> CompleteAsync(
             IReadOnlyList<string> paths,
             SliderCompletionatorServiceOptions options,
+            bool quickRun = false,
             IProgress<double>? progress = null,
             CancellationToken cancellationToken = default)
         {

@@ -109,8 +109,6 @@ public sealed class TimingCopierViewModelTests
             service ?? new RecordingTimingCopier(),
             new ToolExecutionService(
                 new UserNotificationService(),
-                new RecordingEditorReloadService(),
-                new ApplicationSettings(),
                 TimeProvider.System),
             filePicker ?? new TestFilePicker(),
             new RecordingCurrentBeatmapLocator(),

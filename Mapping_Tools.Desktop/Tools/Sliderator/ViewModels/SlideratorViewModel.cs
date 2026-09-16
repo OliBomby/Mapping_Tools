@@ -398,7 +398,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         bool succeeded = false;
         await RunWithStateAsync(async () =>
         {
-            succeeded = await RunPathAsync(path, true, false, cancellationToken);
+            succeeded = await RunPathAsync(path, false, true, cancellationToken);
         });
         return succeeded;
     }
@@ -551,8 +551,8 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
     private async Task<bool> RunPathAsync(
         string path,
-        bool quick,
-        bool reloadEditor,
+        bool quickRun,
+        bool suppressSummary,
         CancellationToken cancellationToken)
     {
         var sourceSlider = VisibleHitObject;
@@ -571,14 +571,13 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
                         path,
                         project,
                         sourceSlider,
-                        reloadEditor,
+                        quickRun,
                         new Progress<double>(value => context.ReportProgress(value, "Sliderating")),
                         context.CancellationToken,
                         preferLiveEditor);
                     return new ToolExecutionOutput<SlideratorResult>(
                         result,
-                        quick ? null : "Done!",
-                        reloadEditor);
+                        suppressSummary ? null : "Done!");
                 }),
             CreateProgress(),
             cancellationToken);

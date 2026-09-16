@@ -61,14 +61,11 @@ public sealed class HitsoundPreviewHelperViewModelTests
     }
 
     [TestMethod]
-    public async Task RunQuickAsync_WithCurrentBeatmap_RequestsEditorReloadThroughExecutionHost()
+    public async Task RunQuickAsync_WithCurrentBeatmap_PassesQuickRunToService()
     {
         // Arrange
         RecordingPreviewService preview = new();
-        RecordingEditorReloadService reload = new();
-        var viewModel = CreateViewModel(
-            preview,
-            reloadService: reload);
+        var viewModel = CreateViewModel(preview);
         viewModel.AddCommand.Execute(null);
 
         // Act
@@ -76,7 +73,7 @@ public sealed class HitsoundPreviewHelperViewModelTests
 
         // Assert
         preview.Paths.Should().Equal("current.osu");
-        reload.ReloadCount.Should().Be(1);
+        preview.QuickRun.Should().BeTrue();
         viewModel.ResultSummary.Should().Be("Placed 1 preview hitsounds.");
     }
 
@@ -116,15 +113,12 @@ public sealed class HitsoundPreviewHelperViewModelTests
     private static HitsoundPreviewHelperViewModel CreateViewModel(
         RecordingPreviewService? preview = null,
         TestBeatmapWorkspace? workspace = null,
-        RecordingRhythmGuideWindowService? windowService = null,
-        RecordingEditorReloadService? reloadService = null)
+        RecordingRhythmGuideWindowService? windowService = null)
     {
         UserNotificationService notifications = new();
         ToolExecutionService execution = new(
             notifications,
-            reloadService ?? new RecordingEditorReloadService(),
-            new DesktopApplicationSettings(),
-        TimeProvider.System);
+            TimeProvider.System);
         var windows = windowService ?? new RecordingRhythmGuideWindowService();
         TestBeatmapWorkspace effectiveWorkspace = workspace ?? new TestBeatmapWorkspace
         {
@@ -158,14 +152,18 @@ public sealed class HitsoundPreviewHelperViewModelTests
 
         public HitsoundPreviewHelperServiceOptions? Options { get; private set; }
 
+        public bool QuickRun { get; private set; }
+
         public Task<HitsoundPreviewHelperResult> ApplyAsync(
             IReadOnlyList<string> paths,
             HitsoundPreviewHelperServiceOptions options,
+            bool quickRun = false,
             IProgress<double>? progress = null,
             CancellationToken cancellationToken = default)
         {
             Paths = paths.ToArray();
             Options = options;
+            QuickRun = quickRun;
             progress?.Report(1);
             return Task.FromResult(new HitsoundPreviewHelperResult(
                 paths,

@@ -1,5 +1,7 @@
+using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.HitsoundPreviewHelper;
@@ -13,18 +15,24 @@ namespace Mapping_Tools.Application.Tools.HitsoundPreviewHelper;
 public sealed class HitsoundPreviewHelperService : IHitsoundPreviewHelperService
 {
     private readonly IBeatmapEditingGateway editingGateway;
+    private readonly ApplicationSettings settings;
 
     /// <summary>Creates the hitsound-preview application service.</summary>
     /// <param name="editingGateway">Loads live-or-disk maps and saves safe edits.</param>
-    public HitsoundPreviewHelperService(IBeatmapEditingGateway editingGateway)
+    /// <param name="settings">Supplies the automatic editor reload preference.</param>
+    public HitsoundPreviewHelperService(
+        IBeatmapEditingGateway editingGateway,
+        ApplicationSettings settings)
     {
         this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
     /// <inheritdoc />
     public async Task<HitsoundPreviewHelperResult> ApplyAsync(
         IReadOnlyList<string> paths,
         HitsoundPreviewHelperServiceOptions options,
+        bool quickRun = false,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {
@@ -52,7 +60,13 @@ public sealed class HitsoundPreviewHelperService : IHitsoundPreviewHelperService
 
             // Save the file
             await editingGateway
-                .SaveAsync(session, cancellationToken: cancellationToken)
+                .SaveAsync(
+                    session,
+                    AutomaticEditorReloadPolicy.ShouldReloadEditor(
+                        session,
+                        quickRun,
+                        settings),
+                    cancellationToken)
                 .ConfigureAwait(false);
             processedPaths.Add(paths[index]);
             updatedEventCount += updated;

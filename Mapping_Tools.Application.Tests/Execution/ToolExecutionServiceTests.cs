@@ -2,8 +2,6 @@ using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
-using Mapping_Tools.Application.Settings.Models;
-using Mapping_Tools.Application.Tests.TestDoubles;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Application.Tests.Execution;
@@ -18,11 +16,7 @@ public sealed class ToolExecutionServiceTests
         UserNotificationService notifications = new();
         List<UserNotification> published = [];
         notifications.Published += (_, args) => published.Add(args.Notification);
-        RecordingEditorReloadService reload = new();
-        var service = CreateService(
-            notifications,
-            reload,
-            new ApplicationSettings { AutoReload = true });
+        var service = CreateService(notifications);
         List<ToolExecutionProgress> progress = [];
         int callerThread = Environment.CurrentManagedThreadId;
         int operationThread = callerThread;
@@ -37,8 +31,7 @@ public sealed class ToolExecutionServiceTests
                 return Task.FromResult(
                     new ToolExecutionOutput<int>(
                         42,
-                        "Removed 3 greenlines.",
-                        true));
+                        "Removed 3 greenlines."));
             });
 
         // Act
@@ -52,61 +45,10 @@ public sealed class ToolExecutionServiceTests
         operationThread.Should().NotBe(callerThread);
         progress.Count.Should().Be(2);
         progress[1].Progress.Should().Be(1);
-        reload.ReloadCount.Should().Be(1);
-        result.EditorReloaded.Should().BeTrue();
         published.Count.Should().Be(1);
         published[0].Severity.Should().Be(UserNotificationSeverity.Success);
         published[0].Message.Should().Be("Removed 3 greenlines.");
         service.IsRunning("cleaner").Should().BeFalse();
-    }
-
-    [TestMethod]
-    public async Task ExecuteAsync_WithAutoReloadDisabled_SuppressesRequestedReload()
-    {
-        // Arrange
-        RecordingEditorReloadService reload = new();
-        var service = CreateService(
-            new UserNotificationService(),
-            reload,
-            new ApplicationSettings { AutoReload = false });
-        ToolExecutionRequest<int> request = new(
-            "tool",
-            "Tool",
-            _ => Task.FromResult(
-                new ToolExecutionOutput<int>(
-                    1,
-                    reloadEditor: true)));
-
-        // Act
-        var result = await service.ExecuteAsync(request);
-
-        // Assert
-        result.Status.Should().Be(ToolExecutionStatus.Succeeded);
-        reload.ReloadCount.Should().Be(0);
-        result.EditorReloaded.Should().BeFalse();
-    }
-
-    [TestMethod]
-    public async Task ExecuteAsync_WithOrdinaryToolOutput_DoesNotReload()
-    {
-        // Arrange
-        RecordingEditorReloadService reload = new();
-        var service = CreateService(
-            new UserNotificationService(),
-            reload,
-            new ApplicationSettings { AutoReload = true });
-        ToolExecutionRequest<int> request = new(
-            "tool",
-            "Tool",
-            _ => Task.FromResult(new ToolExecutionOutput<int>(1)));
-
-        // Act
-        var result = await service.ExecuteAsync(request);
-
-        // Assert
-        result.Status.Should().Be(ToolExecutionStatus.Succeeded);
-        reload.ReloadCount.Should().Be(0);
-        result.EditorReloaded.Should().BeFalse();
     }
 
     [TestMethod]
@@ -118,9 +60,7 @@ public sealed class ToolExecutionServiceTests
         notifications.Published += (_, args) => published = args.Notification;
         InvalidDataException failure = new("Invalid timing section.");
         var service = CreateService(
-            notifications,
-            new RecordingEditorReloadService(),
-            new ApplicationSettings());
+            notifications);
         ToolExecutionRequest<int> request = new(
             "timing",
             "Timing Helper",
@@ -364,14 +304,10 @@ public sealed class ToolExecutionServiceTests
     }
 
     private static ToolExecutionService CreateService(
-        IUserNotificationService? notifications = null,
-        RecordingEditorReloadService? reload = null,
-        ApplicationSettings? settings = null)
+        IUserNotificationService? notifications = null)
     {
         return new ToolExecutionService(
             notifications ?? new UserNotificationService(),
-            reload ?? new RecordingEditorReloadService(),
-            settings ?? new ApplicationSettings(),
             TimeProvider.System);
     }
 

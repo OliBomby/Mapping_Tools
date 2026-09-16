@@ -331,12 +331,12 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
                 {
                     var result = await copier.CopyAsync(
                         options,
+                        quick,
                         new Progress<double>(value => context.ReportProgress(value, "Copying hitsounds")),
                         context.CancellationToken);
                     return new ToolExecutionOutput<HitsoundCopierResult>(
                         result,
-                        quick ? null : $"Successfully copied hitsounds to {result.ProcessedCount} " + $"{(result.ProcessedCount == 1 ? "beatmap" : "beatmaps")}!",
-                        quick);
+                        quick ? null : $"Successfully copied hitsounds to {result.ProcessedCount} " + $"{(result.ProcessedCount == 1 ? "beatmap" : "beatmaps")}!");
                 }),
             CreateProgress());
     }

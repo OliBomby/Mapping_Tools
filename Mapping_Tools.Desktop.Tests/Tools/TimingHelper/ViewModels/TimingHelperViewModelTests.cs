@@ -46,24 +46,22 @@ public sealed class TimingHelperViewModelTests
     }
 
     [TestMethod]
-    public async Task RunQuickAsync_WithCurrentBeatmap_UsesQuickPathAndReloadsEditor()
+    public async Task RunQuickAsync_WithCurrentBeatmap_PassesQuickRunToService()
     {
         // Arrange
         RecordingTimingHelper service = new();
         RecordingCurrentBeatmapLocator currentBeatmap = new("current.osu");
-        RecordingEditorReloadService reload = new();
         var viewModel = Create(
             service,
             new TestBeatmapWorkspace(),
-            currentBeatmap,
-            reload);
+            currentBeatmap);
 
         // Act
         await viewModel.RunQuickAsync(CancellationToken.None);
 
         // Assert
         service.Paths.Should().Equal("current.osu");
-        reload.ReloadCount.Should().Be(1);
+        service.QuickRun.Should().BeTrue();
     }
 
     [TestMethod]
@@ -187,8 +185,7 @@ public sealed class TimingHelperViewModelTests
     private static TimingHelperViewModel Create(
         RecordingTimingHelper? service = null,
         TestBeatmapWorkspace? workspace = null,
-        RecordingCurrentBeatmapLocator? currentBeatmap = null,
-        RecordingEditorReloadService? reload = null)
+        RecordingCurrentBeatmapLocator? currentBeatmap = null)
     {
         UserNotificationService notifications = new();
         TestBeatmapWorkspace effectiveWorkspace = workspace ?? new TestBeatmapWorkspace();
@@ -197,8 +194,6 @@ public sealed class TimingHelperViewModelTests
             service ?? new RecordingTimingHelper(),
             new ToolExecutionService(
                 notifications,
-                reload ?? new RecordingEditorReloadService(),
-                new DesktopApplicationSettings(),
                 TimeProvider.System),
             effectiveWorkspace,
             new DesktopApplicationSettings());
@@ -210,14 +205,18 @@ public sealed class TimingHelperViewModelTests
 
         public TimingHelperServiceOptions? Options { get; private set; }
 
+        public bool QuickRun { get; private set; }
+
         public Task<TimingHelperResult> AdjustAsync(
             IReadOnlyList<string> paths,
             TimingHelperServiceOptions options,
+            bool quickRun = false,
             IProgress<double>? progress = null,
             CancellationToken cancellationToken = default)
         {
             Paths = paths.ToArray();
             Options = options;
+            QuickRun = quickRun;
             progress?.Report(1);
             return Task.FromResult(new TimingHelperResult(paths, 2));
         }

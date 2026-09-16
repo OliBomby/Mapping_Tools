@@ -1,5 +1,7 @@
+using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.TimingHelper;
 
@@ -12,21 +14,27 @@ namespace Mapping_Tools.Application.Tools.TimingHelper;
 public sealed class TimingHelperService : ITimingHelperService
 {
     private readonly IBeatmapEditingGateway editingGateway;
+    private readonly ApplicationSettings settings;
 
     /// <summary>
     ///     Creates the Timing Helper application service.
     /// </summary>
     /// <param name="editingGateway">Loads and saves beatmaps through the shared backup boundary.</param>
-    public TimingHelperService(IBeatmapEditingGateway editingGateway)
+    /// <param name="settings">Supplies the automatic editor reload preference.</param>
+    public TimingHelperService(
+        IBeatmapEditingGateway editingGateway,
+        ApplicationSettings settings)
     {
         this.editingGateway = editingGateway
                               ?? throw new ArgumentNullException(nameof(editingGateway));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
     /// <inheritdoc />
     public async Task<TimingHelperResult> AdjustAsync(
         IReadOnlyList<string> paths,
         TimingHelperServiceOptions options,
+        bool quickRun = false,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {
@@ -56,7 +64,13 @@ public sealed class TimingHelperService : ITimingHelperService
                 mapProgress,
                 cancellationToken);
             await editingGateway
-                .SaveAsync(session, cancellationToken: cancellationToken)
+                .SaveAsync(
+                    session,
+                    AutomaticEditorReloadPolicy.ShouldReloadEditor(
+                        session,
+                        quickRun,
+                        settings),
+                    cancellationToken)
                 .ConfigureAwait(false);
             processedPaths.Add(path);
             progress?.Report(index + 1, paths.Count);

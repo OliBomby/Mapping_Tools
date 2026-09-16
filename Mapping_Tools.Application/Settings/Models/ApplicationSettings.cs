@@ -46,7 +46,7 @@ public class ApplicationSettings
     public bool UseEditorReader { get; set; } = true;
 
     /// <summary>
-    ///     Requests that active tools reload their input after the workspace selection changes.
+    ///     Allows QuickRun mutations of a live editor session to reload osu! after saving.
     /// </summary>
     public bool AutoReload { get; set; } = true;
 

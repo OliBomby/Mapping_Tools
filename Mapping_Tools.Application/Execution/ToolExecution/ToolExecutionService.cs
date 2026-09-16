@@ -2,7 +2,6 @@ using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
-using Mapping_Tools.Application.Settings.Models;
 
 namespace Mapping_Tools.Application.Execution.ToolExecution;
 
@@ -14,35 +13,25 @@ public sealed class ToolExecutionService : IToolExecutionService
 {
     private readonly object gate = new();
     private readonly IUserNotificationService notifications;
-    private readonly IEditorReloadService reloadService;
 
     private readonly Dictionary<string, RunningOperation> running =
         new(StringComparer.Ordinal);
 
-    private readonly ApplicationSettings settings;
     private readonly CancellationTokenSource stopping = new();
     private readonly TimeProvider timeProvider;
 
     /// <summary>
     ///     Creates the coordinator that owns duplicate-run prevention, application
-    ///     shutdown cancellation, notifications, and post-success editor reload.
+    ///     shutdown cancellation, and notifications.
     /// </summary>
     /// <param name="notifications">The frontend-neutral outcome stream.</param>
-    /// <param name="reloadService">The platform adapter invoked for successful reload requests.</param>
-    /// <param name="settings">The live AutoReload preference.</param>
     /// <param name="timeProvider">Supplies deterministic result timestamps.</param>
     public ToolExecutionService(
         IUserNotificationService notifications,
-        IEditorReloadService reloadService,
-        ApplicationSettings settings,
         TimeProvider timeProvider)
     {
         this.notifications = notifications
                              ?? throw new ArgumentNullException(nameof(notifications));
-        this.reloadService = reloadService
-                             ?? throw new ArgumentNullException(nameof(reloadService));
-        this.settings = settings
-                        ?? throw new ArgumentNullException(nameof(settings));
         this.timeProvider = timeProvider
                             ?? throw new ArgumentNullException(nameof(timeProvider));
     }
@@ -70,8 +59,7 @@ public sealed class ToolExecutionService : IToolExecutionService
                         default,
                         null,
                         startedAt,
-                        startedAt,
-                        false));
+                        startedAt));
             }
 
             var operation = new RunningOperation(linked);
@@ -146,13 +134,6 @@ public sealed class ToolExecutionService : IToolExecutionService
                 .ConfigureAwait(false);
             linked.Token.ThrowIfCancellationRequested();
 
-            bool reloaded = false;
-            if (output.ReloadEditor && settings.AutoReload)
-            {
-                await reloadService.ReloadAsync(linked.Token).ConfigureAwait(false);
-                reloaded = true;
-            }
-
             if (output.Summary is not null)
                 await PublishSafelyAsync(
                         new UserNotification.Models.UserNotification(
@@ -166,8 +147,7 @@ public sealed class ToolExecutionService : IToolExecutionService
                 output.Value,
                 null,
                 startedAt,
-                timeProvider.GetUtcNow(),
-                reloaded);
+                timeProvider.GetUtcNow());
         }
         catch (OperationCanceledException) when (linked.IsCancellationRequested)
         {
@@ -176,8 +156,7 @@ public sealed class ToolExecutionService : IToolExecutionService
                 default,
                 null,
                 startedAt,
-                timeProvider.GetUtcNow(),
-                false);
+                timeProvider.GetUtcNow());
         }
         catch (Exception exception)
         {
@@ -193,8 +172,7 @@ public sealed class ToolExecutionService : IToolExecutionService
                 default,
                 exception,
                 startedAt,
-                timeProvider.GetUtcNow(),
-                false);
+                timeProvider.GetUtcNow());
         }
         finally
         {

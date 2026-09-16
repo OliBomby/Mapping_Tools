@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.Sliderator.Contracts;
 using Mapping_Tools.Application.Tools.Sliderator.Models;
 using Mapping_Tools.Core.BeatmapHelper;
@@ -16,12 +17,17 @@ namespace Mapping_Tools.Application.Tools.Sliderator;
 public sealed class SlideratorService : ISlideratorService
 {
     private readonly IBeatmapEditingGateway editingGateway;
+    private readonly ApplicationSettings settings;
 
     /// <summary>Creates the Sliderator application service.</summary>
     /// <param name="editingGateway">Opens live-or-disk maps and saves backup-first.</param>
-    public SlideratorService(IBeatmapEditingGateway editingGateway)
+    /// <param name="settings">Supplies the automatic editor reload preference.</param>
+    public SlideratorService(
+        IBeatmapEditingGateway editingGateway,
+        ApplicationSettings settings)
     {
         this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
     /// <inheritdoc />
@@ -53,7 +59,7 @@ public sealed class SlideratorService : ISlideratorService
         string path,
         SlideratorServiceOptions project,
         HitObject sourceSlider,
-        bool reloadEditor,
+        bool quickRun,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default,
         bool preferLiveEditor = true)
@@ -76,7 +82,10 @@ public sealed class SlideratorService : ISlideratorService
             project,
             progress,
             cancellationToken);
-        bool shouldReload = reloadEditor && session.Source == BeatmapEditingSource.LiveEditor;
+        bool shouldReload = AutomaticEditorReloadPolicy.ShouldReloadEditor(
+            session,
+            quickRun,
+            settings);
         // Save the file
         await editingGateway
             .SaveAsync(session, shouldReload, cancellationToken)

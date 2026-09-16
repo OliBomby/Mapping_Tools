@@ -2,6 +2,7 @@ using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Tests.TestDoubles;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.HitsoundCopier;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
@@ -25,7 +26,8 @@ public sealed class HitsoundCopierServiceTests
             gateway,
             new StubSampleService(),
             new TestDirectories(),
-            new RecordingFileRevealService());
+            new RecordingFileRevealService(),
+            new ApplicationSettings());
         HitsoundCopierServiceOptions options = new()
         {
             PathFrom = "source.osu",
@@ -66,7 +68,8 @@ public sealed class HitsoundCopierServiceTests
             gateway,
             samples,
             new TestDirectories(),
-            reveal);
+            reveal,
+            new ApplicationSettings());
         HitsoundCopierServiceOptions options = new()
         {
             PathFrom = "source.osu",
@@ -107,7 +110,8 @@ public sealed class HitsoundCopierServiceTests
             gateway,
             samples,
             new TestDirectories(),
-            reveal);
+            reveal,
+            new ApplicationSettings());
         HitsoundCopierServiceOptions options = new()
         {
             PathFrom = "source.osu",

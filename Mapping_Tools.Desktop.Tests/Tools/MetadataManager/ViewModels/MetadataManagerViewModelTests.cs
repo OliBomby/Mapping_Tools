@@ -103,8 +103,6 @@ public sealed class MetadataManagerViewModelTests
         UserNotificationService notifications = new();
         ToolExecutionService execution = new(
             notifications,
-            new RecordingEditorReloadService(),
-            new ApplicationSettings(),
             TimeProvider.System);
         return new MetadataManagerViewModel(
             metadataManager ?? new RecordingMetadataManagerService(),

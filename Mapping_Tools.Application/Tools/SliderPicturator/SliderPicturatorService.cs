@@ -1,5 +1,7 @@
+using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.SliderPicturator;
 
@@ -10,20 +12,27 @@ public sealed class SliderPicturatorService : ISliderPicturatorService
 {
     private readonly IBeatmapEditingGateway editingGateway;
     private readonly IImageFileService images;
+    private readonly ApplicationSettings settings;
 
     /// <summary>Creates the Slider Picturator application service.</summary>
     /// <param name="editingGateway">Loads and backup-saves beatmaps.</param>
     /// <param name="images">Decodes local image files into Core pixel buffers.</param>
-    public SliderPicturatorService(IBeatmapEditingGateway editingGateway, IImageFileService images)
+    /// <param name="settings">Supplies the automatic editor reload preference.</param>
+    public SliderPicturatorService(
+        IBeatmapEditingGateway editingGateway,
+        IImageFileService images,
+        ApplicationSettings settings)
     {
         this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
         this.images = images ?? throw new ArgumentNullException(nameof(images));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
     /// <inheritdoc />
     public async Task<SliderPicturatorResult> PicturateAsync(
         string path,
         SliderPicturatorServiceOptions options,
+        bool quickRun = false,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {
@@ -49,7 +58,15 @@ public sealed class SliderPicturatorService : ISliderPicturatorService
         SliderPicturatorEngine.ApplyToBeatmap(beatmap, pathPoints, frameDistance, options);
         long segmentCount = SliderPicturatorEngine.Recolor(image, options).SegmentCount;
 
-        await editingGateway.SaveAsync(session, cancellationToken: cancellationToken).ConfigureAwait(false);
+        await editingGateway
+            .SaveAsync(
+                session,
+                AutomaticEditorReloadPolicy.ShouldReloadEditor(
+                    session,
+                    quickRun,
+                    settings),
+                cancellationToken)
+            .ConfigureAwait(false);
         progress?.Report(1);
         return new SliderPicturatorResult(path, segmentCount);
     }

@@ -92,8 +92,6 @@ public sealed class HitsoundCopierViewModelTests
             new TestHitsoundCopier(),
             new ToolExecutionService(
                 new UserNotificationService(),
-                new RecordingEditorReloadService(),
-                settings,
                 TimeProvider.System),
             filePicker,
             new RecordingCurrentBeatmapLocator(),
@@ -105,6 +103,7 @@ public sealed class HitsoundCopierViewModelTests
     {
         public Task<HitsoundCopierResult> CopyAsync(
             HitsoundCopierServiceOptions options,
+            bool quickRun = false,
             IProgress<double>? progress = null,
             CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();

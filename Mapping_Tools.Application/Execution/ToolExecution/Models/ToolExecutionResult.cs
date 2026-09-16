@@ -11,15 +11,13 @@ public sealed class ToolExecutionResult<T>
         T? value,
         Exception? exception,
         DateTimeOffset startedAt,
-        DateTimeOffset completedAt,
-        bool editorReloaded)
+        DateTimeOffset completedAt)
     {
         Status = status;
         Value = value;
         Exception = exception;
         StartedAt = startedAt;
         CompletedAt = completedAt;
-        EditorReloaded = editorReloaded;
     }
 
     /// <summary>
@@ -32,10 +30,7 @@ public sealed class ToolExecutionResult<T>
     /// </summary>
     public T? Value { get; }
 
-    /// <summary>
-    ///     Retains the operation or reload failure only when <see cref="Status" /> is
-    ///     <see cref="ToolExecutionStatus.Failed" />.
-    /// </summary>
+    /// <summary>Retains the operation failure when <see cref="Status" /> is <see cref="ToolExecutionStatus.Failed" />.</summary>
     public Exception? Exception { get; }
 
     /// <summary>
@@ -49,13 +44,7 @@ public sealed class ToolExecutionResult<T>
     public DateTimeOffset CompletedAt { get; }
 
     /// <summary>
-    ///     Confirms that a requested and settings-enabled osu! reload completed successfully.
-    /// </summary>
-    public bool EditorReloaded { get; }
-
-    /// <summary>
     ///     Measures time spent in accepted work and completion behavior.
     /// </summary>
     public TimeSpan Duration => CompletedAt - StartedAt;
 }
-

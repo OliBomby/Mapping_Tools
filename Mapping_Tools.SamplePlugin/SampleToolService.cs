@@ -1,5 +1,7 @@
+using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 
 namespace Mapping_Tools.SamplePlugin;
@@ -10,19 +12,25 @@ namespace Mapping_Tools.SamplePlugin;
 public sealed class SampleToolService
 {
     private readonly IBeatmapEditingGateway editingGateway;
+    private readonly ApplicationSettings settings;
 
     /// <summary>
     ///     Creates the sample edit service.
     /// </summary>
     /// <param name="editingGateway">Loads and saves beatmaps with backup protection.</param>
-    public SampleToolService(IBeatmapEditingGateway editingGateway)
+    /// <param name="settings">Supplies the automatic editor reload preference.</param>
+    public SampleToolService(
+        IBeatmapEditingGateway editingGateway,
+        ApplicationSettings settings)
     {
         this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
     internal async Task<int> AddTagAsync(
         IReadOnlyList<string> paths,
         string tag,
+        bool quickRun = false,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {
@@ -53,7 +61,13 @@ public sealed class SampleToolService
                 session.Editor.Beatmap.Metadata["Tags"] = new StringValue(
                     string.Join(' ', existingTags.Append(tag)));
                 await editingGateway
-                    .SaveAsync(session, cancellationToken: cancellationToken)
+                    .SaveAsync(
+                        session,
+                        AutomaticEditorReloadPolicy.ShouldReloadEditor(
+                            session,
+                            quickRun,
+                            settings),
+                        cancellationToken)
                     .ConfigureAwait(false);
                 changedCount++;
             }

@@ -155,12 +155,12 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
                         var result = await timingHelper.AdjustAsync(
                             paths,
                             options,
+                            quick,
                             progress,
                             context.CancellationToken);
                         return new ToolExecutionOutput<TimingHelperResult>(
                             result,
-                            quick ? null : $"Successfully added {result.RedlinesAdded} redlines!",
-                            quick);
+                            quick ? null : $"Successfully added {result.RedlinesAdded} redlines!");
                     }),
                 CreateProgress(),
                 cancellationToken)

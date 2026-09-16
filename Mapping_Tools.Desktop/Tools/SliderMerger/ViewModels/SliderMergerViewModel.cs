@@ -146,6 +146,7 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
                         var result = await merger.MergeAsync(
                             paths,
                             options,
+                            quick,
                             new Progress<double>(value => context.ReportProgress(
                                 value,
                                 "Merging sliders")),
@@ -153,8 +154,7 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
                         string message = $"Successfully merged {result.ObjectsMerged} " + $"{(result.ObjectsMerged == 1 ? "slider" : "sliders")}!";
                         return new ToolExecutionOutput<SliderMergerResult>(
                             result,
-                            quick ? null : message,
-                            quick);
+                            quick ? null : message);
                     }),
                 CreateProgress(),
                 cancellationToken)

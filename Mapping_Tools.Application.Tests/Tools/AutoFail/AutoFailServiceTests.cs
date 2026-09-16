@@ -1,5 +1,6 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.AutoFail;
 using Mapping_Tools.Core.Tools.AutoFail.Models;
@@ -16,7 +17,7 @@ public sealed class AutoFailServiceTests
         // Arrange
         RecordingBeatmapEditingGateway gateway = new(
             new BeatmapEditingSession(CreateEditor(), BeatmapEditingSource.Disk, []));
-        AutoFailService service = new(gateway);
+        AutoFailService service = new(gateway, new ApplicationSettings());
 
         // Act
         var run = await service.AnalyzeAsync(new AutoFailServiceOptions("accepted.osu"));
@@ -33,7 +34,7 @@ public sealed class AutoFailServiceTests
         // Arrange
         RecordingBeatmapEditingGateway gateway = new(
             new BeatmapEditingSession(CreateEditor(), BeatmapEditingSource.Disk, []));
-        AutoFailService service = new(gateway);
+        AutoFailService service = new(gateway, new ApplicationSettings());
         var run = await service.AnalyzeAsync(new AutoFailServiceOptions("accepted.osu"));
         AutoFailFixPlan plan = new(
             Enumerable.Repeat(0, run.Analysis.PotentialUnloadingObjects.Count + 1).ToArray(),

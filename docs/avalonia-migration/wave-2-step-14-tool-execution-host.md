@@ -12,14 +12,12 @@ properties, completion handlers, and message windows:
   cancellation key, a user-facing name, and a typed asynchronous operation;
 - `ToolExecutionContext` supplies cooperative cancellation and validated
   normalized zero-to-one progress with optional stage text;
-- `ToolExecutionOutput<T>` carries a typed value, optional success summary,
-  and an explicit editor-reload request;
+- `ToolExecutionOutput<T>` carries a typed value and optional success summary;
 - `ToolExecutionResult<T>` represents success, cancellation, failure, and
   duplicate-run rejection without using exceptions as frontend state;
 - `IToolExecutionService` runs accepted work off the UI thread, prevents
   concurrent invocations with the same key, supports targeted and process-wide
-  cancellation, applies the live `AutoReload` setting, and captures reload
-  failures in the same terminal result;
+  cancellation, and publishes terminal notifications;
 - `IUserNotificationService` exposes immutable severity, title, message, and
   optional diagnostic data without choosing a snackbar, dialog, status bar, or
   dispatcher.
@@ -28,7 +26,14 @@ Notification delivery is synchronous on the publishing thread. A future
 Avalonia subscriber must marshal presentation work to its UI dispatcher.
 Subscriber failures are isolated from the already determined tool outcome so
 a broken notification surface cannot turn a successful map operation into a
-reported tool failure.
+ reported tool failure.
+
+Mapping tool application services own editor reload decisions. A mutating
+QuickRun passes the live session and `AutoReload` preference through the shared
+policy, then calls `IBeatmapEditingGateway.SaveAsync` with the resulting reload
+request. Ordinary runs, disk sessions, and disabled `AutoReload` never request
+an editor reload. The execution host and `ToolExecutionOutput<T>` do not carry
+reload state.
 
 ## Generic Host composition root
 
@@ -54,10 +59,11 @@ before propagating the error.
 ## Legacy compatibility
 
 The WPF `SingleRunMappingTool`, its `BackgroundWorker` instances, message
-windows, and `RunToolCompletedEventArgs` remain intact for unmigrated
-features. Their observed policies informed the new boundary: one active run
-per feature, bounded progress, error reporting, optional success prose, and
-reload only after successful work.
+ windows, and `RunToolCompletedEventArgs` remain intact for unmigrated
+ features. Their observed policies informed the new boundary: one active run
+ per feature, bounded progress, error reporting, and optional success prose.
+ Reload decisions for migrated tools now remain with their application use cases
+ and the shared save boundary.
 
 New Avalonia feature slices must execute their use cases through
 `IToolExecutionService`; converting every WPF tool in this infrastructure step
@@ -67,10 +73,10 @@ hotkeys remain Wave 2 step 15.
 
 ## Automated coverage
 
-`Mapping_Tools.Platform.Tests` verifies:
+The application and desktop suites verify:
 
-- successful typed output, off-UI-thread execution, ordered progress, success
-  notification, and settings-controlled editor reload;
+- successful typed output, off-UI-thread execution, ordered progress, and
+  success notification;
 - typed failure and cancellation outcomes;
 - duplicate-run rejection without invoking the second delegate;
 - targeted, caller, and host-shutdown cancellation;
@@ -80,10 +86,9 @@ hotkeys remain Wave 2 step 15.
 - singleton composition-root validation and hosted-service registration;
 - a real Generic Host start/stop cycle reaching the execution shutdown hook.
 
-The focused platform suite passes 84 tests. Application and Infrastructure
-continue to build with the XML-documentation gate enabled. This step changes
-application lifetime but no AXAML or visual state, so no render baseline
-applies.
+Application services also cover the QuickRun/live-session/setting reload
+predicate at the `SaveAsync` boundary. This step changes application lifetime
+but no AXAML or visual state, so no render baseline applies.
 
 ## Documentation consulted
 

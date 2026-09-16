@@ -125,8 +125,7 @@ public sealed class AutoFailDetectorViewModelTests
         TestDialogService dialogs = new();
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["selected.osu"]);
-        RecordingEditorReloadService reload = new();
-        var viewModel = CreateViewModel(service, workspace, dialogs: dialogs, reload: reload);
+        var viewModel = CreateViewModel(service, workspace, dialogs: dialogs);
         viewModel.GetAutoFailFix = true;
         viewModel.AutoPlaceFix = true;
 
@@ -136,11 +135,11 @@ public sealed class AutoFailDetectorViewModelTests
         // Assert
         service.ApplyFixRequestCount.Should().Be(1);
         viewModel.ResultSummary.Should().EndWith(" Fix applied.");
-        reload.ReloadCount.Should().Be(0);
+        service.QuickRun.Should().BeFalse();
     }
 
     [TestMethod]
-    public async Task RunQuickAsync_WithAutoInsertEnabled_ReloadsAfterAcceptedFixPlan()
+    public async Task RunQuickAsync_WithAutoInsertEnabled_PassesQuickRunToService()
     {
         // Arrange
         RecordingAutoFailService service = new()
@@ -148,12 +147,10 @@ public sealed class AutoFailDetectorViewModelTests
             FixPlans = [new AutoFailFixPlan([1], "Auto-fail fix guide")],
         };
         TestDialogService dialogs = new();
-        RecordingEditorReloadService reload = new();
         var viewModel = CreateViewModel(
             service,
             currentPath: "current.osu",
-            dialogs: dialogs,
-            reload: reload);
+            dialogs: dialogs);
         viewModel.GetAutoFailFix = true;
         viewModel.AutoPlaceFix = true;
 
@@ -162,7 +159,7 @@ public sealed class AutoFailDetectorViewModelTests
 
         // Assert
         service.ApplyFixRequestCount.Should().Be(1);
-        reload.ReloadCount.Should().Be(1);
+        service.QuickRun.Should().BeTrue();
     }
 
     [TestMethod]
@@ -192,15 +189,11 @@ public sealed class AutoFailDetectorViewModelTests
         RecordingAutoFailService service,
         TestBeatmapWorkspace? workspace = null,
         string? currentPath = null,
-        TestDialogService? dialogs = null,
-        RecordingEditorReloadService? reload = null)
+        TestDialogService? dialogs = null)
     {
         UserNotificationService notifications = new();
-        reload ??= new RecordingEditorReloadService();
         ToolExecutionService execution = new(
             notifications,
-            reload,
-            new DesktopApplicationSettings(),
             TimeProvider.System);
         TestBeatmapWorkspace effectiveWorkspace = workspace ?? new TestBeatmapWorkspace();
         effectiveWorkspace.QuickRunPath = currentPath;
@@ -228,6 +221,8 @@ public sealed class AutoFailDetectorViewModelTests
 
         public int ApplyFixRequestCount { get; private set; }
 
+        public bool QuickRun { get; private set; }
+
         public Task<AutoFailRun> AnalyzeAsync(
             AutoFailServiceOptions options,
             CancellationToken cancellationToken = default)
@@ -251,9 +246,11 @@ public sealed class AutoFailDetectorViewModelTests
         public Task ApplyFixAsync(
             AutoFailRun run,
             AutoFailFixPlan plan,
+            bool quickRun = false,
             CancellationToken cancellationToken = default)
         {
             ApplyFixRequestCount++;
+            QuickRun = quickRun;
             return Task.CompletedTask;
         }
     }

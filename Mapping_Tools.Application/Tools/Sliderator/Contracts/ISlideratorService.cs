@@ -23,7 +23,7 @@ public interface ISlideratorService
     /// <param name="path">The target beatmap path.</param>
     /// <param name="project">The complete run settings.</param>
     /// <param name="sourceSlider">The selected source slider geometry.</param>
-    /// <param name="reloadEditor">Whether a live editor should be refreshed after saving.</param>
+    /// <param name="quickRun">Whether this operation was started by QuickRun.</param>
     /// <param name="progress">Optional normalized progress receiver.</param>
     /// <param name="cancellationToken">Cancels generation or persistence.</param>
     /// <param name="preferLiveEditor">Whether the application should prefer unsaved editor state for this run.</param>
@@ -32,7 +32,7 @@ public interface ISlideratorService
         string path,
         SlideratorServiceOptions project,
         HitObject sourceSlider,
-        bool reloadEditor,
+        bool quickRun,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default,
         bool preferLiveEditor = true);

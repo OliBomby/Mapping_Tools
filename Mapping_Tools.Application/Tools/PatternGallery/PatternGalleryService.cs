@@ -1,7 +1,9 @@
 using System.Text;
 using System.Text.RegularExpressions;
+using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.PatternGallery.Contracts;
 using Mapping_Tools.Application.Tools.PatternGallery.Models;
 using Mapping_Tools.Core.BeatmapHelper;
@@ -20,16 +22,20 @@ public sealed class PatternGalleryService : IPatternGalleryService
 {
     private readonly IBeatmapEditingGateway editing;
     private readonly IPatternGalleryFileService files;
+    private readonly ApplicationSettings settings;
 
     /// <summary>Creates the Pattern Gallery application use case.</summary>
     /// <param name="editing">Loads live or disk beatmaps and saves with backups.</param>
     /// <param name="files">Resolves collection files and performs file operations.</param>
+    /// <param name="settings">Supplies the automatic editor reload preference.</param>
     public PatternGalleryService(
         IBeatmapEditingGateway editing,
-        IPatternGalleryFileService files)
+        IPatternGalleryFileService files,
+        ApplicationSettings settings)
     {
         this.editing = editing ?? throw new ArgumentNullException(nameof(editing));
         this.files = files ?? throw new ArgumentNullException(nameof(files));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
     /// <inheritdoc />
@@ -158,7 +164,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
         IReadOnlyList<PatternGalleryPattern> patterns,
         PatternGalleryServiceOptions project,
         PatternGalleryCollectionPaths paths,
-        bool quick,
+        bool quickRun,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {
@@ -216,7 +222,13 @@ public sealed class PatternGalleryService : IPatternGalleryService
             progress?.Report(index + 1, patterns.Count);
         }
 
-        await editing.SaveAsync(target, quick, cancellationToken)
+        await editing.SaveAsync(
+                target,
+                AutomaticEditorReloadPolicy.ShouldReloadEditor(
+                    target,
+                    quickRun,
+                    settings),
+                cancellationToken)
             .ConfigureAwait(false);
 
         return new PatternGalleryRunResult(patterns.Count, "Successfully exported pattern!");

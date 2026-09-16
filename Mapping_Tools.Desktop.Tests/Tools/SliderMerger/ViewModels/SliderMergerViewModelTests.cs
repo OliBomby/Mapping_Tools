@@ -74,24 +74,20 @@ public sealed class SliderMergerViewModelTests
     }
 
     [TestMethod]
-    public async Task RunQuickAsync_WithAutoReloadEnabled_ReloadsEditorAfterSuccessfulMerge()
+    public async Task RunQuickAsync_PassesQuickRunToService()
     {
         // Arrange
         RecordingMerger service = new();
-        RecordingEditorReloadService reload = new();
-        DesktopApplicationSettings settings = new() { AutoReload = true };
         TestBeatmapWorkspace workspace = new() { QuickRunPath = "current.osu" };
         var viewModel = Create(
             service,
-            workspace: workspace,
-            settings: settings,
-            reload: reload);
+            workspace: workspace);
 
         // Act
         await viewModel.RunQuickAsync(CancellationToken.None);
 
         // Assert
-        reload.ReloadCount.Should().Be(1);
+        service.QuickRun.Should().BeTrue();
     }
 
     [TestMethod]
@@ -133,16 +129,13 @@ public sealed class SliderMergerViewModelTests
     private static SliderMergerViewModel Create(
         RecordingMerger service,
         TestBeatmapWorkspace? workspace = null,
-        DesktopApplicationSettings? settings = null,
-        RecordingEditorReloadService? reload = null)
+        DesktopApplicationSettings? settings = null)
     {
         var effectiveSettings = settings ?? new DesktopApplicationSettings();
         return new SliderMergerViewModel(
             service,
             new ToolExecutionService(
                 new UserNotificationService(),
-                reload ?? new RecordingEditorReloadService(),
-                effectiveSettings,
                 TimeProvider.System),
             workspace ?? new TestBeatmapWorkspace(),
             effectiveSettings);
@@ -154,14 +147,18 @@ public sealed class SliderMergerViewModelTests
 
         public SliderMergerServiceOptions? Options { get; private set; }
 
+        public bool QuickRun { get; private set; }
+
         public Task<SliderMergerResult> MergeAsync(
             IReadOnlyList<string> paths,
             SliderMergerServiceOptions options,
+            bool quickRun = false,
             IProgress<double>? progress = null,
             CancellationToken cancellationToken = default)
         {
             Paths = paths.ToArray();
             Options = options;
+            QuickRun = quickRun;
             progress?.Report(1);
             return Task.FromResult(new SliderMergerResult(paths, 2));
         }

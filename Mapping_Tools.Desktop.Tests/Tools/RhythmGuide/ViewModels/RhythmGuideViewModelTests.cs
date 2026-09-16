@@ -85,11 +85,8 @@ public sealed class RhythmGuideViewModelTests
         // Arrange
         UserNotificationService notifications = new();
         List<UserNotification> published = [];
-        RecordingEditorReloadService reload = new();
         notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
-        var viewModel = CreateViewModel(
-            notifications: notifications,
-            reload: reload);
+        var viewModel = CreateViewModel(notifications: notifications);
         viewModel.SourcePaths = ["source.osu"];
         viewModel.ExportPath = "target.osu";
         viewModel.ExportMode = RhythmGuideExportMode.AddToMap;
@@ -99,21 +96,17 @@ public sealed class RhythmGuideViewModelTests
 
         // Assert
         published.Should().ContainSingle(notification => notification.Message == "Done!");
-        reload.ReloadCount.Should().Be(0);
     }
 
     private static RhythmGuideViewModel CreateViewModel(
         RecordingRhythmGuideService? rhythmGuide = null,
         TestFilePicker? filePicker = null,
         UserNotificationService? notifications = null,
-        IEditorReloadService? reload = null,
         TestBeatmapWorkspace? workspace = null)
     {
         notifications ??= new UserNotificationService();
         ToolExecutionService execution = new(
             notifications,
-            reload ?? new RecordingEditorReloadService(),
-            new ApplicationSettings(),
             TimeProvider.System);
         return new RhythmGuideViewModel(
             rhythmGuide ?? new RecordingRhythmGuideService(),

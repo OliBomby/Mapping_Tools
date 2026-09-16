@@ -246,14 +246,14 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
                     var applied = await previewService.ApplyAsync(
                         paths,
                         options,
+                        quick,
                         new Progress<double>(value => context.ReportProgress(
                             value,
                             "Placing preview hitsounds")),
                         context.CancellationToken);
                     return new ToolExecutionOutput<HitsoundPreviewHelperResult>(
                         applied,
-                        quick ? null : "Done!",
-                        quick);
+                        quick ? null : "Done!");
                 }),
             CreateProgress(),
             cancellationToken);

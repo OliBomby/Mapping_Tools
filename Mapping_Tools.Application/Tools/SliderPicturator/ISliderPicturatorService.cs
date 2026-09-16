@@ -5,15 +5,17 @@ namespace Mapping_Tools.Application.Tools.SliderPicturator;
 /// <summary>Runs Slider Picturator through the shared editor gateway and image port.</summary>
 public interface ISliderPicturatorService
 {
-    /// <summary>Loads, transforms, backs up, saves, and optionally reloads one beatmap.</summary>
+    /// <summary>Loads, transforms, backs up, and saves one beatmap.</summary>
     /// <param name="path">The selected beatmap path.</param>
     /// <param name="options">The persisted settings and transient selected slider.</param>
+    /// <param name="quickRun">Whether this operation was started by QuickRun.</param>
     /// <param name="progress">Optional normalized completion reporting.</param>
     /// <param name="cancellationToken">Cancels loading, generation, or saving.</param>
     /// <returns>The written path and generated segment estimate.</returns>
     Task<SliderPicturatorResult> PicturateAsync(
         string path,
         SliderPicturatorServiceOptions options,
+        bool quickRun = false,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);
 

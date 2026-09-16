@@ -1,5 +1,6 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.Sliderator;
 using Mapping_Tools.Application.Tools.Sliderator.Models;
@@ -17,7 +18,7 @@ public sealed class SlideratorServiceTests
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.LiveEditor));
-        SlideratorService service = new(gateway);
+        SlideratorService service = new(gateway, new ApplicationSettings());
 
         // Act
         var result = await service.ImportAsync(
@@ -37,7 +38,7 @@ public sealed class SlideratorServiceTests
         // Arrange
         RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.Disk));
         gateway.Session!.Editor.Beatmap.Bookmarks = [0];
-        SlideratorService service = new(gateway);
+        SlideratorService service = new(gateway, new ApplicationSettings());
 
         // Act
         var bookmarked = await service.ImportAsync(
@@ -65,7 +66,7 @@ public sealed class SlideratorServiceTests
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.LiveEditor));
-        SlideratorService service = new(gateway);
+        SlideratorService service = new(gateway, new ApplicationSettings());
         var source = gateway.Session!.SelectedHitObjects[0];
         SlideratorServiceOptions project = new()
         {

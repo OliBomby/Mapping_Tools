@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.ComboColourStudio;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.ComboColourStudio.Models;
@@ -29,12 +30,13 @@ public sealed class ComboColourStudioServiceTests
         project.ComboColours.Add(new SpecialColour(RgbaColour.FromRgb(10, 20, 30), "Combo1"));
         project.AddColourPoint(0, [project.ComboColours[0]]);
         RecordingProgress<double> progress = new();
-        ComboColourStudioService service = new(gateway);
+        ComboColourStudioService service = new(gateway, new ApplicationSettings());
 
         // Act
         var result = await service.ApplyAsync(
             [editor.Path],
             project,
+            false,
             progress);
 
         // Assert
@@ -65,7 +67,7 @@ public sealed class ComboColourStudioServiceTests
             new BeatmapEditingSession(editor, BeatmapEditingSource.LiveEditor, []));
         ComboColourServiceOptions project = new();
         project.AddComboColour();
-        ComboColourStudioService service = new(gateway);
+        ComboColourStudioService service = new(gateway, new ApplicationSettings());
 
         // Act
         Func<Task> act = () => service.ApplyAsync([], project);
@@ -81,7 +83,7 @@ public sealed class ComboColourStudioServiceTests
         BeatmapEditor editor = CreateEditor();
         RecordingBeatmapEditingGateway gateway = new(
             new BeatmapEditingSession(editor, BeatmapEditingSource.LiveEditor, []));
-        ComboColourStudioService service = new(gateway);
+        ComboColourStudioService service = new(gateway, new ApplicationSettings());
 
         // Act
         ComboColourEngineOptions result = await service.ImportComboColoursAsync(editor.Path);
@@ -99,7 +101,7 @@ public sealed class ComboColourStudioServiceTests
         BeatmapEditor editor = CreateEditor();
         RecordingBeatmapEditingGateway gateway = new(
             new BeatmapEditingSession(editor, BeatmapEditingSource.LiveEditor, []));
-        ComboColourStudioService service = new(gateway);
+        ComboColourStudioService service = new(gateway, new ApplicationSettings());
 
         // Act
         ComboColourEngineOptions result = await service.ImportColourHaxAsync(editor.Path, 2);

@@ -73,7 +73,7 @@ public interface IPatternGalleryService
     /// <param name="patterns">Selected pattern metadata.</param>
     /// <param name="project">The complete placement option snapshot.</param>
     /// <param name="paths">The resolved collection paths.</param>
-    /// <param name="quick">Whether editor reload is requested after saving.</param>
+    /// <param name="quickRun">Whether this operation was started by QuickRun.</param>
     /// <param name="progress">Receives normalized progress from zero through one.</param>
     /// <param name="cancellationToken">Cancels before or between placements.</param>
     /// <returns>The successful placement count and legacy completion message.</returns>
@@ -82,7 +82,7 @@ public interface IPatternGalleryService
         IReadOnlyList<PatternGalleryPattern> patterns,
         PatternGalleryServiceOptions project,
         PatternGalleryCollectionPaths paths,
-        bool quick,
+        bool quickRun,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);
 

@@ -11,12 +11,14 @@ public interface ITimingHelperService
     /// </summary>
     /// <param name="paths">The beatmaps to process.</param>
     /// <param name="options">The marker sources and timing rules.</param>
+    /// <param name="quickRun">Whether this operation was started by QuickRun.</param>
     /// <param name="progress">Receives aggregate normalized completion.</param>
     /// <param name="cancellationToken">Cancels loading, transformation, backup, or saving.</param>
     /// <returns>The processed paths and total inserted redlines.</returns>
     Task<TimingHelperResult> AdjustAsync(
         IReadOnlyList<string> paths,
         TimingHelperServiceOptions options,
+        bool quickRun = false,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);
 }

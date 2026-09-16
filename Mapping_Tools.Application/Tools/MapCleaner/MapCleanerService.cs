@@ -1,6 +1,8 @@
 using Mapping_Tools.Application.Abstractions;
+using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.MapCleaner;
@@ -14,25 +16,30 @@ public sealed class MapCleanerService : IMapCleanerService
     private readonly IBeatmapEditingGateway editingGateway;
     private readonly IBeatmapsetFileSystem fileSystem;
     private readonly IMapCleanerSampleService samples;
+    private readonly ApplicationSettings settings;
 
     /// <summary>Creates a service that cleans beatmaps and their mapset samples.</summary>
     /// <param name="editingGateway">The live-aware, backup-before-write beatmap gateway.</param>
     /// <param name="fileSystem">Resolves beatmap parent directories.</param>
     /// <param name="samples">Analyzes and recoverably removes mapset samples.</param>
+    /// <param name="settings">Supplies the automatic editor reload preference.</param>
     public MapCleanerService(
         IBeatmapEditingGateway editingGateway,
         IBeatmapsetFileSystem fileSystem,
-        IMapCleanerSampleService samples)
+        IMapCleanerSampleService samples,
+        ApplicationSettings settings)
     {
         this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
         this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
         this.samples = samples ?? throw new ArgumentNullException(nameof(samples));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
     /// <inheritdoc />
     public async Task<MapCleanerResult> CleanAsync(
         IReadOnlyList<string> paths,
         MapCleanerServiceOptions.MapCleanerCleanupOptions options,
+        bool quickRun = false,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {
@@ -66,6 +73,10 @@ public sealed class MapCleanerService : IMapCleanerService
             // Save the file
             await editingGateway.SaveAsync(
                 session,
+                AutomaticEditorReloadPolicy.ShouldReloadEditor(
+                    session,
+                    quickRun,
+                    settings),
                 cancellationToken: cancellationToken).ConfigureAwait(false);
             int removedSamples = options.RemoveUnusedSamples
                 ? await this.samples.MoveUnusedToRecoveryAsync(

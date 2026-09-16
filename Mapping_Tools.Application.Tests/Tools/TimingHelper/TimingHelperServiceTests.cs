@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.TimingHelper;
 using Mapping_Tools.Core.Tools.TimingHelper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -20,7 +21,7 @@ public sealed class TimingHelperServiceTests
             "Beatmaps",
             "standard-feature-rich.osu");
         RecordingBeatmapEditingGateway gateway = CreateGateway(fixture);
-        TimingHelperService service = new(gateway);
+        TimingHelperService service = new(gateway, new ApplicationSettings());
         TimingHelperServiceOptions options = new()
         {
             Objects = false,
@@ -34,6 +35,7 @@ public sealed class TimingHelperServiceTests
         var result = await service.AdjustAsync(
             ["first.osu", "second.osu"],
             options,
+            false,
             progress);
 
         // Assert

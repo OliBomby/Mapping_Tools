@@ -1,5 +1,6 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.SliderCompletionator;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
@@ -20,7 +21,7 @@ public sealed class SliderCompletionatorServiceTests
             "Beatmaps",
             "standard-feature-rich.osu");
         RecordingBeatmapEditingGateway gateway = CreateGateway(fixture);
-        SliderCompletionatorService service = new(gateway);
+        SliderCompletionatorService service = new(gateway, new ApplicationSettings());
         SliderCompletionatorServiceOptions options = new();
 
         // Act
@@ -46,7 +47,7 @@ public sealed class SliderCompletionatorServiceTests
             "Beatmaps",
             "standard-feature-rich.osu");
         RecordingBeatmapEditingGateway gateway = CreateGateway(fixture);
-        SliderCompletionatorService service = new(gateway);
+        SliderCompletionatorService service = new(gateway, new ApplicationSettings());
         SliderCompletionatorServiceOptions options = new()
         {
             ImportModeSetting = HitObjectSelectionMode.Everything,
@@ -76,7 +77,7 @@ public sealed class SliderCompletionatorServiceTests
             "Beatmaps",
             "standard-feature-rich.osu");
         RecordingBeatmapEditingGateway gateway = CreateGateway(fixture, 1_000_000);
-        SliderCompletionatorService service = new(gateway);
+        SliderCompletionatorService service = new(gateway, new ApplicationSettings());
         SliderCompletionatorServiceOptions options = new()
         {
             ImportModeSetting = HitObjectSelectionMode.Everything,
@@ -106,7 +107,7 @@ public sealed class SliderCompletionatorServiceTests
             "Beatmaps",
             "standard-feature-rich.osu");
         RecordingBeatmapEditingGateway gateway = CreateGateway(fixture);
-        SliderCompletionatorService service = new(gateway);
+        SliderCompletionatorService service = new(gateway, new ApplicationSettings());
 
         // Act
         Func<Task> act = () => service.CompleteAsync([], new SliderCompletionatorServiceOptions());

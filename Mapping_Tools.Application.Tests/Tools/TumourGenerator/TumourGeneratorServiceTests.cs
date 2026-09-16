@@ -1,5 +1,6 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.TumourGenerator;
 using Mapping_Tools.Application.Tools.TumourGenerator.Models;
@@ -17,7 +18,7 @@ public sealed class TumourGeneratorServiceTests
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.LiveEditor));
-        TumourGeneratorService service = new(gateway);
+        TumourGeneratorService service = new(gateway, new ApplicationSettings());
 
         // Act
         var result = await service.ImportAsync(
@@ -36,7 +37,7 @@ public sealed class TumourGeneratorServiceTests
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.LiveEditor, false));
-        TumourGeneratorService service = new(gateway);
+        TumourGeneratorService service = new(gateway, new ApplicationSettings());
 
         // Act
         var result = await service.ImportAsync(
@@ -53,7 +54,7 @@ public sealed class TumourGeneratorServiceTests
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.LiveEditor));
-        TumourGeneratorService service = new(gateway);
+        TumourGeneratorService service = new(gateway, new ApplicationSettings());
         TumourGeneratorServiceOptions project = new();
         project.TumourLayers[0].TumourCount = 1;
         List<double> progress = [];
@@ -75,11 +76,51 @@ public sealed class TumourGeneratorServiceTests
     }
 
     [TestMethod]
+    public async Task RunAsync_WithLiveSessionAndOrdinaryExecution_SavesWithoutEditorReload()
+    {
+        // Arrange
+        RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.LiveEditor));
+        TumourGeneratorService service = new(gateway, new ApplicationSettings());
+
+        // Act
+        var result = await service.RunAsync(
+            ["map.osu"],
+            new TumourGeneratorServiceOptions(),
+            false);
+
+        // Assert
+        result.EditorReloaded.Should().BeFalse();
+        gateway.SessionSaveRequests.Select(request => request.ReloadEditor)
+            .Should().ContainSingle().Which.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public async Task RunAsync_WithLiveSessionAndDisabledAutoReload_SavesWithoutEditorReload()
+    {
+        // Arrange
+        RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.LiveEditor));
+        TumourGeneratorService service = new(
+            gateway,
+            new ApplicationSettings { AutoReload = false });
+
+        // Act
+        var result = await service.RunAsync(
+            ["map.osu"],
+            new TumourGeneratorServiceOptions(),
+            true);
+
+        // Assert
+        result.EditorReloaded.Should().BeFalse();
+        gateway.SessionSaveRequests.Select(request => request.ReloadEditor)
+            .Should().ContainSingle().Which.Should().BeFalse();
+    }
+
+    [TestMethod]
     public async Task RunAsync_WithDiskSession_SavesWithoutEditorReload()
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.Disk));
-        TumourGeneratorService service = new(gateway);
+        TumourGeneratorService service = new(gateway, new ApplicationSettings());
 
         // Act
         var result = await service.RunAsync(
@@ -98,7 +139,7 @@ public sealed class TumourGeneratorServiceTests
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.Disk));
-        TumourGeneratorService service = new(gateway);
+        TumourGeneratorService service = new(gateway, new ApplicationSettings());
         using CancellationTokenSource cancellation = new();
         cancellation.Cancel();
 

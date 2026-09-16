@@ -1,5 +1,6 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.HitsoundPreviewHelper;
 using Mapping_Tools.Core.BeatmapHelper;
@@ -13,11 +14,11 @@ namespace Mapping_Tools.Application.Tests.Tools.HitsoundPreviewHelper;
 public sealed class HitsoundPreviewHelperServiceTests
 {
     [TestMethod]
-    public async Task ApplyAsync_AlwaysProcessesEveryObjectAndLeavesReloadToExecutionHost()
+    public async Task ApplyAsync_WithOrdinaryExecution_DoesNotRequestEditorReload()
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = CreateGateway(1);
-        HitsoundPreviewHelperService service = new(gateway);
+        HitsoundPreviewHelperService service = new(gateway, new ApplicationSettings());
         HitsoundPreviewHelperServiceOptions options = new()
         {
             Items = [new HitsoundZone { Hitsound = Hitsound.Clap, CustomIndex = 2 }],
@@ -45,7 +46,7 @@ public sealed class HitsoundPreviewHelperServiceTests
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = CreateGateway(0);
-        HitsoundPreviewHelperService service = new(gateway);
+        HitsoundPreviewHelperService service = new(gateway, new ApplicationSettings());
         HitsoundPreviewHelperServiceOptions options = new()
         {
             Items = [new HitsoundZone { Hitsound = Hitsound.Whistle }],
@@ -71,7 +72,7 @@ public sealed class HitsoundPreviewHelperServiceTests
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = CreateGateway(0);
-        HitsoundPreviewHelperService service = new(gateway);
+        HitsoundPreviewHelperService service = new(gateway, new ApplicationSettings());
 
         // Act
         Func<Task> act = () => service.ApplyAsync(

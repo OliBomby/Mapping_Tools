@@ -92,8 +92,6 @@ public sealed class PropertyTransformerViewModelTests
             service ?? new RecordingPropertyTransformer(),
             new ToolExecutionService(
                 new UserNotificationService(),
-                new RecordingEditorReloadService(),
-                new ApplicationSettings(),
                 TimeProvider.System),
             workspace ?? new TestBeatmapWorkspace());
     }

@@ -80,8 +80,6 @@ public sealed class MapsetMergerViewModelTests
         UserNotificationService notifications = new();
         ToolExecutionService execution = new(
             notifications,
-            new RecordingEditorReloadService(),
-            new ApplicationSettings(),
             TimeProvider.System);
         return new MapsetMergerViewModel(
             service,

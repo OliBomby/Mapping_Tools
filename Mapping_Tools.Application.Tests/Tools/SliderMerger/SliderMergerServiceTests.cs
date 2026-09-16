@@ -1,5 +1,6 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.SliderMerger;
 using Mapping_Tools.Core.BeatmapHelper;
@@ -16,7 +17,7 @@ public sealed class SliderMergerServiceTests
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = CreateGateway();
-        SliderMergerService service = new(gateway);
+        SliderMergerService service = new(gateway, new ApplicationSettings());
 
         // Act
         var result = await service.MergeAsync(
@@ -36,7 +37,7 @@ public sealed class SliderMergerServiceTests
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = CreateGateway();
-        SliderMergerService service = new(gateway);
+        SliderMergerService service = new(gateway, new ApplicationSettings());
         SliderMergerServiceOptions options = new()
         {
             ImportModeSetting = HitObjectSelectionMode.Everything,
@@ -61,7 +62,7 @@ public sealed class SliderMergerServiceTests
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = CreateGateway();
-        SliderMergerService service = new(gateway);
+        SliderMergerService service = new(gateway, new ApplicationSettings());
         SliderMergerServiceOptions options = new()
         {
             ImportModeSetting = HitObjectSelectionMode.Bookmarked,
@@ -82,7 +83,7 @@ public sealed class SliderMergerServiceTests
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = CreateGateway();
-        SliderMergerService service = new(gateway);
+        SliderMergerService service = new(gateway, new ApplicationSettings());
         SliderMergerServiceOptions options = new()
         {
             ImportModeSetting = HitObjectSelectionMode.Time,
@@ -104,7 +105,7 @@ public sealed class SliderMergerServiceTests
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = CreateGateway();
-        SliderMergerService service = new(gateway);
+        SliderMergerService service = new(gateway, new ApplicationSettings());
 
         // Act
         Func<Task> act = () => service.MergeAsync([], new SliderMergerServiceOptions());

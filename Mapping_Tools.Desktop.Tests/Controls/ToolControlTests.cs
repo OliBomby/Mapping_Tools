@@ -159,8 +159,6 @@ public sealed class ToolControlTests
     {
         return new ToolExecutionService(
             new UserNotificationService(),
-            new RecordingEditorReloadService(),
-            new ApplicationSettings(),
             TimeProvider.System);
     }
 

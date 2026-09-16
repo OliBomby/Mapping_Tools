@@ -1,5 +1,7 @@
+using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.ComboColourStudio;
 using Mapping_Tools.Core.Tools.ComboColourStudio.Models;
@@ -13,12 +15,17 @@ namespace Mapping_Tools.Application.Tools.ComboColourStudio;
 public sealed class ComboColourStudioService : IComboColourStudioService
 {
     private readonly IBeatmapEditingGateway editing;
+    private readonly ApplicationSettings settings;
 
     /// <summary>Creates a service using the shared beatmap editing gateway.</summary>
     /// <param name="editing">Opens and safely saves beatmaps.</param>
-    public ComboColourStudioService(IBeatmapEditingGateway editing)
+    /// <param name="settings">Supplies the automatic editor reload preference.</param>
+    public ComboColourStudioService(
+        IBeatmapEditingGateway editing,
+        ApplicationSettings settings)
     {
         this.editing = editing ?? throw new ArgumentNullException(nameof(editing));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
     /// <inheritdoc />
@@ -54,6 +61,7 @@ public sealed class ComboColourStudioService : IComboColourStudioService
     public async Task<ComboColourStudioRunResult> ApplyAsync(
         IReadOnlyList<string> paths,
         ComboColourServiceOptions project,
+        bool quickRun = false,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {
@@ -73,7 +81,11 @@ public sealed class ComboColourStudioService : IComboColourStudioService
                 .ConfigureAwait(false);
             ComboColourStudioEngine.Apply(session.Editor.Beatmap, project);
             cancellationToken.ThrowIfCancellationRequested();
-            await editing.SaveAsync(session, false, cancellationToken)
+            bool reloadEditor = AutomaticEditorReloadPolicy.ShouldReloadEditor(
+                session,
+                quickRun,
+                settings);
+            await editing.SaveAsync(session, reloadEditor, cancellationToken)
                 .ConfigureAwait(false);
 
             processed++;

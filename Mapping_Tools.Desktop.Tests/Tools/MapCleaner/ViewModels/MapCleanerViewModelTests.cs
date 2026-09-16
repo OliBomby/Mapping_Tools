@@ -49,24 +49,19 @@ public sealed class MapCleanerViewModelTests
     }
 
     [TestMethod]
-    public async Task RunCommand_WithAutoReloadEnabled_DoesNotReloadOrdinaryRun()
+    public async Task RunCommand_PassesOrdinaryRunToService()
     {
         // Arrange
         RecordingCleaner cleaner = new();
-        RecordingEditorReloadService reload = new();
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["map.osu"]);
-        var viewModel = Create(
-            cleaner,
-            workspace,
-            reload: reload,
-            autoReload: true);
+        var viewModel = Create(cleaner, workspace);
 
         // Act
         await viewModel.RunCommand.ExecuteAsync(null);
 
         // Assert
-        reload.ReloadCount.Should().Be(0);
+        cleaner.QuickRun.Should().BeFalse();
         viewModel.ResultSummary.Should().StartWith("Successfully removed");
     }
 
@@ -218,17 +213,15 @@ public sealed class MapCleanerViewModelTests
     private static MapCleanerViewModel Create(
         RecordingCleaner cleaner,
         TestBeatmapWorkspace? workspace = null,
-        string? currentPath = null,
-        RecordingEditorReloadService? reload = null,
-        bool autoReload = false)
+        string? currentPath = null)
     {
         UserNotificationService notifications = new();
-        DesktopApplicationSettings settings = new() { AutoReload = autoReload };
+        DesktopApplicationSettings settings = new();
         TestBeatmapWorkspace effectiveWorkspace = workspace ?? new TestBeatmapWorkspace();
         effectiveWorkspace.QuickRunPath = currentPath;
         return new MapCleanerViewModel(
             cleaner,
-            new ToolExecutionService(notifications, reload ?? new RecordingEditorReloadService(), settings, TimeProvider.System),
+            new ToolExecutionService(notifications, TimeProvider.System),
             effectiveWorkspace,
             settings,
             new RecordingPlatformLauncher());
@@ -238,10 +231,13 @@ public sealed class MapCleanerViewModelTests
     {
         public IReadOnlyList<string>? Paths { get; private set; }
 
-        public Task<MapCleanerResult> CleanAsync(IReadOnlyList<string> paths, MapCleanerServiceOptions.MapCleanerCleanupOptions options, IProgress<double>? progress = null,
+        public bool QuickRun { get; private set; }
+
+        public Task<MapCleanerResult> CleanAsync(IReadOnlyList<string> paths, MapCleanerServiceOptions.MapCleanerCleanupOptions options, bool quickRun = false, IProgress<double>? progress = null,
             CancellationToken cancellationToken = default)
         {
             Paths = paths;
+            QuickRun = quickRun;
             progress?.Report(1);
             return Task.FromResult(new MapCleanerResult(20, 0, 16, [1000], [2000], [3000], 5000));
         }

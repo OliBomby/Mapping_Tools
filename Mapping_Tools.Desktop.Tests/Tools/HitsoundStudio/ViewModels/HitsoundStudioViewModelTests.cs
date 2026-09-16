@@ -489,8 +489,6 @@ public sealed class HitsoundStudioViewModelTests
         notifications ??= new UserNotificationService();
         ToolExecutionService execution = new(
             notifications,
-            new RecordingEditorReloadService(),
-            new DesktopApplicationSettings(),
             TimeProvider.System);
         return new HitsoundStudioViewModel(
             service,

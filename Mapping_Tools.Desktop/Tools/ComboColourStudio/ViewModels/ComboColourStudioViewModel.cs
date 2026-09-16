@@ -449,12 +449,12 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
                     var result = await studio.ApplyAsync(
                         paths,
                         project,
+                        quick,
                         new Progress<double>(value => context.ReportProgress(value, "Exporting colours")),
                         context.CancellationToken);
                     return new ToolExecutionOutput<ComboColourStudioRunResult>(
                         result,
-                        quick ? null : $"Successfully exported colours to {result.ProcessedCount} " + $"{(result.ProcessedCount == 1 ? "beatmap" : "beatmaps")}!",
-                        quick);
+                        quick ? null : $"Successfully exported colours to {result.ProcessedCount} " + $"{(result.ProcessedCount == 1 ? "beatmap" : "beatmaps")}!");
                 }),
             CreateProgress(),
             cancellationToken);

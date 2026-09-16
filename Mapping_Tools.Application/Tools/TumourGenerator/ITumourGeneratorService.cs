@@ -21,14 +21,14 @@ public interface ITumourGeneratorService
     /// <summary>Runs, backs up, saves, and optionally reloads the requested maps.</summary>
     /// <param name="paths">The beatmaps to transform.</param>
     /// <param name="project">The complete settings snapshot.</param>
-    /// <param name="reloadEditor">Whether a live source editor should be reloaded.</param>
+    /// <param name="quickRun">Whether this operation was started by QuickRun.</param>
     /// <param name="progress">Optional normalized progress receiver.</param>
     /// <param name="cancellationToken">Cancels between objects and save stages.</param>
     /// <returns>The transformed paths and slider count.</returns>
     Task<TumourRunResult> RunAsync(
         IReadOnlyList<string> paths,
         TumourGeneratorServiceOptions project,
-        bool reloadEditor,
+        bool quickRun,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);
 }

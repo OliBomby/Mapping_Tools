@@ -892,8 +892,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
                         context.CancellationToken);
                     return new ToolExecutionOutput<PatternGalleryRunResult>(
                         result,
-                        result.Message,
-                        quick);
+                        result.Message);
                 }),
             CreateProgress(),
             cancellationToken);

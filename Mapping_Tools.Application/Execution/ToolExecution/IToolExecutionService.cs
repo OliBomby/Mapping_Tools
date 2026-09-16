@@ -4,7 +4,7 @@ namespace Mapping_Tools.Application.Execution.ToolExecution;
 
 /// <summary>
 ///     Runs feature use cases outside the UI thread, serializes invocations per
-///     operation identifier, and coordinates cancellation, notifications, and reload.
+///     operation identifier, and coordinates cancellation and notifications.
 /// </summary>
 public interface IToolExecutionService
 {

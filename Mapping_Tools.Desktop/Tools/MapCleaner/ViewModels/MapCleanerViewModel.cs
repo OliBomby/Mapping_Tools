@@ -191,12 +191,12 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
                     var result = await cleaner.CleanAsync(
                         paths,
                         options,
+                        quick,
                         progress,
                         context.CancellationToken);
                     return new ToolExecutionOutput<MapCleanerResult>(
                         result,
-                        quick ? null : Summarize(result, options),
-                        quick);
+                        quick ? null : Summarize(result, options));
                 }),
             CreateProgress(),
             cancellationToken);

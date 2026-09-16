@@ -420,12 +420,12 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
             async context =>
             {
                 var result = await picturator.PicturateAsync(path, options,
+                    quick,
                     new Progress<double>(value => context.ReportProgress(value, "Generating slider picture")),
                     context.CancellationToken);
                 return new ToolExecutionOutput<SliderPicturatorResult>(
                     result,
-                    quick ? null : "Done!",
-                    quick);
+                    quick ? null : "Done!");
             }), CreateProgress(), cancellationToken);
         if (execution.Status == ToolExecutionStatus.Succeeded && execution.Value is { } result)
             SegmentCount = result.SegmentCount;

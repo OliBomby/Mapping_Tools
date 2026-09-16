@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.MapCleaner;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
@@ -32,7 +33,8 @@ public sealed class MapCleanerServiceTests
                 FileExistsResolver = _ => true,
                 ParentDirectoryResolver = _ => @"C:\set",
             },
-            samples);
+            samples,
+            new ApplicationSettings());
         MapCleanerServiceOptions.MapCleanerCleanupOptions options = new()
         {
             SampleSetSliders = false,

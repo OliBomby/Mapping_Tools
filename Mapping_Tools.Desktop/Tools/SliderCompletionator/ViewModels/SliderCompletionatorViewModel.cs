@@ -200,6 +200,7 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
                         var result = await completionator.CompleteAsync(
                             paths,
                             options,
+                            quick,
                             new Progress<double>(value => context.ReportProgress(
                                 value,
                                 "Completing sliders")),
@@ -207,8 +208,7 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
                         string message = $"Successfully completed {result.SlidersCompleted} " + $"{(result.SlidersCompleted == 1 ? "slider" : "sliders")}!";
                         return new ToolExecutionOutput<SliderCompletionatorResult>(
                             result,
-                            quick ? null : message,
-                            quick);
+                            quick ? null : message);
                     }),
                 CreateProgress(),
                 cancellationToken)

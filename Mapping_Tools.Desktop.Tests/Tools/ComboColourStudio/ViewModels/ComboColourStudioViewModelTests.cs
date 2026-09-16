@@ -197,8 +197,6 @@ public sealed class ComboColourStudioViewModelTests
             new StubComboColourStudioService(),
             new ToolExecutionService(
                 notificationService,
-                new RecordingEditorReloadService(),
-                new ApplicationSettings(),
                 TimeProvider.System),
             notificationService,
             new TestBeatmapWorkspace(),
@@ -225,6 +223,7 @@ public sealed class ComboColourStudioViewModelTests
         public Task<ComboColourStudioRunResult> ApplyAsync(
             IReadOnlyList<string> paths,
             ComboColourServiceOptions project,
+            bool quickRun = false,
             IProgress<double>? progress = null,
             CancellationToken cancellationToken = default)
         {

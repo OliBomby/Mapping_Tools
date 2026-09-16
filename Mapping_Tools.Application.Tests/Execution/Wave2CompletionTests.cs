@@ -64,8 +64,6 @@ public sealed class Wave2CompletionTests
         notifications.Published += (_, args) => published.Add(args.Notification);
         ToolExecutionService execution = new(
             notifications,
-            new RecordingEditorReloadService(),
-            settings,
             TimeProvider.System);
         ToolExecutionResult<string>? toolResult = null;
         QuickRunCommandRegistry registry = new();

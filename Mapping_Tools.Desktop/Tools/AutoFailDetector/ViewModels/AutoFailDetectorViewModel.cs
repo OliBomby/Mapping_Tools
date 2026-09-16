@@ -216,8 +216,12 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
                             "Auto-fail Fix",
                             async context =>
                             {
-                                await autoFail.ApplyFixAsync(run, plan, context.CancellationToken);
-                                return new ToolExecutionOutput<bool>(true, "Applied the auto-fail fix.", quick);
+                                await autoFail.ApplyFixAsync(
+                                    run,
+                                    plan,
+                                    quick,
+                                    context.CancellationToken);
+                                return new ToolExecutionOutput<bool>(true, "Applied the auto-fail fix.");
                             }),
                         cancellationToken: cancellationToken);
                     if (applied.Status == ToolExecutionStatus.Succeeded) ResultSummary += " Fix applied.";

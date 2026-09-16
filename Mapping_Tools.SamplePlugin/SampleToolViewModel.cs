@@ -29,7 +29,7 @@ public sealed partial class SampleToolViewModel : SingleRunToolViewModel,
     ///     Creates the sample tool presentation model.
     /// </summary>
     /// <param name="sampleTool">Applies the sample edit through the shared beatmap gateway.</param>
-    /// <param name="execution">Coordinates single-run execution, cancellation, backup notifications, and reload.</param>
+    /// <param name="execution">Coordinates single-run execution, cancellation, and notifications.</param>
     /// <param name="workspace">Supplies the beatmaps selected by the Mapping Tools shell.</param>
     public SampleToolViewModel(
         SampleToolService sampleTool,
@@ -98,12 +98,11 @@ public sealed partial class SampleToolViewModel : SingleRunToolViewModel,
                     Progress<double> progress = new(value =>
                         context.ReportProgress(value, "Updating beatmaps"));
                     int changedCount = await sampleTool
-                        .AddTagAsync(paths, tag, progress, context.CancellationToken)
+                        .AddTagAsync(paths, tag, quick, progress, context.CancellationToken)
                         .ConfigureAwait(false);
                     return new ToolExecutionOutput<int>(
                         changedCount,
-                        quick ? null : Summarize(changedCount, paths.Count, tag),
-                        quick && changedCount > 0);
+                        quick ? null : Summarize(changedCount, paths.Count, tag));
                 }),
             CreateProgress(),
             cancellationToken);

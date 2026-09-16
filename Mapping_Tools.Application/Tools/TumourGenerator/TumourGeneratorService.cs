@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.TumourGenerator.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
@@ -19,12 +20,17 @@ namespace Mapping_Tools.Application.Tools.TumourGenerator;
 public sealed class TumourGeneratorService : ITumourGeneratorService
 {
     private readonly IBeatmapEditingGateway editingGateway;
+    private readonly ApplicationSettings settings;
 
     /// <summary>Creates the service over the shared editing gateway.</summary>
     /// <param name="editingGateway">Loads live or disk maps and saves backup-first.</param>
-    public TumourGeneratorService(IBeatmapEditingGateway editingGateway)
+    /// <param name="settings">Supplies the automatic editor reload preference.</param>
+    public TumourGeneratorService(
+        IBeatmapEditingGateway editingGateway,
+        ApplicationSettings settings)
     {
         this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
     /// <inheritdoc />
@@ -54,7 +60,7 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
     public async Task<TumourRunResult> RunAsync(
         IReadOnlyList<string> paths,
         TumourGeneratorServiceOptions project,
-        bool reloadEditor,
+        bool quickRun,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {
@@ -101,7 +107,10 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
                     project.RemoveSliderTicks,
                     cancellationToken);
 
-            bool shouldReload = reloadEditor && session.Source == BeatmapEditingSource.LiveEditor;
+            bool shouldReload = AutomaticEditorReloadPolicy.ShouldReloadEditor(
+                session,
+                quickRun,
+                settings);
             // Save the file
             await editingGateway.SaveAsync(session, shouldReload, cancellationToken).ConfigureAwait(false);
             editorReloaded |= shouldReload;

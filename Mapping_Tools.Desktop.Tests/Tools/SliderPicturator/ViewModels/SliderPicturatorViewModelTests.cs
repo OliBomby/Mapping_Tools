@@ -139,8 +139,6 @@ public sealed class SliderPicturatorViewModelTests
             new TestFilePicker(),
             new ToolExecutionService(
                 notifications,
-                new RecordingEditorReloadService(),
-                settings,
                 TimeProvider.System),
             workspace ?? new TestBeatmapWorkspace(),
             settings,
@@ -158,6 +156,7 @@ public sealed class SliderPicturatorViewModelTests
         public Task<SliderPicturatorResult> PicturateAsync(
             string path,
             SliderPicturatorServiceOptions options,
+            bool quickRun = false,
             IProgress<double>? progress = null,
             CancellationToken cancellationToken = default)
         {

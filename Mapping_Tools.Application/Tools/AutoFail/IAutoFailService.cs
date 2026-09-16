@@ -24,10 +24,12 @@ public interface IAutoFailService
     /// <summary>Applies a selected repair and persists the edited beatmap.</summary>
     /// <param name="run">The analysis retaining the editable session.</param>
     /// <param name="plan">The repair plan to apply.</param>
+    /// <param name="quickRun">Whether this repair was started by QuickRun.</param>
     /// <param name="cancellationToken">Cancels repair or saving.</param>
     /// <returns>A task that completes after the repaired map is saved.</returns>
     Task ApplyFixAsync(
         AutoFailRun run,
         AutoFailFixPlan plan,
+        bool quickRun = false,
         CancellationToken cancellationToken = default);
 }

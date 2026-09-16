@@ -1,5 +1,7 @@
+using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.AutoFail;
 using Mapping_Tools.Core.Tools.AutoFail.Models;
@@ -10,12 +12,17 @@ namespace Mapping_Tools.Application.Tools.AutoFail;
 public sealed class AutoFailService : IAutoFailService
 {
     private readonly IBeatmapEditingGateway editingGateway;
+    private readonly ApplicationSettings settings;
 
     /// <summary>Creates a service that opens and saves beatmaps through the shared editing gateway.</summary>
     /// <param name="editingGateway">The live-aware, backup-before-write beatmap gateway.</param>
-    public AutoFailService(IBeatmapEditingGateway editingGateway)
+    /// <param name="settings">Supplies the automatic editor reload preference.</param>
+    public AutoFailService(
+        IBeatmapEditingGateway editingGateway,
+        ApplicationSettings settings)
     {
         this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
     /// <inheritdoc />
@@ -63,6 +70,7 @@ public sealed class AutoFailService : IAutoFailService
     public async Task ApplyFixAsync(
         AutoFailRun run,
         AutoFailFixPlan plan,
+        bool quickRun = false,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(run);
@@ -72,8 +80,13 @@ public sealed class AutoFailService : IAutoFailService
         var session = run.Session ?? throw new InvalidOperationException("This analysis has no editing session.");
         // Fix auto-fail
         detector.ApplyFix(plan);
+        bool reloadEditor = AutomaticEditorReloadPolicy.ShouldReloadEditor(
+            session,
+            quickRun,
+            settings);
         await editingGateway.SaveAsync(
             session,
+            reloadEditor,
             cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 

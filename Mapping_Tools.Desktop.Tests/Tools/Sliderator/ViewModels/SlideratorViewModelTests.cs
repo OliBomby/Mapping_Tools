@@ -42,7 +42,7 @@ public sealed class SlideratorViewModelTests
         service.Project.Should().NotBeNull();
         service.Project!.BeatSnapDivisor.Should().Be(8);
         viewModel.ManualVelocity.Should().BeTrue();
-        service.ReloadEditor.Should().BeTrue();
+        service.QuickRun.Should().BeTrue();
         viewModel.DoEditorRead.Should().BeFalse();
         viewModel.IsRunning.Should().BeFalse();
     }
@@ -297,7 +297,7 @@ public sealed class SlideratorViewModelTests
 
         // Assert
         succeeded.Should().BeTrue();
-        service.ReloadEditor.Should().BeFalse();
+        service.QuickRun.Should().BeFalse();
     }
 
     [TestMethod]
@@ -438,8 +438,6 @@ public sealed class SlideratorViewModelTests
             service,
             new ToolExecutionService(
                 new UserNotificationService(),
-                new RecordingEditorReloadService(),
-                new DesktopApplicationSettings(),
                 TimeProvider.System),
             effectiveCurrentBeatmap,
             effectiveWorkspace,
@@ -453,7 +451,7 @@ public sealed class SlideratorViewModelTests
 
         public SlideratorServiceOptions? Project { get; private set; }
 
-        public bool ReloadEditor { get; private set; }
+        public bool QuickRun { get; private set; }
 
         public bool ReturnEmptyImport { get; init; }
 
@@ -476,20 +474,20 @@ public sealed class SlideratorViewModelTests
             string path,
             SlideratorServiceOptions project,
             HitObject sourceSlider,
-            bool reloadEditor,
+            bool quickRun,
             IProgress<double>? progress = null,
             CancellationToken cancellationToken = default,
             bool preferLiveEditor = true)
         {
             RunCalled = true;
             Project = project;
-            ReloadEditor = reloadEditor;
+            QuickRun = quickRun;
             progress?.Report(1);
             return Task.FromResult(
                 new SlideratorResult(
                     path,
                     new SlideratorApplyResult(100, 1, false, 1),
-                    reloadEditor));
+                    quickRun));
         }
     }
 

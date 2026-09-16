@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.SliderMerger;
@@ -11,18 +12,24 @@ namespace Mapping_Tools.Application.Tools.SliderMerger;
 public sealed class SliderMergerService : ISliderMergerService
 {
     private readonly IBeatmapEditingGateway editingGateway;
+    private readonly ApplicationSettings settings;
 
     /// <summary>Creates a Slider Merger service.</summary>
     /// <param name="editingGateway">Loads live-or-disk beatmaps and performs backup-safe saves.</param>
-    public SliderMergerService(IBeatmapEditingGateway editingGateway)
+    /// <param name="settings">Supplies the automatic editor reload preference.</param>
+    public SliderMergerService(
+        IBeatmapEditingGateway editingGateway,
+        ApplicationSettings settings)
     {
         this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
     /// <inheritdoc />
     public async Task<SliderMergerResult> MergeAsync(
         IReadOnlyList<string> paths,
         SliderMergerServiceOptions options,
+        bool quickRun = false,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {
@@ -56,7 +63,13 @@ public sealed class SliderMergerService : ISliderMergerService
                 cancellationToken);
             // Save the file
             await editingGateway
-                .SaveAsync(session, cancellationToken: cancellationToken)
+                .SaveAsync(
+                    session,
+                    AutomaticEditorReloadPolicy.ShouldReloadEditor(
+                        session,
+                        quickRun,
+                        settings),
+                    cancellationToken)
                 .ConfigureAwait(false);
             processedPaths.Add(path);
         }

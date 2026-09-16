@@ -11,12 +11,14 @@ public interface IHitsoundPreviewHelperService
     /// </summary>
     /// <param name="paths">Beatmap paths in the shell's selected order.</param>
     /// <param name="options">The persisted positional zone settings.</param>
+    /// <param name="quickRun">Whether this operation was started by QuickRun.</param>
     /// <param name="progress">Optional normalized progress receiver.</param>
     /// <param name="cancellationToken">Cancels loading, mutation, or persistence.</param>
     /// <returns>The processed paths and total updated event count.</returns>
     Task<HitsoundPreviewHelperResult> ApplyAsync(
         IReadOnlyList<string> paths,
         HitsoundPreviewHelperServiceOptions options,
+        bool quickRun = false,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);
 

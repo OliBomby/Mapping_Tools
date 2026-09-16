@@ -24,15 +24,13 @@ namespace Mapping_Tools.Desktop.Tests.Tools.TumourGenerator.ViewModels;
 public sealed class TumourGeneratorViewModelTests
 {
     [TestMethod]
-    public async Task RunQuickAsync_WithCurrentBeatmap_UsesSelectedSlidersAndReloadsEditor()
+    public async Task RunQuickAsync_WithCurrentBeatmap_PassesQuickRunToService()
     {
         // Arrange
         RecordingGenerator service = new();
-        RecordingEditorReloadService reload = new();
         TestBeatmapWorkspace workspace = new() { QuickRunPath = "current.osu" };
         var viewModel = Create(
             service,
-            reload,
             true,
             workspace: workspace);
 
@@ -43,8 +41,7 @@ public sealed class TumourGeneratorViewModelTests
         service.RunPaths.Should().Equal("current.osu");
         service.Project.Should().NotBeNull();
         service.Project!.ImportModeSetting.Should().Be(HitObjectSelectionMode.Selected);
-        service.ReloadEditor.Should().BeTrue();
-        reload.ReloadCount.Should().Be(1);
+        service.QuickRun.Should().BeTrue();
         viewModel.IsRunning.Should().BeFalse();
     }
 
@@ -258,7 +255,6 @@ public sealed class TumourGeneratorViewModelTests
 
     private static TumourGeneratorViewModel Create(
         RecordingGenerator service,
-        RecordingEditorReloadService? reload = null,
         bool autoReload = false,
         TestDialogService? dialogs = null,
         TestBeatmapWorkspace? workspace = null,
@@ -269,8 +265,6 @@ public sealed class TumourGeneratorViewModelTests
             service,
             new ToolExecutionService(
                 new UserNotificationService(),
-                reload ?? new RecordingEditorReloadService(),
-                settings,
                 TimeProvider.System),
             workspace ?? new TestBeatmapWorkspace(),
             settings,
@@ -289,7 +283,7 @@ public sealed class TumourGeneratorViewModelTests
 
         public bool RunCalled { get; private set; }
 
-        public bool ReloadEditor { get; private set; }
+        public bool QuickRun { get; private set; }
 
         public IReadOnlyList<string>? RunPaths { get; private set; }
 
@@ -313,16 +307,16 @@ public sealed class TumourGeneratorViewModelTests
         public Task<TumourRunResult> RunAsync(
             IReadOnlyList<string> paths,
             TumourGeneratorServiceOptions project,
-            bool reloadEditor,
+            bool quickRun,
             IProgress<double>? progress = null,
             CancellationToken cancellationToken = default)
         {
             RunCalled = true;
             RunPaths = paths;
             Project = project;
-            ReloadEditor = reloadEditor;
+            QuickRun = quickRun;
             progress?.Report(1);
-            return Task.FromResult(new TumourRunResult(paths, 1, reloadEditor));
+            return Task.FromResult(new TumourRunResult(paths, 1, quickRun));
         }
     }
 

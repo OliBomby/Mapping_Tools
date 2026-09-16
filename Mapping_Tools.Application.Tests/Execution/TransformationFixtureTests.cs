@@ -144,7 +144,7 @@ public sealed class TransformationFixtureTests
                     NumberProperty(options, "ApproachRateOverride"),
                     NumberProperty(options, "OverallDifficultyOverride"),
                     IntProperty(options, "PhysicsUpdateLeniency"));
-                AutoFailService service = new(gateway);
+                AutoFailService service = new(gateway, new ApplicationSettings());
                 var positive = await service.AnalyzeAsync(autoFailOptions, cancellationToken);
                 var negative = await service.AnalyzeAsync(
                     autoFailOptions with { Path = RequiredPath(options, "NegativeControl", fixtureRoot) },
@@ -160,7 +160,7 @@ public sealed class TransformationFixtureTests
                     }));
             }
             case "combo-colour-studio":
-                await new ComboColourStudioService(gateway).ApplyAsync(
+                await new ComboColourStudioService(gateway, new ApplicationSettings()).ApplyAsync(
                     [target],
                     ReadTransformationProject<ComboColourServiceOptions>(fixtureRoot, fixtureName),
                     cancellationToken: cancellationToken);
@@ -170,13 +170,14 @@ public sealed class TransformationFixtureTests
                         gateway,
                         new EmptyHitsoundSampleService(),
                         new ApplicationDirectories(Path.GetTempPath()),
-                        new NoopFileRevealService())
+                        new NoopFileRevealService(),
+                        new ApplicationSettings())
                     .CopyAsync(
                         ReadTransformationProject<HitsoundCopierServiceOptions>(fixtureRoot, fixtureName),
                         cancellationToken: cancellationToken);
                 return new FixtureExecutionResult([target]);
             case "hitsound-preview":
-                await new HitsoundPreviewHelperService(gateway).ApplyAsync(
+                await new HitsoundPreviewHelperService(gateway, new ApplicationSettings()).ApplyAsync(
                     [target],
                     ReadTransformationProject<HitsoundPreviewHelperServiceOptions>(fixtureRoot, fixtureName),
                     cancellationToken: cancellationToken);
@@ -196,7 +197,10 @@ public sealed class TransformationFixtureTests
             {
                 var project = ReadTransformationProject<MapCleanerServiceOptions>(fixtureRoot, fixtureName);
                 await new MapCleanerService(
-                        gateway, new PhysicalBeatmapsetFileSystem(), new EmptyMapCleanerSampleService())
+                        gateway,
+                        new PhysicalBeatmapsetFileSystem(),
+                        new EmptyMapCleanerSampleService(),
+                        new ApplicationSettings())
                     .CleanAsync([target], project.MapCleanerArgs, cancellationToken: cancellationToken);
                 return new FixtureExecutionResult([target]);
             }
@@ -230,7 +234,10 @@ public sealed class TransformationFixtureTests
                 var paths = ReadPatternGalleryPaths(options, fixtureRoot);
                 var pattern = project.Patterns.Single(item =>
                     item.Name.Equals(StringProperty(options, "Pattern"), StringComparison.Ordinal));
-                await new PatternGalleryService(gateway, new PatternGalleryFileService())
+                await new PatternGalleryService(
+                        gateway,
+                        new PatternGalleryFileService(),
+                        new ApplicationSettings())
                     .ExportAsync(target, [pattern], project, paths, false, cancellationToken: cancellationToken);
                 return new FixtureExecutionResult([target]);
             }
@@ -252,19 +259,22 @@ public sealed class TransformationFixtureTests
                 return new FixtureExecutionResult([rhythmOptions.ExportPath]);
             }
             case "slider-completionator":
-                await new SliderCompletionatorService(gateway).CompleteAsync(
+                await new SliderCompletionatorService(gateway, new ApplicationSettings()).CompleteAsync(
                     [target],
                     ReadTransformationProject<SliderCompletionatorServiceOptions>(fixtureRoot, fixtureName),
                     cancellationToken: cancellationToken);
                 return new FixtureExecutionResult([target]);
             case "slider-merger":
-                await new SliderMergerService(gateway).MergeAsync(
+                await new SliderMergerService(gateway, new ApplicationSettings()).MergeAsync(
                     [target],
                     ReadTransformationProject<SliderMergerServiceOptions>(fixtureRoot, fixtureName),
                     cancellationToken: cancellationToken);
                 return new FixtureExecutionResult([target]);
             case "slider-picturator":
-                await new SliderPicturatorService(gateway, new SkiaSharpImageFileService())
+                await new SliderPicturatorService(
+                        gateway,
+                        new SkiaSharpImageFileService(),
+                        new ApplicationSettings())
                     .PicturateAsync(
                         target,
                         ReadTransformationProject<SliderPicturatorServiceOptions>(fixtureRoot, fixtureName),
@@ -275,7 +285,7 @@ public sealed class TransformationFixtureTests
                 var project = ReadTransformationProject<SlideratorServiceOptions>(fixtureRoot, fixtureName);
                 var sourceSlider = ReadLegacySlider(fixtureRoot, fixtureName);
                 ApplySlideratorTransientState(project, sourceSlider);
-                await new SlideratorService(gateway).RunAsync(
+                await new SlideratorService(gateway, new ApplicationSettings()).RunAsync(
                     target, project, sourceSlider, false, cancellationToken: cancellationToken);
                 return new FixtureExecutionResult([target]);
             }
@@ -285,7 +295,7 @@ public sealed class TransformationFixtureTests
                     cancellationToken: cancellationToken);
                 return new FixtureExecutionResult([target]);
             case "timing-helper":
-                await new TimingHelperService(gateway).AdjustAsync(
+                await new TimingHelperService(gateway, new ApplicationSettings()).AdjustAsync(
                     [target],
                     ReadTransformationProject<TimingHelperServiceOptions>(fixtureRoot, fixtureName),
                     cancellationToken: cancellationToken);
@@ -298,7 +308,7 @@ public sealed class TransformationFixtureTests
                 project.TumourLayers = project.TumourLayers
                     .Take(IntProperty(options, "LayerCount"))
                     .ToList();
-                await new TumourGeneratorService(gateway).RunAsync(
+                await new TumourGeneratorService(gateway, new ApplicationSettings()).RunAsync(
                     [target],
                     project,
                     false, cancellationToken: cancellationToken);
