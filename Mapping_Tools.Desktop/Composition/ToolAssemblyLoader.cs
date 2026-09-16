@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.Loader;
 using Mapping_Tools.Infrastructure.Files;
@@ -27,12 +28,11 @@ internal static class ToolAssemblyLoader
             {
                 assemblies.Add(AssemblyLoadContext.Default.LoadFromAssemblyPath(Path.GetFullPath(path)));
             }
-            catch (Exception exception) when (exception is IOException
-                                               or BadImageFormatException
-                                               or FileLoadException)
+            catch (Exception exception)
             {
-                throw new InvalidOperationException(
-                    $"Could not load Mapping Tools plugin '{path}'.",
+                Trace.TraceError(
+                    "Could not load Mapping Tools plugin '{0}': {1}",
+                    path,
                     exception);
             }
         }

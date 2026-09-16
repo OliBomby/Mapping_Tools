@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -20,13 +21,17 @@ internal sealed class ToolDefinitionCatalog
 
     internal IReadOnlyList<IMappingToolDefinition> Definitions { get; }
 
-    internal static ToolDefinitionCatalog Discover(IEnumerable<Assembly> assemblies)
+    internal static ToolDefinitionCatalog Discover(
+        IEnumerable<Assembly> assemblies,
+        Action<Assembly, Exception>? logFailure = null)
     {
         ArgumentNullException.ThrowIfNull(assemblies);
 
+        logFailure ??= LogDiscoveryFailure;
+
         var definitions = assemblies
             .Distinct()
-            .SelectMany(DiscoverAssembly)
+            .SelectMany(assembly => DiscoverAssembly(assembly, logFailure))
             .OrderBy(definition => definition.Definition.Id, StringComparer.OrdinalIgnoreCase)
             .ThenBy(definition => definition.GetType().Assembly.GetName().Name, StringComparer.OrdinalIgnoreCase)
             .ToArray();
@@ -76,7 +81,22 @@ internal sealed class ToolDefinitionCatalog
         }
     }
 
-    private static IEnumerable<IMappingToolDefinition> DiscoverAssembly(Assembly assembly)
+    private static IEnumerable<IMappingToolDefinition> DiscoverAssembly(
+        Assembly assembly,
+        Action<Assembly, Exception> logFailure)
+    {
+        try
+        {
+            return DiscoverAssemblyCore(assembly).ToArray();
+        }
+        catch (Exception exception) when (assembly != typeof(ToolDefinitionCatalog).Assembly)
+        {
+            logFailure(assembly, exception);
+            return [];
+        }
+    }
+
+    private static IEnumerable<IMappingToolDefinition> DiscoverAssemblyCore(Assembly assembly)
     {
         foreach (var type in GetLoadableTypes(assembly))
         {
@@ -99,6 +119,14 @@ internal sealed class ToolDefinitionCatalog
         }
     }
 
+    private static void LogDiscoveryFailure(Assembly assembly, Exception exception)
+    {
+        Trace.TraceError(
+            "Could not load tool definitions from plugin assembly '{0}': {1}",
+            assembly.GetName().Name,
+            exception);
+    }
+
     private static IEnumerable<Type> GetLoadableTypes(Assembly assembly)
     {
         try
@@ -108,7 +136,7 @@ internal sealed class ToolDefinitionCatalog
         catch (ReflectionTypeLoadException exception)
         {
             throw new InvalidOperationException(
-                $"Could not inspect tool definitions in assembly '{assembly.FullName}'.",
+                $"Could not inspect tool definitions in assembly '{assembly.GetName().Name}'.",
                 exception);
         }
     }

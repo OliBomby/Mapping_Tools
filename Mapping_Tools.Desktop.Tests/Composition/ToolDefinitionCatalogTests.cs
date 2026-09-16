@@ -1,3 +1,4 @@
+using System.Reflection;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mapping_Tools.Application.Tools;
@@ -26,6 +27,40 @@ public sealed class ToolDefinitionCatalogTests
         catalog.Definitions.Should().ContainSingle(definition => definition.Definition.Id == "external-test");
         catalog.Definitions.Single().ConfigSchema.Id.Should().Be("mapping-tools.tool.external-test");
         services.Should().Contain(descriptor => descriptor.ServiceType == typeof(ExternalPluginService));
+    }
+
+    [TestMethod]
+    public void Discover_UnloadablePluginAssembly_LogsFailureAndContinuesWithOtherAssemblies()
+    {
+        // Arrange
+        UnloadablePluginAssembly unloadableAssembly = new();
+        List<(Assembly Assembly, Exception Exception)> failures = [];
+
+        // Act
+        ToolDefinitionCatalog catalog = ToolDefinitionCatalog.Discover(
+            [unloadableAssembly, typeof(ToolDefinitionCatalogTests).Assembly],
+            (assembly, exception) => failures.Add((assembly, exception)));
+
+        // Assert
+        catalog.Definitions.Should().ContainSingle(definition => definition.Definition.Id == "external-test");
+        failures.Should().ContainSingle();
+        failures[0].Assembly.Should().BeSameAs(unloadableAssembly);
+        failures[0].Exception.Message.Should().Contain("Could not inspect tool definitions");
+    }
+
+    private sealed class UnloadablePluginAssembly : Assembly
+    {
+        public override Type[] GetTypes()
+        {
+            throw new ReflectionTypeLoadException(
+                [],
+                [new TypeLoadException("The plugin references an unavailable type.")]);
+        }
+
+        public override AssemblyName GetName(bool copiedName)
+        {
+            return new AssemblyName("Mapping_Tools.UnloadablePlugin");
+        }
     }
 
     [MappingToolDefinition]
