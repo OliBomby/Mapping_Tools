@@ -97,6 +97,20 @@ public sealed class AdapterTests
     }
 
     [TestMethod]
+    public void ObservableSampleGeneratingArgs_WithInvariantVolume_PreservesVolumeInSnapshot()
+    {
+        // Arrange
+        SampleGeneratingArgs model = new("default.wav") { Volume = -0.01 };
+
+        // Act
+        ObservableSampleGeneratingArgs adapter = new(model);
+        SampleGeneratingArgs snapshot = adapter.Snapshot();
+
+        // Assert
+        snapshot.Volume.Should().Be(-0.01d);
+    }
+
+    [TestMethod]
     public void ObservableHitsoundLayer_WhenEdited_SnapshotsPlainLayerWithoutAdapterState()
     {
         // Arrange

@@ -47,6 +47,32 @@ public class HitsoundDomainTests
     }
 
     [TestMethod]
+    public void SampleGeneratingArgs_VelocityChangedFromFullVolumeToNegativeOne_UsesInvariantVolume()
+    {
+        // Arrange
+        SampleGeneratingArgs sample = new("sample.wav") { Volume = 1 };
+
+        // Act
+        sample.Velocity = -1;
+
+        // Assert
+        sample.Volume.Should().Be(-0.01d);
+    }
+
+    [TestMethod]
+    public void SampleGeneratingArgs_VelocityReadWithInvariantVolume_ReturnsNegativeOne()
+    {
+        // Arrange
+        SampleGeneratingArgs sample = new("sample.wav") { Volume = -0.01 };
+
+        // Act
+        int velocity = sample.Velocity;
+
+        // Assert
+        velocity.Should().Be(-1);
+    }
+
+    [TestMethod]
     public void HitsoundZone_DistanceHonoursWildcardAxesAndCopyIsIndependent()
     {
         // Arrange

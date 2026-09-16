@@ -8,6 +8,8 @@ namespace Mapping_Tools.Core.HitsoundStuff;
 /// </summary>
 public class SampleGeneratingArgs : IEquatable<SampleGeneratingArgs>
 {
+    private const double InvariantVolume = -0.01;
+
     /// <summary>
     ///     Creates an empty, unity-volume sample specification with all SoundFont selectors unset.
     /// </summary>
@@ -75,7 +77,7 @@ public class SampleGeneratingArgs : IEquatable<SampleGeneratingArgs>
     /// <param name="instrument">The SoundFont instrument.</param>
     /// <param name="key">The MIDI note number.</param>
     /// <param name="length">The generated note length.</param>
-    /// <param name="velocity">The MIDI velocity from 0 through 127.</param>
+    /// <param name="velocity">The MIDI velocity from 0 through 127, or -1 for invariant volume.</param>
     public SampleGeneratingArgs(string path, int bank, int patch, int instrument, int key, double length, int velocity)
     {
         Path = path;
@@ -149,13 +151,14 @@ public class SampleGeneratingArgs : IEquatable<SampleGeneratingArgs>
     public double Length { get; set; }
 
     /// <summary>
-    ///     Converts between <see cref="Volume" /> and MIDI velocity on a 0-to-127 scale.
+    ///     Converts between <see cref="Volume" /> and MIDI velocity on a 0-to-127 scale;
+    ///     <c>-1</c> represents the invariant-volume sentinel.
     /// </summary>
     [JsonIgnore]
     public int Velocity
     {
         get => (int)Math.Round(Volume * 127);
-        set => Volume = value / 127d;
+        set => Volume = value == -1 ? InvariantVolume : value / 127d;
     }
 
     /// <summary>
