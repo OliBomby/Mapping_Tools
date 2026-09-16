@@ -534,16 +534,18 @@ public sealed class TransformationFixtureTests
         {
             cancellationToken.ThrowIfCancellationRequested();
             return Task.FromResult(new BeatmapEditingSession(
-                new BeatmapEditor(path, files), BeatmapEditingSource.Disk, []));
+                path,
+                files,
+                BeatmapEditingSource.Disk));
         }
 
-        public Task<StoryboardEditor> OpenStoryboardAsync(string path, CancellationToken cancellationToken = default)
+        public Task<StoryboardEditingSession> OpenStoryboardAsync(string path, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult(new StoryboardEditor(path, files));
+            return Task.FromResult(new StoryboardEditingSession(path, files));
         }
 
-        public Task SaveAsync(Editor value, bool reloadEditor = false, CancellationToken cancellationToken = default)
+        public Task SaveAsync(EditingSession value, bool reloadEditor = false, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             value.SaveFile();
@@ -552,7 +554,7 @@ public sealed class TransformationFixtureTests
 
         public Task SaveAsync(BeatmapEditingSession session, bool reloadEditor = false, CancellationToken cancellationToken = default)
         {
-            return SaveAsync(session.Editor, reloadEditor, cancellationToken);
+            return SaveAsync((EditingSession)session, reloadEditor, cancellationToken);
         }
     }
 

@@ -78,7 +78,7 @@ public sealed class SliderCompletionatorService : ISliderCompletionatorService
                 options.TimeCode);
 
             int completed = SliderCompletionatorEngine.Apply(
-                session.Editor.Beatmap,
+                session.Beatmap,
                 markedObjects,
                 options,
                 editorTime,

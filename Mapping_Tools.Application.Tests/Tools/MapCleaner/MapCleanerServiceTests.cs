@@ -16,15 +16,14 @@ public sealed class MapCleanerServiceTests
     public async Task CleanAsync_WithAcceptedFixture_UsesLiveStateAndBackupSaveBoundary()
     {
         // Arrange
-        BeatmapEditor editor = new(
+        BeatmapEditingSession editor = new(
             File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "Fixtures", "Beatmaps", "standard-feature-rich.osu")).ToList(),
             new NoOpTextFileStore
             {
                 ParentFolderResolver = _ => @"C:\set",
                 CombinePathResolver = Path.Combine,
             }) { Path = @"C:\set\map.osu" };
-        RecordingBeatmapEditingGateway gateway = new(
-            new BeatmapEditingSession(editor, BeatmapEditingSource.LiveEditor, []));
+        RecordingBeatmapEditingGateway gateway = new(editor);
         RecordingSamples samples = new();
         MapCleanerService service = new(
             gateway,
@@ -50,7 +49,7 @@ public sealed class MapCleanerServiceTests
         result.TimingPointsRemoved.Should().Be(16);
         result.ObjectsResnapped.Should().Be(20);
         gateway.OpenRequests.Single().Preference.Should().Be(LiveBeatmapPreference.PreferLive);
-        gateway.SessionSaveRequests.Single().Session.Editor.Should().BeSameAs(editor);
+        gateway.SessionSaveRequests.Single().Session.Should().BeSameAs(editor);
         samples.AnalyzedDirectory.Should().Be(@"C:\set");
     }
 

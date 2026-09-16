@@ -1,4 +1,3 @@
-using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 
@@ -24,9 +23,9 @@ internal static class BeatmapObjectSelection
         return mode switch
         {
             HitObjectSelectionMode.Selected => session.SelectedHitObjects,
-            HitObjectSelectionMode.Bookmarked => session.Editor.Beatmap.GetBookmarkedObjects(),
-            HitObjectSelectionMode.Time => session.Editor.Beatmap.QueryTimeCode(timeCode ?? string.Empty).ToList(),
-            HitObjectSelectionMode.Everything => session.Editor.Beatmap.HitObjects,
+            HitObjectSelectionMode.Bookmarked => session.Beatmap.GetBookmarkedObjects(),
+            HitObjectSelectionMode.Time => session.Beatmap.QueryTimeCode(timeCode ?? string.Empty).ToList(),
+            HitObjectSelectionMode.Everything => session.Beatmap.HitObjects,
             _ => throw new ArgumentException("Unknown hit-object selection mode.", nameof(mode)),
         };
     }

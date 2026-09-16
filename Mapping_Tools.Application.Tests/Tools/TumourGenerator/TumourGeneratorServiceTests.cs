@@ -182,10 +182,15 @@ public sealed class TumourGeneratorServiceTests
             "64,64,0,2,0,L|164:64,1,100",
             "128,128,500,1,0,0:0:0:0:",
         ];
-        BeatmapEditor editor = new(lines, new NoOpTextFileStore { ReadResult = [] });
-        var slider = editor.Beatmap.HitObjects[0];
-        IReadOnlyList<HitObject> selected = selectedSlider ? [slider] : [editor.Beatmap.HitObjects[1]];
-        return new BeatmapEditingSession(editor, source, selected);
+        Beatmap beatmap = new(lines);
+        var slider = beatmap.HitObjects[0];
+        IReadOnlyList<HitObject> selected = selectedSlider ? [slider] : [beatmap.HitObjects[1]];
+        return new BeatmapEditingSession(
+            beatmap,
+            "",
+            new NoOpTextFileStore { ReadResult = [] },
+            source,
+            selected);
     }
 
 }

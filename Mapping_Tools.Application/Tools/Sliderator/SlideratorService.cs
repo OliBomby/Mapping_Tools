@@ -49,7 +49,7 @@ public sealed class SlideratorService : ISlideratorService
         var selected = BeatmapObjectSelection.Select(session, mode, timeCode);
         return new SlideratorImportResult(
             selected.Where(hitObject => hitObject.IsSlider).ToArray(),
-            session.Editor.Beatmap.Difficulty["SliderMultiplier"].DoubleValue,
+            session.Beatmap.Difficulty["SliderMultiplier"].DoubleValue,
             session.Source == BeatmapEditingSource.LiveEditor,
             true);
     }
@@ -77,7 +77,7 @@ public sealed class SlideratorService : ISlideratorService
             .ConfigureAwait(false);
         // Do Sliderator
         var applied = SlideratorEngine.Apply(
-            session.Editor.Beatmap,
+            session.Beatmap,
             sourceSlider,
             project,
             progress,

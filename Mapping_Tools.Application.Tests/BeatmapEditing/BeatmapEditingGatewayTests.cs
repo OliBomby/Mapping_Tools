@@ -41,7 +41,7 @@ public sealed class BeatmapEditingGatewayTests
         var reloaded = await gateway.OpenBeatmapAsync(map_path, LiveBeatmapPreference.DiskOnly);
 
         // Assert
-        reloaded.Editor.Beatmap.HitObjects.Should().ContainSingle()
+        reloaded.Beatmap.HitObjects.Should().ContainSingle()
             .Which.Pos.X.Should().Be(257);
     }
 
@@ -84,13 +84,13 @@ public sealed class BeatmapEditingGatewayTests
 
         // Assert
         session.Source.Should().Be(BeatmapEditingSource.LiveEditor);
-        session.Editor.Beatmap.HitObjects.Select(item => item.Time).ToArray().Should().Equal(1500d, 2500d);
+        session.Beatmap.HitObjects.Select(item => item.Time).ToArray().Should().Equal(1500d, 2500d);
         session.SelectedHitObjects.Count.Should().Be(1);
         session.SelectedHitObjects[0].Should().BeSameAs(selected);
-        session.Editor.Beatmap.HitObjects.Contains(selected).Should().BeTrue();
-        session.Editor.Beatmap.General["PreviewTime"].IntValue.Should().Be(1234);
-        session.Editor.Beatmap.BeatmapTiming.SliderMultiplier.Should().Be(1.8);
-        session.Editor.Beatmap.Bookmarks.ToArray().Should().Equal(750d);
+        session.Beatmap.HitObjects.Contains(selected).Should().BeTrue();
+        session.Beatmap.General["PreviewTime"].IntValue.Should().Be(1234);
+        session.Beatmap.BeatmapTiming.SliderMultiplier.Should().Be(1.8);
+        session.Beatmap.Bookmarks.ToArray().Should().Equal(750d);
         session.LiveEditorTime.Should().Be(2222);
     }
 
@@ -138,8 +138,8 @@ public sealed class BeatmapEditingGatewayTests
 
         // Assert
         session.Source.Should().Be(BeatmapEditingSource.Disk);
-        (session.Editor.Beatmap.HitObjects.Count > 0).Should().BeTrue();
-        session.Editor.Beatmap.HitObjects[0].ObjectType.Should().NotBe(0);
+        (session.Beatmap.HitObjects.Count > 0).Should().BeTrue();
+        session.Beatmap.HitObjects[0].ObjectType.Should().NotBe(0);
     }
 
     [TestMethod]
@@ -206,7 +206,7 @@ public sealed class BeatmapEditingGatewayTests
         var session = await gateway.OpenBeatmapAsync(
             map_path,
             LiveBeatmapPreference.DiskOnly);
-        session.Editor.Beatmap.Metadata["Version"] = new StringValue("Edited");
+        session.Beatmap.Metadata["Version"] = new StringValue("Edited");
 
         // Act
         await gateway.SaveAsync(session, true);
@@ -235,7 +235,7 @@ public sealed class BeatmapEditingGatewayTests
         var session = await gateway.OpenBeatmapAsync(
             map_path,
             LiveBeatmapPreference.DiskOnly);
-        session.Editor.Beatmap.Metadata["Version"] = new StringValue("Edited");
+        session.Beatmap.Metadata["Version"] = new StringValue("Edited");
 
         // Act
         await gateway.SaveAsync(session);
@@ -268,7 +268,7 @@ public sealed class BeatmapEditingGatewayTests
             LiveBeatmapPreference.DiskOnly);
 
         // Act
-        var act3 = () => gateway.SaveAsync(session.Editor, true);
+        var act3 = () => gateway.SaveAsync((EditingSession)session, true);
 
         // Assert
         var exception = (await act3.Should().ThrowAsync<IOException>()).Which;
@@ -395,7 +395,7 @@ public sealed class BeatmapEditingGatewayTests
 
             BeatmapBackupArtifact artifact = new(
                 "backup.osu",
-                session.Editor.Path,
+                session.Path,
                 reason,
                 session.Source == BeatmapEditingSource.LiveEditor,
                 DateTimeOffset.UnixEpoch);

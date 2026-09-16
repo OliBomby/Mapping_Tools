@@ -16,7 +16,7 @@ public sealed class AutoFailServiceTests
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = new(
-            new BeatmapEditingSession(CreateEditor(), BeatmapEditingSource.Disk, []));
+            CreateSession());
         AutoFailService service = new(gateway, new ApplicationSettings());
 
         // Act
@@ -33,7 +33,7 @@ public sealed class AutoFailServiceTests
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = new(
-            new BeatmapEditingSession(CreateEditor(), BeatmapEditingSource.Disk, []));
+            CreateSession());
         AutoFailService service = new(gateway, new ApplicationSettings());
         var run = await service.AnalyzeAsync(new AutoFailServiceOptions("accepted.osu"));
         AutoFailFixPlan plan = new(
@@ -44,16 +44,18 @@ public sealed class AutoFailServiceTests
         await service.ApplyFixAsync(run, plan);
 
         // Assert
-        gateway.SessionSaveRequests.Single().Session.Editor.Should().BeSameAs(gateway.Session!.Editor);
+        gateway.SessionSaveRequests.Single().Session.Should().BeSameAs(gateway.Session);
     }
 
-    private static BeatmapEditor CreateEditor()
+    private static BeatmapEditingSession CreateSession()
     {
         string path = Path.Combine(AppContext.BaseDirectory, "Fixtures", "Beatmaps", "standard-autofail-2b.osu");
-        return new BeatmapEditor(File.ReadAllLines(path).ToList(), new NoOpTextFileStore())
-        {
-            Path = "accepted.osu",
-        };
+        return new BeatmapEditingSession(
+            File.ReadAllLines(path).ToList(),
+            new NoOpTextFileStore(),
+            BeatmapEditingSource.Disk,
+            [],
+            path: "accepted.osu");
     }
 
 }

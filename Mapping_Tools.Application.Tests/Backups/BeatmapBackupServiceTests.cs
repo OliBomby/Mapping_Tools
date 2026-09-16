@@ -129,13 +129,15 @@ public sealed class BeatmapBackupServiceTests
     {
         // Arrange
         var store = CreateStore();
-        BeatmapEditor editor = new(map_path, store);
-        editor.Beatmap.Metadata["Version"] = new StringValue("Unsaved");
+        Beatmap beatmap = new(store.ReadAllLines(map_path).ToList());
+        beatmap.Metadata["Version"] = new StringValue("Unsaved");
         BeatmapEditingSession session = new(
-            editor,
+            beatmap,
+            map_path,
+            store,
             BeatmapEditingSource.LiveEditor,
             []);
-        editor.Beatmap.Metadata["Version"] = new StringValue("AfterToolRun");
+        session.Beatmap.Metadata["Version"] = new StringValue("AfterToolRun");
         var service = CreateService(store, CreateSettings());
 
         // Act
@@ -163,12 +165,11 @@ public sealed class BeatmapBackupServiceTests
     {
         // Arrange
         var store = CreateStore();
-        BeatmapEditor editor = new(map_path, store);
-        store.Files[map_path] = editor.Beatmap.GetLines();
         BeatmapEditingSession session = new(
-            editor,
-            BeatmapEditingSource.LiveEditor,
-            []);
+            map_path,
+            store,
+            BeatmapEditingSource.LiveEditor);
+        store.Files[map_path] = session.Beatmap.GetLines();
         var service = CreateService(store, CreateSettings());
 
         // Act
@@ -188,9 +189,9 @@ public sealed class BeatmapBackupServiceTests
     {
         // Arrange
         var store = CreateStore();
-        BeatmapEditor editor = new(map_path, store);
         BeatmapEditingSession session = new(
-            editor,
+            map_path,
+            store,
             BeatmapEditingSource.Disk,
             []);
         var service = CreateService(store, CreateSettings());
@@ -200,7 +201,7 @@ public sealed class BeatmapBackupServiceTests
             await service.CreatePeriodicIfChangedAsync(session);
         var unchanged =
             await service.CreatePeriodicIfChangedAsync(session);
-        editor.Beatmap.Metadata["Version"] = new StringValue("Changed");
+        session.Beatmap.Metadata["Version"] = new StringValue("Changed");
         var changed =
             await service.CreatePeriodicIfChangedAsync(session);
 

@@ -20,14 +20,13 @@ public sealed class PropertyTransformerServiceTests
             "Fixtures",
             "Beatmaps",
             "standard-feature-rich.osu");
-        BeatmapEditor editor = new(
+        BeatmapEditingSession editor = new(
             File.ReadAllLines(fixture).ToList(),
             new PhysicalBeatmapsetFileSystem())
         {
             Path = fixture,
         };
-        RecordingBeatmapEditingGateway gateway = new(
-            new BeatmapEditingSession(editor, BeatmapEditingSource.LiveEditor, []));
+        RecordingBeatmapEditingGateway gateway = new(editor);
         PropertyTransformerService service = new(gateway);
         PropertyTransformerServiceOptions options = new()
         {
@@ -45,7 +44,7 @@ public sealed class PropertyTransformerServiceTests
         // Assert
         result.ProcessedPaths.Should().Equal(fixture);
         gateway.OpenRequests.Single().Preference.Should().Be(LiveBeatmapPreference.PreferLive);
-        gateway.SessionSaveRequests.Single().Session.Editor.Should().BeSameAs(editor);
+        gateway.SessionSaveRequests.Single().Session.Should().BeSameAs(editor);
         editor.Beatmap.GetBookmarks().Should().Equal(
             originalBookmarks.Select(bookmark => bookmark + 5));
         progress.Values.Last().Should().Be(1);

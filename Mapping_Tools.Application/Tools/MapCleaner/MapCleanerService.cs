@@ -64,7 +64,7 @@ public sealed class MapCleanerService : IMapCleanerService
                 cancellationToken).ConfigureAwait(false);
             var mapProgress = progress?.MapTo(index, paths.Count);
             var result = MapCleanerEngine.Clean(
-                session.Editor.Beatmap,
+                session.Beatmap,
                 options,
                 directory,
                 samples,
@@ -82,7 +82,7 @@ public sealed class MapCleanerService : IMapCleanerService
                 ? await this.samples.MoveUnusedToRecoveryAsync(
                     directory,
                     path,
-                    session.Editor.Beatmap,
+                    session.Beatmap,
                     cancellationToken).ConfigureAwait(false)
                 : 0;
             // Update result with removed count

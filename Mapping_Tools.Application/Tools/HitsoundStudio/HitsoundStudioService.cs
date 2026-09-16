@@ -217,9 +217,9 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
                 project.BaseBeatmap,
                 LiveBeatmapPreference.DiskOnly,
                 cancellationToken).ConfigureAwait(false);
-            ApplyExport(session.Editor.Beatmap, standard.Events, project);
-            mapPath = Path.Combine(project.ExportFolder, session.Editor.Beatmap.GetFileName());
-            session.Editor.SaveFile(mapPath);
+            ApplyExport(session.Beatmap, standard.Events, project);
+            mapPath = Path.Combine(project.ExportFolder, session.Beatmap.GetFileName());
+            session.SaveFile(mapPath);
         }
         Report(progress, 0.8);
 
@@ -319,9 +319,9 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
                 project.BaseBeatmap,
                 LiveBeatmapPreference.DiskOnly,
                 cancellationToken).ConfigureAwait(false);
-            ApplyExport(session.Editor.Beatmap, named.Events, project);
-            mapPath = Path.Combine(project.ExportFolder, session.Editor.Beatmap.GetFileName());
-            session.Editor.SaveFile(mapPath);
+            ApplyExport(session.Beatmap, named.Events, project);
+            mapPath = Path.Combine(project.ExportFolder, session.Beatmap.GetFileName());
+            session.SaveFile(mapPath);
         }
         Report(progress, 0.7);
 
@@ -352,7 +352,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             project.BaseBeatmap,
             LiveBeatmapPreference.DiskOnly,
             cancellationToken).ConfigureAwait(false);
-        var beatmap = session.Editor.Beatmap;
+        var beatmap = session.Beatmap;
 
         string detailedSummary =
             $"Number of notes: {packages.Sum(package => package.Samples.Count)}, "
@@ -436,7 +436,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         string path = OnePath(request);
         var session = await beatmaps.OpenBeatmapAsync(path, LiveBeatmapPreference.DiskOnly, cancellationToken)
             .ConfigureAwait(false);
-        var times = session.Editor.Beatmap.HitObjects
+        var times = session.Beatmap.HitObjects
             .Where(hitObject => (request.X == -1 || Math.Abs(hitObject.Pos.X - request.X) < 3) && (request.Y == -1 || Math.Abs(hitObject.Pos.Y - request.Y) < 3))
             .Select(hitObject => hitObject.Time)
             .ToList();
@@ -476,10 +476,10 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         string path = OnePath(request);
         var session = await beatmaps.OpenBeatmapAsync(path, LiveBeatmapPreference.DiskOnly, cancellationToken)
             .ConfigureAwait(false);
-        var beatmap = session.Editor.Beatmap;
+        var beatmap = session.Beatmap;
         var timeline = beatmap.GetTimeline();
         var mode = (GameMode)beatmap.General["Mode"].IntValue;
-        string mapDirectory = session.Editor.GetParentFolder();
+        string mapDirectory = session.GetParentFolder();
         var firstSamples = await sampleAnalyzer.AnalyzeAsync(
             mapDirectory,
             request.DetectDuplicateSamples,
@@ -559,8 +559,8 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             .ConfigureAwait(false);
         var layers = ImportStoryboardFromBeatmap(
             path,
-            session.Editor.Beatmap,
-            session.Editor.GetParentFolder(),
+            session.Beatmap,
+            session.GetParentFolder(),
             request,
             string.Empty);
         return layers.OrderBy(layer => layer.Name).ToArray();

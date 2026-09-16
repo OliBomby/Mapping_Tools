@@ -15,9 +15,9 @@ internal sealed class RecordingBeatmapEditingGateway : IBeatmapEditingGateway
 
     public Func<string, LiveBeatmapPreference, BeatmapEditingSession>? OpenBeatmapFactory { get; set; }
 
-    public Func<string, StoryboardEditor>? OpenStoryboardFactory { get; set; }
+    public Func<string, StoryboardEditingSession>? OpenStoryboardFactory { get; set; }
 
-    public Action<Editor, bool>? SaveEditorAction { get; set; }
+    public Action<EditingSession, bool>? SaveEditingSessionAction { get; set; }
 
     public Action<BeatmapEditingSession, bool>? SaveSessionAction { get; set; }
 
@@ -29,19 +29,19 @@ internal sealed class RecordingBeatmapEditingGateway : IBeatmapEditingGateway
 
     public List<(string Path, LiveBeatmapPreference Preference)> OpenRequests { get; } = [];
 
-    public List<(string Path, StoryboardEditor Storyboard)> OpenStoryboardRequests { get; } = [];
+    public List<(string Path, StoryboardEditingSession Storyboard)> OpenStoryboardRequests { get; } = [];
 
-    public List<(Editor Editor, bool ReloadEditor)> EditorSaveRequests { get; } = [];
+    public List<(EditingSession Session, bool ReloadEditor)> EditingSessionSaveRequests { get; } = [];
 
     public List<(BeatmapEditingSession Session, bool ReloadEditor)> SessionSaveRequests { get; } = [];
 
-    public List<(Editor Editor, bool ReloadEditor)> CompletedEditorSaveRequests { get; } = [];
+    public List<(EditingSession Session, bool ReloadEditor)> CompletedEditingSessionSaveRequests { get; } = [];
 
     public List<(BeatmapEditingSession Session, bool ReloadEditor)> CompletedSessionSaveRequests { get; } = [];
 
     public BeatmapEditingSession? LastOpenedSession { get; private set; }
 
-    public StoryboardEditor? LastOpenedStoryboard { get; private set; }
+    public StoryboardEditingSession? LastOpenedStoryboard { get; private set; }
 
     public Task<BeatmapEditingSession> OpenBeatmapAsync(
         string path,
@@ -63,7 +63,7 @@ internal sealed class RecordingBeatmapEditingGateway : IBeatmapEditingGateway
         return Task.FromResult(result);
     }
 
-    public Task<StoryboardEditor> OpenStoryboardAsync(
+    public Task<StoryboardEditingSession> OpenStoryboardAsync(
         string path,
         CancellationToken cancellationToken = default)
     {
@@ -71,10 +71,10 @@ internal sealed class RecordingBeatmapEditingGateway : IBeatmapEditingGateway
 
         if (OpenStoryboardFailure is not null)
         {
-            return Task.FromException<StoryboardEditor>(OpenStoryboardFailure);
+            return Task.FromException<StoryboardEditingSession>(OpenStoryboardFailure);
         }
 
-        StoryboardEditor result = OpenStoryboardFactory?.Invoke(path)
+        StoryboardEditingSession result = OpenStoryboardFactory?.Invoke(path)
             ?? throw new NotSupportedException("No storyboard-open behavior was configured.");
         OpenStoryboardRequests.Add((path, result));
         LastOpenedStoryboard = result;
@@ -82,20 +82,20 @@ internal sealed class RecordingBeatmapEditingGateway : IBeatmapEditingGateway
     }
 
     public Task SaveAsync(
-        Editor editor,
+        EditingSession session,
         bool reloadEditor = false,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        EditorSaveRequests.Add((editor, reloadEditor));
+        EditingSessionSaveRequests.Add((session, reloadEditor));
 
         if (SaveFailure is not null)
         {
             return Task.FromException(SaveFailure);
         }
 
-        SaveEditorAction?.Invoke(editor, reloadEditor);
-        CompletedEditorSaveRequests.Add((editor, reloadEditor));
+        SaveEditingSessionAction?.Invoke(session, reloadEditor);
+        CompletedEditingSessionSaveRequests.Add((session, reloadEditor));
         return Task.CompletedTask;
     }
 

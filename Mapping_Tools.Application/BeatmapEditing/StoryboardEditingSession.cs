@@ -6,14 +6,15 @@ namespace Mapping_Tools.Application.BeatmapEditing;
 /// <summary>
 ///     Provides typed loading and saving for an osu! storyboard document.
 /// </summary>
-public class StoryboardEditor : Editor
+public sealed class StoryboardEditingSession : EditingSession
 {
     /// <summary>
-    ///     Creates a storyboard editor from serialized lines.
+    ///     Creates a storyboard editing session from serialized lines.
     /// </summary>
     /// <param name="lines">The storyboard lines to parse.</param>
     /// <param name="fileStore">The persistence implementation used when saving.</param>
-    public StoryboardEditor(List<string> lines, ITextFileStore fileStore) : base(fileStore)
+    public StoryboardEditingSession(List<string> lines, ITextFileStore fileStore)
+        : base(fileStore)
     {
         TextFile = new StoryBoard(lines);
     }
@@ -23,7 +24,8 @@ public class StoryboardEditor : Editor
     /// </summary>
     /// <param name="path">The storyboard file to load.</param>
     /// <param name="fileStore">The persistence implementation used to load and save.</param>
-    public StoryboardEditor(string path, ITextFileStore fileStore) : base(fileStore)
+    public StoryboardEditingSession(string path, ITextFileStore fileStore)
+        : base(fileStore)
     {
         Path = path;
         TextFile = new StoryBoard(ReadFile(path));

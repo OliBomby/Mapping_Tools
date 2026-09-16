@@ -73,7 +73,7 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
                 targetPaths[index],
                 LiveBeatmapPreference.PreferLive,
                 cancellationToken).ConfigureAwait(false);
-            var source = sourceSession?.Editor.Beatmap ?? CreateEmptySource(targetSession.Editor.Beatmap);
+            var source = sourceSession?.Beatmap ?? CreateEmptySource(targetSession.Beatmap);
             string? targetDirectory = Path.GetDirectoryName(targetPaths[index]);
             string mapDirectory = string.IsNullOrWhiteSpace(targetDirectory)
                 ? Directory.GetCurrentDirectory()
@@ -93,7 +93,7 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
                 ? await samples.AnalyzeAsync(sourceDirectory, cancellationToken).ConfigureAwait(false)
                 : new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             var result = HitsoundCopierEngine.Apply(
-                targetSession.Editor.Beatmap,
+                targetSession.Beatmap,
                 source,
                 options,
                 mapDirectory,

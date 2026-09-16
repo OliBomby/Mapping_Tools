@@ -237,23 +237,22 @@ public sealed class MapsetMergerServiceTests : IDisposable
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            BeatmapEditor editor = new(path, files);
             return Task.FromResult(new BeatmapEditingSession(
-                editor,
-                BeatmapEditingSource.Disk,
-                []));
+                path,
+                files,
+                BeatmapEditingSource.Disk));
         }
 
-        public Task<StoryboardEditor> OpenStoryboardAsync(
+        public Task<StoryboardEditingSession> OpenStoryboardAsync(
             string path,
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult(new StoryboardEditor(path, files));
+            return Task.FromResult(new StoryboardEditingSession(path, files));
         }
 
         public Task SaveAsync(
-            Editor editor,
+            EditingSession editor,
             bool reloadEditor = false,
             CancellationToken cancellationToken = default)
         {

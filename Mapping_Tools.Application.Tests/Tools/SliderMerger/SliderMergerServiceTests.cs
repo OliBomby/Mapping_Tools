@@ -28,7 +28,7 @@ public sealed class SliderMergerServiceTests
         result.ProcessedPaths.Should().Equal("selected.osu");
         gateway.OpenRequests.Select(request => request.Preference).Should().ContainSingle()
             .Which.Should().Be(LiveBeatmapPreference.RequireLive);
-        gateway.SessionSaveRequests.Select(request => request.Session.Editor.Path)
+        gateway.SessionSaveRequests.Select(request => request.Session.Path)
             .Should().Equal("selected.osu");
     }
 
@@ -52,7 +52,7 @@ public sealed class SliderMergerServiceTests
         result.ProcessedPaths.Should().Equal("one.osu", "two.osu");
         gateway.OpenRequests.Select(request => request.Preference)
             .Should().OnlyContain(preference => preference == LiveBeatmapPreference.PreferLive);
-        gateway.SessionSaveRequests.Select(request => request.Session.Editor.Path)
+        gateway.SessionSaveRequests.Select(request => request.Session.Path)
             .Should().Equal("one.osu", "two.osu");
         result.ObjectsMerged.Should().Be(4);
     }
@@ -133,7 +133,7 @@ public sealed class SliderMergerServiceTests
                     true,
                     false,
                     false);
-                BeatmapEditor editor = new(
+                BeatmapEditingSession editor = new(
                     new Beatmap([first, second], [redline], redline).GetLines(),
                     new NoOpTextFileStore())
                 {
@@ -142,7 +142,9 @@ public sealed class SliderMergerServiceTests
                 editor.Beatmap.CalculateHitObjectComboStuff();
                 editor.Beatmap.SetBookmarks([0, 100]);
                 return new BeatmapEditingSession(
-                    editor,
+                    editor.Beatmap,
+                    path,
+                    new NoOpTextFileStore(),
                     BeatmapEditingSource.Disk,
                     [editor.Beatmap.HitObjects[0]],
                     liveEditorTime: null);

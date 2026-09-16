@@ -38,7 +38,7 @@ public sealed class TimingCopierServiceTests
             .Should().Equal("source.osu", "first.osu", "second.osu");
         gateway.OpenRequests.Select(request => request.Preference)
             .Should().OnlyContain(preference => preference == LiveBeatmapPreference.PreferLive);
-        gateway.SessionSaveRequests.Select(request => request.Session.Editor.Path)
+        gateway.SessionSaveRequests.Select(request => request.Session.Path)
             .Should().Equal("first.osu", "second.osu");
         progress.Values.Last().Should().Be(1);
     }
@@ -71,7 +71,7 @@ public sealed class TimingCopierServiceTests
 
         // Assert
         await act.Should().ThrowAsync<IOException>();
-        gateway.CompletedSessionSaveRequests.Select(request => request.Session.Editor.Path)
+        gateway.CompletedSessionSaveRequests.Select(request => request.Session.Path)
             .Should().ContainSingle().Which.Should().Be("first.osu");
     }
 
@@ -133,13 +133,12 @@ public sealed class TimingCopierServiceTests
         {
             OpenBeatmapFactory = (path, _) =>
             {
-                BeatmapEditor editor = new(
+                return new BeatmapEditingSession(
                     File.ReadAllLines(fixture).ToList(),
-                    new NoOpTextFileStore())
-                {
-                    Path = path,
-                };
-                return new BeatmapEditingSession(editor, BeatmapEditingSource.Disk, []);
+                    new NoOpTextFileStore(),
+                    BeatmapEditingSource.Disk,
+                    [],
+                    path: path);
             },
         };
     }

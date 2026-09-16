@@ -55,14 +55,14 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         cancellationToken.ThrowIfCancellationRequested();
 
-        BeatmapEditor diskEditor = new(path, fileStore);
-        if (livePreference == LiveBeatmapPreference.DiskOnly) return DiskSession(diskEditor);
+        BeatmapEditingSession diskSession = new(path, fileStore);
+        if (livePreference == LiveBeatmapPreference.DiskOnly) return diskSession;
 
         if (!settings.UseEditorReader)
             return livePreference == LiveBeatmapPreference.RequireLive
                 ? throw new LiveBeatmapUnavailableException(
                     "Live editor state is disabled in Mapping Tools settings.")
-                : DiskSession(diskEditor);
+                : diskSession;
 
         try
         {
@@ -74,17 +74,19 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
                 return livePreference == LiveBeatmapPreference.RequireLive
                     ? throw new LiveBeatmapUnavailableException(
                         "No active osu! beatmap editor could be read.")
-                    : DiskSession(diskEditor);
+                    : diskSession;
 
             if (!string.Equals(snapshot.Path, path, StringComparison.Ordinal))
                 return livePreference == LiveBeatmapPreference.RequireLive
                     ? throw new LiveBeatmapUnavailableException(
                         $"osu! is editing '{snapshot.Path}', not the requested beatmap '{path}'.")
-                    : DiskSession(diskEditor);
+                    : diskSession;
 
-            var selected = ApplyLiveState(diskEditor.Beatmap, snapshot);
+            var selected = ApplyLiveState(diskSession.Beatmap, snapshot);
             return new BeatmapEditingSession(
-                diskEditor,
+                diskSession.Beatmap,
+                path,
+                fileStore,
                 BeatmapEditingSource.LiveEditor,
                 selected,
                 liveEditorTime: snapshot.EditorTime);
@@ -99,7 +101,13 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
         }
         catch (Exception exception) when (livePreference == LiveBeatmapPreference.PreferLive)
         {
-            return DiskSession(diskEditor, exception);
+            return new BeatmapEditingSession(
+                diskSession.Beatmap,
+                path,
+                fileStore,
+                BeatmapEditingSource.Disk,
+                [],
+                exception);
         }
         catch (Exception exception)
         {
@@ -110,23 +118,23 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
     }
 
     /// <inheritdoc />
-    public Task<StoryboardEditor> OpenStoryboardAsync(
+    public Task<StoryboardEditingSession> OpenStoryboardAsync(
         string path,
         CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         cancellationToken.ThrowIfCancellationRequested();
-        return Task.FromResult(new StoryboardEditor(path, fileStore));
+        return Task.FromResult(new StoryboardEditingSession(path, fileStore));
     }
 
     /// <inheritdoc />
     public async Task SaveAsync(
-        Editor editor,
+        EditingSession session,
         bool reloadEditor = false,
         CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(editor);
-        await SaveCoreAsync(editor, null, reloadEditor, cancellationToken)
+        ArgumentNullException.ThrowIfNull(session);
+        await SaveCoreAsync(session, null, reloadEditor, cancellationToken)
             .ConfigureAwait(false);
     }
 
@@ -137,49 +145,38 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(session);
-        await SaveCoreAsync(session.Editor, session, reloadEditor, cancellationToken)
+        await SaveCoreAsync(session, session, reloadEditor, cancellationToken)
             .ConfigureAwait(false);
     }
 
     private async Task SaveCoreAsync(
-        Editor editor,
-        BeatmapEditingSession? session,
+        EditingSession editingSession,
+        BeatmapEditingSession? beatmapSession,
         bool reloadEditor,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (session is null)
+        if (beatmapSession is null)
             await backupService.CreateAsync(
-                    [editor.Path],
+                    [editingSession.Path],
                     BeatmapBackupReason.Automatic,
                     cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
         else
             await backupService.CreateAsync(
-                    session,
+                    beatmapSession,
                     BeatmapBackupReason.Automatic,
                     cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
         cancellationToken.ThrowIfCancellationRequested();
-        editor.SaveFile();
+        editingSession.SaveFile();
 
         if (reloadEditor)
         {
             cancellationToken.ThrowIfCancellationRequested();
             await reloadService.ReloadAsync(cancellationToken).ConfigureAwait(false);
         }
-    }
-
-    private static BeatmapEditingSession DiskSession(
-        BeatmapEditor editor,
-        Exception? liveReadFailure = null)
-    {
-        return new BeatmapEditingSession(
-            editor,
-            BeatmapEditingSource.Disk,
-            [],
-            liveReadFailure);
     }
 
     private static IReadOnlyList<HitObject> ApplyLiveState(

@@ -32,7 +32,7 @@ public sealed class BetterSaveServiceTests
         result.Path.Should().Be(@"C:\Songs\current.osu");
         gateway.OpenRequests.Single().Path.Should().Be(@"C:\Songs\current.osu");
         gateway.OpenRequests.Single().Preference.Should().Be(LiveBeatmapPreference.RequireLive);
-        gateway.SessionSaveRequests.Single().Session.Editor.Should().BeSameAs(gateway.Session!.Editor);
+        gateway.SessionSaveRequests.Single().Session.Should().BeSameAs(gateway.Session);
         published.Should().ContainSingle(notification =>
             notification.Severity == UserNotificationSeverity.Success);
     }
@@ -89,11 +89,9 @@ public sealed class BetterSaveServiceTests
 
     private static BeatmapEditingSession CreateSession()
     {
-        BeatmapEditor editor = new(
-            ["osu file format v14", "", "[HitObjects]"],
-            new NoOpTextFileStore { ReadResult = [] });
         return new BeatmapEditingSession(
-            editor,
+            ["osu file format v14", "", "[HitObjects]"],
+            new NoOpTextFileStore { ReadResult = [] },
             BeatmapEditingSource.LiveEditor,
             []);
     }

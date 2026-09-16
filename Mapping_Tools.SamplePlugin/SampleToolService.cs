@@ -50,7 +50,7 @@ public sealed class SampleToolService
                     cancellationToken)
                 .ConfigureAwait(false);
 
-            StringValue tags = session.Editor.Beatmap.Metadata.TryGetValue("Tags", out StringValue? currentTags)
+            StringValue tags = session.Beatmap.Metadata.TryGetValue("Tags", out StringValue? currentTags)
                 ? currentTags
                 : new StringValue(string.Empty);
             string[] existingTags = tags.Value
@@ -58,7 +58,7 @@ public sealed class SampleToolService
 
             if (!existingTags.Contains(tag, StringComparer.OrdinalIgnoreCase))
             {
-                session.Editor.Beatmap.Metadata["Tags"] = new StringValue(
+                session.Beatmap.Metadata["Tags"] = new StringValue(
                     string.Join(' ', existingTags.Append(tag)));
                 await editingGateway
                     .SaveAsync(

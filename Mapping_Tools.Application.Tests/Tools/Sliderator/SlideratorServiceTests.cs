@@ -4,6 +4,7 @@ using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.Sliderator;
 using Mapping_Tools.Application.Tools.Sliderator.Models;
+using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.Sliderator.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -37,7 +38,7 @@ public sealed class SlideratorServiceTests
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.Disk));
-        gateway.Session!.Editor.Beatmap.Bookmarks = [0];
+        gateway.Session!.Beatmap.Bookmarks = [0];
         SlideratorService service = new(gateway, new ApplicationSettings());
 
         // Act
@@ -91,7 +92,7 @@ public sealed class SlideratorServiceTests
         result.EditorReloaded.Should().BeTrue();
         gateway.SessionSaveRequests.Select(request => request.ReloadEditor)
             .Should().ContainSingle().Which.Should().BeTrue();
-        gateway.Session.Editor.Beatmap.HitObjects.Should().HaveCount(3);
+        gateway.Session.Beatmap.HitObjects.Should().HaveCount(3);
     }
 
     private static BeatmapEditingSession CreateSession(BeatmapEditingSource source)
@@ -119,9 +120,14 @@ public sealed class SlideratorServiceTests
             "64,64,0,2,0,L|164:64,1,100",
             "128,128,500,1,0,0:0:0:0:",
         ];
-        BeatmapEditor editor = new(lines, new NoOpTextFileStore { ReadResult = [] });
-        var slider = editor.Beatmap.HitObjects[0];
-        return new BeatmapEditingSession(editor, source, [slider]);
+        Beatmap beatmap = new(lines);
+        var slider = beatmap.HitObjects[0];
+        return new BeatmapEditingSession(
+            beatmap,
+            "",
+            new NoOpTextFileStore { ReadResult = [] },
+            source,
+            [slider]);
     }
 
 }

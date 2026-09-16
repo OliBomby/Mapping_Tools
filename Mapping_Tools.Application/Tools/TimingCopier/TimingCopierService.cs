@@ -57,8 +57,8 @@ public sealed class TimingCopierService : ITimingCopierService
                     cancellationToken)
                 .ConfigureAwait(false);
             TimingCopierEngine.Apply(
-                target.Editor.Beatmap,
-                source.Editor.Beatmap,
+                target.Beatmap,
+                source.Beatmap,
                 options,
                 cancellationToken);
             // Save the file

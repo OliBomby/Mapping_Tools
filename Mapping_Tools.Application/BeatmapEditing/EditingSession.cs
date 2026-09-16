@@ -4,25 +4,26 @@ using Mapping_Tools.Core.BeatmapHelper;
 namespace Mapping_Tools.Application.BeatmapEditing;
 
 /// <summary>
-///     Edits an osu! text file using caller-provided persistence.
+///     Owns a mutable osu! text document for the duration of an editing session
+///     and provides the persistence operations used to load and save it.
 /// </summary>
-public class Editor
+public class EditingSession
 {
     /// <summary>
-    ///     Creates an editor without loading a document.
+    ///     Creates an editing session without loading a document.
     /// </summary>
-    /// <param name="fileStore">The persistence implementation used by the editor.</param>
-    public Editor(ITextFileStore fileStore)
+    /// <param name="fileStore">The persistence implementation used by the session.</param>
+    public EditingSession(ITextFileStore fileStore)
     {
         FileStore = fileStore ?? throw new ArgumentNullException(nameof(fileStore));
     }
 
     /// <summary>
-    ///     Creates an editor for an in-memory beatmap.
+    ///     Creates an editing session for an in-memory beatmap.
     /// </summary>
     /// <param name="lines">The serialized beatmap lines to parse.</param>
     /// <param name="fileStore">The persistence implementation used when saving.</param>
-    public Editor(List<string> lines, ITextFileStore fileStore) : this(fileStore)
+    public EditingSession(List<string> lines, ITextFileStore fileStore) : this(fileStore)
     {
         TextFile = new Beatmap(lines);
     }
@@ -32,7 +33,7 @@ public class Editor
     /// </summary>
     /// <param name="path">The source file; <c>.osb</c> selects storyboard parsing.</param>
     /// <param name="fileStore">The persistence implementation used to load and save.</param>
-    public Editor(string path, ITextFileStore fileStore) : this(fileStore)
+    public EditingSession(string path, ITextFileStore fileStore) : this(fileStore)
     {
         Path = path;
         var lines = ReadFile(path);
@@ -54,8 +55,7 @@ public class Editor
 
     /// <summary>
     ///     Owns the mutable parsed document that will be serialized on save. Its
-    ///     runtime type is <see cref="Beatmap" /> or <see cref="StoryBoard" />
-    ///     according to the editor that loaded it.
+    ///     runtime type is <see cref="Beatmap" /> or <see cref="StoryBoard" />.
     /// </summary>
     public ITextFile TextFile { get; set; } = null!;
 
@@ -66,7 +66,6 @@ public class Editor
     /// <returns>A mutable list containing the file's lines.</returns>
     public List<string> ReadFile(string path)
     {
-        // Get contents of the file
         return new List<string>(FileStore.ReadAllLines(path));
     }
 
@@ -135,7 +134,7 @@ public class Editor
     }
 
     /// <summary>
-    ///     Allows specialized editors to coordinate external state immediately
+    ///     Allows specialized sessions to coordinate external state immediately
     ///     before serialized lines are persisted.
     /// </summary>
     /// <param name="lines">The exact lines that will be written.</param>

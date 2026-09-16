@@ -55,7 +55,7 @@ public sealed class RhythmGuideService : IRhythmGuideService
                 BeatmapBackupReason.Automatic,
                 false,
                 cancellationToken).ConfigureAwait(false);
-            sources.Add(source.Editor.Beatmap);
+            sources.Add(source.Beatmap);
         }
 
         if (options.ExportMode == RhythmGuideExportMode.AddToMap)
@@ -64,9 +64,9 @@ public sealed class RhythmGuideService : IRhythmGuideService
                 options.ExportPath,
                 LiveBeatmapPreference.PreferLive,
                 cancellationToken).ConfigureAwait(false);
-            int originalCount = target.Editor.Beatmap.HitObjects.Count;
+            int originalCount = target.Beatmap.HitObjects.Count;
             RhythmGuideGenerator.Append(
-                target.Editor.Beatmap,
+                target.Beatmap,
                 sources,
                 options,
                 cancellationToken);
@@ -75,7 +75,7 @@ public sealed class RhythmGuideService : IRhythmGuideService
                 cancellationToken: cancellationToken).ConfigureAwait(false);
             return new RhythmGuideResult(
                 options.ExportPath,
-                target.Editor.Beatmap.HitObjects.Count - originalCount,
+                target.Beatmap.HitObjects.Count - originalCount,
                 options.ExportMode);
         }
 
@@ -83,7 +83,7 @@ public sealed class RhythmGuideService : IRhythmGuideService
             sources,
             options,
             cancellationToken);
-        BeatmapEditor output = new(generated.GetLines(), textFileStore)
+        EditingSession output = new(generated.GetLines(), textFileStore)
         {
             Path = options.ExportPath,
         };

@@ -71,7 +71,7 @@ public sealed class PropertyTransformerService : IPropertyTransformerService
                         cancellationToken)
                     .ConfigureAwait(false);
                 PropertyTransformerEngine.Apply(
-                    session.Editor.Beatmap,
+                    session.Beatmap,
                     options,
                     documentProgress,
                     cancellationToken);

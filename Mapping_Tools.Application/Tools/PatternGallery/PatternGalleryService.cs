@@ -52,9 +52,9 @@ public sealed class PatternGalleryService : IPatternGalleryService
                 cancellationToken)
             .ConfigureAwait(false);
 
-        session.Editor.Beatmap.UpdateStacking();
+        session.Beatmap.UpdateStacking();
 
-        return session.Editor.Beatmap;
+        return session.Beatmap;
     }
 
     /// <inheritdoc />
@@ -114,7 +114,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
         if (!string.IsNullOrEmpty(filter) || startTime != -1 || endTime != -1)
         {
             pattern = maker.FromBeatmapFiltered(
-                source.Editor.Beatmap,
+                source.Beatmap,
                 name,
                 filter,
                 startTime,
@@ -124,7 +124,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
         }
         else
         {
-            pattern = maker.FromBeatmap(source.Editor.Beatmap, name);
+            pattern = maker.FromBeatmap(source.Beatmap, name);
             // Save the pattern in the collection folder by copying
             files.CopyPattern(sourcePath, files.GetPatternPath(paths, pattern.FileName));
         }
@@ -148,7 +148,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
         PatternGalleryMaker maker = new();
 
         var pattern = maker.FromSelected(
-            source.Editor.Beatmap,
+            source.Beatmap,
             name,
             source.SelectedHitObjects,
             out var filtered);
@@ -208,11 +208,11 @@ public sealed class PatternGalleryService : IPatternGalleryService
                 .ConfigureAwait(false);
 
             if (project.ExportTimeMode == ExportTimeMode.Pattern)
-                placer.PlaceOsuPattern(source.Editor.Beatmap, target.Editor.Beatmap, protectBeatmapPattern: false);
+                placer.PlaceOsuPattern(source.Beatmap, target.Beatmap, protectBeatmapPattern: false);
             else
                 placer.PlaceOsuPatternAtTime(
-                    source.Editor.Beatmap,
-                    target.Editor.Beatmap,
+                    source.Beatmap,
+                    target.Beatmap,
                     exportTime,
                     false);
 
@@ -289,7 +289,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
                 .ConfigureAwait(false);
 
             var pattern = maker.FromBeatmap(
-                session.Editor.Beatmap,
+                session.Beatmap,
                 Path.GetFileNameWithoutExtension(filename).Split("__").LastOrDefault() ?? filename,
                 filename);
 

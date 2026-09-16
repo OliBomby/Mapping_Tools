@@ -35,7 +35,7 @@ public sealed class AutoFailService : IAutoFailService
             options.Path,
             LiveBeatmapPreference.PreferLive,
             cancellationToken).ConfigureAwait(false);
-        var beatmap = session.Editor.Beatmap;
+        var beatmap = session.Beatmap;
         double approachRate = options.ApproachRateOverride < 0
             ? beatmap.Difficulty["ApproachRate"].DoubleValue
             : options.ApproachRateOverride;

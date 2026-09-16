@@ -16,15 +16,14 @@ public sealed class ComboColourStudioServiceTests
     public async Task ApplyAsync_WithMapAndValidProject_UsesLivePreferenceAndSavesProgress()
     {
         // Arrange
-        BeatmapEditor editor = new(
+        BeatmapEditingSession editor = new(
             File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "Fixtures", "Beatmaps", "standard-feature-rich.osu")).ToList(),
             new NoOpTextFileStore
             {
                 ParentFolderResolver = _ => @"C:\set",
                 CombinePathResolver = Path.Combine,
             }) { Path = @"C:\set\map.osu" };
-        RecordingBeatmapEditingGateway gateway = new(
-            new BeatmapEditingSession(editor, BeatmapEditingSource.LiveEditor, []));
+        RecordingBeatmapEditingGateway gateway = new(editor);
         ComboColourServiceOptions project = new();
         project.ComboColours.Clear();
         project.ComboColours.Add(new SpecialColour(RgbaColour.FromRgb(10, 20, 30), "Combo1"));
@@ -42,7 +41,7 @@ public sealed class ComboColourStudioServiceTests
         // Assert
         result.ProcessedCount.Should().Be(1);
         gateway.OpenRequests.Single().Preference.Should().Be(LiveBeatmapPreference.PreferLive);
-        gateway.SessionSaveRequests.Single().Session.Editor.Should().BeSameAs(editor);
+        gateway.SessionSaveRequests.Single().Session.Should().BeSameAs(editor);
         gateway.SessionSaveRequests.Single().ReloadEditor.Should().BeFalse();
         editor.Beatmap.ComboColours.Single().Color.Should().Be(RgbaColour.FromRgb(10, 20, 30));
         progress.Values.Should().Equal(1);
@@ -52,7 +51,7 @@ public sealed class ComboColourStudioServiceTests
     public async Task ApplyAsync_WithoutTargetMaps_ThrowsValidationException()
     {
         // Arrange
-        BeatmapEditor editor = new(
+        BeatmapEditingSession editor = new(
             File.ReadAllLines(Path.Combine(
                 AppContext.BaseDirectory,
                 "Fixtures",
@@ -63,8 +62,7 @@ public sealed class ComboColourStudioServiceTests
                 ParentFolderResolver = _ => @"C:\set",
                 CombinePathResolver = Path.Combine,
             });
-        RecordingBeatmapEditingGateway gateway = new(
-            new BeatmapEditingSession(editor, BeatmapEditingSource.LiveEditor, []));
+        RecordingBeatmapEditingGateway gateway = new(editor);
         ComboColourServiceOptions project = new();
         project.AddComboColour();
         ComboColourStudioService service = new(gateway, new ApplicationSettings());
@@ -80,9 +78,8 @@ public sealed class ComboColourStudioServiceTests
     public async Task ImportComboColoursAsync_WithLiveMap_ReturnsPaletteAndUsesPreferLive()
     {
         // Arrange
-        BeatmapEditor editor = CreateEditor();
-        RecordingBeatmapEditingGateway gateway = new(
-            new BeatmapEditingSession(editor, BeatmapEditingSource.LiveEditor, []));
+        BeatmapEditingSession editor = CreateSession();
+        RecordingBeatmapEditingGateway gateway = new(editor);
         ComboColourStudioService service = new(gateway, new ApplicationSettings());
 
         // Act
@@ -98,9 +95,8 @@ public sealed class ComboColourStudioServiceTests
     public async Task ImportColourHaxAsync_WithLiveMap_ReturnsInferredProjectAndUsesPreferLive()
     {
         // Arrange
-        BeatmapEditor editor = CreateEditor();
-        RecordingBeatmapEditingGateway gateway = new(
-            new BeatmapEditingSession(editor, BeatmapEditingSource.LiveEditor, []));
+        BeatmapEditingSession editor = CreateSession();
+        RecordingBeatmapEditingGateway gateway = new(editor);
         ComboColourStudioService service = new(gateway, new ApplicationSettings());
 
         // Act
@@ -112,9 +108,9 @@ public sealed class ComboColourStudioServiceTests
         result.ComboColours.Should().NotBeEmpty();
     }
 
-    private static BeatmapEditor CreateEditor()
+    private static BeatmapEditingSession CreateSession()
     {
-        return new BeatmapEditor(
+        return new BeatmapEditingSession(
             File.ReadAllLines(Path.Combine(
                 AppContext.BaseDirectory,
                 "Fixtures",

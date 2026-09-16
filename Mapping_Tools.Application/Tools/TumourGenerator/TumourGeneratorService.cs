@@ -49,7 +49,7 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
                 cancellationToken)
             .ConfigureAwait(false);
         var markedObjects = BeatmapObjectSelection.Select(session, mode, timeCode);
-        double circleSize = session.Editor.Beatmap.Difficulty["CircleSize"].DoubleValue;
+        double circleSize = session.Beatmap.Difficulty["CircleSize"].DoubleValue;
         return new TumourImportResult(
             markedObjects.Where(hitObject => hitObject.IsSlider).ToArray(),
             circleSize,
@@ -101,7 +101,7 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
 
             if (project.FixSv)
                 SliderVelocityFixer.Fix(
-                    session.Editor.Beatmap,
+                    session.Beatmap,
                     markedObjects,
                     project.DelegateToBpm,
                     project.RemoveSliderTicks,

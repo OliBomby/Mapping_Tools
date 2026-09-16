@@ -1,5 +1,6 @@
 using Mapping_Tools.Application.Backups.Contracts;
 using Mapping_Tools.Application.Backups.Models;
+using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Platform;
@@ -199,13 +200,13 @@ internal sealed class TestBeatmapBackupService : IBeatmapBackupService
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        CreateRequests.Add(([session.Editor.Path], reason, force));
+        CreateRequests.Add(([session.Path], reason, force));
         return Task.FromResult(
             new BeatmapBackupResult(
                 [
                     new BeatmapBackupArtifact(
-                        session.Editor.Path + ".backup",
-                        session.Editor.Path,
+                session.Path + ".backup",
+                session.Path,
                         reason,
                         session.Source == BeatmapEditingSource.LiveEditor,
                         DateTimeOffset.UnixEpoch),

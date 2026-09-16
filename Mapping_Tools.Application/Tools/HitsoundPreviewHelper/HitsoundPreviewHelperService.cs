@@ -53,7 +53,7 @@ public sealed class HitsoundPreviewHelperService : IHitsoundPreviewHelperService
                 .ConfigureAwait(false);
 
             int updated = HitsoundPreviewHelperEngine.Apply(
-                session.Editor.Beatmap,
+                session.Beatmap,
                 options.Items,
                 progress?.MapTo(index, paths.Count),
                 cancellationToken);
@@ -91,7 +91,7 @@ public sealed class HitsoundPreviewHelperService : IHitsoundPreviewHelperService
         var session = await editingGateway
             .OpenBeatmapAsync(path, LiveBeatmapPreference.RequireLive, cancellationToken)
             .ConfigureAwait(false);
-        bool mania = session.Editor.Beatmap.General["Mode"].IntValue == 3;
+        bool mania = session.Beatmap.General["Mode"].IntValue == 3;
         return session.SelectedHitObjects
             .Select(hitObject => new Vector2(hitObject.Pos.X, mania ? -1 : hitObject.Pos.Y))
             .Distinct()

@@ -85,10 +85,10 @@ public sealed class Wave2CompletionTests
                                     path,
                                     LiveBeatmapPreference.DiskOnly,
                                     context.CancellationToken);
-                            session.Editor.Beatmap.Metadata["Version"] =
+                            session.Beatmap.Metadata["Version"] =
                                 new StringValue("Wave 2 validated");
                             await gateway.SaveAsync(
-                                session.Editor,
+                                session,
                                 cancellationToken: context.CancellationToken);
                             return new ToolExecutionOutput<string>(
                                 path,
@@ -170,7 +170,16 @@ public sealed class Wave2CompletionTests
             bool force = false,
             CancellationToken cancellationToken = default)
         {
-            throw new NotSupportedException();
+            cancellationToken.ThrowIfCancellationRequested();
+            CreateCount++;
+            BackupPrecededWrite = store.WriteCount == 0;
+            BeatmapBackupArtifact artifact = new(
+                "backup.osu",
+                session.Path,
+                reason,
+                false,
+                DateTimeOffset.UnixEpoch);
+            return Task.FromResult(new BeatmapBackupResult([artifact], false));
         }
 
         public Task<BeatmapBackupArtifact?> CreatePeriodicIfChangedAsync(

@@ -25,7 +25,7 @@ resources, uses the legacy circle icon for the collapsed swatch, gives the
 centred text, and restores the full RGB/HSV segmented-button hit targets.
 
 Metadata export delegates filename-aware saving to the reusable
-`BeatmapEditor2.SaveFileWithNameUpdate` method. Importing metadata preserves the
+`BeatmapEditingSession.SaveFileWithNameUpdate` method. Importing metadata preserves the
 existing export path. Shared native picker filters now live in
 `CommonFilePickerFilters`, and the shared default and compact TextBox styles no
 longer impose a fixed height, allowing the wrapped Tags field to grow with its

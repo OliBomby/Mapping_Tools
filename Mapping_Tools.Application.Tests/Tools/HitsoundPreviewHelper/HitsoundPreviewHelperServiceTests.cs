@@ -36,9 +36,9 @@ public sealed class HitsoundPreviewHelperServiceTests
             .Which.Should().Be(LiveBeatmapPreference.PreferLive);
         gateway.SessionSaveRequests.Should().ContainSingle()
             .Which.ReloadEditor.Should().BeFalse();
-        gateway.LastOpenedSession!.Editor.Beatmap.HitObjects[0].Hitsounds.Should().Be(8);
-        gateway.LastOpenedSession.Editor.Beatmap.HitObjects[0].CustomIndex.Should().Be(2);
-        gateway.LastOpenedSession.Editor.Beatmap.HitObjects[1].Hitsounds.Should().Be(8);
+        gateway.LastOpenedSession!.Beatmap.HitObjects[0].Hitsounds.Should().Be(8);
+        gateway.LastOpenedSession.Beatmap.HitObjects[0].CustomIndex.Should().Be(2);
+        gateway.LastOpenedSession.Beatmap.HitObjects[1].Hitsounds.Should().Be(8);
     }
 
     [TestMethod]
@@ -63,7 +63,7 @@ public sealed class HitsoundPreviewHelperServiceTests
         gateway.OpenRequests.Select(request => request.Preference).Should().Equal(
             LiveBeatmapPreference.PreferLive,
             LiveBeatmapPreference.PreferLive);
-        gateway.SessionSaveRequests.Select(request => request.Session.Editor.Path)
+        gateway.SessionSaveRequests.Select(request => request.Session.Path)
             .Should().Equal("first.osu", "second.osu");
     }
 
@@ -99,17 +99,14 @@ public sealed class HitsoundPreviewHelperServiceTests
         {
             OpenBeatmapFactory = (path, livePreference) =>
             {
-                BeatmapEditor editor = new(
-                    source.GetLines(),
-                    new NoOpTextFileStore())
-                {
-                    Path = path,
-                };
-                IReadOnlyList<HitObject> selected = editor.Beatmap.HitObjects
+                Beatmap beatmap = new(source.GetLines());
+                IReadOnlyList<HitObject> selected = beatmap.HitObjects
                     .Take(selectedObjectCount)
                     .ToArray();
                 return new BeatmapEditingSession(
-                    editor,
+                    beatmap,
+                    path,
+                    new NoOpTextFileStore(),
                     livePreference == LiveBeatmapPreference.RequireLive
                         ? BeatmapEditingSource.LiveEditor
                         : BeatmapEditingSource.Disk,

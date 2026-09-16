@@ -1,3 +1,4 @@
+using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 
 namespace Mapping_Tools.Application.BeatmapEditing.Contracts;
@@ -27,7 +28,7 @@ public interface IBeatmapEditingGateway
     /// <param name="path">The storyboard file to parse.</param>
     /// <param name="cancellationToken">Cancels before the disk read begins.</param>
     /// <returns>A mutable storyboard editor backed by the configured file store.</returns>
-    Task<StoryboardEditor> OpenStoryboardAsync(
+    Task<StoryboardEditingSession> OpenStoryboardAsync(
         string path,
         CancellationToken cancellationToken = default);
 
@@ -35,7 +36,7 @@ public interface IBeatmapEditingGateway
     ///     Persists the editor's current document after the configured safety
     ///     backup attempt, then optionally asks osu! to reload it.
     /// </summary>
-    /// <param name="editor">The beatmap or storyboard editor to save.</param>
+    /// <param name="session">The beatmap or storyboard editing session to save.</param>
     /// <param name="reloadEditor">Whether an active osu! editor should be refreshed after the write.</param>
     /// <param name="cancellationToken">Cancels before saving or before requesting the reload.</param>
     /// <returns>A task that completes after backup, persistence, and any requested reload.</returns>
@@ -46,7 +47,7 @@ public interface IBeatmapEditingGateway
     ///     Cancellation occurs before backup, save, or a requested reload completes.
     /// </exception>
     Task SaveAsync(
-        Editor editor,
+        EditingSession session,
         bool reloadEditor = false,
         CancellationToken cancellationToken = default);
 

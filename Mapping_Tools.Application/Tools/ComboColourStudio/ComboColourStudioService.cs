@@ -39,7 +39,7 @@ public sealed class ComboColourStudioService : IComboColourStudioService
                 cancellationToken)
             .ConfigureAwait(false);
 
-        return ComboColourStudioEngine.ImportComboColours(session.Editor.Beatmap);
+        return ComboColourStudioEngine.ImportComboColours(session.Beatmap);
     }
 
     /// <inheritdoc />
@@ -54,7 +54,7 @@ public sealed class ComboColourStudioService : IComboColourStudioService
                 cancellationToken)
             .ConfigureAwait(false);
 
-        return ComboColourStudioEngine.ImportColourHax(session.Editor.Beatmap, maxBurstLength);
+        return ComboColourStudioEngine.ImportColourHax(session.Beatmap, maxBurstLength);
     }
 
     /// <inheritdoc />
@@ -79,7 +79,7 @@ public sealed class ComboColourStudioService : IComboColourStudioService
                     LiveBeatmapPreference.PreferLive,
                     cancellationToken)
                 .ConfigureAwait(false);
-            ComboColourStudioEngine.Apply(session.Editor.Beatmap, project);
+            ComboColourStudioEngine.Apply(session.Beatmap, project);
             cancellationToken.ThrowIfCancellationRequested();
             bool reloadEditor = AutomaticEditorReloadPolicy.ShouldReloadEditor(
                 session,

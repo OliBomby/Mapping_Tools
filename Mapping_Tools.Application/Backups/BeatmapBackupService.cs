@@ -82,18 +82,18 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
             EnsureBackupDirectory();
             var createdAt = timeProvider.GetLocalNow();
             var disk = await CopySourceAsync(
-                    session.Editor.Path,
+                    session.Path,
                     reason,
                     createdAt,
                     cancellationToken)
                 .ConfigureAwait(false);
             List<BeatmapBackupArtifact> artifacts = [disk];
 
-            if (session.Source == BeatmapEditingSource.LiveEditor && !HasSameContentsAsDisk(session.Editor.Path, session.InitialBeatmapLines))
+            if (session.Source == BeatmapEditingSource.LiveEditor && !HasSameContentsAsDisk(session.Path, session.InitialBeatmapLines))
                 // Save second copy with newest version if possible
                 artifacts.Add(
                     await WriteSnapshotAsync(
-                            session.Editor.Path,
+                            session.Path,
                             session.InitialBeatmapLines,
                             reason,
                             createdAt,
@@ -122,28 +122,28 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
         cancellationToken.ThrowIfCancellationRequested();
         if (!settings.MakePeriodicBackups) return null;
 
-        IReadOnlyList<string> lines = session.Editor.Beatmap.GetLines();
+        IReadOnlyList<string> lines = session.Beatmap.GetLines();
         string hash = ComputeHash(lines);
         cancellationToken.ThrowIfCancellationRequested();
 
         await operationLock.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            if (periodicHashes.TryGetValue(session.Editor.Path, out string? previous) && string.Equals(previous, hash, StringComparison.Ordinal))
+            if (periodicHashes.TryGetValue(session.Path, out string? previous) && string.Equals(previous, hash, StringComparison.Ordinal))
                 return null;
 
             EnsureBackupDirectory();
             var createdAt = timeProvider.GetLocalNow();
             // Save temp version
             var artifact = await WriteSnapshotAsync(
-                    session.Editor.Path,
+                    session.Path,
                     lines,
                     BeatmapBackupReason.Periodic,
                     createdAt,
                     false,
                     cancellationToken)
                 .ConfigureAwait(false);
-            periodicHashes[session.Editor.Path] = hash;
+            periodicHashes[session.Path] = hash;
             await PruneAsync([artifact.Path], cancellationToken)
                 .ConfigureAwait(false);
             return artifact;
@@ -376,8 +376,8 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
 
         if (allowDifferentFilename) return;
 
-        BeatmapEditor backup = new(backupPath, textFileStore);
-        BeatmapEditor destination = new(destinationPath, textFileStore);
+        BeatmapEditingSession backup = new(backupPath, textFileStore);
+        BeatmapEditingSession destination = new(destinationPath, textFileStore);
         string backupFileName = backup.Beatmap.GetFileName();
         string destinationFileName = destination.Beatmap.GetFileName();
         if (!string.Equals(

@@ -38,7 +38,7 @@ public sealed class MetadataManagerService : IMetadataManagerService
         var session = await editingGateway
             .OpenBeatmapAsync(path, LiveBeatmapPreference.DiskOnly, cancellationToken)
             .ConfigureAwait(false);
-        return MetadataManagerEngine.Read(session.Editor.Beatmap);
+        return MetadataManagerEngine.Read(session.Beatmap);
     }
 
     /// <inheritdoc />
@@ -72,11 +72,11 @@ public sealed class MetadataManagerService : IMetadataManagerService
                     cancellationToken)
                 .ConfigureAwait(false);
 
-            MetadataManagerEngine.Apply(session.Editor.Beatmap, options);
+            MetadataManagerEngine.Apply(session.Beatmap, options);
             cancellationToken.ThrowIfCancellationRequested();
             // Save the file with name update because we updated the metadata
-            session.Editor.SaveFileWithNameUpdate();
-            processedPaths.Add(session.Editor.Path);
+            session.SaveFileWithNameUpdate();
+            processedPaths.Add(session.Path);
             progress?.Report(index + 1, paths.Length);
         }
 

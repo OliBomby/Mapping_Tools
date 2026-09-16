@@ -20,8 +20,8 @@ public sealed class RhythmGuideServiceTests
         Dictionary<string, BeatmapEditingSession> sessions = [];
         RecordingBeatmapEditingGateway gateway = CreateGateway(sessions);
         TestBeatmapBackupService backups = new();
-        sessions["source.osu"] = CreateSession(CreateEditor("source.osu", files, true));
-        sessions["target.osu"] = CreateSession(CreateEditor("target.osu", files, false));
+        sessions["source.osu"] = CreateSession("source.osu", files, true);
+        sessions["target.osu"] = CreateSession("target.osu", files, false);
         RhythmGuideService service = new(gateway, backups, new RecordingBeatmapFileSystem(), files);
         RhythmGuideServiceOptions.RhythmGuideRunOptions options = new()
         {
@@ -39,8 +39,8 @@ public sealed class RhythmGuideServiceTests
         gateway.OpenRequests.Should().Equal(
             ("source.osu", LiveBeatmapPreference.PreferLive),
             ("target.osu", LiveBeatmapPreference.PreferLive));
-        gateway.SessionSaveRequests.Single().Session.Editor
-            .Should().BeSameAs(sessions["target.osu"].Editor);
+        gateway.SessionSaveRequests.Single().Session
+            .Should().BeSameAs(sessions["target.osu"]);
         backups.CreateRequests.Should().ContainSingle();
         backups.CreateRequests[0].Paths.Should().Equal("source.osu");
         backups.CreateRequests[0].Reason.Should().Be(BeatmapBackupReason.Automatic);
@@ -54,7 +54,7 @@ public sealed class RhythmGuideServiceTests
         RecordingTextFileStore files = new();
         Dictionary<string, BeatmapEditingSession> sessions = [];
         RecordingBeatmapEditingGateway gateway = CreateGateway(sessions);
-        sessions["source.osu"] = CreateSession(CreateEditor("source.osu", files, true));
+        sessions["source.osu"] = CreateSession("source.osu", files, true);
         RhythmGuideService service = new(
             gateway,
             new TestBeatmapBackupService(),
@@ -84,7 +84,7 @@ public sealed class RhythmGuideServiceTests
         RecordingTextFileStore files = new();
         Dictionary<string, BeatmapEditingSession> sessions = [];
         RecordingBeatmapEditingGateway gateway = CreateGateway(sessions);
-        sessions["source.osu"] = CreateSession(CreateEditor("source.osu", files, true));
+        sessions["source.osu"] = CreateSession("source.osu", files, true);
         RhythmGuideService service = new(
             gateway,
             new TestBeatmapBackupService(),
@@ -105,11 +105,11 @@ public sealed class RhythmGuideServiceTests
         await service.GenerateAsync(options);
 
         // Assert
-        gateway.EditorSaveRequests.Should().ContainSingle();
-        gateway.EditorSaveRequests.Single().Editor.Path.Should().Be("existing.osu");
+        gateway.EditingSessionSaveRequests.Should().ContainSingle();
+        gateway.EditingSessionSaveRequests.Single().Session.Path.Should().Be("existing.osu");
     }
 
-    private static BeatmapEditor CreateEditor(
+    private static BeatmapEditingSession CreateSession(
         string path,
         ITextFileStore files,
         bool includeObject)
@@ -136,15 +136,12 @@ public sealed class RhythmGuideServiceTests
             "[HitObjects]",
         ];
         if (includeObject) lines.Add("256,192,1000,1,0,0:0:0:0:");
-        return new BeatmapEditor(lines, files) { Path = path };
-    }
-
-    private static BeatmapEditingSession CreateSession(BeatmapEditor editor)
-    {
         return new BeatmapEditingSession(
-            editor,
+            lines,
+            files,
             BeatmapEditingSource.Disk,
-            []);
+            [],
+            path: path);
     }
 
     private static RecordingBeatmapEditingGateway CreateGateway(

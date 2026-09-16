@@ -59,7 +59,7 @@ public sealed class TimingHelperService : ITimingHelperService
 
             var mapProgress = progress?.MapTo(pathIndex, paths.Count);
             redlinesAdded += TimingHelperEngine.Apply(
-                session.Editor.Beatmap,
+                session.Beatmap,
                 options,
                 mapProgress,
                 cancellationToken);

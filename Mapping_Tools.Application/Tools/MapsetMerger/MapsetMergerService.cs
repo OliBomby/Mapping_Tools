@@ -81,7 +81,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
                 var session = await editingGateway
                     .OpenBeatmapAsync(path, LiveBeatmapPreference.DiskOnly, cancellationToken)
                     .ConfigureAwait(false);
-                beatmaps.Add((path, session.Editor.Beatmap));
+                beatmaps.Add((path, session.Beatmap));
             }
 
             List<(string Path, StoryBoard Storyboard)> storyboards = [];
@@ -290,7 +290,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
         Beatmap beatmap)
     {
         // Save beatmap in new location with unique diffname
-        Editor.SaveFile(
+        EditingSession.SaveFile(
             fileSystem,
             transaction.GetStagedPath(relativePath),
             beatmap.GetLines());
@@ -301,7 +301,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
         string relativePath,
         StoryBoard storyboard)
     {
-        StoryboardEditor editor = new(storyboard.GetLines(), fileSystem);
+        StoryboardEditingSession editor = new(storyboard.GetLines(), fileSystem);
         editor.SaveFile(transaction.GetStagedPath(relativePath));
     }
 

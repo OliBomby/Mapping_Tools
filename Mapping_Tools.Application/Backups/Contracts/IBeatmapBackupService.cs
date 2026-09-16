@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.Backups.Models;
+using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 
 namespace Mapping_Tools.Application.Backups.Contracts;
@@ -105,4 +106,3 @@ public interface IBeatmapBackupService
         bool reloadEditor = false,
         CancellationToken cancellationToken = default);
 }
-

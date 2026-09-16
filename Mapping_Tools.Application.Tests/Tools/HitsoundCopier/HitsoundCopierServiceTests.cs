@@ -41,7 +41,7 @@ public sealed class HitsoundCopierServiceTests
         result.ProcessedPaths.Should().Equal("first.osu", "second.osu");
         gateway.OpenRequests.Select(request => request.Path)
             .Should().Equal("source.osu", "first.osu", "second.osu");
-        gateway.SessionSaveRequests.Select(request => request.Session.Editor.Path)
+        gateway.SessionSaveRequests.Select(request => request.Session.Path)
             .Should().Equal("first.osu", "second.osu");
     }
 
@@ -227,13 +227,12 @@ public sealed class HitsoundCopierServiceTests
             OpenBeatmapFactory = (path, _) =>
             {
                 Beatmap beatmap = path == "source.osu" ? source : target;
-                BeatmapEditor editor = new(
+                return new BeatmapEditingSession(
                     beatmap.GetLines(),
-                    new NoOpTextFileStore { ReadResult = [] })
-                {
-                    Path = path,
-                };
-                return new BeatmapEditingSession(editor, BeatmapEditingSource.Disk, []);
+                    new NoOpTextFileStore { ReadResult = [] },
+                    BeatmapEditingSource.Disk,
+                    [],
+                    path: path);
             },
         };
     }
@@ -244,13 +243,12 @@ public sealed class HitsoundCopierServiceTests
         {
             OpenBeatmapFactory = (path, _) =>
             {
-                BeatmapEditor editor = new(
+                return new BeatmapEditingSession(
                     File.ReadAllLines(fixture).ToList(),
-                    new NoOpTextFileStore { ReadResult = [] })
-                {
-                    Path = path,
-                };
-                return new BeatmapEditingSession(editor, BeatmapEditingSource.Disk, []);
+                    new NoOpTextFileStore { ReadResult = [] },
+                    BeatmapEditingSource.Disk,
+                    [],
+                    path: path);
             },
         };
     }

@@ -47,7 +47,7 @@ public sealed class SliderPicturatorService : ISliderPicturatorService
             path,
             LiveBeatmapPreference.PreferLive,
             cancellationToken).ConfigureAwait(false);
-        var beatmap = session.Editor.Beatmap;
+        var beatmap = session.Beatmap;
         double circleSize = beatmap.Difficulty["CircleSize"].DoubleValue;
         (var pathPoints, double frameDistance) = SliderPicturatorEngine.Picturate(
             image,
@@ -89,7 +89,7 @@ public sealed class SliderPicturatorService : ISliderPicturatorService
             path,
             LiveBeatmapPreference.DiskOnly,
             cancellationToken).ConfigureAwait(false);
-        var beatmap = session.Editor.Beatmap;
+        var beatmap = session.Beatmap;
         IReadOnlyList<ComboColour> comboColours = beatmap.ComboColours.Count == 0
             ? ComboColour.GetDefaultComboColours()
             : beatmap.ComboColours;

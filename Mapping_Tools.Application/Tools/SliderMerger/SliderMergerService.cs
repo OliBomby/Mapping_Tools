@@ -56,7 +56,7 @@ public sealed class SliderMergerService : ISliderMergerService
                 options.TimeCode);
             var mapProgress = progress?.MapTo(index, paths.Count);
             objectsMerged += SliderMergerEngine.Merge(
-                session.Editor.Beatmap,
+                session.Beatmap,
                 markedObjects,
                 options,
                 mapProgress,
