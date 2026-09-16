@@ -1,3 +1,5 @@
+using Mapping_Tools.Application.Execution.UserNotification;
+using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Workspace;
@@ -120,6 +122,32 @@ public sealed class BeatmapWorkspaceTests
     }
 
     [TestMethod]
+    public async Task PickBeatmapsAsync_WithMissingSelectedPath_PublishesLegacyWarningBeforePicking()
+    {
+        // Arrange
+        RecordingFilePicker picker = new() { OpenFiles = [] };
+        UserNotificationService notifications = new();
+        List<UserNotification> published = [];
+        notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
+        var workspace = CreateWorkspace(
+            new ApplicationSettings(),
+            picker,
+            notifications: notifications);
+        workspace.SetSelection(["missing.osu"]);
+
+        // Act
+        bool selected = await workspace.PickBeatmapsAsync(true);
+
+        // Assert
+        selected.Should().BeFalse();
+        published.Should().ContainSingle(notification =>
+            notification.Severity == UserNotificationSeverity.Warning &&
+            notification.Title == "Selected beatmap is missing" &&
+            notification.Message ==
+            "It seems like one of the selected beatmaps does not exist. Please re-select the file with 'File > Open beatmap'.");
+    }
+
+    [TestMethod]
     public async Task PickBeatmapsAsync_WithSelection_UsesPickerSourceAndSongsFallback()
     {
         // Arrange
@@ -227,6 +255,32 @@ public sealed class BeatmapWorkspaceTests
         // Assert
         missing.ToArray().Should().Equal("missing.osu");
         workspace.SelectedPaths.ToArray().Should().Equal("present.osu", "missing.osu");
+    }
+
+    [TestMethod]
+    public void SelectedPaths_WithMissingFile_PublishesLegacyWarningAndPreservesSelection()
+    {
+        // Arrange
+        RecordingBeatmapFileSystem fileSystem = new();
+        UserNotificationService notifications = new();
+        List<UserNotification> published = [];
+        notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
+        var workspace = CreateWorkspace(
+            new ApplicationSettings(),
+            fileSystem: fileSystem,
+            notifications: notifications);
+        workspace.SetSelection(["missing.osu"]);
+
+        // Act
+        IReadOnlyList<string> selected = workspace.SelectedPaths;
+
+        // Assert
+        selected.Should().Equal("missing.osu");
+        published.Should().ContainSingle(notification =>
+            notification.Severity == UserNotificationSeverity.Warning &&
+            notification.Title == "Selected beatmap is missing" &&
+            notification.Message ==
+            "It seems like one of the selected beatmaps does not exist. Please re-select the file with 'File > Open beatmap'.");
     }
 
     [TestMethod]
@@ -354,14 +408,16 @@ public sealed class BeatmapWorkspaceTests
         ApplicationSettings settings,
         RecordingFilePicker? picker = null,
         RecordingBeatmapFileSystem? fileSystem = null,
-        RecordingCurrentBeatmapLocator? locator = null)
+        RecordingCurrentBeatmapLocator? locator = null,
+        IUserNotificationService? notifications = null)
     {
         return new BeatmapWorkspace(
             settings,
             picker ?? new RecordingFilePicker(),
             fileSystem ?? new RecordingBeatmapFileSystem(),
             locator ?? new RecordingCurrentBeatmapLocator(),
-            new FixedTimeProvider(fixedNow));
+            new FixedTimeProvider(fixedNow),
+            notifications ?? new UserNotificationService());
     }
 
     private sealed class FixedTimeProvider(DateTimeOffset now) : TimeProvider

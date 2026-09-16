@@ -1,5 +1,7 @@
 using System.Globalization;
 using Mapping_Tools.Application.Abstractions;
+using Mapping_Tools.Application.Execution.UserNotification;
+using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Workspace.Contracts;
@@ -13,10 +15,13 @@ namespace Mapping_Tools.Application.Workspace;
 /// </summary>
 public sealed class BeatmapWorkspace : IBeatmapWorkspace
 {
+    private const string missing_selected_path_message =
+        "It seems like one of the selected beatmaps does not exist. Please re-select the file with 'File > Open beatmap'.";
     private const int recent_map_limit = 20;
     private readonly ICurrentBeatmapLocator currentBeatmapLocator;
     private readonly IFilePicker filePicker;
     private readonly IBeatmapsetFileSystem fileSystem;
+    private readonly IUserNotificationService notifications;
 
     private readonly ApplicationSettings settings;
     private readonly TimeProvider timeProvider;
@@ -34,12 +39,14 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
     ///     by editing sessions, without leaking process-memory types here.
     /// </param>
     /// <param name="timeProvider">Supplies deterministic timestamps for recent history.</param>
+    /// <param name="notifications">Publishes warnings when a selected path is read after its file disappears.</param>
     public BeatmapWorkspace(
         ApplicationSettings settings,
         IFilePicker filePicker,
         IBeatmapsetFileSystem fileSystem,
         ICurrentBeatmapLocator currentBeatmapLocator,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        IUserNotificationService notifications)
     {
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
@@ -47,6 +54,7 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
         this.currentBeatmapLocator = currentBeatmapLocator
                                      ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
         this.timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
+        this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
         this.settings.RecentMaps ??= [];
         RemoveInvalidRecentEntries();
     }
@@ -55,7 +63,24 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
     public event EventHandler<BeatmapSelectionChangedEventArgs>? SelectionChanged;
 
     /// <inheritdoc />
-    public IReadOnlyList<string> SelectedPaths => selectedPaths.ToArray();
+    public IReadOnlyList<string> SelectedPaths
+    {
+        get
+        {
+            IReadOnlyList<string> paths = selectedPaths.ToArray();
+            IReadOnlyList<string> missing = GetMissingSelectedPaths();
+            if (missing.Count > 0)
+            {
+                _ = notifications.PublishAsync(
+                    new UserNotification(
+                        UserNotificationSeverity.Warning,
+                        "Selected beatmap is missing",
+                        missing_selected_path_message));
+            }
+
+            return paths;
+        }
+    }
 
     /// <inheritdoc />
     public IReadOnlyList<RecentBeatmap> RecentMaps => settings.RecentMaps.ToArray();
@@ -148,9 +173,10 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
     {
         if (!settings.CurrentBeatmapDefaultFolder) return currentDirectory;
 
-        string? selectedParent = selectedPaths.Length == 0
+        IReadOnlyList<string> paths = SelectedPaths;
+        string? selectedParent = paths.Count == 0
             ? null
-            : fileSystem.GetParentDirectory(selectedPaths[0]);
+            : fileSystem.GetParentDirectory(paths[0]);
         return string.IsNullOrWhiteSpace(selectedParent)
             ? settings.SongsPath
             : selectedParent;
@@ -223,7 +249,7 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
             return currentPath!;
         }
 
-        return selectedPaths.FirstOrDefault() ?? string.Empty;
+        return SelectedPaths.FirstOrDefault() ?? string.Empty;
     }
 
     private void RemoveInvalidRecentEntries()

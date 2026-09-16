@@ -10,6 +10,8 @@ public interface IBeatmapWorkspace
 {
     /// <summary>
     ///     Gets a snapshot of the selected local paths in caller-supplied order.
+    ///     Publishes the legacy missing-file warning when one or more selected
+    ///     paths no longer resolve to local files.
     /// </summary>
     IReadOnlyList<string> SelectedPaths { get; }
 

@@ -42,6 +42,7 @@ public sealed class HeadlessApplicationWorkflowTests
             liveReader,
             new RecordingEditorReloadService(),
             settings);
+        UserNotificationService notifications = new();
         BeatmapWorkspace workspace = new(
             settings,
             new RecordingFilePicker
@@ -56,10 +57,10 @@ public sealed class HeadlessApplicationWorkflowTests
                 ParentDirectoryResolver = Path.GetDirectoryName,
             },
             new RecordingCurrentBeatmapLocator(map_path),
-            TimeProvider.System);
+            TimeProvider.System,
+            notifications);
         var selection =
             await workspace.SelectCurrentBeatmapAsync();
-        UserNotificationService notifications = new();
         List<UserNotification> published = [];
         notifications.Published += (_, args) => published.Add(args.Notification);
         ToolExecutionService execution = new(
