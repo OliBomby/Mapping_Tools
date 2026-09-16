@@ -27,7 +27,7 @@
     "Clap": false
   },
   "ExportFolder": "",
-  "HitsoundDiffName": "Wave 0 Hitsounds",
+  "HitsoundDiffName": "E2E Hitsounds",
   "ExportMap": true,
   "ExportSamples": true,
   "DeleteAllInExportFirst": true,
@@ -45,7 +45,7 @@
   "HitsoundLayers": [
     {
       "$type": "Mapping_Tools.Classes.HitsoundStuff.HitsoundLayer, Mapping Tools",
-      "Name": "Wave 0",
+      "Name": "E2E",
       "SampleSet": 1,
       "Hitsound": 0,
       "Priority": 0,

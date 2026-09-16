@@ -59,7 +59,7 @@ public sealed class PatternGalleryProjectSerializerTests
     }
 
     [TestMethod]
-    public void Deserialize_WithWaveZeroPatternGalleryFixture_RestoresCollectionAndPatternFile()
+    public void Deserialize_WithE2EPatternGalleryFixture_RestoresCollectionAndPatternFile()
     {
         // Arrange
         string fixture = Path.Combine(
@@ -81,7 +81,7 @@ public sealed class PatternGalleryProjectSerializerTests
     }
 
     [TestMethod]
-    public void Deserialize_WithWaveZeroPatternGalleryProjectFixture_RestoresProjectHistory()
+    public void Deserialize_WithE2EPatternGalleryProjectFixture_RestoresProjectHistory()
     {
         // Arrange
         string fixture = Path.Combine(

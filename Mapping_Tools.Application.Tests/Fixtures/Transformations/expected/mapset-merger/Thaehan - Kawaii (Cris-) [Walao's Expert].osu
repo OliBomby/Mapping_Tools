@@ -1,7 +1,7 @@
 osu file format v14
 
 [General]
-AudioFilename:  Wave0-B\audio.mp3
+AudioFilename:  E2E-B\audio.mp3
 AudioLeadIn: 0
 PreviewTime: 34462
 Countdown: 0
@@ -39,7 +39,7 @@ SliderTickRate:1
 
 [Events]
 //Background and Video events
-0,0,"Wave0-B\Kawaii.jpg",0,0
+0,0,"E2E-B\Kawaii.jpg",0,0
 //Break Periods
 //Storyboard Layer 0 (Background)
 //Storyboard Layer 1 (Fail)

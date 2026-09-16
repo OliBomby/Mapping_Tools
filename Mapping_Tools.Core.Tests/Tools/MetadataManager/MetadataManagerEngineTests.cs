@@ -16,13 +16,13 @@ public sealed class MetadataManagerEngineTests
         int hitObjectCount = beatmap.HitObjects.Count;
         MetadataManagerEngineOptions options = new()
         {
-            Artist = "Wave Zero Artist",
-            RomanisedArtist = "Wave Zero Artist",
-            Title = "Wave Zero Metadata Baseline",
-            RomanisedTitle = "Wave Zero Metadata Baseline",
+            Artist = "E2E Fixture Artist",
+            RomanisedArtist = "E2E Fixture Artist",
+            Title = "E2E Metadata Fixture",
+            RomanisedTitle = "E2E Metadata Fixture",
             BeatmapCreator = "Fixture Mapper",
-            Source = "Wave 0",
-            Tags = "wave zero metadata fixture wave",
+            Source = "E2E Fixture",
+            Tags = "e2e fixture e2e",
             PreviewTime = 12345,
             ResetIds = true,
             ComboColours = [new ComboColour(RgbaColour.FromRgb(255, 51, 102))],
@@ -32,11 +32,11 @@ public sealed class MetadataManagerEngineTests
         MetadataManagerEngine.Apply(beatmap, options);
 
         // Assert
-        beatmap.Metadata["ArtistUnicode"].Value.Should().Be("Wave Zero Artist");
-        beatmap.Metadata["Title"].Value.Should().Be("Wave Zero Metadata Baseline");
+        beatmap.Metadata["ArtistUnicode"].Value.Should().Be("E2E Fixture Artist");
+        beatmap.Metadata["Title"].Value.Should().Be("E2E Metadata Fixture");
         beatmap.Metadata["Creator"].Value.Should().Be("Fixture Mapper");
-        beatmap.Metadata["Source"].Value.Should().Be("Wave 0");
-        beatmap.Metadata["Tags"].Value.Should().Be("wave zero metadata fixture");
+        beatmap.Metadata["Source"].Value.Should().Be("E2E Fixture");
+        beatmap.Metadata["Tags"].Value.Should().Be("e2e fixture");
         beatmap.General["PreviewTime"].DoubleValue.Should().Be(12345);
         beatmap.Metadata["BeatmapID"].Value.Should().Be("0");
         beatmap.Metadata["BeatmapSetID"].Value.Should().Be("-1");

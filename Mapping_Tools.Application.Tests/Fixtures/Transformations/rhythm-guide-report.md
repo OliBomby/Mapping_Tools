@@ -20,6 +20,6 @@
 
 `HitsoundEvents` selection appended one circle for each qualifying source timeline event. `NC everything` marked all 1,327 generated circles as new combos. The original 17 target objects and all nine timing points were retained.
 
-The legacy AddToMap path backs up the input source instead of the mutated export target. The observed `source.osu` backup is byte-identical to the source fixture; this known legacy behavior is recorded for parity and deferred from Wave 0.
+The legacy AddToMap path backs up the input source instead of the mutated export target. The observed `source.osu` backup is byte-identical to the source fixture; this known legacy behavior is recorded for parity and remains unchanged by the E2E fixture.
 
 Status: accepted by Olivier on 2026-07-18.

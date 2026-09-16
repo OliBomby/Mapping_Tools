@@ -27,14 +27,14 @@ GridSize: 4
 TimelineZoom: 0.8000059
 
 [Metadata]
-Title:Wave Zero Metadata Baseline
-TitleUnicode:Wave Zero Metadata Baseline
-Artist:Wave Zero Artist
-ArtistUnicode:Wave Zero Artist
+Title:E2E Metadata Fixture
+TitleUnicode:E2E Metadata Fixture
+Artist:E2E Fixture Artist
+ArtistUnicode:E2E Fixture Artist
 Creator:Fixture Mapper
 Version:complicated
-Source:Wave 0
-Tags:wave zero metadata fixture
+Source:E2E Fixture
+Tags:e2e fixture
 BeatmapID:0
 BeatmapSetID:-1
 

@@ -34,13 +34,13 @@ public sealed class MetadataManagerServiceTests
         MetadataManagerServiceOptions options = new()
         {
             ExportPath = target,
-            Artist = "Wave Zero Artist",
-            RomanisedArtist = "Wave Zero Artist",
-            Title = "Wave Zero Metadata Baseline",
-            RomanisedTitle = "Wave Zero Metadata Baseline",
+            Artist = "E2E Fixture Artist",
+            RomanisedArtist = "E2E Fixture Artist",
+            Title = "E2E Metadata Fixture",
+            RomanisedTitle = "E2E Metadata Fixture",
             BeatmapCreator = "Fixture Mapper",
-            Source = "Wave 0",
-            Tags = "wave zero wave",
+            Source = "E2E Fixture",
+            Tags = "e2e fixture e2e",
             ResetIds = true,
             PreviewTime = 12345,
         };
@@ -56,8 +56,8 @@ public sealed class MetadataManagerServiceTests
         backup.CreateRequests.Should().ContainSingle(request =>
             request.Paths.SequenceEqual(new[] { target }) && request.Reason == BeatmapBackupReason.Automatic && !request.Force);
         Beatmap output = new(File.ReadAllLines(result.ProcessedPaths[0]).ToList());
-        output.Metadata["Artist"].Value.Should().Be("Wave Zero Artist");
-        output.Metadata["Tags"].Value.Should().Be("wave zero");
+        output.Metadata["Artist"].Value.Should().Be("E2E Fixture Artist");
+        output.Metadata["Tags"].Value.Should().Be("e2e fixture");
         output.Metadata["BeatmapID"].Value.Should().Be("0");
         output.General["PreviewTime"].DoubleValue.Should().Be(12345);
     }

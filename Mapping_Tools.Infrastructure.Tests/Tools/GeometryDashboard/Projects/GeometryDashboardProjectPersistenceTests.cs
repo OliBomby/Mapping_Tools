@@ -99,7 +99,7 @@ public sealed class GeometryDashboardProjectPersistenceTests
     }
 
     [TestMethod]
-    public void Deserialize_WithWaveZeroGeometryDashboardFixture_PreservesPreferences()
+    public void Deserialize_WithE2EGeometryDashboardFixture_PreservesPreferences()
     {
         // Arrange
         string fixture = Path.Combine(

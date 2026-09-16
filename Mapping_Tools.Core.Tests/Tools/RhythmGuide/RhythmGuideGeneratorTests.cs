@@ -9,7 +9,7 @@ namespace Mapping_Tools.Core.Tests.Tools.RhythmGuide;
 public sealed class RhythmGuideGeneratorTests
 {
     [TestMethod]
-    public void Append_WithAcceptedWaveZeroOptions_ReproducesLegacySemanticCounts()
+    public void Append_WithAcceptedE2EOptions_ReproducesLegacySemanticCounts()
     {
         // Arrange
         var source = Load("standard-feature-rich.osu");

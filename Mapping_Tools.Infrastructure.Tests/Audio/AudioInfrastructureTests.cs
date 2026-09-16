@@ -14,7 +14,7 @@ namespace Mapping_Tools.Infrastructure.Tests.Audio;
 public sealed class AudioInfrastructureTests
 {
     [TestMethod]
-    public async Task NaudioAudioDecoder_DecodesTheWaveZeroVorbisFixture()
+    public async Task NaudioAudioDecoder_DecodesTheE2EVorbisFixture()
     {
         // Arrange
         string path = Path.Combine(AppContext.BaseDirectory, "Fixtures", "Audio", "soft-hitwhistle6.ogg");

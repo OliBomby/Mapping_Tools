@@ -205,7 +205,7 @@ public sealed class ProjectPersistenceTests
     }
 
     [TestMethod]
-    public void Deserialize_WithWaveZeroHitsoundPreviewFixture_RestoresAllZones()
+    public void Deserialize_WithE2EHitsoundPreviewFixture_RestoresAllZones()
     {
         // Arrange
         string fixture = Path.Combine(
@@ -248,7 +248,7 @@ public sealed class ProjectPersistenceTests
     }
 
     [TestMethod]
-    public void Deserialize_WithWaveZeroHitsoundCopierFixture_RestoresLegacyOptions()
+    public void Deserialize_WithE2EHitsoundCopierFixture_RestoresLegacyOptions()
     {
         // Arrange
         string fixture = Path.Combine(

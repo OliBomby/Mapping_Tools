@@ -1,11 +1,11 @@
 {
   "Mapsets": [
     {
-      "Name": "Wave0-A",
+      "Name": "E2E-A",
       "Beatmaps": ["../Mapsets/multi-difficulty/normal.osu"]
     },
     {
-      "Name": "Wave0-B",
+      "Name": "E2E-B",
       "Beatmaps": ["../Mapsets/multi-difficulty/expert.osu"]
     }
   ],

@@ -18,7 +18,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Mapping_Tools.Application.Tests.Execution;
 
 [TestClass]
-public sealed class Wave2CompletionTests
+public sealed class HeadlessApplicationWorkflowTests
 {
     private const string map_path =
         @"C:\osu!\Songs\123 Artist - Title\map.osu";
@@ -69,14 +69,14 @@ public sealed class Wave2CompletionTests
         QuickRunCommandRegistry registry = new();
         registry.Register(
             new QuickRunCommand(
-                "wave2-acceptance",
-                "Wave 2 acceptance",
+                "headless-application-workflow",
+                "Headless application workflow",
                 QuickRunTargets.Always,
                 async cancellationToken =>
                 {
                     ToolExecutionRequest<string> request = new(
-                        "wave2-acceptance",
-                        "Wave 2 acceptance",
+                        "headless-application-workflow",
+                        "Headless application workflow",
                         async context =>
                         {
                             string path = workspace.SelectedPaths.Single();
@@ -86,19 +86,19 @@ public sealed class Wave2CompletionTests
                                     LiveBeatmapPreference.DiskOnly,
                                     context.CancellationToken);
                             session.Beatmap.Metadata["Version"] =
-                                new StringValue("Wave 2 validated");
+                                new StringValue("Headless application workflow validated");
                             await gateway.SaveAsync(
                                 session,
                                 cancellationToken: context.CancellationToken);
                             return new ToolExecutionOutput<string>(
                                 path,
-                                "Wave 2 headless workflow completed.");
+                                "Headless application workflow completed.");
                         });
                     toolResult = await execution.ExecuteAsync(
                         request,
                         cancellationToken: cancellationToken);
                 }));
-        registry.SelectCurrent("wave2-acceptance");
+        registry.SelectCurrent("headless-application-workflow");
         QuickRunService quickRun = new(
             registry,
             liveReader,
@@ -117,7 +117,7 @@ public sealed class Wave2CompletionTests
         toolResult.Value.Should().Be(map_path);
         backups.CreateCount.Should().Be(1);
         backups.BackupPrecededWrite.Should().BeTrue();
-        store.Files[map_path].Contains("Version:Wave 2 validated").Should().BeTrue();
+        store.Files[map_path].Contains("Version:Headless application workflow validated").Should().BeTrue();
         published.Count.Should().Be(1);
         published[0].Severity.Should().Be(UserNotificationSeverity.Success);
     }

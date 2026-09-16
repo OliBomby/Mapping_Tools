@@ -102,7 +102,7 @@ public sealed class LegacyProjectJsonSerializerTests
     }
 
     [TestMethod]
-    public void Deserialize_WithWaveZeroMapsetMergerFixture_RestoresBothMapsets()
+    public void Deserialize_WithE2EMapsetMergerFixture_RestoresBothMapsets()
     {
         // Arrange
         string fixture = Path.Combine(
