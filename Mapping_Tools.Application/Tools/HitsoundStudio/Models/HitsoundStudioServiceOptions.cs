@@ -10,7 +10,12 @@ public class HitsoundStudioServiceOptions
     public HitsoundStudioServiceOptions()
     {
         BaseBeatmap = string.Empty;
-        DefaultSample = new Sample { Priority = int.MaxValue };
+        DefaultSample = new Sample
+        {
+            Priority = int.MaxValue,
+            SampleSet = SampleSet.None,
+            SampleArgs = new SampleGeneratingArgs { Volume = -0.01 },
+        };
         HitsoundLayers = [];
         ExportFolder = string.Empty;
         HitsoundDiffName = "Hitsounds";

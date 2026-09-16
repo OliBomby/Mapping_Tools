@@ -9,6 +9,20 @@ namespace Mapping_Tools.Application.Tests.Tools.HitsoundStudio;
 public sealed class HitsoundStudioProjectTests
 {
     [TestMethod]
+    public void Constructor_DefaultSample_UsesAutomaticSampleSetAndInvariantVolume()
+    {
+        // Arrange
+        HitsoundStudioServiceOptions project = new();
+
+        // Act
+        Sample defaultSample = project.DefaultSample;
+
+        // Assert
+        defaultSample.SampleSet.Should().Be(SampleSet.None);
+        defaultSample.SampleArgs.Volume.Should().Be(-0.01d);
+    }
+
+    [TestMethod]
     public void Clone_CopiesNestedLayersAndSchemaWithoutSharingMutableState()
     {
         // Arrange

@@ -128,10 +128,15 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     [ObservableProperty]
     public partial string BaseBeatmap { get; set; } = string.Empty;
 
-    /// <summary>Gets or sets the default normal sample.</summary>
+    /// <summary>Gets or sets the default sample.</summary>
     [ObservableProperty]
     public partial ObservableSample DefaultSample { get; set; } =
-        new(new Sample { Priority = int.MaxValue });
+        new(new Sample
+        {
+            Priority = int.MaxValue,
+            SampleSet = SampleSet.None,
+            SampleArgs = new SampleGeneratingArgs { Volume = -0.01 },
+        });
 
     /// <summary>Gets or sets the export directory.</summary>
     [ObservableProperty]

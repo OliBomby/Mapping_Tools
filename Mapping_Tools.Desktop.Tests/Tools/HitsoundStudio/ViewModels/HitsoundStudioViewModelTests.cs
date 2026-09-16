@@ -26,6 +26,23 @@ namespace Mapping_Tools.Desktop.Tests.Tools.HitsoundStudio.ViewModels;
 public sealed class HitsoundStudioViewModelTests
 {
     [TestMethod]
+    public void Constructor_DefaultSample_UsesAutomaticSampleSetAndInvariantVolume()
+    {
+        // Arrange
+        HitsoundStudioViewModel viewModel = CreateViewModel(
+            new RecordingHitsoundStudioService(),
+            new RecordingAudioGenerator(),
+            new RecordingPlaybackService());
+
+        // Act
+        ObservableSample defaultSample = viewModel.DefaultSample;
+
+        // Assert
+        defaultSample.SampleSet.Should().Be(SampleSet.None);
+        defaultSample.SampleArgs.Volume.Should().Be(-0.01d);
+    }
+
+    [TestMethod]
     public async Task PreviewCommand_WhenSupersededDuringGeneration_StopsStaleSessionAndKeepsLatestPlaying()
     {
         // Arrange
