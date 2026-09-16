@@ -159,6 +159,7 @@ public sealed class LayerBoundaryTests
         string desktopUpdates = Path.Combine(
             repositoryRoot,
             "Mapping_Tools.Desktop",
+            "Services",
             "Updates");
         string[] forbiddenApplicationTokens =
         [

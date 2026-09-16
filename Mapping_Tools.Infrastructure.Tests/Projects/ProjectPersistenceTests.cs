@@ -100,23 +100,6 @@ public sealed class ProjectPersistenceTests
     }
 
     [TestMethod]
-    public void Serialize_WithMigratedCoreTypes_UsesLegacyAssemblyName()
-    {
-        // Arrange
-        LegacyProjectJsonSerializer serializer = new();
-
-        // Act
-        string json = serializer.Serialize(new TimingPoint
-        {
-            Offset = 1250,
-            MpB = 500,
-        });
-
-        // Assert
-        json.Should().Contain("\"$type\": \"Mapping_Tools.Classes.BeatmapHelper.TimingPoint, Mapping Tools\"");
-    }
-
-    [TestMethod]
     public void SerializeAndDeserialize_MigratedCoreTypes_PreservesLegacyAliases()
     {
         // Arrange
