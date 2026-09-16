@@ -1,6 +1,5 @@
 {
   "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectCollection.RelevantObjectCollection, Mapping Tools",
-  "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantHitObject, Mapping Tools, Version=1.12.30.0, Culture=neutral, PublicKeyToken=null": [],
   "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools, Version=1.12.30.0, Culture=neutral, PublicKeyToken=null": [
     {
       "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
@@ -9,8 +8,8 @@
         "X": 342.0,
         "Y": 98.0
       },
-      "Time": 10962.0,
       "CustomTime": 0.0,
+      "Time": 10962.0,
       "Relevancy": 1.0,
       "Disposed": false,
       "DoNotDispose": true,
@@ -27,8 +26,8 @@
         "X": 489.0,
         "Y": 73.0
       },
-      "Time": 11120.0,
       "CustomTime": 0.0,
+      "Time": 11120.0,
       "Relevancy": 1.0,
       "Disposed": false,
       "DoNotDispose": true,
@@ -45,44 +44,8 @@
         "X": 361.0,
         "Y": 131.0
       },
-      "Time": 11278.0,
       "CustomTime": 11278.0,
-      "Relevancy": 1.0,
-      "Disposed": false,
-      "DoNotDispose": true,
-      "DefinitelyDispose": false,
-      "AutoPropagate": true,
-      "IsSelected": false,
-      "IsLocked": true,
-      "IsInheritable": true
-    },
-    {
-      "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
-      "PreferencesName": "Virtual point preferences",
-      "Child": {
-        "X": 308.0,
-        "Y": 140.0
-      },
       "Time": 11278.0,
-      "CustomTime": 11278.0,
-      "Relevancy": 1.0,
-      "Disposed": false,
-      "DoNotDispose": true,
-      "DefinitelyDispose": false,
-      "AutoPropagate": true,
-      "IsSelected": false,
-      "IsLocked": true,
-      "IsInheritable": true
-    },
-    {
-      "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
-      "PreferencesName": "Virtual point preferences",
-      "Child": {
-        "X": 224.0,
-        "Y": 214.0
-      },
-      "Time": 11278.0,
-      "CustomTime": 11278.0,
       "Relevancy": 1.0,
       "Disposed": false,
       "DoNotDispose": true,
@@ -99,8 +62,44 @@
         "X": 359.5868603916614,
         "Y": 283.2337334175616
       },
-      "Time": 11278.0,
       "CustomTime": 0.0,
+      "Time": 11278.0,
+      "Relevancy": 1.0,
+      "Disposed": false,
+      "DoNotDispose": true,
+      "DefinitelyDispose": false,
+      "AutoPropagate": true,
+      "IsSelected": false,
+      "IsLocked": true,
+      "IsInheritable": true
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
+      "PreferencesName": "Virtual point preferences",
+      "Child": {
+        "X": 308.0,
+        "Y": 140.0
+      },
+      "CustomTime": 11435.5,
+      "Time": 11435.5,
+      "Relevancy": 1.0,
+      "Disposed": false,
+      "DoNotDispose": true,
+      "DefinitelyDispose": false,
+      "AutoPropagate": true,
+      "IsSelected": false,
+      "IsLocked": true,
+      "IsInheritable": true
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
+      "PreferencesName": "Virtual point preferences",
+      "Child": {
+        "X": 224.0,
+        "Y": 214.0
+      },
+      "CustomTime": 11593.0,
+      "Time": 11593.0,
       "Relevancy": 1.0,
       "Disposed": false,
       "DoNotDispose": true,
@@ -117,44 +116,8 @@
         "X": 84.0,
         "Y": 86.0
       },
-      "Time": 11752.0,
       "CustomTime": 11752.0,
-      "Relevancy": 1.0,
-      "Disposed": false,
-      "DoNotDispose": true,
-      "DefinitelyDispose": false,
-      "AutoPropagate": true,
-      "IsSelected": false,
-      "IsLocked": true,
-      "IsInheritable": true
-    },
-    {
-      "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
-      "PreferencesName": "Virtual point preferences",
-      "Child": {
-        "X": 103.0,
-        "Y": 108.0
-      },
       "Time": 11752.0,
-      "CustomTime": 11752.0,
-      "Relevancy": 1.0,
-      "Disposed": false,
-      "DoNotDispose": true,
-      "DefinitelyDispose": false,
-      "AutoPropagate": true,
-      "IsSelected": false,
-      "IsLocked": true,
-      "IsInheritable": true
-    },
-    {
-      "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
-      "PreferencesName": "Virtual point preferences",
-      "Child": {
-        "X": 125.0,
-        "Y": 155.0
-      },
-      "Time": 11752.0,
-      "CustomTime": 11752.0,
       "Relevancy": 1.0,
       "Disposed": false,
       "DoNotDispose": true,
@@ -171,8 +134,44 @@
         "X": -17.97921760391198,
         "Y": 193.27750611246944
       },
-      "Time": 11752.0,
       "CustomTime": 0.0,
+      "Time": 11752.0,
+      "Relevancy": 1.0,
+      "Disposed": false,
+      "DoNotDispose": true,
+      "DefinitelyDispose": false,
+      "AutoPropagate": true,
+      "IsSelected": false,
+      "IsLocked": true,
+      "IsInheritable": true
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
+      "PreferencesName": "Virtual point preferences",
+      "Child": {
+        "X": 103.0,
+        "Y": 108.0
+      },
+      "CustomTime": 11830.5,
+      "Time": 11830.5,
+      "Relevancy": 1.0,
+      "Disposed": false,
+      "DoNotDispose": true,
+      "DefinitelyDispose": false,
+      "AutoPropagate": true,
+      "IsSelected": false,
+      "IsLocked": true,
+      "IsInheritable": true
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
+      "PreferencesName": "Virtual point preferences",
+      "Child": {
+        "X": 125.0,
+        "Y": 155.0
+      },
+      "CustomTime": 11909.0,
+      "Time": 11909.0,
       "Relevancy": 1.0,
       "Disposed": false,
       "DoNotDispose": true,
@@ -195,8 +194,8 @@
         },
         "Radius": 152.24029214962073
       },
-      "Time": 11278.0,
       "CustomTime": 0.0,
+      "Time": 11278.0,
       "Relevancy": 1.0,
       "Disposed": false,
       "DoNotDispose": true,
@@ -217,8 +216,8 @@
         },
         "Radius": 148.01427005804862
       },
-      "Time": 11752.0,
       "CustomTime": 0.0,
+      "Time": 11752.0,
       "Relevancy": 1.0,
       "Disposed": false,
       "DoNotDispose": true,
