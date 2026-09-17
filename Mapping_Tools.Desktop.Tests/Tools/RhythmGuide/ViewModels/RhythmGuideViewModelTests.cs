@@ -39,11 +39,12 @@ public sealed class RhythmGuideViewModelTests
     }
 
     [TestMethod]
-    public async Task RunCommand_WithNewMap_ExecutesUseCaseWithoutCompletionMessageOrReveal()
+    public async Task RunCommand_WithNewMap_RevealsExportWithoutCompletionMessage()
     {
         // Arrange
         RecordingRhythmGuideService rhythmGuide = new();
-        var viewModel = CreateViewModel(rhythmGuide);
+        TestFileRevealService reveal = new();
+        var viewModel = CreateViewModel(rhythmGuide, fileReveal: reveal);
         viewModel.SourcePaths = ["source.osu"];
         viewModel.ExportPath = "guide.osu";
 
@@ -53,6 +54,7 @@ public sealed class RhythmGuideViewModelTests
         // Assert
         rhythmGuide.Options.Should().NotBeNull();
         rhythmGuide.Options!.Paths.Should().Equal("source.osu");
+        reveal.RevealedPaths.Should().ContainSingle().Which.Should().Be("guide.osu");
         viewModel.Progress.Should().Be(0);
         viewModel.IsRunning.Should().BeFalse();
     }
@@ -80,13 +82,14 @@ public sealed class RhythmGuideViewModelTests
     }
 
     [TestMethod]
-    public async Task RunCommand_WithAddToMap_PublishesLegacyDoneMessage()
+    public async Task RunCommand_WithAddToMap_PublishesDoneMessageAndRevealsExport()
     {
         // Arrange
         UserNotificationService notifications = new();
         List<UserNotification> published = [];
         notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
-        var viewModel = CreateViewModel(notifications: notifications);
+        TestFileRevealService reveal = new();
+        var viewModel = CreateViewModel(notifications: notifications, fileReveal: reveal);
         viewModel.SourcePaths = ["source.osu"];
         viewModel.ExportPath = "target.osu";
         viewModel.ExportMode = RhythmGuideExportMode.AddToMap;
@@ -96,13 +99,15 @@ public sealed class RhythmGuideViewModelTests
 
         // Assert
         published.Should().ContainSingle(notification => notification.Message == "Done!");
+        reveal.RevealedPaths.Should().ContainSingle().Which.Should().Be("target.osu");
     }
 
     private static RhythmGuideViewModel CreateViewModel(
         RecordingRhythmGuideService? rhythmGuide = null,
         TestFilePicker? filePicker = null,
         UserNotificationService? notifications = null,
-        TestBeatmapWorkspace? workspace = null)
+        TestBeatmapWorkspace? workspace = null,
+        TestFileRevealService? fileReveal = null)
     {
         notifications ??= new UserNotificationService();
         ToolExecutionService execution = new(
@@ -112,6 +117,7 @@ public sealed class RhythmGuideViewModelTests
             rhythmGuide ?? new RecordingRhythmGuideService(),
             execution,
             filePicker ?? new TestFilePicker(),
+            fileReveal ?? new TestFileRevealService(),
             new RecordingCurrentBeatmapLocator(),
             workspace ?? new TestBeatmapWorkspace(),
             new StubRhythmGuideWindowService(),

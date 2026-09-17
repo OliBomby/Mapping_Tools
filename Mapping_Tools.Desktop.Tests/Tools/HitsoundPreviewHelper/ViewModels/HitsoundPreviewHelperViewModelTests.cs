@@ -128,6 +128,7 @@ public sealed class HitsoundPreviewHelperViewModelTests
             new StubRhythmGuideService(),
             execution,
             new TestFilePicker(),
+            new TestFileRevealService(),
             new RecordingCurrentBeatmapLocator("current.osu"),
             effectiveWorkspace,
             windows,

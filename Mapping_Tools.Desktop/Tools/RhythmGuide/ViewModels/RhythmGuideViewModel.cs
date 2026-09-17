@@ -26,6 +26,7 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
     private readonly ICurrentBeatmapLocator currentBeatmapLocator;
     private readonly ProjectDefinition<RhythmGuideProject> definition;
     private readonly IFilePicker filePicker;
+    private readonly IFileRevealService fileRevealService;
     private readonly IBeatmapWorkspace workspace;
 
     private readonly IRhythmGuideService rhythmGuide;
@@ -36,6 +37,7 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
     /// <param name="rhythmGuide">Generates framework-independent guide beatmaps.</param>
     /// <param name="execution">Coordinates cancellation, backup, and notifications.</param>
     /// <param name="filePicker">Selects source and destination beatmap files.</param>
+    /// <param name="fileRevealService">Reveals the completed beatmap in the platform file manager.</param>
     /// <param name="currentBeatmapLocator">Finds the beatmap open in osu!.</param>
     /// <param name="workspace">Supplies the shared default beatmap picker location.</param>
     /// <param name="windowService">Opens the auxiliary Rhythm Guide window.</param>
@@ -44,6 +46,7 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
         IRhythmGuideService rhythmGuide,
         IToolExecutionService execution,
         IFilePicker filePicker,
+        IFileRevealService fileRevealService,
         ICurrentBeatmapLocator currentBeatmapLocator,
         IBeatmapWorkspace workspace,
         IRhythmGuideWindowService windowService,
@@ -52,6 +55,7 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
     {
         this.rhythmGuide = rhythmGuide ?? throw new ArgumentNullException(nameof(rhythmGuide));
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
+        this.fileRevealService = fileRevealService ?? throw new ArgumentNullException(nameof(fileRevealService));
         this.currentBeatmapLocator = currentBeatmapLocator ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         this.windowService = windowService ?? throw new ArgumentNullException(nameof(windowService));
@@ -180,7 +184,7 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
     protected override async Task RunCoreAsync()
     {
         var options = CreateOptions();
-        await Execution.ExecuteAsync(
+        var result = await Execution.ExecuteAsync(
             new ToolExecutionRequest<RhythmGuideResult>(
                 Tool.Id,
                 Tool.DisplayName,
@@ -193,9 +197,11 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
                     context.ReportProgress(1, "Complete");
                     return new ToolExecutionOutput<RhythmGuideResult>(
                         generated,
-                        generated.ExportMode == RhythmGuideExportMode.AddToMap ? "Done!" : null);
+                        "Done!");
                 }),
             CreateProgress());
+        if (result is { Status: ToolExecutionStatus.Succeeded, Value: { } exported })
+            await fileRevealService.RevealAsync(exported.ExportPath);
     }
 
     [RelayCommand]
