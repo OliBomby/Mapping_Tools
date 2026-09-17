@@ -4,6 +4,7 @@ using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.PropertyTransformer;
 using Mapping_Tools.Core.Tools.PropertyTransformer;
 using Mapping_Tools.Desktop.Converters;
+using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.PropertyTransformer.ViewModels;
 using Mapping_Tools.Desktop.ViewModels;
@@ -84,6 +85,24 @@ public sealed class PropertyTransformerViewModelTests
         viewModel.IsRunning.Should().BeFalse();
     }
 
+    [TestMethod]
+    public async Task RunQuickAsync_WithCurrentBeatmap_PassesQuickRunPathAndResetsProgress()
+    {
+        // Arrange
+        RecordingPropertyTransformer service = new();
+        TestBeatmapWorkspace workspace = new() { QuickRunPath = "current.osu" };
+        var viewModel = Create(service, workspace: workspace);
+
+        // Act
+        await viewModel.RunQuickAsync(CancellationToken.None);
+
+        // Assert
+        service.Paths.Should().Equal("current.osu");
+        service.QuickRun.Should().BeTrue();
+        viewModel.Progress.Should().Be(0);
+        viewModel.IsRunning.Should().BeFalse();
+    }
+
     private static PropertyTransformerViewModel Create(
         RecordingPropertyTransformer? service = null,
         TestBeatmapWorkspace? workspace = null)
@@ -93,7 +112,8 @@ public sealed class PropertyTransformerViewModelTests
             new ToolExecutionService(
                 new UserNotificationService(),
                 TimeProvider.System),
-            workspace ?? new TestBeatmapWorkspace());
+            workspace ?? new TestBeatmapWorkspace(),
+            new DesktopApplicationSettings());
     }
 
     private sealed class RecordingPropertyTransformer : IPropertyTransformerService
@@ -102,14 +122,18 @@ public sealed class PropertyTransformerViewModelTests
 
         public PropertyTransformerEngineOptions? Options { get; private set; }
 
+        public bool QuickRun { get; private set; }
+
         public Task<PropertyTransformerResult> TransformAsync(
             IReadOnlyList<string> paths,
             PropertyTransformerServiceOptions options,
+            bool quickRun = false,
             IProgress<double>? progress = null,
             CancellationToken cancellationToken = default)
         {
             Paths = paths;
             Options = options;
+            QuickRun = quickRun;
             progress?.Report(1);
             return Task.FromResult(new PropertyTransformerResult(paths));
         }

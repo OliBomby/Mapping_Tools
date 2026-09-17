@@ -14,6 +14,7 @@
     <Grid RowDefinitions="Auto,*,Auto">
         <controls:ToolViewHeader
             Title="Property Transformer"
+            IsQuickRunSupported="True"
             HelpText="Multiply and add to properties of all the timingpoints, hitobjects, bookmarks and storyboarded samples of the current map.&#x0a;The new value is the old value times the multiplier plus the offset. The multiplier is the left textbox and the offset is the right textbox. The multiplier gets done first.&#x0a;Resulting values get rounded if they have to be integer." />
 
         <Grid Grid.Row="1" Margin="0,10,0,0" ColumnDefinitions="470,*">

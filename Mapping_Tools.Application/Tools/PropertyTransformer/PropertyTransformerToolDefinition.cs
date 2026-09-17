@@ -1,3 +1,5 @@
+using Mapping_Tools.Application.QuickRun.Models;
+
 namespace Mapping_Tools.Application.Tools.PropertyTransformer;
 
 /// <summary>Provides the discoverable metadata for Property Transformer.</summary>
@@ -8,5 +10,6 @@ public static class PropertyTransformerToolDefinition
         "property-transformer",
         "Property Transformer",
         "Multiply and add to timing, object, bookmark, and storyboard properties.",
-        ["properties", "transform", "timing", "offset", "multiplier"]);
+        ["properties", "transform", "timing", "offset", "multiplier"],
+        QuickRunTargets.Always);
 }

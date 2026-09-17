@@ -2,12 +2,10 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
-using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
-using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.PropertyTransformer;
 using Mapping_Tools.Application.Workspace.Contracts;
-using Mapping_Tools.Core.Tools.PropertyTransformer;
+using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tools.PropertyTransformer.Models;
 using Mapping_Tools.Desktop.ViewModels;
@@ -18,6 +16,7 @@ namespace Mapping_Tools.Desktop.Tools.PropertyTransformer.ViewModels;
 ///     Owns Property Transformer form state, synchronized time fields, project persistence, and execution.
 /// </summary>
 public sealed partial class PropertyTransformerViewModel : SingleRunToolViewModel,
+    IQuickRun,
     IShellProjectFeature<PropertyTransformerProject>
 {
 
@@ -30,6 +29,7 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
 
     private readonly IPropertyTransformerService propertyTransformer;
     private readonly IBeatmapWorkspace workspace;
+    private readonly DesktopApplicationSettings settings;
 
     /// <summary>
     ///     Creates a Property Transformer presentation model.
@@ -40,12 +40,14 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
     public PropertyTransformerViewModel(
         IPropertyTransformerService propertyTransformer,
         IToolExecutionService execution,
-        IBeatmapWorkspace workspace)
+        IBeatmapWorkspace workspace,
+        DesktopApplicationSettings settings)
         : base(execution, PropertyTransformerToolDefinition.Definition)
     {
         this.propertyTransformer = propertyTransformer
                                    ?? throw new ArgumentNullException(nameof(propertyTransformer));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
     /// <summary>Gets or sets the timing-point offset multiplier.</summary>
@@ -200,9 +202,32 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
         Install(project);
     }
 
+    /// <summary>Runs Property Transformer against the current editor beatmap.</summary>
+    /// <param name="cancellationToken">Cancels beatmap discovery or transformation.</param>
+    /// <returns>A task that completes after QuickRun reaches a terminal state.</returns>
+    public async Task RunQuickAsync(CancellationToken cancellationToken)
+    {
+        string path = await workspace
+            .ResolveQuickRunBeatmapAsync(cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+        await RunWithStateAsync(() => RunPathsAsync(
+            string.IsNullOrWhiteSpace(path) ? [] : [path],
+            true,
+            cancellationToken));
+    }
+
     /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
+        await RunPathsAsync(workspace.SelectedPaths, settings.AlwaysQuickRun, CancellationToken.None);
+    }
+
+    private async Task RunPathsAsync(
+        IReadOnlyList<string> paths,
+        bool quickRun,
+        CancellationToken cancellationToken)
+    {
+        if (quickRun && paths.Count == 0) return;
         PropertyTransformerProject options = Snapshot();
         await Execution.ExecuteAsync(
                 new ToolExecutionRequest<PropertyTransformerResult>(
@@ -214,16 +239,18 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
                             context.ReportProgress(value, "Transforming documents"));
                         var result = await propertyTransformer
                             .TransformAsync(
-                                workspace.SelectedPaths,
+                                paths,
                                 options,
+                                quickRun,
                                 progress,
                                 context.CancellationToken)
                             .ConfigureAwait(false);
                         return new ToolExecutionOutput<PropertyTransformerResult>(
                             result,
-                            "Done!");
+                            quickRun ? null : "Done!");
                     }),
-                CreateProgress())
+                CreateProgress(),
+                cancellationToken)
             .ConfigureAwait(false);
     }
 

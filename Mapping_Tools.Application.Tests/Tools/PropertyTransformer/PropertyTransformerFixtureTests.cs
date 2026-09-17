@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.Tests.Execution;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.PropertyTransformer;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -14,7 +15,9 @@ public sealed class PropertyTransformerFixtureTests : TransformationFixtureTestB
         // Arrange
         using FixtureContext fixture = CreateFixture("property-transformer", fixtureName);
         PropertyTransformerServiceOptions project = fixture.ReadProject<PropertyTransformerServiceOptions>();
-        PropertyTransformerService service = new(fixture.Gateway);
+        PropertyTransformerService service = new(
+            fixture.Gateway,
+            new ApplicationSettings());
 
         // Act
         await service.TransformAsync(
