@@ -132,7 +132,7 @@
                     </StackPanel>
 
                     <StackPanel>
-                        <Image Width="440" Source="{Binding PreviewImage}" Stretch="None"
+                        <Image Width="440" Source="{Binding PreviewImage}" Stretch="Uniform"
                                HorizontalAlignment="Left" VerticalAlignment="Top"
                                RenderOptions.BitmapInterpolationMode="None" />
                     </StackPanel>
