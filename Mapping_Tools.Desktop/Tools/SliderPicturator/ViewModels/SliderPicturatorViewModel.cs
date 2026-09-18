@@ -487,7 +487,9 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
         try
         {
             SliderPicturatorProject options = Snapshot();
-            options.BackgroundColor = RgbaColour.FromArgb(0, 0, 0, 0);
+            // Legacy uses Color.FromArgb(0, 0, 0), the opaque RGB overload.
+            // Keep preview compositing identical to PicturateAsync/export.
+            options.BackgroundColor = RgbaColour.FromRgb(0, 0, 0);
             var sourceImage = this.sourceImage
                               ?? throw new InvalidOperationException("The preview source image was cleared.");
             (RgbaImage image, long segments) result = await Task.Run(

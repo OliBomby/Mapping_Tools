@@ -43,7 +43,7 @@ public static class SliderPicturatorEngine
         for (int x = 0; x < image.Width; x++)
         {
             var source = image.GetPixel(x, y);
-            if (!options.AlphaOn) source = GetOpaqueColor(source, options.BackgroundColor);
+            if (options.AlphaOn) source = GetOpaqueColor(source, options.BackgroundColor);
 
             Vector3 colour = new(
                 options.RedOn ? source.R : 0,
@@ -542,7 +542,7 @@ public static class SliderPicturatorEngine
         for (int y = 0; y < image.Height; y++)
         {
             var source = image.GetPixel(x, y);
-            if (!options.AlphaOn) source = GetOpaqueColor(source, options.BackgroundColor);
+            if (options.AlphaOn) source = GetOpaqueColor(source, options.BackgroundColor);
             Vector3 colour = new(
                 options.RedOn ? source.R : 0,
                 options.GreenOn ? source.G : 0,
