@@ -679,6 +679,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
             FixSv = FixSv,
             DelegateToBpm = DelegateToBpm,
             RemoveSliderTicks = RemoveSliderTicks,
+            AdvancedOptions = AdvancedOptions,
         };
         project.TumourLayers = TumourLayers.Select(layer => layer.Snapshot()).ToList();
         return project;
@@ -717,6 +718,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         FixSv = project.FixSv;
         DelegateToBpm = project.DelegateToBpm;
         RemoveSliderTicks = project.RemoveSliderTicks;
+        AdvancedOptions = project.AdvancedOptions;
 
         TumourLayers.Clear();
         foreach (var layer in project.TumourLayers ?? [])
@@ -724,8 +726,9 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
             ObservableTumourLayer observableLayer = new(layer.Copy());
             TumourLayers.Add(observableLayer);
 
-            // Reapply the persisted end after the collection change so the old
-            // two-way slider value cannot overwrite it during CurrentLayer replacement.
+            // Reapply persisted range values after the collection change so old
+            // two-way slider values cannot overwrite them during CurrentLayer replacement.
+            observableLayer.TumourStart = layer.TumourStart;
             observableLayer.TumourEnd = layer.TumourEnd;
         }
 

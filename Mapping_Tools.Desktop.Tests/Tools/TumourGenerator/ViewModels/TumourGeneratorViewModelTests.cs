@@ -16,6 +16,7 @@ using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.TumourGenerator.Models;
 using Mapping_Tools.Desktop.Tools.TumourGenerator.ViewModels;
 using Mapping_Tools.Desktop.ViewModels;
+using Mapping_Tools.Infrastructure.Projects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Tools.TumourGenerator.ViewModels;
@@ -170,6 +171,45 @@ public sealed class TumourGeneratorViewModelTests
         viewModel.CurrentLayer.TumourTemplateEnum.Should().Be(TumourTemplate.Square);
         viewModel.CurrentLayer.TumourParameter.GetValue(0).Should().Be(12);
         viewModel.PreviewHitObject.Line.Should().Contain("32,64,100");
+    }
+
+    [TestMethod]
+    public void ShellProjectFeature_Install_PreservesAdvancedOptionsAndStart()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingGenerator(), activate: false);
+        const string legacyProjectJson = """
+                                       {
+                                         "$type": "Mapping_Tools.Viewmodels.TumourGeneratorVm, Mapping Tools",
+                                         "TumourLayers": [
+                                           {
+                                             "$type": "Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourLayer, Mapping Tools",
+                                             "TumourStart": 35.39506172839506,
+                                             "TumourEnd": 256.0,
+                                             "UseAbsoluteRange": true
+                                           }
+                                         ],
+                                         "AdvancedOptions": true
+                                       }
+                                       """;
+        TumourGeneratorProject project = new LegacyProjectJsonSerializer()
+            .Deserialize<TumourGeneratorProject>(legacyProjectJson);
+        Slider slider = new() { DataContext = viewModel };
+        slider.Bind(
+            Slider.ValueProperty,
+            new Binding("CurrentLayer.TumourStart") { Mode = BindingMode.TwoWay });
+        IShellProjectFeature<TumourGeneratorProject> feature = viewModel;
+
+        // Act
+        feature.Install(project);
+
+        // Assert
+        viewModel.AdvancedOptions.Should().BeTrue();
+        viewModel.CurrentLayer!.TumourStart.Should().Be(35.39506172839506);
+        slider.Value.Should().Be(35.39506172839506);
+        var snapshot = feature.Snapshot();
+        snapshot.AdvancedOptions.Should().BeTrue();
+        snapshot.TumourLayers[0].TumourStart.Should().Be(35.39506172839506);
     }
 
     [TestMethod]
