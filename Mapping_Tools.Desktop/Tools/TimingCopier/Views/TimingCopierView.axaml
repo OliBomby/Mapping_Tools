@@ -73,7 +73,7 @@
 
                 <TextBlock Margin="0,20,0,0" FontSize="14" FontWeight="Bold"
                            Text="Signatures" ToolTip.Tip="Beat snap divisors for resnapping." />
-                <TextBox Classes="compact" HorizontalAlignment="Left" MinWidth="100" FontSize="14" Cursor="Hand"
+                <TextBox HorizontalAlignment="Left" MinWidth="100" FontSize="14" Cursor="Hand"
                          materialAssists:TextFieldAssist.Label="Beat divisors"
                          Text="{Binding BeatDivisors, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource BeatDivisorArrayToStringConverter}}"
                          ToolTip.Tip="Input any number of beat divisors here separated with commas. Example: 1/4, 1/12, 1/7, 4/5, 0.13435622499" />
