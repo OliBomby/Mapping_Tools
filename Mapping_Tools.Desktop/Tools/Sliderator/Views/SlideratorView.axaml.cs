@@ -111,7 +111,8 @@ public sealed partial class SlideratorView : UserControl
                 nameof(SlideratorViewModel.VelocityLimit) or
                 nameof(SlideratorViewModel.BeatSnapDivisor) or
                 nameof(SlideratorViewModel.BeatsPerMinute) or
-                nameof(SlideratorViewModel.GraphModeSetting))
+                nameof(SlideratorViewModel.GraphModeSetting) or
+                nameof(SlideratorViewModel.ShowRedAnchors))
         {
             UpdateGraphMarkers(viewModel);
         }
