@@ -10,6 +10,7 @@
              x:Class="Mapping_Tools.Desktop.Tools.HitsoundStudio.Views.HitsoundStudioView"
              x:DataType="vm:HitsoundStudioViewModel">
     <UserControl.Resources>
+        <converters:BooleanNotConverter x:Key="BooleanNotConverter" />
         <converters:DoubleArrayToStringConverter x:Key="DoubleArrayToStringConverter" />
         <hsConverters:HitsoundStudioSampleVolumeConverter x:Key="HitsoundStudioSampleVolumeConverter" />
     </UserControl.Resources>
@@ -298,6 +299,30 @@
                     </TableViewColumn>
                 </controls:MaterialGridListView.Columns>
             </controls:MaterialGridListView>
+
+            <StackPanel Grid.Column="2"
+                        Width="200"
+                        Margin="0,0,30,0"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom"
+                        IsVisible="{Binding HasLayers, Converter={StaticResource BooleanNotConverter}}">
+                <TextBlock Foreground="{DynamicResource MaterialBodyLightBrush}"
+                           Text="Press the + button to import some hitsounds!"
+                           FontSize="16"
+                           TextAlignment="Center"
+                           TextWrapping="Wrap" />
+                <materialIcons:MaterialIcon Width="24"
+                                            Height="24"
+                                            Margin="0,30,0,0"
+                                            Foreground="{DynamicResource MaterialBodyLightBrush}"
+                                            HorizontalAlignment="Left"
+                                            Kind="Undo"
+                                            RenderTransformOrigin="0.5,0.5">
+                    <materialIcons:MaterialIcon.RenderTransform>
+                        <RotateTransform Angle="-90" />
+                    </materialIcons:MaterialIcon.RenderTransform>
+                </materialIcons:MaterialIcon>
+            </StackPanel>
         </Grid>
 
         <Grid Grid.Row="2"
