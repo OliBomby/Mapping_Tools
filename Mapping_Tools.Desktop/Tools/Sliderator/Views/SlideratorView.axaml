@@ -70,16 +70,18 @@
                     <Grid ColumnDefinitions="*,Auto,Auto">
                         <ComboBox Grid.Column="0"
                                   Classes="compact"
+                                  VerticalAlignment="Center"
                                   ItemsSource="{Binding ImportModes}"
                                   SelectedItem="{Binding ImportModeSetting}"
                                   Margin="0,0,5,0"
                                   ToolTip.Tip="Import mode" />
                         <TextBox Grid.Column="1"
+                                 Classes="compact"
+                                 VerticalAlignment="Center"
                                  Text="{Binding TimeCode, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                  IsVisible="{Binding TimeCodeVisible}"
-                                 Margin="5,0,5,2"
+                                 Margin="5,0,5,0"
                                  Width="100"
-                                 materialAssists:TextFieldAssist.Label="Time code"
                                  ToolTip.Tip="Input a time code here. Example time code: 00:56:823 (1,2,1,2) - " />
                         <Button Grid.Column="2"
                                 Command="{Binding ImportCommand}"
