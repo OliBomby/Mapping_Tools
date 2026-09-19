@@ -34,7 +34,11 @@ public sealed class SlideratorServiceTests
     }
 
     [TestMethod]
-    public async Task ImportAsync_WithBookmarkedTimeAndEverythingModes_ReadsDiskObjects()
+    [DataRow(HitObjectSelectionMode.Bookmarked)]
+    [DataRow(HitObjectSelectionMode.Time)]
+    [DataRow(HitObjectSelectionMode.Everything)]
+    public async Task ImportAsync_WithNonSelectedMode_UsesPreferLiveAndFiltersSliders(
+        HitObjectSelectionMode mode)
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.Disk));
@@ -42,24 +46,15 @@ public sealed class SlideratorServiceTests
         SlideratorService service = new(gateway, new ApplicationSettings());
 
         // Act
-        var bookmarked = await service.ImportAsync(
+        var result = await service.ImportAsync(
             "map.osu",
-            HitObjectSelectionMode.Bookmarked,
-            null);
-        var timed = await service.ImportAsync(
-            "map.osu",
-            HitObjectSelectionMode.Time,
-            "00:00:000");
-        var everything = await service.ImportAsync(
-            "map.osu",
-            HitObjectSelectionMode.Everything,
-            null);
+            mode,
+            mode == HitObjectSelectionMode.Time ? "00:00:000" : null);
 
         // Assert
-        gateway.OpenRequests[^1].Preference.Should().Be(LiveBeatmapPreference.DiskOnly);
-        bookmarked.Sliders.Should().ContainSingle(item => item.IsSlider);
-        timed.Sliders.Should().ContainSingle(item => item.IsSlider);
-        everything.Sliders.Should().ContainSingle(item => item.IsSlider);
+        gateway.OpenRequests.Should().ContainSingle()
+            .Which.Preference.Should().Be(LiveBeatmapPreference.PreferLive);
+        result.Sliders.Should().ContainSingle(item => item.IsSlider);
     }
 
     [TestMethod]

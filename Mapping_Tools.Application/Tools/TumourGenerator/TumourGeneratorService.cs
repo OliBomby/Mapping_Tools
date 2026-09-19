@@ -45,7 +45,7 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
 
         var session = await editingGateway.OpenBeatmapAsync(
                 path,
-                mode == HitObjectSelectionMode.Selected ? LiveBeatmapPreference.RequireLive : LiveBeatmapPreference.DiskOnly,
+                mode == HitObjectSelectionMode.Selected ? LiveBeatmapPreference.RequireLive : LiveBeatmapPreference.PreferLive,
                 cancellationToken)
             .ConfigureAwait(false);
         var markedObjects = BeatmapObjectSelection.Select(session, mode, timeCode);
@@ -83,7 +83,7 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
                     path,
                     project.ImportModeSetting == HitObjectSelectionMode.Selected
                         ? LiveBeatmapPreference.RequireLive
-                        : LiveBeatmapPreference.DiskOnly,
+                        : LiveBeatmapPreference.PreferLive,
                     cancellationToken)
                 .ConfigureAwait(false);
             // Load sliders from the selector

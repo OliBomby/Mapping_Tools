@@ -42,7 +42,7 @@ public sealed class SlideratorService : ISlideratorService
 
         var preference = mode == HitObjectSelectionMode.Selected
             ? LiveBeatmapPreference.RequireLive
-            : LiveBeatmapPreference.DiskOnly;
+            : LiveBeatmapPreference.PreferLive;
         var session = await editingGateway
             .OpenBeatmapAsync(path, preference, cancellationToken)
             .ConfigureAwait(false);

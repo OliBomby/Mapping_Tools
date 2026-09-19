@@ -32,6 +32,30 @@ public sealed class TumourGeneratorServiceTests
         result.Sliders.Should().ContainSingle(item => item.IsSlider);
     }
 
+    [DataTestMethod]
+    [DataRow(HitObjectSelectionMode.Bookmarked)]
+    [DataRow(HitObjectSelectionMode.Time)]
+    [DataRow(HitObjectSelectionMode.Everything)]
+    public async Task ImportAsync_WithNonSelectedMode_UsesPreferLiveAndReturnsSliders(
+        HitObjectSelectionMode mode)
+    {
+        // Arrange
+        RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.Disk));
+        gateway.Session!.Beatmap.Bookmarks = [0];
+        TumourGeneratorService service = new(gateway, new ApplicationSettings());
+
+        // Act
+        var result = await service.ImportAsync(
+            "map.osu",
+            mode,
+            mode == HitObjectSelectionMode.Time ? "00:00:000" : null);
+
+        // Assert
+        gateway.OpenRequests.Should().ContainSingle()
+            .Which.Preference.Should().Be(LiveBeatmapPreference.PreferLive);
+        result.Sliders.Should().ContainSingle(item => item.IsSlider);
+    }
+
     [TestMethod]
     public async Task ImportAsync_WhenSelectionContainsNoSliders_ReturnsEmptyState()
     {
@@ -73,6 +97,36 @@ public sealed class TumourGeneratorServiceTests
         gateway.SessionSaveRequests.Select(request => request.ReloadEditor)
             .Should().ContainSingle().Which.Should().BeTrue();
         progress.Should().Contain(1);
+    }
+
+    [DataTestMethod]
+    [DataRow(HitObjectSelectionMode.Bookmarked)]
+    [DataRow(HitObjectSelectionMode.Time)]
+    [DataRow(HitObjectSelectionMode.Everything)]
+    public async Task RunAsync_WithNonSelectedMode_UsesPreferLive(
+        HitObjectSelectionMode mode)
+    {
+        // Arrange
+        RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.Disk));
+        gateway.Session!.Beatmap.Bookmarks = [0];
+        TumourGeneratorService service = new(gateway, new ApplicationSettings());
+        TumourGeneratorServiceOptions project = new()
+        {
+            ImportModeSetting = mode,
+            TimeCode = mode == HitObjectSelectionMode.Time ? "00:00:000" : string.Empty,
+        };
+        project.TumourLayers[0].TumourCount = 1;
+
+        // Act
+        await service.RunAsync(
+            ["map.osu"],
+            project,
+            false,
+            cancellationToken: CancellationToken.None);
+
+        // Assert
+        gateway.OpenRequests.Should().ContainSingle()
+            .Which.Preference.Should().Be(LiveBeatmapPreference.PreferLive);
     }
 
     [TestMethod]
