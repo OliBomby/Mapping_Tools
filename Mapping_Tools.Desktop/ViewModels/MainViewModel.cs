@@ -28,6 +28,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
 {
     private static readonly Uri websiteUri = new("https://mappingtools.github.io");
     private static readonly Uri gitHubUri = new("https://github.com/OliBomby/Mapping_Tools");
+    private static readonly Uri issuesUri = new("https://github.com/OliBomby/Mapping_Tools/issues");
     private static readonly Uri donateUri = new("https://ko-fi.com/olibomby");
     private readonly IBetterSaveService betterSave;
     private readonly IDialogService dialogs;
@@ -388,6 +389,12 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
     private Task OpenGitHubAsync()
     {
         return OpenUriAsync(gitHubUri, "source repository");
+    }
+
+    [RelayCommand]
+    private Task OpenIssuesAsync()
+    {
+        return OpenUriAsync(issuesUri, "issue tracker");
     }
 
     [RelayCommand]

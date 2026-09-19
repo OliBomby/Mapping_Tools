@@ -214,10 +214,6 @@
                                     </MenuItem.Icon>
                                 </MenuItem>
                             </MenuItem>
-                            <Separator Width="9"
-                                       Height="35"
-                                       Margin="0"
-                                       Foreground="Transparent" />
                             <MenuItem Header="_About"
                                       MinWidth="67"
                                       Height="35">
@@ -254,6 +250,13 @@
                                           ToolTip.Tip="Go to the Mapping Tools Github.">
                                     <MenuItem.Icon>
                                         <materialIcons:MaterialIcon Kind="Github" />
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                                <MenuItem Header="_Report an issue"
+                                          Command="{Binding OpenIssuesCommand}"
+                                          ToolTip.Tip="Report a bug or request a feature on GitHub.">
+                                    <MenuItem.Icon>
+                                        <materialIcons:MaterialIcon Kind="BugReport" />
                                     </MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem Header="_Donate"

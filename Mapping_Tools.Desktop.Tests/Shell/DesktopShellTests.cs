@@ -550,6 +550,21 @@ public sealed class DesktopShellTests
     }
 
     [TestMethod]
+    public async Task MainViewModel_OpenIssuesCommand_WhenExecuted_OpensGitHubIssuesPage()
+    {
+        // Arrange
+        RecordingPlatformLauncher launcher = new();
+        using var viewModel = CreateMainViewModel(launcher: launcher);
+
+        // Act
+        await ExecuteAsync(viewModel.OpenIssuesCommand);
+
+        // Assert
+        launcher.OpenedUris.Should().ContainSingle()
+            .Which.Should().Be(new Uri("https://github.com/OliBomby/Mapping_Tools/issues"));
+    }
+
+    [TestMethod]
     public async Task MainViewModel_OpenDonateCommand_WhenExecuted_OpensLegacyDonationPage()
     {
         // Arrange
