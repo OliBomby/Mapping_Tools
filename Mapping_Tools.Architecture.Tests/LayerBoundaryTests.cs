@@ -161,6 +161,10 @@ public sealed class LayerBoundaryTests
             "Mapping_Tools.Desktop",
             "Services",
             "Updates");
+        string desktopComposition = Path.Combine(
+            repositoryRoot,
+            "Mapping_Tools.Desktop",
+            "Composition");
         string[] forbiddenApplicationTokens =
         [
             "Onova",
@@ -169,12 +173,14 @@ public sealed class LayerBoundaryTests
             "System.IO",
         ];
         string[] forbiddenDesktopTokens = ["Onova", "System.Diagnostics.Process"];
+        string[] forbiddenDesktopCompositionTokens = ["Onova.Services", "System.Diagnostics.Process"];
 
         // Act
         string[] violations =
         [
             .. FindDirectoryTokenViolations(applicationUpdates, forbiddenApplicationTokens),
             .. FindDirectoryTokenViolations(desktopUpdates, forbiddenDesktopTokens),
+            .. FindDirectoryTokenViolations(desktopComposition, forbiddenDesktopCompositionTokens),
         ];
         string infrastructureProject = Path.Combine(
             repositoryRoot,

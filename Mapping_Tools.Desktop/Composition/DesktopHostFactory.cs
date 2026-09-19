@@ -9,8 +9,11 @@ internal static class DesktopHostFactory
 {
     internal static IHost Create(string[] args)
     {
+        string? localUpdatePackagePath = DesktopStartupArguments.GetLocalUpdatePackagePath(args);
         var builder = Host.CreateApplicationBuilder(args);
-        builder.Services.AddMappingToolsDesktop(ToolAssemblyLoader.Load());
+        builder.Services.AddMappingToolsDesktop(
+            ToolAssemblyLoader.Load(),
+            localUpdatePackagePath);
         builder.Services.AddMappingToolsHostedServices();
         return builder.Build();
     }

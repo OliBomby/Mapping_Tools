@@ -5,9 +5,9 @@ namespace Mapping_Tools.Application.Updates.Models;
 /// </summary>
 /// <param name="CurrentVersion">The version of the running application.</param>
 /// <param name="LatestVersion">The newest version offered by the selected update channel.</param>
-/// <param name="ReleaseTitle">The GitHub release title, when the release payload contains one.</param>
-/// <param name="ReleaseBody">The GitHub release description, when the release payload contains one.</param>
-/// <param name="AssetName">The architecture-specific package asset selected for this process.</param>
+/// <param name="ReleaseTitle">The update source title, when one is available.</param>
+/// <param name="ReleaseBody">The update source description, when one is available.</param>
+/// <param name="AssetName">The selected package asset or local package file name.</param>
 public sealed record UpdatePackageInfo(
     Version CurrentVersion,
     Version? LatestVersion,
@@ -20,4 +20,3 @@ public sealed record UpdatePackageInfo(
     /// </summary>
     public bool CanUpdate => LatestVersion is not null && LatestVersion > CurrentVersion;
 }
-

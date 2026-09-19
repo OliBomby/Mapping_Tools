@@ -4,19 +4,16 @@ using Mapping_Tools.Application.Updates.Contracts;
 using Mapping_Tools.Application.Updates.Models;
 using Onova;
 using Onova.Models;
-using Onova.Services;
 
 namespace Mapping_Tools.Infrastructure.Updates;
 
 /// <summary>
-///     Adapts Onova's GitHub resolver, ZIP extractor, staging directory, lock file,
+///     Adapts an Onova package resolver, ZIP extractor, staging directory, lock file,
 ///     and external updater process to the Application update contract.
 /// </summary>
 public sealed class OnovaUpdateGateway : IUpdateGateway
 {
     private const string published_executable_name = "Mapping Tools.exe";
-    private const string repository_owner = "OliBomby";
-    private const string repository_name = "Mapping_Tools";
 
     private const string release_metadata_url =
         "https://api.github.com/repos/OliBomby/Mapping_Tools/releases/latest";
@@ -28,44 +25,43 @@ public sealed class OnovaUpdateGateway : IUpdateGateway
     private readonly string assetName;
     private readonly bool disposeHttpClient;
     private readonly HttpClient httpClient;
-    private readonly GithubPackageResolver packageResolver;
     private readonly IUpdateManager updateManager;
     private bool disposed;
 
     /// <summary>
-    ///     Creates the production GitHub updater with the Mapping Tools user-agent
-    ///     and architecture-specific Avalonia release assets.
+    ///     Creates an updater using the supplied package resolver.
     /// </summary>
-    public OnovaUpdateGateway()
-        : this(new HttpClient(), true)
+    /// <param name="packageResolver">Resolves the packages offered by the update channel.</param>
+    public OnovaUpdateGateway(IPackageResolver packageResolver)
+        : this(packageResolver, new HttpClient(), true)
     {
     }
 
     /// <summary>
-    ///     Creates a gateway using a caller-owned HTTP client, which is useful for
-    ///     deterministic hosts and tests.
+    ///     Creates an updater using caller-owned resolver and HTTP resources.
     /// </summary>
-    /// <param name="httpClient">The HTTP client used for GitHub API and asset requests.</param>
-    public OnovaUpdateGateway(HttpClient httpClient)
-        : this(httpClient, false)
+    /// <param name="packageResolver">Resolves the packages offered by the update channel.</param>
+    /// <param name="httpClient">The HTTP client used for release metadata requests.</param>
+    public OnovaUpdateGateway(IPackageResolver packageResolver, HttpClient httpClient)
+        : this(packageResolver, httpClient, false)
     {
     }
 
-    private OnovaUpdateGateway(HttpClient httpClient, bool disposeHttpClient)
+    private OnovaUpdateGateway(
+        IPackageResolver packageResolver,
+        HttpClient httpClient,
+        bool disposeHttpClient)
     {
+        ArgumentNullException.ThrowIfNull(packageResolver);
         this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         this.disposeHttpClient = disposeHttpClient;
+
         if (!this.httpClient.DefaultRequestHeaders.UserAgent.Any())
             this.httpClient.DefaultRequestHeaders.TryAddWithoutValidation(
                 "User-Agent",
                 "Mapping Tools");
 
         assetName = GetAssetName();
-        packageResolver = new GithubPackageResolver(
-            this.httpClient,
-            repository_owner,
-            repository_name,
-            assetName);
 
         var entryAssembly = Assembly.GetEntryAssembly()
                             ?? typeof(OnovaUpdateGateway).Assembly;
@@ -73,10 +69,11 @@ public sealed class OnovaUpdateGateway : IUpdateGateway
         var assemblyMetadata = File.Exists(publishedExecutablePath)
             ? AssemblyMetadata.FromAssembly(entryAssembly, publishedExecutablePath)
             : AssemblyMetadata.FromAssembly(entryAssembly);
+
         updateManager = new UpdateManager(
             assemblyMetadata,
-            packageResolver,
-            new ZipPackageExtractor());
+            new OnovaPackageResolverAdapter(packageResolver),
+            new Onova.Services.ZipPackageExtractor());
     }
 
     /// <inheritdoc />
@@ -88,6 +85,7 @@ public sealed class OnovaUpdateGateway : IUpdateGateway
         var result = await updateManager
             .CheckForUpdatesAsync(cancellationToken)
             .ConfigureAwait(false);
+
         UpdateReleaseNotes? notes = null;
         if (result.CanUpdate && result.LastVersion is not null) notes = await ReadLatestReleaseNotesAsync(cancellationToken).ConfigureAwait(false);
 
@@ -211,4 +209,34 @@ public sealed class OnovaUpdateGateway : IUpdateGateway
             : "x64";
         return $"mapping-tools-{platform}-{architecture}.zip";
     }
+
+    private sealed class OnovaPackageResolverAdapter : Onova.Services.IPackageResolver
+    {
+        private readonly IPackageResolver resolver;
+
+        public OnovaPackageResolverAdapter(IPackageResolver resolver)
+        {
+            this.resolver = resolver;
+        }
+
+        public Task<IReadOnlyList<Version>> GetPackageVersionsAsync(
+            CancellationToken cancellationToken)
+        {
+            return resolver.GetPackageVersionsAsync(cancellationToken);
+        }
+
+        public Task DownloadPackageAsync(
+            Version version,
+            string destFilePath,
+            IProgress<double>? progress = null,
+            CancellationToken cancellationToken = default)
+        {
+            return resolver.DownloadPackageAsync(
+                version,
+                destFilePath,
+                progress,
+                cancellationToken);
+        }
+    }
+
 }
