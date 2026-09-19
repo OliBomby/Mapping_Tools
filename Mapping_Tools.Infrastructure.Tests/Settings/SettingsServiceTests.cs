@@ -37,7 +37,7 @@ public sealed class SettingsServiceTests
     }
 
     [TestMethod]
-    public void Load_WithLegacySettings_WritesPreferencesWithoutChangingConfiguration()
+    public void Load_WithLegacySettings_DoesNotWritePreferencesOrChangeConfiguration()
     {
         // Arrange
         using var test = TestDirectory.FromFixture("legacy-config.json");
@@ -50,22 +50,27 @@ public sealed class SettingsServiceTests
         // Assert
         settings.RecentMaps.Should().HaveCount(20);
         settings.MainWindowRestoreBounds.Should().Be(new WindowBounds(440, 256, 1407, 855));
-        File.Exists(test.Directories.PreferencesFile).Should().BeTrue();
+        File.Exists(test.Directories.PreferencesFile).Should().BeFalse();
         File.ReadAllText(test.Directories.ConfigurationFile).Should().Be(legacyJson);
-
-        using var document = JsonDocument.Parse(
-            File.ReadAllText(test.Directories.PreferencesFile));
-        var root = document.RootElement;
-        root.GetProperty("$schema").GetString().Should().Be("mapping-tools.settings");
-        root.GetProperty("$version").GetInt32().Should().Be(1);
-        root.GetProperty("MainWindowRestoreBounds").GetProperty("X").GetDouble().Should().Be(440);
-        root.GetProperty("QuickRunHotkey").GetProperty("Key").ValueKind.Should().Be(JsonValueKind.Number);
-        root.GetProperty("PeriodicBackupInterval").GetString().Should().Be("00:10:00");
-        var firstRecent = root.GetProperty("RecentMaps")[0];
-        firstRecent.ValueKind.Should().Be(JsonValueKind.Object);
-        firstRecent.GetProperty("Path").GetString().Should().Be(settings.RecentMaps[0].Path);
-        firstRecent.GetProperty("DisplayDate").GetString().Should().Be(settings.RecentMaps[0].DisplayDate);
         File.Exists(test.Directories.ConfigurationFile + ".bak").Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void Load_WithVersionedConfigurationInLegacyLocation_DoesNotWritePreferences()
+    {
+        // Arrange
+        using var test = TestDirectory.Empty();
+        test.Directories.EnsureCreated();
+        File.WriteAllText(
+            test.Directories.ConfigurationFile,
+            "{\"$schema\":\"mapping-tools.settings\",\"$version\":1}");
+        JsonSettingsStore store = new(test.Directories);
+
+        // Act
+        _ = store.Load();
+
+        // Assert
+        File.Exists(test.Directories.PreferencesFile).Should().BeFalse();
     }
 
     [TestMethod]

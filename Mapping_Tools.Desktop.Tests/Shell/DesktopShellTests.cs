@@ -5,6 +5,8 @@ using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
+using Mapping_Tools.Application.Migration.Contracts;
+using Mapping_Tools.Application.Migration.Models;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
@@ -12,6 +14,7 @@ using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.QuickRun.Models;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Application.Settings.Contracts;
 using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services;
@@ -401,6 +404,31 @@ public sealed class DesktopShellTests
     }
 
     [TestMethod]
+    public async Task MainViewModel_InitializeAsync_WithLegacyData_CopiesBeforeActivationWithoutDialog()
+    {
+        // Arrange
+        StubFeatureViewModel feature = new();
+        TestDialogService dialogs = new() { BooleanResult = true };
+        RecordingMigrationService migration = new();
+        RecordingSettingsService settingsService = new();
+        using var viewModel = CreateMainViewModel(
+            [Registration("first", "First", () => feature)],
+            dialogs: dialogs,
+            migrationService: migration,
+            settingsService: settingsService,
+            initialize: false);
+
+        // Act
+        await viewModel.InitializeAsync();
+
+        // Assert
+        migration.CopyCount.Should().Be(1);
+        settingsService.SaveCount.Should().Be(1);
+        dialogs.MessageCount.Should().Be(0);
+        viewModel.CurrentFeature.Should().BeSameAs(feature);
+    }
+
+    [TestMethod]
     public async Task MainViewModel_SwitchingBetweenProjectFeatures_PreservesMenuVisibilityWhileLoading()
     {
         // Arrange
@@ -666,6 +694,8 @@ public sealed class DesktopShellTests
         IQuickRunCommandRegistry? quickRunRegistry = null,
         RecordingProjectService? projectService = null,
         IUiDispatcher? dispatcher = null,
+        IApplicationDataMigrationService? migrationService = null,
+        ISettingsService? settingsService = null,
         bool initialize = true)
     {
         var resolvedSettings = settings ?? new DesktopApplicationSettings();
@@ -698,7 +728,10 @@ public sealed class DesktopShellTests
                 projectService,
                 resolvedDialogs,
                 resolvedNotifications),
-            dispatcher ?? workspaceDispatcher);
+            dispatcher ?? workspaceDispatcher,
+            null,
+            migrationService,
+            settingsService);
         if (initialize) viewModel.InitializeAsync().GetAwaiter().GetResult();
         return viewModel;
     }
@@ -870,6 +903,35 @@ public sealed class DesktopShellTests
         {
             OpenCount++;
             return Task.FromResult<ProjectOpenResult<TProject>?>(null);
+        }
+    }
+
+    private sealed class RecordingMigrationService : IApplicationDataMigrationService
+    {
+        public bool RequiresMigration => true;
+
+        public int CopyCount { get; private set; }
+
+        public Task<ApplicationDataMigrationResult> CopyLegacyDataAsync(
+            CancellationToken cancellationToken = default)
+        {
+            CopyCount++;
+            return Task.FromResult(new ApplicationDataMigrationResult(1, 2, 0));
+        }
+    }
+
+    private sealed class RecordingSettingsService : ISettingsService
+    {
+        public int SaveCount { get; private set; }
+
+        public SettingsLoadResult LoadOrCreate()
+        {
+            return new SettingsLoadResult(new ApplicationSettings(), false, false);
+        }
+
+        public void Save(ApplicationSettings settings)
+        {
+            SaveCount++;
         }
     }
 

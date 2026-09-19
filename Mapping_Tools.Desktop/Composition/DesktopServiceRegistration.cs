@@ -9,6 +9,7 @@ using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
+using Mapping_Tools.Application.Migration.Contracts;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.Projects;
@@ -39,6 +40,7 @@ using Mapping_Tools.Infrastructure.Editor;
 using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Infrastructure.Platform;
 using Mapping_Tools.Infrastructure.Projects;
+using Mapping_Tools.Infrastructure.Migration;
 using Mapping_Tools.Infrastructure.Settings;
 using Mapping_Tools.Infrastructure.Updates;
 using Microsoft.Extensions.DependencyInjection;
@@ -102,6 +104,7 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<IFileRevealService, PortableFileRevealService>();
         services.AddSingleton<IApplicationThemeService, ApplicationThemeService>();
         services.AddSingleton<IApplicationDirectories, ApplicationDirectories>();
+        services.AddSingleton<IApplicationDataMigrationService, ApplicationDataMigrationService>();
         services.AddSingleton<ISettingsStore>(provider =>
             new JsonSettingsStore(
                 provider.GetRequiredService<IApplicationDirectories>(),

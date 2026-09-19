@@ -7,8 +7,10 @@ using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
+using Mapping_Tools.Application.Migration.Contracts;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.QuickRun.Contracts;
+using Mapping_Tools.Application.Settings.Contracts;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services;
 using Mapping_Tools.Desktop.Services.Dialogs;
@@ -41,6 +43,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
     private readonly DesktopApplicationSettings settings;
     private readonly IUiDispatcher dispatcher;
     private readonly IUpdaterInteractionService? updaterInteraction;
+    private readonly IApplicationDataMigrationService? migrationService;
+    private readonly ISettingsService? settingsService;
     private CancellationTokenSource? featureActivationCancellation;
     private long featureActivationVersion;
     private bool featureActivationReady;
@@ -65,6 +69,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
     ///     Shows update decisions and owns update shutdown interaction when supplied by runtime
     ///     composition.
     /// </param>
+    /// <param name="migrationService">Copies legacy application data.</param>
+    /// <param name="settingsService">Persists the modern settings document after migration.</param>
     public MainViewModel(
         IShellFeatureRegistry registry,
         IQuickRunCommandRegistry quickRunRegistry,
@@ -76,7 +82,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
         IDialogService dialogs,
         ProjectAutosaveCoordinator projectCoordinator,
         IUiDispatcher dispatcher,
-        IUpdaterInteractionService? updaterInteraction = null)
+        IUpdaterInteractionService? updaterInteraction = null,
+        IApplicationDataMigrationService? migrationService = null,
+        ISettingsService? settingsService = null)
     {
         this.registry = registry ?? throw new ArgumentNullException(nameof(registry));
         this.quickRunRegistry = quickRunRegistry ?? throw new ArgumentNullException(nameof(quickRunRegistry));
@@ -89,6 +97,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
         this.projectCoordinator = projectCoordinator ?? throw new ArgumentNullException(nameof(projectCoordinator));
         this.dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
         this.updaterInteraction = updaterInteraction;
+        this.migrationService = migrationService;
+        this.settingsService = settingsService;
 
         FeatureItems = registry.Features
             .Select(registration => new ShellFeatureItemViewModel(
@@ -223,13 +233,37 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
         projectCoordinator.SuppressSave();
     }
 
-    internal Task InitializeAsync()
+    internal async Task InitializeAsync()
     {
-        if (featureActivationStarted) return Task.CompletedTask;
+        if (featureActivationStarted) return;
 
         featureActivationStarted = true;
+        await MigrateLegacyDataAsync();
         featureActivationReady = true;
-        return SelectedFeature is null ? Task.CompletedTask : ActivateAsync(SelectedFeature);
+        if (SelectedFeature is not null) await ActivateAsync(SelectedFeature);
+    }
+
+    private async Task MigrateLegacyDataAsync()
+    {
+        if (migrationService is null || settingsService is null || !migrationService.RequiresMigration) return;
+
+        try
+        {
+            var result = await migrationService.CopyLegacyDataAsync();
+            settingsService.Save(settings);
+            await notifications.PublishAsync(new UserNotification(
+                UserNotificationSeverity.Success,
+                "Legacy data migrated",
+                $"Copied {result.AutosavesCopied} autosave(s) and {result.ProjectFilesCopied} project file(s) into the current layout."));
+        }
+        catch (Exception exception)
+        {
+            await notifications.PublishAsync(new UserNotification(
+                UserNotificationSeverity.Error,
+                "Legacy data migration failed",
+                "The legacy files were not removed. Migration may be incomplete; you can try again the next time Mapping Tools starts.",
+                exception));
+        }
     }
 
     private async Task ActivateAsync(ShellFeatureItemViewModel item)
