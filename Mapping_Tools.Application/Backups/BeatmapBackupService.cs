@@ -208,7 +208,7 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
         var backups = await store
             .ListAsync(settings.BackupsPath, cancellationToken)
             .ConfigureAwait(false);
-        var newest = backups.FirstOrDefault();
+        var newest = backups.FirstOrDefault(backup => !IsPeriodicBackup(backup.Path));
         if (newest is null) return null;
 
         return await RestoreAsync(
@@ -218,6 +218,17 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
                 reloadEditor,
                 cancellationToken)
             .ConfigureAwait(false);
+    }
+
+    private static bool IsPeriodicBackup(string path)
+    {
+        const int timestampLength = 19;
+        const string periodicMarker = "_PB_";
+        string fileName = Path.GetFileName(path);
+        return fileName.Length >= timestampLength + periodicMarker.Length
+               && fileName.AsSpan(timestampLength).StartsWith(
+                   periodicMarker,
+                   StringComparison.Ordinal);
     }
 
     private async Task<BeatmapBackupResult> CreateFilesAsync(

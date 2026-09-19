@@ -302,6 +302,38 @@ public sealed class BeatmapBackupServiceTests
     }
 
     [TestMethod]
+    public async Task QuickUndoAsync_WithNewestPeriodicBackup_SkipsPeriodicAndRestoresNewestEligibleBackup()
+    {
+        // Arrange
+        var store = CreateStore();
+        string eligible = Path.Combine(
+            backup_directory,
+            "2026-07-25 14-05-05__map.osu");
+        string periodic = Path.Combine(
+            backup_directory,
+            "2026-07-25 14-05-06_PB__map.osu");
+        var eligibleLines = store.Files[map_path].ToList();
+        var periodicLines = store.Files[map_path].ToList();
+        int eligiblePreview = eligibleLines.FindIndex(
+            line => line.StartsWith("PreviewTime:", StringComparison.Ordinal));
+        int periodicPreview = periodicLines.FindIndex(
+            line => line.StartsWith("PreviewTime:", StringComparison.Ordinal));
+        eligibleLines[eligiblePreview] = "PreviewTime:4444";
+        periodicLines[periodicPreview] = "PreviewTime:5555";
+        store.AddFile(eligible, eligibleLines, now.AddMinutes(-2));
+        store.AddFile(periodic, periodicLines, now.AddMinutes(-1));
+        var service = CreateService(store, CreateSettings());
+
+        // Act
+        var result = await service.QuickUndoAsync(map_path);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.BackupPath.Should().Be(eligible);
+        store.Files[map_path].Should().Contain("PreviewTime:4444");
+    }
+
+    [TestMethod]
     public async Task QuickUndoAsync_WithSameCreationTime_PrefersEditorReaderBackup()
     {
         // Arrange

@@ -86,17 +86,18 @@ public interface IBeatmapBackupService
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    ///     Restores the newest retained file into the requested beatmap using the
-    ///     same compatibility and safety rules as an explicit restore.
+    ///     Restores the newest non-periodic retained file into the requested
+    ///     beatmap using the same compatibility and safety rules as an explicit
+    ///     restore.
     /// </summary>
     /// <param name="destinationPath">The current beatmap that QuickUndo should replace.</param>
-    /// <param name="allowDifferentFilename">Allows the globally newest backup to belong to different metadata.</param>
+    /// <param name="allowDifferentFilename">Allows the newest eligible backup to belong to different metadata.</param>
     /// <param name="reloadEditor">Requests an osu! reload after replacement.</param>
     /// <param name="cancellationToken">Cancels before lookup, validation, replacement, or reload.</param>
     /// <returns>The restore result, or <see langword="null" /> when no backup exists.</returns>
     /// <exception cref="DirectoryNotFoundException">The configured backup directory is unavailable.</exception>
     /// <exception cref="BeatmapBackupIncompatibleException">
-    ///     The newest backup has different metadata and <paramref name="allowDifferentFilename" /> is <see langword="false" />
+    ///     The newest eligible backup has different metadata and <paramref name="allowDifferentFilename" /> is <see langword="false" />
     ///     .
     /// </exception>
     /// <exception cref="OperationCanceledException">Cancellation occurs before lookup or restoration finishes.</exception>

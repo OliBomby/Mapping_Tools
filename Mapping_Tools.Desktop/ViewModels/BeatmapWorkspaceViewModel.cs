@@ -36,7 +36,7 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
     /// </summary>
     /// <param name="workspace">Owns selected paths and recent-map history.</param>
     /// <param name="backupService">Creates and restores durable safety copies.</param>
-    /// <param name="quickUndoService">Runs the same newest-backup restore used by the global hotkey.</param>
+    /// <param name="quickUndoService">Runs the same newest-non-periodic-backup restore used by the global hotkey.</param>
     /// <param name="filePicker">Presents the native restore-source picker.</param>
     /// <param name="fileRevealService">Opens application-owned folders in the platform file manager.</param>
     /// <param name="applicationDirectories">Supplies the Mapping Tools data directory.</param>

@@ -201,7 +201,7 @@
                                 </MenuItem>
                                 <MenuItem Header="_QuickUndo"
                                           Command="{Binding Workspace.QuickUndoCommand}"
-                                          ToolTip.Tip="Restore the newest retained backup into the beatmap open in osu!.">
+                                          ToolTip.Tip="Restore the newest non-periodic backup into the beatmap open in osu!.">
                                     <MenuItem.Icon>
                                         <materialIcons:MaterialIcon Kind="Undo" />
                                     </MenuItem.Icon>
@@ -377,7 +377,7 @@
                                 </MenuItem>
                                 <MenuItem Header="_QuickUndo"
                                           Command="{Binding Workspace.QuickUndoCommand}"
-                                          ToolTip.Tip="Restore the newest retained backup into the beatmap open in osu!.">
+                                          ToolTip.Tip="Restore the newest non-periodic backup into the beatmap open in osu!.">
                                     <MenuItem.Icon>
                                         <materialIcons:MaterialIcon Kind="Undo" />
                                     </MenuItem.Icon>

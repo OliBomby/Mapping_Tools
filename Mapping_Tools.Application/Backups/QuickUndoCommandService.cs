@@ -8,8 +8,9 @@ using Mapping_Tools.Application.Workspace.Contracts;
 namespace Mapping_Tools.Application.Backups;
 
 /// <summary>
-///     Coordinates current-map discovery, newest-backup restore, optional editor
-///     reload, and user notification independently of its invocation surface.
+///     Coordinates current-map discovery, newest non-periodic backup restore,
+///     optional editor reload, and user notification independently of its
+///     invocation surface.
 /// </summary>
 public sealed class QuickUndoCommandService : IQuickUndoCommandService
 {
@@ -23,7 +24,7 @@ public sealed class QuickUndoCommandService : IQuickUndoCommandService
     ///     notification boundaries.
     /// </summary>
     /// <param name="currentBeatmapLocator">Finds the destination currently open in osu!.</param>
-    /// <param name="backupService">Selects and safely applies the newest retained snapshot.</param>
+    /// <param name="backupService">Selects and safely applies the newest non-periodic retained snapshot.</param>
     /// <param name="settings">Determines whether a successful restore reloads osu!.</param>
     /// <param name="notifications">Reports non-success and completion outcomes to the active frontend.</param>
     public QuickUndoCommandService(
@@ -77,7 +78,7 @@ public sealed class QuickUndoCommandService : IQuickUndoCommandService
                 await PublishAsync(
                         UserNotificationSeverity.Warning,
                         "QuickUndo",
-                        "No retained backup is available to restore.")
+                        "No non-periodic retained backup is available to restore.")
                     .ConfigureAwait(false);
                 return new QuickUndoCommandResult(
                     QuickUndoCommandStatus.NoBackup);
@@ -86,7 +87,7 @@ public sealed class QuickUndoCommandService : IQuickUndoCommandService
             await PublishAsync(
                     UserNotificationSeverity.Success,
                     "QuickUndo",
-                    "The newest backup was restored successfully.")
+                    "The newest non-periodic backup was restored successfully.")
                 .ConfigureAwait(false);
             return new QuickUndoCommandResult(
                 QuickUndoCommandStatus.Restored,

@@ -3,8 +3,9 @@ using Mapping_Tools.Application.Backups.Models;
 namespace Mapping_Tools.Application.Backups.Contracts;
 
 /// <summary>
-///     Resolves osu!'s current beatmap and applies the newest retained backup using
-///     the same operation from both in-app actions and global shortcuts.
+///     Resolves osu!'s current beatmap and applies the newest non-periodic
+///     retained backup using the same operation from both in-app actions and
+///     global shortcuts.
 /// </summary>
 public interface IQuickUndoCommandService
 {
@@ -16,4 +17,3 @@ public interface IQuickUndoCommandService
     Task<QuickUndoCommandResult> ExecuteAsync(
         CancellationToken cancellationToken = default);
 }
-
