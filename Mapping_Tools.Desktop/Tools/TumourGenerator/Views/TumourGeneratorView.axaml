@@ -274,7 +274,6 @@
                         <CheckBox Content="Recalculate" Margin="0,5,0,0"
                                   IsChecked="{Binding CurrentLayer.Recalculate, Mode=TwoWay}"
                                   ToolTip.Tip="Whether to recalculate the distances and angles of the slider before applying this layer. If true, tumours will be placed on top of tumours of the previous layers as if they were part of the slider, instead of merging with those tumours." />
-                        <TextBlock Text="{Binding ResultSummary}" TextWrapping="Wrap" Opacity="0.75" />
                     </StackPanel>
                 </ScrollViewer>
 

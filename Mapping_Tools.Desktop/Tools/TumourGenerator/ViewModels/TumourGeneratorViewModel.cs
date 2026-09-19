@@ -243,10 +243,6 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     /// <summary>Gets the range slider step matching relative or absolute units.</summary>
     public double TumourRangeSliderSmallChange => CurrentLayer?.UseAbsoluteRange == true ? 1 : 0.0001;
 
-    /// <summary>Gets the latest validation, import, or run summary.</summary>
-    [ObservableProperty]
-    public partial string ResultSummary { get; private set; } = string.Empty;
-
     /// <summary>
     ///     Stops pending preview work and detaches layer event handlers owned by this view model.
     /// </summary>
@@ -378,7 +374,6 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
 
             PreviewHitObject = result.Sliders[0].DeepCopy();
             CircleSize = result.CircleSize;
-            ResultSummary = "Successfully imported slider.";
         }
         catch (OperationCanceledException)
         {
@@ -486,7 +481,6 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     {
         if (!base.PrepareRun())
         {
-            ResultSummary = "Correct the invalid Tumour Generator settings before running.";
             return false;
         }
 
@@ -614,14 +608,13 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         {
             // A newer property change owns the next preview request.
         }
-        catch (Exception exception)
+        catch (Exception)
         {
             lock (previewGate)
             {
                 if (disposed || !isActive || !ReferenceEquals(previewCancellation, cancellation)) return;
             }
 
-            ResultSummary = exception.Message;
             IsProcessingPreview = false;
         }
     }
@@ -638,7 +631,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         }
 
         var project = Snapshot();
-        var execution = await Execution.ExecuteAsync(
+        await Execution.ExecuteAsync(
             new ToolExecutionRequest<TumourRunResult>(
                 Tool.Id,
                 Tool.DisplayName,
@@ -658,13 +651,6 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
             CreateProgress(),
             cancellationToken);
 
-        if (execution.Status == ToolExecutionStatus.Succeeded && execution.Value is not null)
-            ResultSummary = $"Successfully generated tumours on {execution.Value.SlidersTumourated} " + $"{(execution.Value.SlidersTumourated == 1 ? "slider" : "sliders")}" + "!";
-        else if (execution.Status == ToolExecutionStatus.Failed)
-            ResultSummary = execution.Exception?.Message ?? "Tumour Generator 2 failed.";
-        else if (execution.Status == ToolExecutionStatus.Cancelled)
-            ResultSummary = "Tumour Generator 2 was cancelled.";
-        else if (execution.Status == ToolExecutionStatus.AlreadyRunning) ResultSummary = "Tumour Generator 2 is already running.";
     }
 
     private TumourGeneratorProject Snapshot()
