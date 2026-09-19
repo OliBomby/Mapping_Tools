@@ -527,7 +527,11 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         {
             var result = await sliderator
                 .ImportAsync(path, mode, TimeCode, cancellationToken);
-            if (result.Sliders.Count == 0) return false;
+            if (result.Sliders.Count == 0)
+            {
+                await ShowMessageAsync("Could not find any sliders in imported hit objects.");
+                return false;
+            }
 
             LoadedHitObjects.Clear();
             foreach (var hitObject in result.Sliders) LoadedHitObjects.Add(hitObject);

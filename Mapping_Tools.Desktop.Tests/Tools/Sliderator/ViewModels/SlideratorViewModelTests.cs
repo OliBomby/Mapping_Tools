@@ -317,13 +317,15 @@ public sealed class SlideratorViewModelTests
     }
 
     [TestMethod]
-    public async Task ImportCommand_WhenNoSlidersAreReturned_PreservesCurrentPreview()
+    public async Task ImportCommand_WhenNoSlidersAreReturned_ShowsReasonAndPreservesCurrentPreview()
     {
         // Arrange
         RecordingSliderator service = new() { ReturnEmptyImport = true };
+        TestDialogService dialogs = new();
         var viewModel = Create(
             service,
-            new RecordingCurrentBeatmapLocator("current.osu"));
+            new RecordingCurrentBeatmapLocator("current.osu"),
+            dialogs);
         HitObject slider = new("64,64,0,2,0,L|164:64,1,100");
         viewModel.LoadedHitObjects.Add(slider);
 
@@ -332,6 +334,8 @@ public sealed class SlideratorViewModelTests
 
         // Assert
         viewModel.LoadedHitObjects.Should().ContainSingle().Which.Should().BeSameAs(slider);
+        ((MessageDialogRequest<bool>)dialogs.LastMessageRequest!).Message
+            .Should().Be("Could not find any sliders in imported hit objects.");
     }
 
     [TestMethod]
