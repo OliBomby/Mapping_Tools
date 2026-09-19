@@ -202,6 +202,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [Range(1, 12, ErrorMessage = "Minimum tumour length must be between 1 and 12.")]
+    [NotifyPropertyChangedFor(nameof(ExpectedSegments))]
     public partial double MinDendrite { get; set; } = 2;
 
     /// <summary>Gets or sets whether output velocity is delegated to BPM redlines.</summary>

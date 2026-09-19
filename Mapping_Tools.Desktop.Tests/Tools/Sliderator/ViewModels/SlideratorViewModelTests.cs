@@ -172,6 +172,25 @@ public sealed class SlideratorViewModelTests
     }
 
     [TestMethod]
+    public void ExpectedSegments_WhenMinDendriteChanges_RaisesPropertyChangedAndRecalculates()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        viewModel.ManualVelocity = true;
+        viewModel.NewVelocity = 10;
+        long initialExpectedSegments = viewModel.ExpectedSegments;
+        List<string?> changedProperties = [];
+        viewModel.PropertyChanged += (_, args) => changedProperties.Add(args.PropertyName);
+
+        // Act
+        viewModel.MinDendrite = 4;
+
+        // Assert
+        viewModel.ExpectedSegments.Should().BeLessThan(initialExpectedSegments);
+        changedProperties.Should().Contain(nameof(viewModel.ExpectedSegments));
+    }
+
+    [TestMethod]
     public void InstallProject_WithDefaultGraph_UsesProjectGraph()
     {
         // Arrange
