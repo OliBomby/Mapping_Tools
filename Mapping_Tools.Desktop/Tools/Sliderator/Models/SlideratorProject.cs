@@ -31,6 +31,6 @@ public sealed class SlideratorProject : SlideratorServiceOptions
     /// <summary>Gets or sets the distance travelled by the current graph.</summary>
     public double DistanceTraveled { get; set; }
 
-    /// <summary>Gets or sets whether the next run should refresh the source from the live editor.</summary>
+    /// <summary>Gets or sets whether the next fast placement should refresh the source from the live editor.</summary>
     public bool DoEditorRead { get; set; }
 }

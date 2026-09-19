@@ -309,7 +309,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     /// <summary>Gets the current graph distance in preview pixels.</summary>
     public double DistanceTraveled { get; private set; }
 
-    /// <summary>Gets the most recent imported editor state preference.</summary>
+    /// <summary>Gets whether fast placement should refresh the source from the live editor.</summary>
     public bool DoEditorRead { get; private set; }
 
     /// <summary>Gets or sets the explicit interaction boundary used for Shift navigation.</summary>
@@ -357,7 +357,12 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         {
             if (!await ImportForPathAsync(path, HitObjectSelectionMode.Selected, cancellationToken)) return;
 
-            await RunPathAsync(path, true, true, cancellationToken);
+            await RunPathAsync(
+                path,
+                true,
+                true,
+                cancellationToken,
+                useEditorReadPreference: false);
         });
     }
 
@@ -398,7 +403,12 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         bool succeeded = false;
         await RunWithStateAsync(async () =>
         {
-            succeeded = await RunPathAsync(path, false, true, cancellationToken);
+            succeeded = await RunPathAsync(
+                path,
+                false,
+                true,
+                cancellationToken,
+                useEditorReadPreference: true);
         });
         return succeeded;
     }
@@ -484,7 +494,8 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
             path,
             settings.AlwaysQuickRun,
             settings.AlwaysQuickRun,
-            CancellationToken.None);
+            CancellationToken.None,
+            useEditorReadPreference: false);
     }
 
     private async Task ImportAsync()
@@ -557,14 +568,15 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         string path,
         bool quickRun,
         bool suppressSummary,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        bool useEditorReadPreference)
     {
         var sourceSlider = VisibleHitObject;
         if (sourceSlider is null) return false;
 
+        bool preferLiveEditor = !useEditorReadPreference || DoEditorRead;
+        DoEditorRead = !useEditorReadPreference;
         var project = Snapshot();
-        bool preferLiveEditor = DoEditorRead;
-        DoEditorRead = false;
         var execution = await Execution.ExecuteAsync(
             new ToolExecutionRequest<SlideratorResult>(
                 Tool.Id,

@@ -23,7 +23,7 @@ namespace Mapping_Tools.Desktop.Tests.Tools.Sliderator.ViewModels;
 public sealed class SlideratorViewModelTests
 {
     [TestMethod]
-    public async Task RunQuickAsync_WithImportedSlider_PassesPersistedGraphSettingsToService()
+    public async Task RunQuickAsync_WithImportedSlider_PreservesEditorReadPreferenceAndPassesPersistedGraphSettings()
     {
         // Arrange
         RecordingSliderator service = new();
@@ -43,7 +43,8 @@ public sealed class SlideratorViewModelTests
         service.Project!.BeatSnapDivisor.Should().Be(8);
         viewModel.ManualVelocity.Should().BeTrue();
         service.QuickRun.Should().BeTrue();
-        viewModel.DoEditorRead.Should().BeFalse();
+        service.PreferLiveEditor.Should().BeTrue();
+        viewModel.DoEditorRead.Should().BeTrue();
         viewModel.IsRunning.Should().BeFalse();
     }
 
@@ -298,6 +299,51 @@ public sealed class SlideratorViewModelTests
         // Assert
         succeeded.Should().BeTrue();
         service.QuickRun.Should().BeFalse();
+        service.PreferLiveEditor.Should().BeFalse();
+        viewModel.DoEditorRead.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public async Task RunFastPlacementAsync_WithImportedSlider_ClearsEditorReadPreference()
+    {
+        // Arrange
+        RecordingSliderator service = new();
+        var viewModel = Create(
+            service,
+            new RecordingCurrentBeatmapLocator("current.osu"));
+        await viewModel.ImportCommand.ExecuteAsync(null);
+
+        // Act
+        bool succeeded = await viewModel.RunFastPlacementAsync();
+
+        // Assert
+        succeeded.Should().BeTrue();
+        service.PreferLiveEditor.Should().BeTrue();
+        viewModel.DoEditorRead.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public async Task RunCommand_WithDisabledEditorRead_AlwaysPrefersLiveEditorAndRestoresPreference()
+    {
+        // Arrange
+        RecordingSliderator service = new();
+        var viewModel = Create(
+            service,
+            new RecordingCurrentBeatmapLocator("current.osu"));
+        HitObject slider = new("64,64,0,2,0,L|164:64,1,100");
+        ((IShellProjectFeature<SlideratorProject>)viewModel).Install(
+            new SlideratorProject
+            {
+                LoadedHitObjects = [slider],
+                DoEditorRead = false,
+            });
+
+        // Act
+        await viewModel.RunCommand.ExecuteAsync(null);
+
+        // Assert
+        service.PreferLiveEditor.Should().BeTrue();
+        viewModel.DoEditorRead.Should().BeTrue();
     }
 
     [TestMethod]
@@ -457,6 +503,8 @@ public sealed class SlideratorViewModelTests
 
         public bool QuickRun { get; private set; }
 
+        public bool PreferLiveEditor { get; private set; }
+
         public bool ReturnEmptyImport { get; init; }
 
         public bool RunCalled { get; private set; }
@@ -486,6 +534,7 @@ public sealed class SlideratorViewModelTests
             RunCalled = true;
             Project = project;
             QuickRun = quickRun;
+            PreferLiveEditor = preferLiveEditor;
             progress?.Report(1);
             return Task.FromResult(
                 new SlideratorResult(
