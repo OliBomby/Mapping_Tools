@@ -1,6 +1,4 @@
 using Avalonia.Controls;
-using Avalonia.Input;
-using Avalonia.Interactivity;
 
 namespace Mapping_Tools.Desktop.Views;
 
@@ -14,27 +12,4 @@ public sealed partial class UpdaterWindow : Window
     {
         InitializeComponent();
     }
-
-    private void CloseWindow(object? sender, RoutedEventArgs eventArgs)
-    {
-        Close();
-    }
-
-    private void DragWindow(object? sender, PointerPressedEventArgs eventArgs)
-    {
-        if (eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed) BeginMoveDrag(eventArgs);
-    }
-
-    private void MinimizeWindow(object? sender, RoutedEventArgs eventArgs)
-    {
-        WindowState = WindowState.Minimized;
-    }
-
-    private void ToggleMaximizeWindow(object? sender, RoutedEventArgs eventArgs)
-    {
-        WindowState = WindowState == WindowState.Maximized
-            ? WindowState.Normal
-            : WindowState.Maximized;
-    }
-
 }

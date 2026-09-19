@@ -2,8 +2,10 @@
         xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+        xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
         xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         xmlns:md="https://github.com/whistyun/Markdown.Avalonia"
+        xmlns:controls="using:Mapping_Tools.Desktop.Controls"
         xmlns:viewModels="clr-namespace:Mapping_Tools.Desktop.ViewModels"
         x:DataType="viewModels:UpdaterViewModel"
         Title="Mapping Tools - Updater"
@@ -22,38 +24,10 @@
         FontSize="14"
         FontWeight="Medium">
     <Grid RowDefinitions="35,*">
-        <Grid Grid.Row="0" Background="{DynamicResource MaterialCardBackgroundBrush}">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" IsHitTestVisible="False">
-                <Border Width="24" Height="24" Margin="9,0,0,0"
-                        VerticalAlignment="Center"
-                        Background="{DynamicResource MaterialBodyBrush}">
-                    <Border.OpacityMask>
-                        <ImageBrush Source="/Assets/mt_logo_white_24.png" Stretch="Uniform" />
-                    </Border.OpacityMask>
-                </Border>
-                <TextBlock Text="Mapping Tools - Updater" Margin="8,0,0,0" VerticalAlignment="Center"
-                           FontWeight="Normal" />
-            </StackPanel>
-            <Border Margin="0,0,145,0" Background="Transparent"
-                    PointerPressed="DragWindow" DoubleTapped="ToggleMaximizeWindow" />
-            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                <Button Width="49" Height="35" Padding="0" Background="Transparent"
-                        BorderThickness="0" Click="MinimizeWindow" ToolTip.Tip="Minimize">
-                    <materialIcons:MaterialIcon Kind="WindowMinimize" Width="16" Height="16" />
-                </Button>
-                <Button Width="47" Height="35" Padding="0" Background="Transparent"
-                        BorderThickness="0" Click="ToggleMaximizeWindow" ToolTip.Tip="Maximize or restore">
-                    <materialIcons:MaterialIcon Kind="WindowMaximize" Width="16" Height="16" />
-                </Button>
-                <Button Width="49" Height="35" Padding="0" Background="Transparent"
-                        BorderThickness="0" Click="CloseWindow" ToolTip.Tip="Close">
-                    <materialIcons:MaterialIcon Kind="WindowClose" Width="16" Height="16" />
-                </Button>
-            </StackPanel>
-        </Grid>
+        <controls:WindowChrome Grid.Row="0" Title="Mapping Tools - Updater" />
 
         <Grid Grid.Row="1"
-              Margin="30,10,30,30">
+              Margin="20,10,20,20">
             <Grid IsVisible="{Binding IsReadyPanelVisible}"
                   RowDefinitions="Auto,*,Auto"
                   ColumnDefinitions="*,200">
@@ -72,6 +46,7 @@
 
                 <materialControls:Card Grid.Row="1"
                                        Grid.Column="0"
+                                       materialAssists:ShadowAssist.ShadowDepth="Depth0"
                                        Margin="0,10,0,0"
                                        Padding="10">
                     <ScrollViewer VerticalScrollBarVisibility="Auto"
@@ -103,7 +78,7 @@
                             Margin="0,0,0,20" />
                     <Button Content="Skip this version"
                             Command="{Binding SkipVersionCommand}"
-                            Classes="flat"
+                            Classes="outline"
                             Margin="20,20,20,0" />
                 </StackPanel>
             </Grid>

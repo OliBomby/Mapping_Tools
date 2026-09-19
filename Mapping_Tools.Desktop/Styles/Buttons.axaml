@@ -23,7 +23,7 @@
         <Setter Property="Foreground" Value="{DynamicResource MaterialDarkForegroundBrush}" />
     </Style>
 
-    <Style Selector="Button:not(.primary)">
+    <Style Selector="Button:not(.light):not(.primary):not(.outline)">
         <Setter Property="Foreground" Value="{DynamicResource MaterialDarkForegroundBrush}" />
     </Style>
 
