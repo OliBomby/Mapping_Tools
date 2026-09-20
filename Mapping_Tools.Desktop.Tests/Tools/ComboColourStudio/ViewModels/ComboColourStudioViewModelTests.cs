@@ -1,16 +1,12 @@
-using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
-using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.ComboColourStudio;
-using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.ComboColourStudio.Models;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels;
-using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Tools.ComboColourStudio.ViewModels;
@@ -26,7 +22,7 @@ public sealed class ComboColourStudioViewModelTests
         viewModel.AddComboColourCommand.Execute(null);
 
         // Act
-        ((IRelayCommand)viewModel.AddColourPointCommand).Execute(null);
+        viewModel.AddColourPointCommand.Execute(null);
         viewModel.SelectedSequenceColour = viewModel.ComboColours[0];
         viewModel.AddSequenceColourCommand.Execute(viewModel.SelectedColourPoint);
 
@@ -42,7 +38,7 @@ public sealed class ComboColourStudioViewModelTests
     public async Task AddColourPointAtEditorTimeCommand_WithLiveEditorTimestamp_AddsPointAtThatTime()
     {
         // Arrange
-        const double editorTime = 1234;
+        const double editor_time = 1234;
         var liveReader = new RecordingLiveBeatmapReader(new LiveBeatmapSnapshot(
             "C:/Songs/map/map.osu",
             [],
@@ -53,7 +49,7 @@ public sealed class ComboColourStudioViewModelTests
             1,
             5,
             4,
-            editorTime));
+            editor_time));
         var viewModel = CreateViewModel(liveReader);
 
         // Act
@@ -61,7 +57,7 @@ public sealed class ComboColourStudioViewModelTests
 
         // Assert
         viewModel.Project.ColourPoints.Should().ContainSingle()
-            .Which.Time.Should().Be(editorTime);
+            .Which.Time.Should().Be(editor_time);
     }
 
     [TestMethod]
@@ -101,7 +97,7 @@ public sealed class ComboColourStudioViewModelTests
         await viewModel.AddColourPointAtEditorTimeCommand.ExecuteAsync(null);
 
         // Assert
-        UserNotification notification = published.Should().ContainSingle().Which;
+        var notification = published.Should().ContainSingle().Which;
         notification.Severity.Should().Be(UserNotificationSeverity.Error);
         notification.Exception.Should().BeSameAs(failure);
         viewModel.Project.ColourPoints.Should().BeEmpty();
@@ -112,14 +108,14 @@ public sealed class ComboColourStudioViewModelTests
     {
         // Arrange
         var viewModel = CreateViewModel();
-        ((IRelayCommand)viewModel.AddColourPointCommand).Execute(null);
-        ((IRelayCommand)viewModel.AddColourPointCommand).Execute(null);
-        ((IRelayCommand)viewModel.AddColourPointCommand).Execute(null);
+        viewModel.AddColourPointCommand.Execute(null);
+        viewModel.AddColourPointCommand.Execute(null);
+        viewModel.AddColourPointCommand.Execute(null);
         var points = viewModel.ColourPoints.ToArray();
         viewModel.SetSelectedColourPoints([points[0], points[2]]);
 
         // Act
-        ((IRelayCommand)viewModel.RemoveColourPointCommand).Execute(null);
+        viewModel.RemoveColourPointCommand.Execute(null);
 
         // Assert
         viewModel.ColourPoints.Should().ContainSingle().Which.Should().Be(points[1]);
@@ -132,13 +128,13 @@ public sealed class ComboColourStudioViewModelTests
     {
         // Arrange
         var viewModel = CreateViewModel();
-        ((IRelayCommand)viewModel.AddColourPointCommand).Execute(null);
-        ((IRelayCommand)viewModel.AddColourPointCommand).Execute(null);
+        viewModel.AddColourPointCommand.Execute(null);
+        viewModel.AddColourPointCommand.Execute(null);
         var points = viewModel.ColourPoints.ToArray();
         viewModel.SetSelectedColourPoints([]);
 
         // Act
-        ((IRelayCommand)viewModel.RemoveColourPointCommand).Execute(null);
+        viewModel.RemoveColourPointCommand.Execute(null);
 
         // Assert
         viewModel.ColourPoints.Should().ContainSingle().Which.Should().Be(points[0]);
@@ -151,7 +147,7 @@ public sealed class ComboColourStudioViewModelTests
         var viewModel = CreateViewModel();
         viewModel.AddComboColourCommand.Execute(null);
         viewModel.AddComboColourCommand.Execute(null);
-        ((IRelayCommand)viewModel.AddColourPointCommand).Execute(null);
+        viewModel.AddColourPointCommand.Execute(null);
         viewModel.SelectedSequenceColour = viewModel.ComboColours[0];
         viewModel.AddSequenceColourCommand.Execute(viewModel.SelectedColourPoint);
         viewModel.SelectedSequenceColour = viewModel.ComboColours[1];
@@ -176,7 +172,7 @@ public sealed class ComboColourStudioViewModelTests
         var viewModel = CreateViewModel();
         viewModel.AddComboColourCommand.Execute(null);
         viewModel.AddComboColourCommand.Execute(null);
-        ((IRelayCommand)viewModel.AddColourPointCommand).Execute(null);
+        viewModel.AddColourPointCommand.Execute(null);
         var point = viewModel.SelectedColourPoint!;
         var colour = viewModel.ComboColours[1];
 
@@ -192,7 +188,7 @@ public sealed class ComboColourStudioViewModelTests
         ILiveBeatmapReader? liveReader = null,
         IUserNotificationService? notifications = null)
     {
-        IUserNotificationService notificationService = notifications ?? new UserNotificationService();
+        var notificationService = notifications ?? new UserNotificationService();
         return new ComboColourStudioViewModel(
             new StubComboColourStudioService(),
             new ToolExecutionService(
@@ -209,8 +205,10 @@ public sealed class ComboColourStudioViewModelTests
     {
         public Task<ComboColourEngineOptions> ImportComboColoursAsync(
             string path,
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult(new ComboColourEngineOptions());
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(new ComboColourEngineOptions());
+        }
 
         public Task<ComboColourEngineOptions> ImportColourHaxAsync(
             string path,
@@ -230,5 +228,4 @@ public sealed class ComboColourStudioViewModelTests
             return Task.FromResult(new ComboColourStudioRunResult(paths.Count));
         }
     }
-
 }

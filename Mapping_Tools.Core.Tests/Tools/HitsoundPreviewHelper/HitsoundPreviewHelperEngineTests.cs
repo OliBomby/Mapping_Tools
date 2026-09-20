@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
@@ -7,6 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Mapping_Tools.Core.Tests.Tools.HitsoundPreviewHelper;
 
 [TestClass]
+[SuppressMessage("ReSharper", "AccessToDisposedClosure")]
 public sealed class HitsoundPreviewHelperEngineTests
 {
     [TestMethod]
@@ -16,7 +18,7 @@ public sealed class HitsoundPreviewHelperEngineTests
         HitObject first = new("64,96,1000,1,0,0:0:0:0:");
         HitObject second = new("400,96,2000,1,0,0:0:0:0:");
         Beatmap beatmap = new(
-            new List<HitObject> { first, second },
+            [first, second],
             [],
             globalSv: 1.4);
         List<HitsoundZone> zones =
@@ -46,7 +48,7 @@ public sealed class HitsoundPreviewHelperEngineTests
     {
         // Arrange
         Beatmap beatmap = new(
-            new List<HitObject> { new("64,96,1000,1,0,0:0:0:0:") },
+            [new HitObject("64,96,1000,1,0,0:0:0:0:")],
             [],
             globalSv: 1.4);
 
@@ -66,7 +68,7 @@ public sealed class HitsoundPreviewHelperEngineTests
         // Arrange
         HitObject selected = new("256,96,1000,1,0,0:0:0:0:");
         Beatmap beatmap = new(
-            new List<HitObject> { selected },
+            [selected],
             [],
             globalSv: 1.4);
         HitsoundZone first = new(
@@ -99,7 +101,7 @@ public sealed class HitsoundPreviewHelperEngineTests
         HitObject hold = new(
             "256,192,4000,128,0,5000:0:0:0:0:");
         Beatmap beatmap = new(
-            new List<HitObject> { slider, spinner, hold },
+            [slider, spinner, hold],
             [],
             globalSv: 1.4);
         HitsoundZone zone = new(
@@ -130,7 +132,7 @@ public sealed class HitsoundPreviewHelperEngineTests
         // Arrange
         HitObject selected = new("64,96,1000,1,0,0:0:0:0:");
         Beatmap beatmap = new(
-            new List<HitObject> { selected },
+            [selected],
             [],
             globalSv: 1.4);
         HitsoundZone zone = new("zone", "zone.wav", 64, 96, Hitsound.Clap,

@@ -83,12 +83,12 @@ public sealed class NaudioSoundFontRenderer : ISoundFontRenderer
                 if (args.Instrument >= preset.Zones.Length) return [];
 
                 result.AddRange(ImportInstrument(soundFont, preset.Zones[args.Instrument].Instrument(), args, cancellationToken));
-                return result.ToArray();
+                return [.. result];
             }
 
             foreach (var zone in ValidZones(preset.Zones, args, true)) result.AddRange(ImportInstrument(soundFont, zone.Instrument(), args, cancellationToken));
 
-            return result.ToArray();
+            return [.. result];
         }
         catch
         {
@@ -169,7 +169,7 @@ public sealed class NaudioSoundFontRenderer : ISoundFontRenderer
         {
             foreach (var zone in ValidZones(instrument.Zones, args, sampleHeader: true)) result.Add(GenerateSample(soundFont, zone, args, globalZone, cancellationToken));
 
-            return result.ToArray();
+            return [.. result];
         }
         catch
         {
@@ -187,7 +187,7 @@ public sealed class NaudioSoundFontRenderer : ISoundFontRenderer
     {
         cancellationToken.ThrowIfCancellationRequested();
         Generator[] generators = zone.Generators;
-        if (globalZone is not null) generators = generators.Concat(globalZone.Generators).ToArray();
+        if (globalZone is not null) generators = [.. generators, .. globalZone.Generators];
 
         var output = GetSampleWithLength(generators, soundFont.SampleData, args);
         try
@@ -374,7 +374,7 @@ public sealed class NaudioSoundFontRenderer : ISoundFontRenderer
                 int read = provider.Read(buffer, 0, buffer.Length);
                 if (read == 0) break;
 
-                samples.AddRange(buffer.AsSpan(0, read).ToArray());
+                samples.AddRange([.. buffer.AsSpan(0, read)]);
             }
 
             return new AudioClip(new AudioFormat(provider.WaveFormat.SampleRate, provider.WaveFormat.Channels), samples);
@@ -608,11 +608,11 @@ internal static class SoundFontGeneratorExtensions
 
 internal sealed class DelayFadeOutSampleProvider : ISampleProvider
 {
-    private readonly object gate = new();
+    private readonly Lock gate = new();
     private readonly ISampleProvider source;
     private int fadeFrameCount;
     private int fadeOutDelayFrames;
-    private long framesRead;
+    private long totalFramesRead;
 
     public DelayFadeOutSampleProvider(ISampleProvider source)
     {
@@ -631,7 +631,7 @@ internal sealed class DelayFadeOutSampleProvider : ISampleProvider
             int framesRead = sourceSamplesRead / WaveFormat.Channels;
             for (int frame = 0; frame < framesRead; frame++)
             {
-                long absoluteFrame = this.framesRead + frame;
+                long absoluteFrame = totalFramesRead + frame;
                 float multiplier;
                 if (absoluteFrame < fadeOutDelayFrames)
                 {
@@ -647,7 +647,7 @@ internal sealed class DelayFadeOutSampleProvider : ISampleProvider
                 for (int channel = 0; channel < WaveFormat.Channels; channel++) buffer[sampleOffset + channel] *= multiplier;
             }
 
-            this.framesRead += framesRead;
+            totalFramesRead += framesRead;
         }
 
         return sourceSamplesRead;
@@ -657,7 +657,7 @@ internal sealed class DelayFadeOutSampleProvider : ISampleProvider
     {
         lock (gate)
         {
-            framesRead = 0;
+            totalFramesRead = 0;
             fadeFrameCount = Math.Max(1, (int)(durationMilliseconds * source.WaveFormat.SampleRate / 1000));
             fadeOutDelayFrames = Math.Max(0, (int)(delayMilliseconds * source.WaveFormat.SampleRate / 1000));
         }

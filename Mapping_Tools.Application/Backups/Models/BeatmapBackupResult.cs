@@ -11,4 +11,3 @@ namespace Mapping_Tools.Application.Backups.Models;
 public sealed record BeatmapBackupResult(
     IReadOnlyList<BeatmapBackupArtifact> Artifacts,
     bool SkippedByPreference);
-

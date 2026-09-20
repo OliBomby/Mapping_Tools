@@ -40,7 +40,7 @@ internal sealed class ParabolaTemplate : TumourTemplateBase
         return PathType.Bezier;
     }
 
-    public override Func<double, double>? GetDistanceRelation()
+    public override Func<double, double> GetDistanceRelation()
     {
         double totalLength = GetLength();
         double width = Width;

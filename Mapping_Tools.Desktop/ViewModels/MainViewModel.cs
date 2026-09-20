@@ -32,25 +32,24 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
     private static readonly Uri donateUri = new("https://ko-fi.com/olibomby");
     private readonly IBetterSaveService betterSave;
     private readonly IDialogService dialogs;
+    private readonly IUiDispatcher dispatcher;
 
     private readonly Dictionary<string, ObservableObject> featureViewModels =
         new(StringComparer.OrdinalIgnoreCase);
 
     private readonly IPlatformLauncher launcher;
+    private readonly IApplicationDataMigrationService? migrationService;
     private readonly IUserNotificationService notifications;
     private readonly ProjectAutosaveCoordinator projectCoordinator;
     private readonly IQuickRunCommandRegistry quickRunRegistry;
     private readonly IShellFeatureRegistry registry;
     private readonly DesktopApplicationSettings settings;
-    private readonly IUiDispatcher dispatcher;
-    private readonly IUpdaterInteractionService? updaterInteraction;
-    private readonly IApplicationDataMigrationService? migrationService;
     private readonly ISettingsService? settingsService;
+    private readonly IUpdaterInteractionService? updaterInteraction;
     private CancellationTokenSource? featureActivationCancellation;
-    private long featureActivationVersion;
     private bool featureActivationReady;
     private bool featureActivationStarted;
-    private string searchText = string.Empty;
+    private long featureActivationVersion;
     private Task? shutdownTask;
 
     /// <summary>
@@ -144,12 +143,12 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
     /// <summary>Gets or sets the case-insensitive feature search query.</summary>
     public string SearchText
     {
-        get => searchText;
+        get;
         set
         {
-            if (SetProperty(ref searchText, value)) RefreshVisibleFeatures();
+            if (SetProperty(ref field, value)) RefreshVisibleFeatures();
         }
-    }
+    } = string.Empty;
 
     /// <summary>Gets the currently activated feature presentation model.</summary>
     [ObservableProperty]
@@ -186,6 +185,14 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
     [ObservableProperty]
     public partial bool IsNavigationOpen { get; set; } = true;
 
+    /// <inheritdoc />
+    public ValueTask DisposeAsync()
+    {
+        if (shutdownTask is null) shutdownTask = DisposeCoreAsync();
+
+        return new ValueTask(shutdownTask);
+    }
+
     /// <summary>
     ///     Saves recovery snapshots for all instantiated project features and
     ///     deactivates the current feature during application shutdown.
@@ -195,22 +202,12 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
         DisposeAsync().AsTask().GetAwaiter().GetResult();
     }
 
-    /// <inheritdoc />
-    public ValueTask DisposeAsync()
-    {
-        if (shutdownTask is null)
-        {
-            shutdownTask = DisposeCoreAsync();
-        }
-
-        return new ValueTask(shutdownTask);
-    }
-
     private async Task DisposeCoreAsync()
     {
-        featureActivationCancellation?.Cancel();
+        if (featureActivationCancellation is not null)
+            await featureActivationCancellation.CancelAsync();
 
-        Task[] saveTasks = featureViewModels.Values
+        var saveTasks = featureViewModels.Values
             .OfType<IShellProjectFeature>()
             .Select(projectCoordinator.SaveOnShutdown)
             .ToArray();
@@ -269,7 +266,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
 
     private async Task ActivateAsync(ShellFeatureItemViewModel item)
     {
-        featureActivationCancellation?.Cancel();
+        if (featureActivationCancellation is not null)
+            await featureActivationCancellation.CancelAsync();
+
         CancellationTokenSource cancellation = new();
         featureActivationCancellation = cancellation;
         long activationVersion = ++featureActivationVersion;

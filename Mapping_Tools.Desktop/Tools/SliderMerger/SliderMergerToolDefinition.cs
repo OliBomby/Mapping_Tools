@@ -5,7 +5,6 @@ using Mapping_Tools.Desktop.Tools.SliderMerger.ViewModels;
 using Mapping_Tools.Desktop.Tools.SliderMerger.Views;
 using Microsoft.Extensions.DependencyInjection;
 
-
 namespace Mapping_Tools.Desktop.Tools.SliderMerger;
 
 /// <summary>Describes and composes the Slider Merger plugin feature.</summary>

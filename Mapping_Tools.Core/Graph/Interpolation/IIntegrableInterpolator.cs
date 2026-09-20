@@ -9,4 +9,3 @@ public interface IIntegrableInterpolator
     /// <returns>The signed area under the normalized interpolation.</returns>
     double GetIntegral(double t1, double t2);
 }
-

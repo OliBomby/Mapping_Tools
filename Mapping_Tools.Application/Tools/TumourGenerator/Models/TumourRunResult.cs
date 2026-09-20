@@ -8,4 +8,3 @@ public sealed record TumourRunResult(
     IReadOnlyList<string> Paths,
     int SlidersTumourated,
     bool EditorReloaded);
-

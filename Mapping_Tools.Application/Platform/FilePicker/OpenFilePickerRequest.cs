@@ -25,4 +25,3 @@ public sealed record OpenFilePickerRequest
     /// </summary>
     public IReadOnlyList<FilePickerFilter> Filters { get; init; } = [];
 }
-

@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Mapping_Tools.Infrastructure.Platform;
 
+[SuppressMessage("ReSharper", "MemberHidesStaticFromOuterClass")]
 internal static class WindowsNativeMethods
 {
     internal const uint MONITOR_DEFAULT_TO_NEAREST = 2;
@@ -29,6 +31,8 @@ internal static class WindowsNativeMethods
 
     internal static readonly nint TopMostWindow = new(-1);
 
+    internal static int NativeInputSize => Marshal.SizeOf<Input>();
+
     [DllImport("kernel32.dll")]
     internal static extern uint GetCurrentThreadId();
 
@@ -52,20 +56,6 @@ internal static class WindowsNativeMethods
 
     [DllImport("user32.dll")]
     internal static extern void PostQuitMessage(int exitCode);
-
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct Message
-    {
-        internal nint Window;
-        internal uint Id;
-        internal nuint WParam;
-        internal nint LParam;
-        internal uint Time;
-        internal Point Point;
-        internal uint Private;
-    }
-
-    internal static int NativeInputSize => Marshal.SizeOf<Input>();
 
     [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -257,6 +247,18 @@ internal static class WindowsNativeMethods
         uint colorKey,
         ref BlendFunction blendFunction,
         uint flags);
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct Message
+    {
+        internal nint Window;
+        internal uint Id;
+        internal nuint WParam;
+        internal nint LParam;
+        internal uint Time;
+        internal Point Point;
+        internal uint Private;
+    }
 
     [UnmanagedFunctionPointer(CallingConvention.Winapi)]
     internal delegate bool EnumWindowsCallback(nint window, nint data);

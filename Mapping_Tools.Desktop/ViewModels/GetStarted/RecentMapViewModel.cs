@@ -8,4 +8,3 @@ public sealed record RecentMapViewModel(
     string FileName,
     string FullPath,
     string DisplayDate);
-

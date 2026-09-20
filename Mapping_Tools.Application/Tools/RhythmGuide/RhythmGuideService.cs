@@ -4,7 +4,6 @@ using Mapping_Tools.Application.Backups.Models;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
-using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.RhythmGuide;
 using Mapping_Tools.Core.Tools.RhythmGuide.Models;

@@ -14,4 +14,3 @@ public interface IEditorReloadService
     /// <returns>A task that completes after the reload gesture is delivered or skipped.</returns>
     Task ReloadAsync(CancellationToken cancellationToken = default);
 }
-

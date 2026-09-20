@@ -1,8 +1,8 @@
 using System.Security.Cryptography;
 using System.Text.Json;
+using Mapping_Tools.Application.Tests.Execution;
 using Mapping_Tools.Application.Tools.MapsetMerger;
 using Mapping_Tools.Application.Tools.MapsetMerger.Models;
-using Mapping_Tools.Application.Tests.Execution;
 using Mapping_Tools.Infrastructure.Files;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -16,8 +16,8 @@ public sealed class MapsetMergerFixtureTests : TransformationFixtureTestBase
     public async Task MergeAsync_AcceptedFixture_ProducesEquivalentOutput(string fixtureName)
     {
         // Arrange
-        using FixtureContext fixture = CreateFixture("mapset-merger", fixtureName);
-        MapsetMergerServiceOptions project = fixture.ReadProject<MapsetMergerServiceOptions>();
+        using var fixture = CreateFixture("mapset-merger", fixtureName);
+        var project = fixture.ReadProject<MapsetMergerServiceOptions>();
         StageMapsetMergerSources(fixture, project);
         MapsetMergerService service = new(fixture.Gateway, new PhysicalBeatmapsetFileSystem());
 
@@ -49,10 +49,7 @@ public sealed class MapsetMergerFixtureTests : TransformationFixtureTestBase
                          .Select(item => item.GetString()!))
             {
                 string sourceAsset = Path.Combine(sourceRoot, asset);
-                if (File.Exists(sourceAsset))
-                {
-                    File.Copy(sourceAsset, Path.Combine(mapset.Path, asset), true);
-                }
+                if (File.Exists(sourceAsset)) File.Copy(sourceAsset, Path.Combine(mapset.Path, asset), true);
             }
         }
     }

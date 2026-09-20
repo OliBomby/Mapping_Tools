@@ -137,4 +137,3 @@ public sealed class GraphState
         return Math.Abs(width) < Precision.DOUBLE_EPSILON ? 0 : GetIntegral(start, end) / width;
     }
 }
-

@@ -243,7 +243,7 @@ public class PathGenerator
     {
         int dir = Math.Sign(endIndex - startIndex);
 
-        if (dir == 0) return [new(startIndex, endIndex)];
+        if (dir == 0) return [new Tuple<double, double>(startIndex, endIndex)];
 
         // If the direction is reversed, just swap the start and end index and then reverse the result at the end
         if (dir == -1)

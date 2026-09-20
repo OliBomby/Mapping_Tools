@@ -30,7 +30,7 @@ public sealed class PerfectCircleGenerator : RelevantObjectsGenerator
     public RelevantCircle? GetRelevantObjects(RelevantHitObject relevantHitObject)
     {
         var hitObject = relevantHitObject.HitObject;
-        return hitObject.IsSlider && hitObject.SliderType == PathType.PerfectCurve && hitObject.CurvePoints is { Count: 2 }
+        return hitObject is { IsSlider: true, SliderType: PathType.PerfectCurve, CurvePoints.Count: 2 }
             ? new RelevantCircle(new Circle(new CircleArc(hitObject.GetAllCurvePoints())))
             : null;
     }

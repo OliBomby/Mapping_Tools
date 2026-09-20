@@ -90,25 +90,25 @@ public class StoryBoard : ITextFile
         var storyboardSoundSamplesLines = new List<string>();
 
         string[] backgroundAndVideoIdentifiers =
-        {
+        [
             "0", "1", "Video",
-        };
+        ];
         string[] breakPeriodsIdentifiers =
-        {
+        [
             "2", "Break",
-        };
+        ];
         string[] soundSampleIdentifiers =
-        {
+        [
             "5", "Sample",
-        };
+        ];
         string[] categoryIdentifiers =
-        {
+        [
             "//Storyboard Layer 0 (Background)",
             "//Storyboard Layer 1 (Fail)",
             "//Storyboard Layer 2 (Pass)",
             "//Storyboard Layer 3 (Foreground)",
             "//Storyboard Layer 4 (Overlay)",
-        };
+        ];
         string lastCategory = categoryIdentifiers[0];
 
         foreach (string line in eventLines)
@@ -167,14 +167,14 @@ public class StoryBoard : ITextFile
 
     private void Initialize()
     {
-        BackgroundAndVideoEvents = new List<Event>();
-        BreakPeriods = new List<Break>();
-        StoryboardLayerBackground = new List<Event>();
-        StoryboardLayerPass = new List<Event>();
-        StoryboardLayerFail = new List<Event>();
-        StoryboardLayerForeground = new List<Event>();
-        StoryboardLayerOverlay = new List<Event>();
-        StoryboardSoundSamples = new List<StoryboardSoundSample>();
+        BackgroundAndVideoEvents = [];
+        BreakPeriods = [];
+        StoryboardLayerBackground = [];
+        StoryboardLayerPass = [];
+        StoryboardLayerFail = [];
+        StoryboardLayerForeground = [];
+        StoryboardLayerOverlay = [];
+        StoryboardSoundSamples = [];
     }
 
     /// <summary>

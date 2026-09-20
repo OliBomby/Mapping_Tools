@@ -23,4 +23,3 @@ public interface IAudioPlaybackSession : IAsyncDisposable
     /// <summary>Stops output and releases device and stream resources.</summary>
     ValueTask StopAsync();
 }
-

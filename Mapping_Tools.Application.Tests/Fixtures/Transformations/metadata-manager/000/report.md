@@ -9,19 +9,21 @@
 
 ## Semantic comparison
 
-| Item | Before | After |
-|---|---|---|
-| Artist / romanised artist | Test Artist | E2E Fixture Artist |
-| Title / romanised title | Test Title | E2E Metadata Fixture |
-| Creator | OliBomby | Fixture Mapper |
-| Source | empty | E2E Fixture |
-| Tags | test | e2e fixture |
-| Preview time | -1 | 12345 |
-| Beatmap ID / set ID | existing values | 0 / -1 |
-| Combo colours | existing palette | `#FF3366`, `#33CCFF`, `#FFCC33` |
-| Timing points | 9 | 9 |
-| Hit objects | 17 | 17 |
+| Item                      | Before           | After                           |
+|---------------------------|------------------|---------------------------------|
+| Artist / romanised artist | Test Artist      | E2E Fixture Artist              |
+| Title / romanised title   | Test Title       | E2E Metadata Fixture            |
+| Creator                   | OliBomby         | Fixture Mapper                  |
+| Source                    | empty            | E2E Fixture                     |
+| Tags                      | test             | e2e fixture                     |
+| Preview time              | -1               | 12345                           |
+| Beatmap ID / set ID       | existing values  | 0 / -1                          |
+| Combo colours             | existing palette | `#FF3366`, `#33CCFF`, `#FFCC33` |
+| Timing points             | 9                | 9                               |
+| Hit objects               | 17               | 17                              |
 
-The manager removed the duplicate `e2e` tag, reset the online IDs, replaced the combo palette, and renamed the file to `E2E Fixture Artist - E2E Metadata Fixture (Fixture Mapper) [complicated].osu`. Timing and hit objects were retained. The backup is byte-identical to the target seed.
+The manager removed the duplicate `e2e` tag, reset the online IDs, replaced the combo palette, and renamed the file to
+`E2E Fixture Artist - E2E Metadata Fixture (Fixture Mapper) [complicated].osu`. Timing and hit objects were retained.
+The backup is byte-identical to the target seed.
 
 Status: accepted by Olivier on 2026-07-18.

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
@@ -9,6 +10,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Mapping_Tools.Application.Tests.Tools.MapsetMerger;
 
 [TestClass]
+[SuppressMessage("ReSharper", "AccessToDisposedClosure")]
 public sealed class MapsetMergerServiceTests : IDisposable
 {
     private readonly DisposableFixture fixture = new();
@@ -46,8 +48,8 @@ public sealed class MapsetMergerServiceTests : IDisposable
         result.BeatmapsWritten.Should().Be(2);
         Directory.GetFiles(exportPath, "*.osu").Should().HaveCount(2);
         Directory.GetFiles(exportPath, "*.osb").Should().HaveCount(2);
-        File.ReadAllText(Directory.GetFiles(exportPath, "*.osu").Single(path =>
-                File.ReadAllText(path).Contains("Pack\\audio.mp3", StringComparison.Ordinal)))
+        (await File.ReadAllTextAsync(Directory.GetFiles(exportPath, "*.osu").Single(path =>
+                File.ReadAllText(path).Contains("Pack\\audio.mp3", StringComparison.Ordinal))))
             .Should().Contain("Pack\\audio.mp3");
         Directory.GetFiles(exportPath, "soft-hitfinish*.wav").Should().HaveCount(2);
         Directory.GetFiles(exportPath, "background.jpg", SearchOption.AllDirectories).Should().HaveCount(2);
@@ -67,7 +69,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
         string exportPath = Path.Combine(fixture.Root, "export");
         Directory.CreateDirectory(exportPath);
         string existing = Path.Combine(exportPath, "keep.txt");
-        File.WriteAllText(existing, "keep");
+        await File.WriteAllTextAsync(existing, "keep");
         MapsetMergerServiceOptions project = new()
         {
             ExportPath = exportPath,
@@ -77,7 +79,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
             new FixtureEditingGateway(),
             new PhysicalBeatmapsetFileSystem());
         using CancellationTokenSource cancellation = new();
-        cancellation.Cancel();
+        await cancellation.CancelAsync();
 
         // Act
         Func<Task> act = () => service.MergeAsync(project, cancellationToken: cancellation.Token);
@@ -112,10 +114,10 @@ public sealed class MapsetMergerServiceTests : IDisposable
         string beatmapPath = Directory.GetFiles(exportPath, "*.osu").Single();
         string storyboardPath = Directory.GetFiles(exportPath, "*.osb").Single();
         string nestedReference(string filename) => Path.Combine("Nested", $"nested/{filename}");
-        File.ReadAllText(beatmapPath).Should().Contain(nestedReference("background.jpg"));
-        File.ReadAllText(storyboardPath).Should().Contain(nestedReference("story.png"));
-        File.ReadAllText(storyboardPath).Should().Contain(nestedReference("sb.wav"));
-        File.ReadAllText(storyboardPath).Should().Contain(nestedReference("video.mp4"));
+        (await File.ReadAllTextAsync(beatmapPath)).Should().Contain(nestedReference("background.jpg"));
+        (await File.ReadAllTextAsync(storyboardPath)).Should().Contain(nestedReference("story.png"));
+        (await File.ReadAllTextAsync(storyboardPath)).Should().Contain(nestedReference("sb.wav"));
+        (await File.ReadAllTextAsync(storyboardPath)).Should().Contain(nestedReference("video.mp4"));
         File.Exists(Path.Combine(exportPath, "Nested", "nested", "anim0.png")).Should().BeTrue();
         File.Exists(Path.Combine(exportPath, "Nested", "nested", "anim1.png")).Should().BeTrue();
         File.Exists(Path.Combine(exportPath, "Nested", "nested", "background.jpg")).Should().BeTrue();
@@ -170,7 +172,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
         // Assert
         result.StoryboardsWritten.Should().Be(0);
         Directory.GetFiles(exportPath, "*.osb").Should().BeEmpty();
-        File.ReadAllText(Directory.GetFiles(exportPath, "*.osu").Single())
+        (await File.ReadAllTextAsync(Directory.GetFiles(exportPath, "*.osu").Single()))
             .Should().Contain("Embedded\\nested/story.png");
     }
 
@@ -239,8 +241,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
             cancellationToken.ThrowIfCancellationRequested();
             return Task.FromResult(new BeatmapEditingSession(
                 path,
-                files,
-                BeatmapEditingSource.Disk));
+                files));
         }
 
         public Task<StoryboardEditingSession> OpenStoryboardAsync(

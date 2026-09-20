@@ -5,7 +5,7 @@ namespace Mapping_Tools.Core.Graph.Interpolation.Interpolators;
 
 /// <summary>Interpolates an oscillating sine or triangle wave.</summary>
 [DisplayName("Wave")]
-[CustomDerivativeExtrema(new[] { 0d, 0.5d, 1d })]
+[CustomDerivativeExtrema([0d, 0.5d, 1d])]
 public sealed class WaveInterpolator : CustomInterpolator, IDerivableInterpolator, IIntegrableInterpolator, IInvertibleInterpolator
 {
     /// <summary>Creates a wave interpolator.</summary>
@@ -118,4 +118,3 @@ public sealed class WaveInterpolator : CustomInterpolator, IDerivableInterpolato
         }
     }
 }
-

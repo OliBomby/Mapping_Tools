@@ -57,7 +57,7 @@ public static class PathApproximator
         // Spline fitting does not make sense when the input contains no points or just one point. In this case
         // the user likely wants this function to behave like a no-op.
         if (controlPoints.Count < 2)
-            return controlPoints.Count == 0 ? new List<Vector2>() : new List<Vector2> { controlPoints[0] };
+            return controlPoints.Count == 0 ? [] : [controlPoints[0]];
 
         // With fewer control points than the degree, splines can not be unambiguously fitted. Rather than erroring
         // out, we set the degree to the minimal number that permits a unique fit to avoid special casing in
@@ -156,7 +156,7 @@ public static class PathApproximator
         // If we have a degenerate triangle where a side-length is almost zero, then give up and fall
         // back to a more numerically stable method.
         if (Precision.AlmostEquals(aSq, 0) || Precision.AlmostEquals(bSq, 0) || Precision.AlmostEquals(cSq, 0))
-            return new List<Vector2>();
+            return [];
 
         double s = aSq * (bSq + cSq - aSq);
         double t = bSq * (aSq + cSq - bSq);
@@ -167,7 +167,7 @@ public static class PathApproximator
         // If we have a degenerate triangle with an almost-zero size, then give up and fall
         // back to a more numerically stable method.
         if (Precision.AlmostEquals(sum, 0))
-            return new List<Vector2>();
+            return [];
 
         var centre = (s * a + t * b + u * c) / sum;
         var dA = a - centre;

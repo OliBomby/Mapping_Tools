@@ -16,10 +16,10 @@ namespace Mapping_Tools.Application.Tools.HitsoundCopier;
 /// </summary>
 public sealed class HitsoundCopierService : IHitsoundCopierService
 {
-    private readonly IBeatmapEditingGateway editingGateway;
     private readonly IApplicationDirectories directories;
-    private readonly IHitsoundSampleService samples;
+    private readonly IBeatmapEditingGateway editingGateway;
     private readonly IFileRevealService reveal;
+    private readonly IHitsoundSampleService samples;
     private readonly ApplicationSettings settings;
 
     /// <summary>Creates the Hitsound Copier application service.</summary>
@@ -54,12 +54,10 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
             .Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         BeatmapEditingSession? sourceSession = null;
         if (!string.IsNullOrWhiteSpace(options.PathFrom))
-        {
             sourceSession = await editingGateway.OpenBeatmapAsync(
                 options.PathFrom,
                 LiveBeatmapPreference.PreferLive,
                 cancellationToken).ConfigureAwait(false);
-        }
 
         List<string> processed = [];
         SampleSchema schema = new();
@@ -80,7 +78,7 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
                 : targetDirectory;
 
             bool inspectTargetSamples = options.CopyMode == HitsoundCopierCopyMode.OverwriteOnlyDefined
-                                         || options.CopyStoryboardedSamples && options.IgnoreHitsoundSatisfiedSamples;
+                                        || options is { CopyStoryboardedSamples: true, IgnoreHitsoundSatisfiedSamples: true };
             var firstSamples = inspectTargetSamples
                 ? await samples.AnalyzeAsync(mapDirectory, cancellationToken).ConfigureAwait(false)
                 : new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -112,7 +110,7 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
                 cancellationToken);
             await editingGateway.SaveAsync(
                 targetSession,
-                reloadEditor: AutomaticEditorReloadPolicy.ShouldReloadEditor(
+                AutomaticEditorReloadPolicy.ShouldReloadEditor(
                     targetSession,
                     quickRun,
                     settings),
@@ -158,10 +156,9 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
         ArgumentException.ThrowIfNullOrWhiteSpace(options.PathTo);
         if (options.PathTo
                 .Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
-                .Length == 0)
-        {
+                .Length
+            == 0)
             throw new ArgumentException("Select at least one target beatmap.", nameof(options));
-        }
 
         HitsoundCopierEngine.Validate(options);
     }

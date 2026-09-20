@@ -49,7 +49,7 @@ public sealed class GeometryDashboardGeneratorSettingRowViewModel : ObservableOb
         {
             try
             {
-                object? converted = Convert.ChangeType(
+                object converted = Convert.ChangeType(
                     value,
                     Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType,
                     CultureInfo.InvariantCulture);

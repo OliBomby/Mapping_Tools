@@ -41,4 +41,3 @@ public sealed class ParabolaInterpolator : CustomInterpolator, IDerivableInterpo
         return -p * Math.Pow(t, 3) / 3 + (p + 1) * Math.Pow(t, 2) / 2;
     }
 }
-

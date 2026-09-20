@@ -8,8 +8,8 @@ namespace Mapping_Tools.Desktop.Services.Notifications;
 
 internal sealed class NotificationPresenter : IHostedService
 {
-    private readonly SemaphoreSlim errorDialogGate = new(1, 1);
     private readonly IDialogService dialogs;
+    private readonly SemaphoreSlim errorDialogGate = new(1, 1);
     private readonly IUserNotificationService notifications;
     private readonly INotificationSurface surface;
     private bool started;
@@ -48,7 +48,7 @@ internal sealed class NotificationPresenter : IHostedService
         object? sender,
         UserNotificationPublishedEventArgs eventArgs)
     {
-        UserNotification notification = eventArgs.Notification;
+        var notification = eventArgs.Notification;
         if (notification.Severity == UserNotificationSeverity.Error)
         {
             _ = ShowErrorDialogAsync(notification);
@@ -67,7 +67,7 @@ internal sealed class NotificationPresenter : IHostedService
                 new MessageDialogRequest<bool>(
                     $"Error: {notification.Title}",
                     notification.Message,
-                    [new DialogChoice<bool>("OK", true, IsDefault: true, IsCancel: true)],
+                    [new DialogChoice<bool>("OK", true, true, true)],
                     true,
                     FormatExceptionDetails(notification.Exception)));
         }
@@ -86,13 +86,11 @@ internal sealed class NotificationPresenter : IHostedService
         if (exception is null) return null;
 
         List<string> sections = [];
-        for (Exception? current = exception; current is not null; current = current.InnerException)
-        {
+        for (var current = exception; current is not null; current = current.InnerException)
             sections.Add(
                 string.IsNullOrWhiteSpace(current.StackTrace)
                     ? current.Message
                     : $"{current.Message}{Environment.NewLine}{Environment.NewLine}{current.StackTrace}");
-        }
 
         return string.Join(
             $"{Environment.NewLine}{Environment.NewLine}Inner exception:{Environment.NewLine}{Environment.NewLine}",

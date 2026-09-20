@@ -84,11 +84,11 @@ public class PathGenerator2
         var labels = PathHelper.EnumerateBetween(start, end).Select(o => o.Pos).ToList();
 
         Vector2?[] middles =
-        {
+        [
             null,
             TangentIntersectionApproximation(start, end),
             DoubleMiddleApproximation(start, end),
-        };
+        ];
 
         Vector2? bestMiddle = null;
         double bestLoss = double.PositiveInfinity;
@@ -169,7 +169,7 @@ public class PathGenerator2
         switch (dir)
         {
             case 0:
-                return new List<(LinkedListNode<PathPoint>, LinkedListNode<PathPoint>)> { (start, end) };
+                return [(start, end)];
             case -1:
                 // If the direction is reversed, just swap the start and end index and then reverse the result at the end
                 (start, end) = (end, start);
@@ -177,7 +177,7 @@ public class PathGenerator2
         }
 
         double lastAngleChange = 0;
-        LinkedListNode<PathPoint> startSubRange = start;
+        var startSubRange = start;
         var current = start;
         double subRangeAngleChange = 0;
         var subRanges = new List<(LinkedListNode<PathPoint>, LinkedListNode<PathPoint>, double)>();
@@ -201,7 +201,11 @@ public class PathGenerator2
                 startSubRange = current;
                 subRangeAngleChange = -Math.Abs(angleChange); // Negate the angle change because this point invalidates the angle
             }
-            else if (!Precision.AlmostEquals(angleChange, 0) && Precision.AlmostEquals(lastAngleChange, 0) && current != startSubRange && current.Previous is not null && current.Previous != startSubRange)
+            else if (!Precision.AlmostEquals(angleChange, 0)
+                     && Precision.AlmostEquals(lastAngleChange, 0)
+                     && current != startSubRange
+                     && current.Previous is not null
+                     && current.Previous != startSubRange)
             {
                 // Extra check to prevent subranges going backwards with i - 1
                 // Place on the previous index for symmetry with the part going into the zero chain

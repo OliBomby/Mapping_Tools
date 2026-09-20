@@ -14,4 +14,3 @@ public enum SliderCompletionatorFreeVariable
     /// <summary>Calculates slider duration.</summary>
     Duration,
 }
-

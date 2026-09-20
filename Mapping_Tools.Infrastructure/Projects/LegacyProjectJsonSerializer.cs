@@ -80,8 +80,8 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
     public TProject Deserialize<TProject>(string json)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(json);
-        TProject project = JsonConvert.DeserializeObject<TProject>(json, CreateSettings())
-                           ?? throw new InvalidDataException("The project document contained a JSON null root.");
+        var project = JsonConvert.DeserializeObject<TProject>(json, CreateSettings())
+                      ?? throw new InvalidDataException("The project document contained a JSON null root.");
         MigrateGeometryDashboardKeepRunning(json, project);
         return project;
     }
@@ -95,7 +95,7 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             BindingFlags.Instance | BindingFlags.Public);
         if (property?.PropertyType != typeof(bool) || !property.CanWrite) return;
 
-        JObject root = JObject.Parse(json);
+        var root = JObject.Parse(json);
         if (root["KeepRunning"] is not null) return;
         if (root["CurrentPreferences"]?["KeepRunning"] is not JValue value
             || value.Type != JTokenType.Boolean)
@@ -128,10 +128,23 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
         };
     }
 
+    private static T ReadValue<T>(
+        JObject json,
+        string propertyName,
+        JsonSerializer serializer,
+        T fallback)
+    {
+        var token = json[propertyName];
+        return token is null || token.Type == JTokenType.Null
+            ? fallback
+            : token.ToObject<T>(serializer)!;
+    }
+
     private sealed class TimingCopierResnapModeConverter : JsonConverter
     {
         private const string legacy_preserve_beat_spacing =
             "Number of beats between objects stays the same";
+
         private const string legacy_resnap = "Just resnap";
         private const string legacy_keep_objects_fixed = "Don't move objects";
 
@@ -161,7 +174,6 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             JsonSerializer serializer)
         {
             if (reader.TokenType == JsonToken.Integer)
-            {
                 try
                 {
                     return Parse(Convert.ToInt32(reader.Value));
@@ -170,9 +182,8 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 {
                     throw new JsonSerializationException("The Timing Copier resnap mode was invalid.", exception);
                 }
-            }
 
-            if (reader.TokenType == JsonToken.String && reader.Value is string text)
+            if (reader is { TokenType: JsonToken.String, Value: string text })
             {
                 if (text.Equals(legacy_preserve_beat_spacing, StringComparison.Ordinal))
                     return TimingCopierResnapMode.PreserveBeatSpacing;
@@ -188,7 +199,7 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
 
         private static TimingCopierResnapMode Parse(int value)
         {
-            TimingCopierResnapMode mode = (TimingCopierResnapMode)value;
+            var mode = (TimingCopierResnapMode)value;
             if (!Enum.IsDefined(mode))
                 throw new JsonSerializationException("The Timing Copier resnap mode was invalid.");
 
@@ -243,24 +254,33 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
         private const string desktop_assembly_name = "Mapping_Tools.Desktop";
         private const string legacy_hotkey = "Mapping_Tools.Classes.SystemTools.Hotkey";
         private const string intermediate_core_hotkey = "Mapping_Tools.Core.Classes.SystemTools.Hotkey";
+
         private const string current_geometry_hotkey =
             "Mapping_Tools.Core.Tools.GeometryDashboard.Serialization.Hotkey";
+
         private const string current_namespace_prefix = "Mapping_Tools.Core.";
+
         private const string legacy_relevant_objects_prefix =
             "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.";
+
         private const string intermediate_relevant_objects_prefix =
             "Mapping_Tools.Core.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.";
+
         private const string current_relevant_objects_prefix =
             "Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.";
+
         private const string current_relevant_object_prefix =
             "Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject.";
+
         private const string intermediate_current_relevant_objects_prefix =
             "Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.";
+
         private const string intermediate_current_relevant_object_prefix =
             "Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject.";
 
         private const string legacy_relevant_objects_prefix_without_tools =
             "Mapping_Tools.Classes.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.";
+
         private const string legacy_rhythm_guide_project = "Mapping_Tools.Viewmodels.RhythmGuideVm";
 
         private const string legacy_hitsound_preview_helper_project =
@@ -370,7 +390,7 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
         private const string legacy_pattern_gallery_handler =
             "Mapping_Tools.Classes.Tools.PatternGallery.OsuPatternFileHandler";
 
-        private static readonly string[] current_desktop_model_namespaces =
+        private static readonly string[] currentDesktopModelNamespaces =
         [
             "Mapping_Tools.Desktop.Tools.ComboColourStudio.Models",
             "Mapping_Tools.Desktop.Tools.GeometryDashboard.Models",
@@ -403,13 +423,13 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             if (typeName.StartsWith("System.Collections.Generic.Dictionary`2", StringComparison.Ordinal) && typeName.Contains("GeneratorSettings", StringComparison.Ordinal))
                 return typeof(Dictionary<Type, GeneratorSettings>);
 
-            if (TryResolveLegacyGenericType(typeName, out Type genericType))
+            if (TryResolveLegacyGenericType(typeName, out var genericType))
                 return genericType;
 
             if (typeName.EndsWith("[]", StringComparison.Ordinal)
                 && (IsLegacyAssembly(assemblyName) || IsCurrentCoreAssembly(assemblyName)))
             {
-                Type elementType = BindToType(assemblyName, typeName[..^2]);
+                var elementType = BindToType(assemblyName, typeName[..^2]);
                 return elementType.MakeArrayType();
             }
 
@@ -503,7 +523,8 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
 
                 if (typeName == legacy_rhythm_guide_project) return ResolveDesktopProject("RhythmGuideProject", typeof(RhythmGuideServiceOptions));
                 if (typeName == legacy_hitsound_preview_helper_project) return ResolveDesktopProject("HitsoundPreviewHelperProject", typeof(HitsoundPreviewHelperServiceOptions));
-                if (typeName == legacy_hitsound_preview_helper_project_uppercase) return ResolveDesktopProject("HitsoundPreviewHelperProject", typeof(HitsoundPreviewHelperServiceOptions));
+                if (typeName == legacy_hitsound_preview_helper_project_uppercase)
+                    return ResolveDesktopProject("HitsoundPreviewHelperProject", typeof(HitsoundPreviewHelperServiceOptions));
                 if (typeName == legacy_hitsound_copier_project) return ResolveDesktopProject("HitsoundCopierProject", typeof(HitsoundCopierServiceOptions));
                 if (typeName == legacy_hitsound_studio_project)
                     return ResolveDesktopProject("HitsoundStudioProject", typeof(HitsoundStudioServiceOptions));
@@ -897,17 +918,17 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
         private static Type ResolveDesktopProject(string typeName, Type fallbackType)
         {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-            foreach (string modelNamespace in current_desktop_model_namespaces)
+            foreach (string modelNamespace in currentDesktopModelNamespaces)
             {
-                Type? currentType = assembly.GetType(
+                var currentType = assembly.GetType(
                     $"{modelNamespace}.{typeName}",
-                    throwOnError: false);
+                    false);
                 if (currentType is not null) return currentType;
             }
 
             return Type.GetType(
                        $"Mapping_Tools.Desktop.Models.{typeName}, {desktop_assembly_name}",
-                       throwOnError: false)
+                       false)
                    ?? fallbackType;
         }
 
@@ -915,7 +936,8 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
         {
             return serializedType.Namespace?.StartsWith(
                        "Mapping_Tools.Desktop.Tools.",
-                       StringComparison.Ordinal) == true
+                       StringComparison.Ordinal)
+                   == true
                    && serializedType.Namespace.EndsWith(
                        ".Models",
                        StringComparison.Ordinal);
@@ -923,9 +945,9 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
 
         private bool TryResolveLegacyGenericType(string typeName, out Type resolvedType)
         {
-            Type? genericDefinition = typeName.StartsWith(
-                                          "System.Collections.Generic.List`1",
-                                          StringComparison.Ordinal)
+            var genericDefinition = typeName.StartsWith(
+                "System.Collections.Generic.List`1",
+                StringComparison.Ordinal)
                 ? typeof(List<>)
                 : typeName.StartsWith(
                     "System.Collections.ObjectModel.ObservableCollection`1",
@@ -954,13 +976,12 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 argumentsStart + 2,
                 argumentsEnd - argumentsStart - 2);
             string[] arguments = argumentsText.Split(
-                "],[",
-                StringSplitOptions.None);
-            Type[] argumentTypes = arguments.Select(ResolveLegacyGenericArgument).ToArray();
+                "],[");
+            var argumentTypes = arguments.Select(resolveLegacyGenericArgument).ToArray();
             resolvedType = genericDefinition.MakeGenericType(argumentTypes);
             return true;
 
-            Type ResolveLegacyGenericArgument(string argument)
+            Type resolveLegacyGenericArgument(string argument)
             {
                 int separator = FindAssemblySeparator(argument);
                 string nestedTypeName = separator < 0 ? argument.Trim() : argument[..separator].Trim();
@@ -973,7 +994,6 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
         {
             int bracketDepth = 0;
             for (int index = 0; index < typeName.Length; index++)
-            {
                 switch (typeName[index])
                 {
                     case '[':
@@ -985,7 +1005,6 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                     case ',' when bracketDepth == 0:
                         return index;
                 }
-            }
 
             return -1;
         }
@@ -994,7 +1013,7 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
         {
             foreach (string candidate in GetCurrentTypeNameCandidates(typeName))
             {
-                Type? migratedType = migratedCoreMarker.Assembly.GetType(candidate);
+                var migratedType = migratedCoreMarker.Assembly.GetType(candidate);
                 if (migratedType is not null) return migratedType;
             }
 
@@ -1252,7 +1271,7 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             object? existingValue,
             JsonSerializer serializer)
         {
-            JObject json = JObject.Load(reader);
+            var json = JObject.Load(reader);
             Sample sample = new()
             {
                 Priority = ReadValue(json, "Priority", serializer, 0),
@@ -1306,7 +1325,7 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             object? existingValue,
             JsonSerializer serializer)
         {
-            JObject json = JObject.Load(reader);
+            var json = JObject.Load(reader);
             HitsoundLayer layer = new()
             {
                 Name = ReadValue(json, "Name", serializer, string.Empty),
@@ -1317,14 +1336,14 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             };
 
             layer.ImportArgs = json["ImportArgs"]?.ToObject<LayerImportArgs>(serializer)
-                                ?? new LayerImportArgs
-                                {
-                                    ImportType = ReadValue(json, "ImportType", serializer, ImportType.None),
-                                    Path = ReadValue(json, "Path", serializer, string.Empty),
-                                    X = ReadValue(json, "X", serializer, -1d),
-                                    Y = ReadValue(json, "Y", serializer, -1d),
-                                    SamplePath = ReadValue(json, "SamplePath", serializer, string.Empty),
-                                };
+                               ?? new LayerImportArgs
+                               {
+                                   ImportType = ReadValue(json, "ImportType", serializer, ImportType.None),
+                                   Path = ReadValue(json, "Path", serializer, string.Empty),
+                                   X = ReadValue(json, "X", serializer, -1d),
+                                   Y = ReadValue(json, "Y", serializer, -1d),
+                                   SamplePath = ReadValue(json, "SamplePath", serializer, string.Empty),
+                               };
             layer.SampleArgs = json["SampleArgs"]?.ToObject<SampleGeneratingArgs>(serializer)
                                ?? new SampleGeneratingArgs();
             if (string.IsNullOrEmpty(layer.SampleArgs.Path))
@@ -1332,18 +1351,6 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
 
             return layer;
         }
-    }
-
-    private static T ReadValue<T>(
-        JObject json,
-        string propertyName,
-        JsonSerializer serializer,
-        T fallback)
-    {
-        JToken? token = json[propertyName];
-        return token is null || token.Type == JTokenType.Null
-            ? fallback
-            : token.ToObject<T>(serializer)!;
     }
 
     private sealed class GeometryGeneratorSettingsDictionaryConverter : JsonConverter

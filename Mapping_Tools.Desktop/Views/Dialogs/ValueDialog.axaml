@@ -1,29 +1,29 @@
 <UserControl xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="using:Mapping_Tools.Desktop.ViewModels.Dialogs"
-        xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
-        x:Class="Mapping_Tools.Desktop.Views.Dialogs.ValueDialog"
-        x:DataType="vm:ValueDialogViewModel"
-        HorizontalAlignment="Center"
-        VerticalAlignment="Center">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Mapping_Tools.Desktop.ViewModels.Dialogs"
+             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             x:Class="Mapping_Tools.Desktop.Views.Dialogs.ValueDialog"
+             x:DataType="vm:ValueDialogViewModel"
+             HorizontalAlignment="Center"
+             VerticalAlignment="Center">
     <UserControl.Styles>
         <Style Selector="TextBlock">
             <Setter Property="FontWeight" Value="Medium" />
         </Style>
     </UserControl.Styles>
     <Grid
-          MaxWidth="363"
-          Margin="0"
-          HorizontalAlignment="Left"
-          VerticalAlignment="Top"
-          RowDefinitions="Auto,Auto">
+        MaxWidth="363"
+        Margin="0"
+        HorizontalAlignment="Left"
+        VerticalAlignment="Top"
+        RowDefinitions="Auto,Auto">
         <TextBox x:Name="ValueTextBox"
                  Margin="12"
                  FontSize="18"
                  FontWeight="Medium"
                  Text="{Binding ValueText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                  materialAssists:TextFieldAssist.Label="{Binding Prompt}" />
-            <StackPanel Grid.Row="1"
+        <StackPanel Grid.Row="1"
                     HorizontalAlignment="Center"
                     Orientation="Horizontal"
                     Margin="2"

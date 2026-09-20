@@ -11,7 +11,7 @@ public sealed class ProgressExtensionsTests
     {
         // Arrange
         RecordingProgress destination = new();
-        IProgress<double> mapped = destination.MapTo(0.5, 1);
+        var mapped = destination.MapTo(0.5, 1);
 
         // Act
         mapped.Report(0);
@@ -27,7 +27,7 @@ public sealed class ProgressExtensionsTests
     {
         // Arrange
         RecordingProgress destination = new();
-        IProgress<double> mapped = destination.MapTo(0.5, 1).MapTo(0.25, 0.75);
+        var mapped = destination.MapTo(0.5, 1).MapTo(0.25, 0.75);
 
         // Act
         mapped.Report(0);
@@ -42,7 +42,7 @@ public sealed class ProgressExtensionsTests
     {
         // Arrange
         RecordingProgress destination = new();
-        IProgress<double> mapped = destination.MapTo(1, 2);
+        var mapped = destination.MapTo(1, 2);
 
         // Act
         mapped.Report(0);
@@ -99,7 +99,7 @@ public sealed class ProgressExtensionsTests
         RecordingProgress destination = new();
 
         // Act
-        Action act = () => destination.Report(3, 2);
+        var act = () => destination.Report(3, 2);
 
         // Assert
         act.Should().Throw<ArgumentOutOfRangeException>();
@@ -110,10 +110,10 @@ public sealed class ProgressExtensionsTests
     {
         // Arrange
         RecordingProgress destination = new();
-        IProgress<double> mapped = destination.MapTo(0, 1);
+        var mapped = destination.MapTo(0, 1);
 
         // Act
-        Action act = () => mapped.Report(1.01);
+        var act = () => mapped.Report(1.01);
 
         // Assert
         act.Should().Throw<ArgumentOutOfRangeException>();

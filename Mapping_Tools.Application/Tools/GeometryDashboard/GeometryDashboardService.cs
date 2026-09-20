@@ -8,7 +8,6 @@ using Mapping_Tools.Core.Tools.GeometryDashboard;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators;
-using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 
 namespace Mapping_Tools.Application.Tools.GeometryDashboard;
@@ -25,36 +24,38 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
     private const double selection_range = 80;
     private const int snapping_interval_milliseconds = 16;
     private static readonly HitObjectComparer hitObjectComparer = new();
-    private static readonly HitObjectComparer heldHitObjectComparer = new(checkPosition: false);
-
-    private readonly GeometryDashboardServiceOptions project;
+    private static readonly HitObjectComparer heldHitObjectComparer = new(false);
     private readonly ApplicationSettings applicationSettings;
+    private readonly List<IRelevantDrawable> inheritableDrawables = [];
     private readonly IGeometryDashboardInputService input;
     private readonly LayerCollection layers;
-    private readonly IGeometryDashboardOverlayService overlayService;
-    private readonly IGeometryDashboardRuntime runtime;
-    private readonly object lifecycleGate = new();
-    private readonly SemaphoreSlim refreshGate = new(1, 1);
-    private readonly object stateGate = new();
-    private readonly List<IRelevantDrawable> inheritableDrawables = [];
+    private readonly Lock lifecycleGate = new();
     private readonly List<IRelevantDrawable> lockedDrawables = [];
+    private readonly IGeometryDashboardOverlayService overlayService;
+
+    private readonly GeometryDashboardServiceOptions project;
+    private readonly SemaphoreSlim refreshGate = new(1, 1);
+    private readonly IGeometryDashboardRuntime runtime;
     private readonly List<IRelevantDrawable> selectedDrawables = [];
+    private readonly Lock stateGate = new();
+    private bool disposed;
+    private HitObject[] heldHitObjects = [];
+    private Vector2 heldMouseOffset;
+    private IRelevantDrawable? lastSnapped;
+    private bool lockedToggle;
+    private CancellationTokenSource? runCancellation;
+    private Task? runLoop;
+    private GeometryDashboardRuntimeSnapshot? runtimeSnapshot;
+    private Task? snappingLoop;
+    private bool snappingWithMouseDown;
+
     private GeometryDashboardServiceState state = new(
         "Stopped",
         false,
         0,
         0);
-    private CancellationTokenSource? runCancellation;
-    private Task? runLoop;
-    private Task? snappingLoop;
-    private GeometryDashboardRuntimeSnapshot? runtimeSnapshot;
-    private HitObject[] heldHitObjects = [];
-    private bool snappingWithMouseDown;
-    private IRelevantDrawable? lastSnapped;
-    private Vector2 heldMouseOffset;
-    private bool lockedToggle;
+
     private bool unlockedSomething;
-    private bool disposed;
 
     /// <summary>
     ///     Creates a dashboard calculation session over the supplied project and
@@ -85,6 +86,8 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
             project.CurrentPreferences.AcceptableDifference);
     }
 
+    private GeometryDashboardPreferences Preferences => project.CurrentPreferences;
+
     /// <inheritdoc />
     public event EventHandler? StateChanged;
 
@@ -96,7 +99,10 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
     {
         get
         {
-            lock (stateGate) return state;
+            lock (stateGate)
+            {
+                return state;
+            }
         }
     }
 
@@ -105,7 +111,10 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
     {
         get
         {
-            lock (lifecycleGate) return runLoop is { IsCompleted: false };
+            lock (lifecycleGate)
+            {
+                return runLoop is { IsCompleted: false };
+            }
         }
     }
 
@@ -120,7 +129,7 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
             PublishState("Starting...");
             runCancellation?.Dispose();
             runCancellation = new CancellationTokenSource();
-            CancellationToken cancellationToken = runCancellation.Token;
+            var cancellationToken = runCancellation.Token;
             runLoop = Task.Run(() => RunLoopAsync(cancellationToken));
             snappingLoop = Task.Run(() => SnappingLoopAsync(cancellationToken));
         }
@@ -285,10 +294,7 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
         }
 
         refreshGate.Dispose();
-        GC.SuppressFinalize(this);
     }
-
-    private GeometryDashboardPreferences Preferences => project.CurrentPreferences;
 
     private async Task RunLoopAsync(CancellationToken cancellationToken)
     {
@@ -384,6 +390,7 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
                                  || Preferences.UpdateMode switch
                                  {
                                      UpdateMode.AnyChange => true,
+                                     // ReSharper disable once CompareOfFloatsByEqualityOperator
                                      UpdateMode.TimeChange => previousSnapshot.Editor.EditorTime != snapshot.Editor.EditorTime,
                                      UpdateMode.OsuActivated => snapshot.IsEditorActive && !previousSnapshot.IsEditorActive,
                                      UpdateMode.HotkeyDown => false,
@@ -414,7 +421,7 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
         }
     }
 
-    private bool UpdateRootObjects(LiveBeatmapSnapshot editor)
+    private void UpdateRootObjects(LiveBeatmapSnapshot editor)
     {
         lock (stateGate)
         {
@@ -443,10 +450,9 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
             bool selectionChanged = SynchronizeRootSelection(
                 layers.GetRootRelevantHitObjects(),
                 editor.SelectedHitObjects);
-            if (added.Length == 0 && removed.Length == 0 && !selectionChanged) return false;
+            if (added.Length == 0 && removed.Length == 0 && !selectionChanged) return;
 
             layers.GetRootLayer().GenerateNewObjects(true);
-            return true;
         }
     }
 
@@ -482,7 +488,10 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
                     static (objectModel, value) => objectModel.IsSelected = value);
             else selectedDrawables.Clear();
 
-            if (input.IsHotkeyDown(Preferences.LockHotkey)) ApplyNearestLock();
+            if (input.IsHotkeyDown(Preferences.LockHotkey))
+            {
+                ApplyNearestLock();
+            }
             else
             {
                 lockedDrawables.Clear();
@@ -610,7 +619,10 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
                     drawables = related;
                 }
             }
-            else if (!Preferences.KeyUpViewMode.HasFlag(ViewMode.Everything)) drawables = [];
+            else if (!Preferences.KeyUpViewMode.HasFlag(ViewMode.Everything))
+            {
+                drawables = [];
+            }
 
             List<GeometryDashboardOverlayShape> shapes = [];
             if (Preferences.VisiblePlayfieldBoundary)
@@ -719,7 +731,9 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
         if (nearest is null || lockedDrawables.Contains(nearest)) return;
         if (lockedDrawables.Count == 0) lockedToggle = !nearest.IsLocked;
         if (lockedToggle)
+        {
             layers.GetRootLayer().Add(nearest.GetLockedRelevantObject());
+        }
         else if (nearest.IsLocked && !unlockedSomething)
         {
             nearest.Dispose();
@@ -745,7 +759,7 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
                 if (heldObjects is not null
                     && drawable.ParentObjects.Count > 0
                     && drawable.ParentObjects.All(parent => parent is RelevantHitObject hit
-                        && heldObjects.Any(held => heldHitObjectComparer.Equals(hit.HitObject, held))))
+                                                            && heldObjects.Any(held => heldHitObjectComparer.Equals(hit.HitObject, held))))
                     continue;
 
                 double distance = drawable.DistanceTo(cursor);
@@ -802,7 +816,8 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
                 foreach (var value in values.Where(value => !value.IsLocked))
                     layers.GetRootLayer().Add(value.GetLockedRelevantObject());
             else
-                foreach (var value in values.Where(value => value.IsLocked)) value.Dispose();
+                foreach (var value in values.Where(value => value.IsLocked))
+                    value.Dispose();
 
             layers.GetRootLayer().GenerateNewObjects(true);
             UpdateOverlay();
@@ -831,6 +846,7 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
             heldMouseOffset = Vector2.Zero;
             lastSnapped = null;
         }
+
         overlayService.Hide();
         PublishState(status);
     }
@@ -841,7 +857,7 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
         EventHandler? handler;
         lock (stateGate)
         {
-            next = new(
+            next = new GeometryDashboardServiceState(
                 status,
                 runtimeSnapshot is not null && overlayService.IsVisible,
                 layers.GetAllRelevantDrawables().Count(),
@@ -871,10 +887,10 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
 
     private static double GetHue(double red, double green, double blue, double max, double min)
     {
-        if (max == min) return 0;
+        if (Precision.AlmostEquals(max, min)) return 0;
         double delta = max - min;
-        if (max == red) return 60 * ((green - blue) / delta % 6);
-        if (max == green) return 60 * ((blue - red) / delta + 2);
+        if (Precision.AlmostEquals(max, red)) return 60 * ((green - blue) / delta % 6);
+        if (Precision.AlmostEquals(max, green)) return 60 * ((blue - red) / delta + 2);
         return 60 * ((red - green) / delta + 4);
     }
 

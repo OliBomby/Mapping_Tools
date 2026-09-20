@@ -9,4 +9,3 @@ public enum SlideratorExportMode
     /// <summary>Replaces the object already at the time.</summary>
     Override,
 }
-

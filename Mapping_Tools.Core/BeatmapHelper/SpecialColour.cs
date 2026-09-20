@@ -70,6 +70,7 @@ public class SpecialColour : ComboColour, IEquatable<SpecialColour>, ICloneable
     /// <returns>The key hash, or zero for an unnamed colour.</returns>
     public override int GetHashCode()
     {
+        // ReSharper disable once NonReadonlyMemberInGetHashCode
         return Name?.GetHashCode() ?? 0;
     }
 }

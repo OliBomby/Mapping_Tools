@@ -1,14 +1,14 @@
+using Mapping_Tools.Application.Projects.Models;
+using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.Graph.Interpolation;
 using Mapping_Tools.Core.Graph.Interpolation.Interpolators;
 using Mapping_Tools.Core.MathUtil;
-using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
+using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettingses;
-using Mapping_Tools.Application.Projects.Models;
-using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -21,8 +21,8 @@ internal static class CanonicalProjectJsonSerializer
         ArgumentNullException.ThrowIfNull(schema);
         ArgumentNullException.ThrowIfNull(project);
 
-        JsonSerializer serializer = CreateSerializer();
-        JObject document = JObject.FromObject(project, serializer);
+        var serializer = CreateSerializer();
+        var document = JObject.FromObject(project, serializer);
         document.AddFirst(new JProperty("$version", schema.CurrentVersion));
         document.AddFirst(new JProperty("$schema", schema.Id));
         return document.ToString(Formatting.Indented);
@@ -30,14 +30,14 @@ internal static class CanonicalProjectJsonSerializer
 
     internal static TProject Deserialize<TProject>(JObject document)
     {
-        JsonSerializer serializer = CreateSerializer();
+        var serializer = CreateSerializer();
         return document.ToObject<TProject>(serializer)
                ?? throw new InvalidDataException("The project document contained a JSON null root.");
     }
 
     private static JsonSerializer CreateSerializer()
     {
-        JsonSerializer serializer = JsonSerializer.Create(new JsonSerializerSettings
+        var serializer = JsonSerializer.Create(new JsonSerializerSettings
         {
             NullValueHandling = NullValueHandling.Ignore,
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
@@ -96,9 +96,9 @@ internal static class CanonicalProjectJsonSerializer
             if (reader.TokenType == JsonToken.Null)
                 return null!;
 
-            JObject json = JObject.Load(reader);
-            JToken? denominator = json["Denominator"];
-            JToken? numerator = json["Numerator"];
+            var json = JObject.Load(reader);
+            var denominator = json["Denominator"];
+            var numerator = json["Numerator"];
             if (denominator is not null || numerator is not null)
             {
                 if (denominator is null || numerator is null)
@@ -115,9 +115,8 @@ internal static class CanonicalProjectJsonSerializer
                 }
             }
 
-            JToken? value = json["Value"];
+            var value = json["Value"];
             if (value is not null)
-            {
                 try
                 {
                     return new IrrationalBeatDivisor(value.Value<double>());
@@ -126,7 +125,6 @@ internal static class CanonicalProjectJsonSerializer
                 {
                     throw new JsonSerializationException("An irrational beat divisor contained an invalid number.", exception);
                 }
-            }
 
             throw new JsonSerializationException(
                 "A beat divisor must contain either Denominator and Numerator or Value.");
@@ -197,7 +195,7 @@ internal static class CanonicalProjectJsonSerializer
                 throw new JsonSerializationException("Geometry Dashboard generator settings were invalid.");
 
             writer.WriteStartObject();
-            foreach ((Type generatorType, GeneratorSettings generatorSettings) in settings)
+            foreach (var (generatorType, generatorSettings) in settings)
             {
                 if (!generatorIds.TryGetValue(generatorType, out string? generatorId))
                     throw new JsonSerializationException(
@@ -207,7 +205,7 @@ internal static class CanonicalProjectJsonSerializer
                     throw new JsonSerializationException(
                         $"The Geometry Dashboard settings type '{generatorSettings.GetType().FullName}' has no stable identifier.");
 
-                JObject settingsJson = JObject.FromObject(generatorSettings, serializer);
+                var settingsJson = JObject.FromObject(generatorSettings, serializer);
                 settingsJson.AddFirst(new JProperty("$kind", settingsId));
                 writer.WritePropertyName(generatorId);
                 settingsJson.WriteTo(writer);
@@ -222,19 +220,19 @@ internal static class CanonicalProjectJsonSerializer
             object? existingValue,
             JsonSerializer serializer)
         {
-            JObject json = JObject.Load(reader);
+            var json = JObject.Load(reader);
             Dictionary<Type, GeneratorSettings> settings = new();
-            foreach (JProperty property in json.Properties())
+            foreach (var property in json.Properties())
             {
-                if (!generatorTypes.TryGetValue(property.Name, out Type? generatorType))
+                if (!generatorTypes.TryGetValue(property.Name, out var generatorType))
                     throw new JsonSerializationException(
                         $"The Geometry Dashboard generator identifier '{property.Name}' is unknown.");
 
                 string? settingsId = property.Value["$kind"]?.Value<string>();
-                Type settingsType = typeof(GeneratorSettings);
+                var settingsType = typeof(GeneratorSettings);
                 if (settingsId is not null)
                 {
-                    if (!settingsTypes.TryGetValue(settingsId, out Type? knownSettingsType))
+                    if (!settingsTypes.TryGetValue(settingsId, out var knownSettingsType))
                         throw new JsonSerializationException(
                             $"The Geometry Dashboard settings identifier '{settingsId}' is unknown.");
 
@@ -242,8 +240,8 @@ internal static class CanonicalProjectJsonSerializer
                 }
 
                 settings[generatorType] = property.Value.ToObject(settingsType, serializer) as GeneratorSettings
-                                           ?? throw new JsonSerializationException(
-                                               $"The Geometry Dashboard settings for '{property.Name}' were null.");
+                                          ?? throw new JsonSerializationException(
+                                              $"The Geometry Dashboard settings for '{property.Name}' were null.");
             }
 
             return settings;
@@ -296,7 +294,7 @@ internal static class CanonicalProjectJsonSerializer
             object? existingValue,
             JsonSerializer serializer)
         {
-            JObject json = JObject.Load(reader);
+            var json = JObject.Load(reader);
             GraphState graph = new([], 0, 0, 1, 1)
             {
                 MinX = json["MinX"]?.Value<double>() ?? 0,
@@ -323,7 +321,7 @@ internal static class CanonicalProjectJsonSerializer
 
             if (interpolatorIds.TryGetValue(anchor.Interpolator.GetType(), out string? interpolatorId))
             {
-                JObject interpolator = JObject.FromObject(anchor.Interpolator, serializer);
+                var interpolator = JObject.FromObject(anchor.Interpolator, serializer);
                 interpolator.AddFirst(new JProperty("$kind", interpolatorId));
                 json["Interpolator"] = interpolator;
             }
@@ -333,17 +331,17 @@ internal static class CanonicalProjectJsonSerializer
 
         private static GraphAnchor DeserializeAnchor(JToken token, JsonSerializer serializer)
         {
-            JObject json = token as JObject
-                          ?? throw new JsonSerializationException("A graph anchor must be a JSON object.");
-            Vector2 position = json["Pos"]?.ToObject<Vector2>(serializer)
-                               ?? throw new JsonSerializationException("A graph anchor did not contain a position.");
+            var json = token as JObject
+                       ?? throw new JsonSerializationException("A graph anchor must be a JSON object.");
+            var position = json["Pos"]?.ToObject<Vector2>(serializer)
+                           ?? throw new JsonSerializationException("A graph anchor did not contain a position.");
             double tension = json["Tension"]?.Value<double>() ?? 0;
             IGraphInterpolator interpolator = new SingleCurveInterpolator();
 
             if (json["Interpolator"] is JObject interpolatorJson)
             {
                 string? interpolatorId = interpolatorJson["$kind"]?.Value<string>();
-                if (interpolatorId is not null && interpolatorTypes.TryGetValue(interpolatorId, out Type? interpolatorType))
+                if (interpolatorId is not null && interpolatorTypes.TryGetValue(interpolatorId, out var interpolatorType))
                     interpolator = GraphInterpolatorCatalog.GetInterpolator(interpolatorType);
                 else if (interpolatorId is not null)
                     throw new JsonSerializationException(
@@ -382,7 +380,7 @@ internal static class CanonicalProjectJsonSerializer
                 throw new JsonSerializationException("The Geometry Dashboard object collection was invalid.");
 
             writer.WriteStartObject();
-            foreach ((Type objectType, List<IRelevantObject> objects) in collection)
+            foreach (var (objectType, objects) in collection)
             {
                 if (!objectIds.TryGetValue(objectType, out string? objectId))
                     throw new JsonSerializationException(
@@ -390,9 +388,9 @@ internal static class CanonicalProjectJsonSerializer
 
                 writer.WritePropertyName(objectId);
                 writer.WriteStartArray();
-                foreach (IRelevantObject relevantObject in objects)
+                foreach (var relevantObject in objects)
                 {
-                    JObject objectJson = JObject.FromObject(relevantObject, serializer);
+                    var objectJson = JObject.FromObject(relevantObject, serializer);
                     objectJson.WriteTo(writer);
                 }
 
@@ -408,13 +406,13 @@ internal static class CanonicalProjectJsonSerializer
             object? existingValue,
             JsonSerializer serializer)
         {
-            JObject json = JObject.Load(reader);
+            var json = JObject.Load(reader);
             RelevantObjectCollection collection = new();
-            foreach (JProperty property in json.Properties())
+            foreach (var property in json.Properties())
             {
                 if (property.Name is "$schema" or "$version") continue;
 
-                if (!objectTypes.TryGetValue(property.Name, out Type? relevantObjectType))
+                if (!objectTypes.TryGetValue(property.Name, out var relevantObjectType))
                     throw new JsonSerializationException(
                         $"The Geometry Dashboard object identifier '{property.Name}' is unknown.");
 
@@ -423,12 +421,10 @@ internal static class CanonicalProjectJsonSerializer
                         $"The Geometry Dashboard object group '{property.Name}' must be a JSON array.");
 
                 List<IRelevantObject> objects = [];
-                foreach (JToken objectJson in objectsJson)
-                {
+                foreach (var objectJson in objectsJson)
                     objects.Add(objectJson.ToObject(relevantObjectType, serializer) as IRelevantObject
                                 ?? throw new JsonSerializationException(
                                     $"The Geometry Dashboard object group '{property.Name}' contained a null object."));
-                }
 
                 collection[relevantObjectType] = objects;
             }

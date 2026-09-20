@@ -12,4 +12,3 @@ public enum AudioExportFormat
     /// <summary>Ogg Vorbis.</summary>
     OggVorbis,
 }
-

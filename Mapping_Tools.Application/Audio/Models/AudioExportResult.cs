@@ -23,4 +23,3 @@ public sealed class AudioExportResult
     /// <summary>Gets the resulting file length in bytes.</summary>
     public long BytesWritten { get; }
 }
-

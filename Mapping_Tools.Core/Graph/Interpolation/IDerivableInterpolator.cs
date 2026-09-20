@@ -8,4 +8,3 @@ public interface IDerivableInterpolator
     /// <returns>The derivative of the normalized interpolation.</returns>
     double GetDerivative(double t);
 }
-

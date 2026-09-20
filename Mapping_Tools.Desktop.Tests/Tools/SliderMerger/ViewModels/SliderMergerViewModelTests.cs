@@ -1,13 +1,11 @@
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
-using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.SliderMerger;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.SliderMerger.Models;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.SliderMerger.ViewModels;
-using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Tools.SliderMerger.ViewModels;
@@ -81,7 +79,7 @@ public sealed class SliderMergerViewModelTests
         TestBeatmapWorkspace workspace = new() { QuickRunPath = "current.osu" };
         var viewModel = Create(
             service,
-            workspace: workspace);
+            workspace);
 
         // Act
         await viewModel.RunQuickAsync(CancellationToken.None);
@@ -163,5 +161,4 @@ public sealed class SliderMergerViewModelTests
             return Task.FromResult(new SliderMergerResult(paths, 2));
         }
     }
-
 }

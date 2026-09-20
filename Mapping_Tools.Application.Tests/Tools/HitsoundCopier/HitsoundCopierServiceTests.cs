@@ -1,8 +1,8 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Platform;
-using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.HitsoundCopier;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
@@ -54,13 +54,12 @@ public sealed class HitsoundCopierServiceTests
         {
             CustomIndex = 1,
         };
-        Beatmap source = new([sourceObject], [sourceTiming], sourceTiming, 1.4);
+        Beatmap source = new([sourceObject], [sourceTiming], sourceTiming);
         TimingPoint targetTiming = sourceTiming.Copy();
         Beatmap target = new(
             [new HitObject("256,192,0,2,0,L|396:192,1,140,0|0:0,0:0:0:0:")],
             [targetTiming],
-            targetTiming,
-            1.4);
+            targetTiming);
         RecordingBeatmapEditingGateway gateway = CreateGateway(source, target);
         RecordingSampleService samples = new();
         RecordingFileRevealService reveal = new();
@@ -96,13 +95,12 @@ public sealed class HitsoundCopierServiceTests
         {
             CustomIndex = 1,
         };
-        Beatmap source = new([sourceObject], [sourceTiming], sourceTiming, 1.4);
+        Beatmap source = new([sourceObject], [sourceTiming], sourceTiming);
         TimingPoint targetTiming = sourceTiming.Copy();
         Beatmap target = new(
             [new HitObject("256,192,0,2,0,L|396:192,1,140,0|0:0,0:0:0:0:")],
             [targetTiming],
-            targetTiming,
-            1.4);
+            targetTiming);
         RecordingBeatmapEditingGateway gateway = CreateGateway(source, target);
         RecordingSampleService samples = new() { ExportedCount = 0 };
         RecordingFileRevealService reveal = new();
@@ -171,7 +169,7 @@ public sealed class HitsoundCopierServiceTests
                 new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase));
         }
 
-        public HitsoundSampleAssignment? TryCreateAssignment(
+        public HitsoundSampleAssignment TryCreateAssignment(
             string directory,
             IReadOnlyList<string> sourceFilenames,
             IReadOnlyDictionary<string, string> firstSamples,

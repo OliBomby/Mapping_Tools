@@ -108,6 +108,6 @@ public class HitsoundEvent
     /// <returns></returns>
     public int GetHitsounds()
     {
-        return MathHelper.GetIntFromBitArray(new BitArray(new[] { false, Whistle, Finish, Clap }));
+        return MathHelper.GetIntFromBitArray(new BitArray([false, Whistle, Finish, Clap]));
     }
 }

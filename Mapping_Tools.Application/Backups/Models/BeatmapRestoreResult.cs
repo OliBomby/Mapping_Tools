@@ -11,4 +11,3 @@ public sealed record BeatmapRestoreResult(
     string BackupPath,
     string DestinationPath,
     BeatmapBackupArtifact SafetyBackup);
-

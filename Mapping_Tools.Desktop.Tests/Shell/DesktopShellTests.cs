@@ -13,8 +13,8 @@ using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.QuickRun.Models;
-using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Settings.Contracts;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services;
@@ -152,7 +152,7 @@ public sealed class DesktopShellTests
         ], settings);
 
         // Act
-        var visibleToolIds = viewModel.VisibleFeatures.Select(item => item.Id).ToArray();
+        string[] visibleToolIds = viewModel.VisibleFeatures.Select(item => item.Id).ToArray();
 
         // Assert
         visibleToolIds.Should().Equal("bravo", "zulu", "alpha", "charlie");
@@ -292,7 +292,7 @@ public sealed class DesktopShellTests
         // Arrange
         StubProjectFeatureViewModel project = new();
         RecordingProjectService projectService = new();
-        using var viewModel = CreateMainViewModel(
+        var viewModel = CreateMainViewModel(
         [
             Registration("home", "Home"),
             Registration("project", "Project", () => project),
@@ -371,11 +371,13 @@ public sealed class DesktopShellTests
 
         // Act
         using var viewModel = CreateMainViewModel(
-            [Registration("first", "First", () =>
-            {
-                factoryCalls++;
-                return new StubFeatureViewModel();
-            })],
+            [
+                Registration("first", "First", () =>
+                {
+                    factoryCalls++;
+                    return new StubFeatureViewModel();
+                }),
+            ],
             initialize: false);
 
         // Assert
@@ -389,7 +391,7 @@ public sealed class DesktopShellTests
     {
         // Arrange
         StubFeatureViewModel feature = new();
-        using var viewModel = CreateMainViewModel(
+        await using var viewModel = CreateMainViewModel(
             [Registration("first", "First", () => feature)],
             initialize: false);
 
@@ -411,7 +413,7 @@ public sealed class DesktopShellTests
         TestDialogService dialogs = new() { BooleanResult = true };
         RecordingMigrationService migration = new();
         RecordingSettingsService settingsService = new();
-        using var viewModel = CreateMainViewModel(
+        await using var viewModel = CreateMainViewModel(
             [Registration("first", "First", () => feature)],
             dialogs: dialogs,
             migrationService: migration,
@@ -433,14 +435,14 @@ public sealed class DesktopShellTests
     {
         // Arrange
         QueuedTestDispatcher dispatcher = new();
-        using var viewModel = CreateMainViewModel(
+        await using var viewModel = CreateMainViewModel(
             [
                 Registration("first", "First", () => new StubProjectFeatureViewModel()),
                 Registration("second", "Second", () => new StubProjectFeatureViewModel()),
             ],
             dispatcher: dispatcher,
             initialize: false);
-        Task initialActivation = viewModel.InitializeAsync();
+        var initialActivation = viewModel.InitializeAsync();
         dispatcher.RunAll();
         await initialActivation;
         var second = viewModel.FeatureItems.Single(item => item.Id == "second");
@@ -465,7 +467,7 @@ public sealed class DesktopShellTests
     public async Task MainViewModel_FeatureFactoryThrows_ExposesRecoverableLoadingError()
     {
         // Arrange
-        using var viewModel = CreateMainViewModel(
+        await using var viewModel = CreateMainViewModel(
             [Registration("broken", "Broken", () => throw new InvalidOperationException("factory failed"))],
             initialize: false);
 
@@ -515,7 +517,7 @@ public sealed class DesktopShellTests
     {
         // Arrange
         RecordingPlatformLauncher launcher = new();
-        using var viewModel = CreateMainViewModel(launcher: launcher);
+        await using var viewModel = CreateMainViewModel(launcher: launcher);
 
         // Act
         await ExecuteAsync(viewModel.OpenWebsiteCommand);
@@ -534,7 +536,7 @@ public sealed class DesktopShellTests
         List<UserNotification> published = [];
         notifications.Published += (_, eventArgs) =>
             published.Add(eventArgs.Notification);
-        using var viewModel = CreateMainViewModel(
+        await using var viewModel = CreateMainViewModel(
             notifications: notifications,
             launcher: launcher);
 
@@ -554,7 +556,7 @@ public sealed class DesktopShellTests
     {
         // Arrange
         RecordingPlatformLauncher launcher = new();
-        using var viewModel = CreateMainViewModel(launcher: launcher);
+        await using var viewModel = CreateMainViewModel(launcher: launcher);
 
         // Act
         await ExecuteAsync(viewModel.OpenIssuesCommand);
@@ -569,7 +571,7 @@ public sealed class DesktopShellTests
     {
         // Arrange
         RecordingPlatformLauncher launcher = new();
-        using var viewModel = CreateMainViewModel(launcher: launcher);
+        await using var viewModel = CreateMainViewModel(launcher: launcher);
 
         // Act
         await ExecuteAsync(viewModel.OpenDonateCommand);
@@ -584,7 +586,7 @@ public sealed class DesktopShellTests
     {
         // Arrange
         TestDialogService dialogs = new();
-        using var viewModel = CreateMainViewModel(dialogs: dialogs);
+        await using var viewModel = CreateMainViewModel(dialogs: dialogs);
 
         // Act
         await ExecuteAsync(viewModel.OpenAboutCommand);
@@ -600,7 +602,7 @@ public sealed class DesktopShellTests
     {
         // Arrange
         TestBetterSaveService betterSave = new();
-        using var viewModel = CreateMainViewModel(betterSave: betterSave);
+        await using var viewModel = CreateMainViewModel(betterSave: betterSave);
 
         // Act
         await ExecuteAsync(viewModel.BetterSaveCommand);
@@ -616,7 +618,7 @@ public sealed class DesktopShellTests
         StubProjectFeatureViewModel project = new();
         RecordingProjectService projectService = new();
         TestDialogService dialogs = new() { BooleanResult = true };
-        using var viewModel = CreateMainViewModel(
+        await using var viewModel = CreateMainViewModel(
             [
                 Registration("home", "Home"),
                 Registration("project", "Project", () => project),
@@ -645,7 +647,7 @@ public sealed class DesktopShellTests
         // Arrange
         StubProjectFeatureViewModel project = new();
         TestDialogService dialogs = new() { BooleanResult = false };
-        using var viewModel = CreateMainViewModel(
+        await using var viewModel = CreateMainViewModel(
             [Registration("project", "Project", () => project)],
             dialogs: dialogs);
 
@@ -766,8 +768,8 @@ public sealed class DesktopShellTests
             $"Open {displayName}.",
             [displayName, id],
             factory ?? (() => new StubFeatureViewModel()),
-            horizontalScrollBarVisibility: horizontalScrollBarVisibility,
-            verticalScrollBarVisibility: verticalScrollBarVisibility);
+            horizontalScrollBarVisibility,
+            verticalScrollBarVisibility);
     }
 
     private static Task ExecuteAsync(IAsyncRelayCommand command)
@@ -923,9 +925,8 @@ public sealed class DesktopShellTests
 
     private sealed class RecordingMigrationService : IApplicationDataMigrationService
     {
-        public bool RequiresMigration => true;
-
         public int CopyCount { get; private set; }
+        public bool RequiresMigration => true;
 
         public Task<ApplicationDataMigrationResult> CopyLegacyDataAsync(
             CancellationToken cancellationToken = default)
@@ -949,5 +950,4 @@ public sealed class DesktopShellTests
             SaveCount++;
         }
     }
-
 }

@@ -67,7 +67,7 @@ public sealed class PropertyTransformerEngineTests
         };
 
         // Act
-        Action act = () => PropertyTransformerEngine.Validate(options);
+        var act = () => PropertyTransformerEngine.Validate(options);
 
         // Assert
         act.Should().Throw<ArgumentException>()

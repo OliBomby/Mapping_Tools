@@ -15,10 +15,10 @@ public sealed class UpdateResolverRegistrationTests
         // Arrange
         ServiceCollection services = new();
         services.AddMappingToolsDesktop();
-        using ServiceProvider provider = services.BuildServiceProvider();
+        using var provider = services.BuildServiceProvider();
 
         // Act
-        IPackageResolver resolver = provider.GetRequiredService<IPackageResolver>();
+        var resolver = provider.GetRequiredService<IPackageResolver>();
 
         // Assert
         resolver.Should().BeOfType<GithubUpdatePackageResolver>();
@@ -30,10 +30,10 @@ public sealed class UpdateResolverRegistrationTests
         // Arrange
         ServiceCollection services = new();
         services.AddMappingToolsDesktop();
-        using ServiceProvider provider = services.BuildServiceProvider();
+        using var provider = services.BuildServiceProvider();
 
         // Act
-        IUpdateGateway gateway = provider.GetRequiredService<IUpdateGateway>();
+        var gateway = provider.GetRequiredService<IUpdateGateway>();
 
         // Assert
         gateway.Should().BeOfType<OnovaUpdateGateway>();
@@ -52,10 +52,10 @@ public sealed class UpdateResolverRegistrationTests
         {
             ServiceCollection services = new();
             services.AddMappingToolsDesktop(localUpdatePackagePath: packagePath);
-            using ServiceProvider provider = services.BuildServiceProvider();
+            using var provider = services.BuildServiceProvider();
 
             // Act
-            IPackageResolver resolver = provider.GetRequiredService<IPackageResolver>();
+            var resolver = provider.GetRequiredService<IPackageResolver>();
 
             // Assert
             resolver.Should().BeOfType<LocalUpdatePackageResolver>();

@@ -14,4 +14,3 @@ public interface ISettingsPathService
     /// <returns>Information about fallbacks used while resolving paths.</returns>
     SettingsPathResult ApplyDefaults(ApplicationSettings settings);
 }
-

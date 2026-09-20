@@ -57,9 +57,7 @@ public static class SlideratorEngine
         }
 
         // Test if the function is a constant velocity
-        bool simplifyShape = options.ExportAsNormal
-                             && !options.ExportAsInvisibleSlider
-                             && !options.ExportAsStream
+        bool simplifyShape = options is { ExportAsNormal: true, ExportAsInvisibleSlider: false, ExportAsStream: false }
                              && constantVelocity
                              && Precision.AlmostEquals(
                                  options.PixelLength / options.GraphBeats / options.GlobalSv / 100,

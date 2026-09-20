@@ -10,4 +10,3 @@ public sealed record RhythmGuideResult(
     string ExportPath,
     int AddedObjectCount,
     RhythmGuideExportMode ExportMode);
-

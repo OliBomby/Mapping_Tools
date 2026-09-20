@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.MathUtil;
@@ -38,7 +39,7 @@ public sealed class AutoFailDetectorEngine
         int physicsTime)
     {
         ArgumentNullException.ThrowIfNull(hitObjects);
-        if (physicsTime < 0) throw new ArgumentOutOfRangeException(nameof(physicsTime));
+        ArgumentOutOfRangeException.ThrowIfNegative(physicsTime);
         this.hitObjects = hitObjects;
         this.mapStartTime = mapStartTime;
         this.mapEndTime = mapEndTime;
@@ -52,10 +53,10 @@ public sealed class AutoFailDetectorEngine
     }
 
     /// <summary>Replaces the mutable object collection and invalidates prior analysis state.</summary>
-    /// <param name="hitObjects">The new hit-object collection.</param>
-    public void SetHitObjects(List<HitObject> hitObjects)
+    /// <param name="newHitObjects">The new hit-object collection.</param>
+    public void SetHitObjects(List<HitObject> newHitObjects)
     {
-        this.hitObjects = hitObjects ?? throw new ArgumentNullException(nameof(hitObjects));
+        hitObjects = newHitObjects ?? throw new ArgumentNullException(nameof(newHitObjects));
         problemAreas = null;
         SortHitObjects();
     }
@@ -71,11 +72,14 @@ public sealed class AutoFailDetectorEngine
         List<double> disruptorTimes = [];
         // Get times to check
         // These are all the times at which the startIndex can change in the object loading system.
-        timesToCheckStartIndex = new SortedSet<int>(hitObjects.SelectMany(hitObject => new[]
-        {
-            (int)hitObject.EndTime + approachTime,
-            (int)hitObject.EndTime + approachTime + 1,
-        }));
+        timesToCheckStartIndex =
+        [
+            .. hitObjects.SelectMany(hitObject => new[]
+            {
+                (int)hitObject.EndTime + approachTime,
+                (int)hitObject.EndTime + approachTime + 1,
+            }),
+        ];
 
         // Find all problematic areas which could cause auto-fail depending on the binary search
         // A problem area consists of one object and the objects which can unload it
@@ -129,14 +133,15 @@ public sealed class AutoFailDetectorEngine
             // It cant load before the map has started
             firstRequiredLoadTime = Math.Max(firstRequiredLoadTime, mapStartTime);
             // These are all the times to check. If the object is loaded at all these times, then it will not cause auto-fail. (terms and conditions apply)
-            HashSet<int> timesToCheck = new(
-                timesToCheckStartIndex.GetViewBetween(
+            HashSet<int> timesToCheck =
+            [
+                .. timesToCheckStartIndex.GetViewBetween(
                     firstRequiredLoadTime,
-                    firstRequiredLoadTime + physicsTime))
-            {
+                    firstRequiredLoadTime + physicsTime),
+
                 firstRequiredLoadTime + physicsTime,
-            };
-            problemAreas.Add(new ProblemArea(index, hitObject, disruptors, timesToCheck));
+            ];
+            problemAreas.Add(new ProblemArea(index, hitObject, timesToCheck));
             potential.Add(hitObject.Time);
         }
 
@@ -165,9 +170,9 @@ public sealed class AutoFailDetectorEngine
 
         return new AutoFailAnalysis(
             unloading.Count > 0,
-            unloading.ToArray(),
-            potential.ToArray(),
-            disruptorTimes.ToArray());
+            [.. unloading],
+            [.. potential],
+            [.. disruptorTimes]);
     }
 
     /// <summary>Lazily enumerates valid padding distributions after analysis.</summary>
@@ -185,7 +190,7 @@ public sealed class AutoFailDetectorEngine
         foreach (int[] solution in SolveAutoFailPaddingEnumerableInfinite(paddingCount))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            yield return new AutoFailFixPlan(solution.ToArray(), BuildFixGuide(solution));
+            yield return new AutoFailFixPlan([.. solution], BuildFixGuide(solution));
         }
     }
 
@@ -328,6 +333,7 @@ public sealed class AutoFailDetectorEngine
         return true;
     }
 
+    [SuppressMessage("ReSharper", "IteratorNeverReturns")]
     private IEnumerable<int[]> SolveAutoFailPaddingEnumerableInfinite(int initialPaddingCount)
     {
         int paddingCount = initialPaddingCount;
@@ -505,7 +511,6 @@ public sealed class AutoFailDetectorEngine
     private sealed record ProblemArea(
         int Index,
         HitObject UnloadableHitObject,
-        HashSet<HitObject> Disruptors,
         HashSet<int> TimesToCheck)
     {
         public int StartTime => (int)UnloadableHitObject.Time;

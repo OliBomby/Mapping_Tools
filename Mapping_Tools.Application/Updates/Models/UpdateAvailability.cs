@@ -14,4 +14,3 @@ public enum UpdateAvailability
     /// <summary>A newer package is ready to be offered to the user.</summary>
     Available,
 }
-

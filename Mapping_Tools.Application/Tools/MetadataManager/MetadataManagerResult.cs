@@ -7,4 +7,3 @@ public sealed record MetadataManagerResult(IReadOnlyList<string> ProcessedPaths)
     /// <summary>Gets the number of beatmaps successfully written.</summary>
     public int ProcessedCount => ProcessedPaths.Count;
 }
-

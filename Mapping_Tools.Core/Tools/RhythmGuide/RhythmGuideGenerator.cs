@@ -134,9 +134,5 @@ public static class RhythmGuideGenerator
             throw new ArgumentException(
                 "Rhythm Guide requires at least one beat divisor.",
                 nameof(options));
-        if (options.BeatDivisors.Any(divisor => divisor is null))
-            throw new ArgumentException(
-                "Rhythm Guide beat divisors cannot contain null values.",
-                nameof(options));
     }
 }

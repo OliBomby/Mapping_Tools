@@ -17,7 +17,7 @@ public sealed class WindowsGeometryDashboardCoordinateContext
     private readonly IGeometryDashboardScreenService screens;
     private readonly IGeometryDashboardWindowService windows;
     private readonly Func<bool> isWindows;
-    private readonly object refreshGate = new();
+    private readonly Lock refreshGate = new();
     private Box2 editorBoxOffset = new(0, 0, 0, 0);
     private WindowsGeometryDashboardCoordinateSnapshot? current;
 
@@ -68,17 +68,17 @@ public sealed class WindowsGeometryDashboardCoordinateContext
     ///     Refreshes the transform from current desktop state and replaces the
     ///     context's current immutable snapshot when osu! is available.
     /// </summary>
-    /// <param name="editorBoxOffset">The osu! editor-space offset requested by the feature.</param>
+    /// <param name="newEditorBoxOffset">The osu! editor-space offset requested by the feature.</param>
     /// <param name="snapshot">Receives the refreshed coordinate snapshot.</param>
     /// <returns><see langword="true" /> when a usable osu! window was found.</returns>
     internal bool TryRefresh(
-        Box2 editorBoxOffset,
+        Box2 newEditorBoxOffset,
         out WindowsGeometryDashboardCoordinateSnapshot snapshot)
     {
         lock (refreshGate)
         {
-            this.editorBoxOffset = editorBoxOffset;
-            return TryRefreshCore(editorBoxOffset, out snapshot);
+            editorBoxOffset = newEditorBoxOffset;
+            return TryRefreshCore(newEditorBoxOffset, out snapshot);
         }
     }
 
@@ -94,7 +94,7 @@ public sealed class WindowsGeometryDashboardCoordinateContext
     }
 
     private bool TryRefreshCore(
-        Box2 editorBoxOffset,
+        Box2 newEditorBoxOffset,
         out WindowsGeometryDashboardCoordinateSnapshot snapshot)
     {
         snapshot = default!;
@@ -109,11 +109,10 @@ public sealed class WindowsGeometryDashboardCoordinateContext
             window,
             screen,
             configuration.Read(),
-            editorBoxOffset);
+            newEditorBoxOffset);
         snapshot = new WindowsGeometryDashboardCoordinateSnapshot(
             window,
-            transform,
-            ConfigurationStatus);
+            transform);
         Interlocked.Exchange(ref current, snapshot);
         return true;
     }
@@ -121,14 +120,12 @@ public sealed class WindowsGeometryDashboardCoordinateContext
     /// <summary>Gets the latest usable transform without performing a desktop query.</summary>
     /// <param name="snapshot">Receives the most recently refreshed snapshot.</param>
     /// <returns><see langword="true" /> when a snapshot has been established.</returns>
-    internal bool TryGetCurrent(out WindowsGeometryDashboardCoordinateSnapshot snapshot)
+    internal void TryGetCurrent(out WindowsGeometryDashboardCoordinateSnapshot snapshot)
     {
         snapshot = Volatile.Read(ref current)!;
-        return snapshot is not null;
     }
 }
 
 internal sealed record WindowsGeometryDashboardCoordinateSnapshot(
     GeometryDashboardWindow Window,
-    WindowsGeometryDashboardCoordinateTransform Transform,
-    string? ConfigurationStatus);
+    WindowsGeometryDashboardCoordinateTransform Transform);

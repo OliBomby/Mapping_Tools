@@ -72,7 +72,7 @@ public struct SliderPath : IEquatable<SliderPath>
         get
         {
             EnsureInitialised();
-            return cumulativeLength.Count == 0 ? 0 : cumulativeLength[cumulativeLength.Count - 1];
+            return cumulativeLength.Count == 0 ? 0 : cumulativeLength[^1];
         }
     }
 
@@ -350,13 +350,13 @@ public struct SliderPath : IEquatable<SliderPath>
         // Lengthen slider paths that are too short compared to the expected distance
         if (ExpectedDistance.HasValue && l < ExpectedDistance && calculatedPath.Count > 1)
         {
-            var diff = calculatedPath[calculatedPath.Count - 1] - calculatedPath[calculatedPath.Count - 2];
+            var diff = calculatedPath[^1] - calculatedPath[^2];
             double d = diff.Length;
 
             if (d <= 0)
                 return;
 
-            calculatedPath[calculatedPath.Count - 1] += diff * (double)((ExpectedDistance - l) / d);
+            calculatedPath[^1] += diff * (double)((ExpectedDistance - l) / d);
             cumulativeLength[calculatedPath.Count - 1] = ExpectedDistance.Value;
         }
     }
@@ -411,7 +411,8 @@ public struct SliderPath : IEquatable<SliderPath>
         if (other.ControlPoints == null && ControlPoints != null)
             return false;
 
-        return ControlPoints.SequenceEqual(other.ControlPoints) && ExpectedDistance.Equals(other.ExpectedDistance) && Type == other.Type;
+        return (ControlPoints == null && other.ControlPoints == null || ControlPoints!.SequenceEqual(other.ControlPoints!)) &&
+               ExpectedDistance.Equals(other.ExpectedDistance) && Type == other.Type;
     }
 
     /// <summary>
@@ -449,8 +450,8 @@ public struct SliderPath : IEquatable<SliderPath>
     public override int GetHashCode()
     {
         int hashCode = -1383746172;
-        hashCode = hashCode * -1521134295 + base.GetHashCode();
-        hashCode = hashCode * -1521134295 + EqualityComparer<double?>.Default.GetHashCode(ExpectedDistance);
+        if (ExpectedDistance.HasValue)
+            hashCode = hashCode * -1521134295 + EqualityComparer<double?>.Default.GetHashCode(ExpectedDistance);
         hashCode = hashCode * -1521134295 + Type.GetHashCode();
         hashCode = hashCode * -1521134295 + EqualityComparer<Vector2[]>.Default.GetHashCode(controlPoints);
         return hashCode;

@@ -10,12 +10,12 @@ namespace Mapping_Tools.Desktop.Tools.GeometryDashboard;
 /// </summary>
 public sealed class GeometryDashboardLifecycleCoordinator : IHostedService, IDisposable
 {
+    private readonly Lock gate = new();
     private readonly GeometryDashboardProject project;
     private readonly IGeometryDashboardService service;
-    private readonly object gate = new();
     private bool applicationStarted;
-    private bool viewActive;
     private bool disposed;
+    private bool viewActive;
 
     /// <summary>Creates a lifecycle coordinator for one project and service.</summary>
     /// <param name="project">The Desktop-owned project containing <c>KeepRunning</c>.</param>
@@ -26,6 +26,19 @@ public sealed class GeometryDashboardLifecycleCoordinator : IHostedService, IDis
     {
         this.project = project ?? throw new ArgumentNullException(nameof(project));
         this.service = service ?? throw new ArgumentNullException(nameof(service));
+    }
+
+    /// <summary>Stops lifecycle coordination and the application service.</summary>
+    public void Dispose()
+    {
+        lock (gate)
+        {
+            if (disposed) return;
+            disposed = true;
+            applicationStarted = false;
+            viewActive = false;
+            service.Stop();
+        }
     }
 
     /// <inheritdoc />
@@ -96,21 +109,6 @@ public sealed class GeometryDashboardLifecycleCoordinator : IHostedService, IDis
             if (disposed) return;
             ReconcileCore();
         }
-    }
-
-    /// <summary>Stops lifecycle coordination and the application service.</summary>
-    public void Dispose()
-    {
-        lock (gate)
-        {
-            if (disposed) return;
-            disposed = true;
-            applicationStarted = false;
-            viewActive = false;
-            service.Stop();
-        }
-
-        GC.SuppressFinalize(this);
     }
 
     private void ReconcileCore()

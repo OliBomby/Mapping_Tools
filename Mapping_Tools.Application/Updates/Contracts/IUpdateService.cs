@@ -51,4 +51,3 @@ public interface IUpdateService : IDisposable
     /// </summary>
     void AbandonUpdate();
 }
-

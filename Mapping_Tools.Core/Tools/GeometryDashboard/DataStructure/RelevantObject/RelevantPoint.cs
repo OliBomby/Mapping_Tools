@@ -33,7 +33,7 @@ public sealed class RelevantPoint : RelevantDrawable
     /// <inheritdoc />
     public override bool Intersection(IRelevantObject other, out Vector2[] intersections)
     {
-        intersections = new[] { Child };
+        intersections = [Child];
         return other switch
         {
             RelevantPoint point => Precision.AlmostEquals(point.Child.X, Child.X) & Precision.AlmostEquals(point.Child.Y, Child.Y),
@@ -57,4 +57,3 @@ public sealed class RelevantPoint : RelevantDrawable
             : double.PositiveInfinity;
     }
 }
-

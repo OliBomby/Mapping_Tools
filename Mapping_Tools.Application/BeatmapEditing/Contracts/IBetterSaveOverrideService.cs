@@ -15,4 +15,3 @@ public interface IBetterSaveOverrideService
     /// <summary>Stops observation and releases platform watcher resources.</summary>
     void Stop();
 }
-

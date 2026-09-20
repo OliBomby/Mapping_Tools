@@ -7,6 +7,12 @@ namespace Mapping_Tools.Desktop.Shell;
 public interface IShellProjectFeature
 {
     /// <summary>
+    ///     Gets optional feature-owned recovery files that receive the same
+    ///     snapshot as the primary shell autosave.
+    /// </summary>
+    IReadOnlyList<string> AdditionalAutoSavePaths => [];
+
+    /// <summary>
     ///     Dispatches an operation to the feature's concrete project type.
     /// </summary>
     /// <param name="operation">The strongly typed operation to execute.</param>
@@ -15,10 +21,4 @@ public interface IShellProjectFeature
     Task ExecuteProjectOperationAsync(
         IProjectFeatureOperation operation,
         CancellationToken cancellationToken = default);
-
-    /// <summary>
-    ///     Gets optional feature-owned recovery files that receive the same
-    ///     snapshot as the primary shell autosave.
-    /// </summary>
-    IReadOnlyList<string> AdditionalAutoSavePaths => [];
 }

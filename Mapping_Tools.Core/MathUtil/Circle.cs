@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace Mapping_Tools.Core.MathUtil;
@@ -73,23 +74,23 @@ public struct Circle : IEquatable<Circle>
 
         if (disc <= -Precision.DOUBLE_EPSILON * 10)
         {
-            intersections = new Vector2[0];
+            intersections = [];
             return false;
         }
 
         if (Math.Abs(disc) < Precision.DOUBLE_EPSILON * 10)
         {
-            intersections = new Vector2[1] { new(c * d2 / ds + c1, -c * d1 / ds + c2) };
+            intersections = [new Vector2(c * d2 / ds + c1, -c * d1 / ds + c2)];
             return true;
         }
 
         double root = Math.Sqrt(disc);
 
-        intersections = new Vector2[2]
-        {
-            new((c * d2 - d1 * root) / ds + c1, (-c * d1 - d2 * root) / ds + c2),
-            new((c * d2 + d1 * root) / ds + c1, (-c * d1 + d2 * root) / ds + c2),
-        };
+        intersections =
+        [
+            new Vector2((c * d2 - d1 * root) / ds + c1, (-c * d1 - d2 * root) / ds + c2),
+            new Vector2((c * d2 + d1 * root) / ds + c1, (-c * d1 + d2 * root) / ds + c2),
+        ];
         return true;
     }
 
@@ -116,19 +117,19 @@ public struct Circle : IEquatable<Circle>
         if (Math.Abs(d - (left.Radius + right.Radius)) < Precision.DOUBLE_EPSILON)
         {
             // One solution
-            intersections = new[]
-            {
+            intersections =
+            [
                 p2,
-            };
+            ];
             return true;
         }
 
         var b = h * (right.Centre - left.Centre) / d;
-        intersections = new[]
-        {
+        intersections =
+        [
             p2 + b.PerpendicularLeft,
             p2 + b.PerpendicularRight,
-        };
+        ];
         return true;
     }
 
@@ -194,10 +195,10 @@ public struct Circle : IEquatable<Circle>
     /// <summary>Indicates whether the current Circle is equal to another Circle.</summary>
     /// <param name="other">A Circle to compare with this Circle.</param>
     /// <returns>true if the current Circle is equal to the Circle parameter; otherwise, false.</returns>
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     public bool Equals(Circle other)
     {
-        return
-            Centre == other.Centre && Radius == other.Radius;
+        return Centre == other.Centre && Radius == other.Radius;
     }
 
     /// <summary>
@@ -207,7 +208,6 @@ public struct Circle : IEquatable<Circle>
     public override int GetHashCode()
     {
         int hashCode = 2048149326;
-        hashCode = hashCode * -1521134295 + base.GetHashCode();
         hashCode = hashCode * -1521134295 + EqualityComparer<Vector2>.Default.GetHashCode(Centre);
         hashCode = hashCode * -1521134295 + Radius.GetHashCode();
         return hashCode;

@@ -67,26 +67,6 @@ public class TypeConverters
     }
 
     /// <summary>
-    ///     Attempts to evaluate a floating-point expression, using <c>-1</c> as the failure sentinel.
-    /// </summary>
-    /// <param name="str">The expression to evaluate.</param>
-    /// <param name="result">The evaluated value, or <c>-1</c> on failure.</param>
-    /// <returns><see langword="true" /> when the expression was evaluated and converted successfully.</returns>
-    public static bool TryParseDouble(string str, out double result)
-    {
-        try
-        {
-            result = ParseDouble(str);
-            return true;
-        }
-        catch (Exception)
-        {
-            result = -1;
-            return false;
-        }
-    }
-
-    /// <summary>
     ///     Attempts to evaluate an integer expression without propagating parser or conversion failures.
     /// </summary>
     /// <param name="str">The expression to evaluate.</param>
@@ -103,26 +83,6 @@ public class TypeConverters
         catch (Exception)
         {
             result = defaultValue;
-            return false;
-        }
-    }
-
-    /// <summary>
-    ///     Attempts to evaluate an integer expression, using <c>-1</c> as the failure sentinel.
-    /// </summary>
-    /// <param name="str">The expression to evaluate.</param>
-    /// <param name="result">The converted value, or <c>-1</c> on failure.</param>
-    /// <returns><see langword="true" /> when the expression was evaluated and converted successfully.</returns>
-    public static bool TryParseInt(string str, out int result)
-    {
-        try
-        {
-            result = ParseInt(str);
-            return true;
-        }
-        catch (Exception)
-        {
-            result = -1;
             return false;
         }
     }

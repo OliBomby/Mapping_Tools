@@ -1,6 +1,4 @@
 using Avalonia.Controls;
-using Avalonia.Input;
-using Avalonia.Interactivity;
 using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
@@ -21,5 +19,4 @@ public sealed partial class GeometryDashboardSavestatesWindow : Window
         if (DataContext is GeometryDashboardSavestatesViewModel viewModel && sender is MaterialGridListView listView)
             viewModel.SetSelectedSlots(listView.SelectedItems?.OfType<GeometryDashboardSaveSlot>() ?? []);
     }
-
 }

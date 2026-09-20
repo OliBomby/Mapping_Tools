@@ -22,7 +22,8 @@
                 <ToggleSwitch Grid.Column="1" IsChecked="{Binding BooleanValue, Mode=TwoWay}"
                               OnContent="" OffContent=""
                               IsVisible="{Binding IsBoolean}" HorizontalAlignment="Left" Cursor="Hand" />
-                <TextBox Grid.Column="1" Classes="compact" Width="100" Text="{Binding ValueText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                <TextBox Grid.Column="1" Classes="compact" Width="100"
+                         Text="{Binding ValueText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          IsVisible="{Binding IsTextEditable}" HorizontalAlignment="Left"
                          ToolTip.Tip="{Binding ValueTextError}" />
             </Grid>
@@ -66,7 +67,7 @@
                       x:DataType="geometryDashboard:GeometryDashboardPredicateCollectionViewModel">
             <Grid ColumnDefinitions="150,270,Auto,Auto" Margin="10">
                 <TextBlock Text="{Binding Name}"
-                           VerticalAlignment="Top"/>
+                           VerticalAlignment="Top" />
                 <ListBox Grid.Column="1" Width="270" MaxHeight="200"
                          ItemsSource="{Binding Predicates}" SelectionMode="Multiple"
                          SelectedItem="{Binding SelectedPredicate, Mode=OneWayToSource}"
@@ -124,7 +125,8 @@
         <Border Grid.Row="2" Padding="10">
             <Grid ColumnDefinitions="*,*">
                 <Button Width="200" Content="Apply" CornerRadius="10" Command="{Binding ApplyCommand}" />
-                <Button Grid.Column="1" Width="200" Content="Cancel" CornerRadius="10" Command="{Binding CancelCommand}" />
+                <Button Grid.Column="1" Width="200" Content="Cancel" CornerRadius="10"
+                        Command="{Binding CancelCommand}" />
             </Grid>
         </Border>
     </Grid>

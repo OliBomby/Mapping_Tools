@@ -66,4 +66,3 @@ public sealed class MidiNote
     /// <summary>Gets the optional source-format note name.</summary>
     public string? KeyName { get; }
 }
-

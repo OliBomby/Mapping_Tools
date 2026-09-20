@@ -25,7 +25,7 @@ public sealed class DesktopProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        HitsoundStudioProject project = serializer.Deserialize<HitsoundStudioProject>(json);
+        var project = serializer.Deserialize<HitsoundStudioProject>(json);
 
         // Assert
         project.ShowResults.Should().BeTrue();
@@ -44,7 +44,7 @@ public sealed class DesktopProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        PropertyTransformerProject project = serializer.Deserialize<PropertyTransformerProject>(json);
+        var project = serializer.Deserialize<PropertyTransformerProject>(json);
 
         // Assert
         project.SyncTimeFields.Should().BeTrue();
@@ -66,7 +66,7 @@ public sealed class DesktopProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        SlideratorProject project = serializer.Deserialize<SlideratorProject>(json);
+        var project = serializer.Deserialize<SlideratorProject>(json);
 
         // Assert
         project.ShowRedAnchors.Should().BeTrue();
@@ -91,7 +91,7 @@ public sealed class DesktopProjectPersistenceTests
 
         // Act
         string json = serializer.Serialize(project);
-        SlideratorProject restored = serializer.Deserialize<SlideratorProject>(json);
+        var restored = serializer.Deserialize<SlideratorProject>(json);
 
         // Assert
         json.Should().Contain("\"LoadedHitObjects\"");
@@ -133,7 +133,7 @@ public sealed class DesktopProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        SlideratorProject project = serializer.Deserialize<SlideratorProject>(json);
+        var project = serializer.Deserialize<SlideratorProject>(json);
 
         // Assert
         project.LoadedHitObjects.Should().ContainSingle();
@@ -164,7 +164,7 @@ public sealed class DesktopProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        SliderPicturatorProject project = serializer.Deserialize<SliderPicturatorProject>(json);
+        var project = serializer.Deserialize<SliderPicturatorProject>(json);
 
         // Assert
         project.SegmentCount.Should().Be(42);
@@ -185,7 +185,7 @@ public sealed class DesktopProjectPersistenceTests
 
         // Act
         string json = serializer.Serialize(project);
-        SliderPicturatorProject restored = serializer.Deserialize<SliderPicturatorProject>(json);
+        var restored = serializer.Deserialize<SliderPicturatorProject>(json);
 
         // Assert
         json.Should().Contain("Mapping_Tools.Viewmodels.SliderPicturatorVm, Mapping Tools");
@@ -208,7 +208,7 @@ public sealed class DesktopProjectPersistenceTests
 
         // Act
         string json = serializer.Serialize(project);
-        SliderPicturatorProject restored = serializer.Deserialize<SliderPicturatorProject>(json);
+        var restored = serializer.Deserialize<SliderPicturatorProject>(json);
 
         // Assert
         json.Should().Contain("\"SelectedSlider\"");

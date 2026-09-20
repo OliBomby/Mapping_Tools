@@ -8,8 +8,6 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Serializable, frontend-neutral settings shared by all geometry generators.</summary>
 public class GeneratorSettings : ICloneable
 {
-    private SelectionPredicateCollection inputPredicate = new();
-
     /// <summary>Creates settings with the legacy inactive/default selection behavior.</summary>
     public GeneratorSettings()
     {
@@ -48,7 +46,7 @@ public class GeneratorSettings : ICloneable
 
     /// <summary>Gets or sets the OR-combined input selection predicates.</summary>
     [DisplayName("Input Selection")]
-    public SelectionPredicateCollection InputPredicate { get => inputPredicate; set => inputPredicate = value ?? new SelectionPredicateCollection(); }
+    public SelectionPredicateCollection InputPredicate { get; protected init; } = new();
 
     /// <inheritdoc />
     public virtual object Clone()

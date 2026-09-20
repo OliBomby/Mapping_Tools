@@ -121,7 +121,7 @@ public class HitsoundDomainTests
         // Arrange
         var layer = new HitsoundLayer
         {
-            Times = new List<double> { 1000, 1000, 1250, 1250 },
+            Times = [1000, 1000, 1250, 1250],
         };
 
         // Act
@@ -138,7 +138,7 @@ public class HitsoundDomainTests
         var sample = new SampleGeneratingArgs("kick.wav");
         var schema = new SampleSchema
         {
-            ["normal-hitnormal3"] = new List<SampleGeneratingArgs> { sample },
+            ["normal-hitnormal3"] = [sample],
         };
 
         // Act
@@ -166,7 +166,7 @@ public class HitsoundDomainTests
         customIndex.CleanInvalids(sample => sample.Path == "valid.wav");
 
         // Assert
-        customIndex.Samples["normal-hitnormal"].ToArray().Should().BeEquivalentTo(new[] { valid });
+        customIndex.Samples["normal-hitnormal"].ToArray().Should().BeEquivalentTo([valid]);
     }
 
     [TestMethod]

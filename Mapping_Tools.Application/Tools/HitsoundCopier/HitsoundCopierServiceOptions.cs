@@ -10,5 +10,4 @@ public class HitsoundCopierServiceOptions : HitsoundCopierEngineOptions
 
     /// <summary>Gets or sets vertical-bar-separated target beatmap paths.</summary>
     public string PathTo { get; set; } = string.Empty;
-
 }

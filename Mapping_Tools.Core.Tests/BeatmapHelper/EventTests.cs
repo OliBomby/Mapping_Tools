@@ -14,10 +14,10 @@ public class EventTests
         const string line = "3,100,163,162,255";
 
         // Act
-        Event actual = Event.MakeEvent(line);
+        var actual = Event.MakeEvent(line);
 
         // Assert
-        Colour colour = actual.Should().BeOfType<Colour>().Subject;
+        var colour = actual.Should().BeOfType<Colour>().Subject;
         colour.Color.Should().Be(RgbaColour.FromRgb(163, 162, 255));
         actual.GetLine().Should().Be(line);
     }

@@ -1,6 +1,6 @@
-using Mapping_Tools.Application.Tools.MapCleaner;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tests.Execution;
+using Mapping_Tools.Application.Tools.MapCleaner;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Infrastructure.Files;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -15,8 +15,8 @@ public sealed class MapCleanerFixtureTests : TransformationFixtureTestBase
     public async Task CleanAsync_AcceptedFixture_ProducesEquivalentOutput(string fixtureName)
     {
         // Arrange
-        using FixtureContext fixture = CreateFixture("map-cleaner", fixtureName);
-        MapCleanerServiceOptions project = fixture.ReadProject<MapCleanerServiceOptions>();
+        using var fixture = CreateFixture("map-cleaner", fixtureName);
+        var project = fixture.ReadProject<MapCleanerServiceOptions>();
         MapCleanerService service = new(
             fixture.Gateway,
             new PhysicalBeatmapsetFileSystem(),

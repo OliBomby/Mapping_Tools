@@ -157,10 +157,9 @@ public static class ComboColourStudioEngine
     {
         ArgumentNullException.ThrowIfNull(beatmap);
 
-        if (maxBurstLength < 0)
-            throw new ArgumentOutOfRangeException(nameof(maxBurstLength));
+        ArgumentOutOfRangeException.ThrowIfNegative(maxBurstLength);
 
-        ComboColourEngineOptions project = ImportComboColours(beatmap);
+        var project = ImportComboColours(beatmap);
         project.MaxBurstLength = maxBurstLength;
 
         // Remove all colour points since those are getting replaced
@@ -248,6 +247,7 @@ public static class ComboColourStudioEngine
         if (sequenceStartIndex >= objects.Count) return null;
 
         var firstComboHitObject = objects[sequenceStartIndex];
+
         // Getting all sequences and calculating the scores
         int[][] sequences = sequenceLengthChecks
             .Select(length => GetColourSequence(objects, sequenceStartIndex, length))
@@ -255,19 +255,20 @@ public static class ComboColourStudioEngine
         int[] contributions = sequences
             .Select(sequence => GetSequenceContribution(objects, sequenceStartIndex, sequence))
             .ToArray();
+
         // Get the sequence with the highest score
         double bestScore = double.NegativeInfinity;
         int[]? bestSequence = null;
         int bestContribution = 0;
         double bestCost = double.PositiveInfinity;
+
         for (int index = 0; index < sequences.Length; index++)
         {
-            int[]? sequence = sequences[index];
-            if (sequence is null) continue;
-
+            int[] sequence = sequences[index];
             int contribution = contributions[index];
             bool burst = contribution == 1 && GetComboLengthForImport(beatmap.HitObjects, firstComboHitObject) <= maxBurstLength;
             double cost = sequence.Length;
+
             // There is no cost if the colour point doesnt have to be added
             if (lastBurst
                 && lastNormalSequence is not null
@@ -303,6 +304,7 @@ public static class ComboColourStudioEngine
             bestSequence = sequence;
             bestContribution = contribution;
             bestCost = cost;
+
             if (double.IsPositiveInfinity(bestScore)) break;
         }
 

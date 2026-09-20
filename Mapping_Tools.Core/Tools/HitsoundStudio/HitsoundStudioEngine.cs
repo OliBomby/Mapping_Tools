@@ -49,7 +49,7 @@ public sealed class HitsoundStudioEngine
 
         Timing exported = new(timing.SliderMultiplier);
         TimingPointChange.Apply(exported, changes);
-        return exported.ToList();
+        return [.. exported];
     }
 
     /// <summary>
@@ -74,7 +74,7 @@ public sealed class HitsoundStudioEngine
         foreach (var layer in layers)
         {
             ArgumentNullException.ThrowIfNull(layer);
-            foreach (double time in layer.Times ?? [])
+            foreach (double time in layer.Times)
             {
                 var package = packages.FirstOrDefault(candidate => Math.Abs(candidate.Time - time) <= leniency);
                 if (package is null)
@@ -92,7 +92,7 @@ public sealed class HitsoundStudioEngine
                          package.Samples.All(sample => sample.Hitsound != Hitsound.Normal)))
                 package.Samples.Add(defaultSample.Copy());
 
-        return packages.OrderBy(package => package.Time).ToArray();
+        return [.. packages.OrderBy(package => package.Time)];
     }
 
     /// <summary>
@@ -178,7 +178,7 @@ public sealed class HitsoundStudioEngine
     {
         ArgumentNullException.ThrowIfNull(packages);
         ArgumentNullException.ThrowIfNull(isSampleValid);
-        if (firstCustomIndex < 0) throw new ArgumentOutOfRangeException(nameof(firstCustomIndex));
+        ArgumentOutOfRangeException.ThrowIfNegative(firstCustomIndex);
 
         var packageList = packages.ToList();
         var identity = comparer ?? new SampleGeneratingArgsComparer();
@@ -193,7 +193,7 @@ public sealed class HitsoundStudioEngine
             schemaIndices = GiveIndices(Optimize(indices), false, firstCustomIndex);
         else if (allowGrowth)
             schemaIndices = GiveIndices(
-                Optimize(previousIndices.Concat(indices).ToList()),
+                Optimize([.. previousIndices, .. indices]),
                 true,
                 firstCustomIndex);
         else

@@ -83,8 +83,7 @@ public sealed class RelevantObjectLayer
             // Dispose this relevant object
             relevantObject.Dispose();
             // Set DoNotDispose for the GenerateNewObjects method
-            if (!similarObject.DoNotDispose
-                && !similarObject.DefinitelyDispose
+            if (similarObject is { DoNotDispose: false, DefinitelyDispose: false }
                 && previousCollection is not null
                 && previousCollection.FindSimilar(similarObject, ParentCollection.AcceptableDifference, out _))
                 similarObject.DefinitelyDispose = true;
@@ -259,7 +258,7 @@ public sealed class RelevantObjectLayer
         // Remove relevant object from this layer
         Objects.RemoveRelevantObject(relevantObject);
         // Return if there are no children
-        if (!propagate || relevantObject.ChildObjects is null) return;
+        if (!propagate) return;
 
         // Kill all children
         foreach (var child in relevantObject.ChildObjects) child.Layer?.Remove(child);

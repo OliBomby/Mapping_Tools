@@ -8,7 +8,6 @@ namespace Mapping_Tools.Core.BeatmapHelper;
 /// </summary>
 public class ComboColour
 {
-    private RgbaColour color;
     private bool hasAlpha;
 
     /// <summary>
@@ -73,10 +72,10 @@ public class ComboColour
     /// <summary>Gets or sets the RGBA value.</summary>
     public RgbaColour Color
     {
-        get => color;
+        get;
         set
         {
-            color = value;
+            field = value;
             if (value.A != byte.MaxValue)
                 hasAlpha = true;
         }
@@ -108,12 +107,12 @@ public class ComboColour
     /// <returns>Fresh orange, green, blue, and red combo-colour instances.</returns>
     public static ComboColour[] GetDefaultComboColours()
     {
-        return new[]
-        {
+        return
+        [
             new ComboColour(255, 192, 0),
             new ComboColour(0, 202, 0),
             new ComboColour(18, 124, 255),
             new ComboColour(242, 24, 57),
-        };
+        ];
     }
 }

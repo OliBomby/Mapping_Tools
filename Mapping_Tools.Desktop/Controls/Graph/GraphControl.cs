@@ -2,11 +2,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
-using Avalonia.VisualTree;
 using DialogHostAvalonia;
 using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.Graph.Interpolation;
@@ -158,27 +158,28 @@ public sealed class GraphControl : Decorator
     public static readonly StyledProperty<IBrush?> MarkerBrushProperty =
         AvaloniaProperty.Register<GraphControl, IBrush?>(nameof(MarkerBrush));
 
+    private readonly string dialogIdentifier = $"GraphDialog_{Guid.NewGuid():N}";
+    private Cursor? arrowCursor;
+
     private IPointer? capturedPointer;
     private bool committingState;
     private int? contextAnchorIndex;
     private ContextMenu? contextMenu;
+    private Cursor? crossCursor;
     private bool drawAnchors;
     private int gestureAnchorIndex = -1;
     private Point gestureStartPosition;
     private double gestureStartTension;
+    private Cursor? hiddenCursor;
     private Point lastPointerPosition;
+    private Cursor? panCursor;
+    private Cursor? verticalResizeCursor;
     private bool viewInitialized;
     private double viewMaxX = 1;
     private double viewMaxY = 1;
 
     private double viewMinX;
     private double viewMinY;
-    private Cursor? arrowCursor;
-    private Cursor? crossCursor;
-    private Cursor? hiddenCursor;
-    private Cursor? panCursor;
-    private Cursor? verticalResizeCursor;
-    private readonly string dialogIdentifier = $"GraphDialog_{Guid.NewGuid():N}";
 
     static GraphControl()
     {
@@ -221,36 +222,13 @@ public sealed class GraphControl : Decorator
             Content = new Border { Background = Brushes.Transparent },
         };
         dialogHost.Bind(
-            DialogHost.BackgroundProperty,
+            TemplatedControl.BackgroundProperty,
             new DynamicResourceExtension("MaterialPaperBrush"));
         dialogHost.Bind(
             DialogHost.OverlayBackgroundProperty,
             new DynamicResourceExtension("MappingToolsDialogOverlayBrush"));
         Child = dialogHost;
     }
-
-    /// <inheritdoc />
-    protected override Size MeasureOverride(Size availableSize)
-    {
-        return VisualRoot is null ? new Size() : base.MeasureOverride(availableSize);
-    }
-
-    /// <inheritdoc />
-    protected override Size ArrangeOverride(Size finalSize)
-    {
-        return VisualRoot is null ? finalSize : base.ArrangeOverride(finalSize);
-    }
-
-    /// <inheritdoc />
-    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
-    {
-        base.OnAttachedToVisualTree(e);
-        InvalidateMeasure();
-        InvalidateArrange();
-    }
-
-    /// <summary>Suppresses state-change notifications while a host batches anchor updates.</summary>
-    public bool IgnoreAnchorUpdates { get; set; }
 
     /// <summary>Gets or sets the graph state edited by the control.</summary>
     public GraphState? GraphState
@@ -629,6 +607,26 @@ public sealed class GraphControl : Decorator
     private double ViewWidthInternal => Math.Max(viewMaxX - viewMinX, minimum_view_size);
 
     private double ViewHeightInternal => Math.Max(viewMaxY - viewMinY, minimum_view_size);
+
+    /// <inheritdoc />
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        return VisualRoot is null ? new Size() : base.MeasureOverride(availableSize);
+    }
+
+    /// <inheritdoc />
+    protected override Size ArrangeOverride(Size finalSize)
+    {
+        return VisualRoot is null ? finalSize : base.ArrangeOverride(finalSize);
+    }
+
+    /// <inheritdoc />
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        InvalidateMeasure();
+        InvalidateArrange();
+    }
 
     /// <summary>Raised after an edit produces a new cloned graph state.</summary>
     public event EventHandler<GraphStateChangedEventArgs>? StateChanged;
@@ -1023,7 +1021,7 @@ public sealed class GraphControl : Decorator
         UpdateCursor(point);
         if (capturedPointer != eventArgs.Pointer || ActiveGesture == GraphPointerGesture.None) return;
 
-        Point previousPointerPosition = lastPointerPosition;
+        var previousPointerPosition = lastPointerPosition;
         lastPointerPosition = point;
 
         switch (ActiveGesture)
@@ -1084,7 +1082,7 @@ public sealed class GraphControl : Decorator
 
     internal static bool IsWheelZoomPositionInLegacyBounds(Vector2 zoomPoint, GraphState state)
     {
-        return zoomPoint.X >= 0 && zoomPoint.Y >= 0 && zoomPoint.X <= state.MaxX && zoomPoint.Y <= state.MaxY;
+        return zoomPoint is { X: >= 0, Y: >= 0 } && zoomPoint.X <= state.MaxX && zoomPoint.Y <= state.MaxY;
     }
 
     internal static double GetWheelZoomFactor(double deltaY)
@@ -1204,10 +1202,10 @@ public sealed class GraphControl : Decorator
 
         var state = GraphState;
         bool isReset = state is not null
-            && viewMinX == state.MinX
-            && viewMaxX == state.MaxX
-            && viewMinY == state.MinY
-            && viewMaxY == state.MaxY;
+                       && Precision.AlmostEquals(viewMinX, state.MinX)
+                       && Precision.AlmostEquals(viewMaxX, state.MaxX)
+                       && Precision.AlmostEquals(viewMinY, state.MinY)
+                       && Precision.AlmostEquals(viewMaxY, state.MaxY);
         Cursor = isReset
             ? arrowCursor ??= new Cursor(StandardCursorType.Arrow)
             : panCursor ??= new Cursor(StandardCursorType.SizeAll);
@@ -1225,7 +1223,7 @@ public sealed class GraphControl : Decorator
             committingState = false;
         }
 
-        if (!IgnoreAnchorUpdates) StateChanged?.Invoke(this, new GraphStateChangedEventArgs(state.Clone()));
+        StateChanged?.Invoke(this, new GraphStateChangedEventArgs(state.Clone()));
         InvalidateVisual();
     }
 
@@ -1299,7 +1297,7 @@ public sealed class GraphControl : Decorator
 
     private IEnumerable<GraphMarker> EnumerateMarkers(GraphMarkerOrientation orientation)
     {
-        foreach (var marker in Markers ?? Array.Empty<GraphMarker>())
+        foreach (var marker in Markers)
             if (marker.Visible && marker.Orientation == orientation)
                 yield return marker;
 
@@ -1416,7 +1414,7 @@ public sealed class GraphControl : Decorator
         }
 
         if (points.Count == 0) return;
-        if (Fill is not null && Fill != Brushes.Transparent)
+        if (Fill is not null && !Equals(Fill, Brushes.Transparent))
         {
             StreamGeometry geometry = new();
             using (var geometryContext = geometry.Open())
@@ -1555,7 +1553,7 @@ public sealed class GraphControl : Decorator
             {
                 Header = GraphInterpolatorCatalog.GetName(type),
                 Tag = type,
-                Icon = CreateInterpolatorIcon(isSelected: false),
+                Icon = CreateInterpolatorIcon(false),
             };
             item.Click += (_, _) =>
             {
@@ -1566,7 +1564,7 @@ public sealed class GraphControl : Decorator
 
         menu.Items.Add(new Separator());
         MenuItem typeIn = new() { Header = "Type in value..." };
-        typeIn.Click += (_, _) => TypeInValueAsync();
+        typeIn.Click += async (_, _) => await TypeInValueAsync();
         menu.Items.Add(typeIn);
         return menu;
     }
@@ -1577,7 +1575,7 @@ public sealed class GraphControl : Decorator
         if (contextMenu.Items[0] is MenuItem delete) delete.IsEnabled = index > 0 && index < GraphState.Anchors.Count - 1;
 
         for (int itemIndex = 2; itemIndex < contextMenu.Items.Count; itemIndex++)
-            if (contextMenu.Items[itemIndex] is MenuItem item && item.Tag is Type type)
+            if (contextMenu.Items[itemIndex] is MenuItem { Tag: Type type } item)
             {
                 item.IsEnabled = index > 0;
                 item.Icon = CreateInterpolatorIcon(GraphState.Anchors[index].Interpolator.GetType() == type);
@@ -1592,7 +1590,7 @@ public sealed class GraphControl : Decorator
         };
     }
 
-    private async void TypeInValueAsync()
+    private async Task TypeInValueAsync()
     {
         if (contextAnchorIndex is not { } index || GraphState is null) return;
 

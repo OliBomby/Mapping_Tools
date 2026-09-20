@@ -97,7 +97,7 @@ public static partial class MapsetMergerEngine
         ArgumentNullException.ThrowIfNull(beatmap);
         RequireSafeMapsetName(mapsetName);
         ArgumentNullException.ThrowIfNull(sampleIndices);
-        if (nextSampleIndex < 1) throw new ArgumentOutOfRangeException(nameof(nextSampleIndex));
+        ArgumentOutOfRangeException.ThrowIfLessThan(nextSampleIndex, 1);
 
         MapsetMergerReferences references = new();
         string audioFilename = beatmap.General["AudioFilename"].Value.Trim();
@@ -259,7 +259,7 @@ public static partial class MapsetMergerEngine
     public static string GetRemappedHitsoundFilename(string filename, int mappedIndex)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(filename);
-        if (mappedIndex < 1) throw new ArgumentOutOfRangeException(nameof(mappedIndex));
+        ArgumentOutOfRangeException.ThrowIfLessThan(mappedIndex, 1);
 
         string extension = Path.GetExtension(filename);
         string extensionless = Path.GetFileNameWithoutExtension(filename);

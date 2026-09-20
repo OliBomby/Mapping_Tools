@@ -7,10 +7,10 @@ namespace Mapping_Tools.Desktop.Utilities;
 internal static class DialogHostInteraction
 {
     /// <summary>Identifies the DialogHost covering the main shell.</summary>
-    internal const string RootIdentifier = "RootDialog";
+    internal const string ROOT_IDENTIFIER = "RootDialog";
 
     /// <summary>Identifies DialogHost instances embedded in graph editors.</summary>
-    internal const string GraphIdentifier = "GraphDialog";
+    internal const string GRAPH_IDENTIFIER = "GraphDialog";
 
     /// <summary>Shows content in a named host and closes it when cancellation is requested.</summary>
     /// <param name="content">The control or view model displayed by the host.</param>
@@ -25,13 +25,9 @@ internal static class DialogHostInteraction
         ArgumentNullException.ThrowIfNull(content);
         cancellationToken.ThrowIfCancellationRequested();
 
-        if (Dispatcher.UIThread.CheckAccess())
-        {
-            return await ShowOnUiThreadAsync(content, identifier, cancellationToken);
-        }
+        if (Dispatcher.UIThread.CheckAccess()) return await ShowOnUiThreadAsync(content, identifier, cancellationToken);
 
-        return await Dispatcher.UIThread.InvokeAsync(
-            () => ShowOnUiThreadAsync(content, identifier, cancellationToken));
+        return await Dispatcher.UIThread.InvokeAsync(() => ShowOnUiThreadAsync(content, identifier, cancellationToken));
     }
 
     /// <summary>Closes a named host session with an optional result.</summary>
@@ -69,7 +65,7 @@ internal static class DialogHostInteraction
         }
         finally
         {
-            registration.Dispose();
+            await registration.DisposeAsync();
         }
     }
 }

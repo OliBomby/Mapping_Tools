@@ -14,8 +14,8 @@ public sealed class SliderPicturatorFixtureTests : TransformationFixtureTestBase
     public async Task PicturateAsync_AcceptedFixture_ProducesEquivalentOutput(string fixtureName)
     {
         // Arrange
-        using FixtureContext fixture = CreateFixture("slider-picturator", fixtureName);
-        SliderPicturatorServiceOptions project = fixture.ReadProject<SliderPicturatorServiceOptions>();
+        using var fixture = CreateFixture("slider-picturator", fixtureName);
+        var project = fixture.ReadProject<SliderPicturatorServiceOptions>();
         SliderPicturatorService service = new(
             fixture.Gateway,
             new SkiaSharpImageFileService(),

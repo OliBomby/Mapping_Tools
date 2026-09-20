@@ -9,8 +9,8 @@ namespace Mapping_Tools.Infrastructure.Migration;
 /// </summary>
 public sealed class ApplicationDataMigrationService : IApplicationDataMigrationService
 {
-    private const string autosavesDirectoryName = "Autosaves";
-    private const string projectsDirectoryName = "Projects";
+    private const string autosaves_directory_name = "Autosaves";
+    private const string projects_directory_name = "Projects";
     private readonly IApplicationDirectories directories;
 
     /// <summary>
@@ -43,8 +43,8 @@ public sealed class ApplicationDataMigrationService : IApplicationDataMigrationS
         int existingFilesSkipped = 0;
         string applicationData = directories.ApplicationData;
 
-        string autosavesDirectory = Path.Combine(applicationData, autosavesDirectoryName);
-        string projectsDirectory = Path.Combine(applicationData, projectsDirectoryName);
+        string autosavesDirectory = Path.Combine(applicationData, autosaves_directory_name);
+        string projectsDirectory = Path.Combine(applicationData, projects_directory_name);
 
         foreach (string file in Directory.EnumerateFiles(applicationData, "*", SearchOption.TopDirectoryOnly))
         {

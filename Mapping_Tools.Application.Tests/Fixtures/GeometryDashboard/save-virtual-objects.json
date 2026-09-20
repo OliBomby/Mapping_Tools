@@ -9,7 +9,12 @@
   "editorSelection": "none",
   "visibleSourceObjects": {
     "count": 4,
-    "times": [10962, 11120, 11278, 11752],
+    "times": [
+      10962,
+      11120,
+      11278,
+      11752
+    ],
     "sliders": 2,
     "circles": 2
   },

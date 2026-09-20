@@ -102,5 +102,4 @@ public sealed partial class PatternGalleryFileImportViewModel : ObservableValida
         });
         if (selected.Count > 0) FilePath = selected[0];
     }
-
 }

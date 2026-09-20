@@ -9,14 +9,15 @@
 
 ## Semantic comparison
 
-| Item | Before | After | Difference |
-|---|---:|---:|---:|
-| Redlines | 1 | 416 | +415 |
-| Greenlines | 830 | 830 | 0 |
-| Total timing points | 831 | 1246 | +415 |
-| Hit objects | 924 | 924 | 0 |
-| Bookmarks | 20 | 20 | 0 |
+| Item                | Before | After | Difference |
+|---------------------|-------:|------:|-----------:|
+| Redlines            |      1 |   416 |       +415 |
+| Greenlines          |    830 |   830 |          0 |
+| Total timing points |    831 |  1246 |       +415 |
+| Hit objects         |    924 |   924 |          0 |
+| Bookmarks           |     20 |    20 |          0 |
 
-The operation added exactly the reported number of redlines without removing greenlines, hit objects, or bookmarks. Bookmark timestamps were unchanged. The backup is byte-identical to the seed.
+The operation added exactly the reported number of redlines without removing greenlines, hit objects, or bookmarks.
+Bookmark timestamps were unchanged. The backup is byte-identical to the seed.
 
 Status: accepted by Olivier on 2026-07-18.

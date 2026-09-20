@@ -63,4 +63,3 @@ public sealed record HitsoundStudioImportRequest
     /// <summary>Gets or sets MIDI velocity rounding roughness.</summary>
     public double VelocityRoughness { get; init; } = 10;
 }
-

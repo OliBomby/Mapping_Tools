@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Events;
 using Mapping_Tools.Core.MathUtil;
@@ -7,6 +8,7 @@ namespace Mapping_Tools.Core.Tools.PropertyTransformer;
 /// <summary>
 ///     Applies Property Transformer changes to parsed beatmaps and storyboards.
 /// </summary>
+[SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
 public static class PropertyTransformerEngine
 {
     /// <summary>

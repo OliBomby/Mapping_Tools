@@ -1,7 +1,6 @@
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Projects.Contracts;
-using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
 
@@ -223,7 +222,7 @@ public sealed class ProjectAutosaveCoordinator
             IShellProjectFeature<TProject> feature,
             CancellationToken cancellationToken = default)
         {
-            TProject project = await projects.LoadAutoSaveAsync(
+            var project = await projects.LoadAutoSaveAsync(
                 feature.ProjectDefinition,
                 cancellationToken);
             feature.Install(project);
@@ -264,7 +263,7 @@ public sealed class ProjectAutosaveCoordinator
             IShellProjectFeature<TProject> feature,
             CancellationToken cancellationToken = default)
         {
-            ProjectOpenResult<TProject>? opened = await projects.OpenAsync(
+            var opened = await projects.OpenAsync(
                 feature.ProjectDefinition,
                 cancellationToken);
             if (opened is not null) feature.Install(opened.Project);

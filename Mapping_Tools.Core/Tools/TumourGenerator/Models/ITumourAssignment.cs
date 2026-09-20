@@ -29,4 +29,3 @@ public interface ITumourAssignment
     /// <summary>Gets the configured tumour shape.</summary>
     ITumourTemplate GetTemplate();
 }
-

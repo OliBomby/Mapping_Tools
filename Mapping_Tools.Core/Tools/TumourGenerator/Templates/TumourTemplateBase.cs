@@ -19,4 +19,3 @@ internal abstract class TumourTemplateBase : ITumourTemplate
     public abstract PathType GetReconstructionHintPathType();
     public abstract Func<double, double>? GetDistanceRelation();
 }
-

@@ -4,7 +4,6 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Mapping_Tools.Core.BeatmapHelper;
-using Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Core.MathUtil;
 
 namespace Mapping_Tools.Desktop.Tools.PatternGallery.Controls;
@@ -17,13 +16,13 @@ public sealed class PatternThumbnailControl : Control
     private const double maximum_pixel_length = 1e6;
     private const int maximum_anchor_count = 5000;
 
-    private static readonly IBrush circle_inside_brush = Brushes.Green;
-    private static readonly IBrush circle_outside_brush = Brushes.White;
-    private static readonly IBrush slider_inside_brush = Brushes.DarkSlateGray;
-    private static readonly IBrush slider_outside_brush = Brushes.White;
-    private static readonly IBrush combo_text_brush = Brushes.White;
-    private static readonly IBrush spinner_brush = Brushes.White;
-    private static readonly IBrush follow_point_brush = Brushes.White;
+    private static readonly IBrush circleInsideBrush = Brushes.Green;
+    private static readonly IBrush circleOutsideBrush = Brushes.White;
+    private static readonly IBrush sliderInsideBrush = Brushes.DarkSlateGray;
+    private static readonly IBrush sliderOutsideBrush = Brushes.White;
+    private static readonly IBrush comboTextBrush = Brushes.White;
+    private static readonly IBrush spinnerBrush = Brushes.White;
+    private static readonly IBrush followPointBrush = Brushes.White;
 
     /// <summary>Identifies the beatmap represented by the thumbnail.</summary>
     public static readonly StyledProperty<Beatmap?> BeatmapProperty =
@@ -34,15 +33,15 @@ public sealed class PatternThumbnailControl : Control
         AvaloniaProperty.Register<PatternThumbnailControl, IReadOnlyDictionary<HitObject, IReadOnlyList<Vector2>>?>(
             nameof(SliderPathPoints));
 
+    private readonly Dictionary<HitObject, StreamGeometry> geometryCache = [];
+    private CancellationTokenSource? preparationCancellation;
+
     static PatternThumbnailControl()
     {
         AffectsRender<PatternThumbnailControl>(BeatmapProperty);
         AffectsRender<PatternThumbnailControl>(SliderPathPointsProperty);
         BeatmapProperty.Changed.AddClassHandler<PatternThumbnailControl>(static (control, _) => control.PrepareBeatmap());
     }
-
-    private readonly Dictionary<HitObject, StreamGeometry> geometryCache = [];
-    private CancellationTokenSource? preparationCancellation;
 
     /// <summary>Creates a clipped custom-drawn pattern thumbnail.</summary>
     public PatternThumbnailControl()
@@ -112,7 +111,7 @@ public sealed class PatternThumbnailControl : Control
         preparationCancellation?.Dispose();
         geometryCache.Clear();
 
-        Beatmap? beatmap = Beatmap;
+        var beatmap = Beatmap;
         if (beatmap is null)
         {
             SliderPathPoints = null;
@@ -131,7 +130,7 @@ public sealed class PatternThumbnailControl : Control
     {
         try
         {
-            Dictionary<HitObject, IReadOnlyList<Vector2>> paths = await Task.Run(
+            var paths = await Task.Run(
                     () => BuildSliderPathPoints(beatmap, token),
                     token)
                 .ConfigureAwait(false);
@@ -143,7 +142,8 @@ public sealed class PatternThumbnailControl : Control
                 if (token.IsCancellationRequested || !ReferenceEquals(Beatmap, beatmap)) return;
 
                 foreach (var path in paths)
-                    if (path.Value.Count > 0) path.Key.EndPos = path.Value[^1];
+                    if (path.Value.Count > 0)
+                        path.Key.EndPos = path.Value[^1];
 
                 SliderPathPoints = paths;
                 geometryCache.Clear();
@@ -200,7 +200,7 @@ public sealed class PatternThumbnailControl : Control
             var shift = position - hitObject.Pos;
             if (sliderPaths is not null && sliderPaths.TryGetValue(hitObject, out var pathPoints) && pathPoints.Count > 0)
             {
-                if (!geometryCache.TryGetValue(hitObject, out StreamGeometry? pathGeometry))
+                if (!geometryCache.TryGetValue(hitObject, out var pathGeometry))
                 {
                     pathGeometry = CreatePathGeometry(pathPoints.Select(point => point + shift).ToArray());
                     geometryCache[hitObject] = pathGeometry;
@@ -209,11 +209,11 @@ public sealed class PatternThumbnailControl : Control
                 using (context.PushTransform(GetThumbnailTransform(scale, offsetX, offsetY)))
                 {
                     context.DrawGeometry(null,
-                        new Pen(slider_outside_brush, radius * 1.95,
+                        new Pen(sliderOutsideBrush, radius * 1.95,
                             lineCap: PenLineCap.Round, lineJoin: PenLineJoin.Round),
                         pathGeometry);
                     context.DrawGeometry(null,
-                        new Pen(slider_inside_brush, radius * 1.65,
+                        new Pen(sliderInsideBrush, radius * 1.65,
                             lineCap: PenLineCap.Round, lineJoin: PenLineJoin.Round),
                         pathGeometry);
                 }
@@ -250,8 +250,8 @@ public sealed class PatternThumbnailControl : Control
         double offsetY)
     {
         var point = ToPoint(position, scale, offsetX, offsetY);
-        context.DrawEllipse(circle_outside_brush, null, point, radius * scale, radius * scale);
-        context.DrawEllipse(circle_inside_brush, null, point, radius * 0.846 * scale, radius * 0.846 * scale);
+        context.DrawEllipse(circleOutsideBrush, null, point, radius * scale, radius * scale);
+        context.DrawEllipse(circleInsideBrush, null, point, radius * 0.846 * scale, radius * 0.846 * scale);
     }
 
     private void DrawRing(
@@ -263,7 +263,7 @@ public sealed class PatternThumbnailControl : Control
         double offsetX,
         double offsetY)
     {
-        context.DrawEllipse(null, new Pen(spinner_brush, thickness * scale),
+        context.DrawEllipse(null, new Pen(spinnerBrush, thickness * scale),
             ToPoint(position, scale, offsetX, offsetY), radius * scale, radius * scale);
     }
 
@@ -281,7 +281,7 @@ public sealed class PatternThumbnailControl : Control
             FlowDirection.LeftToRight,
             new Typeface("Arial"),
             radius * 0.6 * scale,
-            combo_text_brush);
+            comboTextBrush);
         var center = ToPoint(hitObject.StackedPos, scale, offsetX, offsetY);
         context.DrawText(text, new Point(center.X - text.Width / 2, center.Y - text.Height / 2));
     }
@@ -289,7 +289,7 @@ public sealed class PatternThumbnailControl : Control
     private static StreamGeometry CreatePathGeometry(IReadOnlyList<Vector2> points)
     {
         var geometry = new StreamGeometry();
-        using (StreamGeometryContext geometryContext = geometry.Open())
+        using (var geometryContext = geometry.Open())
         {
             geometryContext.BeginFigure(new Point(points[0].X, points[0].Y), false);
             for (int index = 1; index < points.Count; index++)
@@ -315,7 +315,7 @@ public sealed class PatternThumbnailControl : Control
         double offsetX,
         double offsetY)
     {
-        context.DrawLine(new Pen(follow_point_brush, thickness * scale),
+        context.DrawLine(new Pen(followPointBrush, thickness * scale),
             ToPoint(start, scale, offsetX, offsetY),
             ToPoint(end, scale, offsetX, offsetY));
     }

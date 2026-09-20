@@ -1,9 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
 using Mapping_Tools.Desktop.Services.Platform;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Desktop.Tests.Platform;
+namespace Mapping_Tools.Desktop.Tests.Services.Platform;
 
 [TestClass]
+[SuppressMessage("ReSharper", "AccessToDisposedClosure")]
 public sealed class AvaloniaClipboardServiceTests
 {
     [TestMethod]
@@ -30,7 +32,7 @@ public sealed class AvaloniaClipboardServiceTests
             return null;
         });
         using CancellationTokenSource cancellation = new();
-        cancellation.Cancel();
+        await cancellation.CancelAsync();
 
         // Act
         var act2 = () => clipboard.ClearAsync(cancellation.Token);

@@ -20,4 +20,3 @@ public sealed class MapsetMergerInput
     /// <summary>Gets or sets the source mapset directory.</summary>
     public string Path { get; set; }
 }
-

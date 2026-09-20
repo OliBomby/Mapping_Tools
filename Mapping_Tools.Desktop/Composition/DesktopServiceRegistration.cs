@@ -39,9 +39,9 @@ using Mapping_Tools.Infrastructure.Audio;
 using Mapping_Tools.Infrastructure.Backups;
 using Mapping_Tools.Infrastructure.Editor;
 using Mapping_Tools.Infrastructure.Files;
+using Mapping_Tools.Infrastructure.Migration;
 using Mapping_Tools.Infrastructure.Platform;
 using Mapping_Tools.Infrastructure.Projects;
-using Mapping_Tools.Infrastructure.Migration;
 using Mapping_Tools.Infrastructure.Settings;
 using Mapping_Tools.Infrastructure.Updates;
 using Microsoft.Extensions.DependencyInjection;
@@ -84,7 +84,7 @@ internal static class DesktopServiceRegistration
         });
         services.AddSingleton<IPackageResolver>(provider =>
         {
-            HttpClient httpClient = provider.GetRequiredService<HttpClient>();
+            var httpClient = provider.GetRequiredService<HttpClient>();
             if (localUpdatePackagePath is not null)
                 return new LocalUpdatePackageResolver(
                     Path.GetDirectoryName(localUpdatePackagePath)!,
@@ -99,7 +99,6 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<IUpdateGateway, OnovaUpdateGateway>();
         services.AddSingleton<IUpdateService, UpdateService>();
         if (OperatingSystem.IsWindows())
-        {
             services.AddSingleton<IUpdaterInteractionService>(provider =>
                 new AvaloniaUpdaterInteractionService(
                     () => provider.GetRequiredService<MainWindow>(),
@@ -107,7 +106,6 @@ internal static class DesktopServiceRegistration
                     provider.GetRequiredService<IUserNotificationService>(),
                     () => provider.GetRequiredService<IDialogService>(),
                     provider.GetRequiredService<IUiDispatcher>()));
-        }
         services.AddSingleton<BeatmapWorkspaceViewModel>();
         services.AddDesktopFeatures(
             toolAssemblies ?? [typeof(DesktopServiceRegistration).Assembly]);
@@ -139,8 +137,7 @@ internal static class DesktopServiceRegistration
                 typeof(DesktopApplicationSettings)));
         services.AddSingleton<ISettingsPathEnvironment, PortableSettingsPathEnvironment>();
         services.AddSingleton<ISettingsPathService, SettingsPathService>();
-        services.AddSingleton<Func<ApplicationSettings>>(
-            static _ => static () => new DesktopApplicationSettings());
+        services.AddSingleton<Func<ApplicationSettings>>(static _ => static () => new DesktopApplicationSettings());
         services.AddSingleton<ISettingsService, SettingsService>();
         services.AddSingleton<DesktopApplicationSettings>(provider =>
             (DesktopApplicationSettings)provider
@@ -170,13 +167,9 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<IQuickRunService>(provider =>
             provider.GetRequiredService<QuickRunService>());
         if (OperatingSystem.IsWindows())
-        {
             services.AddSingleton<IGlobalHotkeyService, WindowsGlobalHotkeyService>();
-        }
         else
-        {
             services.AddSingleton<IGlobalHotkeyService, UnsupportedPlatformGlobalHotkeyService>();
-        }
 
         services.AddSingleton<GlobalHotkeyHostedService>();
         services.AddSingleton<IHotkeyBindingCoordinator>(provider =>
@@ -208,23 +201,15 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<IAudioGenerator, NaudioAudioGenerator>();
         services.AddSingleton<IAudioExporter, NaudioAudioExporter>();
         if (OperatingSystem.IsWindows())
-        {
             services.AddSingleton<IAudioPlaybackService, NaudioAudioPlaybackService>();
-        }
         else
-        {
             services.AddSingleton<IAudioPlaybackService, ProcessAudioPlaybackService>();
-        }
         services.AddSingleton<IMidiService, NaudioMidiService>();
         services.AddSingleton<AudioExportService>();
         if (OperatingSystem.IsWindows())
-        {
             services.AddSingleton<IBetterSaveOverrideService, WindowsBetterSaveOverrideService>();
-        }
         else
-        {
             services.AddSingleton<IBetterSaveOverrideService, UnsupportedPlatformBetterSaveOverrideService>();
-        }
         services.AddSingleton<IBeatmapWorkspace, BeatmapWorkspace>();
         services.AddSingleton<IProjectSerializer, VersionedProjectJsonSerializer>();
         services.AddSingleton<IProjectStore, FileSystemProjectStore>();

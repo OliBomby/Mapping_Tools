@@ -2,7 +2,6 @@ using System.Collections.ObjectModel;
 using System.Text.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mapping_Tools.Application.Updates.Contracts;
-using Mapping_Tools.Application.Updates.Models;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Application.Workspace.Models;
 using Mapping_Tools.Desktop.Shell;
@@ -14,10 +13,10 @@ namespace Mapping_Tools.Desktop.ViewModels.GetStarted;
 /// </summary>
 public sealed partial class GetStartedViewModel : ObservableObject, IDisposable
 {
-    private readonly IBeatmapWorkspace workspace;
+    private readonly CancellationTokenSource changelogCancellation = new();
     private readonly IUiDispatcher dispatcher;
     private readonly IUpdateGateway updateGateway;
-    private readonly CancellationTokenSource changelogCancellation = new();
+    private readonly IBeatmapWorkspace workspace;
     private bool disposed;
 
     /// <summary>Creates the landing-page presentation model.</summary>
@@ -97,7 +96,7 @@ public sealed partial class GetStartedViewModel : ObservableObject, IDisposable
     {
         try
         {
-            IReadOnlyList<UpdateReleaseNotes> notes = await updateGateway
+            var notes = await updateGateway
                 .GetReleaseNotesAsync(changelogCancellation.Token)
                 .ConfigureAwait(false);
             if (disposed || notes.Count == 0) return;
@@ -106,7 +105,7 @@ public sealed partial class GetStartedViewModel : ObservableObject, IDisposable
             {
                 if (disposed) return;
 
-                foreach (UpdateReleaseNotes note in notes)
+                foreach (var note in notes)
                 {
                     if (string.IsNullOrWhiteSpace(note.Title) && string.IsNullOrWhiteSpace(note.Body)) continue;
 

@@ -1,7 +1,7 @@
 using Mapping_Tools.Desktop.Services.Platform;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Desktop.Tests.Platform;
+namespace Mapping_Tools.Desktop.Tests.Services.Platform;
 
 [TestClass]
 public sealed class AvaloniaPlatformLauncherTests

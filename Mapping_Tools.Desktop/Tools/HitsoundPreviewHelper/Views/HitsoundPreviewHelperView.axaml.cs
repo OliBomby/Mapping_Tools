@@ -3,7 +3,6 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.ViewModels;
-using Mapping_Tools.Desktop.ViewModels;
 
 namespace Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.Views;
 
@@ -26,13 +25,9 @@ public sealed partial class HitsoundPreviewHelperView : UserControl
         bool addFromSelection = addButtonModifiers.Consume().HasFlag(KeyModifiers.Shift);
 
         if (addFromSelection)
-        {
             viewModel.AddFromSelectionCommand.Execute(null);
-        }
         else
-        {
             viewModel.AddCommand.Execute(null);
-        }
 
         e.Handled = true;
     }

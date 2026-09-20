@@ -1,461 +1,454 @@
-using System;
-using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Labs.Controls.Utils;
+using Mapping_Tools.Desktop.Controls.VirtualizingWrapPanel.Utils;
 
-namespace Avalonia.Labs.Controls
+namespace Mapping_Tools.Desktop.Controls.VirtualizingWrapPanel;
+
+/// <summary>
+/// Stores the realized element state for a virtualizing panel that arranges its children
+/// in a wrap layout, such as <see cref="VirtualizingWrapPanel"/>.
+/// </summary>
+internal class RealizedWrapElements
 {
-    /// <summary>
-    /// Stores the realized element state for a virtualizing panel that arranges its children
-    /// in a wrap layout, such as <see cref="VirtualizingWrapPanel"/>.
-    /// </summary>
-    internal class RealizedWrapElements
+    private int firstIndex;
+    private readonly List<Control?> elements;
+    private readonly List<Size> sizes;
+    private readonly Dictionary<Control, int> elementToIndex = new();
+
+    public RealizedWrapElements()
     {
-        private int _firstIndex;
-        private readonly List<Control?> _elements;
-        private readonly List<Size> _sizes;
-        private readonly Dictionary<Control, int> _elementToIndex = new();
+        // Pre-allocate with reasonable capacity to reduce reallocations
+        elements = new List<Control?>(32);
+        sizes = new List<Size>(32);
+    }
 
-        public RealizedWrapElements()
+    /// <summary>
+    /// Gets the number of realized elements.
+    /// </summary>
+    public int Count => elements.Count;
+
+    /// <summary>
+    /// Gets the index of the first realized element, or -1 if no elements are realized.
+    /// </summary>
+    public int FirstIndex => elements.Count > 0 ? firstIndex : -1;
+
+    /// <summary>
+    /// Gets the index of the last realized element, or -1 if no elements are realized.
+    /// </summary>
+    public int LastIndex => elements.Count > 0 ? firstIndex + elements.Count - 1 : -1;
+
+    /// <summary>
+    /// Gets the elements.
+    /// </summary>
+    public IReadOnlyList<Control?> Elements => elements;
+
+    /// <summary>
+    /// Gets the sizes of the elements on the primary axis.
+    /// </summary>
+    public IReadOnlyList<Size> Sizes => sizes;
+
+    /// <summary>
+    /// Adds a newly realized element to the collection.
+    /// </summary>
+    /// <param name="index">The index of the element.</param>
+    /// <param name="element">The element.</param>
+    /// <param name="size">The size of the element on the primary axis.</param>
+    public void Add(int index, Control element, Size size)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(index);
+
+        int count = elements.Count;
+
+        if (count == 0)
         {
-            // Pre-allocate with reasonable capacity to reduce reallocations
-            _elements = new List<Control?>(32);
-            _sizes = new List<Size>(32);
+            elements.Add(element);
+            sizes.Add(size);
+            elementToIndex[element] = index;
+            firstIndex = index;
         }
-
-        /// <summary>
-        /// Gets the number of realized elements.
-        /// </summary>
-        public int Count => _elements.Count;
-
-        /// <summary>
-        /// Gets the index of the first realized element, or -1 if no elements are realized.
-        /// </summary>
-        public int FirstIndex => _elements.Count > 0 ? _firstIndex : -1;
-
-        /// <summary>
-        /// Gets the index of the last realized element, or -1 if no elements are realized.
-        /// </summary>
-        public int LastIndex => _elements.Count > 0 ? _firstIndex + _elements.Count - 1 : -1;
-
-        /// <summary>
-        /// Gets the elements.
-        /// </summary>
-        public IReadOnlyList<Control?> Elements => _elements;
-
-        /// <summary>
-        /// Gets the sizes of the elements on the primary axis.
-        /// </summary>
-        public IReadOnlyList<Size> Sizes => _sizes;
-
-        /// <summary>
-        /// Adds a newly realized element to the collection.
-        /// </summary>
-        /// <param name="index">The index of the element.</param>
-        /// <param name="element">The element.</param>
-        /// <param name="size">The size of the element on the primary axis.</param>
-        public void Add(int index, Control element, Size size)
+        else if (index == firstIndex + count)
         {
-            if (index < 0)
-                throw new ArgumentOutOfRangeException(nameof(index));
-
-            var count = _elements.Count;
-
-            if (count == 0)
-            {
-                _elements.Add(element);
-                _sizes.Add(size);
-                _elementToIndex[element] = index;
-                _firstIndex = index;
-            }
-            else if (index == _firstIndex + count)
-            {
-                _elements.Add(element);
-                _sizes.Add(size);
-                _elementToIndex[element] = index;
-            }
-            else if (index == _firstIndex - 1)
-            {
-                --_firstIndex;
-                _elements.Insert(0, element);
-                _sizes.Insert(0, size);
-                _elementToIndex[element] = index;
-            }
-            else
-            {
-                throw new NotSupportedException("Can only add items to the beginning or end of realized elements.");
-            }
+            elements.Add(element);
+            sizes.Add(size);
+            elementToIndex[element] = index;
         }
-
-        /// <summary>
-        /// Gets the element at the specified index, if realized.
-        /// </summary>
-        /// <param name="index">The index in the source collection of the element to get.</param>
-        /// <returns>The element if realized; otherwise null.</returns>
-        public Control? GetElement(int index)
+        else if (index == firstIndex - 1)
         {
-            var i = index - _firstIndex;
-            var count = _elements.Count;
-            if (i >= 0 && i < count)
-                return _elements[i];
+            --firstIndex;
+            elements.Insert(0, element);
+            sizes.Insert(0, size);
+            elementToIndex[element] = index;
+        }
+        else
+        {
+            throw new NotSupportedException("Can only add items to the beginning or end of realized elements.");
+        }
+    }
+
+    /// <summary>
+    /// Gets the element at the specified index, if realized.
+    /// </summary>
+    /// <param name="index">The index in the source collection of the element to get.</param>
+    /// <returns>The element if realized; otherwise null.</returns>
+    public Control? GetElement(int index)
+    {
+        int i = index - firstIndex;
+        int count = elements.Count;
+        if (i >= 0 && i < count)
+            return elements[i];
+        return null;
+    }
+
+    /// <summary>
+    /// Gets the Size of the element, if realized.
+    /// </summary>
+    /// <returns>
+    /// The size of the element or Infinite if not found
+    /// </returns>
+    public Size? GetElementSize(Control? child)
+    {
+        if (child == null) return null;
+
+        int index = GetIndex(child);
+
+        if (index < 0)
             return null;
-        }
 
-        /// <summary>
-        /// Gets the Size of the element, if realized.
-        /// </summary>
-        /// <returns>
-        /// The size of the element or Infinite if not found
-        /// </returns>
-        public Size? GetElementSize(Control? child)
+        int localIndex = index - firstIndex;
+        if (localIndex < 0 || localIndex >= sizes.Count)
+            return null;
+
+        return sizes[localIndex];
+    }
+
+    /// <summary>
+    /// Gets the Size of the element, if realized.
+    /// </summary>
+    /// <param name="index">The index to lookup</param>
+    /// <returns>The size of the element or null if not found</returns>
+    public Size? GetElementSize(int index)
+    {
+        if (index < FirstIndex)
+            return null;
+
+        int localIndex = index - firstIndex;
+        if (localIndex >= sizes.Count)
+            return null;
+
+        return sizes[localIndex];
+    }
+
+    /// <summary>
+    /// Gets the index of the specified element.
+    /// </summary>
+    /// <param name="element">The element.</param>
+    /// <returns>The index or -1 if the element is not present in the collection.</returns>
+    public int GetIndex(Control element)
+    {
+        return elementToIndex.TryGetValue(element, out int index) ? index : -1;
+    }
+
+    /// <summary>
+    /// Updates the elements in response to items being inserted into the source collection.
+    /// </summary>
+    /// <param name="index">The index in the source collection of the insert.</param>
+    /// <param name="count">The number of items inserted.</param>
+    /// <param name="updateElementIndex">A method used to update the element indexes.</param>
+    public void ItemsInserted(int index, int count, Action<Control, int, int> updateElementIndex)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(index);
+
+        int elementCount = elements.Count;
+        if (elementCount == 0)
+            return;
+
+        // Get the index within the realized _elements collection.
+        int first = firstIndex;
+        int realizedIndex = index - first;
+
+        if (realizedIndex < elementCount)
         {
-            if (child == null) return null;
+            // The insertion point affects the realized elements. Update the index of the
+            // elements after the insertion point.
+            int start = Math.Max(realizedIndex, 0);
 
-            var index = GetIndex(child);
-
-            if (index < 0)
-                return null;
-
-            var localIndex = index - _firstIndex;
-            if (localIndex < 0 || localIndex >= _sizes.Count)
-                return null;
-
-            return _sizes[localIndex];
-        }
-
-        /// <summary>
-        /// Gets the Size of the element, if realized.
-        /// </summary>
-        /// <param name="index">The index to lookup</param>
-        /// <returns>The size of the element or null if not found</returns>
-        public Size? GetElementSize(int index)
-        {
-            if (index < FirstIndex)
-                return null;
-
-            var localIndex = index - _firstIndex;
-            if (localIndex >= _sizes.Count)
-                return null;
-
-            return _sizes[localIndex];
-        }
-
-        /// <summary>
-        /// Gets the index of the specified element.
-        /// </summary>
-        /// <param name="element">The element.</param>
-        /// <returns>The index or -1 if the element is not present in the collection.</returns>
-        public int GetIndex(Control element)
-        {
-            return _elementToIndex.TryGetValue(element, out var index) ? index : -1;
-        }
-
-        /// <summary>
-        /// Updates the elements in response to items being inserted into the source collection.
-        /// </summary>
-        /// <param name="index">The index in the source collection of the insert.</param>
-        /// <param name="count">The number of items inserted.</param>
-        /// <param name="updateElementIndex">A method used to update the element indexes.</param>
-        public void ItemsInserted(int index, int count, Action<Control, int, int> updateElementIndex)
-        {
-            if (index < 0)
-                throw new ArgumentOutOfRangeException(nameof(index));
-
-            var elementCount = _elements.Count;
-            if (elementCount == 0)
-                return;
-
-            // Get the index within the realized _elements collection.
-            var first = _firstIndex;
-            var realizedIndex = index - first;
-
-            if (realizedIndex < elementCount)
+            for (int i = start; i < elementCount; ++i)
             {
-                // The insertion point affects the realized elements. Update the index of the
-                // elements after the insertion point.
-                var start = Math.Max(realizedIndex, 0);
-
-                for (var i = start; i < elementCount; ++i)
-                {
-                    if (_elements[i] is not { } element)
-                        continue;
-                    var oldIndex = i + first;
-                    var newIndex = oldIndex + count;
-                    updateElementIndex(element, oldIndex, newIndex);
-                    _elementToIndex[element] = newIndex;
-                }
-
-                if (realizedIndex < 0)
-                {
-                    // The insertion point was before the first element, update the first index.
-                    _firstIndex += count;
-                }
-                else
-                {
-                    // The insertion point was within the realized elements, insert an empty space
-                    // in _elements and _sizes.
-                    _elements.InsertMany(realizedIndex, null, count);
-                    _sizes.InsertMany(realizedIndex, Size.Infinity, count);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Updates the elements in response to items being removed from the source collection.
-        /// </summary>
-        /// <param name="index">The index in the source collection of the remove.</param>
-        /// <param name="count">The number of items removed.</param>
-        /// <param name="updateElementIndex">A method used to update the element indexes.</param>
-        /// <param name="recycleElement">A method used to recycle elements.</param>
-        public void ItemsRemoved(
-            int index,
-            int count,
-            Action<Control, int, int> updateElementIndex,
-            Action<Control> recycleElement)
-        {
-            if (index < 0)
-                throw new ArgumentOutOfRangeException(nameof(index));
-
-            var elementCount = _elements.Count;
-            if (elementCount == 0)
-                return;
-
-            // Get the removal start and end index within the realized _elements collection.
-            var first = _firstIndex;
-            var startIndex = index - first;
-            var endIndex = (index + count) - first;
-
-            if (endIndex < 0)
-            {
-                // The removed range was before the realized elements. Update the first index and
-                // the indexes of the realized elements.
-                _firstIndex -= count;
-
-                var newIndex = _firstIndex;
-                for (var i = 0; i < elementCount; ++i)
-                {
-                    if (_elements[i] is { } element)
-                    {
-                        updateElementIndex(element, newIndex + count, newIndex);
-                        _elementToIndex[element] = newIndex;
-                    }
-
-                    ++newIndex;
-                }
-            }
-            else if (startIndex < elementCount)
-            {
-                // Recycle and remove the affected elements.
-                var start = Math.Max(startIndex, 0);
-                var end = Math.Min(endIndex, elementCount);
-
-                for (var i = start; i < end; ++i)
-                {
-                    if (_elements[i] is { } element)
-                    {
-                        _elements[i] = null;
-                        _elementToIndex.Remove(element);
-                        recycleElement(element);
-                    }
-                }
-
-                _elements.RemoveRange(start, end - start);
-                _sizes.RemoveRange(start, end - start);
-
-                // If the remove started before and ended within our realized elements, then our new
-                // first index will be the index where the remove started. Mark StartU as unstable
-                // because we can't rely on it now to estimate element heights.
-                if (startIndex <= 0 && end < elementCount)
-                {
-                    _firstIndex = first = index;
-                }
-
-                // Update the indexes of the elements after the removed range.
-                end = _elements.Count;
-                var newIndex = first + start;
-                for (var i = start; i < end; ++i)
-                {
-                    if (_elements[i] is { } element)
-                    {
-                        updateElementIndex(element, newIndex + count, newIndex);
-                        _elementToIndex[element] = newIndex;
-                    }
-
-                    ++newIndex;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Updates the elements in response to items being replaced in the source collection.
-        /// </summary>
-        /// <param name="index">The index in the source collection of the remove.</param>
-        /// <param name="count">The number of items removed.</param>
-        /// <param name="recycleElement">A method used to recycle elements.</param>
-        public void ItemsReplaced(int index, int count, Action<Control> recycleElement)
-        {
-            if (index < 0)
-                throw new ArgumentOutOfRangeException(nameof(index));
-
-            var elementCount = _elements.Count;
-            if (elementCount == 0)
-                return;
-
-            // Get the index within the realized _elements collection.
-            var startIndex = index - _firstIndex;
-            var endIndex = Math.Min(startIndex + count, elementCount);
-
-            if (startIndex >= 0 && endIndex > startIndex)
-            {
-                for (var i = startIndex; i < endIndex; ++i)
-                {
-                    if (_elements[i] is { } element)
-                    {
-                        recycleElement(element);
-                        _elementToIndex.Remove(element);
-                        _elements[i] = null;
-                        _sizes[i] = Size.Infinity;
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Recycles all elements in response to the source collection being reset.
-        /// </summary>
-        /// <param name="recycleElement">A method used to recycle elements.</param>
-        public void ItemsReset(Action<Control> recycleElement)
-        {
-            var count = _elements.Count;
-            if (count == 0)
-                return;
-
-            for (var i = 0; i < count; i++)
-            {
-                if (_elements[i] is { } e)
-                {
-                    _elements[i] = null;
-                    _elementToIndex.Remove(e);
-                    recycleElement(e);
-                }
+                if (elements[i] is not { } element)
+                    continue;
+                int oldIndex = i + first;
+                int newIndex = oldIndex + count;
+                updateElementIndex(element, oldIndex, newIndex);
+                elementToIndex[element] = newIndex;
             }
 
-            _elements.Clear();
-            _sizes.Clear();
-            _elementToIndex.Clear();
-        }
-
-        /// <summary>
-        /// Recycles elements before a specific index.
-        /// </summary>
-        /// <param name="index">The index in the source collection of new first element.</param>
-        /// <param name="recycleElement">A method used to recycle elements.</param>
-        public void RecycleElementsBefore(int index, Action<Control, int> recycleElement)
-        {
-            var count = _elements.Count;
-            var first = _firstIndex;
-
-            if (index <= first || count == 0)
-                return;
-
-            if (index > first + count - 1)
+            if (realizedIndex < 0)
             {
-                RecycleAllElements(recycleElement);
+                // The insertion point was before the first element, update the first index.
+                firstIndex += count;
             }
             else
             {
-                var endIndex = index - first;
+                // The insertion point was within the realized elements, insert an empty space
+                // in _elements and _sizes.
+                elements.InsertMany(realizedIndex, null, count);
+                sizes.InsertMany(realizedIndex, Size.Infinity, count);
+            }
+        }
+    }
 
-                for (var i = 0; i < endIndex; ++i)
+    /// <summary>
+    /// Updates the elements in response to items being removed from the source collection.
+    /// </summary>
+    /// <param name="index">The index in the source collection of the remove.</param>
+    /// <param name="count">The number of items removed.</param>
+    /// <param name="updateElementIndex">A method used to update the element indexes.</param>
+    /// <param name="recycleElement">A method used to recycle elements.</param>
+    public void ItemsRemoved(
+        int index,
+        int count,
+        Action<Control, int, int> updateElementIndex,
+        Action<Control> recycleElement)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(index);
+
+        int elementCount = elements.Count;
+        if (elementCount == 0)
+            return;
+
+        // Get the removal start and end index within the realized _elements collection.
+        int first = firstIndex;
+        int startIndex = index - first;
+        int endIndex = index + count - first;
+
+        if (endIndex < 0)
+        {
+            // The removed range was before the realized elements. Update the first index and
+            // the indexes of the realized elements.
+            firstIndex -= count;
+
+            int newIndex = firstIndex;
+            for (int i = 0; i < elementCount; ++i)
+            {
+                if (elements[i] is { } element)
                 {
-                    if (_elements[i] is { } e)
-                    {
-                        _elements[i] = null;
-                        _elementToIndex.Remove(e);
-                        recycleElement(e, i + first);
-                    }
+                    updateElementIndex(element, newIndex + count, newIndex);
+                    elementToIndex[element] = newIndex;
                 }
 
-                _elements.RemoveRange(0, endIndex);
-                _sizes.RemoveRange(0, endIndex);
-                _firstIndex = index;
+                ++newIndex;
+            }
+        }
+        else if (startIndex < elementCount)
+        {
+            // Recycle and remove the affected elements.
+            int start = Math.Max(startIndex, 0);
+            int end = Math.Min(endIndex, elementCount);
+
+            for (int i = start; i < end; ++i)
+            {
+                if (elements[i] is { } element)
+                {
+                    elements[i] = null;
+                    elementToIndex.Remove(element);
+                    recycleElement(element);
+                }
+            }
+
+            elements.RemoveRange(start, end - start);
+            sizes.RemoveRange(start, end - start);
+
+            // If the remove started before and ended within our realized elements, then our new
+            // first index will be the index where the remove started. Mark StartU as unstable
+            // because we can't rely on it now to estimate element heights.
+            if (startIndex <= 0 && end < elementCount)
+            {
+                firstIndex = first = index;
+            }
+
+            // Update the indexes of the elements after the removed range.
+            end = elements.Count;
+            int newIndex = first + start;
+            for (int i = start; i < end; ++i)
+            {
+                if (elements[i] is { } element)
+                {
+                    updateElementIndex(element, newIndex + count, newIndex);
+                    elementToIndex[element] = newIndex;
+                }
+
+                ++newIndex;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Updates the elements in response to items being replaced in the source collection.
+    /// </summary>
+    /// <param name="index">The index in the source collection of the remove.</param>
+    /// <param name="count">The number of items removed.</param>
+    /// <param name="recycleElement">A method used to recycle elements.</param>
+    public void ItemsReplaced(int index, int count, Action<Control> recycleElement)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(index);
+
+        int elementCount = elements.Count;
+        if (elementCount == 0)
+            return;
+
+        // Get the index within the realized _elements collection.
+        int startIndex = index - firstIndex;
+        int endIndex = Math.Min(startIndex + count, elementCount);
+
+        if (startIndex >= 0 && endIndex > startIndex)
+        {
+            for (int i = startIndex; i < endIndex; ++i)
+            {
+                if (elements[i] is { } element)
+                {
+                    recycleElement(element);
+                    elementToIndex.Remove(element);
+                    elements[i] = null;
+                    sizes[i] = Size.Infinity;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Recycles all elements in response to the source collection being reset.
+    /// </summary>
+    /// <param name="recycleElement">A method used to recycle elements.</param>
+    public void ItemsReset(Action<Control> recycleElement)
+    {
+        int count = elements.Count;
+        if (count == 0)
+            return;
+
+        for (int i = 0; i < count; i++)
+        {
+            if (elements[i] is { } e)
+            {
+                elements[i] = null;
+                elementToIndex.Remove(e);
+                recycleElement(e);
             }
         }
 
-        /// <summary>
-        /// Recycles elements after a specific index.
-        /// </summary>
-        /// <param name="index">The index in the source collection of new last element.</param>
-        /// <param name="recycleElement">A method used to recycle elements.</param>
-        public void RecycleElementsAfter(int index, Action<Control, int> recycleElement)
+        elements.Clear();
+        sizes.Clear();
+        elementToIndex.Clear();
+    }
+
+    /// <summary>
+    /// Recycles elements before a specific index.
+    /// </summary>
+    /// <param name="index">The index in the source collection of new first element.</param>
+    /// <param name="recycleElement">A method used to recycle elements.</param>
+    public void RecycleElementsBefore(int index, Action<Control, int> recycleElement)
+    {
+        int count = elements.Count;
+        int first = firstIndex;
+
+        if (index <= first || count == 0)
+            return;
+
+        if (index > first + count - 1)
         {
-            var count = _elements.Count;
-            var first = _firstIndex;
-
-            if (index >= first + count - 1 || count == 0)
-                return;
-
-            if (index < first)
-            {
-                RecycleAllElements(recycleElement);
-            }
-            else
-            {
-                var startIndex = (index + 1) - first;
-
-                for (var i = startIndex; i < count; ++i)
-                {
-                    if (_elements[i] is { } e)
-                    {
-                        _elements[i] = null;
-                        _elementToIndex.Remove(e);
-                        recycleElement(e, i + first);
-                    }
-                }
-
-                var removeCount = count - startIndex;
-                _elements.RemoveRange(startIndex, removeCount);
-                _sizes.RemoveRange(startIndex, removeCount);
-            }
+            RecycleAllElements(recycleElement);
         }
-
-        /// <summary>
-        /// Recycles all realized elements.
-        /// </summary>
-        /// <param name="recycleElement">A method used to recycle elements.</param>
-        public void RecycleAllElements(Action<Control, int> recycleElement)
+        else
         {
-            var count = _elements.Count;
-            if (count == 0)
-                return;
+            int endIndex = index - first;
 
-            var first = _firstIndex;
-            for (var i = 0; i < count; i++)
+            for (int i = 0; i < endIndex; ++i)
             {
-                if (_elements[i] is { } e)
+                if (elements[i] is { } e)
                 {
-                    _elements[i] = null;
-                    _elementToIndex.Remove(e);
+                    elements[i] = null;
+                    elementToIndex.Remove(e);
                     recycleElement(e, i + first);
                 }
             }
 
-            _firstIndex = 0;
-            _elements.Clear();
-            _sizes.Clear();
-            _elementToIndex.Clear();
+            elements.RemoveRange(0, endIndex);
+            sizes.RemoveRange(0, endIndex);
+            firstIndex = index;
+        }
+    }
+
+    /// <summary>
+    /// Recycles elements after a specific index.
+    /// </summary>
+    /// <param name="index">The index in the source collection of new last element.</param>
+    /// <param name="recycleElement">A method used to recycle elements.</param>
+    public void RecycleElementsAfter(int index, Action<Control, int> recycleElement)
+    {
+        int count = elements.Count;
+        int first = firstIndex;
+
+        if (index >= first + count - 1 || count == 0)
+            return;
+
+        if (index < first)
+        {
+            RecycleAllElements(recycleElement);
+        }
+        else
+        {
+            int startIndex = index + 1 - first;
+
+            for (int i = startIndex; i < count; ++i)
+            {
+                if (elements[i] is { } e)
+                {
+                    elements[i] = null;
+                    elementToIndex.Remove(e);
+                    recycleElement(e, i + first);
+                }
+            }
+
+            int removeCount = count - startIndex;
+            elements.RemoveRange(startIndex, removeCount);
+            sizes.RemoveRange(startIndex, removeCount);
+        }
+    }
+
+    /// <summary>
+    /// Recycles all realized elements.
+    /// </summary>
+    /// <param name="recycleElement">A method used to recycle elements.</param>
+    public void RecycleAllElements(Action<Control, int> recycleElement)
+    {
+        int count = elements.Count;
+        if (count == 0)
+            return;
+
+        int first = firstIndex;
+        for (int i = 0; i < count; i++)
+        {
+            if (elements[i] is { } e)
+            {
+                elements[i] = null;
+                elementToIndex.Remove(e);
+                recycleElement(e, i + first);
+            }
         }
 
-        /// <summary>
-        /// Resets the element list and prepares it for reuse.
-        /// </summary>
-        public void ResetForReuse()
-        {
-            _firstIndex = 0;
-            _elements.Clear();
-            _sizes.Clear();
-            _elementToIndex.Clear();
-        }
+        firstIndex = 0;
+        elements.Clear();
+        sizes.Clear();
+        elementToIndex.Clear();
+    }
+
+    /// <summary>
+    /// Resets the element list and prepares it for reuse.
+    /// </summary>
+    public void ResetForReuse()
+    {
+        firstIndex = 0;
+        elements.Clear();
+        sizes.Clear();
+        elementToIndex.Clear();
     }
 }

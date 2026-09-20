@@ -1,14 +1,10 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
-using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
-using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.TimingHelper;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
-using Mapping_Tools.Core.Tools.TimingHelper;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tools.TimingHelper.Models;
@@ -24,13 +20,6 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
     IQuickRun,
     IShellProjectFeature<TimingHelperProject>
 {
-    private readonly ProjectDefinition<TimingHelperProject> definition = new(
-        "timinghelperproject.json",
-        "Timing Helper Projects",
-        static () => new TimingHelperProject(),
-        "timing-helper-project.json",
-        ToolConfigSchema.ForTool(TimingHelperToolDefinition.Definition.Id));
-
     private readonly DesktopApplicationSettings settings;
 
     private readonly ITimingHelperService timingHelper;
@@ -108,7 +97,12 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
             cancellationToken));
     }
 
-    ProjectDefinition<TimingHelperProject> IShellProjectFeature<TimingHelperProject>.ProjectDefinition => definition;
+    ProjectDefinition<TimingHelperProject> IShellProjectFeature<TimingHelperProject>.ProjectDefinition { get; } = new(
+        "timinghelperproject.json",
+        "Timing Helper Projects",
+        static () => new TimingHelperProject(),
+        "timing-helper-project.json",
+        ToolConfigSchema.ForTool(TimingHelperToolDefinition.Definition.Id));
 
     TimingHelperProject IShellProjectFeature<TimingHelperProject>.Snapshot()
     {
@@ -143,11 +137,11 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
     {
         if (paths.Count == 0) return;
 
-        TimingHelperProject options = Snapshot();
+        var options = Snapshot();
         await Execution.ExecuteAsync(
                 new ToolExecutionRequest<TimingHelperResult>(
-                Tool.Id,
-                Tool.DisplayName,
+                    Tool.Id,
+                    Tool.DisplayName,
                     async context =>
                     {
                         Progress<double> progress = new(value =>
@@ -191,6 +185,6 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
         OmitBarline = project.OmitBarline;
         Leniency = project.Leniency;
         BeatsBetween = project.BeatsBetween;
-        BeatDivisors = project.BeatDivisors?.ToArray() ?? [];
+        BeatDivisors = project.BeatDivisors.ToArray();
     }
 }

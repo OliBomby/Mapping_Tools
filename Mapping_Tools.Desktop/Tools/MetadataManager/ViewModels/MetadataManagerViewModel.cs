@@ -8,9 +8,7 @@ using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Platform.FilePicker;
-using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
-using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.MetadataManager;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper;
@@ -32,10 +30,10 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     private readonly ICurrentBeatmapLocator currentBeatmapLocator;
     private readonly ProjectDefinition<MetadataManagerProject> definition;
     private readonly IFilePicker filePicker;
-    private readonly IBeatmapWorkspace workspace;
 
     private readonly IMetadataManagerService metadataManager;
     private readonly IUserNotificationService notifications;
+    private readonly IBeatmapWorkspace workspace;
 
     /// <summary>Creates a Metadata Manager presentation model.</summary>
     /// <param name="metadataManager">Imports and exports metadata through application ports.</param>
@@ -79,7 +77,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     /// <summary>Gets or sets vertical-bar-separated target beatmap paths.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ExportMapCountText))]
-    public partial string ExportPath { get; set; } = string.Empty;
+    public partial string ExportPath { get; set; }
 
     /// <summary>Gets or sets the Unicode artist name.</summary>
     [ObservableProperty]
@@ -316,7 +314,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
-        MetadataManagerProject options = Snapshot();
+        var options = Snapshot();
         await Execution.ExecuteAsync(
             new ToolExecutionRequest<MetadataManagerResult>(
                 Tool.Id,
@@ -391,11 +389,11 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         UseComboColours = options.UseComboColours;
 
         ComboColours.Clear();
-        foreach (var colour in options.ComboColours ?? [])
+        foreach (var colour in options.ComboColours)
             ComboColours.Add(new ObservableComboColour(new ComboColour(colour.Color)));
 
         SpecialColours.Clear();
-        foreach (var colour in options.SpecialColours ?? [])
+        foreach (var colour in options.SpecialColours)
             SpecialColours.Add(new ObservableSpecialColour(new SpecialColour(colour.Color, colour.Name ?? string.Empty)));
     }
 
@@ -453,5 +451,4 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
             ExportPath = exportPath,
         };
     }
-
 }

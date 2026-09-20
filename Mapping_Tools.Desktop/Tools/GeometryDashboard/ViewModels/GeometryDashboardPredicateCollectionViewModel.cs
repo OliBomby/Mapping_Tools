@@ -118,9 +118,8 @@ public sealed partial class GeometryDashboardPredicateCollectionViewModel : Obse
     private int IndexOfReference(SelectionPredicate predicate)
     {
         for (int index = 0; index < Predicates.Count; index++)
-        {
-            if (ReferenceEquals(Predicates[index], predicate)) return index;
-        }
+            if (ReferenceEquals(Predicates[index], predicate))
+                return index;
 
         return -1;
     }

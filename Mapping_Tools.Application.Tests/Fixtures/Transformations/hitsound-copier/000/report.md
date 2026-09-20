@@ -10,13 +10,16 @@
 
 ## Semantic comparison
 
-| Target item | Before | After | Difference |
-|---|---:|---:|---:|
-| Redlines | 5 | 5 | 0 |
-| Greenlines | 4 | 799 | +795 |
-| Hit objects | 17 | 17 | 0 |
-| Objects with nonzero hitsound flags | 14 | 0 | -14 |
+| Target item                         | Before | After | Difference |
+|-------------------------------------|-------:|------:|-----------:|
+| Redlines                            |      5 |     5 |          0 |
+| Greenlines                          |      4 |   799 |       +795 |
+| Hit objects                         |     17 |    17 |          0 |
+| Objects with nonzero hitsound flags |     14 |     0 |        -14 |
 
-Overwrite mode copied the source sampleset, custom-index, and volume state into the target timeline. It retained the target's five redlines and all 17 target objects. No source hitsound event matched a target event within the configured 5.5 ms leniency, so the target's object hitsound flags were reset. Storyboard sample copying and slider-end muting were disabled. The backup is byte-identical to the target seed.
+Overwrite mode copied the source sampleset, custom-index, and volume state into the target timeline. It retained the
+target's five redlines and all 17 target objects. No source hitsound event matched a target event within the configured
+5.5 ms leniency, so the target's object hitsound flags were reset. Storyboard sample copying and slider-end muting were
+disabled. The backup is byte-identical to the target seed.
 
 Status: accepted by Olivier on 2026-07-18.

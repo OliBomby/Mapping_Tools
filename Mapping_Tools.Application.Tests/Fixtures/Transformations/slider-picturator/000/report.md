@@ -9,14 +9,15 @@
 
 ## Semantic comparison
 
-| Target item | Before | After | Difference |
-|---|---:|---:|---:|
-| Hit objects | 17 | 18 | +1 |
-| Sliders | 7 | 8 | +1 |
-| Total slider curve points | 31 | 98,680 | +98,649 |
-| Redlines | 5 | 7 | +2 |
-| Greenlines | 4 | 5 | +1 |
+| Target item               | Before |  After | Difference |
+|---------------------------|-------:|-------:|-----------:|
+| Hit objects               |     17 |     18 |         +1 |
+| Sliders                   |      7 |      8 |         +1 |
+| Total slider curve points |     31 | 98,680 |    +98,649 |
+| Redlines                  |      5 |      7 |         +2 |
+| Greenlines                |      4 |      5 |         +1 |
 
-The generated picture slider contains 98,649 curve points and a pixel length of `2276190953.8339233`. The export also added `SliderTrackOverride : 255,51,85` and `SliderBorder : 255,255,255`. The backup is byte-identical to the seed.
+The generated picture slider contains 98,649 curve points and a pixel length of `2276190953.8339233`. The export also
+added `SliderTrackOverride : 255,51,85` and `SliderBorder : 255,255,255`. The backup is byte-identical to the seed.
 
 Status: accepted by Olivier on 2026-07-19.

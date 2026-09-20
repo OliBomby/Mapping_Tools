@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Mapping_Tools.Application.Tests.Execution;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Application.Tests.Execution;
 using Mapping_Tools.Application.Tools.AutoFail;
 using Mapping_Tools.Core.Tools.AutoFail.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -16,7 +16,7 @@ public sealed class AutoFailDetectorFixtureTests : TransformationFixtureTestBase
     public async Task AnalyzeAsync_AcceptedFixture_ProducesEquivalentOutput(string fixtureName)
     {
         // Arrange
-        using FixtureContext fixture = CreateFixture("auto-fail-detector", fixtureName);
+        using var fixture = CreateFixture("auto-fail-detector", fixtureName);
         AutoFailServiceOptions options = new(
             fixture.TargetPath,
             fixture.NumberProperty("ApproachRateOverride"),

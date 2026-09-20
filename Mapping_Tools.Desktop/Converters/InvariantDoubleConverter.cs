@@ -1,5 +1,6 @@
 using System.Globalization;
 using Avalonia.Data.Converters;
+using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.SystemTools;
 
 namespace Mapping_Tools.Desktop.Converters;
@@ -19,7 +20,7 @@ public sealed class InvariantDoubleConverter : IValueConverter
         return ValueConverterHelper.Convert(() =>
         {
             double converted = ValueConverterHelper.RequireValue<double>(value, targetType);
-            return converted == 727
+            return Precision.AlmostEquals(converted, 727)
                 ? "727 WYSI"
                 : converted.ToString("R", CultureInfo.InvariantCulture);
         });

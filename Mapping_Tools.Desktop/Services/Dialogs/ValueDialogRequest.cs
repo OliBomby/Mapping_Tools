@@ -77,5 +77,4 @@ public sealed class ValueDialogRequest<TValue>
     ///     Gets the label for the Escape/cancel action.
     /// </summary>
     public string CancelLabel { get; }
-
 }

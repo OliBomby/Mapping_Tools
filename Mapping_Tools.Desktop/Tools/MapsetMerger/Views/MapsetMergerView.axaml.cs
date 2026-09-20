@@ -3,7 +3,6 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Tools.MapsetMerger.ViewModels;
-using Mapping_Tools.Desktop.ViewModels;
 
 namespace Mapping_Tools.Desktop.Tools.MapsetMerger.Views;
 

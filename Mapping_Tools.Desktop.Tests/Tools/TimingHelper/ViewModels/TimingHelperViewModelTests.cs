@@ -3,16 +3,12 @@ using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.QuickRun.Models;
-using Mapping_Tools.Application.Settings.Models;
-using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.TimingHelper;
-using Mapping_Tools.Core.Tools.TimingHelper;
 using Mapping_Tools.Desktop.Converters;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services.Hosted;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.TimingHelper.ViewModels;
-using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Tools.TimingHelper.ViewModels;
@@ -188,7 +184,7 @@ public sealed class TimingHelperViewModelTests
         RecordingCurrentBeatmapLocator? currentBeatmap = null)
     {
         UserNotificationService notifications = new();
-        TestBeatmapWorkspace effectiveWorkspace = workspace ?? new TestBeatmapWorkspace();
+        var effectiveWorkspace = workspace ?? new TestBeatmapWorkspace();
         effectiveWorkspace.QuickRunPath = currentBeatmap?.Path;
         return new TimingHelperViewModel(
             service ?? new RecordingTimingHelper(),
@@ -221,5 +217,4 @@ public sealed class TimingHelperViewModelTests
             return Task.FromResult(new TimingHelperResult(paths, 2));
         }
     }
-
 }

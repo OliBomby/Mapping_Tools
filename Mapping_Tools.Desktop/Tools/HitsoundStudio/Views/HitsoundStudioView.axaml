@@ -22,7 +22,7 @@
                                  HelpText="Hitsound Studio is the tool that lets you import data from multiple outside sources and convert them to osu! standard hitsounds in the form of a hitsounding difficulty that you can copy to other beatmaps.&#x0a;&#x0a;It represents hitsounds as a list of layers (hitsound layers). One layer contains a unique sound, the sampleset and hitsound that accompany that sound and a list of times that sound has to be played." />
 
         <Grid Grid.Row="1"
-              Grid.ColumnSpan="2">
+              Grid.ColumnSpan="2" Grid.Column="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="{Binding EditorColumnWidth}" />
                 <ColumnDefinition Width="Auto" />
@@ -63,10 +63,11 @@
                                   IsChecked="{Binding ShowTimes, Mode=TwoWay}"
                                   ToolTip.Tip="Show the times when the sound of this hitsound layer has to be played." />
                         <StackPanel IsVisible="{Binding ShowTimes}">
-                            <TextBox Text="{Binding EditTimes, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource DoubleArrayToStringConverter}}"
-                                     TextWrapping="Wrap"
-                                     materialAssists:TextFieldAssist.Label="Times"
-                                     ToolTip.Tip="Times in milliseconds, separated by commas." />
+                            <TextBox
+                                Text="{Binding EditTimes, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource DoubleArrayToStringConverter}}"
+                                TextWrapping="Wrap"
+                                materialAssists:TextFieldAssist.Label="Times"
+                                ToolTip.Tip="Times in milliseconds, separated by commas." />
                         </StackPanel>
 
                         <TextBlock Margin="0,20,0,0"
@@ -91,15 +92,15 @@
                             </Button>
                         </Grid>
                         <TextBox Margin="0,5,0,0"
-                                 Text="{Binding EditSampleVolume, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                 Text="{Binding EditSampleVolume, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource HitsoundStudioSampleVolumeConverter}, ConverterParameter=100}"
                                  materialAssists:TextFieldAssist.Label="Volume %"
                                  ToolTip.Tip="The volume at which the sound of this hitsound layer has to play. Ranges from 0 to 100." />
                         <TextBox Margin="0,5,0,0"
-                                 Text="{Binding EditSamplePanning, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                 Text="{Binding EditSamplePanning, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=0}"
                                  materialAssists:TextFieldAssist.Label="Panning"
                                  ToolTip.Tip="Panning of the sound. -1 means all left and 1 means all right." />
                         <TextBox Margin="0,5,0,0"
-                                 Text="{Binding EditSamplePitchShift, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                 Text="{Binding EditSamplePitchShift, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=0}"
                                  materialAssists:TextFieldAssist.Label="Pitch shift"
                                  ToolTip.Tip="Pitch shift of the sound in keys. 12 is plus one octave. -12 is minus one octave." />
                         <StackPanel IsVisible="{Binding IsSoundFontSample}">
@@ -120,7 +121,7 @@
                                      materialAssists:TextFieldAssist.Label="Key"
                                      ToolTip.Tip="The key number of the sample." />
                             <TextBox Margin="0,5,0,0"
-                                     Text="{Binding EditSampleLength, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                     Text="{Binding EditSampleLength, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}"
                                      materialAssists:TextFieldAssist.Label="Length"
                                      ToolTip.Tip="The length in milliseconds of the sample." />
                             <TextBox Margin="0,5,0,0"
@@ -171,11 +172,12 @@
                             <StackPanel IsVisible="{Binding IsStackImport}">
                                 <Grid Margin="0,5,0,0"
                                       ColumnDefinitions="*,5,*">
-                                    <TextBox Text="{Binding EditImportX, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                             materialAssists:TextFieldAssist.Label="X coordinate"
-                                             ToolTip.Tip="The X coordinate of the stack in the source beatmap." />
+                                    <TextBox
+                                        Text="{Binding EditImportX, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}"
+                                        materialAssists:TextFieldAssist.Label="X coordinate"
+                                        ToolTip.Tip="The X coordinate of the stack in the source beatmap." />
                                     <TextBox Grid.Column="2"
-                                             Text="{Binding EditImportY, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                             Text="{Binding EditImportY, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}"
                                              materialAssists:TextFieldAssist.Label="Y coordinate"
                                              ToolTip.Tip="The Y coordinate of the stack in the source beatmap." />
                                 </Grid>
@@ -226,22 +228,23 @@
                                          materialAssists:TextFieldAssist.Label="Key"
                                          ToolTip.Tip="MIDI key filter, or -1 for any key." />
                                 <TextBox Margin="0,5,0,0"
-                                         Text="{Binding EditImportLength, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                         Text="{Binding EditImportLength, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}"
                                          materialAssists:TextFieldAssist.Label="Length"
                                          ToolTip.Tip="MIDI length filter, or -1 for any length." />
-                                <TextBox Text="{Binding EditImportLengthRoughness, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                         materialAssists:TextFieldAssist.Label="Length roughness"
-                                         ToolTip.Tip="Quantization used when importing MIDI note lengths." />
+                                <TextBox
+                                    Text="{Binding EditImportLengthRoughness, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=1}"
+                                    materialAssists:TextFieldAssist.Label="Length roughness"
+                                    ToolTip.Tip="Quantization used when importing MIDI note lengths." />
                                 <TextBox Margin="0,5,0,0"
                                          Text="{Binding EditImportVelocity, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                          materialAssists:TextFieldAssist.Label="Velocity"
                                          ToolTip.Tip="MIDI velocity filter, or -1 for any velocity." />
                                 <TextBox Margin="0,5,0,0"
-                                         Text="{Binding EditImportVelocityRoughness, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                         Text="{Binding EditImportVelocityRoughness, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=1}"
                                          materialAssists:TextFieldAssist.Label="Velocity roughness"
                                          ToolTip.Tip="Quantization used when importing MIDI velocities." />
                                 <TextBox Margin="0,5,0,0"
-                                         Text="{Binding EditImportOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                         Text="{Binding EditImportOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=0}"
                                          materialAssists:TextFieldAssist.Label="Offset"
                                          ToolTip.Tip="Millisecond offset applied to imported events." />
                             </StackPanel>
@@ -257,15 +260,15 @@
             </Grid>
 
             <GridSplitter
-                          Grid.Column="1"
-                          Width="1"
-                          Margin="0,10,0,10"
-                          Background="{DynamicResource MaterialDividerBrush}"
-                          IsVisible="{Binding HasLayers}"
-                          HorizontalAlignment="Stretch"
-                          VerticalAlignment="Stretch"
-                          ResizeDirection="Columns"
-                          ResizeBehavior="PreviousAndNext" />
+                Grid.Column="1"
+                Width="1"
+                Margin="0,10,0,10"
+                Background="{DynamicResource MaterialDividerBrush}"
+                IsVisible="{Binding HasLayers}"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                ResizeDirection="Columns"
+                ResizeBehavior="PreviousAndNext" />
 
             <controls:MaterialGridListView Grid.Column="2"
                                            Margin="10,0,0,0"

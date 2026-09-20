@@ -27,5 +27,4 @@ public class TumourGeneratorServiceOptions : TumourGeneratorEngineOptions
 
     /// <summary>Gets or sets whether delegated velocity removes slider ticks.</summary>
     public bool RemoveSliderTicks { get; set; }
-
 }

@@ -13,7 +13,7 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
     private readonly CancellationTokenSource disposeCancellation = new();
     private readonly IUpdateGateway gateway;
     private readonly ApplicationSettings settings;
-    private readonly object stateLock = new();
+    private readonly Lock stateLock = new();
     private Task? activeDownloadTask;
     private bool checkInProgress;
     private Task? disposeTask;
@@ -172,9 +172,9 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
         ThrowIfDisposed();
 
         UpdateCheckResult check;
-        CancellationTokenSource? downloadCancellation = null;
-        TaskCompletionSource? completion = null;
-        long operationId = 0;
+        CancellationTokenSource? newDownloadCancellation;
+        TaskCompletionSource? completion;
+        long newOperationId;
         lock (stateLock)
         {
             ThrowIfDisposed();
@@ -190,28 +190,30 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
 
             if (activeDownloadTask is { IsCompleted: false }) return activeDownloadTask;
 
-            downloadCancellation = CancellationTokenSource.CreateLinkedTokenSource(
+            newDownloadCancellation = CancellationTokenSource.CreateLinkedTokenSource(
                 cancellationToken,
                 disposeCancellation.Token);
             completion = new TaskCompletionSource(
                 TaskCreationOptions.RunContinuationsAsynchronously);
-            this.downloadCancellation = downloadCancellation;
+            downloadCancellation = newDownloadCancellation;
             activeDownloadTask = completion.Task;
-            operationId = ++this.operationId;
+            newOperationId = ++operationId;
         }
 
-        var downloadCancellationSource = downloadCancellation!;
-        var completionSource = completion!;
+        var downloadCancellationSource = newDownloadCancellation;
+        var completionSource = completion;
         IProgress<double> progress = new InlineProgress(value =>
         {
             ProgressChanged?.Invoke(this, new UpdateProgressChangedEventArgs(value));
         });
+
         _ = PrepareCoreAsync(
             check,
-            operationId,
+            newOperationId,
             progress,
             downloadCancellationSource,
             completionSource);
+
         return completionSource.Task;
     }
 
@@ -275,12 +277,12 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
         DisposeAsync().AsTask().GetAwaiter().GetResult();
     }
 
-    private async Task DisposeCoreAsync(Task? activeDownloadTask)
+    private async Task DisposeCoreAsync(Task? activeDownloadTaskToAwait)
     {
-        if (activeDownloadTask is not null)
+        if (activeDownloadTaskToAwait is not null)
             try
             {
-                await activeDownloadTask.ConfigureAwait(false);
+                await activeDownloadTaskToAwait.ConfigureAwait(false);
             }
             catch (Exception)
             {
@@ -298,21 +300,21 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
 
     private async Task PrepareCoreAsync(
         UpdateCheckResult check,
-        long operationId,
+        long operationId2,
         IProgress<double> progress,
-        CancellationTokenSource downloadCancellation,
+        CancellationTokenSource downloadCancellation2,
         TaskCompletionSource completion)
     {
         try
         {
             await gateway
-                .PrepareUpdateAsync(check.LatestVersion!, progress, downloadCancellation.Token)
+                .PrepareUpdateAsync(check.LatestVersion!, progress, downloadCancellation2.Token)
                 .ConfigureAwait(false);
-            downloadCancellation.Token.ThrowIfCancellationRequested();
+            downloadCancellation2.Token.ThrowIfCancellationRequested();
             bool isCurrent;
             lock (stateLock)
             {
-                isCurrent = !disposed && this.operationId == operationId && ReferenceEquals(lastCheck, check);
+                isCurrent = !disposed && operationId == operationId2 && ReferenceEquals(lastCheck, check);
                 prepared = isCurrent;
             }
 
@@ -325,19 +327,19 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
         {
             lock (stateLock)
             {
-                if (this.operationId == operationId) prepared = false;
+                if (operationId == operationId2) prepared = false;
             }
 
             var token = exception.CancellationToken.IsCancellationRequested
                 ? exception.CancellationToken
-                : downloadCancellation.Token;
+                : downloadCancellation2.Token;
             completion.TrySetCanceled(token);
         }
         catch (Exception exception)
         {
             lock (stateLock)
             {
-                if (this.operationId == operationId) prepared = false;
+                if (operationId == operationId2) prepared = false;
             }
 
             completion.TrySetException(exception);
@@ -346,10 +348,10 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
         {
             lock (stateLock)
             {
-                if (ReferenceEquals(this.downloadCancellation, downloadCancellation)) this.downloadCancellation = null;
+                if (ReferenceEquals(downloadCancellation, downloadCancellation2)) downloadCancellation = null;
             }
 
-            downloadCancellation.Dispose();
+            downloadCancellation2.Dispose();
         }
     }
 

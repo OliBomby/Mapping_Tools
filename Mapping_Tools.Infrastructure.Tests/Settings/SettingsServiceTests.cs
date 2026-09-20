@@ -2,9 +2,9 @@ using System.Text.Json;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Settings.Contracts;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Core.Settings.Models;
 using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Infrastructure.Settings;
-using Mapping_Tools.Core.Settings.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Infrastructure.Tests.Settings;

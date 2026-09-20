@@ -37,4 +37,3 @@ public interface IPatternGalleryArchiveService
         string basePath,
         CancellationToken cancellationToken = default);
 }
-

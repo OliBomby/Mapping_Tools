@@ -5,7 +5,6 @@ using Mapping_Tools.Desktop.Tools.SliderCompletionator.ViewModels;
 using Mapping_Tools.Desktop.Tools.SliderCompletionator.Views;
 using Microsoft.Extensions.DependencyInjection;
 
-
 namespace Mapping_Tools.Desktop.Tools.SliderCompletionator;
 
 /// <summary>Describes and composes the Slider Completionator plugin feature.</summary>

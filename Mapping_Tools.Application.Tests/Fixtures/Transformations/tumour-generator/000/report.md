@@ -9,14 +9,16 @@
 
 ## Semantic comparison
 
-| Target item | Before | After | Difference |
-|---|---:|---:|---:|
-| Sliders | 7 | 7 | 0 |
-| Total slider curve points | 31 | 58 | +27 |
-| Hit objects | 17 | 17 | 0 |
-| Redlines | 5 | 5 | 0 |
-| Greenlines | 4 | 6 | +2 |
+| Target item               | Before | After | Difference |
+|---------------------------|-------:|------:|-----------:|
+| Sliders                   |      7 |     7 |          0 |
+| Total slider curve points |     31 |    58 |        +27 |
+| Hit objects               |     17 |    17 |          0 |
+| Redlines                  |      5 |     5 |          0 |
+| Greenlines                |      4 |     6 |         +2 |
 
-The real-world single triangle layer was applied to every slider, adding 27 reconstructed curve points and adjusting affected pixel lengths. With `Fix SV` enabled, two additional inherited points preserved the resulting temporal slider lengths. The backup is byte-identical to the seed.
+The real-world single triangle layer was applied to every slider, adding 27 reconstructed curve points and adjusting
+affected pixel lengths. With `Fix SV` enabled, two additional inherited points preserved the resulting temporal slider
+lengths. The backup is byte-identical to the seed.
 
 Status: accepted by Olivier on 2026-07-19.

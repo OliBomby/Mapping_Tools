@@ -20,6 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Xml.Serialization;
 
@@ -703,6 +704,7 @@ public struct Quaternion : IEquatable<Quaternion>
     /// </summary>
     /// <param name="other">The other Quaternion to be used in the comparison.</param>
     /// <returns>True if both instances are equal; false otherwise.</returns>
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     public bool Equals(Quaternion other)
     {
         return Xyz == other.Xyz && W == other.W;

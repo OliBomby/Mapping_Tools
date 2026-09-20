@@ -1,5 +1,4 @@
 using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.Settings.Models;
 using NonInvasiveKeyboardHookLibrary;
 
@@ -19,7 +18,7 @@ public sealed class WindowsGlobalHotkeyService : IGlobalHotkeyService
     private readonly Dictionary<string, Binding> bindings =
         new(StringComparer.Ordinal);
 
-    private readonly object gate = new();
+    private readonly Lock gate = new();
     private readonly Func<bool> isWindows;
     private readonly KeyboardHookManager manager = new();
     private bool started;
@@ -201,7 +200,7 @@ public sealed class WindowsGlobalHotkeyService : IGlobalHotkeyService
             CancellationToken.None);
     }
 
-    private static NonInvasiveKeyboardHookLibrary.ModifierKeys[] ConvertModifiers(int modifiers)
+    private static ModifierKeys[] ConvertModifiers(int modifiers)
     {
         const int known_modifiers = 1 | 2 | 4 | 8;
         if ((modifiers & ~known_modifiers) != 0)
@@ -210,14 +209,14 @@ public sealed class WindowsGlobalHotkeyService : IGlobalHotkeyService
                 modifiers,
                 "Only legacy Alt, Control, Shift, and Windows modifiers are supported.");
 
-        List<NonInvasiveKeyboardHookLibrary.ModifierKeys> result = [];
-        if ((modifiers & 1) != 0) result.Add(NonInvasiveKeyboardHookLibrary.ModifierKeys.Alt);
+        List<ModifierKeys> result = [];
+        if ((modifiers & 1) != 0) result.Add(ModifierKeys.Alt);
 
-        if ((modifiers & 2) != 0) result.Add(NonInvasiveKeyboardHookLibrary.ModifierKeys.Control);
+        if ((modifiers & 2) != 0) result.Add(ModifierKeys.Control);
 
-        if ((modifiers & 4) != 0) result.Add(NonInvasiveKeyboardHookLibrary.ModifierKeys.Shift);
+        if ((modifiers & 4) != 0) result.Add(ModifierKeys.Shift);
 
-        if ((modifiers & 8) != 0) result.Add(NonInvasiveKeyboardHookLibrary.ModifierKeys.WindowsKey);
+        if ((modifiers & 8) != 0) result.Add(ModifierKeys.WindowsKey);
 
         return result.ToArray();
     }

@@ -18,5 +18,4 @@ public sealed record TimelineMarker
 
     /// <summary>Gets the semantic style used to draw the marker.</summary>
     public TimelineMarkerKind Kind { get; }
-
 }

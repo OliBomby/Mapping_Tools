@@ -27,7 +27,7 @@ public sealed class SliderEndGenerator : RelevantObjectsGenerator
     public RelevantPoint? GetRelevantObjects(RelevantHitObject relevantHitObject)
     {
         var hitObject = relevantHitObject.HitObject;
-        return hitObject.IsSlider && hitObject.CurvePoints is not null
+        return hitObject is { IsSlider: true, CurvePoints: not null }
             ? new RelevantPoint(hitObject.GetSliderPath().PositionAt(1)) { CustomTime = hitObject.EndTime }
             : null;
     }

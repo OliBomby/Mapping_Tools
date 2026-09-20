@@ -6,7 +6,6 @@ using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Application.Workspace.Models;
 using Mapping_Tools.Core.Settings.Models;
@@ -159,10 +158,10 @@ internal sealed class TestBeatmapWorkspace : IBeatmapWorkspace
         return path;
     }
 
-    public void SetRecentMaps(params RecentBeatmap[] recentMaps)
+    public void SetRecentMaps(params RecentBeatmap[] newRecentMaps)
     {
-        this.recentMaps.Clear();
-        this.recentMaps.AddRange(recentMaps);
+        recentMaps.Clear();
+        recentMaps.AddRange(newRecentMaps);
     }
 }
 
@@ -205,8 +204,8 @@ internal sealed class TestBeatmapBackupService : IBeatmapBackupService
             new BeatmapBackupResult(
                 [
                     new BeatmapBackupArtifact(
-                session.Path + ".backup",
-                session.Path,
+                        session.Path + ".backup",
+                        session.Path,
                         reason,
                         session.Source == BeatmapEditingSource.LiveEditor,
                         DateTimeOffset.UnixEpoch),

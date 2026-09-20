@@ -9,25 +9,42 @@ namespace Mapping_Tools.Core.HitsoundStuff;
 /// </summary>
 public class HitsoundLayer
 {
-    /// <inheritdoc />
+    /// <summary>Creates a new hitsound layer with default values.</summary>
     public HitsoundLayer() : this(string.Empty, SampleSet.Normal, Hitsound.Normal, int.MaxValue,
-        new LayerImportArgs(), new SampleGeneratingArgs(), new List<double>())
+        new LayerImportArgs(), new SampleGeneratingArgs(), [])
     {
     }
 
-    /// <inheritdoc />
+    /// <summary>Creates a new hitsound layer with the specified values.</summary>
+    /// <param name="name">The name of this hitsound layer.</param>
+    /// <param name="importType">The import type of this hitsound layer.</param>
+    /// <param name="sampleSet">The sample set that this sample should play as.</param>
+    /// <param name="hitsound">The hitsound that this sample should play as.</param>
+    /// <param name="samplePath">The path to the sample that this hitsound layer should play.</param>
     public HitsoundLayer(string name, ImportType importType, SampleSet sampleSet, Hitsound hitsound, string samplePath) :
-        this(name, sampleSet, hitsound, int.MaxValue, new LayerImportArgs(importType), new SampleGeneratingArgs(samplePath), new List<double>())
+        this(name, sampleSet, hitsound, int.MaxValue, new LayerImportArgs(importType), new SampleGeneratingArgs(samplePath), [])
     {
     }
 
-    /// <inheritdoc />
+    /// <summary>Creates a new hitsound layer with the specified values.</summary>
+    /// <param name="name">The name of this hitsound layer.</param>
+    /// <param name="sampleSet">The sample set that this sample should play as.</param>
+    /// <param name="hitsound">The hitsound that this sample should play as.</param>
+    /// <param name="importArgs">The import arguments for this hitsound layer.</param>
+    /// <param name="sampleArgs">The sample generating arguments for this hitsound layer.</param>
     public HitsoundLayer(string name, SampleSet sampleSet, Hitsound hitsound, SampleGeneratingArgs sampleArgs, LayerImportArgs importArgs) :
-        this(name, sampleSet, hitsound, int.MaxValue, importArgs, sampleArgs, new List<double>())
+        this(name, sampleSet, hitsound, int.MaxValue, importArgs, sampleArgs, [])
     {
     }
 
-    /// <inheritdoc />
+    /// <summary>Creates a new hitsound layer with the specified values.</summary>
+    /// <param name="name">The name of this hitsound layer.</param>
+    /// <param name="sampleSet">The sample set that this sample should play as.</param>
+    /// <param name="hitsound">The hitsound that this sample should play as.</param>
+    /// <param name="priority">The priority of this hitsound layer.</param>
+    /// <param name="importArgs">The import arguments for this hitsound layer.</param>
+    /// <param name="sampleArgs">The sample generating arguments for this hitsound layer.</param>
+    /// <param name="times">The list of times that this hitsound should play.</param>
     public HitsoundLayer(string name, SampleSet sampleSet, Hitsound hitsound, int priority, LayerImportArgs importArgs, SampleGeneratingArgs sampleArgs, List<double> times)
     {
         Name = name;
@@ -45,12 +62,12 @@ public class HitsoundLayer
     public string Name { get; set; }
 
     /// <summary>
-    ///     The sample set that this sample should play on.
+    ///     The sample set that this sample should play as.
     /// </summary>
     public SampleSet SampleSet { get; set; }
 
     /// <summary>
-    ///     The hitsound that this sample should play on.
+    ///     The hitsound that this sample should play as.
     /// </summary>
     public Hitsound Hitsound { get; set; }
 

@@ -12,4 +12,3 @@ public interface IAudioDecoder
     /// <returns>The decoded clip.</returns>
     Task<AudioClip> DecodeAsync(AudioDecodeRequest request, CancellationToken cancellationToken = default);
 }
-

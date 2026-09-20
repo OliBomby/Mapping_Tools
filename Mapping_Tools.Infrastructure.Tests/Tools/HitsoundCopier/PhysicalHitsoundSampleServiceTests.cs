@@ -25,7 +25,7 @@ public sealed class PhysicalHitsoundSampleServiceTests
         Directory.CreateDirectory(Path.GetDirectoryName(firstPath)!);
         File.WriteAllBytes(firstPath, [1]);
         File.WriteAllBytes(secondPath, [2]);
-        PhysicalHitsoundSampleService service = CreateService(directory.Root);
+        var service = CreateService(directory.Root);
         SampleSchema schema = new();
         IReadOnlyDictionary<string, string> firstSamples = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
@@ -54,8 +54,8 @@ public sealed class PhysicalHitsoundSampleServiceTests
         // Assert
         first.Should().NotBeNull();
         second.Should().NotBeNull();
-        first!.Index.Should().Be(100);
-        second!.Index.Should().Be(101);
+        first.Index.Should().Be(100);
+        second.Index.Should().Be(101);
         schema.Should().ContainKey("normal-slidertick100");
         schema.Should().ContainKey("normal-slidertick101");
         schema["normal-slidertick100"].Should().ContainSingle().Which.Path.Should().Be(firstPath);
@@ -74,7 +74,7 @@ public sealed class PhysicalHitsoundSampleServiceTests
         RecordingAudioGenerator generator = new();
         RecordingAudioClipMixer mixer = new();
         RecordingAudioExporter exporter = new();
-        PhysicalHitsoundSampleService service = CreateService(
+        var service = CreateService(
             directory.Root,
             generator,
             exporter,
@@ -82,7 +82,7 @@ public sealed class PhysicalHitsoundSampleServiceTests
         SampleSchema schema = new()
         {
             ["normal-slidertick100"] =
-            [new SampleGeneratingArgs(firstPath), new SampleGeneratingArgs(secondPath)]
+                [new SampleGeneratingArgs(firstPath), new SampleGeneratingArgs(secondPath)],
         };
 
         // Act
@@ -111,14 +111,14 @@ public sealed class PhysicalHitsoundSampleServiceTests
             "Exports",
             "stale.wav");
         byte[] sourceBytes = [1, 2, 3];
-        File.WriteAllBytes(sourcePath, sourceBytes);
+        await File.WriteAllBytesAsync(sourcePath, sourceBytes);
         Directory.CreateDirectory(Path.GetDirectoryName(stalePath)!);
         File.WriteAllBytes(stalePath, [9]);
         RecordingAudioExporter exporter = new();
-        PhysicalHitsoundSampleService service = CreateService(directory.Root, exporter: exporter);
+        var service = CreateService(directory.Root, exporter: exporter);
         SampleSchema schema = new()
         {
-            ["normal-slidertick100"] = [new SampleGeneratingArgs(sourcePath)]
+            ["normal-slidertick100"] = [new SampleGeneratingArgs(sourcePath)],
         };
 
         // Act
@@ -130,7 +130,7 @@ public sealed class PhysicalHitsoundSampleServiceTests
             "Mapping Tools",
             "Exports",
             "normal-slidertick100.wav");
-        File.ReadAllBytes(destination).Should().Equal(sourceBytes);
+        (await File.ReadAllBytesAsync(destination)).Should().Equal(sourceBytes);
         File.Exists(stalePath).Should().BeFalse();
         exporter.Request.Should().BeNull();
         exportedCount.Should().Be(1);

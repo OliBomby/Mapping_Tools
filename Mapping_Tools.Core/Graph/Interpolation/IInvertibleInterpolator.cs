@@ -8,4 +8,3 @@ public interface IInvertibleInterpolator
     /// <returns>All known normalized positions in the interpolation domain.</returns>
     IEnumerable<double> GetInverse(double y);
 }
-

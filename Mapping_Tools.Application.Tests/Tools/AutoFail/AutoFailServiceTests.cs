@@ -57,5 +57,4 @@ public sealed class AutoFailServiceTests
             [],
             path: "accepted.osu");
     }
-
 }

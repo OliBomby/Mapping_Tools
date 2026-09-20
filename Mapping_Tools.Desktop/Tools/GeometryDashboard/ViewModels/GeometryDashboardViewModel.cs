@@ -10,12 +10,11 @@ using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Application.QuickRun.Contracts;
+using Mapping_Tools.Application.Tools.GeometryDashboard;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
-using Mapping_Tools.Application.Tools.GeometryDashboard;
 using Mapping_Tools.Core.Settings.Models;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure;
-using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 using Mapping_Tools.Desktop.Models;
@@ -34,24 +33,25 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     IShellProjectFeature<GeometryDashboardProject>, IShellExtraProjectMenuFeature, IShellFeatureActivation, IDisposable
 {
     private const string save_slot_binding_prefix = "geometry-dashboard-save-slot";
-    private readonly Dictionary<GeometryDashboardSaveSlot, string> saveSlotBindingIds = [];
+    private readonly IGeometryDashboardService dashboardService;
+
     private readonly ProjectDefinition<GeometryDashboardProject> definition = new(
         "geometrydashboardproject.json",
         "Geometry Dashboard Projects",
         static () => new GeometryDashboardProject(),
         "geometry-dashboard-project.json",
         ToolConfigSchema.ForTool(GeometryDashboardToolDefinition.Definition.Id));
+
     private readonly IUiDispatcher dispatcher;
     private readonly IFilePicker filePicker;
-    private readonly IGlobalHotkeyService globalHotkeys;
     private readonly ITextFileStore files;
+    private readonly IGlobalHotkeyService globalHotkeys;
     private readonly GeometryDashboardLifecycleCoordinator lifecycle;
     private readonly IUserNotificationService notifications;
-    private readonly IGeometryDashboardService dashboardService;
-    private readonly IProjectSerializer serializer;
     private readonly Func<Window> owner;
+    private readonly Dictionary<GeometryDashboardSaveSlot, string> saveSlotBindingIds = [];
+    private readonly IProjectSerializer serializer;
     private bool disposed;
-    private string filter = string.Empty;
     private bool viewActive;
 
     /// <summary>Creates the dashboard presentation over an application session.</summary>
@@ -116,13 +116,12 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     /// <summary>Gets or sets the case-insensitive generator search query.</summary>
     public string Filter
     {
-        get => filter;
+        get;
         set
         {
-            string normalized = value ?? string.Empty;
-            if (SetProperty(ref filter, normalized)) RebuildGroups();
+            if (SetProperty(ref field, value)) RebuildGroups();
         }
-    }
+    } = string.Empty;
 
     /// <summary>Gets the current engine preferences edited by the dashboard.</summary>
     public GeometryDashboardPreferences Preferences => Project.CurrentPreferences;
@@ -148,7 +147,6 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         viewActive = false;
         lifecycle.ViewDeactivated();
         SynchronizeSaveSlotHotkeys();
-        GC.SuppressFinalize(this);
     }
 
     IReadOnlyList<ShellProjectMenuItem> IShellExtraProjectMenuFeature.ExtraProjectMenuItems =>
@@ -393,7 +391,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
             return GeometryDashboardStatusIndicatorState.Error;
 
         return status.StartsWith("Running:", StringComparison.OrdinalIgnoreCase)
-            || status.StartsWith("Unfocused:", StringComparison.OrdinalIgnoreCase)
+               || status.StartsWith("Unfocused:", StringComparison.OrdinalIgnoreCase)
             ? GeometryDashboardStatusIndicatorState.Running
             : GeometryDashboardStatusIndicatorState.Waiting;
     }
@@ -403,7 +401,11 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         dispatcher.Post(() =>
         {
             if (disposed) return;
-            lock (Project) Project.LoadFromSlot(slot);
+            lock (Project)
+            {
+                Project.LoadFromSlot(slot);
+            }
+
             dashboardService.ApplyPreferences();
         });
     }
@@ -411,10 +413,13 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     private void SynchronizeSaveSlotHotkeys()
     {
         GeometryDashboardSaveSlot[] slots;
-        lock (Project) slots = Project.SaveSlots.ToArray();
+        lock (Project)
+        {
+            slots = Project.SaveSlots.ToArray();
+        }
 
         var currentSlots = slots.ToHashSet();
-        foreach (var (slot, bindingId) in saveSlotBindingIds.ToArray())
+        foreach ((var slot, string bindingId) in saveSlotBindingIds.ToArray())
         {
             if ((viewActive || Project.KeepRunning) && currentSlots.Contains(slot)) continue;
 
@@ -426,7 +431,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
 
         foreach (var slot in slots)
         {
-            if (!saveSlotBindingIds.TryGetValue(slot, out var bindingId))
+            if (!saveSlotBindingIds.TryGetValue(slot, out string? bindingId))
             {
                 bindingId = $"{save_slot_binding_prefix}-{Guid.NewGuid():N}";
                 saveSlotBindingIds.Add(slot, bindingId);

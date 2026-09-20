@@ -12,7 +12,11 @@
   "ResetIds": true,
   "PreviewTime": 12345.0,
   "UseComboColours": true,
-  "ComboColours": ["#FFFF3366", "#FF33CCFF", "#FFFFCC33"],
+  "ComboColours": [
+    "#FFFF3366",
+    "#FF33CCFF",
+    "#FFFFCC33"
+  ],
   "SpecialColours": [],
   "UseEditorReader": false,
   "MakeBackups": true

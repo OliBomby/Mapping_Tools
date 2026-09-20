@@ -6,19 +6,18 @@ namespace Mapping_Tools.Desktop.Controls;
 
 internal static class ToolValidationHelper
 {
-    internal static event EventHandler? ValidationChanged;
-
     static ToolValidationHelper()
     {
-        DataValidationErrors.HasErrorsProperty.Changed.AddClassHandler<Control>(
-            static (_, _) => ValidationChanged?.Invoke(null, EventArgs.Empty));
+        DataValidationErrors.HasErrorsProperty.Changed.AddClassHandler<Control>(static (_, _) => ValidationChanged?.Invoke(null, EventArgs.Empty));
     }
+
+    internal static event EventHandler? ValidationChanged;
 
     public static bool HasErrors(Visual source)
     {
         ArgumentNullException.ThrowIfNull(source);
 
-        Visual scope = FindScope(source);
+        var scope = FindScope(source);
         return scope.GetSelfAndVisualDescendants()
             .OfType<Control>()
             .Any(DataValidationErrors.GetHasErrors);
@@ -26,8 +25,8 @@ internal static class ToolValidationHelper
 
     private static Visual FindScope(Visual source)
     {
-        Visual scope = source;
-        while (scope.GetVisualParent() is Visual parent)
+        var scope = source;
+        while (scope.GetVisualParent() is { } parent)
         {
             scope = parent;
             if (scope is UserControl) return scope;

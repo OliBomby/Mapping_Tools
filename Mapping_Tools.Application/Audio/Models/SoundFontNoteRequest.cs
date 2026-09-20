@@ -18,4 +18,3 @@ public sealed class SoundFontNoteRequest
     /// <summary>Gets an independent SoundFont sample specification.</summary>
     public SampleGeneratingArgs Sample { get; }
 }
-

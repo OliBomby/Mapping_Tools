@@ -286,11 +286,12 @@ public sealed class BeatmapEditingGatewayTests
         RecordingLiveBeatmapReader reader = new((LiveBeatmapSnapshot?)null);
         var gateway = CreateGateway(store, reader);
         using CancellationTokenSource source = new();
-        source.Cancel();
+        await source.CancelAsync();
 
         // Act
         Func<Task> act4 = () => gateway.OpenBeatmapAsync(
             map_path,
+            // ReSharper disable once AccessToDisposedClosure
             cancellationToken: source.Token);
 
         // Assert
@@ -311,7 +312,8 @@ public sealed class BeatmapEditingGatewayTests
             store,
             backupService ?? new RecordingBackupService(store),
             reader,
-            reloadService ?? new RecordingEditorReloadService
+            reloadService
+            ?? new RecordingEditorReloadService
             {
                 FileWrittenResolver = () => store.WriteCount > 0,
             },
@@ -430,5 +432,4 @@ public sealed class BeatmapEditingGatewayTests
             throw new NotSupportedException();
         }
     }
-
 }

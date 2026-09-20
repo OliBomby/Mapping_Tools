@@ -7,4 +7,3 @@ public sealed record TimingCopierResult(IReadOnlyList<string> ProcessedPaths)
     /// <summary>Gets the number of target beatmaps written.</summary>
     public int ProcessedCount => ProcessedPaths.Count;
 }
-

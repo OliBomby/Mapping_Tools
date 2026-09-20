@@ -29,4 +29,3 @@ public sealed class MidiExportRequest
     /// <summary>Gets the tempo in beats per minute.</summary>
     public double BeatsPerMinute { get; }
 }
-

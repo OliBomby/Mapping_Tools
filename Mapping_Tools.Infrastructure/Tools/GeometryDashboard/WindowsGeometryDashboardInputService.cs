@@ -111,13 +111,11 @@ public sealed class WindowsGeometryDashboardInputService : IGeometryDashboardInp
 
         if (!coordinates.TryRefresh(out var snapshot)) return false;
 
-        Vector2 screen = snapshot.Transform.EditorToScreenCoordinate(position);
+        var screen = snapshot.Transform.EditorToScreenCoordinate(position);
         return double.IsFinite(screen.X)
                && double.IsFinite(screen.Y)
-               && screen.X >= int.MinValue
-               && screen.X <= int.MaxValue
-               && screen.Y >= int.MinValue
-               && screen.Y <= int.MaxValue
+               && screen.X is >= int.MinValue and <= int.MaxValue
+               && screen.Y is >= int.MinValue and <= int.MaxValue
                && WindowsNativeMethods.SetCursorPos(
                    Convert.ToInt32(Math.Round(screen.X)),
                    Convert.ToInt32(Math.Round(screen.Y)));

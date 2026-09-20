@@ -191,7 +191,7 @@ public abstract class TransformationFixtureTestBase
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult(new BeatmapEditingSession(path, files, BeatmapEditingSource.Disk));
+            return Task.FromResult(new BeatmapEditingSession(path, files));
         }
 
         public Task<StoryboardEditingSession> OpenStoryboardAsync(

@@ -23,7 +23,6 @@ internal static class ToolAssemblyLoader
 
         foreach (string path in Directory.EnumerateFiles(fullPluginDirectory, "*.dll", SearchOption.TopDirectoryOnly)
                      .OrderBy(path => path, StringComparer.OrdinalIgnoreCase))
-        {
             try
             {
                 assemblies.Add(AssemblyLoadContext.Default.LoadFromAssemblyPath(Path.GetFullPath(path)));
@@ -35,7 +34,6 @@ internal static class ToolAssemblyLoader
                     path,
                     exception);
             }
-        }
 
         return assemblies;
     }

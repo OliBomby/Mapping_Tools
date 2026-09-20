@@ -6,10 +6,7 @@ using Mapping_Tools.Application.Execution.ToolExecution.Models;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Platform.FilePicker;
-using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
-using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.HitsoundCopier;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
@@ -26,23 +23,20 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     IShellProjectFeature<HitsoundCopierProject>,
     IQuickRun
 {
-
     private readonly IHitsoundCopierService copier;
     private readonly ICurrentBeatmapLocator currentBeatmap;
-    private readonly IBeatmapWorkspace workspace;
-
-    private readonly ProjectDefinition<HitsoundCopierProject> definition = new(
-        "hitsoundcopierproject.json",
-        "Hitsound Copier Projects",
-        () => new HitsoundCopierProject(),
-        "hitsound-copier-project.json",
-        ToolConfigSchema.ForTool(HitsoundCopierToolDefinition.Definition.Id));
 
     private readonly IFilePicker filePicker;
     private readonly IUserNotificationService notifications;
+    private readonly IBeatmapWorkspace workspace;
 
     /// <summary>Creates the Hitsound Copier presentation model.</summary>
+    /// <param name="copier">Supplies the Hitsound Copier service.</param>
+    /// <param name="execution">Supplies the tool execution service.</param>
+    /// <param name="filePicker">Supplies the file picker service.</param>
+    /// <param name="currentBeatmap">Supplies the current beatmap locator service.</param>
     /// <param name="workspace">Supplies the shell's selected beatmap for QuickRun fallback.</param>
+    /// <param name="notifications">Supplies the user notification service.</param>
     public HitsoundCopierViewModel(
         IHitsoundCopierService copier,
         IToolExecutionService execution,
@@ -116,10 +110,12 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets whether unmatched hitsounds target slider ticks.</summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(StartIndexBoxVisible))]
     public partial bool CopyToSliderTicks { get; set; }
 
     /// <summary>Gets or sets whether unmatched hitsounds target slider slides.</summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(StartIndexBoxVisible))]
     public partial bool CopyToSliderSlides { get; set; }
 
     /// <summary>Gets whether the custom sample index field is relevant.</summary>
@@ -164,10 +160,6 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     /// <summary>Gets every sample family accepted by the legacy form.</summary>
     public IReadOnlyList<SampleSet> MutedSampleSets { get; } = Enum.GetValues<SampleSet>();
 
-    /// <summary>Gets the latest ordinary-run summary.</summary>
-    [ObservableProperty]
-    public partial string ResultSummary { get; private set; } = string.Empty;
-
     /// <summary>Gets the legacy singular/plural target count label.</summary>
     public string ExportMapCountText
     {
@@ -186,16 +178,21 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
 
         if (string.IsNullOrWhiteSpace(path))
         {
-            ResultSummary = "Open a target beatmap in osu! before using QuickRun.";
+            PublishWarning("Open a target beatmap in osu! before using QuickRun.");
             return;
         }
 
-        HitsoundCopierProject options = Snapshot();
+        var options = Snapshot();
         options.PathTo = path;
         await RunWithStateAsync(() => RunOptionsAsync(options, true));
     }
 
-    ProjectDefinition<HitsoundCopierProject> IShellProjectFeature<HitsoundCopierProject>.ProjectDefinition => definition;
+    ProjectDefinition<HitsoundCopierProject> IShellProjectFeature<HitsoundCopierProject>.ProjectDefinition { get; } = new(
+        "hitsoundcopierproject.json",
+        "Hitsound Copier Projects",
+        () => new HitsoundCopierProject(),
+        "hitsound-copier-project.json",
+        ToolConfigSchema.ForTool(HitsoundCopierToolDefinition.Definition.Id));
 
     HitsoundCopierProject IShellProjectFeature<HitsoundCopierProject>.Snapshot()
     {
@@ -205,16 +202,6 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     void IShellProjectFeature<HitsoundCopierProject>.Install(HitsoundCopierProject project)
     {
         Install(project);
-    }
-
-    partial void OnCopyToSliderTicksChanged(bool value)
-    {
-        OnPropertyChanged(nameof(StartIndexBoxVisible));
-    }
-
-    partial void OnCopyToSliderSlidesChanged(bool value)
-    {
-        OnPropertyChanged(nameof(StartIndexBoxVisible));
     }
 
     /// <summary>Fetches the current osu! map into the source field.</summary>
@@ -255,7 +242,7 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     {
         if (!base.PrepareRun())
         {
-            ResultSummary = "Correct the invalid Hitsound Copier settings before running.";
+            PublishWarning("Correct the invalid Hitsound Copier settings before running.");
             return false;
         }
 
@@ -298,8 +285,8 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
 
     private void Install(HitsoundCopierProject project)
     {
-        PathFrom = project.PathFrom ?? string.Empty;
-        PathTo = project.PathTo ?? string.Empty;
+        PathFrom = project.PathFrom;
+        PathTo = project.PathTo;
         CopyMode = project.CopyMode;
         TemporalLeniency = project.TemporalLeniency;
         CopyHitsounds = project.CopyHitsounds;
@@ -314,8 +301,8 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
         CopyToSliderSlides = project.CopyToSliderSlides;
         StartIndex = project.StartIndex;
         MuteSliderends = project.MuteSliderends;
-        BeatDivisors = project.BeatDivisors?.ToArray() ?? [];
-        MutedDivisors = project.MutedDivisors?.ToArray() ?? [];
+        BeatDivisors = project.BeatDivisors.ToArray();
+        MutedDivisors = project.MutedDivisors.ToArray();
         MinLength = project.MinLength;
         MutedIndex = project.MutedIndex;
         MutedSampleSet = project.MutedSampleSet;
@@ -345,7 +332,7 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     {
         try
         {
-            string? path = await currentBeatmap.FindCurrentBeatmapAsync();
+            string path = await currentBeatmap.FindCurrentBeatmapAsync();
             if (!string.IsNullOrWhiteSpace(path)) setter(path);
         }
         catch (Exception exception)
@@ -398,5 +385,13 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
         return notifications.PublishAsync(
             new UserNotification(UserNotificationSeverity.Error, title,
                 "The beatmap path could not be obtained.", exception));
+    }
+
+    private void PublishWarning(string message)
+    {
+        notifications.PublishAsync(new UserNotification(
+            UserNotificationSeverity.Warning,
+            Tool.DisplayName,
+            message)).GetAwaiter().GetResult();
     }
 }

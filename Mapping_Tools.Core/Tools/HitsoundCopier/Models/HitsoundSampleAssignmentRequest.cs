@@ -12,4 +12,3 @@ public sealed record HitsoundSampleAssignmentRequest(
     string Role,
     SampleSet SampleSet,
     int StartIndex);
-

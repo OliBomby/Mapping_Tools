@@ -15,9 +15,9 @@ public sealed class PatternGalleryFixtureTests : TransformationFixtureTestBase
     public async Task ExportAsync_AcceptedFixture_ProducesEquivalentOutput(string fixtureName)
     {
         // Arrange
-        using FixtureContext fixture = CreateFixture("pattern-gallery", fixtureName);
-        PatternGalleryServiceOptions project = fixture.ReadProject<PatternGalleryServiceOptions>();
-        PatternGalleryCollectionPaths paths = ReadPatternGalleryPaths(fixture);
+        using var fixture = CreateFixture("pattern-gallery", fixtureName);
+        var project = fixture.ReadProject<PatternGalleryServiceOptions>();
+        var paths = ReadPatternGalleryPaths(fixture);
         var pattern = project.Patterns.Single(item =>
             item.Name.Equals(fixture.Options.GetProperty("Pattern").GetString(), StringComparison.Ordinal));
         PatternGalleryService service = new(

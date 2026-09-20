@@ -23,4 +23,3 @@ public sealed class MidiVolumeChange
     /// <summary>Gets the MIDI volume value.</summary>
     public int Volume { get; }
 }
-

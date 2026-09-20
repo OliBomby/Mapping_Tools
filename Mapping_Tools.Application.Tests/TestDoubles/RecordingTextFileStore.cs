@@ -52,13 +52,13 @@ internal sealed class RecordingTextFileStore : ITextFileStore
     public string GetParentFolder(string path)
     {
         return ParentFolderResolver?.Invoke(path)
-            ?? Path.GetDirectoryName(path)
-            ?? string.Empty;
+               ?? Path.GetDirectoryName(path)
+               ?? string.Empty;
     }
 
     public string CombinePath(string parent, string child)
     {
         return CombinePathResolver?.Invoke(parent, child)
-            ?? Path.Combine(parent, child);
+               ?? Path.Combine(parent, child);
     }
 }

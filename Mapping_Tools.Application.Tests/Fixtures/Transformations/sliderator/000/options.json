@@ -3,7 +3,20 @@
   "ExportTime": 2500,
   "ExportMode": "Add",
   "GraphMode": "Position",
-  "GraphAnchors": [[0, 0], [1, 0.25], [2, 1]],
+  "GraphAnchors": [
+    [
+      0,
+      0
+    ],
+    [
+      1,
+      0.25
+    ],
+    [
+      2,
+      1
+    ]
+  ],
   "GlobalSv": 2.79999990463257,
   "VelocityLimit": 100,
   "MinDendrite": 1,

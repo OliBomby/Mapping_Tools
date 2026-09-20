@@ -26,4 +26,3 @@ public sealed class AudioExportRequest
     /// <summary>Gets the Vorbis quality value.</summary>
     public float Quality { get; }
 }
-

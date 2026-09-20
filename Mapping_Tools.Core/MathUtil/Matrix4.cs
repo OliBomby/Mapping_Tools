@@ -27,7 +27,6 @@ namespace Mapping_Tools.Core.MathUtil;
 /// <summary>
 ///     Represents a 4x4 matrix containing 3D rotation, scale, transform, and projection.
 /// </summary>
-/// <seealso cref="Matrix4D" />
 [Serializable]
 [StructLayout(LayoutKind.Sequential)]
 public struct Matrix4 : IEquatable<Matrix4>
@@ -544,7 +543,7 @@ public struct Matrix4 : IEquatable<Matrix4>
     /// <summary>
     ///     Returns the rotation component of this instance. Quite slow.
     /// </summary>
-    /// <param name="row_normalise">
+    /// <param name="rowNormalise">
     ///     Whether the method should row-normalise (i.e. remove scale from) the Matrix. Pass false if
     ///     you know it's already normalised.
     /// </param>
@@ -1000,9 +999,9 @@ public struct Matrix4 : IEquatable<Matrix4>
     public static void CreatePerspectiveFieldOfView(double fovy, double aspect, double zNear, double zFar, out Matrix4 result)
     {
         if (fovy <= 0 || fovy > Math.PI) throw new ArgumentOutOfRangeException("fovy");
-        if (aspect <= 0) throw new ArgumentOutOfRangeException("aspect");
-        if (zNear <= 0) throw new ArgumentOutOfRangeException("zNear");
-        if (zFar <= 0) throw new ArgumentOutOfRangeException("zFar");
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(aspect);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(zNear);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(zFar);
 
         double yMax = zNear * Math.Tan(0.5f * fovy);
         double yMin = -yMax;
@@ -1056,9 +1055,9 @@ public struct Matrix4 : IEquatable<Matrix4>
     /// </exception>
     public static void CreatePerspectiveOffCenter(double left, double right, double bottom, double top, double zNear, double zFar, out Matrix4 result)
     {
-        if (zNear <= 0) throw new ArgumentOutOfRangeException("zNear");
-        if (zFar <= 0) throw new ArgumentOutOfRangeException("zFar");
-        if (zNear >= zFar) throw new ArgumentOutOfRangeException("zNear");
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(zNear);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(zFar);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(zNear, zFar);
 
         double x = 2.0f * zNear / (right - left);
         double y = 2.0f * zNear / (top - bottom);
@@ -1319,9 +1318,9 @@ public struct Matrix4 : IEquatable<Matrix4>
     /// <exception cref="InvalidOperationException">Thrown if the Matrix4 is singular.</exception>
     public static void Invert(ref Matrix4 mat, out Matrix4 result)
     {
-        int[] colIdx = { 0, 0, 0, 0 };
-        int[] rowIdx = { 0, 0, 0, 0 };
-        int[] pivotIdx = { -1, -1, -1, -1 };
+        int[] colIdx = [0, 0, 0, 0];
+        int[] rowIdx = [0, 0, 0, 0];
+        int[] pivotIdx = [-1, -1, -1, -1];
 
         // convert the matrix to an array for easy looping
         double[,] inverse =

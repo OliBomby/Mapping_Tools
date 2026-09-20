@@ -135,8 +135,7 @@ public class PatternGalleryPlacer
             throw new ArgumentException("Pattern Gallery contains an invalid numeric setting.", parameterName);
         if (snapToNewTiming
             && (beatDivisors is null
-                || beatDivisors.Length == 0
-                || beatDivisors.Any(divisor => divisor is null)))
+                || beatDivisors.Length == 0))
             throw new ArgumentException("Pattern Gallery requires at least one beat divisor.", parameterName);
     }
 
@@ -189,8 +188,11 @@ public class PatternGalleryPlacer
 
         // Keep just the timing point changes which are inside the parts.
         // These timing point changes have everything that is necessary for inside the parts of the pattern. (even timing)
-        timingPointsChanges = timingPointsChanges.Where(tpc => parts.Any(part =>
-            part.StartTime <= tpc.TimingPoint.Offset && part.EndTime >= tpc.TimingPoint.Offset)).ToList();
+        timingPointsChanges =
+        [
+            .. timingPointsChanges.Where(tpc => parts.Any(part =>
+                part.StartTime <= tpc.TimingPoint.Offset && part.EndTime >= tpc.TimingPoint.Offset)),
+        ];
 
         // Remove stuff
         if (PatternOverwriteMode != PatternOverwriteMode.NoOverwrite)
@@ -432,12 +434,12 @@ public class PatternGalleryPlacer
         if (PatternOverwriteMode == PatternOverwriteMode.PartitionedOverwrite)
             parts = PartitionBeatmap(patternBeatmap, scaleToNewTiming);
         else
-            parts = new List<Part>
-            {
-                new(patternBeatmap.HitObjects.Min(o => o.Time),
+            parts =
+            [
+                new Part(patternBeatmap.HitObjects.Min(o => o.Time),
                     patternBeatmap.HitObjects.Max(o => o.GetEndTime(!scaleToNewTiming)),
                     patternBeatmap.HitObjects),
-            };
+            ];
 
         // Construct a new timing which is a mix of the beatmap and the pattern.
         // If scaleToNewTiming then use beat relative values to determine the duration of timing sections in the pattern.
@@ -465,25 +467,31 @@ public class PatternGalleryPlacer
             {
                 case TimingOverwriteMode.PatternTimingOnly:
                     // Subtract one from the end time to omit BPM changes right on the end of the part.
-                    inPartRedlines = transformPatternTiming.GetRedlinesInRange(startTime,
-                        Math.Max(startTime, endTime - 2 * Precision.DOUBLE_EPSILON)).ToArray();
+                    inPartRedlines =
+                    [
+                        .. transformPatternTiming.GetRedlinesInRange(startTime,
+                            Math.Max(startTime, endTime - 2 * Precision.DOUBLE_EPSILON)),
+                    ];
                     startPartRedline = transformPatternTiming.GetRedlineAtTime(startTime);
                     break;
                 case TimingOverwriteMode.InPatternAbsoluteTiming:
                     var tempInPartRedlines = transformPatternTiming.GetRedlinesInRange(startTime, endTime - 2 * Precision.DOUBLE_EPSILON);
 
                     // Replace all parts in the pattern which have the default BPM to timing from the target beatmap.
-                    inPartRedlines = tempInPartRedlines.Select(tp =>
-                    {
-                        if (Precision.AlmostEquals(tp.MpB, patternDefaultMpb))
+                    inPartRedlines =
+                    [
+                        .. tempInPartRedlines.Select(tp =>
                         {
-                            var tp2 = transformOriginalTiming.GetRedlineAtTime(tp.Offset).Copy();
-                            tp2.Offset = tp.Offset;
-                            return tp2;
-                        }
+                            if (Precision.AlmostEquals(tp.MpB, patternDefaultMpb))
+                            {
+                                var tp2 = transformOriginalTiming.GetRedlineAtTime(tp.Offset).Copy();
+                                tp2.Offset = tp.Offset;
+                                return tp2;
+                            }
 
-                        return tp;
-                    }).ToArray();
+                            return tp;
+                        }),
+                    ];
 
                     startPartRedline = startOriginalRedline;
                     break;
@@ -494,25 +502,32 @@ public class PatternGalleryPlacer
                     var tempInOriginalRedlines = transformOriginalTiming.GetRedlinesInRange(startTime, endTime - 2 * Precision.DOUBLE_EPSILON);
 
                     // Replace all parts in the pattern which have the default BPM to timing from the target beatmap.
-                    inPartRedlines = tempInPartRedlines2.Select(tp =>
-                    {
-                        var tp2 = tp.Copy();
-                        tp2.MpB *= transformOriginalTiming.GetMpBAtTime(tp.Offset) / patternDefaultMpb;
-                        return tp2;
-                    }).Concat(tempInOriginalRedlines.Select(tp =>
-                    {
-                        var tp2 = tp.Copy();
-                        tp2.MpB *= transformPatternTiming.GetMpBAtTime(tp.Offset) / patternDefaultMpb;
-                        return tp2;
-                    })).ToArray();
+                    inPartRedlines =
+                    [
+                        .. tempInPartRedlines2.Select(tp =>
+                        {
+                            var tp2 = tp.Copy();
+                            tp2.MpB *= transformOriginalTiming.GetMpBAtTime(tp.Offset) / patternDefaultMpb;
+                            return tp2;
+                        }),
+                        .. tempInOriginalRedlines.Select(tp =>
+                        {
+                            var tp2 = tp.Copy();
+                            tp2.MpB *= transformPatternTiming.GetMpBAtTime(tp.Offset) / patternDefaultMpb;
+                            return tp2;
+                        }),
+                    ];
 
                     startPartRedline = transformPatternTiming.GetRedlineAtTime(startTime).Copy();
                     startPartRedline.MpB *= transformOriginalTiming.GetMpBAtTime(startTime) / patternDefaultMpb;
                     break;
                 default: // Original timing only
                     // Subtract one from the end time to omit BPM changes right on the end of the part.
-                    inPartRedlines = transformOriginalTiming.GetRedlinesInRange(startTime,
-                        Math.Max(startTime, endTime - 2 * Precision.DOUBLE_EPSILON)).ToArray();
+                    inPartRedlines =
+                    [
+                        .. transformOriginalTiming.GetRedlinesInRange(startTime,
+                            Math.Max(startTime, endTime - 2 * Precision.DOUBLE_EPSILON)),
+                    ];
                     startPartRedline = transformOriginalTiming.GetRedlineAtTime(startTime);
                     break;
             }
@@ -720,8 +735,11 @@ public class PatternGalleryPlacer
         // Make new timingpoints changes for the hitsounds and other stuff
 
         // Add redlines
-        timingPointsChanges = transformNewTiming.Redlines.Select(tp =>
-            new TimingPointChange(tp, true, true, uninherited: true, omitFirstBarLine: true, fuzziness: Precision.DOUBLE_EPSILON)).ToList();
+        timingPointsChanges =
+        [
+            .. transformNewTiming.Redlines.Select(tp =>
+                new TimingPointChange(tp, true, true, uninherited: true, omitFirstBarLine: true, fuzziness: Precision.DOUBLE_EPSILON)),
+        ];
 
         // Add SliderVelocity changes for taiko and mania
         if (includePatternSliderVelocity && (targetMode == GameMode.Taiko || targetMode == GameMode.Mania))
@@ -752,7 +770,7 @@ public class PatternGalleryPlacer
             {
                 // Body hitsounds
                 bool vol = ho.IsSlider || ho.IsSpinner;
-                bool sam = ho.IsSlider && ho.SampleSet == 0;
+                bool sam = ho is { IsSlider: true, SampleSet: 0 };
                 bool ind = ho.IsSlider;
                 timingPointsChanges.AddRange(ho.BodyHitsounds.Select(tp =>
                     new TimingPointChange(tp, volume: vol, index: ind, sampleSet: sam)));

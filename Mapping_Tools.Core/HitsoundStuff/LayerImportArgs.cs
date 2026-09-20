@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Mapping_Tools.Core.MathUtil;
 
 // ReSharper disable CompareOfFloatsByEqualityOperator
@@ -9,10 +10,11 @@ namespace Mapping_Tools.Core.HitsoundStuff;
 /// </summary>
 public class LayerImportArgs : IEquatable<LayerImportArgs>
 {
-    /// <inheritdoc />
+    /// <summary>Creates a new instance of <see cref="LayerImportArgs"/> with default values.</summary>
     public LayerImportArgs() { }
 
-    /// <inheritdoc />
+    /// <summary>Creates a new instance of <see cref="LayerImportArgs"/> with the specified import type.</summary>
+    /// <param name="importType">The import type.</param>
     public LayerImportArgs(ImportType importType)
     {
         ImportType = importType;
@@ -184,6 +186,7 @@ public class LayerImportArgs : IEquatable<LayerImportArgs>
 
     /// <summary>Serves as the default hash function. </summary>
     /// <returns>A hash code for the current object.</returns>
+    [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
     public override int GetHashCode()
     {
         int hashCode = -421944398;

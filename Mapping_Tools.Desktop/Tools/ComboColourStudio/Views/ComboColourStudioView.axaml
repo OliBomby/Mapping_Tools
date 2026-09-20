@@ -65,7 +65,7 @@
                                             </ListBox.ItemsPanel>
                                             <ListBox.ItemContainerTheme>
                                                 <ControlTheme TargetType="ListBoxItem">
-                                                    <Setter Property="Padding" Value="5"/>
+                                                    <Setter Property="Padding" Value="5" />
                                                 </ControlTheme>
                                             </ListBox.ItemContainerTheme>
                                             <ListBox.ItemTemplate>
@@ -74,12 +74,15 @@
                                                         <StackPanel Orientation="Horizontal" Spacing="5">
                                                             <Border Width="32" Height="32" CornerRadius="16"
                                                                     Background="{Binding Color, Converter={StaticResource RgbaColourToAvaloniaBrushConverter}}"
-                                                                    VerticalAlignment="Center" ToolTip.Tip="{Binding Name}" />
+                                                                    VerticalAlignment="Center"
+                                                                    ToolTip.Tip="{Binding Name}" />
                                                             <Button Classes="flat" Tag="{Binding}"
                                                                     Width="32" Height="32" Padding="0"
                                                                     CornerRadius="16" ClipToBounds="True"
-                                                                    Click="RemoveSequenceColour_OnClick" ToolTip.Tip="Remove this colour.">
-                                                                <materialIcons:MaterialIcon Kind="Close" Width="18" Height="18" />
+                                                                    Click="RemoveSequenceColour_OnClick"
+                                                                    ToolTip.Tip="Remove this colour.">
+                                                                <materialIcons:MaterialIcon Kind="Close" Width="18"
+                                                                        Height="18" />
                                                             </Button>
                                                         </StackPanel>
                                                     </materialDesign:Card>
@@ -87,13 +90,13 @@
                                             </ListBox.ItemTemplate>
                                         </ListBox>
                                         <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="5,0"
-                                                                        Click="AddSequenceColourButtonClick"
-                                                                        ToolTip.Tip="Add a colour to this sequence.">
+                                                                       Click="AddSequenceColourButtonClick"
+                                                                       ToolTip.Tip="Add a colour to this sequence.">
                                             <materialIcons:MaterialIcon Kind="Plus" Width="22" Height="22" />
                                         </materialDesign:FloatingButton>
                                         <materialDesign:FloatingButton Classes="mini light no-transitions"
-                                                                        Command="{Binding $parent[DataGrid].((vm:ComboColourStudioViewModel)DataContext)?.RemoveSequenceColourCommand}"
-                                                                        ToolTip.Tip="Remove the last colour from this sequence.">
+                                                                       Command="{Binding $parent[DataGrid].((vm:ComboColourStudioViewModel)DataContext)?.RemoveSequenceColourCommand}"
+                                                                       ToolTip.Tip="Remove the last colour from this sequence.">
                                             <materialIcons:MaterialIcon Kind="Minus" Width="22" Height="22" />
                                         </materialDesign:FloatingButton>
                                     </StackPanel>
@@ -110,20 +113,20 @@
                         <StackPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top"
                                     Orientation="Horizontal">
                             <materialDesign:Card>
-                            <ListBox ItemsSource="{Binding ComboColours}">
-                                <ListBox.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Horizontal" />
-                                    </ItemsPanelTemplate>
-                                </ListBox.ItemsPanel>
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate x:DataType="adapter:ObservableSpecialColour">
-                                        <ColorPicker
-                                            Color="{Binding Color, Mode=TwoWay, Converter={StaticResource RgbaColourToAvaloniaColorConverter}}"
-                                            ToolTip.Tip="{Binding Name}" />
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
+                                <ListBox ItemsSource="{Binding ComboColours}">
+                                    <ListBox.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal" />
+                                        </ItemsPanelTemplate>
+                                    </ListBox.ItemsPanel>
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate x:DataType="adapter:ObservableSpecialColour">
+                                            <ColorPicker
+                                                Color="{Binding Color, Mode=TwoWay, Converter={StaticResource RgbaColourToAvaloniaColorConverter}}"
+                                                ToolTip.Tip="{Binding Name}" />
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
                             </materialDesign:Card>
                             <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="10,5,5,5"
                                                            Command="{Binding AddComboColourCommand}"

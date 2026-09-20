@@ -56,4 +56,3 @@ public interface IPatternGalleryFileService
         PatternGalleryCollectionPaths paths,
         string newCollectionFolderName);
 }
-

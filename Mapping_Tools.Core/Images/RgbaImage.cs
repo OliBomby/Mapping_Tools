@@ -15,8 +15,8 @@ public sealed class RgbaImage
     /// <param name="pixels">Four bytes per pixel in R, G, B, A order.</param>
     public RgbaImage(int width, int height, ReadOnlySpan<byte> pixels)
     {
-        if (width <= 0) throw new ArgumentOutOfRangeException(nameof(width));
-        if (height <= 0) throw new ArgumentOutOfRangeException(nameof(height));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(width);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(height);
         if (pixels.Length != checked(width * height * 4))
             throw new ArgumentException("The pixel buffer must contain exactly four bytes per pixel.", nameof(pixels));
 

@@ -1,14 +1,14 @@
 ﻿using Avalonia;
 
-namespace Avalonia.Labs.Controls;
+namespace Mapping_Tools.Desktop.Controls.VirtualizingWrapPanel;
 
 /// <summary>
-/// Provides the size of items displayed in an VirtualizingPanel.
+///     Provides the size of items displayed in an VirtualizingPanel.
 /// </summary>
 public interface IItemSizeProvider
 {
     /// <summary>
-    /// Gets the size for the specified item.
+    ///     Gets the size for the specified item.
     /// </summary>
     Size GetSizeForItem(object item);
 }

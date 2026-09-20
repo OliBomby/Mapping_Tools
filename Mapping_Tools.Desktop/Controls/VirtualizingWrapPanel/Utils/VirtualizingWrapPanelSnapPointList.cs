@@ -1,177 +1,180 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
 
-namespace Avalonia.Labs.Controls.Utils;
+namespace Mapping_Tools.Desktop.Controls.VirtualizingWrapPanel.Utils;
 
-  internal class VirtualizingWrapPanelSnapPointList : IReadOnlyList<double>
+internal class VirtualizingWrapPanelSnapPointList : IReadOnlyList<double>
+{
+    private const int extra_count = 2;
+    private readonly Orientation orientation;
+    private readonly Orientation parentOrientation;
+    private readonly RealizedWrapElements realizedElements;
+    private readonly double size;
+    private readonly SnapPointsAlignment snapPointsAlignment;
+    private readonly int start = -1;
+
+    public VirtualizingWrapPanelSnapPointList(RealizedWrapElements realizedElements, int count, Orientation orientation, Orientation parentOrientation,
+        SnapPointsAlignment snapPointsAlignment, double size)
     {
-        private const int ExtraCount = 2;
-        private readonly RealizedWrapElements _realizedElements;
-        private readonly Orientation _orientation;
-        private readonly Orientation _parentOrientation;
-        private readonly SnapPointsAlignment _snapPointsAlignment;
-        private readonly double _size;
-        private readonly int _start = -1;
-        private readonly int _end;
-
-        public VirtualizingWrapPanelSnapPointList(RealizedWrapElements realizedElements, int count, Orientation orientation, Orientation parentOrientation, SnapPointsAlignment snapPointsAlignment, double size, IItemSizeProvider? itemSizeProvider)
+        this.realizedElements = realizedElements;
+        this.orientation = orientation;
+        this.parentOrientation = parentOrientation;
+        this.snapPointsAlignment = snapPointsAlignment;
+        this.size = size;
+        if (parentOrientation == orientation)
         {
-            _realizedElements = realizedElements;
-            _orientation = orientation;
-            _parentOrientation = parentOrientation;
-            _snapPointsAlignment = snapPointsAlignment;
-            _size = size;
-            if (parentOrientation == orientation)
-            {
-                _start = Math.Max(0, _realizedElements.FirstIndex - ExtraCount);
-                _end = Math.Min(count - 1, _realizedElements.LastIndex + ExtraCount);
-            }
+            start = Math.Max(0, this.realizedElements.FirstIndex - extra_count);
+            Count = Math.Min(count - 1, this.realizedElements.LastIndex + extra_count);
         }
-
-        public double this[int index]
-        {
-            get
-            {
-                if(index < 0 || index >= Count)
-                    throw new ArgumentOutOfRangeException(nameof(index));
-
-                index += _start;
-
-                double snapPoint = 0;
-                var averageElementSize = _size;
-
-                Control? container;
-                switch (_orientation)
-                {
-                    case Orientation.Horizontal:
-                        container = _realizedElements.GetElement(index);
-                        if (container != null)
-                        {
-                            switch (_snapPointsAlignment)
-                            {
-                                case SnapPointsAlignment.Near:
-                                    snapPoint = container.Bounds.Left;
-                                    break;
-                                case SnapPointsAlignment.Center:
-                                    snapPoint = container.Bounds.Center.X;
-                                    break;
-                                case SnapPointsAlignment.Far:
-                                    snapPoint = container.Bounds.Right;
-                                    break;
-                            }
-                        }
-                        else if (index < _realizedElements.FirstIndex)
-                        {
-                            // Estimate position by stepping backward from the first realized element.
-                            var firstElement = _realizedElements.GetElement(_realizedElements.FirstIndex);
-                            double basePosition = firstElement != null
-                                ? firstElement.Bounds.Left
-                                : _realizedElements.FirstIndex * averageElementSize;
-                            int stepsBack = _realizedElements.FirstIndex - index;
-                            snapPoint = basePosition - stepsBack * averageElementSize;
-                            switch (_snapPointsAlignment)
-                            {
-                                case SnapPointsAlignment.Center:
-                                    snapPoint += averageElementSize / 2;
-                                    break;
-                                case SnapPointsAlignment.Far:
-                                    snapPoint += averageElementSize;
-                                    break;
-                            }
-                        }
-                        else
-                        {
-                            // index > LastIndex: estimate forward from the last realized element.
-                            int stepsForward = index - _realizedElements.LastIndex;
-                            var lastElement = _realizedElements.GetElement(_realizedElements.LastIndex);
-                            double basePosition = lastElement != null
-                                ? lastElement.Bounds.Right
-                                : (_realizedElements.LastIndex + 1) * averageElementSize;
-                            snapPoint = basePosition + (stepsForward - 1) * averageElementSize;
-                            switch (_snapPointsAlignment)
-                            {
-                                case SnapPointsAlignment.Center:
-                                    snapPoint += averageElementSize / 2;
-                                    break;
-                                case SnapPointsAlignment.Far:
-                                    snapPoint += averageElementSize;
-                                    break;
-                            }
-                        }
-                        break;
-                    case Orientation.Vertical:
-                        container = _realizedElements.GetElement(index);
-                        if (container != null)
-                        {
-                            switch (_snapPointsAlignment)
-                            {
-                                case SnapPointsAlignment.Near:
-                                    snapPoint = container.Bounds.Top;
-                                    break;
-                                case SnapPointsAlignment.Center:
-                                    snapPoint = container.Bounds.Center.Y;
-                                    break;
-                                case SnapPointsAlignment.Far:
-                                    snapPoint = container.Bounds.Bottom;
-                                    break;
-                            }
-                        }
-                        else if (index < _realizedElements.FirstIndex)
-                        {
-                            // Estimate position by stepping backward from the first realized element.
-                            var firstElement = _realizedElements.GetElement(_realizedElements.FirstIndex);
-                            double basePosition = firstElement != null
-                                ? firstElement.Bounds.Top
-                                : _realizedElements.FirstIndex * averageElementSize;
-                            int stepsBack = _realizedElements.FirstIndex - index;
-                            snapPoint = basePosition - stepsBack * averageElementSize;
-                            switch (_snapPointsAlignment)
-                            {
-                                case SnapPointsAlignment.Center:
-                                    snapPoint += averageElementSize / 2;
-                                    break;
-                                case SnapPointsAlignment.Far:
-                                    snapPoint += averageElementSize;
-                                    break;
-                            }
-                        }
-                        else
-                        {
-                            // index > LastIndex: estimate forward from the last realized element.
-                            int stepsForward = index - _realizedElements.LastIndex;
-                            var lastElement = _realizedElements.GetElement(_realizedElements.LastIndex);
-                            double basePosition = lastElement != null
-                                ? lastElement.Bounds.Bottom
-                                : (_realizedElements.LastIndex + 1) * averageElementSize;
-                            snapPoint = basePosition + (stepsForward - 1) * averageElementSize;
-                            switch (_snapPointsAlignment)
-                            {
-                                case SnapPointsAlignment.Center:
-                                    snapPoint += averageElementSize / 2;
-                                    break;
-                                case SnapPointsAlignment.Far:
-                                    snapPoint += averageElementSize;
-                                    break;
-                            }
-                        }
-                        break;
-                }
-
-                return snapPoint;
-            }
-        }
-
-        public int Count => _parentOrientation != _orientation ? 0 : _end - _start + 1;
-
-        public IEnumerator<double> GetEnumerator()
-        {
-            for (var i = 0; i < Count; i++)
-                yield return this[i];
-        }
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
+
+    public double this[int index]
+    {
+        get
+        {
+            if (index < 0 || index >= Count)
+                throw new ArgumentOutOfRangeException(nameof(index));
+
+            index += start;
+
+            double snapPoint = 0;
+            double averageElementSize = size;
+
+            Control? container;
+            switch (orientation)
+            {
+                case Orientation.Horizontal:
+                    container = realizedElements.GetElement(index);
+                    if (container != null)
+                    {
+                        switch (snapPointsAlignment)
+                        {
+                            case SnapPointsAlignment.Near:
+                                snapPoint = container.Bounds.Left;
+                                break;
+                            case SnapPointsAlignment.Center:
+                                snapPoint = container.Bounds.Center.X;
+                                break;
+                            case SnapPointsAlignment.Far:
+                                snapPoint = container.Bounds.Right;
+                                break;
+                        }
+                    }
+                    else if (index < realizedElements.FirstIndex)
+                    {
+                        // Estimate position by stepping backward from the first realized element.
+                        var firstElement = realizedElements.GetElement(realizedElements.FirstIndex);
+                        double basePosition = firstElement != null
+                            ? firstElement.Bounds.Left
+                            : realizedElements.FirstIndex * averageElementSize;
+                        int stepsBack = realizedElements.FirstIndex - index;
+                        snapPoint = basePosition - stepsBack * averageElementSize;
+                        switch (snapPointsAlignment)
+                        {
+                            case SnapPointsAlignment.Center:
+                                snapPoint += averageElementSize / 2;
+                                break;
+                            case SnapPointsAlignment.Far:
+                                snapPoint += averageElementSize;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        // index > LastIndex: estimate forward from the last realized element.
+                        int stepsForward = index - realizedElements.LastIndex;
+                        var lastElement = realizedElements.GetElement(realizedElements.LastIndex);
+                        double basePosition = lastElement != null
+                            ? lastElement.Bounds.Right
+                            : (realizedElements.LastIndex + 1) * averageElementSize;
+                        snapPoint = basePosition + (stepsForward - 1) * averageElementSize;
+                        switch (snapPointsAlignment)
+                        {
+                            case SnapPointsAlignment.Center:
+                                snapPoint += averageElementSize / 2;
+                                break;
+                            case SnapPointsAlignment.Far:
+                                snapPoint += averageElementSize;
+                                break;
+                        }
+                    }
+
+                    break;
+                case Orientation.Vertical:
+                    container = realizedElements.GetElement(index);
+                    if (container != null)
+                    {
+                        switch (snapPointsAlignment)
+                        {
+                            case SnapPointsAlignment.Near:
+                                snapPoint = container.Bounds.Top;
+                                break;
+                            case SnapPointsAlignment.Center:
+                                snapPoint = container.Bounds.Center.Y;
+                                break;
+                            case SnapPointsAlignment.Far:
+                                snapPoint = container.Bounds.Bottom;
+                                break;
+                        }
+                    }
+                    else if (index < realizedElements.FirstIndex)
+                    {
+                        // Estimate position by stepping backward from the first realized element.
+                        var firstElement = realizedElements.GetElement(realizedElements.FirstIndex);
+                        double basePosition = firstElement != null
+                            ? firstElement.Bounds.Top
+                            : realizedElements.FirstIndex * averageElementSize;
+                        int stepsBack = realizedElements.FirstIndex - index;
+                        snapPoint = basePosition - stepsBack * averageElementSize;
+                        switch (snapPointsAlignment)
+                        {
+                            case SnapPointsAlignment.Center:
+                                snapPoint += averageElementSize / 2;
+                                break;
+                            case SnapPointsAlignment.Far:
+                                snapPoint += averageElementSize;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        // index > LastIndex: estimate forward from the last realized element.
+                        int stepsForward = index - realizedElements.LastIndex;
+                        var lastElement = realizedElements.GetElement(realizedElements.LastIndex);
+                        double basePosition = lastElement != null
+                            ? lastElement.Bounds.Bottom
+                            : (realizedElements.LastIndex + 1) * averageElementSize;
+                        snapPoint = basePosition + (stepsForward - 1) * averageElementSize;
+                        switch (snapPointsAlignment)
+                        {
+                            case SnapPointsAlignment.Center:
+                                snapPoint += averageElementSize / 2;
+                                break;
+                            case SnapPointsAlignment.Far:
+                                snapPoint += averageElementSize;
+                                break;
+                        }
+                    }
+
+                    break;
+            }
+
+            return snapPoint;
+        }
+    }
+
+    public int Count => parentOrientation != orientation ? 0 : field - start + 1;
+
+    public IEnumerator<double> GetEnumerator()
+    {
+        for (int i = 0; i < Count; i++)
+            yield return this[i];
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+}

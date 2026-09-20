@@ -27,5 +27,4 @@ public sealed record ToolExecutionOutput<T>
     ///     Supplies optional success prose for the notification stream.
     /// </summary>
     public string? Summary { get; }
-
 }

@@ -31,20 +31,12 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
 {
     private readonly ICurrentBeatmapLocator currentBeatmap;
 
-    private readonly ProjectDefinition<ComboColourProject> definition = new(
-        "combocolourproject.json",
-        "Combo Colour Studio Projects",
-        () => new ComboColourProject(),
-        "combo-colour-studio-project.json",
-        ToolConfigSchema.ForTool(ComboColourStudioToolDefinition.Definition.Id));
-
     private readonly IFilePicker filePicker;
     private readonly ILiveBeatmapReader liveReader;
     private readonly IUserNotificationService notifications;
 
     private readonly IComboColourStudioService studio;
     private readonly IBeatmapWorkspace workspace;
-    private ObservableColourPoint? selectedColourPoint;
 
     /// <summary>Creates the Combo Colour Studio presentation model.</summary>
     /// <param name="studio">Runs framework-neutral imports and transformations.</param>
@@ -101,12 +93,12 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     /// <summary>Gets or sets the point selected by the editing grid.</summary>
     public ObservableColourPoint? SelectedColourPoint
     {
-        get => selectedColourPoint;
+        get;
         set
         {
-            if (ReferenceEquals(selectedColourPoint, value)) return;
+            if (ReferenceEquals(field, value)) return;
 
-            SetProperty(ref selectedColourPoint, value);
+            SetProperty(ref field, value);
             SelectedSequenceColour = ComboColours.FirstOrDefault();
             OnPropertyChanged(nameof(SelectedSequence));
         }
@@ -116,10 +108,6 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     public IReadOnlyList<ObservableSpecialColour> SelectedSequence =>
         SelectedColourPoint?.ColourSequence ?? [];
 
-    /// <summary>Gets the latest validation or execution summary.</summary>
-    [ObservableProperty]
-    public partial string ResultSummary { get; private set; } = string.Empty;
-
     /// <inheritdoc />
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
@@ -128,7 +116,10 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
 
         if (string.IsNullOrWhiteSpace(path))
         {
-            ResultSummary = "Open a target beatmap in osu! before using QuickRun.";
+            await notifications.PublishAsync(new UserNotification(
+                UserNotificationSeverity.Warning,
+                Tool.DisplayName,
+                "Open a target beatmap in osu! before using QuickRun."));
             return;
         }
 
@@ -138,7 +129,15 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
             cancellationToken));
     }
 
-    ProjectDefinition<ComboColourProject> IShellProjectFeature<ComboColourProject>.ProjectDefinition => definition;
+    ProjectDefinition<ComboColourProject> IShellProjectFeature<ComboColourProject>.ProjectDefinition
+    {
+        get;
+    } = new(
+        "combocolourproject.json",
+        "Combo Colour Studio Projects",
+        () => new ComboColourProject(),
+        "combo-colour-studio-project.json",
+        ToolConfigSchema.ForTool(ComboColourStudioToolDefinition.Definition.Id));
 
     ComboColourProject IShellProjectFeature<ComboColourProject>.Snapshot()
     {
@@ -343,7 +342,11 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         }
         catch (InvalidOperationException exception)
         {
-            ResultSummary = exception.Message;
+            await notifications.PublishAsync(new UserNotification(
+                UserNotificationSeverity.Error,
+                "Could not read current beatmap",
+                exception.Message,
+                exception));
         }
     }
 
@@ -378,11 +381,18 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
 
             RebuildPresentation();
             SelectedColourPoint = ColourPoints.FirstOrDefault();
-            ResultSummary = colourHax ? "Imported colour hax." : "Imported combo colours.";
+            await notifications.PublishAsync(new UserNotification(
+                UserNotificationSeverity.Success,
+                Tool.DisplayName,
+                colourHax ? "Imported colour hax." : "Imported combo colours."));
         }
         catch (Exception exception)
         {
-            ResultSummary = exception.Message;
+            await notifications.PublishAsync(new UserNotification(
+                UserNotificationSeverity.Error,
+                "Combo Colour Studio import failed",
+                exception.Message,
+                exception));
         }
     }
 
@@ -405,12 +415,12 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
             new(defaultPath, currentBeatmap, workspace, filePicker);
         ComboColourStudioImportDialog dialog = new() { DataContext = viewModel };
         viewModel.Close = value => DialogHostInteraction.Close(
-            DialogHostInteraction.RootIdentifier,
+            DialogHostInteraction.ROOT_IDENTIFIER,
             value);
 
         object? result = await DialogHostInteraction.ShowAsync(
             dialog,
-            DialogHostInteraction.RootIdentifier);
+            DialogHostInteraction.ROOT_IDENTIFIER);
         return result as string;
     }
 
@@ -440,7 +450,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         CancellationToken cancellationToken)
     {
         var project = SnapshotProject();
-        var execution = await Execution.ExecuteAsync(
+        await Execution.ExecuteAsync(
             new ToolExecutionRequest<ComboColourStudioRunResult>(
                 Tool.Id,
                 Tool.DisplayName,
@@ -458,9 +468,6 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
                 }),
             CreateProgress(),
             cancellationToken);
-
-        if (execution.Status == ToolExecutionStatus.Succeeded && execution.Value is not null)
-            ResultSummary = $"Successfully exported colours to {execution.Value.ProcessedCount} " + $"{(execution.Value.ProcessedCount == 1 ? "beatmap" : "beatmaps")}!";
     }
 
     private ObservableColourPoint AddPresentationPoint(ColourPoint point)

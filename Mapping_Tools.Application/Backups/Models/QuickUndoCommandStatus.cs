@@ -26,4 +26,3 @@ public enum QuickUndoCommandStatus
     /// </summary>
     Failed,
 }
-

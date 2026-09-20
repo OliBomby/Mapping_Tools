@@ -16,7 +16,6 @@ public sealed class ToolRunButton : Viewbox
     public static readonly StyledProperty<ICommand?> RunCommandProperty =
         AvaloniaProperty.Register<ToolRunButton, ICommand?>(nameof(RunCommand));
 
-    private readonly FloatingButton button;
     private readonly ValidationCommand validationCommand;
 
     static ToolRunButton()
@@ -29,7 +28,7 @@ public sealed class ToolRunButton : Viewbox
     {
         Width = 70;
         validationCommand = new ValidationCommand(this);
-        button = new FloatingButton
+        var runButton = new FloatingButton
         {
             Content = new MaterialIcon
             {
@@ -38,10 +37,10 @@ public sealed class ToolRunButton : Viewbox
                 Kind = MaterialIconKind.Play,
             },
         };
-        button.Classes.Add("no-transitions");
-        ToolTip.SetTip(button, "Run this tool.");
-        button.Command = validationCommand;
-        Child = button;
+        runButton.Classes.Add("no-transitions");
+        ToolTip.SetTip(runButton, "Run this tool.");
+        runButton.Command = validationCommand;
+        Child = runButton;
     }
 
     /// <summary>Gets or sets the command invoked when the play action is selected.</summary>

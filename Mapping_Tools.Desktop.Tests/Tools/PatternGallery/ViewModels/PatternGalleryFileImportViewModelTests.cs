@@ -12,7 +12,7 @@ public sealed class PatternGalleryFileImportViewModelTests
     public void AcceptCommand_WithOptionalTimeValues_ReturnsTypedInput()
     {
         // Arrange
-        PatternGalleryFileImportViewModel viewModel = CreateViewModel("pattern.osu");
+        var viewModel = CreateViewModel("pattern.osu");
         object? result = null;
         viewModel.Close = value => result = value;
         viewModel.StartTime = -1;
@@ -33,7 +33,7 @@ public sealed class PatternGalleryFileImportViewModelTests
     public void AcceptCommand_WithBlankFilePath_LeavesDialogOpenAndReportsPathValidation()
     {
         // Arrange
-        PatternGalleryFileImportViewModel viewModel = CreateViewModel(string.Empty);
+        var viewModel = CreateViewModel(string.Empty);
         object? result = null;
         viewModel.Close = value => result = value;
 
@@ -57,7 +57,7 @@ public sealed class PatternGalleryFileImportViewModelTests
         {
             BeatmapPickerStartLocation = @"C:\Maps",
         };
-        PatternGalleryFileImportViewModel viewModel = CreateViewModel(
+        var viewModel = CreateViewModel(
             "initial.osu",
             filePicker,
             workspace: workspace);
@@ -76,7 +76,7 @@ public sealed class PatternGalleryFileImportViewModelTests
     {
         // Arrange
         var currentBeatmap = new RecordingCurrentBeatmapLocator("current.osu");
-        PatternGalleryFileImportViewModel viewModel = CreateViewModel(
+        var viewModel = CreateViewModel(
             "initial.osu",
             currentBeatmap: currentBeatmap);
 

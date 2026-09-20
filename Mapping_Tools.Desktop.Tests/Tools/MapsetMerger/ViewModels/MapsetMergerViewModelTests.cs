@@ -1,12 +1,10 @@
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
-using Mapping_Tools.Application.Settings.Models;
-using Mapping_Tools.Application.Tools.MapsetMerger;
+using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Tools.MapsetMerger.Contracts;
 using Mapping_Tools.Application.Tools.MapsetMerger.Models;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.MapsetMerger.ViewModels;
-using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Tools.MapsetMerger.ViewModels;
@@ -19,7 +17,10 @@ public sealed class MapsetMergerViewModelTests
     {
         // Arrange
         RecordingMapsetMergerService service = new();
-        var viewModel = CreateViewModel(service);
+        UserNotificationService notifications = new();
+        List<UserNotification> published = [];
+        notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
+        var viewModel = CreateViewModel(service, notifications: notifications);
         viewModel.Mapsets.Add(new MapsetMergerItemViewModel(new TestFilePicker(), "Pack", "first"));
         viewModel.Mapsets.Add(new MapsetMergerItemViewModel(new TestFilePicker(), "Pack", "second"));
 
@@ -30,6 +31,7 @@ public sealed class MapsetMergerViewModelTests
         viewModel.Mapsets.Select(item => item.Name).Should().Equal("Pack", "Pack1");
         service.Project.Should().NotBeNull();
         service.Project!.Mapsets.Select(item => item.Name).Should().Equal("Pack", "Pack1");
+        published.Should().ContainSingle(notification => notification.Message == "Successfully merged 2 mapsets!");
     }
 
     [TestMethod]
@@ -75,11 +77,12 @@ public sealed class MapsetMergerViewModelTests
     private static MapsetMergerViewModel CreateViewModel(
         RecordingMapsetMergerService service,
         TestFilePicker? filePicker = null,
-        TestBeatmapWorkspace? workspace = null)
+        TestBeatmapWorkspace? workspace = null,
+        IUserNotificationService? notifications = null)
     {
-        UserNotificationService notifications = new();
+        var notificationService = notifications ?? new UserNotificationService();
         ToolExecutionService execution = new(
-            notifications,
+            notificationService,
             TimeProvider.System);
         return new MapsetMergerViewModel(
             service,
@@ -87,7 +90,8 @@ public sealed class MapsetMergerViewModelTests
             filePicker ?? new TestFilePicker(),
             workspace ?? new TestBeatmapWorkspace(),
             new RecordingCurrentBeatmapLocator(),
-            new TestApplicationDirectories());
+            new TestApplicationDirectories(),
+            notificationService);
     }
 
     private sealed class RecordingMapsetMergerService : IMapsetMergerService

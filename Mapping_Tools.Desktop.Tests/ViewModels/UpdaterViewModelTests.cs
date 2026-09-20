@@ -6,7 +6,7 @@ using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UpdaterViewModel = Mapping_Tools.Desktop.ViewModels.UpdaterViewModel;
 
-namespace Mapping_Tools.Desktop.Tests.Updates;
+namespace Mapping_Tools.Desktop.Tests.ViewModels;
 
 [TestClass]
 public sealed class UpdaterViewModelTests

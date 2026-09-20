@@ -1,11 +1,14 @@
+using System.Diagnostics.CodeAnalysis;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.ToolHelpers.Sliders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Core.Tests.Tools.SliderVelocity;
 
 [TestClass]
+[SuppressMessage("ReSharper", "AccessToDisposedClosure")]
 public sealed class SliderVelocityFixerTests
 {
     [TestMethod]
@@ -25,7 +28,7 @@ public sealed class SliderVelocityFixerTests
         selected.Time.Should().Be(selectedTime);
         unselected.Time.Should().Be(unselectedTime);
         beatmap.BeatmapTiming.Greenlines.Should().Contain(point =>
-            point.Offset == selectedTime && point.MpB == selectedVelocity);
+            Precision.AlmostEquals(point.Offset, selectedTime) && Precision.AlmostEquals(point.MpB, selectedVelocity));
     }
 
     [TestMethod]
@@ -42,8 +45,8 @@ public sealed class SliderVelocityFixerTests
         // Assert
         selected.Time.Should().Be(selectedTime - 1);
         double.IsNaN(selected.SliderVelocity).Should().BeTrue();
-        beatmap.BeatmapTiming.Redlines.Should().Contain(point => point.Offset == selectedTime - 1);
-        beatmap.BeatmapTiming.Redlines.Should().Contain(point => point.Offset == selectedTime);
+        beatmap.BeatmapTiming.Redlines.Should().Contain(point => Precision.AlmostEquals(point.Offset, selectedTime - 1));
+        beatmap.BeatmapTiming.Redlines.Should().Contain(point => Precision.AlmostEquals(point.Offset, selectedTime));
     }
 
     [TestMethod]

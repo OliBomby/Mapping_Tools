@@ -71,11 +71,9 @@ public static class MetadataManagerEngine
                 .ToList();
             beatmap.SpecialColours.Clear();
             foreach (var specialColour in options.SpecialColours)
-            {
                 beatmap.SpecialColours.Add(
                     specialColour.Name ?? throw new ArgumentException("A special colour must have a name.", nameof(options)),
                     new ComboColour(specialColour.Color));
-            }
         }
 
         if (options.ResetIds)
@@ -87,7 +85,10 @@ public static class MetadataManagerEngine
 
     /// <summary>Validates metadata text, preview timing, and optional colour collections.</summary>
     /// <param name="options">The Metadata Manager settings to validate.</param>
-    /// <exception cref="ArgumentNullException"><paramref name="options" /> or a required collection value is <see langword="null" />.</exception>
+    /// <exception cref="ArgumentNullException">
+    ///     <paramref name="options" /> or a required collection value is
+    ///     <see langword="null" />.
+    /// </exception>
     /// <exception cref="ArgumentException">A required value, colour entry, special-colour name, or preview time is invalid.</exception>
     public static void Validate(MetadataManagerEngineOptions options)
     {
@@ -103,9 +104,6 @@ public static class MetadataManagerEngine
         ArgumentNullException.ThrowIfNull(options.SpecialColours);
         if (!double.IsFinite(options.PreviewTime))
             throw new ArgumentException("Metadata Manager preview time must be finite.", nameof(options));
-        if (options.ComboColours.Any(colour => colour is null)
-            || options.SpecialColours.Any(colour => colour is null))
-            throw new ArgumentException("Metadata Manager contains a null colour entry.", nameof(options));
         if (options.UseComboColours
             && options.SpecialColours.Any(colour => string.IsNullOrWhiteSpace(colour.Name)))
             throw new ArgumentException(

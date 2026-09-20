@@ -12,4 +12,3 @@ public enum PatternOverwriteMode
     /// <summary>Removes existing objects throughout the pattern's time span.</summary>
     CompleteOverwrite,
 }
-

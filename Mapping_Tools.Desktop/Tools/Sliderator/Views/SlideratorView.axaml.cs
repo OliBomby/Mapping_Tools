@@ -11,19 +11,17 @@ using Mapping_Tools.Core.ToolHelpers.Sliders;
 using Mapping_Tools.Core.Tools.Sliderator;
 using Mapping_Tools.Core.Tools.Sliderator.Models;
 using Mapping_Tools.Desktop.Controls;
-using Mapping_Tools.Desktop.Controls.Graph;
 using Mapping_Tools.Desktop.Tools.Sliderator.ViewModels;
-using Mapping_Tools.Desktop.ViewModels;
 
 namespace Mapping_Tools.Desktop.Tools.Sliderator.Views;
 
 /// <summary>Displays Sliderator's graph, source controls, and shared object preview.</summary>
 public sealed partial class SlideratorView : UserControl
 {
-    private readonly Stopwatch previewClock = new();
-    private readonly DispatcherTimer previewTimer;
     private readonly ButtonModifierCapture moveLeftButtonModifiers;
     private readonly ButtonModifierCapture moveRightButtonModifiers;
+    private readonly Stopwatch previewClock = new();
+    private readonly DispatcherTimer previewTimer;
     private SlideratorViewModel? observedViewModel;
 
     /// <summary>Creates the Sliderator view and connects shared Core-backed controls.</summary>
@@ -113,9 +111,7 @@ public sealed partial class SlideratorView : UserControl
                 nameof(SlideratorViewModel.BeatsPerMinute) or
                 nameof(SlideratorViewModel.GraphModeSetting) or
                 nameof(SlideratorViewModel.ShowRedAnchors))
-        {
             UpdateGraphMarkers(viewModel);
-        }
 
         if (sender is SlideratorViewModel markerViewModel
             && args.PropertyName is nameof(SlideratorViewModel.GraphState) or
@@ -125,9 +121,7 @@ public sealed partial class SlideratorView : UserControl
                 nameof(SlideratorViewModel.ShowRedAnchors) or
                 nameof(SlideratorViewModel.ShowGraphAnchors) or
                 nameof(SlideratorViewModel.VisibleHitObject))
-        {
             UpdatePreviewMarkers(markerViewModel);
-        }
     }
 
     private void UpdateGraphMarkers(SlideratorViewModel viewModel)
@@ -145,7 +139,7 @@ public sealed partial class SlideratorView : UserControl
             ? new DoubleMarkerGenerator(0, 1 / 4d, "x")
             : new DoubleMarkerGenerator(0, 1 / 4d);
 
-        if (viewModel.ShowRedAnchors && viewModel.GraphModeSetting == SlideratorGraphMode.Position && viewModel.VisibleHitObject?.IsSlider == true)
+        if (viewModel is { ShowRedAnchors: true, GraphModeSetting: SlideratorGraphMode.Position, VisibleHitObject.IsSlider: true })
         {
             var sourcePath = viewModel.VisibleHitObject.GetSliderPath();
             GraphControlElement.Markers = SliderPathUtil

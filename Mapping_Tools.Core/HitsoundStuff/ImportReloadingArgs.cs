@@ -7,12 +7,23 @@ namespace Mapping_Tools.Core.HitsoundStuff;
 /// </summary>
 public class ImportReloadingArgs : IEquatable<ImportReloadingArgs>
 {
-    /// <inheritdoc />
+    /// <summary>Creates a new instance of <see cref="ImportReloadingArgs" /> with the specified path.</summary>
+    /// <param name="path">The imported beatmap, MIDI, stack, or hitsound source path.</param>
     public ImportReloadingArgs(string path) : this(ImportType.None, path, -1, -1, -1, -1, false, false, false, 0)
     {
     }
 
-    /// <inheritdoc />
+    /// <summary>Creates a new instance of <see cref="ImportReloadingArgs" /> with the specified values.</summary>
+    /// <param name="importType">The source interpretation mode.</param>
+    /// <param name="path">The imported beatmap, MIDI, stack, or hitsound source path.</param>
+    /// <param name="x">The stack X filter, or -1 for any coordinate.</param>
+    /// <param name="y">The stack Y filter, or -1 for any coordinate.</param>
+    /// <param name="lengthRoughness">The MIDI note-length grouping tolerance.</param>
+    /// <param name="velocityRoughness">The MIDI velocity grouping tolerance.</param>
+    /// <param name="discriminateVolumes">Indicates whether hitsound imports split otherwise identical samples by volume.</param>
+    /// <param name="detectDuplicateSamples">Indicates whether audio content is inspected for duplicate samples.</param>
+    /// <param name="removeDuplicates">Indicates whether detected duplicate imports are discarded.</param>
+    /// <param name="offset">The millisecond offset applied to imported events.</param>
     public ImportReloadingArgs(ImportType importType, string path, double x, double y, double lengthRoughness, double velocityRoughness,
         bool discriminateVolumes, bool detectDuplicateSamples, bool removeDuplicates, double offset)
     {

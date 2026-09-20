@@ -20,18 +20,18 @@ public sealed class LegacyProjectCompatibilityTests
     {
         // Arrange
         const string json = """
-                           {
-                             "$type": "Mapping_Tools.Viewmodels.MapCleanerVm, Mapping Tools",
-                             "MapCleanerArgs": {
-                               "$type": "Mapping_Tools.Classes.Tools.MapCleanerArgs, Mapping Tools",
-                               "ResnapObjects": false
-                             }
-                           }
-                           """;
+                            {
+                              "$type": "Mapping_Tools.Viewmodels.MapCleanerVm, Mapping Tools",
+                              "MapCleanerArgs": {
+                                "$type": "Mapping_Tools.Classes.Tools.MapCleanerArgs, Mapping Tools",
+                                "ResnapObjects": false
+                              }
+                            }
+                            """;
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        MapCleanerServiceOptions project = serializer.Deserialize<MapCleanerServiceOptions>(json);
+        var project = serializer.Deserialize<MapCleanerServiceOptions>(json);
 
         // Assert
         project.MapCleanerArgs.ResnapObjects.Should().BeFalse();
@@ -42,15 +42,15 @@ public sealed class LegacyProjectCompatibilityTests
     {
         // Arrange
         const string json = """
-                           {
-                             "$type": "Mapping_Tools.Viewmodels.HitsoundPreviewHelperVM, Mapping Tools",
-                             "Items": []
-                           }
-                           """;
+                            {
+                              "$type": "Mapping_Tools.Viewmodels.HitsoundPreviewHelperVM, Mapping Tools",
+                              "Items": []
+                            }
+                            """;
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        HitsoundPreviewHelperServiceOptions project = serializer.Deserialize<HitsoundPreviewHelperServiceOptions>(json);
+        var project = serializer.Deserialize<HitsoundPreviewHelperServiceOptions>(json);
 
         // Assert
         project.Items.Should().BeEmpty();
@@ -61,15 +61,15 @@ public sealed class LegacyProjectCompatibilityTests
     {
         // Arrange
         const string json = """
-                           {
-                             "$type": "Mapping_Tools.Viewmodels.HitsoundStudioVM, Mapping Tools",
-                             "HitsoundLayers": []
-                           }
-                           """;
+                            {
+                              "$type": "Mapping_Tools.Viewmodels.HitsoundStudioVM, Mapping Tools",
+                              "HitsoundLayers": []
+                            }
+                            """;
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        HitsoundStudioServiceOptions project = serializer.Deserialize<HitsoundStudioServiceOptions>(json);
+        var project = serializer.Deserialize<HitsoundStudioServiceOptions>(json);
 
         // Assert
         project.HitsoundLayers.Should().BeEmpty();
@@ -80,15 +80,15 @@ public sealed class LegacyProjectCompatibilityTests
     {
         // Arrange
         const string json = """
-                           {
-                             "$type": "Mapping_Tools.Viewmodels.PropertyTransformerVM, Mapping Tools",
-                             "MatchFilter": 10.0
-                           }
-                           """;
+                            {
+                              "$type": "Mapping_Tools.Viewmodels.PropertyTransformerVM, Mapping Tools",
+                              "MatchFilter": 10.0
+                            }
+                            """;
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        PropertyTransformerServiceOptions project = serializer.Deserialize<PropertyTransformerServiceOptions>(json);
+        var project = serializer.Deserialize<PropertyTransformerServiceOptions>(json);
 
         // Assert
         project.MatchFilter.Should().Equal(10d);
@@ -99,24 +99,24 @@ public sealed class LegacyProjectCompatibilityTests
     {
         // Arrange
         const string json = """
-                           {
-                             "$type": "Mapping_Tools.Viewmodels.HitsoundPreviewHelperVm, Mapping Tools",
-                             "Items": {
-                               "$type": "System.Collections.ObjectModel.ObservableCollection`1[[Mapping_Tools.Classes.HitsoundStuff.HitsoundZone, Mapping Tools]], System",
-                               "$values": [
-                                 {
-                                   "$type": "Mapping_Tools.Classes.HitsoundStuff.HitsoundZone, Mapping Tools",
-                                   "Name": "legacy zone",
-                                   "Filename": "legacy.wav"
-                                 }
-                               ]
-                             }
-                           }
-                           """;
+                            {
+                              "$type": "Mapping_Tools.Viewmodels.HitsoundPreviewHelperVm, Mapping Tools",
+                              "Items": {
+                                "$type": "System.Collections.ObjectModel.ObservableCollection`1[[Mapping_Tools.Classes.HitsoundStuff.HitsoundZone, Mapping Tools]], System",
+                                "$values": [
+                                  {
+                                    "$type": "Mapping_Tools.Classes.HitsoundStuff.HitsoundZone, Mapping Tools",
+                                    "Name": "legacy zone",
+                                    "Filename": "legacy.wav"
+                                  }
+                                ]
+                              }
+                            }
+                            """;
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        HitsoundPreviewHelperServiceOptions project = serializer.Deserialize<HitsoundPreviewHelperServiceOptions>(json);
+        var project = serializer.Deserialize<HitsoundPreviewHelperServiceOptions>(json);
 
         // Assert
         project.Items.Should().ContainSingle();
@@ -129,26 +129,26 @@ public sealed class LegacyProjectCompatibilityTests
     {
         // Arrange
         const string json = """
-                           {
-                             "$type": "Mapping_Tools.Viewmodels.HitsoundStudioVm, Mapping Tools",
-                             "PreviousSampleSchema": {
-                               "$type": "Mapping_Tools.Classes.HitsoundStuff.SampleSchema, Mapping Tools",
-                               "Normal": {
-                                 "$type": "System.Collections.Generic.List`1[[Mapping_Tools.Classes.HitsoundStuff.SampleGeneratingArgs, Mapping Tools]], mscorlib",
-                                 "$values": [
-                                   {
-                                     "$type": "Mapping_Tools.Classes.HitsoundStuff.SampleGeneratingArgs, Mapping Tools",
-                                     "Path": "legacy.wav"
-                                   }
-                                 ]
-                               }
-                             }
-                           }
-                           """;
+                            {
+                              "$type": "Mapping_Tools.Viewmodels.HitsoundStudioVm, Mapping Tools",
+                              "PreviousSampleSchema": {
+                                "$type": "Mapping_Tools.Classes.HitsoundStuff.SampleSchema, Mapping Tools",
+                                "Normal": {
+                                  "$type": "System.Collections.Generic.List`1[[Mapping_Tools.Classes.HitsoundStuff.SampleGeneratingArgs, Mapping Tools]], mscorlib",
+                                  "$values": [
+                                    {
+                                      "$type": "Mapping_Tools.Classes.HitsoundStuff.SampleGeneratingArgs, Mapping Tools",
+                                      "Path": "legacy.wav"
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                            """;
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        HitsoundStudioServiceOptions project = serializer.Deserialize<HitsoundStudioServiceOptions>(json);
+        var project = serializer.Deserialize<HitsoundStudioServiceOptions>(json);
 
         // Assert
         project.PreviousSampleSchema.Should().NotBeNull();
@@ -161,11 +161,11 @@ public sealed class LegacyProjectCompatibilityTests
     {
         // Arrange
         const string json = """
-                           {
-                             "$type": "System.Collections.Generic.Dictionary`2[[Mapping_Tools.Classes.HitsoundStuff.HitsoundExporter+SampleExportFormat, Mapping Tools],[System.String, mscorlib]], mscorlib",
-                             "Default": "Default"
-                           }
-                           """;
+                            {
+                              "$type": "System.Collections.Generic.Dictionary`2[[Mapping_Tools.Classes.HitsoundStuff.HitsoundExporter+SampleExportFormat, Mapping Tools],[System.String, mscorlib]], mscorlib",
+                              "Default": "Default"
+                            }
+                            """;
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
@@ -182,22 +182,22 @@ public sealed class LegacyProjectCompatibilityTests
     {
         // Arrange
         const string json = """
-                           {
-                             "$type": "Mapping_Tools.Classes.BeatmapHelper.TimingPoint, Mapping Tools",
-                             "Offset": 1000.0,
-                             "MpB": 500.0,
-                             "Meter": {
-                               "$type": "Mapping_Tools.Classes.ExternalFileUtil.TempoSignature, Mapping Tools",
-                               "TempoDenominator": 8,
-                               "TempoNumerator": 7,
-                               "PartialMeasure": true
-                             }
-                           }
-                           """;
+                            {
+                              "$type": "Mapping_Tools.Classes.BeatmapHelper.TimingPoint, Mapping Tools",
+                              "Offset": 1000.0,
+                              "MpB": 500.0,
+                              "Meter": {
+                                "$type": "Mapping_Tools.Classes.ExternalFileUtil.TempoSignature, Mapping Tools",
+                                "TempoDenominator": 8,
+                                "TempoNumerator": 7,
+                                "PartialMeasure": true
+                              }
+                            }
+                            """;
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        TimingPoint timingPoint = serializer.Deserialize<TimingPoint>(json);
+        var timingPoint = serializer.Deserialize<TimingPoint>(json);
 
         // Assert
         timingPoint.Meter.TempoDenominator.Should().Be(8);
@@ -210,29 +210,29 @@ public sealed class LegacyProjectCompatibilityTests
     {
         // Arrange
         const string json = """
-                           {
-                             "DefaultSample": {
-                               "SampleSet": 1,
-                               "Hitsound": 0,
-                               "SamplePath": "default.wav",
-                               "Priority": 3
-                             },
-                             "HitsoundLayers": [
-                               {
-                                 "Name": "legacy layer",
-                                 "ImportType": "Hitsounds",
-                                 "Path": "map.osu",
-                                 "SamplePath": "layer.ogg",
-                                 "Times": [1000.0],
-                                 "Priority": 2
-                               }
-                             ]
-                           }
-                           """;
+                            {
+                              "DefaultSample": {
+                                "SampleSet": 1,
+                                "Hitsound": 0,
+                                "SamplePath": "default.wav",
+                                "Priority": 3
+                              },
+                              "HitsoundLayers": [
+                                {
+                                  "Name": "legacy layer",
+                                  "ImportType": "Hitsounds",
+                                  "Path": "map.osu",
+                                  "SamplePath": "layer.ogg",
+                                  "Times": [1000.0],
+                                  "Priority": 2
+                                }
+                              ]
+                            }
+                            """;
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        HitsoundStudioServiceOptions project = serializer.Deserialize<HitsoundStudioServiceOptions>(json);
+        var project = serializer.Deserialize<HitsoundStudioServiceOptions>(json);
 
         // Assert
         project.DefaultSample.SampleArgs.Path.Should().Be("default.wav");
@@ -248,23 +248,23 @@ public sealed class LegacyProjectCompatibilityTests
     {
         // Arrange
         const string json = """
-                           {
-                             "$type": "Mapping_Tools.Classes.ComboColourStudio.ComboColourEngineOptions, Mapping Tools",
-                             "ComboColours": {
-                               "$type": "System.Collections.ObjectModel.ObservableCollection`1[[Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools]], System",
-                               "$values": [
-                                 {
-                                   "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
-                                   "Name": "Combo1"
-                                 }
-                               ]
-                             }
-                           }
-                           """;
+                            {
+                              "$type": "Mapping_Tools.Classes.ComboColourStudio.ComboColourEngineOptions, Mapping Tools",
+                              "ComboColours": {
+                                "$type": "System.Collections.ObjectModel.ObservableCollection`1[[Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools]], System",
+                                "$values": [
+                                  {
+                                    "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+                                    "Name": "Combo1"
+                                  }
+                                ]
+                              }
+                            }
+                            """;
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        ComboColourEngineOptions project = serializer.Deserialize<ComboColourEngineOptions>(json);
+        var project = serializer.Deserialize<ComboColourEngineOptions>(json);
 
         // Assert
         project.ComboColours.Should().ContainSingle();
@@ -276,29 +276,29 @@ public sealed class LegacyProjectCompatibilityTests
     {
         // Arrange
         const string json = """
-                           {
-                             "$type": "Mapping_Tools.Classes.GeometryDashboard.DataStructure.RelevantObjectCollection.RelevantObjectCollection, Mapping Tools",
-                             "Mapping_Tools.Classes.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools": [
-                               {
-                                 "$type": "Mapping_Tools.Classes.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
-                                 "Child": {
-                                   "$type": "Mapping_Tools.Classes.MathUtil.Vector2, Mapping Tools",
-                                   "X": 12.0,
-                                   "Y": 34.0
-                                 },
-                                 "IsLocked": true
-                               }
-                             ]
-                           }
-                           """;
+                            {
+                              "$type": "Mapping_Tools.Classes.GeometryDashboard.DataStructure.RelevantObjectCollection.RelevantObjectCollection, Mapping Tools",
+                              "Mapping_Tools.Classes.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools": [
+                                {
+                                  "$type": "Mapping_Tools.Classes.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
+                                  "Child": {
+                                    "$type": "Mapping_Tools.Classes.MathUtil.Vector2, Mapping Tools",
+                                    "X": 12.0,
+                                    "Y": 34.0
+                                  },
+                                  "IsLocked": true
+                                }
+                              ]
+                            }
+                            """;
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        RelevantObjectCollection objects = serializer.Deserialize<RelevantObjectCollection>(json);
+        var objects = serializer.Deserialize<RelevantObjectCollection>(json);
 
         // Assert
         objects[typeof(RelevantPoint)].Should().ContainSingle();
-        RelevantPoint point = (RelevantPoint)objects[typeof(RelevantPoint)][0];
+        var point = (RelevantPoint)objects[typeof(RelevantPoint)][0];
         point.Child.Should().Be(new Vector2(12, 34));
         point.IsLocked.Should().BeTrue();
     }

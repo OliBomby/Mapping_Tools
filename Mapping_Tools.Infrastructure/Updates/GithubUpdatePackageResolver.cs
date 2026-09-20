@@ -1,4 +1,5 @@
-using Mapping_Tools.Application.Updates.Contracts;
+using Onova.Services;
+using IPackageResolver = Mapping_Tools.Application.Updates.Contracts.IPackageResolver;
 
 namespace Mapping_Tools.Infrastructure.Updates;
 
@@ -7,7 +8,7 @@ namespace Mapping_Tools.Infrastructure.Updates;
 /// </summary>
 public sealed class GithubUpdatePackageResolver : IPackageResolver
 {
-    private readonly Onova.Services.GithubPackageResolver resolver;
+    private readonly GithubPackageResolver resolver;
 
     /// <summary>
     ///     Creates a GitHub-backed package resolver.
@@ -27,7 +28,7 @@ public sealed class GithubUpdatePackageResolver : IPackageResolver
         ArgumentException.ThrowIfNullOrWhiteSpace(repositoryName);
         ArgumentException.ThrowIfNullOrWhiteSpace(packageFilePattern);
 
-        resolver = new Onova.Services.GithubPackageResolver(
+        resolver = new GithubPackageResolver(
             httpClient,
             repositoryOwner,
             repositoryName,

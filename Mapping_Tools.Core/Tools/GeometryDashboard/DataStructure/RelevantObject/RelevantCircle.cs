@@ -36,7 +36,7 @@ public sealed class RelevantCircle : RelevantDrawable
         switch (other)
         {
             case RelevantPoint point:
-                intersections = new[] { point.Child };
+                intersections = [point.Child];
                 return Precision.AlmostEquals(Vector2.Distance(Child.Centre, point.Child), Child.Radius);
             case RelevantLine line:
                 return Circle.Intersection(Child, line.Child, out intersections);

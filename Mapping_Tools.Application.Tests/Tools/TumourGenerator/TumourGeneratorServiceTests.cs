@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Settings.Models;
@@ -11,6 +12,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Mapping_Tools.Application.Tests.Tools.TumourGenerator;
 
 [TestClass]
+[SuppressMessage("ReSharper", "AccessToDisposedClosure")]
 public sealed class TumourGeneratorServiceTests
 {
     [TestMethod]
@@ -195,7 +197,7 @@ public sealed class TumourGeneratorServiceTests
         RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.Disk));
         TumourGeneratorService service = new(gateway, new ApplicationSettings());
         using CancellationTokenSource cancellation = new();
-        cancellation.Cancel();
+        await cancellation.CancelAsync();
 
         // Act
         Func<Task> act = () => service.RunAsync(
@@ -246,5 +248,4 @@ public sealed class TumourGeneratorServiceTests
             source,
             selected);
     }
-
 }

@@ -17,7 +17,7 @@ public sealed class HitsoundPreviewHelperServiceTests
     public async Task ApplyAsync_WithOrdinaryExecution_DoesNotRequestEditorReload()
     {
         // Arrange
-        RecordingBeatmapEditingGateway gateway = CreateGateway(1);
+        var gateway = CreateGateway(1);
         HitsoundPreviewHelperService service = new(gateway, new ApplicationSettings());
         HitsoundPreviewHelperServiceOptions options = new()
         {
@@ -45,7 +45,7 @@ public sealed class HitsoundPreviewHelperServiceTests
     public async Task ApplyAsync_ProcessesEveryObjectInEveryInputMap()
     {
         // Arrange
-        RecordingBeatmapEditingGateway gateway = CreateGateway(0);
+        var gateway = CreateGateway(0);
         HitsoundPreviewHelperService service = new(gateway, new ApplicationSettings());
         HitsoundPreviewHelperServiceOptions options = new()
         {
@@ -71,7 +71,7 @@ public sealed class HitsoundPreviewHelperServiceTests
     public async Task ApplyAsync_WithoutZones_ThrowsBeforeOpeningBeatmaps()
     {
         // Arrange
-        RecordingBeatmapEditingGateway gateway = CreateGateway(0);
+        var gateway = CreateGateway(0);
         HitsoundPreviewHelperService service = new(gateway, new ApplicationSettings());
 
         // Act
@@ -88,11 +88,10 @@ public sealed class HitsoundPreviewHelperServiceTests
     private static RecordingBeatmapEditingGateway CreateGateway(int selectedObjectCount)
     {
         Beatmap source = new(
-            new List<HitObject>
-            {
-                new("64,96,1000,1,0,0:0:0:0:"),
-                new("400,96,2000,1,0,0:0:0:0:"),
-            },
+            [
+                new HitObject("64,96,1000,1,0,0:0:0:0:"),
+                new HitObject("400,96,2000,1,0,0:0:0:0:"),
+            ],
             [],
             globalSv: 1.4);
         return new RecordingBeatmapEditingGateway
@@ -100,9 +99,11 @@ public sealed class HitsoundPreviewHelperServiceTests
             OpenBeatmapFactory = (path, livePreference) =>
             {
                 Beatmap beatmap = new(source.GetLines());
-                IReadOnlyList<HitObject> selected = beatmap.HitObjects
-                    .Take(selectedObjectCount)
-                    .ToArray();
+                IReadOnlyList<HitObject> selected =
+                [
+                    .. beatmap.HitObjects
+                        .Take(selectedObjectCount),
+                ];
                 return new BeatmapEditingSession(
                     beatmap,
                     path,

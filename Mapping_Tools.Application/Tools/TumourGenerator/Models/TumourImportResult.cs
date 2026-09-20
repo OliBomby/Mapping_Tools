@@ -10,4 +10,3 @@ public sealed record TumourImportResult(
     IReadOnlyList<HitObject> Sliders,
     double CircleSize,
     bool UsedLiveEditor);
-

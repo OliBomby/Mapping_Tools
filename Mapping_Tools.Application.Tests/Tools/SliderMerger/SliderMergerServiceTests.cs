@@ -16,7 +16,7 @@ public sealed class SliderMergerServiceTests
     public async Task MergeAsync_WithSelectedMode_RequiresLiveStateAndSavesChanges()
     {
         // Arrange
-        RecordingBeatmapEditingGateway gateway = CreateGateway();
+        var gateway = CreateGateway();
         SliderMergerService service = new(gateway, new ApplicationSettings());
 
         // Act
@@ -36,7 +36,7 @@ public sealed class SliderMergerServiceTests
     public async Task MergeAsync_WithEverythingMode_UsesPreferLiveForEachPath()
     {
         // Arrange
-        RecordingBeatmapEditingGateway gateway = CreateGateway();
+        var gateway = CreateGateway();
         SliderMergerService service = new(gateway, new ApplicationSettings());
         SliderMergerServiceOptions options = new()
         {
@@ -61,7 +61,7 @@ public sealed class SliderMergerServiceTests
     public async Task MergeAsync_WithBookmarkedMode_UsesBookmarkedObjects()
     {
         // Arrange
-        RecordingBeatmapEditingGateway gateway = CreateGateway();
+        var gateway = CreateGateway();
         SliderMergerService service = new(gateway, new ApplicationSettings());
         SliderMergerServiceOptions options = new()
         {
@@ -82,7 +82,7 @@ public sealed class SliderMergerServiceTests
     public async Task MergeAsync_WithTimeMode_UsesTimeCodeObjects()
     {
         // Arrange
-        RecordingBeatmapEditingGateway gateway = CreateGateway();
+        var gateway = CreateGateway();
         SliderMergerService service = new(gateway, new ApplicationSettings());
         SliderMergerServiceOptions options = new()
         {
@@ -104,7 +104,7 @@ public sealed class SliderMergerServiceTests
     public async Task MergeAsync_WithoutPaths_ThrowsBeforeOpeningBeatmaps()
     {
         // Arrange
-        RecordingBeatmapEditingGateway gateway = CreateGateway();
+        var gateway = CreateGateway();
         SliderMergerService service = new(gateway, new ApplicationSettings());
 
         // Act

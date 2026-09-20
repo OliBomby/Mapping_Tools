@@ -24,43 +24,43 @@
                           EditTriggers="CellClick"
                           UseLogicalScrollable="True"
                           ScrollViewer.VerticalScrollBarVisibility="Auto">
-                <DataGrid.Styles>
-                    <Style Selector="DataGridRow">
-                        <Setter Property="IsSelected"
-                                Value="{ReflectionBinding IsSelected, Mode=TwoWay}" />
-                    </Style>
-                </DataGrid.Styles>
-                <DataGrid.Columns>
-                    <controls:CompactDataGridTextColumn Header="Name"
-                                                        Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
-                    <DataGridTemplateColumn Header="Path" Width="Auto">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate x:DataType="vm:MapsetMergerItemViewModel">
-                                <TextBlock Text="{Binding Path}"
-                                           VerticalAlignment="Center" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate x:DataType="vm:MapsetMergerItemViewModel">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBox Text="{Binding Path, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                             Classes="compact"
-                                             VerticalAlignment="Center"
-                                             Width="200" />
-                                    <materialDesign:FloatingButton Classes="mini light no-transitions"
-                                            Margin="10,0,5,0"
-                                            VerticalAlignment="Center"
-                                            Command="{Binding BrowseCommand}"
-                                            ToolTip.Tip="Browse">
-                                        <materialIcons:MaterialIcon Kind="Folder"
-                                                                    Width="24"
-                                                                    Height="24" />
-                                    </materialDesign:FloatingButton>
-                                </StackPanel>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                </DataGrid.Columns>
+                    <DataGrid.Styles>
+                        <Style Selector="DataGridRow">
+                            <Setter Property="IsSelected"
+                                    Value="{ReflectionBinding IsSelected, Mode=TwoWay}" />
+                        </Style>
+                    </DataGrid.Styles>
+                    <DataGrid.Columns>
+                        <controls:CompactDataGridTextColumn Header="Name"
+                                                            Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+                        <DataGridTemplateColumn Header="Path" Width="Auto">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="vm:MapsetMergerItemViewModel">
+                                    <TextBlock Text="{Binding Path}"
+                                               VerticalAlignment="Center" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                            <DataGridTemplateColumn.CellEditingTemplate>
+                                <DataTemplate x:DataType="vm:MapsetMergerItemViewModel">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBox Text="{Binding Path, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                                 Classes="compact"
+                                                 VerticalAlignment="Center"
+                                                 Width="200" />
+                                        <materialDesign:FloatingButton Classes="mini light no-transitions"
+                                                                       Margin="10,0,5,0"
+                                                                       VerticalAlignment="Center"
+                                                                       Command="{Binding BrowseCommand}"
+                                                                       ToolTip.Tip="Browse">
+                                            <materialIcons:MaterialIcon Kind="Folder"
+                                                                        Width="24"
+                                                                        Height="24" />
+                                        </materialDesign:FloatingButton>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellEditingTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
                 </DataGrid>
             </Grid>
 

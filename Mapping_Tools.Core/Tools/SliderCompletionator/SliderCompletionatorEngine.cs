@@ -1,4 +1,5 @@
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.ToolHelpers.Sliders;
 using Mapping_Tools.Core.Tools.SliderCompletionator.Models;
@@ -42,13 +43,13 @@ public static class SliderCompletionatorEngine
                 "Current editor time must be a finite number.",
                 nameof(currentEditorTime));
 
-        if (options.UseCurrentEditorTime && options.UseEndTime && currentEditorTime is null)
+        if (options is { UseCurrentEditorTime: true, UseEndTime: true } && currentEditorTime is null)
             throw new ArgumentException(
                 "Current editor time is required when current-editor-time mode is enabled.",
                 nameof(currentEditorTime));
 
         int slidersCompleted = 0;
-        double endTime = options.UseCurrentEditorTime && options.UseEndTime
+        double endTime = options is { UseCurrentEditorTime: true, UseEndTime: true }
             ? currentEditorTime!.Value
             : options.EndTime;
         var timing = beatmap.BeatmapTiming;
@@ -67,16 +68,16 @@ public static class SliderCompletionatorEngine
                 double oldVelocity = timing.GetSvAtTime(hitObject.Time);
 
                 double newDuration = options.UseEndTime
-                    ? endTime == -1 && !options.UseCurrentEditorTime
+                    ? Precision.AlmostEquals(endTime, -1) && !options.UseCurrentEditorTime
                         ? oldDuration
                         : endTime - hitObject.Time
-                    : options.Duration == -1
+                    : Precision.AlmostEquals(options.Duration, -1)
                         ? oldDuration
                         : timing.WalkBeatsInMillisecondTime(options.Duration, hitObject.Time) - hitObject.Time;
-                double newLength = options.Length == -1
+                double newLength = Precision.AlmostEquals(options.Length, -1)
                     ? oldLength
                     : hitObject.GetSliderPath(true).Distance * options.Length;
-                double newVelocity = options.SliderVelocity == -1
+                double newVelocity = Precision.AlmostEquals(options.SliderVelocity, -1)
                     ? oldVelocity
                     : -100 / options.SliderVelocity;
 

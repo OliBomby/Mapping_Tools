@@ -7,7 +7,6 @@ namespace Mapping_Tools.Core.Graph;
 /// <summary>Describes one editable anchor and the interpolation leading into it.</summary>
 public sealed class GraphAnchor
 {
-    private IGraphInterpolator interpolator = new SingleCurveInterpolator();
     private double tension;
 
     /// <summary>Creates an anchor with the legacy single-curve interpolation by default.</summary>
@@ -34,13 +33,13 @@ public sealed class GraphAnchor
     /// <exception cref="ArgumentNullException">Thrown when the value is <see langword="null" />.</exception>
     public IGraphInterpolator Interpolator
     {
-        get => interpolator;
+        get;
         set
         {
-            interpolator = value ?? throw new ArgumentNullException(nameof(value));
-            interpolator.P = tension;
+            field = value ?? throw new ArgumentNullException(nameof(value));
+            field.P = tension;
         }
-    }
+    } = new SingleCurveInterpolator();
 
     /// <summary>Gets or sets the interpolation parameter, normally in the range -1 to 1.</summary>
     public double Tension
@@ -49,7 +48,7 @@ public sealed class GraphAnchor
         set
         {
             tension = value;
-            if (Interpolator is not null) Interpolator.P = value;
+            Interpolator.P = value;
         }
     }
 

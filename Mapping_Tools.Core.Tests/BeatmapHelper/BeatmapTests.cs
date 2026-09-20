@@ -18,7 +18,7 @@ public class BeatmapTests
         string expected = File.ReadAllText(path);
 
         // Act
-        var beatmap = new Beatmap(File.ReadAllLines(path).ToList());
+        var beatmap = new Beatmap([.. File.ReadAllLines(path)]);
         // Repository fixtures use LF line endings regardless of the host platform.
         string actual = string.Join("\r\n", beatmap.GetLines());
 
@@ -36,7 +36,7 @@ public class BeatmapTests
         string path = Path.Combine(AppContext.BaseDirectory, "Resources", filename);
 
         // Act
-        var beatmap = new Beatmap(File.ReadAllLines(path).ToList());
+        var beatmap = new Beatmap([.. File.ReadAllLines(path)]);
 
         // Assert
         beatmap.General["Mode"].IntValue.Should().Be(expectedMode);
@@ -47,12 +47,11 @@ public class BeatmapTests
     public void QueryTimeCode_SelectsRequestedComboObjects()
     {
         // Arrange
-        var beatmap = new Beatmap(new List<HitObject>
-        {
-            new("64,96,1000,5,0,0:0:0:0:"),
-            new("128,96,1100,1,0,0:0:0:0:"),
-            new("192,96,1200,1,0,0:0:0:0:"),
-        }, new List<TimingPoint>(), globalSv: 1.4);
+        var beatmap = new Beatmap([
+            new HitObject("64,96,1000,5,0,0:0:0:0:"),
+            new HitObject("128,96,1100,1,0,0:0:0:0:"),
+            new HitObject("192,96,1200,1,0,0:0:0:0:"),
+        ], [], globalSv: 1.4);
 
         // Act
         var matches = beatmap.QueryTimeCode("00:01:000 (1,2) - ").ToList();

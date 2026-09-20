@@ -15,4 +15,3 @@ public enum RhythmGuideSelectionMode
     /// <summary>Creates long-note guide objects where the source rhythm permits them.</summary>
     LongNotes,
 }
-

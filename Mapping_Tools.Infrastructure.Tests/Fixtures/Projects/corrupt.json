@@ -1,1 +1,3 @@
-{"$type":"Mapping_Tools.Viewmodels.MapCleanerVm, Mapping Tools","MapCleanerArgs":
+{
+  "$type": "Mapping_Tools.Viewmodels.MapCleanerVm, Mapping Tools",
+  "MapCleanerArgs":

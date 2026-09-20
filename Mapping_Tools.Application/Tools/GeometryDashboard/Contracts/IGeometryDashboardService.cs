@@ -10,12 +10,6 @@ namespace Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
 /// </summary>
 public interface IGeometryDashboardService : IDisposable
 {
-    /// <summary>
-    ///     Raised after a calculation or command changes the state exposed by
-    ///     <see cref="State" />. Handlers may run on the worker thread.
-    /// </summary>
-    event EventHandler? StateChanged;
-
     /// <summary>Gets the generator models owned by the calculation session.</summary>
     IReadOnlyList<RelevantObjectsGenerator> Generators { get; }
 
@@ -24,6 +18,12 @@ public interface IGeometryDashboardService : IDisposable
 
     /// <summary>Gets whether the calculation worker is currently running.</summary>
     bool IsRunning { get; }
+
+    /// <summary>
+    ///     Raised after a calculation or command changes the state exposed by
+    ///     <see cref="State" />. Handlers may run on the worker thread.
+    /// </summary>
+    event EventHandler? StateChanged;
 
     /// <summary>Starts the calculation worker if it is not already running.</summary>
     void Start();

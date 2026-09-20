@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Mapping_Tools.Infrastructure.Files;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -5,11 +6,17 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Mapping_Tools.Infrastructure.Tests.Files;
 
 [TestClass]
+[SuppressMessage("ReSharper", "AccessToDisposedClosure")]
 public sealed class PhysicalAtomicFileWriterTests : IDisposable
 {
     private readonly string root = Path.Combine(
         Path.GetTempPath(),
         "mapping-tools-atomic-writer-" + Guid.NewGuid().ToString("N"));
+
+    public void Dispose()
+    {
+        if (Directory.Exists(root)) Directory.Delete(root, true);
+    }
 
     [TestInitialize]
     public void Initialize()
@@ -21,11 +28,6 @@ public sealed class PhysicalAtomicFileWriterTests : IDisposable
     public void Cleanup()
     {
         Dispose();
-    }
-
-    public void Dispose()
-    {
-        if (Directory.Exists(root)) Directory.Delete(root, true);
     }
 
     [TestMethod]
@@ -53,12 +55,12 @@ public sealed class PhysicalAtomicFileWriterTests : IDisposable
     {
         // Arrange
         string destination = Path.Combine(root, "document.json");
-        File.WriteAllText(destination, "previous");
+        await File.WriteAllTextAsync(destination, "previous");
         using CancellationTokenSource cancellation = new();
-        cancellation.Cancel();
+        await cancellation.CancelAsync();
 
         // Act
-        Func<Task> act = () => PhysicalAtomicFileWriter.WriteTextAsync(
+        var act = () => PhysicalAtomicFileWriter.WriteTextAsync(
             destination,
             "replacement",
             PhysicalAtomicFileWriter.Utf8WithoutBom,

@@ -55,7 +55,6 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
                                      ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
         this.timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
         this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
-        this.settings.RecentMaps ??= [];
         RemoveInvalidRecentEntries();
     }
 
@@ -254,7 +253,7 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
 
     private void RemoveInvalidRecentEntries()
     {
-        settings.RecentMaps.RemoveAll(recent => recent is null || string.IsNullOrWhiteSpace(recent.Path) || recent.DisplayDate is null);
+        settings.RecentMaps.RemoveAll(recent => string.IsNullOrWhiteSpace(recent.Path));
         while (settings.RecentMaps.Count > recent_map_limit) settings.RecentMaps.RemoveAt(settings.RecentMaps.Count - 1);
     }
 

@@ -1,7 +1,7 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Models;
-using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.MapCleaner;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
@@ -17,7 +17,7 @@ public sealed class MapCleanerServiceTests
     {
         // Arrange
         BeatmapEditingSession editor = new(
-            File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "Fixtures", "Beatmaps", "standard-feature-rich.osu")).ToList(),
+            (await File.ReadAllLinesAsync(Path.Combine(AppContext.BaseDirectory, "Fixtures", "Beatmaps", "standard-feature-rich.osu"))).ToList(),
             new NoOpTextFileStore
             {
                 ParentFolderResolver = _ => @"C:\set",
@@ -68,5 +68,4 @@ public sealed class MapCleanerServiceTests
             return Task.FromResult(0);
         }
     }
-
 }

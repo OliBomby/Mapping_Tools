@@ -6,4 +6,3 @@ namespace Mapping_Tools.Application.Tools.SliderCompletionator;
 public sealed record SliderCompletionatorResult(
     IReadOnlyList<string> ProcessedPaths,
     int SlidersCompleted);
-

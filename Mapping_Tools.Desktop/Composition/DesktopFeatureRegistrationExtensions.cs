@@ -29,8 +29,8 @@ internal static class DesktopFeatureRegistrationExtensions
             "Application",
             "Paths, backup policy, Editor Reader, and application theme.",
             ["settings", "paths", "backups", "editor reader", "theme"],
-            horizontalScrollBarVisibility: ScrollBarVisibility.Auto,
-            verticalScrollBarVisibility: ScrollBarVisibility.Auto);
+            ScrollBarVisibility.Auto,
+            ScrollBarVisibility.Auto);
 
         var catalog = ToolDefinitionCatalog.Discover(toolAssemblies);
         catalog.RegisterServices(services);
@@ -43,8 +43,7 @@ internal static class DesktopFeatureRegistrationExtensions
         return services;
     }
 
-    private static IServiceCollection AddShellFeature<TViewModel>(
-        this IServiceCollection services,
+    private static void AddShellFeature<TViewModel>(this IServiceCollection services,
         string id,
         string displayName,
         string category,
@@ -64,7 +63,5 @@ internal static class DesktopFeatureRegistrationExtensions
             provider.GetRequiredService<TViewModel>,
             horizontalScrollBarVisibility,
             verticalScrollBarVisibility));
-
-        return services;
     }
 }

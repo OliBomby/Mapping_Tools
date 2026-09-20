@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Desktop.Validation;
 
 namespace Mapping_Tools.Desktop.ViewModels.Dialogs;

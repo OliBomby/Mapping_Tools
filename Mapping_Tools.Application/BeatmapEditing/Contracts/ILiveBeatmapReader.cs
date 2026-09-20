@@ -18,4 +18,3 @@ public interface ILiveBeatmapReader
     /// </returns>
     Task<LiveBeatmapSnapshot?> ReadAsync(CancellationToken cancellationToken = default);
 }
-

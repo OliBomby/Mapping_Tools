@@ -36,11 +36,11 @@ public sealed class RelevantLine : RelevantDrawable
         switch (other)
         {
             case RelevantPoint point:
-                intersections = new[] { point.Child };
+                intersections = [point.Child];
                 return Precision.AlmostEquals(Line2.Distance(Child, point.Child), 0);
             case RelevantLine line:
                 bool isIntersecting = Line2.Intersection(Child, line.Child, out var intersection);
-                intersections = new[] { intersection };
+                intersections = [intersection];
                 return isIntersecting;
             case RelevantCircle circle:
                 return Circle.Intersection(circle.Child, Child, out intersections);
@@ -66,4 +66,3 @@ public sealed class RelevantLine : RelevantDrawable
         return Line2.Distance(Child, line.Child.PositionVector) + angleDiff;
     }
 }
-

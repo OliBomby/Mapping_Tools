@@ -1,20 +1,17 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
-using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
-using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.TumourGenerator;
 using Mapping_Tools.Application.Tools.TumourGenerator.Models;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
-using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.ToolHelpers.Sliders.Newgen;
 using Mapping_Tools.Core.Tools.TumourGenerator;
 using Mapping_Tools.Core.Tools.TumourGenerator.Models;
@@ -22,8 +19,8 @@ using Mapping_Tools.Core.Tools.TumourGenerator.Templates;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
-using Mapping_Tools.Desktop.Tools.TumourGenerator.ViewModels.Adapters;
 using Mapping_Tools.Desktop.Tools.TumourGenerator.Models;
+using Mapping_Tools.Desktop.Tools.TumourGenerator.ViewModels.Adapters;
 using Mapping_Tools.Desktop.ViewModels;
 
 namespace Mapping_Tools.Desktop.Tools.TumourGenerator.ViewModels;
@@ -32,31 +29,22 @@ namespace Mapping_Tools.Desktop.Tools.TumourGenerator.ViewModels;
 ///     Owns Tumour Generator 2 settings, graph-backed layers, preview state,
 ///     project persistence, and ordinary or QuickRun execution.
 /// </summary>
+[SuppressMessage("ReSharper", "UnusedParameterInPartialMethod")]
 public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     IShellProjectFeature<TumourGeneratorProject>,
     IQuickRun,
     IShellFeatureActivation,
     IDisposable
 {
-    private readonly ProjectDefinition<TumourGeneratorProject> definition = new(
-        "tumourgeneratorproject.json",
-        "Tumour Generator Projects",
-        static () => new TumourGeneratorProject(),
-        "tumour-generator-project.json",
-        ToolConfigSchema.ForTool(TumourGeneratorToolDefinition.Definition.Id));
-
     private readonly IDialogService dialogs;
 
     private readonly ITumourGeneratorService generator;
-    private readonly object previewGate = new();
+    private readonly Lock previewGate = new();
     private readonly DesktopApplicationSettings settings;
     private readonly IBeatmapWorkspace workspace;
-    private int currentLayerIndex;
     private bool disposed;
     private bool isActive;
     private CancellationTokenSource? previewCancellation;
-    private HitObject previewHitObject = new("0,0,0,2,0,L|256:0,1,256");
-    private HitObject? tumouredPreviewHitObject;
 
     /// <summary>
     ///     Creates the Tumour Generator 2 presentation model.
@@ -126,10 +114,12 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets whether slider velocity is corrected after generation.</summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(RemoveSliderTicksEnabled))]
     public partial bool FixSv { get; set; } = true;
 
     /// <summary>Gets or sets whether corrected velocity is delegated to BPM redlines.</summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(RemoveSliderTicksEnabled))]
     public partial bool DelegateToBpm { get; set; }
 
     /// <summary>Gets or sets whether delegated velocity removes slider ticks.</summary>
@@ -142,6 +132,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     /// <summary>Gets or sets whether advanced layer controls are visible.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(TumourStartSliderMin))]
+    [NotifyPropertyChangedFor(nameof(TumourRangeSliderMax))]
     [NotifyPropertyChangedFor(nameof(TumourParameterGraphVisible))]
     public partial bool AdvancedOptions { get; set; }
 
@@ -158,24 +149,24 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     /// <summary>Gets or sets the slider displayed in the preview.</summary>
     public HitObject PreviewHitObject
     {
-        get => previewHitObject;
+        get;
         set
         {
             ArgumentNullException.ThrowIfNull(value);
-            if (ReferenceEquals(previewHitObject, value)) return;
+            if (ReferenceEquals(field, value)) return;
 
-            SetProperty(ref previewHitObject, value);
+            SetProperty(ref field, value);
             QueuePreview();
         }
-    }
+    } = new("0,0,0,2,0,L|256:0,1,256");
 
     /// <summary>Gets the most recently generated preview slider.</summary>
     public HitObject? TumouredPreviewHitObject
     {
-        get => tumouredPreviewHitObject;
+        get;
         private set
         {
-            if (SetProperty(ref tumouredPreviewHitObject, value)) IsProcessingPreview = false;
+            if (SetProperty(ref field, value)) IsProcessingPreview = false;
         }
     }
 
@@ -186,11 +177,11 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     /// <summary>Gets or sets the selected layer index.</summary>
     public int CurrentLayerIndex
     {
-        get => currentLayerIndex;
+        get;
         set
         {
             int normalized = Math.Clamp(value, 0, Math.Max(0, TumourLayers.Count - 1));
-            if (!SetProperty(ref currentLayerIndex, normalized)) return;
+            if (!SetProperty(ref field, normalized)) return;
 
             OnPropertyChanged(nameof(CurrentLayer));
             OnPropertyChanged(nameof(TumourParameterGraphVisible));
@@ -315,7 +306,15 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     }
 
     /// <inheritdoc />
-    ProjectDefinition<TumourGeneratorProject> IShellProjectFeature<TumourGeneratorProject>.ProjectDefinition => definition;
+    ProjectDefinition<TumourGeneratorProject> IShellProjectFeature<TumourGeneratorProject>.ProjectDefinition
+    {
+        get;
+    } = new(
+        "tumourgeneratorproject.json",
+        "Tumour Generator Projects",
+        static () => new TumourGeneratorProject(),
+        "tumour-generator-project.json",
+        ToolConfigSchema.ForTool(TumourGeneratorToolDefinition.Definition.Id));
 
     /// <inheritdoc />
     TumourGeneratorProject IShellProjectFeature<TumourGeneratorProject>.Snapshot()
@@ -337,7 +336,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         try
         {
             path = ImportModeSetting == HitObjectSelectionMode.Selected
-                ? await workspace.ResolveQuickRunBeatmapAsync(updateSelection: false)
+                ? await workspace.ResolveQuickRunBeatmapAsync(false)
                 : workspace.SelectedPaths.FirstOrDefault();
         }
         catch (OperationCanceledException)
@@ -479,10 +478,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     /// <inheritdoc />
     protected override bool PrepareRun()
     {
-        if (!base.PrepareRun())
-        {
-            return false;
-        }
+        if (!base.PrepareRun()) return false;
 
         return true;
     }
@@ -500,22 +496,6 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     partial void OnDebugConstructionChanged(bool value)
     {
         QueuePreview();
-    }
-
-    partial void OnFixSvChanged(bool value)
-    {
-        OnPropertyChanged(nameof(RemoveSliderTicksEnabled));
-    }
-
-    partial void OnDelegateToBpmChanged(bool value)
-    {
-        OnPropertyChanged(nameof(RemoveSliderTicksEnabled));
-    }
-
-    partial void OnAdvancedOptionsChanged(bool value)
-    {
-        OnPropertyChanged(nameof(TumourStartSliderMin));
-        OnPropertyChanged(nameof(TumourRangeSliderMax));
     }
 
     private void InsertAfterCurrent(ObservableTumourLayer layer)
@@ -650,7 +630,6 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
                 }),
             CreateProgress(),
             cancellationToken);
-
     }
 
     private TumourGeneratorProject Snapshot()
@@ -697,7 +676,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     private void Install(TumourGeneratorProject project)
     {
         ImportModeSetting = project.ImportModeSetting;
-        TimeCode = project.TimeCode ?? string.Empty;
+        TimeCode = project.TimeCode;
         JustMiddleAnchors = project.JustMiddleAnchors;
         Scale = project.Scale;
         DebugConstruction = project.DebugConstruction;
@@ -707,7 +686,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         AdvancedOptions = project.AdvancedOptions;
 
         TumourLayers.Clear();
-        foreach (var layer in project.TumourLayers ?? [])
+        foreach (var layer in project.TumourLayers)
         {
             ObservableTumourLayer observableLayer = new(layer.Copy());
             TumourLayers.Add(observableLayer);

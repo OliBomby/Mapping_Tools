@@ -13,8 +13,8 @@ public sealed class SliderMergerFixtureTests : TransformationFixtureTestBase
     public async Task MergeAsync_AcceptedFixture_ProducesEquivalentOutput(string fixtureName)
     {
         // Arrange
-        using FixtureContext fixture = CreateFixture("slider-merger", fixtureName);
-        SliderMergerServiceOptions project = fixture.ReadProject<SliderMergerServiceOptions>();
+        using var fixture = CreateFixture("slider-merger", fixtureName);
+        var project = fixture.ReadProject<SliderMergerServiceOptions>();
         SliderMergerService service = new(fixture.Gateway, new ApplicationSettings());
 
         // Act

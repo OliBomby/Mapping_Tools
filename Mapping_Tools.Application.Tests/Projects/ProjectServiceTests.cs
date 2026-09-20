@@ -15,11 +15,11 @@ public sealed class ProjectServiceTests
     {
         // Arrange
         // Act
-        Action act1 = () => new ProjectDefinition<string>("nested/project.json", "Projects", () => "");
+        Action act1 = () => _ = new ProjectDefinition<string>("nested/project.json", "Projects", () => "");
 
         // Assert
         act1.Should().Throw<ArgumentException>();
-        Action act2 = () => new ProjectDefinition<string>("project.json", "../Projects", () => "");
+        Action act2 = () => _ = new ProjectDefinition<string>("project.json", "../Projects", () => "");
 
         act2.Should().Throw<ArgumentException>();
     }
@@ -66,7 +66,7 @@ public sealed class ProjectServiceTests
         store.MissingPaths.Add(currentPath);
 
         // Act
-        TestProject project = await service.LoadAutoSaveAsync(definition);
+        var project = await service.LoadAutoSaveAsync(definition);
 
         // Assert
         project.Name.Should().Be("loaded");
@@ -118,12 +118,13 @@ public sealed class ProjectServiceTests
         FakeProjectStore store = new();
         var service = CreateService(new RecordingFilePicker(), store);
         using CancellationTokenSource cancellation = new();
-        cancellation.Cancel();
+        await cancellation.CancelAsync();
 
         // Act
         var act3 = () => service.AutoSaveAsync(
             CreateDefinition(),
             new TestProject("cancelled"),
+            // ReSharper disable once AccessToDisposedClosure
             cancellationToken: cancellation.Token);
 
         // Assert
@@ -295,5 +296,4 @@ public sealed class ProjectServiceTests
             return Task.FromResult((TProject)(object)ProjectToLoad);
         }
     }
-
 }

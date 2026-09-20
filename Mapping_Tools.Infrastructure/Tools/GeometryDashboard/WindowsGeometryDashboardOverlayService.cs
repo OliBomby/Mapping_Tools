@@ -17,7 +17,7 @@ public sealed class WindowsGeometryDashboardOverlayService : IGeometryDashboardO
     private readonly WindowsGeometryDashboardCoordinateContext coordinates;
     private readonly WindowsGeometryDashboardOverlayHost host;
     private readonly Func<bool> isWindows;
-    private readonly object gate = new();
+    private readonly Lock gate = new();
     private readonly TaskCompletionSource<uint> windowThreadId = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private Thread? windowThread;
     private Action? windowAction;
@@ -48,7 +48,15 @@ public sealed class WindowsGeometryDashboardOverlayService : IGeometryDashboardO
     }
 
     /// <inheritdoc />
-    public bool IsSupported => !disposed && isWindows();
+    public bool IsSupported
+    {
+        get
+        {
+            lock (gate) {
+                return !disposed && isWindows();
+            }
+        }
+    }
 
     /// <inheritdoc />
     public bool IsVisible => host.IsVisible;
@@ -121,7 +129,6 @@ public sealed class WindowsGeometryDashboardOverlayService : IGeometryDashboardO
                 windowThread.Join();
             }
             else host.Dispose();
-            GC.SuppressFinalize(this);
         }
     }
 
@@ -164,7 +171,7 @@ public sealed class WindowsGeometryDashboardOverlayService : IGeometryDashboardO
                 if (result == 0) break;
                 if (result == -1) throw new Win32Exception(Marshal.GetLastWin32Error());
 
-                if (message.Window == 0 && message.Id == window_action_message)
+                if (message is { Window: 0, Id: window_action_message })
                 {
                     var action = Interlocked.Exchange(ref windowAction, null);
                     var completion = windowCompletion!;

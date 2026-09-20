@@ -16,7 +16,7 @@ public sealed class CompactDataGridTextColumn : DataGridTextColumn
     /// <returns>The generated compact text-box editor.</returns>
     protected override Control GenerateEditingElementDirect(DataGridCell cell, object dataItem)
     {
-        Control element = base.GenerateEditingElementDirect(cell, dataItem);
+        var element = base.GenerateEditingElementDirect(cell, dataItem);
         if (element is TextBox textBox && !textBox.Classes.Contains("compact"))
             textBox.Classes.Add("compact");
 

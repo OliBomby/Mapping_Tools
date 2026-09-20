@@ -166,7 +166,7 @@ public sealed class TumourGeneratorEngineTests
         TumourGeneratorEngineOptions options = new();
 
         // Act
-        Action act = () => TumourGeneratorEngine.Validate(options);
+        var act = () => TumourGeneratorEngine.Validate(options);
 
         // Assert
         act.Should().Throw<ArgumentException>()
@@ -182,7 +182,7 @@ public sealed class TumourGeneratorEngineTests
         TumourGeneratorEngineOptions options = new() { TumourLayers = [layer] };
 
         // Act
-        Action act = () => TumourGeneratorEngine.Validate(options);
+        var act = () => TumourGeneratorEngine.Validate(options);
 
         // Assert
         act.Should().Throw<ArgumentException>()
@@ -199,7 +199,7 @@ public sealed class TumourGeneratorEngineTests
         };
 
         // Act
-        Action act = () => TumourGeneratorEngine.Validate(options);
+        var act = () => TumourGeneratorEngine.Validate(options);
 
         // Assert
         act.Should().NotThrow();

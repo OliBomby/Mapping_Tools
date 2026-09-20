@@ -3,7 +3,6 @@ using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.TumourGenerator.Models;
-using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.ToolHelpers.Sliders;
@@ -140,5 +139,4 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
             throw new ArgumentException("Tumour Generator contains an unknown import mode.", nameof(project));
         TumourGeneratorEngine.Validate(project);
     }
-
 }

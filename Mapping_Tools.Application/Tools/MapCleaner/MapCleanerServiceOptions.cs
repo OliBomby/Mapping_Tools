@@ -13,6 +13,5 @@ public class MapCleanerServiceOptions
     {
         /// <summary>Gets or sets whether unused samples are moved to recoverable storage.</summary>
         public bool RemoveUnusedSamples { get; set; }
-
     }
 }

@@ -10,4 +10,3 @@ public sealed record MapsetMergerResult(
     int BeatmapsWritten,
     int StoryboardsWritten,
     int AssetsCopied);
-

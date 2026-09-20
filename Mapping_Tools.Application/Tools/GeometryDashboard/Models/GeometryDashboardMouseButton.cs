@@ -8,4 +8,3 @@ public enum GeometryDashboardMouseButton
     /// <summary>The primary/left pointer button.</summary>
     Left,
 }
-

@@ -107,7 +107,7 @@ public class RationalBeatDivisor : IBeatDivisor
     /// <returns>Divisors for 1/16 and 1/12 of a beat.</returns>
     public static IBeatDivisor[] GetDefaultBeatDivisors()
     {
-        return new IBeatDivisor[] { new RationalBeatDivisor(16), new RationalBeatDivisor(12) };
+        return [new RationalBeatDivisor(16), new RationalBeatDivisor(12)];
     }
 
     /// <summary>

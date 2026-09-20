@@ -6,4 +6,3 @@ namespace Mapping_Tools.Application.Tools.SliderMerger;
 public sealed record SliderMergerResult(
     IReadOnlyList<string> ProcessedPaths,
     int ObjectsMerged);
-

@@ -6,4 +6,3 @@ namespace Mapping_Tools.Application.Backups.Models;
 /// <param name="Path">The complete file path.</param>
 /// <param name="CreatedAt">The filesystem creation timestamp used by legacy ordering.</param>
 public sealed record StoredBeatmapBackup(string Path, DateTimeOffset CreatedAt);
-

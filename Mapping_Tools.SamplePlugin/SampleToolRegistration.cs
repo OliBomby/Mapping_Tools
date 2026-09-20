@@ -1,5 +1,5 @@
-using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Projects.Models;
+using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Desktop.Plugin;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,9 +16,6 @@ public sealed class SampleToolRegistration : IMappingToolDefinition
 
     /// <inheritdoc />
     public ToolScrollBarVisibility VerticalScrollBarVisibility => ToolScrollBarVisibility.Auto;
-
-    /// <inheritdoc />
-    public int Order => 10_000;
 
     /// <inheritdoc />
     public ToolDefinition Definition => SampleToolDefinition.Definition;

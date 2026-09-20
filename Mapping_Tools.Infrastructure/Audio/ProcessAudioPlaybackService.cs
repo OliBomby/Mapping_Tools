@@ -64,19 +64,21 @@ public sealed class ProcessAudioPlaybackService : IAudioPlaybackService
 
     private sealed class ProcessAudioPlaybackSession : IAudioPlaybackSession
     {
-        private readonly object gate = new();
         private readonly AudioClip clip;
-        private readonly string path;
-        private readonly TimeSpan duration;
-        private readonly bool loop;
+
         private readonly TaskCompletionSource<object?> completion =
             new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        private readonly TimeSpan duration;
+        private readonly Lock gate = new();
+        private readonly bool loop;
         private readonly CancellationTokenSource monitorCancellation = new();
+        private readonly string path;
         private readonly Stopwatch stopwatch = new();
-        private Process? process;
-        private AudioPlaybackState state = AudioPlaybackState.Stopped;
         private TimeSpan contentOffset;
         private bool disposed;
+        private Process? process;
+        private AudioPlaybackState state = AudioPlaybackState.Stopped;
 
         public ProcessAudioPlaybackSession(
             string path,
@@ -94,7 +96,10 @@ public sealed class ProcessAudioPlaybackService : IAudioPlaybackService
         {
             get
             {
-                lock (gate) return state;
+                lock (gate)
+                {
+                    return state;
+                }
             }
         }
 
@@ -104,28 +109,13 @@ public sealed class ProcessAudioPlaybackService : IAudioPlaybackService
             {
                 lock (gate)
                 {
-                    TimeSpan position = contentOffset + stopwatch.Elapsed;
+                    var position = contentOffset + stopwatch.Elapsed;
                     return loop ? position : Min(position, duration);
                 }
             }
         }
 
         public Task Completion => completion.Task;
-
-        public void Start()
-        {
-            WriteClip(path, clip, TimeSpan.Zero);
-            Process started = StartPlayerProcess(path);
-            lock (gate)
-            {
-                ObjectDisposedException.ThrowIf(disposed, this);
-                process = started;
-                state = AudioPlaybackState.Playing;
-                stopwatch.Restart();
-            }
-
-            _ = MonitorAsync(started, monitorCancellation.Token);
-        }
 
         public void Pause()
         {
@@ -212,6 +202,21 @@ public sealed class ProcessAudioPlaybackService : IAudioPlaybackService
             return ValueTask.CompletedTask;
         }
 
+        public void Start()
+        {
+            WriteClip(path, clip, TimeSpan.Zero);
+            var started = StartPlayerProcess(path);
+            lock (gate)
+            {
+                ObjectDisposedException.ThrowIf(disposed, this);
+                process = started;
+                state = AudioPlaybackState.Playing;
+                stopwatch.Restart();
+            }
+
+            _ = MonitorAsync(started, monitorCancellation.Token);
+        }
+
         private async Task MonitorAsync(Process monitored, CancellationToken cancellationToken)
         {
             try
@@ -246,11 +251,10 @@ public sealed class ProcessAudioPlaybackService : IAudioPlaybackService
             }
 
             if (restart)
-            {
                 try
                 {
                     WriteClip(path, clip, TimeSpan.Zero);
-                    Process next = StartPlayerProcess(path);
+                    var next = StartPlayerProcess(path);
                     lock (gate)
                     {
                         if (disposed)
@@ -272,11 +276,8 @@ public sealed class ProcessAudioPlaybackService : IAudioPlaybackService
                         completion.TrySetException(exception);
                     }
                 }
-            }
             else
-            {
                 TryDelete(path);
-            }
         }
 
         private void Stop()
@@ -305,7 +306,7 @@ public sealed class ProcessAudioPlaybackService : IAudioPlaybackService
 
             try
             {
-                if (!process.HasExited) process.Kill(entireProcessTree: true);
+                if (!process.HasExited) process.Kill(true);
             }
             catch (InvalidOperationException)
             {
@@ -322,7 +323,6 @@ public sealed class ProcessAudioPlaybackService : IAudioPlaybackService
         private static Process StartPlayerProcess(string path)
         {
             foreach (var command in GetPlayerCommands(path))
-            {
                 try
                 {
                     var info = new ProcessStartInfo(command.FileName)
@@ -339,7 +339,6 @@ public sealed class ProcessAudioPlaybackService : IAudioPlaybackService
                 catch (Win32Exception) when (!OperatingSystem.IsWindows())
                 {
                 }
-            }
 
             throw new PlatformNotSupportedException(
                 "No supported native audio player was found. Install afplay, paplay, aplay, or ffplay.");

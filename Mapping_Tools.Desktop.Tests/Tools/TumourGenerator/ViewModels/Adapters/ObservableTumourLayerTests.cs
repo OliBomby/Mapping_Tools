@@ -13,7 +13,7 @@ public sealed class ObservableTumourLayerTests
     public void ScalarProjection_RefreshingFromGraph_DoesNotReplaceGraph()
     {
         // Arrange
-        TumourLayer model = TumourLayer.GetDefaultLayer();
+        var model = TumourLayer.GetDefaultLayer();
         model.TumourScale = new GraphState(
             [new GraphAnchor(new Vector2(0, 10)), new GraphAnchor(new Vector2(0.5, 30)), new GraphAnchor(new Vector2(1, 20))],
             0,

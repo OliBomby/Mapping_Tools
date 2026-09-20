@@ -1,4 +1,3 @@
-using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
@@ -11,7 +10,7 @@ namespace Mapping_Tools.Application.Execution.ToolExecution;
 /// </summary>
 public sealed class ToolExecutionService : IToolExecutionService
 {
-    private readonly object gate = new();
+    private readonly Lock gate = new();
     private readonly IUserNotificationService notifications;
 
     private readonly Dictionary<string, RunningOperation> running =
@@ -102,7 +101,7 @@ public sealed class ToolExecutionService : IToolExecutionService
     /// <inheritdoc />
     public async Task StopAsync(CancellationToken cancellationToken = default)
     {
-        stopping.Cancel();
+        await stopping.CancelAsync();
         Task[] tasks;
         RunningOperation[] operations;
         lock (gate)

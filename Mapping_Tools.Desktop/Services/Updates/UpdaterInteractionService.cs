@@ -18,9 +18,9 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
     private readonly Func<MainWindow> owner;
     private readonly IUpdateService updates;
     private Task? checkTask;
+    private UpdaterViewModel? currentViewModel;
+    private UpdaterWindow? currentWindow;
     private bool disposed;
-    private UpdaterViewModel? viewModel;
-    private UpdaterWindow? window;
 
     internal AvaloniaUpdaterInteractionService(
         Func<MainWindow> owner,
@@ -46,7 +46,7 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
         CancellationToken cancellationToken = default)
     {
         ObjectDisposedException.ThrowIf(disposed, this);
-        if (window is not null) return Task.CompletedTask;
+        if (currentWindow is not null) return Task.CompletedTask;
 
         if (checkTask is { IsCompleted: false }) return checkTask;
 
@@ -107,10 +107,10 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
 
         disposed = true;
         lifetimeCancellation.Cancel();
-        if (window is not null) window.Close();
+        if (currentWindow is not null) currentWindow.Close();
 
-        viewModel?.Dispose();
-        viewModel = null;
+        currentViewModel?.Dispose();
+        currentViewModel = null;
         lifetimeCancellation.Dispose();
     }
 
@@ -165,7 +165,7 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
 
     private void ShowDecisionWindow(UpdateCheckResult result)
     {
-        if (disposed || this.window is not null) return;
+        if (disposed || currentWindow is not null) return;
 
         UpdaterViewModel viewModel = new(
             updates,
@@ -178,6 +178,7 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
             DataContext = viewModel,
             ShowActivated = true,
         };
+
         viewModel.CloseRequested += (_, _) => CloseDecisionWindow(window);
         viewModel.ApplicationCloseRequested += (_, _) =>
         {
@@ -185,8 +186,9 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
             owner().Close();
         };
         window.Closed += (_, _) => DecisionWindowClosed(window, viewModel);
-        this.viewModel = viewModel;
-        this.window = window;
+
+        currentViewModel = viewModel;
+        currentWindow = window;
         window.Show(owner());
     }
 
@@ -199,13 +201,13 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
         UpdaterWindow window,
         UpdaterViewModel viewModel)
     {
-        if (!ReferenceEquals(this.window, window)) return;
+        if (!ReferenceEquals(currentWindow, window)) return;
 
         ShouldUpdateOnClose = viewModel.UpdateAfterClose;
         if (!ShouldUpdateOnClose) updates.AbandonUpdate();
 
-        this.window = null;
-        this.viewModel = null;
+        currentWindow = null;
+        currentViewModel = null;
         viewModel.Dispose();
     }
 
@@ -260,15 +262,15 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
         });
     }
 
-    private async Task ObserveCheckAsync(Task checkTask)
+    private async Task ObserveCheckAsync(Task checkTask2)
     {
         try
         {
-            await checkTask.ConfigureAwait(true);
+            await checkTask2.ConfigureAwait(true);
         }
         finally
         {
-            if (ReferenceEquals(this.checkTask, checkTask)) this.checkTask = null;
+            if (ReferenceEquals(checkTask, checkTask2)) checkTask = null;
         }
     }
 

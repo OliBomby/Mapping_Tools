@@ -17,5 +17,4 @@ public class TumourGeneratorEngineOptions
 
     /// <summary>Gets or sets whether intelligent path reconstruction is skipped.</summary>
     public bool DebugConstruction { get; set; }
-
 }

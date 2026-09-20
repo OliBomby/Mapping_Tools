@@ -18,4 +18,3 @@ public enum HitsoundStudioSampleExportFormat
     /// <summary>A single-chord MIDI file.</summary>
     MidiChords,
 }
-

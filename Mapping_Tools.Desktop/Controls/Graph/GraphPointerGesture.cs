@@ -15,4 +15,3 @@ public enum GraphPointerGesture
     /// <summary>The graph viewport is being panned.</summary>
     Pan,
 }
-

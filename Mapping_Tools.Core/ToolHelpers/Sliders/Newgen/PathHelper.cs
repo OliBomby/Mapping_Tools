@@ -78,7 +78,7 @@ public static class PathHelper
                 double totalLength = path.Last!.Value.CumulativeLength;
                 double lengthAtStartOfLastHint = segmentStartNode!.Value.CumulativeLength;
                 double remainingLength = totalLength - lengthAtStartOfLastHint;
-                double lastSegmentLength = new SliderPath(sliderPath.Type, segments[segmentIndex - 1].ToArray()).Distance;
+                double lastSegmentLength = new SliderPath(sliderPath.Type, [.. segments[segmentIndex - 1]]).Distance;
                 endP = remainingLength / lastSegmentLength;
             }
 
@@ -147,7 +147,7 @@ public static class PathHelper
     /// <param name="t">The local interpolation parameter between the node and its successor.</param>
     public static void Interpolate(LinkedListNode<PathPoint> p1, double t)
     {
-        Interpolate(p1, new[] { t });
+        Interpolate(p1, [t]);
     }
 
     /// <summary>
@@ -173,7 +173,7 @@ public static class PathHelper
         var v2 = p1.Value;
         var v3 = p2.Value;
         var v1 = p1.Previous is not null && !p1.Value.Red ? p1.Previous.Value : v2 + v2 - v3;
-        var v4 = p2?.Next is not null && !v3.Red ? p2.Next.Value : v3 + v3 - v2;
+        var v4 = p2.Next is not null && !v3.Red ? p2.Next.Value : v3 + v3 - v2;
 
         // Normalize v1 and v4 to prevent extreme curvature
         double length = Vector2.Distance(v2.Pos, v3.Pos);
@@ -317,7 +317,7 @@ public static class PathHelper
     /// <param name="ensuredPoints">Critical points, can be null.</param>
     /// <returns>The number of points added between start and end.</returns>
     public static int EnsureLocalCurvature(this LinkedList<PathPoint> path, LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end,
-        IEnumerable<LinkedListNode<PathPoint>> ensuredPoints)
+        IEnumerable<LinkedListNode<PathPoint>>? ensuredPoints)
     {
         if (ReferenceEquals(start, end)) throw new ArgumentException(@"Start and end points can not be the same.");
 
@@ -544,7 +544,7 @@ public static class PathHelper
     /// </summary>
     /// <param name="start">The node before the forward search begins.</param>
     /// <returns>The next red or terminal node, or null when no successor exists.</returns>
-    public static LinkedListNode<PathPoint>? FindNextRed(LinkedListNode<PathPoint> start)
+    public static LinkedListNode<PathPoint>? FindNextRed(LinkedListNode<PathPoint>? start)
     {
         var current = start?.Next;
         while (current is not null)
@@ -561,7 +561,7 @@ public static class PathHelper
     /// </summary>
     /// <param name="start">The node after which the backward search begins.</param>
     /// <returns>The previous red or initial node, or null when no predecessor exists.</returns>
-    public static LinkedListNode<PathPoint>? FindPreviousRed(LinkedListNode<PathPoint> start)
+    public static LinkedListNode<PathPoint>? FindPreviousRed(LinkedListNode<PathPoint>? start)
     {
         var current = start?.Previous;
         while (current is not null)

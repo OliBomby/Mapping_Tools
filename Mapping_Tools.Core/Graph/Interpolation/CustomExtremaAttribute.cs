@@ -14,4 +14,3 @@ public sealed class CustomExtremaAttribute : Attribute
     /// <summary>Gets the normalized positions at which extrema are known.</summary>
     public double[] ExtremaPositions { get; }
 }
-

@@ -76,22 +76,20 @@ public class PathHelperTests
         // Arrange
         CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
-        var path = new LinkedList<PathPoint>(new[]
-        {
+        var path = new LinkedList<PathPoint>([
             new PathPoint(new Vector2(-9, 0)),
             new PathPoint(new Vector2(1, 0)),
             new PathPoint(new Vector2(2, 1)),
             new PathPoint(new Vector2(12, 1)),
-        });
+        ]);
         PathHelper.Recalculate(path);
 
-        var path2 = new LinkedList<PathPoint>(new[]
-        {
+        var path2 = new LinkedList<PathPoint>([
             new PathPoint(new Vector2(-9, 0)),
             new PathPoint(new Vector2(1, 0)),
             new PathPoint(new Vector2(2, 1), red: true),
             new PathPoint(new Vector2(12, 1)),
-        });
+        ]);
         PathHelper.Recalculate(path2);
 
         // Act
@@ -112,13 +110,12 @@ public class PathHelperTests
     public void Subdivide_FourPointPath_InsertsOrderedPoints()
     {
         // Arrange
-        var path = new LinkedList<PathPoint>(new[]
-        {
+        var path = new LinkedList<PathPoint>([
             new PathPoint(new Vector2(-9, 0)),
             new PathPoint(new Vector2(1, 0)),
             new PathPoint(new Vector2(2, 1)),
             new PathPoint(new Vector2(12, 1)),
-        });
+        ]);
         PathHelper.Recalculate(path);
 
         // Act
@@ -130,7 +127,7 @@ public class PathHelperTests
         // Assert
         added.Should().Be(4);
 
-        (start!.Next!.Value > start.Value).Should().BeTrue();
+        (start.Next!.Value > start.Value).Should().BeTrue();
         start.Next.Should().BeSameAs(middle);
         (start.Next.Next!.Value > start.Next.Value).Should().BeTrue();
         (start.Next.Next.Next!.Value > start.Next.Next.Value).Should().BeTrue();

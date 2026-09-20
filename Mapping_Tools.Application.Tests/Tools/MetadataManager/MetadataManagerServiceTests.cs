@@ -55,7 +55,7 @@ public sealed class MetadataManagerServiceTests
         File.Exists(target).Should().BeFalse();
         backup.CreateRequests.Should().ContainSingle(request =>
             request.Paths.SequenceEqual(new[] { target }) && request.Reason == BeatmapBackupReason.Automatic && !request.Force);
-        Beatmap output = new(File.ReadAllLines(result.ProcessedPaths[0]).ToList());
+        Beatmap output = new((await File.ReadAllLinesAsync(result.ProcessedPaths[0])).ToList());
         output.Metadata["Artist"].Value.Should().Be("E2E Fixture Artist");
         output.Metadata["Tags"].Value.Should().Be("e2e fixture");
         output.Metadata["BeatmapID"].Value.Should().Be("0");

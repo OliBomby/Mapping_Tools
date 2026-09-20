@@ -21,7 +21,7 @@ public sealed class PropertyTransformerServiceTests
             "Beatmaps",
             "standard-feature-rich.osu");
         BeatmapEditingSession editor = new(
-            File.ReadAllLines(fixture).ToList(),
+            (await File.ReadAllLinesAsync(fixture)).ToList(),
             new PhysicalBeatmapsetFileSystem())
         {
             Path = fixture,
@@ -39,8 +39,8 @@ public sealed class PropertyTransformerServiceTests
         var result = await service.TransformAsync(
             [fixture],
             options,
-            quickRun: false,
-            progress: progress);
+            false,
+            progress);
 
         // Assert
         result.ProcessedPaths.Should().Equal(fixture);
@@ -50,6 +50,7 @@ public sealed class PropertyTransformerServiceTests
             originalBookmarks.Select(bookmark => bookmark + 5));
         progress.Values.Last().Should().Be(1);
     }
+
     [TestMethod]
     public async Task TransformAsync_QuickRunWithLiveBeatmap_RequestsConfiguredEditorReload()
     {
@@ -60,7 +61,7 @@ public sealed class PropertyTransformerServiceTests
             "Beatmaps",
             "standard-feature-rich.osu");
         BeatmapEditingSession editor = new(
-            File.ReadAllLines(fixture).ToList(),
+            (await File.ReadAllLinesAsync(fixture)).ToList(),
             new PhysicalBeatmapsetFileSystem(),
             BeatmapEditingSource.LiveEditor,
             [],
@@ -74,7 +75,7 @@ public sealed class PropertyTransformerServiceTests
         await service.TransformAsync(
             [fixture],
             new PropertyTransformerServiceOptions(),
-            quickRun: true);
+            true);
 
         // Assert
         gateway.SessionSaveRequests.Single().ReloadEditor.Should().BeTrue();

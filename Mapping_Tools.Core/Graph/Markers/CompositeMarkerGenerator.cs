@@ -7,7 +7,7 @@ public sealed class CompositeMarkerGenerator : IGraphMarkerGenerator
     /// <param name="generators">The generators to invoke in order.</param>
     public CompositeMarkerGenerator(IEnumerable<IGraphMarkerGenerator> generators)
     {
-        Generators = generators?.ToArray() ?? throw new ArgumentNullException(nameof(generators));
+        Generators = generators.ToArray() ?? throw new ArgumentNullException(nameof(generators));
     }
 
     /// <summary>Gets the child generators.</summary>

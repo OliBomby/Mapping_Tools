@@ -15,4 +15,3 @@ public enum TumourTemplate
     /// <summary>A parabolic protrusion.</summary>
     Parabola,
 }
-

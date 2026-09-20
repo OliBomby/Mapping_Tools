@@ -47,34 +47,34 @@
                              ToolTip.Tip="Search for a generator." />
 
                     <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
-                <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="0,0,8,0"
-                                               ToolTip.Tip="Toggle selection on all virtual objects. Hold shift for enable all, hold ctrl for disable all."
-                                               x:Name="ToggleSelectedButton"
-                                               Click="ToggleSelectedClick">
-                    <materialIcons:MaterialIcon Kind="SelectAll" Width="22" Height="22" />
-                </materialDesign:FloatingButton>
-                <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="0,0,8,0"
-                                               ToolTip.Tip="Toggle locked on all virtual objects. Hold shift for enable all, hold ctrl for disable all."
-                                               x:Name="ToggleLockedButton"
-                                               Click="ToggleLockedClick">
-                    <materialIcons:MaterialIcon Kind="Lock" Width="22" Height="22" />
-                </materialDesign:FloatingButton>
-                <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="0,0,28,0"
-                                               ToolTip.Tip="Toggle usability on all virtual objects. Hold shift for enable all, hold ctrl for disable all."
-                                               x:Name="ToggleInheritableButton"
-                                               Click="ToggleInheritableClick">
-                    <materialIcons:MaterialIcon Kind="Pizza" Width="22" Height="22" />
-                </materialDesign:FloatingButton>
-                <materialDesign:FloatingButton Classes="mini no-transitions" Margin="0,0,8,0"
-                                               Foreground="{DynamicResource MaterialDarkForegroundBrush}"
-                                               ToolTip.Tip="Savestates..." Click="ShowProjects">
-                    <materialIcons:MaterialIcon Kind="ContentSaveAll" Width="22" Height="22" />
-                </materialDesign:FloatingButton>
-                <materialDesign:FloatingButton Classes="mini no-transitions" ToolTip.Tip="Preferences..."
-                                               Foreground="{DynamicResource MaterialDarkForegroundBrush}"
-                                               Click="ShowPreferences">
-                    <materialIcons:MaterialIcon Kind="SettingsOutline" Width="22" Height="22" />
-                </materialDesign:FloatingButton>
+                        <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="0,0,8,0"
+                                                       ToolTip.Tip="Toggle selection on all virtual objects. Hold shift for enable all, hold ctrl for disable all."
+                                                       x:Name="ToggleSelectedButton"
+                                                       Click="ToggleSelectedClick">
+                            <materialIcons:MaterialIcon Kind="SelectAll" Width="22" Height="22" />
+                        </materialDesign:FloatingButton>
+                        <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="0,0,8,0"
+                                                       ToolTip.Tip="Toggle locked on all virtual objects. Hold shift for enable all, hold ctrl for disable all."
+                                                       x:Name="ToggleLockedButton"
+                                                       Click="ToggleLockedClick">
+                            <materialIcons:MaterialIcon Kind="Lock" Width="22" Height="22" />
+                        </materialDesign:FloatingButton>
+                        <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="0,0,28,0"
+                                                       ToolTip.Tip="Toggle usability on all virtual objects. Hold shift for enable all, hold ctrl for disable all."
+                                                       x:Name="ToggleInheritableButton"
+                                                       Click="ToggleInheritableClick">
+                            <materialIcons:MaterialIcon Kind="Pizza" Width="22" Height="22" />
+                        </materialDesign:FloatingButton>
+                        <materialDesign:FloatingButton Classes="mini no-transitions" Margin="0,0,8,0"
+                                                       Foreground="{DynamicResource MaterialDarkForegroundBrush}"
+                                                       ToolTip.Tip="Savestates..." Click="ShowProjects">
+                            <materialIcons:MaterialIcon Kind="ContentSaveAll" Width="22" Height="22" />
+                        </materialDesign:FloatingButton>
+                        <materialDesign:FloatingButton Classes="mini no-transitions" ToolTip.Tip="Preferences..."
+                                                       Foreground="{DynamicResource MaterialDarkForegroundBrush}"
+                                                       Click="ShowPreferences">
+                            <materialIcons:MaterialIcon Kind="SettingsOutline" Width="22" Height="22" />
+                        </materialDesign:FloatingButton>
                     </StackPanel>
                 </Grid>
             </StackPanel>
@@ -111,7 +111,8 @@
                                                        Foreground="Green"
                                                        Margin="10,0,0,0"
                                                        VerticalAlignment="Bottom" />
-                                            <TextBlock Text=" item(s)" FontSize="22" FontStyle="Italic" Foreground="Silver"
+                                            <TextBlock Text=" item(s)" FontSize="22" FontStyle="Italic"
+                                                       Foreground="Silver"
                                                        VerticalAlignment="Bottom" />
                                         </StackPanel>
                                     </Expander.Header>
@@ -127,13 +128,16 @@
                                                 <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                                                 <Setter Property="VerticalContentAlignment" Value="Center" />
                                             </Style>
-                                            <Style Selector="ListBoxItem /template/ Border#PART_RootBorder:not(:nothing)">
-                                                <Setter Property="BorderThickness" Value="0, 0, 0, 1"/>
-                                                <Setter Property="BorderBrush" Value="{DynamicResource MaterialDividerBrush}" />
+                                            <Style
+                                                Selector="ListBoxItem /template/ Border#PART_RootBorder:not(:nothing)">
+                                                <Setter Property="BorderThickness" Value="0, 0, 0, 1" />
+                                                <Setter Property="BorderBrush"
+                                                        Value="{DynamicResource MaterialDividerBrush}" />
                                             </Style>
                                         </ListBox.Styles>
                                         <ListBox.ItemTemplate>
-                                            <DataTemplate x:DataType="geometryDashboard:GeometryDashboardGeneratorViewModel">
+                                            <DataTemplate
+                                                x:DataType="geometryDashboard:GeometryDashboardGeneratorViewModel">
                                                 <Grid ColumnDefinitions="70,110,*,100,100"
                                                       HorizontalAlignment="Stretch"
                                                       Margin="0,2">

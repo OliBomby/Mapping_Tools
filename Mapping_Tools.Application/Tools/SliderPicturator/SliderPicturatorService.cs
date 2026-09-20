@@ -71,13 +71,6 @@ public sealed class SliderPicturatorService : ISliderPicturatorService
         return new SliderPicturatorResult(path, segmentCount);
     }
 
-    private static void Validate(SliderPicturatorServiceOptions options)
-    {
-        ArgumentNullException.ThrowIfNull(options);
-        SliderPicturatorEngine.Validate(options);
-        ArgumentException.ThrowIfNullOrWhiteSpace(options.PictureFile);
-    }
-
     /// <inheritdoc />
     public async Task<IReadOnlyList<RgbaColour>> GetAvailableColorsAsync(
         string path,
@@ -111,5 +104,12 @@ public sealed class SliderPicturatorService : ISliderPicturatorService
             LiveBeatmapPreference.RequireLive,
             cancellationToken).ConfigureAwait(false);
         return session.SelectedHitObjects.FirstOrDefault(item => item.IsSlider)?.DeepCopy();
+    }
+
+    private static void Validate(SliderPicturatorServiceOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        SliderPicturatorEngine.Validate(options);
+        ArgumentException.ThrowIfNullOrWhiteSpace(options.PictureFile);
     }
 }

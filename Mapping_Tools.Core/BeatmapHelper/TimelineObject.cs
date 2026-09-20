@@ -32,7 +32,7 @@ public class TimelineObject
         Origin = origin;
         Time = time;
 
-        var b = new BitArray(new[] { hitsounds });
+        var b = new BitArray([hitsounds]);
         Normal = b[0];
         Whistle = b[1];
         Finish = b[2];
@@ -73,7 +73,7 @@ public class TimelineObject
     /// </summary>
     public int ObjectType { get; set; }
 
-    private BitArray TypeArray => new(new[] { ObjectType });
+    private BitArray TypeArray => new([ObjectType]);
 
     /// <summary>
     ///     Indicates that the origin is a circle.
@@ -246,7 +246,7 @@ public class TimelineObject
     /// <returns>The packed hitsound bit field.</returns>
     public int GetHitsounds()
     {
-        return MathHelper.GetIntFromBitArray(new BitArray(new[] { Normal, Whistle, Finish, Clap }));
+        return MathHelper.GetIntFromBitArray(new BitArray([Normal, Whistle, Finish, Clap]));
     }
 
     /// <summary>

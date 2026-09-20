@@ -20,4 +20,3 @@ public enum CurrentBeatmapSelectionStatus
     /// </summary>
     FileMissing,
 }
-

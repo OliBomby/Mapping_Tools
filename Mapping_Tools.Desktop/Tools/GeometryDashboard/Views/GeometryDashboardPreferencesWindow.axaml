@@ -48,7 +48,8 @@
                                                        Classes="compact"
                                                        Hotkey="{Binding Preferences.LockHotkey, Mode=TwoWay}"
                                                        ToolTip.Tip="Press or hold this key to lock virtual objects." />
-                                <TextBlock Width="100" Text="Usability key" VerticalAlignment="Bottom" Margin="10,0,0,6"
+                                <TextBlock Width="100" Text="Usability key" VerticalAlignment="Bottom"
+                                           Margin="10,0,0,6"
                                            ToolTip.Tip="Press or hold this key to select which virtual objects can get used by generators." />
                                 <controls:HotkeyEditor Width="150" VerticalAlignment="Bottom"
                                                        Classes="compact"
@@ -215,23 +216,26 @@
 
                                         <StackPanel Orientation="Horizontal" MinHeight="35" Spacing="10">
                                             <TextBlock Text="Opacity" Width="120" VerticalAlignment="Center" />
-                                            <Slider Width="300" VerticalAlignment="Center" TickFrequency="0.01" Orientation="Horizontal"
-                                                    Minimum="0" Maximum="1" Value="{Binding Opacity, Mode=TwoWay}"/>
+                                            <Slider Width="300" VerticalAlignment="Center" TickFrequency="0.01"
+                                                    Orientation="Horizontal"
+                                                    Minimum="0" Maximum="1" Value="{Binding Opacity, Mode=TwoWay}" />
                                             <TextBox Classes="compact" Width="40" VerticalAlignment="Center"
                                                      Text="{Binding Opacity, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=PropertyChanged}" />
                                         </StackPanel>
 
                                         <StackPanel Orientation="Horizontal" MinHeight="35" Spacing="10">
                                             <TextBlock Text="Thickness" Width="120" VerticalAlignment="Center" />
-                                            <Slider Width="300" VerticalAlignment="Center" TickFrequency="1" Orientation="Horizontal"
-                                                    Minimum="1" Maximum="10" Value="{Binding Thickness, Mode=TwoWay}"/>
+                                            <Slider Width="300" VerticalAlignment="Center" TickFrequency="1"
+                                                    Orientation="Horizontal"
+                                                    Minimum="1" Maximum="10" Value="{Binding Thickness, Mode=TwoWay}" />
                                             <TextBox Classes="compact" Width="40" VerticalAlignment="Center"
                                                      Text="{Binding Thickness, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=PropertyChanged}" />
                                         </StackPanel>
 
                                         <StackPanel Orientation="Horizontal" MinHeight="35" Spacing="10">
                                             <TextBlock Text="DashStyle" Width="120" VerticalAlignment="Center" />
-                                            <ComboBox Classes="compact" Width="305" VerticalAlignment="Center" ItemsSource="{Binding DashStyles}"
+                                            <ComboBox Classes="compact" Width="305" VerticalAlignment="Center"
+                                                      ItemsSource="{Binding DashStyles}"
                                                       Margin="5, 0, 0, 0"
                                                       SelectedItem="{Binding DashStyle, Mode=TwoWay}" />
                                         </StackPanel>
@@ -239,8 +243,9 @@
                                         <StackPanel Orientation="Horizontal" MinHeight="35" Spacing="10"
                                                     IsVisible="{Binding HasSizeOption}">
                                             <TextBlock Text="Size" Width="120" VerticalAlignment="Center" />
-                                            <Slider Width="300" VerticalAlignment="Center" TickFrequency="1" Orientation="Horizontal"
-                                                    Minimum="1" Maximum="10" Value="{Binding Size, Mode=TwoWay}"/>
+                                            <Slider Width="300" VerticalAlignment="Center" TickFrequency="1"
+                                                    Orientation="Horizontal"
+                                                    Minimum="1" Maximum="10" Value="{Binding Size, Mode=TwoWay}" />
                                             <TextBox Classes="compact" Width="40" VerticalAlignment="Center"
                                                      Text="{Binding Size, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=PropertyChanged}" />
                                         </StackPanel>
@@ -256,7 +261,8 @@
         <Border Grid.Row="2" Padding="10">
             <Grid ColumnDefinitions="*,*">
                 <Button Width="200" Content="Apply" CornerRadius="10" Command="{Binding ApplyCommand}" />
-                <Button Grid.Column="1" Width="200" Content="Cancel" CornerRadius="10" Command="{Binding CancelCommand}" />
+                <Button Grid.Column="1" Width="200" Content="Cancel" CornerRadius="10"
+                        Command="{Binding CancelCommand}" />
             </Grid>
         </Border>
     </Grid>

@@ -28,15 +28,15 @@ public static class MapCleanerEngine
         Validate(options);
 
         firstSamples ??= new Dictionary<string, string>();
-        Timing timing = beatmap.BeatmapTiming;
-        GameMode mode = (GameMode)beatmap.General["Mode"].IntValue;
+        var timing = beatmap.BeatmapTiming;
+        var mode = (GameMode)beatmap.General["Mode"].IntValue;
         double circleSize = beatmap.Difficulty["CircleSize"].DoubleValue;
-        List<TimingPoint> original = timing.TimingPoints.Select(point => point.Copy()).ToList();
+        var original = timing.TimingPoints.Select(point => point.Copy()).ToList();
 
         // Collect timeline objects before resnapping, so the timingpoints
         // are still valid and the tlo's get the correct hitsounds and offsets.
         // Resnapping of the hit objects will move the tlo's aswell
-        Timeline timeline = beatmap.GetTimeline();
+        var timeline = beatmap.GetTimeline();
         int objectsResnapped = 0;
 
         // Collect Kiai toggles and SliderVelocity changes for mania/taiko
@@ -44,100 +44,83 @@ public static class MapCleanerEngine
         List<TimingPoint> svChanges = [];
         bool lastKiai = false;
         double lastSv = -100;
-        foreach (TimingPoint point in timing.TimingPoints)
+        foreach (var point in timing.TimingPoints)
         {
             if (point.Kiai != lastKiai)
             {
                 kiaiToggles.Add(point.Copy());
                 lastKiai = point.Kiai;
             }
+
             if (point.Uninherited)
             {
                 lastSv = -100;
             }
-            else if (point.MpB != lastSv)
+            else if (!Precision.AlmostEquals(point.MpB, lastSv))
             {
                 svChanges.Add(point.Copy());
                 lastSv = point.MpB;
             }
         }
+
         Report(progress, 0.09);
 
         if (options.ResnapObjects)
         {
             // Resnap all objects
-            foreach (HitObject hitObject in beatmap.HitObjects)
+            foreach (var hitObject in beatmap.HitObjects)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                if (hitObject.ResnapSelf(timing, options.BeatDivisors))
-                {
-                    objectsResnapped++;
-                }
+                if (hitObject.ResnapSelf(timing, options.BeatDivisors)) objectsResnapped++;
 
                 hitObject.ResnapEnd(timing, options.BeatDivisors);
                 hitObject.ResnapPosition(mode, circleSize);
             }
 
             // Resnap Kiai toggles
-            foreach (TimingPoint point in kiaiToggles)
-            {
-                point.ResnapSelf(timing, options.BeatDivisors);
-            }
+            foreach (var point in kiaiToggles) point.ResnapSelf(timing, options.BeatDivisors);
 
             // Resnap SliderVelocity changes
-            foreach (TimingPoint point in svChanges)
-            {
-                point.ResnapSelf(timing, options.BeatDivisors);
-            }
+            foreach (var point in svChanges) point.ResnapSelf(timing, options.BeatDivisors);
             Report(progress, 0.36);
         }
 
         if (options.ResnapBookmarks)
-        {
             // Resnap the bookmarks
             beatmap.SetBookmarks(beatmap.GetBookmarks()
                 .Select(bookmark => timing.Resnap(bookmark, options.BeatDivisors))
                 .Distinct()
                 .ToList());
-        }
         Report(progress, 0.45);
 
         // Make new timingpoints
         List<TimingPointChange> changes = [];
 
         // Add redlines
-        foreach (TimingPoint point in timing.Redlines)
-        {
-            changes.Add(new TimingPointChange(point, mpb: true, meter: true,
+        foreach (var point in timing.Redlines)
+            changes.Add(new TimingPointChange(point, true, true,
                 uninherited: true, omitFirstBarLine: true, fuzziness: Precision.DOUBLE_EPSILON));
-        }
 
         if (mode is GameMode.Taiko or GameMode.Mania)
-        {
             // Add SliderVelocity changes for taiko and mania
-            foreach (TimingPoint point in svChanges)
-            {
-                changes.Add(new TimingPointChange(point, mpb: true, fuzziness: 0.4));
-            }
-        }
+            foreach (var point in svChanges)
+                changes.Add(new TimingPointChange(point, true, fuzziness: 0.4));
 
         // Add Kiai toggles
-        foreach (TimingPoint point in kiaiToggles)
-        {
-            changes.Add(new TimingPointChange(point, kiai: true));
-        }
+        foreach (var point in kiaiToggles) changes.Add(new TimingPointChange(point, kiai: true));
 
         // Add Hitobject stuff
-        foreach (HitObject hitObject in beatmap.HitObjects)
+        foreach (var hitObject in beatmap.HitObjects)
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (hitObject.IsSlider)
             {
-                TimingPoint sliderVelocity = hitObject.TimingPoint.Copy();
+                var sliderVelocity = hitObject.TimingPoint.Copy();
                 sliderVelocity.Offset = hitObject.Time;
                 sliderVelocity.MpB = hitObject.SliderVelocity;
-                changes.Add(new TimingPointChange(sliderVelocity, mpb: true, fuzziness: 0.4));
+                changes.Add(new TimingPointChange(sliderVelocity, true, fuzziness: 0.4));
             }
+
             if (options.RemoveHitsounds)
             {
                 // Skip adding hitsounds if we want to remove them
@@ -146,66 +129,50 @@ public static class MapCleanerEngine
             }
 
             // Body hitsounds
-            bool volume = hitObject.IsSlider && options.VolumeSliders ||
-                          hitObject.IsSpinner && options.VolumeSpinners;
+            bool volume = hitObject.IsSlider && options.VolumeSliders || hitObject.IsSpinner && options.VolumeSpinners;
             bool sampleSet = hitObject.IsSlider && options.SampleSetSliders && hitObject.SampleSet == 0;
             bool index = hitObject.IsSlider && options.SampleSetSliders;
             bool sampleSetChanged = false;
-            foreach (TimingPoint point in hitObject.BodyHitsounds)
+            foreach (var point in hitObject.BodyHitsounds)
             {
-                if (point.Volume == 5 && options.RemoveMuting)
-                {
-                    volume = false;
-                }
+                if (Precision.AlmostEquals(point.Volume, 5) && options.RemoveMuting) volume = false;
 
                 changes.Add(new TimingPointChange(
                     point,
                     volume: volume,
                     index: index,
                     sampleSet: sampleSet));
-                if (point.SampleSet != hitObject.HitsoundTimingPoint.SampleSet)
-                {
-                    sampleSetChanged = options.SampleSetSliders && hitObject.SampleSet == 0;
-                }
+                if (point.SampleSet != hitObject.HitsoundTimingPoint.SampleSet) sampleSetChanged = options.SampleSetSliders && hitObject.SampleSet == 0;
             }
 
-            if (hitObject.IsSlider && !sampleSetChanged && hitObject.SampleSet == 0)
-            {
-                hitObject.SampleSet = hitObject.HitsoundTimingPoint.SampleSet;
-            }
+            if (hitObject.IsSlider && !sampleSetChanged && hitObject.SampleSet == 0) hitObject.SampleSet = hitObject.HitsoundTimingPoint.SampleSet;
 
             if (hitObject.IsSlider && sampleSetChanged)
             {
-                TimingPoint point = hitObject.HitsoundTimingPoint.Copy();
+                var point = hitObject.HitsoundTimingPoint.Copy();
                 point.Offset = hitObject.Time;
                 changes.Add(new TimingPointChange(point, sampleSet: true));
             }
         }
+
         Report(progress, 0.75);
 
         if (!options.RemoveHitsounds)
-        {
             // Add timeline hitsounds
-            foreach (TimelineObject timelineObject in timeline.TimelineObjects)
+            foreach (var timelineObject in timeline.TimelineObjects)
             {
                 // Change the samplesets in the hitobjects
                 cancellationToken.ThrowIfCancellationRequested();
                 RewriteObjectHitsound(timelineObject, mode);
-                if (timelineObject.Origin.AdditionSet == timelineObject.Origin.SampleSet)
-                {
-                    timelineObject.Origin.AdditionSet = 0;
-                }
+                if (timelineObject.Origin.AdditionSet == timelineObject.Origin.SampleSet) timelineObject.Origin.AdditionSet = 0;
 
-                if (!timelineObject.HasHitsound)
-                {
-                    continue;
-                }
+                if (!timelineObject.HasHitsound) continue;
 
                 // Add greenlines for custom indexes and volumes
-                TimingPoint point = timelineObject.HitsoundTimingPoint.Copy();
-                bool unmute = timelineObject.FenoSampleVolume == 5 && options.RemoveMuting;
-                bool mute = options.RemoveUnclickableHitsounds && !options.RemoveMuting &&
-                            !(timelineObject.IsCircle || timelineObject.IsSliderHead || timelineObject.IsHoldnoteHead);
+                var point = timelineObject.HitsoundTimingPoint.Copy();
+                bool unmute = Precision.AlmostEquals(timelineObject.FenoSampleVolume, 5) && options.RemoveMuting;
+                bool mute = options is { RemoveUnclickableHitsounds: true, RemoveMuting: false }
+                            && !(timelineObject.IsCircle || timelineObject.IsSliderHead || timelineObject.IsHoldnoteHead);
                 bool index = !timelineObject.UsesFilename && !unmute;
                 bool volume = !unmute;
                 if (index && options.AnalyzeSamples && firstSamples.Count > 0)
@@ -218,16 +185,13 @@ public static class MapCleanerEngine
                     int oldIndex = timelineObject.FenoCustomIndex;
                     int newIndex = timelineObject.FenoCustomIndex;
                     double latest = double.NegativeInfinity;
-                    foreach (TimingPointChange change in changes)
-                    {
-                        if (change.Index &&
-                            change.TimingPoint.Offset <= timelineObject.Time &&
-                            change.TimingPoint.Offset >= latest)
+                    foreach (var change in changes)
+                        if (change.Index && change.TimingPoint.Offset <= timelineObject.Time && change.TimingPoint.Offset >= latest)
                         {
                             newIndex = change.TimingPoint.SampleIndex;
                             latest = change.TimingPoint.Offset;
                         }
-                    }
+
                     point.SampleIndex = newIndex;
                     timelineObject.GiveHitsoundTimingPoint(point);
                     // Index changes dont change sound
@@ -235,17 +199,16 @@ public static class MapCleanerEngine
                             mode,
                             mapDirectory,
                             firstSamples.ToDictionary())))
-                    {
                         point.SampleIndex = oldIndex;
-                    }
                     timelineObject.GiveHitsoundTimingPoint(point);
                 }
+
                 point.Offset = timelineObject.Time;
                 point.SampleIndex = timelineObject.FenoCustomIndex;
                 point.Volume = mute ? 5 : timelineObject.FenoSampleVolume;
                 changes.Add(new TimingPointChange(point, volume: volume, index: index));
             }
-        }
+
         Report(progress, 0.85);
 
         // Replace the old timingpoints
@@ -267,8 +230,7 @@ public static class MapCleanerEngine
     {
         ArgumentNullException.ThrowIfNull(options);
         if (options.BeatDivisors is null
-            || options.BeatDivisors.Length == 0
-            || options.BeatDivisors.Any(divisor => divisor is null))
+            || options.BeatDivisors.Length == 0)
             throw new ArgumentException("Select at least one beat divisor.", nameof(options));
     }
 
@@ -289,10 +251,7 @@ public static class MapCleanerEngine
             item.Origin.EdgeHitsounds[item.Repeat] = item.GetHitsounds();
             item.Origin.EdgeSampleSets[item.Repeat] = item.FenoSampleSet;
             item.Origin.EdgeAdditionSets[item.Repeat] = item.FenoAdditionSet;
-            if (item.Origin.EdgeAdditionSets[item.Repeat] == item.Origin.EdgeSampleSets[item.Repeat])
-            {
-                item.Origin.EdgeAdditionSets[item.Repeat] = 0;
-            }
+            if (item.Origin.EdgeAdditionSets[item.Repeat] == item.Origin.EdgeSampleSets[item.Repeat]) item.Origin.EdgeAdditionSets[item.Repeat] = 0;
         }
         else if (item.Origin.IsSpinner && item.Repeat == 1)
         {
@@ -318,7 +277,7 @@ public static class MapCleanerEngine
         double[] changed = original
             .Where(old =>
             {
-                TimingPoint[] matching = current
+                var matching = current
                     .Where(now => Math.Abs(now.Offset - old.Offset) < Precision.DOUBLE_EPSILON)
                     .ToArray();
                 return matching.Length > 0 && matching.All(now => !old.Equals(now));
@@ -344,22 +303,23 @@ public static class MapCleanerEngine
          */
         for (int index = 0; index < beatmap.HitObjects.Count - 1; index++)
         {
-            HitObject first = beatmap.HitObjects[index];
-            HitObject second = beatmap.HitObjects[index + 1];
-            if (first.IsSlider &&
-                second.IsCircle &&
-                Precision.AlmostEquals(first.Time, second.Time))
-            {
+            var first = beatmap.HitObjects[index];
+            var second = beatmap.HitObjects[index + 1];
+            if (first.IsSlider && second.IsCircle && Precision.AlmostEquals(first.Time, second.Time))
                 (beatmap.HitObjects[index], beatmap.HitObjects[index + 1]) = (second, first);
-            }
         }
     }
 
-    private static void Report(IProgress<double>? progress, double value) => progress?.Report(value);
+    private static void Report(IProgress<double>? progress, double value)
+    {
+        progress?.Report(value);
+    }
 }
 
 internal static class DictionaryCompatibility
 {
-    public static Dictionary<string, string> ToDictionary(this IReadOnlyDictionary<string, string> source) =>
-        source as Dictionary<string, string> ?? source.ToDictionary(pair => pair.Key, pair => pair.Value);
+    public static Dictionary<string, string> ToDictionary(this IReadOnlyDictionary<string, string> source)
+    {
+        return source as Dictionary<string, string> ?? source.ToDictionary(pair => pair.Key, pair => pair.Value);
+    }
 }

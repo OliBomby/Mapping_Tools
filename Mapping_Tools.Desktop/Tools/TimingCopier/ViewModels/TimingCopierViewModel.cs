@@ -5,9 +5,7 @@ using Mapping_Tools.Application.Execution.ToolExecution.Models;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Platform.FilePicker;
-using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
-using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.TimingCopier;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
@@ -25,13 +23,6 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
     IShellProjectFeature<TimingCopierProject>
 {
     private readonly ICurrentBeatmapLocator currentBeatmapLocator;
-
-    private readonly ProjectDefinition<TimingCopierProject> definition = new(
-        "timingcopierproject.json",
-        "Timing Copier Projects",
-        () => new TimingCopierProject(),
-        "timing-copier-project.json",
-        ToolConfigSchema.ForTool(TimingCopierToolDefinition.Definition.Id));
 
     private readonly IFilePicker filePicker;
     private readonly IUserNotificationService notifications;
@@ -99,7 +90,12 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
         }
     }
 
-    ProjectDefinition<TimingCopierProject> IShellProjectFeature<TimingCopierProject>.ProjectDefinition => definition;
+    ProjectDefinition<TimingCopierProject> IShellProjectFeature<TimingCopierProject>.ProjectDefinition { get; } = new(
+        "timingcopierproject.json",
+        "Timing Copier Projects",
+        () => new TimingCopierProject(),
+        "timing-copier-project.json",
+        ToolConfigSchema.ForTool(TimingCopierToolDefinition.Definition.Id));
 
     TimingCopierProject IShellProjectFeature<TimingCopierProject>.Snapshot()
     {
@@ -117,7 +113,7 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
     {
         try
         {
-            string? path = await currentBeatmapLocator.FindCurrentBeatmapAsync();
+            string path = await currentBeatmapLocator.FindCurrentBeatmapAsync();
             if (!string.IsNullOrWhiteSpace(path)) ImportPath = path;
         }
         catch (OperationCanceledException)
@@ -149,7 +145,7 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
     {
         try
         {
-            string? path = await currentBeatmapLocator.FindCurrentBeatmapAsync();
+            string path = await currentBeatmapLocator.FindCurrentBeatmapAsync();
             if (!string.IsNullOrWhiteSpace(path)) ExportPath = path;
         }
         catch (OperationCanceledException)
@@ -188,11 +184,11 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
     /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
-        TimingCopierProject options = Snapshot();
+        var options = Snapshot();
         await Execution.ExecuteAsync(
                 new ToolExecutionRequest<TimingCopierResult>(
-                Tool.Id,
-                Tool.DisplayName,
+                    Tool.Id,
+                    Tool.DisplayName,
                     async context =>
                     {
                         var result = await timingCopier.CopyAsync(
@@ -224,7 +220,7 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
         ImportPath = project.ImportPath;
         ExportPath = project.ExportPath;
         ResnapMode = project.ResnapMode;
-        BeatDivisors = project.BeatDivisors?.ToArray() ?? [];
+        BeatDivisors = project.BeatDivisors.ToArray();
     }
 
     private async Task PickBeatmapsAsync(

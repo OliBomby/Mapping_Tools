@@ -24,4 +24,3 @@ public interface IRelevantDrawable : IRelevantObject
     /// <returns><see langword="true" /> when at least one intersection exists.</returns>
     bool Intersection(IRelevantObject other, out Vector2[] intersections);
 }
-

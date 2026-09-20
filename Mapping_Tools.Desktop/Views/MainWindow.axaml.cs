@@ -29,8 +29,8 @@ public partial class MainWindow : Window, INotificationSurface
     private readonly DesktopApplicationSettings settings;
     private readonly SettingsPersistenceHostedService? settingsPersistence;
     private readonly IUpdaterInteractionService? updaterInteraction;
-    private WindowBounds normalBounds = defaultBounds;
     private bool allowCloseAfterShutdown;
+    private WindowBounds normalBounds = defaultBounds;
     private bool restored;
     private bool shutdownCloseInProgress;
     private bool updateCloseInProgress;
@@ -90,15 +90,22 @@ public partial class MainWindow : Window, INotificationSurface
         UpdateWindowChrome();
     }
 
+    void INotificationSurface.ShowSnackbar(UserNotification notification)
+    {
+        Dispatcher.UIThread.Post(
+            () => SnackbarHost.Post(
+                new SnackbarModel($"{notification.Title}: {notification.Message}", snackbarDuration),
+                "Root",
+                DispatcherPriority.Normal),
+            DispatcherPriority.Normal);
+    }
+
     /// <inheritdoc />
     protected override void OnOpened(EventArgs eventArgs)
     {
         base.OnOpened(eventArgs);
         RestoreWindowPlacement();
-        if (DataContext is MainViewModel viewModel)
-        {
-            _ = InitializeAndCheckForUpdatesAsync(viewModel);
-        }
+        if (DataContext is MainViewModel viewModel) _ = InitializeAndCheckForUpdatesAsync(viewModel);
     }
 
     private static async Task InitializeAndCheckForUpdatesAsync(MainViewModel viewModel)
@@ -149,7 +156,6 @@ public partial class MainWindow : Window, INotificationSurface
         {
             shutdownCloseInProgress = true;
             if (DataContext is MainViewModel viewModel)
-            {
                 try
                 {
                     await viewModel.DisposeAsync();
@@ -158,13 +164,14 @@ public partial class MainWindow : Window, INotificationSurface
                 {
                     App.WriteCrashLog(exception);
                 }
-            }
 
             allowCloseAfterShutdown = true;
             Close();
         }
         else
+        {
             updateCloseInProgress = false;
+        }
     }
 
     private async Task CompleteShutdownAndCloseAsync(MainViewModel viewModel)
@@ -279,16 +286,6 @@ public partial class MainWindow : Window, INotificationSurface
         MaximizeIcon.Kind = maximized ? MaterialIconKind.WindowRestore : MaterialIconKind.WindowMaximize;
     }
 
-    void INotificationSurface.ShowSnackbar(UserNotification notification)
-    {
-        Dispatcher.UIThread.Post(
-            () => SnackbarHost.Post(
-                new SnackbarModel($"{notification.Title}: {notification.Message}", snackbarDuration),
-                "Root",
-                DispatcherPriority.Normal),
-            DispatcherPriority.Normal);
-    }
-
     private void HandleWindowKeyDown(object? sender, KeyEventArgs eventArgs)
     {
         if (eventArgs.Key != Key.K || eventArgs.KeyModifiers != KeyModifiers.Control) return;
@@ -309,7 +306,8 @@ public partial class MainWindow : Window, INotificationSurface
         if (eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed) BeginMoveDrag(eventArgs);
     }
 
-    private void AcceptFileDrop(object? sender, DragEventArgs eventArgs)
+    // ReSharper disable once UnusedMember.Local
+    private void AcceptFileDrop(object? _, DragEventArgs eventArgs)
     {
         eventArgs.DragEffects = eventArgs.DataTransfer.Formats.Contains(DataFormat.File)
             ? DragDropEffects.Copy
@@ -317,7 +315,8 @@ public partial class MainWindow : Window, INotificationSurface
         eventArgs.Handled = true;
     }
 
-    private void OpenDroppedBeatmaps(object? sender, DragEventArgs eventArgs)
+    // ReSharper disable once UnusedMember.Local
+    private void OpenDroppedBeatmaps(object? _, DragEventArgs eventArgs)
     {
         IReadOnlyList<string> paths = eventArgs.DataTransfer.TryGetFiles()?
                                           .Select(item => item.TryGetLocalPath())

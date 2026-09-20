@@ -9,11 +9,9 @@ namespace Mapping_Tools.Infrastructure.Tools.GeometryDashboard;
 /// </summary>
 internal sealed class WindowsGeometryDashboardCoordinateTransform
 {
-    private readonly bool dpiSourceAvailable;
-    private readonly bool fullscreen;
+    private readonly Box2? clientBox;
     private readonly Vector2 dpiMultiplier;
     private readonly Box2 editorBoxOffset;
-    private readonly Box2? clientBox;
     private readonly bool letterboxing;
     private readonly Vector2 letterboxingPosition;
     private readonly Vector2 osuResolution;
@@ -32,8 +30,8 @@ internal sealed class WindowsGeometryDashboardCoordinateTransform
         this.editorBoxOffset = editorBoxOffset;
         clientBox = window.ClientBounds;
         dpiMultiplier = window.DpiScale;
-        dpiSourceAvailable = window.DpiSourceAvailable;
-        fullscreen = display.Fullscreen;
+        DpiSourceAvailable = window.DpiSourceAvailable;
+        OsuFillsScreen = display.Fullscreen;
         letterboxing = display.Letterboxing;
         letterboxingPosition = display.LetterboxingPosition;
         osuResolution = display.Resolution;
@@ -46,6 +44,16 @@ internal sealed class WindowsGeometryDashboardCoordinateTransform
     internal Vector2 EditorGridResolution => new(512, 384);
 
     internal Box2 EditorBox => GetEditorBox();
+
+    internal bool DpiSourceAvailable { get; }
+
+    private double FilebarHeight => 24 * dpiMultiplier.Y;
+
+    private double WindowChromeHeight => 24 * dpiMultiplier.Y;
+
+    private bool OsuFillsScreen => field
+                                   || letterboxing
+                                   || Precision.AlmostEquals(osuResolution.X, screenBox.Width) && Precision.AlmostEquals(osuResolution.Y, screenBox.Height);
 
     internal Vector2 ScreenToEditorCoordinate(Vector2 coordinate)
     {
@@ -87,7 +95,7 @@ internal sealed class WindowsGeometryDashboardCoordinateTransform
 
     internal Vector2 ToDpi(Vector2 coordinate)
     {
-        return !dpiSourceAvailable
+        return !DpiSourceAvailable
             ? coordinate
             : new Vector2(
                   coordinate.X / dpiMultiplier.X,
@@ -99,16 +107,6 @@ internal sealed class WindowsGeometryDashboardCoordinateTransform
     {
         return dpiMultiplier;
     }
-
-    internal bool DpiSourceAvailable => dpiSourceAvailable;
-
-    private double FilebarHeight => 24 * dpiMultiplier.Y;
-
-    private double WindowChromeHeight => 24 * dpiMultiplier.Y;
-
-    private bool OsuFillsScreen => fullscreen
-                                   || letterboxing
-                                   || (osuResolution.X == screenBox.Width && osuResolution.Y == screenBox.Height);
 
     private Box2 GetOsuWindowBox()
     {
@@ -141,7 +139,7 @@ internal sealed class WindowsGeometryDashboardCoordinateTransform
 
     private Box2 GetOsuWindowBoxWithoutChrome()
     {
-        if (clientBox is Box2 actualClientBox) return actualClientBox;
+        if (clientBox is { } actualClientBox) return actualClientBox;
 
         var osuWindow = GetOsuWindowBox();
         if (OsuFillsScreen) return osuWindow;

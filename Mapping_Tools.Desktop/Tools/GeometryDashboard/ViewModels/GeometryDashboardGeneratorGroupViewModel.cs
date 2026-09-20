@@ -21,4 +21,3 @@ public sealed class GeometryDashboardGeneratorGroupViewModel
     /// <summary>Gets the visible row count rendered in the heading.</summary>
     public int ItemCount => Generators.Count;
 }
-

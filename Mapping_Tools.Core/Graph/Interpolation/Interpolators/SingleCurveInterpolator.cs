@@ -47,4 +47,3 @@ public sealed class SingleCurveInterpolator : CustomInterpolator, IDerivableInte
         return (Math.Exp(p * t) / p - t) / (Math.Exp(p) - 1);
     }
 }
-

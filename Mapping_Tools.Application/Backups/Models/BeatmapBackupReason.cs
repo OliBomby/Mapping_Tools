@@ -26,4 +26,3 @@ public enum BeatmapBackupReason
     /// </summary>
     RestoreSafety,
 }
-

@@ -53,8 +53,7 @@ public static class SliderPicturatorEngine
             Vector3 outerVector = new(outer.R, outer.G, outer.B);
             Vector3 borderVector = new(options.BorderColor.R, options.BorderColor.G, options.BorderColor.B);
 
-            double projectionLength = (innerVector - outerVector).Length;
-            double gradientDistance = (colour - ClosestGradient(colour, outerVector, innerVector, projectionLength)).LengthSquared;
+            double gradientDistance = (colour - ClosestGradient(colour, outerVector, innerVector)).LengthSquared;
             double borderDistance = (colour - borderVector).LengthSquared;
 
             bool useBorder = options.BorderOn && gradientDistance >= borderDistance;
@@ -548,7 +547,7 @@ public static class SliderPicturatorEngine
                 options.GreenOn ? source.G : 0,
                 options.BlueOn ? source.B : 0);
 
-            var closest = ClosestGradient(colour, outerVector, innerVector, projectionLength);
+            var closest = ClosestGradient(colour, outerVector, innerVector);
             double gradientDistance = (colour - closest).LengthSquared;
             double borderDistance = (colour - borderVector).LengthSquared;
             double blackDistance = colour.LengthSquared;
@@ -570,7 +569,7 @@ public static class SliderPicturatorEngine
         return distances;
     }
 
-    private static Vector3 ClosestGradient(Vector3 colour, Vector3 outer, Vector3 inner, double length)
+    private static Vector3 ClosestGradient(Vector3 colour, Vector3 outer, Vector3 inner)
     {
         var direction = inner - outer;
 
@@ -595,11 +594,10 @@ public static class SliderPicturatorEngine
             while (direction == 1 ? x < width : x >= 0)
             {
                 int offset = 0;
-                double gradient = 0;
                 // Look for gradients
                 if (x + direction >= 0 && x + direction < width)
                 {
-                    gradient = distances[x + direction, y] - distances[x, y];
+                    double gradient = distances[x + direction, y] - distances[x, y];
                     offset = direction;
 
                     while (x + offset + direction >= 0

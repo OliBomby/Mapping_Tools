@@ -2,13 +2,13 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
+using Mapping_Tools.Application.Execution.UserNotification;
+using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Platform;
-using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Desktop.Controls.Timeline;
-using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.AutoFail;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.Tools.AutoFail.Models;
+using Mapping_Tools.Desktop.Controls.Timeline;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
@@ -22,6 +22,7 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
     private readonly IAutoFailService autoFail;
     private readonly IDialogService dialogs;
     private readonly IPlatformLauncher launcher;
+    private readonly IUserNotificationService notifications;
     private readonly DesktopApplicationSettings settings;
     private readonly IBeatmapWorkspace workspace;
 
@@ -32,13 +33,15 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
     /// <param name="settings">Supplies QuickRun behavior preferences.</param>
     /// <param name="dialogs">Presents repair choices.</param>
     /// <param name="launcher">Navigates osu! to selected timeline markers.</param>
+    /// <param name="notifications">Publishes user-facing validation and completion messages.</param>
     public AutoFailDetectorViewModel(
         IAutoFailService autoFail,
         IToolExecutionService execution,
         IBeatmapWorkspace workspace,
         DesktopApplicationSettings settings,
         IDialogService dialogs,
-        IPlatformLauncher launcher)
+        IPlatformLauncher launcher,
+        IUserNotificationService notifications)
         : base(execution, AutoFailDetectorToolDefinition.Definition)
     {
         this.autoFail = autoFail ?? throw new ArgumentNullException(nameof(autoFail));
@@ -46,6 +49,7 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         this.dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
         this.launcher = launcher ?? throw new ArgumentNullException(nameof(launcher));
+        this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
     }
 
     /// <summary>Gets or sets whether confirmed unloading objects appear on the timeline.</summary>
@@ -92,11 +96,6 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
     [ObservableProperty]
     public partial IReadOnlyList<TimelineMarker> Markers { get; private set; } = [];
 
-    /// <summary>Gets a textual summary of the latest analysis.</summary>
-    [ObservableProperty]
-    public partial string ResultSummary { get; private set; } =
-        "Run the detector to inspect this beatmap.";
-
     /// <summary>Analyzes the current editor beatmap, falling back to the shell selection.</summary>
     /// <param name="cancellationToken">Cancels beatmap discovery or analysis.</param>
     /// <returns>A task that completes after QuickRun finishes.</returns>
@@ -107,7 +106,7 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
         await RunWithStateAsync(() => RunPathAsync(path, true, cancellationToken));
     }
 
-        /// <inheritdoc />
+    /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
         string? path = settings.AlwaysQuickRun
@@ -128,7 +127,10 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
     {
         if (string.IsNullOrWhiteSpace(path))
         {
-            ResultSummary = "Select a beatmap or open one in osu! before running the detector.";
+            await notifications.PublishAsync(new UserNotification(
+                UserNotificationSeverity.Warning,
+                Tool.DisplayName,
+                "Select a beatmap or open one in osu! before running the detector."));
             return;
         }
 
@@ -161,7 +163,6 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
     private void InstallResult(AutoFailRun run)
     {
         HasRun = true;
-        ResultSummary = Summarize(run.Analysis);
         EndTime = run.MapEndTime;
         List<TimelineMarker> markers = [];
         if (ShowPotentialUnloadingObjects)
@@ -209,8 +210,7 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
                     cancellationToken);
                 if (choice == FixChoice.Next) continue;
                 if (choice == FixChoice.Apply)
-                {
-                    var applied = await Execution.ExecuteAsync(
+                    await Execution.ExecuteAsync(
                         new ToolExecutionRequest<bool>(
                             Tool.Id + "-fix",
                             "Auto-fail Fix",
@@ -224,8 +224,6 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
                                 return new ToolExecutionOutput<bool>(true, "Applied the auto-fail fix.");
                             }),
                         cancellationToken: cancellationToken);
-                    if (applied.Status == ToolExecutionStatus.Succeeded) ResultSummary += " Fix applied.";
-                }
 
                 return;
             }
@@ -236,7 +234,7 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
                 new MessageDialogRequest<bool>(
                     "Auto-fail fix",
                     "Could not create an auto-fail fix guide.",
-                    [new DialogChoice<bool>("OK", true, IsDefault: true, IsCancel: true)],
+                    [new DialogChoice<bool>("OK", true, true, true)],
                     false,
                     exception.Message),
                 cancellationToken);

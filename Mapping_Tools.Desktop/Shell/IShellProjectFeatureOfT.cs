@@ -12,6 +12,14 @@ public interface IShellProjectFeature<TProject> : IShellProjectFeature
     /// <summary>Gets the persistence metadata for the feature's project type.</summary>
     ProjectDefinition<TProject> ProjectDefinition { get; }
 
+    Task IShellProjectFeature.ExecuteProjectOperationAsync(
+        IProjectFeatureOperation operation,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(operation);
+        return operation.ExecuteAsync(this, cancellationToken);
+    }
+
     /// <summary>Captures the complete current project state.</summary>
     /// <returns>A project snapshot that matches <see cref="ProjectDefinition" />.</returns>
     TProject Snapshot();
@@ -22,12 +30,4 @@ public interface IShellProjectFeature<TProject> : IShellProjectFeature
     /// </summary>
     /// <param name="project">The project instance to install.</param>
     void Install(TProject project);
-
-    Task IShellProjectFeature.ExecuteProjectOperationAsync(
-        IProjectFeatureOperation operation,
-        CancellationToken cancellationToken)
-    {
-        ArgumentNullException.ThrowIfNull(operation);
-        return operation.ExecuteAsync(this, cancellationToken);
-    }
 }

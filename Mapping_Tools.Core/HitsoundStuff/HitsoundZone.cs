@@ -83,8 +83,8 @@ public class HitsoundZone
     /// <returns>Distance in playfield pixels over the constrained axes.</returns>
     public double Distance(Vector2 pos)
     {
-        double dx = XPos == -1 ? 0 : XPos - pos.X;
-        double dy = YPos == -1 ? 0 : YPos - pos.Y;
+        double dx = Precision.AlmostEquals(XPos, -1) ? 0 : XPos - pos.X;
+        double dy = Precision.AlmostEquals(YPos, -1) ? 0 : YPos - pos.Y;
         return Math.Sqrt(dx * dx + dy * dy);
     }
 

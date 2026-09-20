@@ -209,5 +209,4 @@ public sealed class HeadlessApplicationWorkflowTests
             throw new NotSupportedException();
         }
     }
-
 }

@@ -1,8 +1,8 @@
 using Mapping_Tools.Application.Updates.Contracts;
 using Mapping_Tools.Application.Updates.Models;
 using Mapping_Tools.Application.Workspace.Models;
-using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.ViewModels.GetStarted;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -36,10 +36,10 @@ public sealed class GetStartedViewModelTests
     public void Changelog_WhenGatewayReturnsMultipleReleases_DisplaysAllInGatewayOrder()
     {
         // Arrange
-        using GetStartedViewModel viewModel = CreateViewModel();
+        using var viewModel = CreateViewModel();
 
         // Act
-        ChangelogEntryViewModel[] entries = viewModel.Changelog.ToArray();
+        var entries = viewModel.Changelog.ToArray();
 
         // Assert
         entries.Select(entry => entry.Title).Should().Equal("Version 2.0", "Version 1.0");
@@ -86,7 +86,7 @@ public sealed class GetStartedViewModelTests
                 new UpdateReleaseNotes(
                     "Version 2.0",
                     "## Improvements\n\n- A release note fetched from GitHub."),
-                new UpdateReleaseNotes("Version 1.0", "Bug fixes.")
+                new UpdateReleaseNotes("Version 1.0", "Bug fixes."),
             ]);
         }
 

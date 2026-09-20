@@ -43,14 +43,14 @@ public sealed class SampleToolService
         for (int index = 0; index < paths.Count; index++)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            BeatmapEditingSession session = await editingGateway
+            var session = await editingGateway
                 .OpenBeatmapAsync(
                     paths[index],
                     LiveBeatmapPreference.PreferLive,
                     cancellationToken)
                 .ConfigureAwait(false);
 
-            StringValue tags = session.Beatmap.Metadata.TryGetValue("Tags", out StringValue? currentTags)
+            var tags = session.Beatmap.Metadata.TryGetValue("Tags", out var currentTags)
                 ? currentTags
                 : new StringValue(string.Empty);
             string[] existingTags = tags.Value

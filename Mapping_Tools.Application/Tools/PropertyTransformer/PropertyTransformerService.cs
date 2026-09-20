@@ -1,9 +1,9 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.PropertyTransformer;
-using Mapping_Tools.Application.Settings.Models;
 
 namespace Mapping_Tools.Application.Tools.PropertyTransformer;
 
@@ -86,11 +86,11 @@ public sealed class PropertyTransformerService : IPropertyTransformerService
                 // Save the file
                 await editingGateway.SaveAsync(
                         session,
-                        reloadEditor: AutomaticEditorReloadPolicy.ShouldReloadEditor(
+                        AutomaticEditorReloadPolicy.ShouldReloadEditor(
                             session,
                             quickRun,
                             settings),
-                        cancellationToken: cancellationToken)
+                        cancellationToken)
                     .ConfigureAwait(false);
             }
 

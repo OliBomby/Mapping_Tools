@@ -12,5 +12,4 @@ public class TimingCopierServiceOptions : TimingCopierEngineOptions
 
     /// <summary>Gets or sets vertical-bar-separated beatmap targets.</summary>
     public string ExportPath { get; set; } = string.Empty;
-
 }

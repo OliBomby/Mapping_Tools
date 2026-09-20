@@ -24,7 +24,7 @@ public class SampleSchema : Dictionary<string, List<SampleGeneratingArgs>>
     {
         foreach (var customIndex in customIndices)
         foreach (var customIndexSample in customIndex.Samples)
-            Add(customIndexSample.Key + customIndex.GetNumberExtension(), customIndexSample.Value.ToList());
+            Add(customIndexSample.Key + customIndex.GetNumberExtension(), [.. customIndexSample.Value]);
     }
 
     /// <summary>
@@ -36,7 +36,7 @@ public class SampleSchema : Dictionary<string, List<SampleGeneratingArgs>>
         foreach (var sample in sampleNames)
         {
             if (string.IsNullOrEmpty(sample.Value)) continue;
-            Add(sample.Value, new List<SampleGeneratingArgs> { sample.Key });
+            Add(sample.Value, [sample.Key]);
         }
     }
 
@@ -137,8 +137,7 @@ public class SampleSchema : Dictionary<string, List<SampleGeneratingArgs>>
 
         foreach (var kvp in this)
         {
-            string? name = Path.GetFileNameWithoutExtension(kvp.Key);
-            if (name == null) continue;
+            string name = Path.GetFileNameWithoutExtension(kvp.Key);
 
             var match = Regex.Match(name, "^(normal|soft|drum)-hit(normal|whistle|finish|clap)");
             if (!match.Success) continue;
@@ -151,9 +150,9 @@ public class SampleSchema : Dictionary<string, List<SampleGeneratingArgs>>
                 if (!FileFormatHelper.TryParseInt(remainder, out index))
                     continue;
 
-            if (customIndices.ContainsKey(index))
+            if (customIndices.TryGetValue(index, out var customIndex))
             {
-                customIndices[index].Samples[hitsound] = new HashSet<SampleGeneratingArgs>(kvp.Value);
+                customIndex.Samples[hitsound] = [.. kvp.Value];
             }
             else
             {
@@ -163,7 +162,7 @@ public class SampleSchema : Dictionary<string, List<SampleGeneratingArgs>>
             }
         }
 
-        return customIndices.Values.ToList();
+        return [.. customIndices.Values];
     }
 
     /// <summary>

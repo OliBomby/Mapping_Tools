@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace Mapping_Tools.Core.MathUtil;
@@ -206,6 +207,7 @@ public struct CircleArc : IEquatable<CircleArc>
     /// <summary>Indicates whether the current CircleArc is equal to another CircleArc.</summary>
     /// <param name="other">A CircleArc to compare with this CircleArc.</param>
     /// <returns>true if the current CircleArc is equal to the CircleArc parameter; otherwise, false.</returns>
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     public bool Equals(CircleArc other)
     {
         return
@@ -219,7 +221,6 @@ public struct CircleArc : IEquatable<CircleArc>
     public override int GetHashCode()
     {
         int hashCode = 2048149326;
-        hashCode = hashCode * -1521134295 + base.GetHashCode();
         hashCode = hashCode * -1521134295 + EqualityComparer<Vector2>.Default.GetHashCode(Centre);
         hashCode = hashCode * -1521134295 + Radius.GetHashCode();
         hashCode = hashCode * -1521134295 + ThetaStart.GetHashCode();

@@ -6,4 +6,3 @@ public sealed class AudioPlaybackOptions
     /// <summary>Gets or sets whether playback should repeat until stopped.</summary>
     public bool Loop { get; set; }
 }
-

@@ -9,7 +9,10 @@
   "VolumeSliders": true,
   "SampleSetSliders": false,
   "VolumeSpinners": true,
-  "BeatDivisors": ["1/12", "1/16"],
+  "BeatDivisors": [
+    "1/12",
+    "1/16"
+  ],
   "UseEditorReader": false,
   "AlwaysQuickRun": false,
   "MakeBackups": true

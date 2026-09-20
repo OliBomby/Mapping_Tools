@@ -15,7 +15,7 @@ public sealed class HitsoundStudioProjectTests
         HitsoundStudioServiceOptions project = new();
 
         // Act
-        Sample defaultSample = project.DefaultSample;
+        var defaultSample = project.DefaultSample;
 
         // Assert
         defaultSample.SampleSet.Should().Be(SampleSet.None);

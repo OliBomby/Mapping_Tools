@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Mapping_Tools.Core.MathUtil;
 using Newtonsoft.Json;
 
@@ -8,7 +9,7 @@ namespace Mapping_Tools.Core.HitsoundStuff;
 /// </summary>
 public class SampleGeneratingArgs : IEquatable<SampleGeneratingArgs>
 {
-    private const double InvariantVolume = -0.01;
+    private const double invariant_volume = -0.01;
 
     /// <summary>
     ///     Creates an empty, unity-volume sample specification with all SoundFont selectors unset.
@@ -108,7 +109,7 @@ public class SampleGeneratingArgs : IEquatable<SampleGeneratingArgs>
     /// <summary>
     ///     Gets or sets the source audio or SoundFont path.
     /// </summary>
-    public string Path { get; set; } = "";
+    public string Path { get; set; }
 
     /// <summary>
     ///     Gets or sets the linear gain used when rendering the sample.
@@ -158,7 +159,7 @@ public class SampleGeneratingArgs : IEquatable<SampleGeneratingArgs>
     public int Velocity
     {
         get => (int)Math.Round(Volume * 127);
-        set => Volume = value == -1 ? InvariantVolume : value / 127d;
+        set => Volume = value == -1 ? invariant_volume : value / 127d;
     }
 
     /// <summary>
@@ -186,14 +187,12 @@ public class SampleGeneratingArgs : IEquatable<SampleGeneratingArgs>
     {
         string filename = System.IO.Path.GetFileNameWithoutExtension(Path);
         return GetExtension().ToLower() == ".sf2"
-            ?
-            Math.Abs(Panning) < Precision.DOUBLE_EPSILON && Math.Abs(PitchShift) < Precision.DOUBLE_EPSILON
+            ? Math.Abs(Panning) < Precision.DOUBLE_EPSILON && Math.Abs(PitchShift) < Precision.DOUBLE_EPSILON
                 ? $"{filename}-{Bank}-{Patch}-{Instrument}-{Key}-{(int)Length}-{Velocity}"
                 : $"{filename}-{(int)(Panning * 100)}-{(int)(PitchShift * 100)}-{Bank}-{Patch}-{Instrument}-{Key}-{(int)Length}-{Velocity}"
             : Math.Abs(Volume - 1) < Precision.DOUBLE_EPSILON && Math.Abs(Panning) < Precision.DOUBLE_EPSILON && Math.Abs(PitchShift) < Precision.DOUBLE_EPSILON
                 ? filename
-                :
-                $"{filename}-{(int)(Volume * 100)}-{(int)(Panning * 100)}-{(int)(PitchShift * 100)}";
+                : $"{filename}-{(int)(Volume * 100)}-{(int)(Panning * 100)}-{(int)(PitchShift * 100)}";
     }
 
     /// <summary>
@@ -237,6 +236,7 @@ public class SampleGeneratingArgs : IEquatable<SampleGeneratingArgs>
 
     /// <summary>Serves as the default hash function. </summary>
     /// <returns>A hash code for the current object.</returns>
+    [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
     public override int GetHashCode()
     {
         int hashCode = 0x34894079;
@@ -258,7 +258,7 @@ public class SampleGeneratingArgs : IEquatable<SampleGeneratingArgs>
     /// <param name="left">The sample specification.</param>
     /// <param name="right">The value to compare.</param>
     /// <returns><see langword="true" /> when the left instance is non-null and equal to the right value.</returns>
-    public static bool operator ==(SampleGeneratingArgs left, object right) => !(left is null) && left.Equals(right);
+    public static bool operator ==(SampleGeneratingArgs left, object right) => left.Equals(right);
 
     /// <summary>
     ///     Applies the != operator.
@@ -266,5 +266,5 @@ public class SampleGeneratingArgs : IEquatable<SampleGeneratingArgs>
     /// <param name="left">The sample specification.</param>
     /// <param name="right">The value to compare.</param>
     /// <returns><see langword="true" /> when the values are not equal.</returns>
-    public static bool operator !=(SampleGeneratingArgs left, object right) => left is null || !left.Equals(right);
+    public static bool operator !=(SampleGeneratingArgs left, object right) => !left.Equals(right);
 }

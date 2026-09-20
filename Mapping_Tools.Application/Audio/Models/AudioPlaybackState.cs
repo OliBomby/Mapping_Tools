@@ -15,4 +15,3 @@ public enum AudioPlaybackState
     /// <summary>The output device reported an unrecoverable failure.</summary>
     Failed,
 }
-

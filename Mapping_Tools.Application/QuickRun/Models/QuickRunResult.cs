@@ -11,4 +11,3 @@ public sealed record QuickRunResult(
     QuickRunStatus Status,
     string? CommandId = null,
     Exception? Exception = null);
-

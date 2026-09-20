@@ -1,4 +1,6 @@
-﻿namespace Mapping_Tools.Core.BeatmapHelper;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Mapping_Tools.Core.BeatmapHelper;
 #nullable disable
 
 /// <summary>
@@ -78,6 +80,7 @@ public class TempoSignature : IEquatable<TempoSignature>
     ///     Combines the metrical components and partial-measure flag into a hash code.
     /// </summary>
     /// <returns>A hash code for this signature state.</returns>
+    [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
     public override int GetHashCode()
     {
         int hashCode = -175245820;

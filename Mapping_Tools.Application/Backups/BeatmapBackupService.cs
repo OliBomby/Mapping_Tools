@@ -222,12 +222,12 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
 
     private static bool IsPeriodicBackup(string path)
     {
-        const int timestampLength = 19;
-        const string periodicMarker = "_PB_";
+        const int timestamp_length = 19;
+        const string periodic_marker = "_PB_";
         string fileName = Path.GetFileName(path);
-        return fileName.Length >= timestampLength + periodicMarker.Length
-               && fileName.AsSpan(timestampLength).StartsWith(
-                   periodicMarker,
+        return fileName.Length >= timestamp_length + periodic_marker.Length
+               && fileName.AsSpan(timestamp_length).StartsWith(
+                   periodic_marker,
                    StringComparison.Ordinal);
     }
 

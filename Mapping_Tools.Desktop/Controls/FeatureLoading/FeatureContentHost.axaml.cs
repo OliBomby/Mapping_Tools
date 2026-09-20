@@ -65,7 +65,7 @@ public sealed partial class FeatureContentHost : UserControl
             return;
         }
 
-        if (viewCache.TryGetValue(Feature.GetType(), out Control? cachedView))
+        if (viewCache.TryGetValue(Feature.GetType(), out var cachedView))
         {
             ShowView(cachedView);
             return;
@@ -90,8 +90,8 @@ public sealed partial class FeatureContentHost : UserControl
             }
 
             Control view;
-            Type featureType = feature.GetType();
-            if (viewCache.TryGetValue(featureType, out Control? cachedView))
+            var featureType = feature.GetType();
+            if (viewCache.TryGetValue(featureType, out var cachedView))
             {
                 view = cachedView;
             }
@@ -133,7 +133,7 @@ public sealed partial class FeatureContentHost : UserControl
         StateHost.IsVisible = false;
         StateHost.Content = null;
 
-        foreach (Control cachedView in CachedViews.Children)
+        foreach (var cachedView in CachedViews.Children)
         {
             bool isActive = ReferenceEquals(cachedView, view);
             cachedView.IsVisible = isActive;
@@ -143,11 +143,10 @@ public sealed partial class FeatureContentHost : UserControl
 
     private void HideCachedViews()
     {
-        foreach (Control cachedView in CachedViews.Children)
+        foreach (var cachedView in CachedViews.Children)
         {
             cachedView.IsVisible = false;
             cachedView.IsHitTestVisible = false;
         }
     }
-
 }

@@ -31,4 +31,3 @@ public enum QuickRunStatus
     /// </summary>
     Failed,
 }
-

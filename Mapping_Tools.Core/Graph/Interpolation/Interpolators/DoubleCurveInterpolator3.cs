@@ -6,7 +6,7 @@ namespace Mapping_Tools.Core.Graph.Interpolation.Interpolators;
 /// <summary>Provides a rational version of the opposing double curve.</summary>
 [DisplayName("Double curve 3")]
 [VerticalMirrorInterpolator]
-[CustomDerivativeExtrema(new[] { 0d, 0.5d, 1d })]
+[CustomDerivativeExtrema([0d, 0.5d, 1d])]
 public sealed class DoubleCurveInterpolator3 : CustomInterpolator, IDerivableInterpolator, IIntegrableInterpolator
 {
     private readonly LinearInterpolator linearDegenerate = new();

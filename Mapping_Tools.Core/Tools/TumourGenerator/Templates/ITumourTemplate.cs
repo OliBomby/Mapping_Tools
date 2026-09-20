@@ -44,4 +44,3 @@ public interface ITumourTemplate
     /// <summary>Gets the cumulative-distance relation for a reconstruction hint.</summary>
     Func<double, double>? GetDistanceRelation();
 }
-

@@ -292,14 +292,12 @@ public sealed class ObjectVisualiserControl : Control
             : new Pen(Fill, ThicknessInsideOutline, lineCap: PenLineCap.Round, lineJoin: PenLineJoin.Round);
 
         if (sliderPathGeometry is not null)
-        {
             using (context.PushTransform(GetFigureTransform()))
             {
                 if (pathOutlinePen is not null) context.DrawGeometry(null, pathOutlinePen, sliderPathGeometry);
 
                 if (pathFillPen is not null) context.DrawGeometry(null, pathFillPen, sliderPathGeometry);
             }
-        }
 
         DrawCircleAtProgress(context, Fill, GetOutlinePen(), 0);
         DrawCircleAtProgress(context, Fill, GetOutlinePen(), 1);
@@ -340,7 +338,7 @@ public sealed class ObjectVisualiserControl : Control
     private static StreamGeometry CreatePathGeometry(IReadOnlyList<Vector2> points)
     {
         var geometry = new StreamGeometry();
-        using (StreamGeometryContext geometryContext = geometry.Open())
+        using (var geometryContext = geometry.Open())
         {
             geometryContext.BeginFigure(new Point(points[0].X, points[0].Y), false);
             for (int index = 1; index < points.Count; index++)
@@ -354,8 +352,7 @@ public sealed class ObjectVisualiserControl : Control
 
     private Matrix GetFigureTransform()
     {
-        return Matrix.CreateTranslation(-contentBounds.Left, -contentBounds.Top) *
-               Matrix.CreateScale(scale, scale);
+        return Matrix.CreateTranslation(-contentBounds.Left, -contentBounds.Top) * Matrix.CreateScale(scale, scale);
     }
 
     private void DrawCircleAtProgress(DrawingContext context, IBrush? fill, Pen? pen, double progress)

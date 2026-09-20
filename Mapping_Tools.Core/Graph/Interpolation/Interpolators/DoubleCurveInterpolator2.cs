@@ -6,7 +6,7 @@ namespace Mapping_Tools.Core.Graph.Interpolation.Interpolators;
 /// <summary>Provides a base-two version of the opposing double curve.</summary>
 [DisplayName("Double curve 2")]
 [VerticalMirrorInterpolator]
-[CustomDerivativeExtrema(new[] { 0d, 0.5d, 1d })]
+[CustomDerivativeExtrema([0d, 0.5d, 1d])]
 public sealed class DoubleCurveInterpolator2 : CustomInterpolator, IDerivableInterpolator, IIntegrableInterpolator
 {
     private readonly LinearInterpolator linearDegenerate = new();
@@ -60,4 +60,3 @@ public sealed class DoubleCurveInterpolator2 : CustomInterpolator, IDerivableInt
             : ((Math.Pow(2, p + 2) - 2) * t + Math.Pow(2, p) * (Math.Pow(2, p - 2 * p * t) - p * Math.Log(4)) / (p * Math.Log(2))) / (4 * (Math.Pow(2, p) - 1));
     }
 }
-

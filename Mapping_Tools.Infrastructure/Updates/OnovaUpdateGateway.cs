@@ -4,6 +4,8 @@ using Mapping_Tools.Application.Updates.Contracts;
 using Mapping_Tools.Application.Updates.Models;
 using Onova;
 using Onova.Models;
+using Onova.Services;
+using IPackageResolver = Mapping_Tools.Application.Updates.Contracts.IPackageResolver;
 
 namespace Mapping_Tools.Infrastructure.Updates;
 
@@ -20,6 +22,7 @@ public sealed class OnovaUpdateGateway : IUpdateGateway
 
     private const string release_history_url =
         "https://api.github.com/repos/OliBomby/Mapping_Tools/releases";
+
     private const int release_page_size = 100;
 
     private readonly string assetName;
@@ -73,7 +76,7 @@ public sealed class OnovaUpdateGateway : IUpdateGateway
         updateManager = new UpdateManager(
             assemblyMetadata,
             new OnovaPackageResolverAdapter(packageResolver),
-            new Onova.Services.ZipPackageExtractor());
+            new ZipPackageExtractor());
     }
 
     /// <inheritdoc />
@@ -87,7 +90,7 @@ public sealed class OnovaUpdateGateway : IUpdateGateway
             .ConfigureAwait(false);
 
         UpdateReleaseNotes? notes = null;
-        if (result.CanUpdate && result.LastVersion is not null) notes = await ReadLatestReleaseNotesAsync(cancellationToken).ConfigureAwait(false);
+        if (result is { CanUpdate: true, LastVersion: not null }) notes = await ReadLatestReleaseNotesAsync(cancellationToken).ConfigureAwait(false);
 
         return new UpdatePackageInfo(
             updateManager.Updatee.Version,
@@ -157,7 +160,7 @@ public sealed class OnovaUpdateGateway : IUpdateGateway
     {
         List<UpdateReleaseNotes> releaseNotes = [];
 
-        for (int page = 1; ; page++)
+        for (int page = 1;; page++)
         {
             using var response = await httpClient
                 .GetAsync($"{release_history_url}?per_page={release_page_size}&page={page}", cancellationToken)
@@ -166,7 +169,7 @@ public sealed class OnovaUpdateGateway : IUpdateGateway
             string json = await response.Content
                 .ReadAsStringAsync(cancellationToken)
                 .ConfigureAwait(false);
-            IReadOnlyList<UpdateReleaseNotes> pageNotes = GithubReleaseMetadataParser.ParseMany(json);
+            var pageNotes = GithubReleaseMetadataParser.ParseMany(json);
             releaseNotes.AddRange(pageNotes);
 
             if (pageNotes.Count < release_page_size) return releaseNotes;
@@ -238,5 +241,4 @@ public sealed class OnovaUpdateGateway : IUpdateGateway
                 cancellationToken);
         }
     }
-
 }

@@ -14,6 +14,7 @@ using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.BeatmapHelper.Events;
 using Mapping_Tools.Core.HitsoundStuff;
+using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.HitsoundStudio;
 using Mapping_Tools.Core.Tools.HitsoundStudio.Models;
 
@@ -85,7 +86,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             ImportType.Hitsounds => await ImportHitsoundsAsync(request, cancellationToken).ConfigureAwait(false),
             ImportType.Storyboard => await ImportStoryboardAsync(request, cancellationToken).ConfigureAwait(false),
             ImportType.MIDI => await ImportMidiAsync(request, cancellationToken).ConfigureAwait(false),
-            _ => throw new ArgumentOutOfRangeException(nameof(request.ImportType), request.ImportType, null),
+            _ => throw new ArgumentOutOfRangeException(nameof(request), request.ImportType, null),
         };
     }
 
@@ -95,7 +96,6 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(layers);
-        List<HitsoundLayer> reloaded = [];
         foreach (var group in layers
                      .Where(layer => layer.ImportArgs.ImportType != ImportType.None)
                      .GroupBy(layer => layer.ImportArgs.GetImportReloadingArgs(), new ImportReloadingArgsComparer()))
@@ -103,7 +103,9 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             cancellationToken.ThrowIfCancellationRequested();
             var imported = await ImportAsync(
                 ToImportRequest(group.Key), cancellationToken).ConfigureAwait(false);
-            foreach (var layer in group) layer.Reload(imported.ToList());
+
+            foreach (var layer in group)
+                layer.Reload([.. imported]);
         }
 
         return layers;
@@ -156,7 +158,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         bool validateSampleFile = project.SingleSampleExportFormat != HitsoundStudioSampleExportFormat.MidiChords
                                   && project.MixedSampleExportFormat != HitsoundStudioSampleExportFormat.MidiChords;
         SampleGeneratingArgsComparer comparer = new(validateSampleFile);
-        if (project.UsePreviousSampleSchema && project.PreviousSampleSchema is null)
+        if (project is { UsePreviousSampleSchema: true, PreviousSampleSchema: null })
             throw new InvalidDataException("A previous sample schema is required when that option is enabled.");
 
         return project.HitsoundExportModeSetting switch
@@ -221,6 +223,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             mapPath = Path.Combine(project.ExportFolder, session.Beatmap.GetFileName());
             session.SaveFile(mapPath);
         }
+
         Report(progress, 0.8);
 
         int sampleCount = project.ExportSamples
@@ -252,8 +255,8 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             project,
             validateSampleFile,
             comparer,
-            maniaPositions: project.HitsoundExportGameMode == GameMode.Mania,
-            includeRegularHitsounds: project.AddCoincidingRegularHitsounds,
+            project.HitsoundExportGameMode == GameMode.Mania,
+            project.AddCoincidingRegularHitsounds,
             progress,
             cancellationToken);
     }
@@ -269,8 +272,8 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             project,
             validateSampleFile,
             comparer,
-            maniaPositions: false,
-            includeRegularHitsounds: false,
+            false,
+            false,
             progress,
             cancellationToken);
     }
@@ -323,6 +326,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             mapPath = Path.Combine(project.ExportFolder, session.Beatmap.GetFileName());
             session.SaveFile(mapPath);
         }
+
         Report(progress, 0.7);
 
         int sampleCount = project.ExportSamples
@@ -379,12 +383,12 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             project,
             writesFiles,
             mapPath,
-            sampleCount: 0,
-            schema: project.PreviousSampleSchema ?? new SampleSchema(),
-            eventCount: packages.Sum(package => package.Samples.Count),
-            detailedSummary: detailedSummary,
-            progress: progress,
-            cancellationToken: cancellationToken).ConfigureAwait(false);
+            0,
+            project.PreviousSampleSchema ?? new SampleSchema(),
+            packages.Sum(package => package.Samples.Count),
+            detailedSummary,
+            progress,
+            cancellationToken).ConfigureAwait(false);
     }
 
     private async Task<HitsoundStudioExportResult> ShowResultsAsync(
@@ -421,8 +425,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         // Delete all files in the export folder before filling it again.
         foreach (string path in files.EnumerateFiles(
                      project.ExportFolder,
-                     "*",
-                     SearchOption.TopDirectoryOnly))
+                     "*"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             files.Delete(path);
@@ -437,9 +440,11 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         var session = await beatmaps.OpenBeatmapAsync(path, LiveBeatmapPreference.DiskOnly, cancellationToken)
             .ConfigureAwait(false);
         var times = session.Beatmap.HitObjects
-            .Where(hitObject => (request.X == -1 || Math.Abs(hitObject.Pos.X - request.X) < 3) && (request.Y == -1 || Math.Abs(hitObject.Pos.Y - request.Y) < 3))
+            .Where(hitObject => (Precision.AlmostEquals(request.X, -1) || Math.Abs(hitObject.Pos.X - request.X) < 3)
+                                && (Precision.AlmostEquals(request.Y, -1) || Math.Abs(hitObject.Pos.Y - request.Y) < 3))
             .Select(hitObject => hitObject.Time)
             .ToList();
+
         HitsoundLayer layer = new(request.Name, SampleSetOrDefault(request.SampleSet), request.Hitsound,
             new SampleGeneratingArgs(request.SamplePath), new LayerImportArgs(ImportType.Stack)
             {
@@ -450,6 +455,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         {
             Times = times,
         };
+
         return [layer];
     }
 

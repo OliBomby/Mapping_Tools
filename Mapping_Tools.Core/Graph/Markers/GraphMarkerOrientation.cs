@@ -9,4 +9,3 @@ public enum GraphMarkerOrientation
     /// <summary>A vertical line representing an X value.</summary>
     Vertical,
 }
-

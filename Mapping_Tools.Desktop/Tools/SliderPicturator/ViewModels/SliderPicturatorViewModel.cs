@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -7,10 +8,7 @@ using Mapping_Tools.Application.Execution.ToolExecution.Models;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Platform.FilePicker;
-using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
-using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.SliderPicturator;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Application.Workspace.Models;
@@ -26,13 +24,12 @@ using Mapping_Tools.Desktop.ViewModels;
 namespace Mapping_Tools.Desktop.Tools.SliderPicturator.ViewModels;
 
 /// <summary>Owns Slider Picturator state, preview generation, project persistence, and tool execution.</summary>
+[SuppressMessage("ReSharper", "UnusedParameterInPartialMethod")]
 public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, IQuickRun, IShellProjectFeature<SliderPicturatorProject>,
     IShellFeatureActivation
 {
-    private readonly ProjectDefinition<SliderPicturatorProject> definition = new(
-        "sliderpicturatorproject.json", "Slider Picturator Projects", static () => new SliderPicturatorProject(),
-        "slider-picturator-project.json",
-        ToolConfigSchema.ForTool(SliderPicturatorToolDefinition.Definition.Id));
+    private static readonly RgbaColour[] defaultComboColors =
+        [.. ComboColour.GetDefaultComboColours().Select(colour => colour.Color)];
 
     private readonly IFilePicker filePicker;
     private readonly IImageFileService images;
@@ -44,10 +41,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     private CancellationTokenSource? imageLoadCancellation;
     private bool isActive;
     private CancellationTokenSource? previewCancellation;
-    private Bitmap? previewImage;
     private RgbaImage? sourceImage;
-    private static readonly RgbaColour[] defaultComboColors =
-        [.. ComboColour.GetDefaultComboColours().Select(colour => colour.Color)];
 
     /// <summary>Creates the Slider Picturator presentation model.</summary>
     /// <param name="picturator">Runs the framework-independent operation.</param>
@@ -85,13 +79,13 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     /// <summary>Gets the current recoloured preview bitmap.</summary>
     public Bitmap? PreviewImage
     {
-        get => previewImage;
+        get;
         private set
         {
-            if (ReferenceEquals(previewImage, value)) return;
+            if (ReferenceEquals(field, value)) return;
 
-            var previous = previewImage;
-            previewImage = value;
+            var previous = field;
+            field = value;
             OnPropertyChanged();
             previous?.Dispose();
         }
@@ -245,7 +239,13 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
         PreviewImage = null;
     }
 
-    ProjectDefinition<SliderPicturatorProject> IShellProjectFeature<SliderPicturatorProject>.ProjectDefinition => definition;
+    ProjectDefinition<SliderPicturatorProject> IShellProjectFeature<SliderPicturatorProject>.ProjectDefinition
+    {
+        get;
+    } = new(
+        "sliderpicturatorproject.json", "Slider Picturator Projects", static () => new SliderPicturatorProject(),
+        "slider-picturator-project.json",
+        ToolConfigSchema.ForTool(SliderPicturatorToolDefinition.Definition.Id));
 
     SliderPicturatorProject IShellProjectFeature<SliderPicturatorProject>.Snapshot()
     {
@@ -283,7 +283,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     {
         try
         {
-            string path = await workspace.ResolveQuickRunBeatmapAsync(updateSelection: false);
+            string path = await workspace.ResolveQuickRunBeatmapAsync(false);
             SelectedSlider = await picturator.GetSelectedSliderAsync(path);
         }
         catch (Exception exception) { await PublishFailureAsync("Could not import slider", "The selected hit object could not be read.", exception); }
@@ -298,7 +298,8 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
 
     private async Task RefreshColorsAsync()
     {
-        colorRefreshCancellation?.Cancel();
+        if (colorRefreshCancellation is not null)
+            await colorRefreshCancellation.CancelAsync();
         CancellationTokenSource cancellation = new();
         colorRefreshCancellation = cancellation;
         try
@@ -427,16 +428,18 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
                     result,
                     quick ? null : "Done!");
             }), CreateProgress(), cancellationToken);
-        if (execution.Status == ToolExecutionStatus.Succeeded && execution.Value is { } result)
-            SegmentCount = result.SegmentCount;
+        if (execution is { Status: ToolExecutionStatus.Succeeded, Value: { } result2 })
+            SegmentCount = result2.SegmentCount;
     }
 
     private async Task LoadPreviewAsync(string path)
     {
-        imageLoadCancellation?.Cancel();
+        if (imageLoadCancellation is not null)
+            await imageLoadCancellation.CancelAsync();
         CancellationTokenSource cancellation = new();
         imageLoadCancellation = cancellation;
-        previewCancellation?.Cancel();
+        if (previewCancellation is not null)
+            await previewCancellation.CancelAsync();
         sourceImage = null;
         PreviewImage = null;
 
@@ -479,23 +482,28 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     private async Task GeneratePreviewAsync()
     {
         if (sourceImage is null) return;
-        previewCancellation?.Cancel();
+        if (previewCancellation is not null)
+            await previewCancellation.CancelAsync();
+
         CancellationTokenSource cancellation = new();
         previewCancellation = cancellation;
         var token = cancellation.Token;
         IsProcessingPreview = true;
+
         try
         {
-            SliderPicturatorProject options = Snapshot();
+            var options = Snapshot();
             // Legacy uses Color.FromArgb(0, 0, 0), the opaque RGB overload.
             // Keep preview compositing identical to PicturateAsync/export.
             options.BackgroundColor = RgbaColour.FromRgb(0, 0, 0);
-            var sourceImage = this.sourceImage
-                              ?? throw new InvalidOperationException("The preview source image was cleared.");
+            var sourceImage2 = sourceImage
+                               ?? throw new InvalidOperationException("The preview source image was cleared.");
+
             (RgbaImage image, long segments) result = await Task.Run(
-                () => SliderPicturatorEngine.Recolor(sourceImage, options),
+                () => SliderPicturatorEngine.Recolor(sourceImage2, options),
                 token);
             token.ThrowIfCancellationRequested();
+
             PreviewImage = RgbaImageBitmapFactory.Create(result.image);
             SegmentCount = result.segments;
         }
@@ -520,29 +528,22 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
 
     private void SetAvailableColors(IReadOnlyList<RgbaColour> colours)
     {
-        IReadOnlyList<RgbaColour> nextColors = colours.Count > 0 ? colours : defaultComboColors;
+        var nextColors = colours.Count > 0 ? colours : defaultComboColors;
         Dictionary<RgbaColour, int> desiredCounts = [];
-        foreach (RgbaColour colour in nextColors)
-        {
-            desiredCounts[colour] = desiredCounts.GetValueOrDefault(colour) + 1;
-        }
+        foreach (var colour in nextColors) desiredCounts[colour] = desiredCounts.GetValueOrDefault(colour) + 1;
 
-        foreach ((RgbaColour colour, int desiredCount) in desiredCounts)
-        {
+        foreach ((var colour, int desiredCount) in desiredCounts)
             for (int existingCount = AvailableColors.Count(item => item == colour);
                  existingCount < desiredCount;
                  existingCount++)
-            {
                 AvailableColors.Add(colour);
-            }
-        }
 
         if (!nextColors.Contains(ComboColor)) ComboColor = nextColors[0];
 
         Dictionary<RgbaColour, int> remainingCounts = new(desiredCounts);
         for (int index = AvailableColors.Count - 1; index >= 0; index--)
         {
-            RgbaColour colour = AvailableColors[index];
+            var colour = AvailableColors[index];
             if (!remainingCounts.TryGetValue(colour, out int remaining) || remaining == 0)
             {
                 AvailableColors.RemoveAt(index);
@@ -556,13 +557,11 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
         {
             int currentIndex = -1;
             for (int candidateIndex = index; candidateIndex < AvailableColors.Count; candidateIndex++)
-            {
                 if (AvailableColors[candidateIndex] == nextColors[index])
                 {
                     currentIndex = candidateIndex;
                     break;
                 }
-            }
 
             if (currentIndex > index) AvailableColors.Move(currentIndex, index);
         }
@@ -599,7 +598,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
         BorderColor = project.BorderColor;
         TimeCode = project.TimeCode;
         Duration = project.Duration;
-        PictureFile = project.PictureFile ?? string.Empty;
+        PictureFile = project.PictureFile;
         BlackOn = project.BlackOn;
         BorderOn = project.BorderOn;
         RedOn = project.RedOn;

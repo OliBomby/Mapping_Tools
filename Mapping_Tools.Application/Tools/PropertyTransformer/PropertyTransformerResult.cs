@@ -7,4 +7,3 @@ public sealed record PropertyTransformerResult(IReadOnlyList<string> ProcessedPa
     /// <summary>Gets the number of documents transformed.</summary>
     public int ProcessedCount => ProcessedPaths.Count;
 }
-

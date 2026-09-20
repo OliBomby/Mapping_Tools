@@ -9,4 +9,3 @@ public enum SlideratorGraphMode
     /// <summary>Interprets graph values as slider velocity in SV units.</summary>
     Velocity,
 }
-

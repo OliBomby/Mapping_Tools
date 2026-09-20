@@ -60,4 +60,3 @@ public sealed class DividedBeatMarkerGenerator : IGraphMarkerGenerator
         return (0xFF808080, 7);
     }
 }
-

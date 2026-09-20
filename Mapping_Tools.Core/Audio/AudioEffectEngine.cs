@@ -20,7 +20,7 @@ public static class AudioEffectEngine
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(effects);
 
-        AudioClip result = source;
+        var result = source;
         bool appliedEffect = false;
         foreach (var effect in effects)
         {

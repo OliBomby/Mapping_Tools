@@ -6,10 +6,7 @@ using Mapping_Tools.Application.Execution.ToolExecution.Models;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Platform;
-using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
-using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.HitsoundPreviewHelper;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
@@ -41,8 +38,6 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     private readonly IRhythmGuideWindowService rhythmGuideWindow;
     private readonly DesktopApplicationSettings settings;
     private readonly IBeatmapWorkspace workspace;
-
-    private bool? isAllItemsSelected;
 
     /// <summary>
     ///     Creates the Hitsound Preview Helper presentation model.
@@ -89,11 +84,6 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     [ObservableProperty]
     public partial ObservableCollection<ObservableHitsoundZone> Items { get; set; } = [];
 
-    /// <summary>Gets a concise result or validation message for the latest action.</summary>
-    [ObservableProperty]
-    public partial string ResultSummary { get; private set; } =
-        "Add hitsound zones, then run the helper.";
-
     /// <summary>Gets every supported hitsound layer.</summary>
     public IReadOnlyList<Hitsound> Hitsounds { get; } = Enum.GetValues<Hitsound>();
 
@@ -103,12 +93,12 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     /// <summary>Gets or sets the tri-state select-all value used by the zone list.</summary>
     public bool? IsAllItemsSelected
     {
-        get => isAllItemsSelected;
+        get;
         set
         {
-            if (isAllItemsSelected == value) return;
+            if (field == value) return;
 
-            isAllItemsSelected = value;
+            field = value;
             if (value.HasValue)
                 foreach (var item in Items)
                     item.IsSelected = value.Value;
@@ -143,7 +133,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     void IShellProjectFeature<HitsoundPreviewHelperProject>.Install(HitsoundPreviewHelperProject project)
     {
         Items = new ObservableCollection<ObservableHitsoundZone>(
-            (project.Items ?? []).Select(item => new ObservableHitsoundZone(item.Copy())));
+            (project.Items).Select(item => new ObservableHitsoundZone(item.Copy())));
     }
 
     /// <inheritdoc />
@@ -229,7 +219,10 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     {
         if (paths.Count == 0)
         {
-            ResultSummary = "Select at least one beatmap or open one in osu! before running Hitsound Preview Helper.";
+            await notifications.PublishAsync(new UserNotification(
+                UserNotificationSeverity.Warning,
+                Tool.DisplayName,
+                "Select at least one beatmap or open one in osu! before running Hitsound Preview Helper."));
             return;
         }
 
@@ -237,7 +230,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
         {
             Items = Items.Select(item => item.Snapshot()).ToList(),
         };
-        var result = await Execution.ExecuteAsync(
+        await Execution.ExecuteAsync(
             new ToolExecutionRequest<HitsoundPreviewHelperResult>(
                 Tool.Id,
                 Tool.DisplayName,
@@ -247,8 +240,8 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
                         paths,
                         options,
                         quick,
-                        new Progress<double>(value => context.ReportProgress(
-                            value,
+                        new Progress<double>(progress => context.ReportProgress(
+                            progress,
                             "Placing preview hitsounds")),
                         context.CancellationToken);
                     return new ToolExecutionOutput<HitsoundPreviewHelperResult>(
@@ -257,11 +250,6 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
                 }),
             CreateProgress(),
             cancellationToken);
-
-        if (result.Status == ToolExecutionStatus.Succeeded && result.Value is { } value)
-            ResultSummary = quick
-                ? $"Placed {value.UpdatedEventCount} preview hitsounds."
-                : "Done!";
     }
 
     private Task PublishSelectionWarningAsync()

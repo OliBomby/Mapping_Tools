@@ -2,16 +2,15 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
+using Mapping_Tools.Application.Execution.UserNotification;
+using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Platform;
-using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
-using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Desktop.Controls.Timeline;
-using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.MapCleaner;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Tools.MapCleaner.Models;
+using Mapping_Tools.Desktop.Controls.Timeline;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tools.MapCleaner.Models;
@@ -26,14 +25,8 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
 {
     private readonly IMapCleanerService cleaner;
 
-    private readonly ProjectDefinition<MapCleanerProject> definition = new(
-        "mapcleanerproject.json",
-        "Map Cleaner Projects",
-        () => new MapCleanerProject(),
-        "map-cleaner-project.json",
-        ToolConfigSchema.ForTool(MapCleanerToolDefinition.Definition.Id));
-
     private readonly IPlatformLauncher launcher;
+    private readonly IUserNotificationService notifications;
     private readonly DesktopApplicationSettings settings;
     private readonly IBeatmapWorkspace workspace;
 
@@ -43,18 +36,21 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
     /// <param name="workspace">Supplies selected beatmaps for ordinary runs.</param>
     /// <param name="settings">Supplies shared execution preferences.</param>
     /// <param name="launcher">Navigates osu! to selected timeline markers.</param>
+    /// <param name="notifications">Publishes user-facing validation messages.</param>
     public MapCleanerViewModel(
         IMapCleanerService cleaner,
         IToolExecutionService execution,
         IBeatmapWorkspace workspace,
         DesktopApplicationSettings settings,
-        IPlatformLauncher launcher)
+        IPlatformLauncher launcher,
+        IUserNotificationService notifications)
         : base(execution, MapCleanerToolDefinition.Definition)
     {
         this.cleaner = cleaner ?? throw new ArgumentNullException(nameof(cleaner));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         this.launcher = launcher ?? throw new ArgumentNullException(nameof(launcher));
+        this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
     }
 
     /// <summary>Gets or sets whether slider volume changes are preserved.</summary>
@@ -102,11 +98,6 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
     public partial IBeatDivisor[] BeatDivisors { get; set; } =
         RationalBeatDivisor.GetDefaultBeatDivisors();
 
-    /// <summary>Gets a textual summary of the latest cleanup.</summary>
-    [ObservableProperty]
-    public partial string ResultSummary { get; private set; } =
-        "Run Map Cleaner to rebuild useful greenlines.";
-
     /// <summary>Gets the latest single-map cleanup markers.</summary>
     [ObservableProperty]
     public partial IReadOnlyList<TimelineMarker> Markers { get; private set; } = [];
@@ -133,7 +124,12 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
             cancellationToken));
     }
 
-    ProjectDefinition<MapCleanerProject> IShellProjectFeature<MapCleanerProject>.ProjectDefinition => definition;
+    ProjectDefinition<MapCleanerProject> IShellProjectFeature<MapCleanerProject>.ProjectDefinition { get; } = new(
+        "mapcleanerproject.json",
+        "Map Cleaner Projects",
+        () => new MapCleanerProject(),
+        "map-cleaner-project.json",
+        ToolConfigSchema.ForTool(MapCleanerToolDefinition.Definition.Id));
 
     MapCleanerProject IShellProjectFeature<MapCleanerProject>.Snapshot()
     {
@@ -174,7 +170,10 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
     {
         if (paths.Count == 0)
         {
-            ResultSummary = "Select at least one beatmap or open one in osu! before running Map Cleaner.";
+            await notifications.PublishAsync(new UserNotification(
+                UserNotificationSeverity.Warning,
+                Tool.DisplayName,
+                "Select at least one beatmap or open one in osu! before running Map Cleaner."));
             return;
         }
 
@@ -200,11 +199,10 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
                 }),
             CreateProgress(),
             cancellationToken);
-        if (execution.Status == ToolExecutionStatus.Succeeded && execution.Value is { } result)
+        if (execution is { Status: ToolExecutionStatus.Succeeded, Value: { } result2 })
         {
-            ResultSummary = Summarize(result, options);
-            EndTime = result.TimelineEndTime;
-            Markers = paths.Count == 1 ? CreateMarkers(result) : [];
+            EndTime = result2.TimelineEndTime;
+            Markers = paths.Count == 1 ? CreateMarkers(result2) : [];
             HasRun = paths.Count == 1;
         }
     }
@@ -213,7 +211,7 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
     {
         return new MapCleanerProject
         {
-            MapCleanerArgs = new MapCleanerProject.MapCleanerCleanupOptions
+            MapCleanerArgs = new MapCleanerServiceOptions.MapCleanerCleanupOptions
             {
                 VolumeSliders = VolumeSliders,
                 SampleSetSliders = SampleSetSliders,
@@ -232,7 +230,7 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
 
     private void Install(MapCleanerProject project)
     {
-        var options = project?.MapCleanerArgs ?? throw new InvalidDataException("Map Cleaner project is incomplete.");
+        var options = project.MapCleanerArgs ?? throw new InvalidDataException("Map Cleaner project is incomplete.");
         VolumeSliders = options.VolumeSliders;
         SampleSetSliders = options.SampleSetSliders;
         VolumeSpinners = options.VolumeSpinners;
@@ -262,7 +260,7 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
             .ToArray();
     }
 
-    private static string Summarize(MapCleanerResult result, MapCleanerProject.MapCleanerCleanupOptions options)
+    private static string Summarize(MapCleanerResult result, MapCleanerServiceOptions.MapCleanerCleanupOptions options)
     {
         return $"Successfully {(result.TimingPointsRemoved < 0 ? "added" : "removed")} "
                + $"{Math.Abs(result.TimingPointsRemoved)} "

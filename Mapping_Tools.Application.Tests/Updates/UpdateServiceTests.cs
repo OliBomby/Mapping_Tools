@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Updates;
 using Mapping_Tools.Application.Updates.Contracts;
@@ -7,6 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Mapping_Tools.Application.Tests.Updates;
 
 [TestClass]
+[SuppressMessage("ReSharper", "AccessToDisposedClosure")]
 public sealed class UpdateServiceTests
 {
     [TestMethod]
@@ -19,7 +21,7 @@ public sealed class UpdateServiceTests
             "Release",
             "Notes",
             "release.zip"));
-        using UpdateService service = new(gateway, new ApplicationSettings());
+        await using UpdateService service = new(gateway, new ApplicationSettings());
 
         // Act
         var result = await service.CheckForUpdatesAsync(
@@ -43,7 +45,7 @@ public sealed class UpdateServiceTests
             null,
             "release.zip"));
         ApplicationSettings settings = new() { SkipVersion = "2.0" };
-        using UpdateService service = new(gateway, settings);
+        await using UpdateService service = new(gateway, settings);
 
         // Act
         var startupResult = await service.CheckForUpdatesAsync(
@@ -66,7 +68,7 @@ public sealed class UpdateServiceTests
             null,
             null,
             "release.zip"));
-        using UpdateService service = new(gateway, new ApplicationSettings());
+        await using UpdateService service = new(gateway, new ApplicationSettings());
         List<double> progress = [];
         service.ProgressChanged += (_, args) => progress.Add(args.Progress);
         await service.CheckForUpdatesAsync(false);
@@ -92,7 +94,7 @@ public sealed class UpdateServiceTests
             null,
             null,
             "release.zip"));
-        using UpdateService service = new(gateway, new ApplicationSettings());
+        await using UpdateService service = new(gateway, new ApplicationSettings());
 
         // Act
         var act = () => service.PrepareUpdateAsync();
@@ -123,7 +125,7 @@ public sealed class UpdateServiceTests
             });
             return preparation.Task;
         };
-        using UpdateService service = new(gateway, new ApplicationSettings());
+        await using UpdateService service = new(gateway, new ApplicationSettings());
         await service.CheckForUpdatesAsync(false);
         var download = service.PrepareUpdateAsync();
 
@@ -180,7 +182,7 @@ public sealed class UpdateServiceTests
             gateway.PrepareCallCount++;
             return preparation.Task;
         };
-        using UpdateService service = new(gateway, new ApplicationSettings());
+        await using UpdateService service = new(gateway, new ApplicationSettings());
         await service.CheckForUpdatesAsync(false);
 
         // Act
@@ -208,7 +210,7 @@ public sealed class UpdateServiceTests
         TaskCompletionSource preparation = new(
             TaskCreationOptions.RunContinuationsAsynchronously);
         gateway.PrepareImplementation = (_, _, _) => preparation.Task;
-        using UpdateService service = new(gateway, new ApplicationSettings());
+        await using UpdateService service = new(gateway, new ApplicationSettings());
         await service.CheckForUpdatesAsync(false);
         var download = service.PrepareUpdateAsync();
 
@@ -258,7 +260,7 @@ public sealed class UpdateServiceTests
         {
             cancellationToken.ThrowIfCancellationRequested();
             return Task.FromResult<IReadOnlyList<UpdateReleaseNotes>>
-            ([new UpdateReleaseNotes(Result.ReleaseTitle, Result.ReleaseBody)]);
+                ([new UpdateReleaseNotes(Result.ReleaseTitle, Result.ReleaseBody)]);
         }
 
         public Task PrepareUpdateAsync(

@@ -30,7 +30,7 @@ public sealed class FileSystemBeatmapBackupStoreTests
 
             await store.WriteLinesAsync(destination, ["snapshot", "complete"]);
             (await File.ReadAllLinesAsync(destination)).Should().Equal("snapshot", "complete");
-            File.ReadAllBytes(destination).Should().Equal(
+            (await File.ReadAllBytesAsync(destination)).Should().Equal(
                 Encoding.UTF8.GetBytes("snapshot\r\ncomplete\r\n"));
             Directory.EnumerateFiles(directory)
                 .Any(path => Path.GetFileName(path)
@@ -125,7 +125,7 @@ public sealed class FileSystemBeatmapBackupStoreTests
                 "2026-07-25 14-05-06__2_map.osu");
             await File.WriteAllTextAsync(diskBackup, "disk");
             await File.WriteAllTextAsync(editorReaderBackup, "editor");
-            DateTime creationTime = DateTime.UtcNow.AddMinutes(-1);
+            var creationTime = DateTime.UtcNow.AddMinutes(-1);
             File.SetCreationTimeUtc(diskBackup, creationTime);
             File.SetCreationTimeUtc(editorReaderBackup, creationTime);
             FileSystemBeatmapBackupStore store = new();

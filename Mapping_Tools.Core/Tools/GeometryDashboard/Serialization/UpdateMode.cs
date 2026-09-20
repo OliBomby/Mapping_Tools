@@ -15,4 +15,3 @@ public enum UpdateMode
     /// <summary>Refresh when osu! becomes the active window.</summary>
     OsuActivated,
 }
-

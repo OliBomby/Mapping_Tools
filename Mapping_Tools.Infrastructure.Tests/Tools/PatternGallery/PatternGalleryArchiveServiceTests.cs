@@ -18,8 +18,8 @@ public sealed class PatternGalleryArchiveServiceTests
         PatternGalleryArchiveService service = new();
         string fixtureRoot = Path.Combine(AppContext.BaseDirectory, "Fixtures", "Patterns", "legacy-collection");
         string patternFileName = "2025-06-07 21-32-54_NEsChy2u__Pattern 1.osu";
-        string projectJson = File.ReadAllText(Path.Combine(fixtureRoot, "project.json"));
-        byte[] patternBytes = File.ReadAllBytes(Path.Combine(fixtureRoot, "Pattern Files", patternFileName));
+        string projectJson = await File.ReadAllTextAsync(Path.Combine(fixtureRoot, "project.json"));
+        byte[] patternBytes = await File.ReadAllBytesAsync(Path.Combine(fixtureRoot, "Pattern Files", patternFileName));
 
         try
         {
@@ -53,7 +53,7 @@ public sealed class PatternGalleryArchiveServiceTests
         string root = Path.Combine(Path.GetTempPath(), "MappingToolsPatternGallery", Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(root);
         string archivePath = Path.Combine(root, "unsafe.zip");
-        using (var archive = ZipFile.Open(archivePath, ZipArchiveMode.Create))
+        await using (var archive = await ZipFile.OpenAsync(archivePath, ZipArchiveMode.Create))
         {
             archive.CreateEntry("../project.json");
         }
@@ -82,7 +82,7 @@ public sealed class PatternGalleryArchiveServiceTests
         string root = Path.Combine(Path.GetTempPath(), "MappingToolsPatternGallery", Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(root);
         string archivePath = Path.Combine(root, "unsafe-rooted.zip");
-        using (var archive = ZipFile.Open(archivePath, ZipArchiveMode.Create))
+        await using (var archive = await ZipFile.OpenAsync(archivePath, ZipArchiveMode.Create))
         {
             archive.CreateEntry("/project.json");
         }

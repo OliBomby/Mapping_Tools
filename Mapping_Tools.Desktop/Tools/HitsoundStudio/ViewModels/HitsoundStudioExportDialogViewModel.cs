@@ -12,10 +12,10 @@ public sealed partial class HitsoundStudioExportDialogViewModel : ObservableObje
 {
     private readonly IFilePicker filePicker;
     private readonly HitsoundStudioProject project;
-    private IAsyncRelayCommand? pickFolderCommand;
 
     /// <summary>Creates export options from an independent project snapshot.</summary>
     /// <param name="project">The current feature state.</param>
+    /// <param name="filePicker">The file picker service.</param>
     public HitsoundStudioExportDialogViewModel(HitsoundStudioProject project, IFilePicker filePicker)
     {
         this.project = project.Clone();
@@ -82,6 +82,11 @@ public sealed partial class HitsoundStudioExportDialogViewModel : ObservableObje
 
     /// <summary>Gets or sets export mode.</summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SampleExportSettingsVisible))]
+    [NotifyPropertyChangedFor(nameof(StandardExtraSettingsVisible))]
+    [NotifyPropertyChangedFor(nameof(CoincidingExtraSettingsVisible))]
+    [NotifyPropertyChangedFor(nameof(MidiExtraSettingsVisible))]
+    [NotifyPropertyChangedFor(nameof(GameModeVisible))]
     public partial HitsoundStudioExportMode HitsoundExportModeSetting { get; set; }
 
     /// <summary>Gets whether sample-specific options apply to the selected mode.</summary>
@@ -139,7 +144,7 @@ public sealed partial class HitsoundStudioExportDialogViewModel : ObservableObje
     public IRelayCommand CancelCommand { get; }
 
     /// <summary>Gets the export-folder picker command.</summary>
-    public IAsyncRelayCommand PickFolderCommand => pickFolderCommand ??= new AsyncRelayCommand(PickFolderAsync);
+    public IAsyncRelayCommand PickFolderCommand => field ??= new AsyncRelayCommand(PickFolderAsync);
 
     /// <summary>Gets or sets the modal close callback.</summary>
     internal Action<object?> Close { get; set; } = _ => { };
@@ -166,15 +171,6 @@ public sealed partial class HitsoundStudioExportDialogViewModel : ObservableObje
             AllowMultiple = false,
         }).ConfigureAwait(false);
         if (paths.Count > 0) ExportFolder = paths[0];
-    }
-
-    partial void OnHitsoundExportModeSettingChanged(HitsoundStudioExportMode value)
-    {
-        OnPropertyChanged(nameof(SampleExportSettingsVisible));
-        OnPropertyChanged(nameof(GameModeVisible));
-        OnPropertyChanged(nameof(StandardExtraSettingsVisible));
-        OnPropertyChanged(nameof(CoincidingExtraSettingsVisible));
-        OnPropertyChanged(nameof(MidiExtraSettingsVisible));
     }
 
     private void Accept()

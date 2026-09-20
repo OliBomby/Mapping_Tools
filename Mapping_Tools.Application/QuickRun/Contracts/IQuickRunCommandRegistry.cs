@@ -47,4 +47,3 @@ public interface IQuickRunCommandRegistry
     /// <returns>An immutable snapshot used to populate Smart QuickRun choices.</returns>
     IReadOnlyList<QuickRunCommand> GetCommandsFor(QuickRunTargets target);
 }
-

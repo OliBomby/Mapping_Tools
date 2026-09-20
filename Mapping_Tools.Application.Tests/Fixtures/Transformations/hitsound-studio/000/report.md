@@ -11,14 +11,16 @@
 
 ## Semantic comparison
 
-| Output item | Count |
-|---|---:|
-| Redlines retained from base | 5 |
-| Generated greenlines | 1 |
-| Generated hit objects | 5 |
-| Generated sample indices | 1 |
-| Exported samples | 1 |
+| Output item                 | Count |
+|-----------------------------|------:|
+| Redlines retained from base |     5 |
+| Generated greenlines        |     1 |
+| Generated hit objects       |     5 |
+| Generated sample indices    |     1 |
+| Exported samples            |     1 |
 
-The single layer produced normal hitsounds at `15`, `334`, `526`, `942`, and `2109` ms. All events share custom index 1, so one inherited timing point and one `normal-hitnormal.wav` sample were emitted. The PCM export is byte-identical to the source WAV. Opening the export folder on completion is part of the observed legacy behavior.
+The single layer produced normal hitsounds at `15`, `334`, `526`, `942`, and `2109` ms. All events share custom index 1,
+so one inherited timing point and one `normal-hitnormal.wav` sample were emitted. The PCM export is byte-identical to
+the source WAV. Opening the export folder on completion is part of the observed legacy behavior.
 
 Status: accepted by Olivier on 2026-07-18.

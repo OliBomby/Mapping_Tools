@@ -78,4 +78,3 @@ public interface IRelevantObject : IDisposable
     /// <returns>A distance value in the object's native geometry units.</returns>
     double DistanceTo(IRelevantObject relevantObject);
 }
-

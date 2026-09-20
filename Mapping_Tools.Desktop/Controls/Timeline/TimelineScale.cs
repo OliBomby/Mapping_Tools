@@ -14,7 +14,7 @@ public sealed class TimelineScale
     public TimelineScale(double startTime, double endTime, int intervalCount = 10)
     {
         if (!double.IsFinite(startTime) || !double.IsFinite(endTime)) throw new ArgumentOutOfRangeException(nameof(endTime));
-        if (intervalCount <= 0) throw new ArgumentOutOfRangeException(nameof(intervalCount));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(intervalCount);
         StartTime = startTime;
         EndTime = Math.Max(endTime, startTime + minimum_span);
         IntervalCount = intervalCount;

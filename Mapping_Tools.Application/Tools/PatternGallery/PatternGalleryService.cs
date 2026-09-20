@@ -8,6 +8,7 @@ using Mapping_Tools.Application.Tools.PatternGallery.Contracts;
 using Mapping_Tools.Application.Tools.PatternGallery.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.PatternGallery;
 using Mapping_Tools.Core.Tools.PatternGallery.Models;
@@ -111,7 +112,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
         PatternGalleryMaker maker = new();
         PatternGalleryPattern pattern;
 
-        if (!string.IsNullOrEmpty(filter) || startTime != -1 || endTime != -1)
+        if (!string.IsNullOrEmpty(filter) || !Precision.AlmostEquals(startTime, -1) || !Precision.AlmostEquals(endTime, -1))
         {
             pattern = maker.FromBeatmapFiltered(
                 source.Beatmap,

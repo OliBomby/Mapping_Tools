@@ -10,4 +10,3 @@ public sealed record SlideratorApplyResult(
     double NewVelocity,
     bool Simplified,
     int ObjectCount);
-

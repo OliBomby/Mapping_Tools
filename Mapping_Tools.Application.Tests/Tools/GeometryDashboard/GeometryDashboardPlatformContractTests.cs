@@ -1,8 +1,6 @@
-using Mapping_Tools.Application.Tools.GeometryDashboard;
+using System.Diagnostics.CodeAnalysis;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
-using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
-using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Infrastructure.Tools.GeometryDashboard;
@@ -13,6 +11,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Mapping_Tools.Application.Tests.Tools.GeometryDashboard;
 
 [TestClass]
+[SuppressMessage("ReSharper", "AccessToDisposedClosure")]
 public sealed class GeometryDashboardPlatformContractTests
 {
     [TestMethod]
@@ -121,7 +120,7 @@ public sealed class GeometryDashboardPlatformContractTests
             new FakeLiveBeatmapReader(null),
             new FakeWindowService(null));
         using CancellationTokenSource cancellation = new();
-        cancellation.Cancel();
+        await cancellation.CancelAsync();
 
         // Act
         Func<Task> act = () => sut.ReadAsync(cancellation.Token);
@@ -147,7 +146,7 @@ public sealed class GeometryDashboardPlatformContractTests
             1,
             9,
             4,
-            editorTime: 1000);
+            1000);
         hitObjects.Clear();
 
         // Assert
@@ -226,7 +225,7 @@ public sealed class GeometryDashboardPlatformContractTests
     {
         public int CallCount { get; private set; }
 
-        public GeometryDashboardWindow? GetWindow(PlatformWindowId windowId)
+        public GeometryDashboardWindow GetWindow(PlatformWindowId windowId)
         {
             throw new NotSupportedException();
         }
@@ -242,5 +241,4 @@ public sealed class GeometryDashboardPlatformContractTests
             return [];
         }
     }
-
 }

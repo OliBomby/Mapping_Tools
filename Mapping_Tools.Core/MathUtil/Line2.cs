@@ -137,7 +137,8 @@ public struct Line2 : IEquatable<Line2>
     /// </summary>
     /// <param name="left">First operand</param>
     /// <param name="right">Second operand</param>
-    /// <returns>The intersection the two inputs</returns>
+    /// <param name="result">The intersection the two inputs</param>
+    /// <returns>Whether the intersection exists</returns>
     public static bool Intersection(Line2 left, Line2 right, out Vector2 result)
     {
         var p1 = left.PositionVector;

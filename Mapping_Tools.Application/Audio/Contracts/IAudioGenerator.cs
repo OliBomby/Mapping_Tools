@@ -12,4 +12,3 @@ public interface IAudioGenerator
     /// <returns>An owned generated clip.</returns>
     Task<AudioClip> GenerateAsync(AudioGenerationRequest request, CancellationToken cancellationToken = default);
 }
-

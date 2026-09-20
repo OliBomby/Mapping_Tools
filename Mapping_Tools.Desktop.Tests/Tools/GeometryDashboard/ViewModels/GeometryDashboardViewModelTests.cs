@@ -52,16 +52,16 @@ public sealed class GeometryDashboardViewModelTests
         var changedProperties = new List<string?>();
         generator.PropertyChanged += (_, eventArgs) => changedProperties.Add(eventArgs.PropertyName);
         bool expectedSequential = !generator.IsSequential;
-        const double expectedRelevancyRatio = 0.75;
+        const double expected_relevancy_ratio = 0.75;
 
         // Act
         generator.Model.Settings.IsSequential = expectedSequential;
-        generator.Model.Settings.RelevancyRatio = expectedRelevancyRatio;
+        generator.Model.Settings.RelevancyRatio = expected_relevancy_ratio;
         generator.NotifySettingsChanged();
 
         // Assert
         generator.IsSequential.Should().Be(expectedSequential);
-        generator.RelevancyRatio.Should().Be(expectedRelevancyRatio);
+        generator.RelevancyRatio.Should().Be(expected_relevancy_ratio);
         changedProperties.Should().Contain(nameof(generator.IsSequential));
         changedProperties.Should().Contain(nameof(generator.RelevancyRatio));
     }
@@ -292,9 +292,8 @@ public sealed class GeometryDashboardViewModelTests
 
     private sealed class RuntimeStub(IEnumerable<GeometryDashboardRuntimeSnapshot?> snapshots) : IGeometryDashboardRuntime
     {
-        public bool IsProcessRunning => true;
-
         private readonly Queue<GeometryDashboardRuntimeSnapshot?> snapshots = new(snapshots);
+        public bool IsProcessRunning => true;
 
         public Task<GeometryDashboardRuntimeSnapshot?> ReadAsync(CancellationToken cancellationToken = default)
         {
@@ -411,11 +410,9 @@ public sealed class GeometryDashboardViewModelTests
 
     private sealed class GeneratorSettingsWithUnmappedProperty : GeneratorSettings
     {
-        [DisplayName("Unmapped")]
-        public double Unmapped { get; set; }
+        [DisplayName("Unmapped")] public double Unmapped { get; set; }
 
-        [DisplayName("Angle")]
-        public double Angle { get; set; }
+        [DisplayName("Angle")] public double Angle { get; set; }
 
         public override object Clone()
         {
@@ -426,5 +423,4 @@ public sealed class GeometryDashboardViewModelTests
             };
         }
     }
-
 }

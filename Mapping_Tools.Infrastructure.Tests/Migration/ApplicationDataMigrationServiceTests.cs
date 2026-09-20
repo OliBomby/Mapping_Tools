@@ -19,10 +19,10 @@ public sealed class ApplicationDataMigrationServiceTests
             "My collection",
             "Pattern Files",
             "pattern.osu");
-        File.WriteAllText(legacyAutosave, "legacy autosave");
+        await File.WriteAllTextAsync(legacyAutosave, "legacy autosave");
         Directory.CreateDirectory(Path.GetDirectoryName(legacyProjectFile)!);
-        File.WriteAllText(legacyProjectFile, "legacy project");
-        File.WriteAllText(test.Directories.ConfigurationFile, "legacy configuration");
+        await File.WriteAllTextAsync(legacyProjectFile, "legacy project");
+        await File.WriteAllTextAsync(test.Directories.ConfigurationFile, "legacy configuration");
         ApplicationDataMigrationService service = new(test.Directories);
 
         // Act
@@ -32,18 +32,18 @@ public sealed class ApplicationDataMigrationServiceTests
         result.AutosavesCopied.Should().Be(1);
         result.ProjectFilesCopied.Should().Be(1);
         result.ExistingFilesSkipped.Should().Be(0);
-        File.ReadAllText(Path.Combine(
+        (await File.ReadAllTextAsync(Path.Combine(
                 test.Directories.ApplicationData,
                 "Autosaves",
-                "patterngalleryproject.json"))
+                "patterngalleryproject.json")))
             .Should().Be("legacy autosave");
-        File.ReadAllText(Path.Combine(
+        (await File.ReadAllTextAsync(Path.Combine(
                 test.Directories.ApplicationData,
                 "Projects",
                 "Pattern Gallery Projects",
                 "My collection",
                 "Pattern Files",
-                "pattern.osu"))
+                "pattern.osu")))
             .Should().Be("legacy project");
         File.Exists(legacyAutosave).Should().BeTrue();
         File.Exists(legacyProjectFile).Should().BeTrue();
@@ -60,10 +60,10 @@ public sealed class ApplicationDataMigrationServiceTests
             test.Directories.ApplicationData,
             "Autosaves",
             "patterngalleryproject.json");
-        File.WriteAllText(legacyAutosave, "legacy");
-        File.WriteAllText(test.Directories.ConfigurationFile, "legacy configuration");
+        await File.WriteAllTextAsync(legacyAutosave, "legacy");
+        await File.WriteAllTextAsync(test.Directories.ConfigurationFile, "legacy configuration");
         Directory.CreateDirectory(Path.GetDirectoryName(modernAutosave)!);
-        File.WriteAllText(modernAutosave, "existing");
+        await File.WriteAllTextAsync(modernAutosave, "existing");
         ApplicationDataMigrationService service = new(test.Directories);
 
         // Act
@@ -72,7 +72,7 @@ public sealed class ApplicationDataMigrationServiceTests
         // Assert
         result.AutosavesCopied.Should().Be(0);
         result.ExistingFilesSkipped.Should().Be(1);
-        File.ReadAllText(modernAutosave).Should().Be("existing");
+        (await File.ReadAllTextAsync(modernAutosave)).Should().Be("existing");
         File.Exists(legacyAutosave).Should().BeTrue();
     }
 

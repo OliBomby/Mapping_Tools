@@ -45,7 +45,7 @@ public sealed class PatternGalleryMaker
         RemoveStoryboard(patternBeatmap);
         // Keep the selected subset of hit objects
         RemoveEverythingThatIsNotTheseHitObjects(patternBeatmap, patternBeatmap.HitObjects
-            .Where((item, index) => selectedIndices.Contains(index))
+            .Where((_, index) => selectedIndices.Contains(index))
             .ToList());
         return FromBeatmap(patternBeatmap, name);
     }
@@ -76,8 +76,8 @@ public sealed class PatternGalleryMaker
             ? patternBeatmap.HitObjects
             : patternBeatmap.QueryTimeCode(filter).ToList();
 
-        if (startTime != -1) objects.RemoveAll(item => item.EndTime < startTime);
-        if (endTime != -1) objects.RemoveAll(item => item.Time > endTime);
+        if (!Precision.AlmostEquals(startTime, -1)) objects.RemoveAll(item => item.EndTime < startTime);
+        if (!Precision.AlmostEquals(endTime, -1)) objects.RemoveAll(item => item.Time > endTime);
 
         if (objects.Count == 0) throw new InvalidOperationException("At least one valid hit object is required.");
 

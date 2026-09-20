@@ -1,4 +1,6 @@
 #nullable disable
+using System.Diagnostics.CodeAnalysis;
+
 namespace Mapping_Tools.Core.BeatmapHelper;
 
 /// <summary>Compares serialized hit-object behavior with optional position and time checks.</summary>
@@ -29,6 +31,7 @@ public class HitObjectComparer : IEqualityComparer<HitObject>
     /// <param name="x">The first hit object.</param>
     /// <param name="y">The second hit object.</param>
     /// <returns><see langword="true" /> when all enabled and type-specific fields match exactly.</returns>
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     public bool Equals(HitObject x, HitObject y)
     {
         if (x == null && y == null)

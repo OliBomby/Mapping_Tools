@@ -35,7 +35,7 @@ public sealed class NaudioAudioPlaybackService : IAudioPlaybackService
     private sealed class NaudioPlaybackSession : IAudioPlaybackSession
     {
         private readonly TaskCompletionSource<object?> completion = new(TaskCreationOptions.RunContinuationsAsynchronously);
-        private readonly object gate = new();
+        private readonly Lock gate = new();
         private readonly bool loop;
         private readonly IWavePlayer player;
         private readonly RawSourceWaveStream stream;

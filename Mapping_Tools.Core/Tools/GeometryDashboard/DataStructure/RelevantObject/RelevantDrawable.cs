@@ -17,4 +17,3 @@ public abstract class RelevantDrawable : RelevantObject, IRelevantDrawable
     /// <inheritdoc />
     public abstract bool Intersection(IRelevantObject other, out Vector2[] intersections);
 }
-

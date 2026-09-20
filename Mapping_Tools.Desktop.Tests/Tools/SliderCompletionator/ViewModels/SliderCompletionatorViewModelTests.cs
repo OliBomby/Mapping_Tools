@@ -2,16 +2,14 @@ using Avalonia.Controls;
 using Avalonia.VisualTree;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
-using Mapping_Tools.Application.Settings.Models;
-using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Application.Tools.SliderCompletionator;
+using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.SliderCompletionator.Models;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.SliderCompletionator.ViewModels;
 using Mapping_Tools.Desktop.Tools.SliderCompletionator.Views;
-using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Tools.SliderCompletionator.ViewModels;
@@ -84,7 +82,7 @@ public sealed class SliderCompletionatorViewModelTests
         // Arrange
         int callingThread = Environment.CurrentManagedThreadId;
         PumpingSynchronizationContext synchronizationContext = new();
-        SynchronizationContext? previousContext = SynchronizationContext.Current;
+        var previousContext = SynchronizationContext.Current;
         SynchronizationContext.SetSynchronizationContext(synchronizationContext);
         try
         {
@@ -103,7 +101,7 @@ public sealed class SliderCompletionatorViewModelTests
             };
 
             // Act
-            Task run = viewModel.RunQuickAsync(CancellationToken.None);
+            var run = viewModel.RunQuickAsync(CancellationToken.None);
             currentBeatmap.Complete();
             synchronizationContext.RunUntilCompleted(run);
 
@@ -130,7 +128,7 @@ public sealed class SliderCompletionatorViewModelTests
         var viewModel = Create(
             service,
             workspace,
-            settings: settings);
+            settings);
         viewModel.ImportModeSetting = HitObjectSelectionMode.Everything;
 
         // Act
@@ -181,10 +179,10 @@ public sealed class SliderCompletionatorViewModelTests
         SliderCompletionatorView view = new() { DataContext = viewModel };
         Window window = new() { Content = view };
         window.Show();
-        CheckBox endTimeOption = view.GetVisualDescendants()
+        var endTimeOption = view.GetVisualDescendants()
             .OfType<CheckBox>()
             .Single(option => HasToolTip(option, "Lets you input the slider end time"));
-        TextBox[] inputs = view.GetVisualDescendants()
+        var inputs = view.GetVisualDescendants()
             .OfType<TextBox>()
             .Where(input => ToolTip.GetTip(input) is string)
             .ToArray();
@@ -250,7 +248,10 @@ public sealed class SliderCompletionatorViewModelTests
             return completion.Task;
         }
 
-        public void Complete() => completion.TrySetResult(path);
+        public void Complete()
+        {
+            completion.TrySetResult(path);
+        }
     }
 
     private sealed class PumpingSynchronizationContext : SynchronizationContext
@@ -305,5 +306,4 @@ public sealed class SliderCompletionatorViewModelTests
             return Task.FromResult(new SliderCompletionatorResult(paths, 2));
         }
     }
-
 }

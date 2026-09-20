@@ -168,7 +168,7 @@ public class TimingPoint : ITextLine, IComparable<TimingPoint>
     /// <returns></returns>
     public string GetLine()
     {
-        int style = MathHelper.GetIntFromBitArray(new BitArray(new[] { Kiai, false, false, OmitFirstBarLine }));
+        int style = MathHelper.GetIntFromBitArray(new BitArray([Kiai, false, false, OmitFirstBarLine]));
         return
             $"{Offset.ToInvariant()},{MpB.ToInvariant()},{Meter.TempoNumerator.ToInvariant()},{SampleSet.ToIntInvariant()},{SampleIndex.ToInvariant()},{(SaveWithFloatPrecision ? Volume.ToInvariant() : Volume.ToRoundInvariant())},{Convert.ToInt32(Uninherited).ToInvariant()},{style.ToInvariant()}";
     }
@@ -211,7 +211,7 @@ public class TimingPoint : ITextLine, IComparable<TimingPoint>
         if (values.Length <= 7) return;
         if (TryParseInt(values[7], out int style))
         {
-            var b = new BitArray(new[] { style });
+            var b = new BitArray([style]);
             Kiai = b[0];
             OmitFirstBarLine = b[3];
         }
@@ -233,13 +233,12 @@ public class TimingPoint : ITextLine, IComparable<TimingPoint>
     /// <summary>
     ///     Can clarify if the current timing point should snap to the nearest beat of the previous timing point.
     /// </summary>
-    /// <param name="timing"></param>
-    /// <param name="snap1"></param>
-    /// <param name="snap2"></param>
-    /// <param name="floor"></param>
-    /// <param name="tp"></param>
-    /// <param name="firstTp"></param>
-    /// <returns></returns>
+    /// <param name="timing">The timing context.</param>
+    /// <param name="beatDivisors">The beat divisors to use for snapping.</param>
+    /// <param name="floor">Whether to floor the result to the nearest beat divisor.</param>
+    /// <param name="tp">The timing point to consider.</param>
+    /// <param name="firstTp">The first timing point in the sequence.</param>
+    /// <returns><see langword="true" /> if the timing point was resnapped; otherwise, <see langword="false" />.</returns>
     public bool ResnapSelf(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint tp = null, TimingPoint firstTp = null)
     {
         double newTime = timing.Resnap(Offset, beatDivisors, floor, tp, firstTp);

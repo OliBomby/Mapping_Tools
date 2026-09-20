@@ -14,4 +14,3 @@ public sealed class CustomIntegralExtremaAttribute : Attribute
     /// <summary>Gets the normalized positions at which integral extrema are known.</summary>
     public double[] ExtremaPositions { get; }
 }
-

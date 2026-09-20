@@ -10,12 +10,14 @@
 ## Semantic comparison
 
 | Target item | Before | After | Difference |
-|---|---:|---:|---:|
-| Sliders | 7 | 7 | 0 |
-| Hit objects | 17 | 17 | 0 |
-| Redlines | 5 | 5 | 0 |
-| Greenlines | 4 | 7 | +3 |
+|-------------|-------:|------:|-----------:|
+| Sliders     |      7 |     7 |          0 |
+| Hit objects |     17 |    17 |          0 |
+| Redlines    |      5 |     5 |          0 |
+| Greenlines  |      4 |     7 |         +3 |
 
-All slider anchors were moved so the effective curve ended at 75% of the full path. Their pixel lengths and inherited velocities were recalculated for a duration of 1.5 beats. Three additional inherited points were required where simultaneous or nearby sliders used distinct calculated velocities. The backup is byte-identical to the seed.
+All slider anchors were moved so the effective curve ended at 75% of the full path. Their pixel lengths and inherited
+velocities were recalculated for a duration of 1.5 beats. Three additional inherited points were required where
+simultaneous or nearby sliders used distinct calculated velocities. The backup is byte-identical to the seed.
 
 Status: accepted by Olivier on 2026-07-19.

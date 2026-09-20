@@ -132,11 +132,11 @@ public sealed class JsonSettingsStore : ISettingsStore
         ArgumentNullException.ThrowIfNull(settings);
         directories.EnsureCreated();
 
-        JsonObject document = (JsonSerializer.SerializeToNode(
-                                   settings,
-                                   settings.GetType(),
-                                   canonicalOptions)
-                               as JsonObject)
+        JsonObject document = JsonSerializer.SerializeToNode(
+                                      settings,
+                                      settings.GetType(),
+                                      canonicalOptions)
+                                  as JsonObject
                                ?? throw new JsonException("The settings model did not serialize to a JSON object.");
         document["$schema"] = schema;
         document["$version"] = SettingsMigrationCatalog.CurrentVersion;
@@ -180,7 +180,7 @@ public sealed class JsonSettingsStore : ISettingsStore
 
     private ApplicationSettings Deserialize(string json, JsonSerializerOptions serializerOptions)
     {
-        return (JsonSerializer.Deserialize(json, settingsType, serializerOptions) as ApplicationSettings)
+        return JsonSerializer.Deserialize(json, settingsType, serializerOptions) as ApplicationSettings
                ?? throw new JsonException("The settings document contained no JSON value.");
     }
 

@@ -1,9 +1,8 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Models;
-using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.TimingHelper;
-using Mapping_Tools.Core.Tools.TimingHelper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Application.Tests.Tools.TimingHelper;
@@ -20,7 +19,7 @@ public sealed class TimingHelperServiceTests
             "Fixtures",
             "Beatmaps",
             "standard-feature-rich.osu");
-        RecordingBeatmapEditingGateway gateway = CreateGateway(fixture);
+        var gateway = CreateGateway(fixture);
         TimingHelperService service = new(gateway, new ApplicationSettings());
         TimingHelperServiceOptions options = new()
         {
@@ -64,5 +63,4 @@ public sealed class TimingHelperServiceTests
             },
         };
     }
-
 }

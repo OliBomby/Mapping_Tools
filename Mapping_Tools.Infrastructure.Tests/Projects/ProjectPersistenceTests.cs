@@ -105,14 +105,14 @@ public sealed class ProjectPersistenceTests
         // Arrange
         LegacyProjectJsonSerializer serializer = new();
         object[] values =
-        {
+        [
             new TimingPoint { Offset = 1250, MpB = 500 },
             new RationalBeatDivisor(1, 4),
             new Sample(),
             new ComboColour(RgbaColour.FromArgb(0x7F, 0x12, 0x34, 0x56)),
             new HitObject("256,192,1000,1,2,0:0:0:0:"),
             new HitsoundZone(),
-        };
+        ];
 
         // Act
         Dictionary<object, (string Json, object RoundTrip)> results = values.ToDictionary(

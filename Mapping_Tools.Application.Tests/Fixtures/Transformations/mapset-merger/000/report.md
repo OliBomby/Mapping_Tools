@@ -9,8 +9,11 @@
 
 ## Semantic comparison
 
-The Normal and Expert inputs were emitted as separate beatmaps. Their audio and background references were rewritten to `E2E-A` and `E2E-B` subfolders respectively. Shared custom hitsound names were collision-resolved by assigning the second mapset the `2` suffix, producing paired samples such as `soft-hitclap.wav` and `soft-hitclap2.wav`.
+The Normal and Expert inputs were emitted as separate beatmaps. Their audio and background references were rewritten to
+`E2E-A` and `E2E-B` subfolders respectively. Shared custom hitsound names were collision-resolved by assigning the
+second mapset the `2` suffix, producing paired samples such as `soft-hitclap.wav` and `soft-hitclap2.wav`.
 
-The exact beatmap outputs are versioned. The output manifest also records hashes for the larger audio/image files without duplicating those media files in the repository.
+The exact beatmap outputs are versioned. The output manifest also records hashes for the larger audio/image files
+without duplicating those media files in the repository.
 
 Status: accepted by Olivier on 2026-07-18.

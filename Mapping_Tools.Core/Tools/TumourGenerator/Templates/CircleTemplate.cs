@@ -87,4 +87,3 @@ internal sealed class CircleTemplate : TumourTemplateBase, IRequireInit
         return null;
     }
 }
-

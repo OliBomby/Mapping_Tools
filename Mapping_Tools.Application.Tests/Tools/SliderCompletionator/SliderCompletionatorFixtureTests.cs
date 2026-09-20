@@ -13,8 +13,8 @@ public sealed class SliderCompletionatorFixtureTests : TransformationFixtureTest
     public async Task CompleteAsync_AcceptedFixture_ProducesEquivalentOutput(string fixtureName)
     {
         // Arrange
-        using FixtureContext fixture = CreateFixture("slider-completionator", fixtureName);
-        SliderCompletionatorServiceOptions project = fixture.ReadProject<SliderCompletionatorServiceOptions>();
+        using var fixture = CreateFixture("slider-completionator", fixtureName);
+        var project = fixture.ReadProject<SliderCompletionatorServiceOptions>();
         SliderCompletionatorService service = new(fixture.Gateway, new ApplicationSettings());
 
         // Act

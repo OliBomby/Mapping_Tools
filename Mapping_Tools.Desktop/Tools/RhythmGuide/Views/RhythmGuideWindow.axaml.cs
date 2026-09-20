@@ -10,5 +10,4 @@ public sealed partial class RhythmGuideWindow : Window
     {
         InitializeComponent();
     }
-
 }

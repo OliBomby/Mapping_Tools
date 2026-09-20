@@ -17,7 +17,7 @@ public sealed class PatternGalleryPlacerTests
         };
 
         // Act
-        Action act = () => PatternGalleryPlacer.Validate(options);
+        var act = () => PatternGalleryPlacer.Validate(options);
 
         // Assert
         act.Should().Throw<ArgumentException>()
@@ -31,7 +31,7 @@ public sealed class PatternGalleryPlacerTests
         PatternGalleryEngineOptions options = new();
 
         // Act
-        Action act = () => PatternGalleryPlacer.Validate(options);
+        var act = () => PatternGalleryPlacer.Validate(options);
 
         // Assert
         act.Should().NotThrow();

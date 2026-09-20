@@ -5,31 +5,26 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 /// <summary>Serializable Geometry Dashboard preferences and ordered save slots.</summary>
 public class GeometryDashboardEngineOptions
 {
-    private GeometryDashboardPreferences currentPreferences;
     private IEnumerable<RelevantObjectsGenerator>? generators;
 
     /// <summary>Creates a project with legacy default preferences and no save slots.</summary>
     public GeometryDashboardEngineOptions()
     {
-        currentPreferences = new GeometryDashboardPreferences();
+        CurrentPreferences = new GeometryDashboardPreferences();
     }
 
     /// <summary>Gets or sets the active preference state.</summary>
-    public GeometryDashboardPreferences CurrentPreferences
-    {
-        get => currentPreferences;
-        set => currentPreferences = value ?? new GeometryDashboardPreferences();
-    }
+    public GeometryDashboardPreferences CurrentPreferences { get; private set; }
 
     /// <summary>Gets the saved slots in their persisted order.</summary>
-    public List<GeometryDashboardSaveSlot> SaveSlots { get; set; } = [];
+    public List<GeometryDashboardSaveSlot> SaveSlots { get; } = [];
 
     /// <summary>Associates live generators so preferences can be applied or captured.</summary>
-    /// <param name="generators">The generator instances owned by the calculation engine.</param>
-    public void SetGenerators(IEnumerable<RelevantObjectsGenerator>? generators)
+    /// <param name="newGenerators">The generator instances owned by the calculation engine.</param>
+    public void SetGenerators(IEnumerable<RelevantObjectsGenerator>? newGenerators)
     {
-        this.generators = generators;
-        if (this.generators is not null) CurrentPreferences.ApplyGeneratorSettings(this.generators);
+        generators = newGenerators;
+        if (generators is not null) CurrentPreferences.ApplyGeneratorSettings(generators);
     }
 
     /// <summary>Replaces active preferences with an independent cloned snapshot.</summary>

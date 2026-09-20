@@ -30,21 +30,21 @@ public sealed class DoubleMarkerGenerator : IGraphMarkerGenerator
     {
         Offset = offset;
         Step = step;
-        Unit = unit ?? string.Empty;
+        Unit = unit;
         Snappable = snappable;
     }
 
     /// <summary>Gets or sets the grid offset.</summary>
-    public double Offset { get; set; }
+    public double Offset { get; }
 
     /// <summary>Gets or sets the initial grid step.</summary>
-    public double Step { get; set; }
+    public double Step { get; }
 
     /// <summary>Gets or sets the display suffix.</summary>
-    public string Unit { get; set; }
+    public string Unit { get; }
 
     /// <summary>Gets or sets whether generated markers can snap anchors.</summary>
-    public bool Snappable { get; set; }
+    public bool Snappable { get; }
 
     /// <inheritdoc />
     public IEnumerable<GraphMarker> GenerateMarkers(double start, double end, GraphMarkerOrientation orientation, int maxMarkers)

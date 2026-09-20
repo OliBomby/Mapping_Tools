@@ -1,6 +1,7 @@
 using System.Globalization;
 using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Core.MathUtil;
 
 namespace Mapping_Tools.Infrastructure.Tools.GeometryDashboard;
 
@@ -10,8 +11,8 @@ namespace Mapping_Tools.Infrastructure.Tools.GeometryDashboard;
 /// </summary>
 internal sealed class WindowsGeometryDashboardOsuConfigProvider
 {
-    private readonly object gate = new();
     private readonly ITextFileStore files;
+    private readonly Lock gate = new();
     private readonly ApplicationSettings settings;
     private DateTime lastWriteTimeUtc;
     private string? loadedPath;
@@ -30,7 +31,10 @@ internal sealed class WindowsGeometryDashboardOsuConfigProvider
     {
         get
         {
-            lock (gate) return status;
+            lock (gate)
+            {
+                return status;
+            }
         }
     }
 
@@ -48,7 +52,7 @@ internal sealed class WindowsGeometryDashboardOsuConfigProvider
                 return WindowsGeometryDashboardOsuDisplaySettings.Defaults;
             }
 
-            DateTime writeTime = GetLastWriteTimeUtc(path);
+            var writeTime = GetLastWriteTimeUtc(path);
             if (loadedPath == path && loadedSettings is not null && writeTime == lastWriteTimeUtc)
                 return loadedSettings;
 
@@ -57,12 +61,12 @@ internal sealed class WindowsGeometryDashboardOsuConfigProvider
                 var values = ReadValues(path);
                 bool fullscreen = GetBool(values, "Fullscreen", true);
                 loadedSettings = new WindowsGeometryDashboardOsuDisplaySettings(
-                    new Core.MathUtil.Vector2(
+                    new Vector2(
                         GetDouble(values, fullscreen ? "WidthFullscreen" : "Width", 1920),
                         GetDouble(values, fullscreen ? "HeightFullscreen" : "Height", 1080)),
                     fullscreen,
                     GetBool(values, "Letterboxing", true),
-                    new Core.MathUtil.Vector2(
+                    new Vector2(
                         GetDouble(values, "LetterboxPositionX", 0.5),
                         GetDouble(values, "LetterboxPositionY", 0.5)));
                 loadedPath = path;

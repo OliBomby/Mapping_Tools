@@ -47,7 +47,7 @@ public sealed class PortableFileRevealService : IFileRevealService
         if (!isDirectory && !File.Exists(fullPath))
             throw new FileNotFoundException("The path to reveal does not exist.", fullPath);
 
-        ProcessStartInfo? startInfo = CreateStartInfo(
+        var startInfo = CreateStartInfo(
             getPlatform(),
             fullPath,
             isDirectory);

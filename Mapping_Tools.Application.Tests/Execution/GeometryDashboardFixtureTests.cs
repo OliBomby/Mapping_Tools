@@ -23,26 +23,26 @@ public sealed class GeometryDashboardFixtureTests
     {
         // Arrange
         string fixtureRoot = Path.Combine(AppContext.BaseDirectory, "Fixtures", "GeometryDashboard");
-        using JsonDocument record = JsonDocument.Parse(
-            File.ReadAllText(Path.Combine(fixtureRoot, "save-virtual-objects.json")));
+        using var record = JsonDocument.Parse(
+            await File.ReadAllTextAsync(Path.Combine(fixtureRoot, "save-virtual-objects.json")));
         string beatmapPath = ResolveFixturePath(fixtureRoot, record.RootElement.GetProperty("sourceInput").GetString()!);
         string projectPath = ResolveFixturePath(fixtureRoot, record.RootElement.GetProperty("project").GetString()!);
         string expectedPath = ResolveFixturePath(fixtureRoot, record.RootElement.GetProperty("expectedOutput").GetString()!);
-        Beatmap beatmap = new(File.ReadAllLines(beatmapPath).ToList());
+        Beatmap beatmap = new((await File.ReadAllLinesAsync(beatmapPath)).ToList());
         double[] visibleTimes = record.RootElement
             .GetProperty("visibleSourceObjects")
             .GetProperty("times")
             .EnumerateArray()
             .Select(value => value.GetDouble())
             .ToArray();
-        HitObject[] visibleHitObjects = beatmap.HitObjects
+        var visibleHitObjects = beatmap.HitObjects
             .Where(hitObject => visibleTimes.Contains(hitObject.Time))
             .Select(hitObject => hitObject.DeepCopy())
             .ToArray();
 
         VersionedProjectJsonSerializer serializer = new();
-        GeometryDashboardEngineOptions persistedProject = serializer.Deserialize<GeometryDashboardEngineOptions>(
-            File.ReadAllText(projectPath));
+        var persistedProject = serializer.Deserialize<GeometryDashboardEngineOptions>(
+            await File.ReadAllTextAsync(projectPath));
         GeometryDashboardServiceOptions project = new();
         project.SetCurrentPreferences(persistedProject.CurrentPreferences);
         LiveBeatmapSnapshot liveBeatmap = new(
@@ -65,16 +65,16 @@ public sealed class GeometryDashboardFixtureTests
             new SimulatedGeometryDashboardInput(),
             new SimulatedGeometryDashboardOverlay());
 
-        RelevantObjectCollection expectedObjects = serializer.Deserialize<RelevantObjectCollection>(
-            File.ReadAllText(expectedPath));
-        foreach (Type type in expectedObjects.Keys.Where(type => expectedObjects[type].Count == 0).ToArray())
+        var expectedObjects = serializer.Deserialize<RelevantObjectCollection>(
+            await File.ReadAllTextAsync(expectedPath));
+        foreach (var type in expectedObjects.Keys.Where(type => expectedObjects[type].Count == 0).ToArray())
             expectedObjects.Remove(type);
         string expectedJson = serializer.Serialize(expectedObjects);
 
         // Act
         await service.RefreshOnceAsync();
         service.ToggleLocked(GeometryDashboardTargetingMode.Enable);
-        RelevantObjectCollection actualObjects = service.GetLockedObjects();
+        var actualObjects = service.GetLockedObjects();
         string actualJson = serializer.Serialize(actualObjects);
 
         // Assert
@@ -118,9 +118,15 @@ public sealed class GeometryDashboardFixtureTests
     {
         public bool IsSupported => true;
 
-        public bool IsHotkeyDown(HotkeySettings? hotkey) => false;
+        public bool IsHotkeyDown(HotkeySettings? hotkey)
+        {
+            return false;
+        }
 
-        public bool IsMouseButtonDown(GeometryDashboardMouseButton button) => false;
+        public bool IsMouseButtonDown(GeometryDashboardMouseButton button)
+        {
+            return false;
+        }
 
         public bool TryGetCursorPosition(out Vector2 position)
         {
@@ -128,7 +134,10 @@ public sealed class GeometryDashboardFixtureTests
             return false;
         }
 
-        public bool TrySetCursorPosition(Vector2 position) => false;
+        public bool TrySetCursorPosition(Vector2 position)
+        {
+            return false;
+        }
     }
 
     private sealed class SimulatedGeometryDashboardOverlay : IGeometryDashboardOverlayService
@@ -144,7 +153,10 @@ public sealed class GeometryDashboardFixtureTests
             IsVisible = true;
         }
 
-        public void Hide() => IsVisible = false;
+        public void Hide()
+        {
+            IsVisible = false;
+        }
 
         public void Dispose() { }
     }

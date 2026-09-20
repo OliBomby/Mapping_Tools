@@ -10,12 +10,14 @@
 
 ## Semantic comparison
 
-| Item | Before | After | Difference |
-|---|---:|---:|---:|
-| Timing points | 831 | 815 | -16 |
-| Hit objects | 924 | 924 | 0 |
-| Bookmarks | 20 | 20 | 0 |
+| Item          | Before | After | Difference |
+|---------------|-------:|------:|-----------:|
+| Timing points |    831 |   815 |        -16 |
+| Hit objects   |    924 |   924 |          0 |
+| Bookmarks     |     20 |    20 |          0 |
 
-The operation changed 20 bookmark timestamps. Exact-line comparison found 128 removed and 112 added timing-point lines, and 844 removed/added hit-object lines; these broad textual changes are consistent with resnapping while preserving the hit-object count. The backup is byte-identical to the seed.
+The operation changed 20 bookmark timestamps. Exact-line comparison found 128 removed and 112 added timing-point lines,
+and 844 removed/added hit-object lines; these broad textual changes are consistent with resnapping while preserving the
+hit-object count. The backup is byte-identical to the seed.
 
 Status: accepted by Olivier on 2026-07-18.

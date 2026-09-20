@@ -1,4 +1,5 @@
-﻿using static Mapping_Tools.Core.BeatmapHelper.FileFormatHelper;
+﻿using System.Diagnostics.CodeAnalysis;
+using static Mapping_Tools.Core.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Core.BeatmapHelper.Events;
 
@@ -72,10 +73,14 @@ public class StoryboardSoundSample : Event, IEquatable<StoryboardSoundSample>, I
     /// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
     /// <param name="other">An object to compare with this object.</param>
     /// <returns>true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.</returns>
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     public bool Equals(StoryboardSoundSample other)
     {
-        return
-            other != null && StartTime == other.StartTime && Layer == other.Layer && FilePath == other.FilePath && Volume == other.Volume;
+        return other != null &&
+               StartTime == other.StartTime &&
+               Layer == other.Layer &&
+               FilePath == other.FilePath &&
+               Volume == other.Volume;
     }
 
     /// <inheritdoc />

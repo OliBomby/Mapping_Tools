@@ -11,7 +11,7 @@ public sealed class ComboColourStudioImportDialogViewModelTests
     public void AcceptCommand_WithBlankPath_LeavesDialogOpenAndReportsValidationError()
     {
         // Arrange
-        ComboColourStudioImportDialogViewModel viewModel = CreateViewModel();
+        var viewModel = CreateViewModel();
         object? result = null;
         viewModel.Close = value => result = value;
         viewModel.Path = "  ";

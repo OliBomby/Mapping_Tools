@@ -4,8 +4,14 @@
   "ViewportSize": 16384,
   "Quality": 4,
   "YResolution": 64,
-  "SliderStart": [256, 192],
-  "ImageStart": [0, 0],
+  "SliderStart": [
+    256,
+    192
+  ],
+  "ImageStart": [
+    0,
+    0
+  ],
   "UseMapComboColors": false,
   "TrackColor": "#FF3355",
   "BorderColor": "#FFFFFF",

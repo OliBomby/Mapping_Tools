@@ -6,7 +6,7 @@ namespace Mapping_Tools.Core.Graph.Interpolation.Interpolators;
 /// <summary>Provides two opposing exponential curves joined at the midpoint.</summary>
 [DisplayName("Double curve")]
 [VerticalMirrorInterpolator]
-[CustomDerivativeExtrema(new[] { 0d, 0.5d, 1d })]
+[CustomDerivativeExtrema([0d, 0.5d, 1d])]
 public sealed class DoubleCurveInterpolator : CustomInterpolator, IDerivableInterpolator, IIntegrableInterpolator
 {
     private readonly LinearInterpolator linearDegenerate = new();
@@ -60,4 +60,3 @@ public sealed class DoubleCurveInterpolator : CustomInterpolator, IDerivableInte
             : (2 * p * ((2 * Math.Exp(p) - 1) * t - Math.Exp(p)) + Math.Exp(p * (2 - 2 * t))) / (4 * (Math.Exp(p) - 1) * p);
     }
 }
-

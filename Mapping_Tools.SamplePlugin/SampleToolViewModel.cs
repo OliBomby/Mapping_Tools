@@ -16,12 +16,6 @@ public sealed partial class SampleToolViewModel : SingleRunToolViewModel,
     IQuickRun,
     IShellProjectFeature<SampleToolProject>
 {
-    private readonly ProjectDefinition<SampleToolProject> definition = new(
-        "samplepluginproject.json",
-        "Sample Plugin Projects",
-        static () => new SampleToolProject(),
-        "sample-plugin-project.json",
-        SampleToolConfigSchema.Definition);
     private readonly SampleToolService sampleTool;
     private readonly IBeatmapWorkspace workspace;
 
@@ -60,7 +54,12 @@ public sealed partial class SampleToolViewModel : SingleRunToolViewModel,
     }
 
     /// <inheritdoc />
-    ProjectDefinition<SampleToolProject> IShellProjectFeature<SampleToolProject>.ProjectDefinition => definition;
+    ProjectDefinition<SampleToolProject> IShellProjectFeature<SampleToolProject>.ProjectDefinition { get; } = new(
+        "samplepluginproject.json",
+        "Sample Plugin Projects",
+        static () => new SampleToolProject(),
+        "sample-plugin-project.json",
+        SampleToolConfigSchema.Definition);
 
     /// <inheritdoc />
     SampleToolProject IShellProjectFeature<SampleToolProject>.Snapshot()

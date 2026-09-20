@@ -1,16 +1,16 @@
 <UserControl xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:converters="using:Mapping_Tools.Desktop.Tools.HitsoundStudio.Converters"
-        xmlns:hitsoundStudio="clr-namespace:Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels"
-        xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
-        xmlns:materialIcons="using:Material.Icons.Avalonia"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d"
-        x:Class="Mapping_Tools.Desktop.Tools.HitsoundStudio.Views.HitsoundStudioExportDialog"
-        x:DataType="hitsoundStudio:HitsoundStudioExportDialogViewModel"
-        d:DesignWidth="800"
-        d:DesignHeight="450">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="using:Mapping_Tools.Desktop.Tools.HitsoundStudio.Converters"
+             xmlns:hitsoundStudio="clr-namespace:Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels"
+             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:materialIcons="using:Material.Icons.Avalonia"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="Mapping_Tools.Desktop.Tools.HitsoundStudio.Views.HitsoundStudioExportDialog"
+             x:DataType="hitsoundStudio:HitsoundStudioExportDialogViewModel"
+             d:DesignWidth="800"
+             d:DesignHeight="450">
     <UserControl.Resources>
         <converters:HitsoundStudioSampleFormatDisplayConverter x:Key="HitsoundStudioSampleFormatDisplayConverter" />
     </UserControl.Resources>
@@ -96,7 +96,8 @@
                       ToolTip.Tip="Encoding for one-source samples.">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding Converter={StaticResource HitsoundStudioSampleFormatDisplayConverter}}" />
+                        <TextBlock
+                            Text="{Binding Converter={StaticResource HitsoundStudioSampleFormatDisplayConverter}}" />
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
@@ -108,7 +109,8 @@
                       ToolTip.Tip="Encoding for mixed samples.">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding Converter={StaticResource HitsoundStudioSampleFormatDisplayConverter}}" />
+                        <TextBlock
+                            Text="{Binding Converter={StaticResource HitsoundStudioSampleFormatDisplayConverter}}" />
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>

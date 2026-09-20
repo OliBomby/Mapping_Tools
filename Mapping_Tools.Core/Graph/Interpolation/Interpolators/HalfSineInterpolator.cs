@@ -62,4 +62,3 @@ public sealed class HalfSineInterpolator : CustomInterpolator, IDerivableInterpo
             : MathHelper.Cosec(b) * (Math.Cos(b) - Math.Cos(b - b * t)) / b + t;
     }
 }
-

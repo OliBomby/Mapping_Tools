@@ -52,7 +52,7 @@ public class Timing : IList<TimingPoint>
     /// <param name="sliderMultiplier">The slider multiplier.</param>
     public Timing(IEnumerable<string> timingLines, double sliderMultiplier)
     {
-        SetTimingPoints(GetTimingPoints(timingLines).ToList());
+        SetTimingPoints([.. GetTimingPoints(timingLines)]);
         SliderMultiplier = sliderMultiplier;
     }
 
@@ -80,13 +80,13 @@ public class Timing : IList<TimingPoint>
     /// <summary>
     ///     Replaces all the timingpoints and sorts again.
     /// </summary>
-    /// <param name="timingPoints"></param>
-    public void SetTimingPoints(List<TimingPoint> timingPoints)
+    /// <param name="newTimingPoints">The new list of timing points to set.</param>
+    public void SetTimingPoints(List<TimingPoint> newTimingPoints)
     {
-        this.timingPoints = timingPoints ?? new List<TimingPoint>();
-        this.timingPoints.Sort();
-        redlines = this.timingPoints.Where(tp => tp.Uninherited).ToList();
-        greenlines = this.timingPoints.Where(tp => !tp.Uninherited).ToList();
+        timingPoints = newTimingPoints ?? [];
+        timingPoints.Sort();
+        redlines = [.. timingPoints.Where(tp => tp.Uninherited)];
+        greenlines = [.. timingPoints.Where(tp => !tp.Uninherited)];
     }
 
     /// <summary>
@@ -103,29 +103,27 @@ public class Timing : IList<TimingPoint>
     ///     Calculates the number of beats between the start time and the end time.
     ///     Optionally the resulting number of beats will be rounded to a set of beat divisors.
     /// </summary>
-    /// <param name="startTime"></param>
-    /// <param name="endTime"></param>
+    /// <param name="startTime">The start time in milliseconds.</param>
+    /// <param name="endTime">The end time in milliseconds.</param>
     /// <param name="round">To round the number of beats to a snap divisor.</param>
     /// <param name="divisors">The beat divisors to round to. If null, the default beat divisors will be used.</param>
-    /// <returns></returns>
+    /// <returns>The number of beats between the start time and the end time.</returns>
     public double GetBeatLength(double startTime, double endTime, bool round = false, IBeatDivisor[] divisors = null)
     {
         bool reverse = false;
         if (startTime > endTime)
         {
-            double endTimeTemp = endTime;
-            endTime = startTime;
-            startTime = endTimeTemp;
+            (endTime, startTime) = (startTime, endTime);
             reverse = true;
         }
 
-        var redlines = GetRedlinesInRange(startTime, endTime, false);
-        divisors = divisors ?? RationalBeatDivisor.GetDefaultBeatDivisors();
+        var redlinesInRange = GetRedlinesInRange(startTime, endTime, false);
+        divisors ??= RationalBeatDivisor.GetDefaultBeatDivisors();
 
         double beats = 0;
         double lastTime = startTime;
         var lastRedline = GetRedlineAtTime(startTime);
-        foreach (var redline in redlines)
+        foreach (var redline in redlinesInRange)
         {
             double inc1 = (redline.Offset - lastTime) / lastRedline.MpB;
             beats += round ? MultiSnapRound(inc1, divisors) : inc1;
@@ -150,11 +148,9 @@ public class Timing : IList<TimingPoint>
             double round = Math.Round(value / beatDivisor.GetValue()) * beatDivisor.GetValue();
             double diff = Math.Abs(round - value);
 
-            if (diff < minDiff)
-            {
-                minDiff = diff;
-                bestRound = round;
-            }
+            if (!(diff < minDiff)) continue;
+            minDiff = diff;
+            bestRound = round;
         }
 
         return bestRound;
@@ -164,21 +160,23 @@ public class Timing : IList<TimingPoint>
     ///     Assumes all the redlines are in beat timing and calculates the millisecond time for a beat time.
     ///     0 beatTime returns originTime.
     /// </summary>
-    /// <param name="originTime"></param>
-    /// <param name="beatTime"></param>
-    /// <returns></returns>
+    /// <param name="originTime">The origin time in milliseconds.</param>
+    /// <param name="beatTime">The beat time to convert to milliseconds.</param>
+    /// <param name="round">Whether to round the result to the nearest beat divisor.</param>
+    /// <param name="divisors">The beat divisors to use for rounding.</param>
+    /// <returns>The corresponding time in milliseconds.</returns>
     public double GetMilliseconds(double beatTime, double originTime = 0, bool round = false, IBeatDivisor[] divisors = null)
     {
         double ms = originTime;
 
         if (beatTime >= 0)
         {
-            var redlines = GetRedlinesInRange(0, beatTime, false);
+            var redlinesInRange = GetRedlinesInRange(0, beatTime, false);
             var lastRedline = GetRedlineAtTime(0);
             ms += round
                 ? MultiSnapRound(lastRedline.Offset, divisors) * lastRedline.MpB
                 : lastRedline.Offset * lastRedline.MpB;
-            foreach (var redline in redlines)
+            foreach (var redline in redlinesInRange)
             {
                 ms += round
                     ? MultiSnapRound(redline.Offset - lastRedline.Offset, divisors) * lastRedline.MpB
@@ -193,12 +191,12 @@ public class Timing : IList<TimingPoint>
         }
         else
         {
-            var redlines = GetRedlinesInRange(beatTime, 0, false);
+            var redlinesInRange = GetRedlinesInRange(beatTime, 0, false);
             var lastRedline = GetRedlineAtTime(beatTime);
             ms += round
                 ? MultiSnapRound(beatTime - lastRedline.Offset, divisors) * lastRedline.MpB
                 : (beatTime - lastRedline.Offset) * lastRedline.MpB;
-            foreach (var redline in redlines)
+            foreach (var redline in redlinesInRange)
             {
                 ms -= round
                     ? MultiSnapRound(redline.Offset - lastRedline.Offset, divisors) * lastRedline.MpB
@@ -220,7 +218,7 @@ public class Timing : IList<TimingPoint>
     ///     time.
     ///     0 beatTime returns originTime.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The corresponding beat time.</returns>
     public double WalkMillisecondsInBeatTime(double startBeatTime, double milliseconds)
     {
         double beatTime = startBeatTime;
@@ -273,9 +271,11 @@ public class Timing : IList<TimingPoint>
     ///     Assumes all the redlines are in millsecond timing and calculates the millisecond time for a beat time.
     ///     0 beatTime returns originTime.
     /// </summary>
-    /// <param name="originTime"></param>
-    /// <param name="beatTime"></param>
-    /// <returns></returns>
+    /// <param name="originTime">The origin time in milliseconds.</param>
+    /// <param name="beatTime">The beat time to convert to milliseconds.</param>
+    /// <param name="round">Whether to round the result to the nearest beat divisor.</param>
+    /// <param name="divisors">The beat divisors to use for rounding.</param>
+    /// <returns>The corresponding time in milliseconds.</returns>
     public double WalkBeatsInMillisecondTime(double beatTime, double originTime = 0, bool round = false, IBeatDivisor[] divisors = null)
     {
         double ms = originTime;
@@ -597,16 +597,16 @@ public class Timing : IList<TimingPoint>
     /// </summary>
     /// <param name="needRedline">The need redline.</param>
     /// <returns>An earlier copy of the first redline, a 1000-ms fallback based on the first greenline, or a zeroed default.</returns>
-    public TimingPoint GetFirstTimingPointExtended(bool needRedline = false)
+    private TimingPoint GetFirstTimingPointExtended(bool needRedline = false)
     {
         // Add an extra timingpoint that is the same as the first redline but like 10 x meter beats earlier so any objects before the first redline can use that thing
 
-        // When you have a greenline before the first redline, the greenline will act like the first redline and you can snap objects to the greenline's bpm. 
+        // When you have a greenline before the first redline, the greenline will act like the first redline and you can snap objects to the greenline's bpm.
         // The value in the greenline will be used as the milliseconds per beat, so for example a 1x SliderVelocity slider will be 600 bpm.
         // The timeline will work like a redline on 0 offset and 1000 milliseconds per beat
 
         var firstTp = timingPoints.FirstOrDefault();
-        if (firstTp != null && firstTp.Uninherited)
+        if (firstTp is { Uninherited: true })
             return new TimingPoint(firstTp.Offset - firstTp.MpB * firstTp.Meter.TempoDenominator * 10, firstTp.MpB,
                 firstTp.Meter, firstTp.SampleSet, firstTp.SampleIndex, firstTp.Volume, needRedline || firstTp.Uninherited, false, false);
 
@@ -686,10 +686,10 @@ public class Timing : IList<TimingPoint>
     /// <summary>
     ///     Inserts each point through <see cref="Add(TimingPoint)" /> so all indexes remain sorted.
     /// </summary>
-    /// <param name="timingPoints">The timing points.</param>
-    public void AddRange(IEnumerable<TimingPoint> timingPoints)
+    /// <param name="timingPointsToAdd">The timing points to add.</param>
+    public void AddRange(IEnumerable<TimingPoint> timingPointsToAdd)
     {
-        foreach (var timingPoint in timingPoints) Add(timingPoint);
+        foreach (var timingPoint in timingPointsToAdd) Add(timingPoint);
     }
 
     /// <summary>
@@ -819,7 +819,7 @@ public class Timing : IList<TimingPoint>
     /// <returns>Independently mutable timing data.</returns>
     public Timing Copy()
     {
-        return new Timing(timingPoints.Select(o => o.Copy()).ToList(), SliderMultiplier);
+        return new Timing([.. timingPoints.Select(o => o.Copy())], SliderMultiplier);
     }
 
     #endregion

@@ -104,7 +104,7 @@ public sealed class AdapterTests
 
         // Act
         ObservableSampleGeneratingArgs adapter = new(model);
-        SampleGeneratingArgs snapshot = adapter.Snapshot();
+        var snapshot = adapter.Snapshot();
 
         // Assert
         snapshot.Volume.Should().Be(-0.01d);

@@ -10,16 +10,19 @@
 
 ## Semantic comparison
 
-| Target item | Before | After | Difference |
-|---|---:|---:|---:|
-| Redlines | 5 | 5 | 0 |
-| Greenlines | 4 | 4 | 0 |
-| Hit objects | 17 | 1,344 | +1,327 |
-| Circles | 9 | 1,336 | +1,327 |
-| New-combo objects | 7 | 1,334 | +1,327 |
+| Target item       | Before | After | Difference |
+|-------------------|-------:|------:|-----------:|
+| Redlines          |      5 |     5 |          0 |
+| Greenlines        |      4 |     4 |          0 |
+| Hit objects       |     17 | 1,344 |     +1,327 |
+| Circles           |      9 | 1,336 |     +1,327 |
+| New-combo objects |      7 | 1,334 |     +1,327 |
 
-`HitsoundEvents` selection appended one circle for each qualifying source timeline event. `NC everything` marked all 1,327 generated circles as new combos. The original 17 target objects and all nine timing points were retained.
+`HitsoundEvents` selection appended one circle for each qualifying source timeline event. `NC everything` marked all
+1,327 generated circles as new combos. The original 17 target objects and all nine timing points were retained.
 
-The legacy AddToMap path backs up the input source instead of the mutated export target. The observed `source.osu` backup is byte-identical to the source fixture; this known legacy behavior is recorded for parity and remains unchanged by the E2E fixture.
+The legacy AddToMap path backs up the input source instead of the mutated export target. The observed `source.osu`
+backup is byte-identical to the source fixture; this known legacy behavior is recorded for parity and remains unchanged
+by the E2E fixture.
 
 Status: accepted by Olivier on 2026-07-18.

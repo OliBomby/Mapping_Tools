@@ -8,4 +8,3 @@ namespace Mapping_Tools.Application.Workspace.Models;
 public sealed record BeatmapSelectionChangedEventArgs(
     IReadOnlyList<string> Paths,
     BeatmapSelectionSource Source);
-

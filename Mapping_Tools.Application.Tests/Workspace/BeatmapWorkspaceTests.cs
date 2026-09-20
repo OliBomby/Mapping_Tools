@@ -1,3 +1,4 @@
+using System.Globalization;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Settings.Models;
@@ -31,7 +32,7 @@ public sealed class BeatmapWorkspaceTests
         // Assert
         workspace.SelectedPaths.ToArray().Should().Equal(@"C:\Maps\first.osu", @"C:\Maps\second.osb");
         workspace.RecentMaps.Select(recent => recent.Path).ToArray().Should().Equal(@"C:\Maps\second.osb", @"C:\Maps\first.osu");
-        workspace.RecentMaps.All(recent => recent.DisplayDate == fixedNow.DateTime.ToString()).Should().BeTrue();
+        workspace.RecentMaps.All(recent => recent.DisplayDate == fixedNow.DateTime.ToString(CultureInfo.InvariantCulture)).Should().BeTrue();
         (notification?.Source).Should().Be(BeatmapSelectionSource.DragAndDrop);
         (notification?.Paths.ToArray()).Should().Equal(workspace.SelectedPaths.ToArray());
     }
@@ -141,10 +142,9 @@ public sealed class BeatmapWorkspaceTests
         // Assert
         selected.Should().BeFalse();
         published.Should().ContainSingle(notification =>
-            notification.Severity == UserNotificationSeverity.Warning &&
-            notification.Title == "Selected beatmap is missing" &&
-            notification.Message ==
-            "It seems like one of the selected beatmaps does not exist. Please re-select the file with 'File > Open beatmap'.");
+            notification.Severity == UserNotificationSeverity.Warning
+            && notification.Title == "Selected beatmap is missing"
+            && notification.Message == "It seems like one of the selected beatmaps does not exist. Please re-select the file with 'File > Open beatmap'.");
     }
 
     [TestMethod]
@@ -272,15 +272,14 @@ public sealed class BeatmapWorkspaceTests
         workspace.SetSelection(["missing.osu"]);
 
         // Act
-        IReadOnlyList<string> selected = workspace.SelectedPaths;
+        var selected = workspace.SelectedPaths;
 
         // Assert
         selected.Should().Equal("missing.osu");
         published.Should().ContainSingle(notification =>
-            notification.Severity == UserNotificationSeverity.Warning &&
-            notification.Title == "Selected beatmap is missing" &&
-            notification.Message ==
-            "It seems like one of the selected beatmaps does not exist. Please re-select the file with 'File > Open beatmap'.");
+            notification.Severity == UserNotificationSeverity.Warning
+            && notification.Title == "Selected beatmap is missing"
+            && notification.Message == "It seems like one of the selected beatmaps does not exist. Please re-select the file with 'File > Open beatmap'.");
     }
 
     [TestMethod]
@@ -381,7 +380,7 @@ public sealed class BeatmapWorkspaceTests
         workspace.SetSelection(["selected.osu"]);
 
         // Act
-        string path = await workspace.ResolveQuickRunBeatmapAsync(updateSelection: false);
+        string path = await workspace.ResolveQuickRunBeatmapAsync(false);
 
         // Assert
         path.Should().Be("live.osu");
@@ -429,5 +428,4 @@ public sealed class BeatmapWorkspaceTests
             return now;
         }
     }
-
 }

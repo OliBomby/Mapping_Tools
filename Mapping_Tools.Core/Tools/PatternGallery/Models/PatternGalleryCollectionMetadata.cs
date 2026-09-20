@@ -13,5 +13,4 @@ public sealed class PatternGalleryCollectionMetadata
 
     /// <summary>Gets or sets the unique directory name for this collection.</summary>
     public string CollectionFolderName { get; set; } = RNG.RandomString(20);
-
 }

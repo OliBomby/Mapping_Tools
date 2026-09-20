@@ -23,4 +23,3 @@ public enum LiveBeatmapPreference
     /// </summary>
     RequireLive,
 }
-

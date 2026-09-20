@@ -26,4 +26,3 @@ public enum UserNotificationSeverity
     /// </summary>
     Error,
 }
-

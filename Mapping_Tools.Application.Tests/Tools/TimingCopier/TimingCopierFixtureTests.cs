@@ -12,8 +12,8 @@ public sealed class TimingCopierFixtureTests : TransformationFixtureTestBase
     public async Task CopyAsync_AcceptedFixture_ProducesEquivalentOutput(string fixtureName)
     {
         // Arrange
-        using FixtureContext fixture = CreateFixture("timing-copier", fixtureName);
-        TimingCopierServiceOptions project = fixture.ReadProject<TimingCopierServiceOptions>();
+        using var fixture = CreateFixture("timing-copier", fixtureName);
+        var project = fixture.ReadProject<TimingCopierServiceOptions>();
         TimingCopierService service = new(fixture.Gateway);
 
         // Act

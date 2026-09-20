@@ -6,30 +6,23 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Base implementation for generated objects and their ownership graph.</summary>
 public abstract class RelevantObject : IRelevantObject
 {
-    private HashSet<IRelevantObject> childObjects = [];
-    private double customTime;
-    private bool isInheritable = true;
-    private bool isLocked;
     private bool isSelected;
-    private HashSet<IRelevantObject> parentObjects = [];
-    private double relevancy;
-    private double time;
 
     /// <summary>Initializes empty graph ownership and full base relevance.</summary>
     protected RelevantObject()
     {
-        ParentObjects = new HashSet<IRelevantObject>();
-        ChildObjects = new HashSet<IRelevantObject>();
+        ParentObjects = [];
+        ChildObjects = [];
         Relevancy = 1;
     }
 
     /// <summary>Gets or sets the manually supplied time used by custom positioning generators.</summary>
     public double CustomTime
     {
-        get => customTime;
+        get;
         set
         {
-            customTime = value;
+            field = value;
             if (Generator?.TemporalPositioning != GeneratorTemporalPositioning.Custom) return;
 
             UpdateTime();
@@ -44,11 +37,8 @@ public abstract class RelevantObject : IRelevantObject
         Layer?.Remove(this, false);
         Disposed = true;
 
-        if (ParentObjects is not null)
-            foreach (var relevantObject in ParentObjects)
-                relevantObject.ChildObjects.Remove(this);
-
-        if (ChildObjects is null) return;
+        foreach (var relevantObject in ParentObjects)
+            relevantObject.ChildObjects.Remove(this);
 
         var objectsToDispose = ChildObjects.ToArray();
         foreach (var child in objectsToDispose) child.Dispose();
@@ -57,11 +47,10 @@ public abstract class RelevantObject : IRelevantObject
     /// <inheritdoc />
     public virtual double Time
     {
-        get => time;
+        get;
         set
         {
-            time = value;
-            if (ChildObjects is null) return;
+            field = value;
 
             foreach (var relevantObject in ChildObjects) relevantObject.UpdateTime();
 
@@ -72,11 +61,10 @@ public abstract class RelevantObject : IRelevantObject
     /// <inheritdoc />
     public double Relevancy
     {
-        get => isSelected ? 1 : relevancy;
+        get => isSelected ? 1 : field;
         set
         {
-            relevancy = value;
-            if (ChildObjects is null) return;
+            field = value;
 
             foreach (var relevantObject in ChildObjects) relevantObject.UpdateRelevancy();
         }
@@ -103,9 +91,8 @@ public abstract class RelevantObject : IRelevantObject
             if (isSelected == value) return;
 
             isSelected = value;
-            if (ChildObjects is not null)
-                foreach (var relevantObject in ChildObjects)
-                    relevantObject.UpdateRelevancy();
+            foreach (var relevantObject in ChildObjects)
+                relevantObject.UpdateRelevancy();
 
             if (AutoPropagate) Layer?.NextLayer?.GenerateNewObjects(true);
         }
@@ -114,12 +101,12 @@ public abstract class RelevantObject : IRelevantObject
     /// <inheritdoc />
     public bool IsLocked
     {
-        get => isLocked;
+        get;
         set
         {
-            if (isLocked == value) return;
+            if (field == value) return;
 
-            isLocked = value;
+            field = value;
             if (AutoPropagate) Layer?.NextLayer?.GenerateNewObjects(true);
         }
     }
@@ -127,15 +114,15 @@ public abstract class RelevantObject : IRelevantObject
     /// <inheritdoc />
     public bool IsInheritable
     {
-        get => isInheritable;
+        get;
         set
         {
-            if (isInheritable == value) return;
+            if (field == value) return;
 
-            isInheritable = value;
+            field = value;
             if (!AutoPropagate) return;
 
-            if (isInheritable)
+            if (field)
             {
                 Layer?.NextLayer?.GenerateNewObjects(true);
             }
@@ -147,7 +134,7 @@ public abstract class RelevantObject : IRelevantObject
                 Layer?.NextLayer?.GenerateNewObjects(true);
             }
         }
-    }
+    } = true;
 
     /// <inheritdoc />
     public RelevantObjectLayer? Layer { get; set; }
@@ -158,27 +145,23 @@ public abstract class RelevantObject : IRelevantObject
     /// <inheritdoc />
     public HashSet<IRelevantObject> ParentObjects
     {
-        get => parentObjects;
+        get;
         set
         {
-            parentObjects = value ?? [];
+            field = value;
             UpdateRelevancy();
             UpdateTime();
         }
     }
 
     /// <inheritdoc />
-    public HashSet<IRelevantObject> ChildObjects
-    {
-        get => childObjects;
-        set => childObjects = value ?? [];
-    }
+    public HashSet<IRelevantObject> ChildObjects { get; set; }
 
     /// <inheritdoc />
     public HashSet<IRelevantObject> GetParentage(int level)
     {
-        HashSet<IRelevantObject> parentageSet = new() { this };
-        if (ParentObjects is null || ParentObjects.Count == 0 || level == 0 || IsLocked) return parentageSet;
+        HashSet<IRelevantObject> parentageSet = [this];
+        if (ParentObjects.Count == 0 || level == 0 || IsLocked) return parentageSet;
 
         foreach (var relevantObject in ParentObjects) parentageSet.UnionWith(relevantObject.GetParentage(level - 1));
 
@@ -188,8 +171,8 @@ public abstract class RelevantObject : IRelevantObject
     /// <inheritdoc />
     public HashSet<IRelevantObject> GetDescendants(int level)
     {
-        HashSet<IRelevantObject> childrenSet = new() { this };
-        if (ChildObjects is null || ChildObjects.Count == 0 || level == 0) return childrenSet;
+        HashSet<IRelevantObject> childrenSet = [this];
+        if (ChildObjects.Count == 0 || level == 0) return childrenSet;
 
         foreach (var relevantObject in ChildObjects) childrenSet.UnionWith(relevantObject.GetDescendants(level - 1));
 
@@ -199,15 +182,15 @@ public abstract class RelevantObject : IRelevantObject
     /// <inheritdoc />
     public void UpdateRelevancy()
     {
-        if (ParentObjects is null || ParentObjects.Count == 0) return;
+        if (ParentObjects.Count == 0) return;
 
-        Relevancy = (Generator?.Settings?.RelevancyRatio ?? 1) * ParentObjects.Average(o => o.Relevancy);
+        Relevancy = (Generator?.Settings.RelevancyRatio ?? 1) * ParentObjects.Average(o => o.Relevancy);
     }
 
     /// <inheritdoc />
     public void UpdateTime()
     {
-        if (ParentObjects is null || ParentObjects.Count == 0) return;
+        if (ParentObjects.Count == 0) return;
 
         var temporalPositioning = Generator?.TemporalPositioning ?? GeneratorTemporalPositioning.Average;
         switch (temporalPositioning)
@@ -262,4 +245,3 @@ public abstract class RelevantObject : IRelevantObject
     /// <inheritdoc />
     public abstract double DistanceTo(IRelevantObject relevantObject);
 }
-

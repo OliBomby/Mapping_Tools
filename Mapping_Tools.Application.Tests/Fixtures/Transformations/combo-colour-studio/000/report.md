@@ -9,13 +9,15 @@
 
 ## Semantic comparison
 
-| Target item | Before | After |
-|---|---:|---:|
-| Combo colours | 4 | 3 |
-| New-combo objects | 7 | 7 |
-| Hit objects | 17 | 17 |
-| Timing points | 9 | 9 |
+| Target item       | Before | After |
+|-------------------|-------:|------:|
+| Combo colours     |      4 |     3 |
+| New-combo objects |      7 |     7 |
+| Hit objects       |     17 |    17 |
+| Timing points     |      9 |     9 |
 
-The palette became `#FF3355`, `#33CC88`, and `#3388FF`. The normal colour point at 526 ms and burst point at 1525 ms changed combo-skip bits on the new-combo objects at 526 ms and 2109 ms. Object count, new-combo count, geometry, hitsounds, and timing were retained. The backup is byte-identical to the seed.
+The palette became `#FF3355`, `#33CC88`, and `#3388FF`. The normal colour point at 526 ms and burst point at 1525 ms
+changed combo-skip bits on the new-combo objects at 526 ms and 2109 ms. Object count, new-combo count, geometry,
+hitsounds, and timing were retained. The backup is byte-identical to the seed.
 
 Status: accepted by Olivier on 2026-07-18.

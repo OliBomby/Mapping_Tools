@@ -111,7 +111,7 @@ public sealed class PhysicalHitsoundSampleService : IHitsoundSampleService
         }
 
         int exportedCount = 0;
-        foreach ((string name, List<SampleGeneratingArgs> source) in schema)
+        foreach ((string name, var source) in schema)
         {
             cancellationToken.ThrowIfCancellationRequested();
             exportedCount += await ExportSourceGroupAsync(name, source, cancellationToken).ConfigureAwait(false);
@@ -125,13 +125,13 @@ public sealed class PhysicalHitsoundSampleService : IHitsoundSampleService
         IReadOnlyList<SampleGeneratingArgs> source,
         CancellationToken cancellationToken)
     {
-        List<SampleGeneratingArgs> valid = source
+        var valid = source
             .Where(sample => File.Exists(sample.Path))
             .Distinct(new SampleGeneratingArgsComparer())
             .ToList();
         if (valid.Count == 0) return 0;
 
-        if (valid.Count == 1 && valid[0].CanCopyPaste)
+        if (valid is [{ CanCopyPaste: true }])
         {
             string destination = Path.Combine(directories.Exports, name + valid[0].GetExtension());
             File.Copy(valid[0].Path, destination, true);
@@ -139,7 +139,7 @@ public sealed class PhysicalHitsoundSampleService : IHitsoundSampleService
         }
 
         List<AudioClip> clips = [];
-        foreach (SampleGeneratingArgs sample in valid)
+        foreach (var sample in valid)
         {
             cancellationToken.ThrowIfCancellationRequested();
             clips.Add(await generator.GenerateAsync(
@@ -148,7 +148,7 @@ public sealed class PhysicalHitsoundSampleService : IHitsoundSampleService
                 .ConfigureAwait(false));
         }
 
-        AudioClip clip = clips.Count == 1
+        var clip = clips.Count == 1
             ? clips[0]
             : await mixer.MixAsync(clips, cancellationToken).ConfigureAwait(false);
         await exporter.ExportAsync(

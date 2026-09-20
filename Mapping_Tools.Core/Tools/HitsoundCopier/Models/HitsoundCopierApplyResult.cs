@@ -12,4 +12,3 @@ public sealed record HitsoundCopierApplyResult(
     int GeneratedSampleCount,
     int MutedEdgeCount,
     SampleSchema SampleSchema);
-

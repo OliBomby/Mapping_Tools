@@ -14,8 +14,8 @@ public sealed class TumourGeneratorFixtureTests : TransformationFixtureTestBase
     public async Task RunAsync_AcceptedFixture_ProducesEquivalentOutput(string fixtureName)
     {
         // Arrange
-        using FixtureContext fixture = CreateFixture("tumour-generator", fixtureName);
-        TumourGeneratorServiceOptions project = fixture.ReadProject<TumourGeneratorServiceOptions>();
+        using var fixture = CreateFixture("tumour-generator", fixtureName);
+        var project = fixture.ReadProject<TumourGeneratorServiceOptions>();
         project.TumourLayers = project.TumourLayers
             .Take(fixture.IntProperty("LayerCount"))
             .ToList();

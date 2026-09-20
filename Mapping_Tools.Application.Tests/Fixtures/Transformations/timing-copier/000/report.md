@@ -10,13 +10,15 @@
 
 ## Semantic comparison
 
-| Target item | Before | After | Difference |
-|---|---:|---:|---:|
-| Redlines | 5 | 1 | -4 |
-| Greenlines | 4 | 8 | +4 |
-| Total timing points | 9 | 9 | 0 |
-| Hit objects | 17 | 17 | 0 |
+| Target item         | Before | After | Difference |
+|---------------------|-------:|------:|-----------:|
+| Redlines            |      5 |     1 |         -4 |
+| Greenlines          |      4 |     8 |         +4 |
+| Total timing points |      9 |     9 |          0 |
+| Hit objects         |     17 |    17 |          0 |
 
-The source contained one redline. The target's previous redlines were replaced by the source timing; four became inherited timing points, preserving the total timing-point count. All 17 target objects were retained and resnapped using `1/3, 1/4`. The backup is byte-identical to the target seed.
+The source contained one redline. The target's previous redlines were replaced by the source timing; four became
+inherited timing points, preserving the total timing-point count. All 17 target objects were retained and resnapped
+using `1/3, 1/4`. The backup is byte-identical to the target seed.
 
 Status: accepted by Olivier on 2026-07-18.

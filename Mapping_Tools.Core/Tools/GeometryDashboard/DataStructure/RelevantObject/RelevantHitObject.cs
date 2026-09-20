@@ -26,7 +26,6 @@ public sealed class RelevantHitObject : RelevantObject
         set
         {
             HitObject.Time = value;
-            if (ChildObjects is null) return;
 
             foreach (var relevantObject in ChildObjects) relevantObject.UpdateTime();
 
@@ -52,9 +51,12 @@ public sealed class RelevantHitObject : RelevantObject
         if (HitObject.ObjectType != other.HitObject.ObjectType || HitObject.SliderType != other.HitObject.SliderType || curvePoints.Count != otherCurvePoints.Count)
             return double.PositiveInfinity;
 
-        List<double> differences = [Vector2.DistanceSquared(HitObject.Pos, other.HitObject.Pos)];
-        differences.AddRange(curvePoints.Select((point, index) =>
-            Vector2.DistanceSquared(point, otherCurvePoints[index])));
+        List<double> differences =
+        [
+            Vector2.DistanceSquared(HitObject.Pos, other.HitObject.Pos),
+            .. curvePoints.Select((point, index) =>
+                Vector2.DistanceSquared(point, otherCurvePoints[index])),
+        ];
         return differences.Sum() / differences.Count;
     }
 

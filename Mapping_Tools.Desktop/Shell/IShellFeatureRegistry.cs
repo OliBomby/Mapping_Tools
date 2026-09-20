@@ -13,4 +13,3 @@ public interface IShellFeatureRegistry
     /// <returns>The matching registration, or <see langword="null" />.</returns>
     ShellFeatureRegistration? Find(string id);
 }
-

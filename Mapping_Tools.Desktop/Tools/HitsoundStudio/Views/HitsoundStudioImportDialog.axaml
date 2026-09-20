@@ -116,11 +116,12 @@
                             </Button>
                         </Grid>
                         <Grid Margin="0,5,0,0" ColumnDefinitions="*,5,*">
-                            <TextBox Text="{Binding XText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                     materialAssists:TextFieldAssist.Label="X coordinate"
-                                     ToolTip.Tip="The X coordinate of the stack in the source beatmap which dictates all the times when the sound has to be played." />
+                            <TextBox
+                                Text="{Binding X, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}"
+                                materialAssists:TextFieldAssist.Label="X coordinate"
+                                ToolTip.Tip="The X coordinate of the stack in the source beatmap which dictates all the times when the sound has to be played." />
                             <TextBox Grid.Column="2"
-                                     Text="{Binding YText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                     Text="{Binding Y, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}"
                                      materialAssists:TextFieldAssist.Label="Y coordinate"
                                      ToolTip.Tip="The Y coordinate of the stack in the source beatmap which dictates all the times when the sound has to be played." />
                         </Grid>
@@ -196,7 +197,7 @@
                             </Button>
                         </Grid>
                         <TextBox Margin="0,15,0,0"
-                                 Text="{Binding OffsetText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                 Text="{Binding Offset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=0}"
                                  materialAssists:TextFieldAssist.Label="Offset"
                                  ToolTip.Tip="The start time offset of the MIDI in milliseconds." />
                         <CheckBox Margin="0,15,0,0"
@@ -211,14 +212,14 @@
                                   ToolTip.Tip="Make separate hitsound layers for different note lengths." />
                         <TextBox Margin="0,8,0,8"
                                  IsVisible="{Binding IsLengthSettingsVisible}"
-                                 Text="{Binding LengthRoughnessText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                 Text="{Binding LengthRoughness, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=2}"
                                  materialAssists:TextFieldAssist.Label="Length rounding roughness" />
                         <CheckBox Content="Discriminate velocities"
                                   IsChecked="{Binding DiscriminateVelocities, Mode=TwoWay}"
                                   ToolTip.Tip="Make separate hitsound layers for different note velocities." />
                         <TextBox Margin="0,8,0,8"
                                  IsVisible="{Binding IsVelocitySettingsVisible}"
-                                 Text="{Binding VelocityRoughnessText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                 Text="{Binding VelocityRoughness, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=10}"
                                  materialAssists:TextFieldAssist.Label="Velocity rounding roughness" />
                     </StackPanel>
                 </ScrollViewer>

@@ -1,8 +1,8 @@
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
-using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.TumourGenerator;
 using Mapping_Tools.Application.Tools.TumourGenerator.Models;
 using Mapping_Tools.Core.BeatmapHelper;
@@ -15,7 +15,6 @@ using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.TumourGenerator.Models;
 using Mapping_Tools.Desktop.Tools.TumourGenerator.ViewModels;
-using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Infrastructure.Projects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -178,25 +177,25 @@ public sealed class TumourGeneratorViewModelTests
     {
         // Arrange
         var viewModel = Create(new RecordingGenerator(), activate: false);
-        const string legacyProjectJson = """
-                                       {
-                                         "$type": "Mapping_Tools.Viewmodels.TumourGeneratorVm, Mapping Tools",
-                                         "TumourLayers": [
+        const string legacy_project_json = """
                                            {
-                                             "$type": "Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourLayer, Mapping Tools",
-                                             "TumourStart": 35.39506172839506,
-                                             "TumourEnd": 256.0,
-                                             "UseAbsoluteRange": true
+                                             "$type": "Mapping_Tools.Viewmodels.TumourGeneratorVm, Mapping Tools",
+                                             "TumourLayers": [
+                                               {
+                                                 "$type": "Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourLayer, Mapping Tools",
+                                                 "TumourStart": 35.39506172839506,
+                                                 "TumourEnd": 256.0,
+                                                 "UseAbsoluteRange": true
+                                               }
+                                             ],
+                                             "AdvancedOptions": true
                                            }
-                                         ],
-                                         "AdvancedOptions": true
-                                       }
-                                       """;
-        TumourGeneratorProject project = new LegacyProjectJsonSerializer()
-            .Deserialize<TumourGeneratorProject>(legacyProjectJson);
+                                           """;
+        var project = new LegacyProjectJsonSerializer()
+            .Deserialize<TumourGeneratorProject>(legacy_project_json);
         Slider slider = new() { DataContext = viewModel };
         slider.Bind(
-            Slider.ValueProperty,
+            RangeBase.ValueProperty,
             new Binding("CurrentLayer.TumourStart") { Mode = BindingMode.TwoWay });
         IShellProjectFeature<TumourGeneratorProject> feature = viewModel;
 
@@ -224,10 +223,10 @@ public sealed class TumourGeneratorViewModelTests
         double savedEnd = project.TumourLayers[0].TumourEnd;
         Slider slider = new() { DataContext = viewModel };
         slider.Bind(
-            Slider.MaximumProperty,
+            RangeBase.MaximumProperty,
             new Binding(nameof(TumourGeneratorViewModel.TumourRangeSliderMax)));
         slider.Bind(
-            Slider.ValueProperty,
+            RangeBase.ValueProperty,
             new Binding("CurrentLayer.TumourEnd") { Mode = BindingMode.TwoWay });
         IShellProjectFeature<TumourGeneratorProject> feature = viewModel;
 
@@ -359,5 +358,4 @@ public sealed class TumourGeneratorViewModelTests
             return Task.FromResult(new TumourRunResult(paths, 1, quickRun));
         }
     }
-
 }

@@ -48,4 +48,3 @@ public sealed record UserNotification
     /// </summary>
     public Exception? Exception { get; }
 }
-

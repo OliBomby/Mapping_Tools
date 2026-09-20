@@ -3,7 +3,6 @@ using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Settings.Models;
-using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.MapCleaner;
 using Mapping_Tools.Core.Tools.MapCleaner.Models;
@@ -54,22 +53,27 @@ public sealed class MapCleanerService : IMapCleanerService
             cancellationToken.ThrowIfCancellationRequested();
             string path = paths[index];
             string directory = fileSystem.GetParentDirectory(path) ?? throw new InvalidOperationException($"Could not resolve the folder for '{path}'.");
+
             var session = await editingGateway.OpenBeatmapAsync(
                 path,
                 LiveBeatmapPreference.PreferLive,
                 cancellationToken).ConfigureAwait(false);
-            var samples = await this.samples.AnalyzeAsync(
+
+            var firstSamples = await samples.AnalyzeAsync(
                 directory,
                 options.AnalyzeSamples,
                 cancellationToken).ConfigureAwait(false);
+
             var mapProgress = progress?.MapTo(index, paths.Count);
+
             var result = MapCleanerEngine.Clean(
                 session.Beatmap,
                 options,
                 directory,
-                samples,
+                firstSamples,
                 mapProgress,
                 cancellationToken);
+
             // Save the file
             await editingGateway.SaveAsync(
                 session,
@@ -77,14 +81,15 @@ public sealed class MapCleanerService : IMapCleanerService
                     session,
                     quickRun,
                     settings),
-                cancellationToken: cancellationToken).ConfigureAwait(false);
+                cancellationToken).ConfigureAwait(false);
             int removedSamples = options.RemoveUnusedSamples
-                ? await this.samples.MoveUnusedToRecoveryAsync(
+                ? await samples.MoveUnusedToRecoveryAsync(
                     directory,
                     path,
                     session.Beatmap,
                     cancellationToken).ConfigureAwait(false)
                 : 0;
+
             // Update result with removed count
             total = total.Add(result with { SamplesRemoved = removedSamples });
         }

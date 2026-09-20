@@ -5,7 +5,6 @@ using Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.Views;
 using Microsoft.Extensions.DependencyInjection;
 
-
 namespace Mapping_Tools.Desktop.Tools.ComboColourStudio;
 
 /// <summary>Describes and composes the Combo Colour Studio plugin feature.</summary>

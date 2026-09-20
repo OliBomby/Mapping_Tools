@@ -14,6 +14,14 @@ public sealed class GraphStateToDoubleConverter : IValueConverter
         return GetScalarValue(value as GraphState);
     }
 
+    /// <inheritdoc />
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is double number && double.IsFinite(number)) return GraphStateTextCodec.CreateConstant(number);
+
+        return null!;
+    }
+
     internal static double GetScalarValue(GraphState? state)
     {
         if (state is null || state.Anchors.Count == 0) return 0d;
@@ -25,13 +33,5 @@ public sealed class GraphStateToDoubleConverter : IValueConverter
         return Math.Abs(width) <= Precision.DOUBLE_EPSILON
             ? firstValue
             : state.GetIntegral(state.MinX, state.MaxX) / width;
-    }
-
-    /// <inheritdoc />
-    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-    {
-        if (value is double number && double.IsFinite(number)) return GraphStateTextCodec.CreateConstant(number);
-
-        return null!;
     }
 }

@@ -107,10 +107,10 @@
                             </ScrollContentPresenter>
                         </DockPanel>
                         <ScrollBar x:Name="PART_HorizontalScrollBar"
-                                   Grid.Row="1"
+                                   Grid.Row="1" Grid.Column="0"
                                    Orientation="Horizontal" />
                         <ScrollBar x:Name="PART_VerticalScrollBar"
-                                   Grid.Column="1"
+                                   Grid.Row="0" Grid.Column="1"
                                    Orientation="Vertical" />
                     </Grid>
                 </ControlTemplate>

@@ -10,4 +10,3 @@ public sealed record TimingHelperResult(
     /// <summary>Gets the number of beatmaps written.</summary>
     public int ProcessedCount => ProcessedPaths.Count;
 }
-

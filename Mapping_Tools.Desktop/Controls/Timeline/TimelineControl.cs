@@ -198,7 +198,7 @@ public sealed class TimelineControl : Control
 
         using (context.PushClip(new Rect(0, 0, width, Bounds.Height)))
         {
-            foreach (var marker in Markers ?? [])
+            foreach (var marker in Markers)
             {
                 double x = scale.ToUnit(marker.Time) * width;
                 var (outer, inner) = GetBrushes(marker.Kind);
@@ -244,7 +244,7 @@ public sealed class TimelineControl : Control
     {
         return x < 0 || x > TimelineWidth
             ? null
-            : CreateScale().FindNearest(Markers ?? [], x, TimelineWidth, hit_tolerance);
+            : CreateScale().FindNearest(Markers, x, TimelineWidth, hit_tolerance);
     }
 
     internal static string FormatToolTip(TimelineMarker marker)

@@ -1,14 +1,12 @@
-using Mapping_Tools.Core.Audio;
-
 namespace Mapping_Tools.Core.Audio.Effects;
 
 /// <summary>Applies the legacy soft clipper and limiter transfer curve.</summary>
 public sealed class SoftLimiterEffect : AudioEffect
 {
-    private const double AmpDb = 8.6562;
-    private const double BaselineThresholdDb = -9;
-    private const double A = 1.017;
-    private const double B = -0.025;
+    private const double amp_db = 8.6562;
+    private const double baseline_threshold_db = -9;
+    private const double a = 1.017;
+    private const double b = -0.025;
 
     /// <summary>Creates a soft limiter effect.</summary>
     /// <param name="boostDecibels">Input boost in decibels. Must be between 0 and 18.</param>
@@ -35,22 +33,22 @@ public sealed class SoftLimiterEffect : AudioEffect
         AudioFormat _,
         CancellationToken cancellationToken)
     {
-        double threshold = BaselineThresholdDb + BrickwallDecibels;
+        double threshold = baseline_threshold_db + BrickwallDecibels;
         for (int index = 0; index < samples.Length; index++)
         {
             cancellationToken.ThrowIfCancellationRequested();
             float sample = samples[index];
             if (sample == 0) continue;
 
-            double decibels = AmpDb * Math.Log(Math.Abs(sample)) + BoostDecibels;
+            double decibels = amp_db * Math.Log(Math.Abs(sample)) + BoostDecibels;
             if (decibels > threshold)
             {
                 double over = decibels - threshold;
-                over = A * over + B * over * over;
+                over = a * over + b * over * over;
                 decibels = Math.Min(threshold + over, BrickwallDecibels);
             }
 
-            samples[index] = (float)(Math.Exp(decibels / AmpDb) * Math.Sign(sample));
+            samples[index] = (float)(Math.Exp(decibels / amp_db) * Math.Sign(sample));
         }
     }
 }

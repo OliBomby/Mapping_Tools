@@ -11,4 +11,3 @@ public sealed record QuickUndoCommandResult(
     QuickUndoCommandStatus Status,
     BeatmapRestoreResult? Restore = null,
     Exception? Exception = null);
-

@@ -38,9 +38,6 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
     /// <summary>Gets or edits the retained-backup limit as a typed count.</summary>
     [ObservableProperty] private int maxBackupFiles;
 
-    private IReadOnlyList<string> multipleQuickRunTools = [current_tool];
-    private IReadOnlyList<string> noneQuickRunTools = [current_tool];
-
     /// <summary>Gets or edits the current user's osu! configuration file.</summary>
     [ObservableProperty] [NotifyDataErrorInfo] [Required(ErrorMessage = "Select a path.")]
     private string osuConfigPath;
@@ -51,8 +48,6 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
 
     /// <summary>Gets or edits the periodic-backup interval as a typed duration.</summary>
     [ObservableProperty] private TimeSpan periodicBackupInterval;
-
-    private IReadOnlyList<string> singleQuickRunTools = [current_tool];
 
     /// <summary>Gets or edits osu!'s beatmap-library directory.</summary>
     [ObservableProperty] [NotifyDataErrorInfo] [Required(ErrorMessage = "Select a path.")]
@@ -97,23 +92,23 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
     /// <summary>Gets QuickRun targets that accept no selected hit objects.</summary>
     public IReadOnlyList<string> NoneQuickRunTools
     {
-        get => noneQuickRunTools;
-        private set => SetProperty(ref noneQuickRunTools, value);
-    }
+        get;
+        private set => SetProperty(ref field, value);
+    } = [current_tool];
 
     /// <summary>Gets QuickRun targets that accept exactly one selected hit object.</summary>
     public IReadOnlyList<string> SingleQuickRunTools
     {
-        get => singleQuickRunTools;
-        private set => SetProperty(ref singleQuickRunTools, value);
-    }
+        get;
+        private set => SetProperty(ref field, value);
+    } = [current_tool];
 
     /// <summary>Gets QuickRun targets that accept multiple selected hit objects.</summary>
     public IReadOnlyList<string> MultipleQuickRunTools
     {
-        get => multipleQuickRunTools;
-        private set => SetProperty(ref multipleQuickRunTools, value);
-    }
+        get;
+        private set => SetProperty(ref field, value);
+    } = [current_tool];
 
     /// <summary>Gets or sets whether tool runs create automatic safety backups.</summary>
     public bool MakeBackups

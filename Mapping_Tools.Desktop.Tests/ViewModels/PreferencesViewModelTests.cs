@@ -423,5 +423,4 @@ public sealed class PreferencesViewModelTests
             AppliedThemes.Add(theme);
         }
     }
-
 }

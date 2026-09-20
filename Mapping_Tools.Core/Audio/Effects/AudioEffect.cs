@@ -1,5 +1,3 @@
-using Mapping_Tools.Core.Audio;
-
 namespace Mapping_Tools.Core.Audio.Effects;
 
 /// <summary>Processes an audio clip without depending on an audio framework.</summary>

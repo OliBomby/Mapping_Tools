@@ -10,9 +10,9 @@ namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.Views;
 /// <summary>Hosts the Geometry Dashboard generator list and dashboard actions.</summary>
 public sealed partial class GeometryDashboardView : UserControl
 {
-    private readonly ButtonModifierCapture toggleSelectedButtonModifiers;
-    private readonly ButtonModifierCapture toggleLockedButtonModifiers;
     private readonly ButtonModifierCapture toggleInheritableButtonModifiers;
+    private readonly ButtonModifierCapture toggleLockedButtonModifiers;
+    private readonly ButtonModifierCapture toggleSelectedButtonModifiers;
     private bool restoreGeneratorsOffset;
     private double savedGeneratorsOffset;
 

@@ -14,4 +14,3 @@ public sealed class MidiImportRequest
     /// <summary>Gets the source MIDI path.</summary>
     public string Path { get; }
 }
-

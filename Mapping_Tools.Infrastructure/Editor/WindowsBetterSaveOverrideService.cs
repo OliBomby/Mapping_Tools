@@ -15,7 +15,7 @@ namespace Mapping_Tools.Infrastructure.Editor;
 public sealed class WindowsBetterSaveOverrideService : IBetterSaveOverrideService, IDisposable
 {
     private readonly IBetterSaveService betterSave;
-    private readonly object configurationGate = new();
+    private readonly Lock configurationGate = new();
     private readonly ICurrentBeatmapLocator currentBeatmapLocator;
     private readonly Func<bool> isOsuForeground;
     private readonly Func<bool> isWindows;
@@ -151,7 +151,7 @@ public sealed class WindowsBetterSaveOverrideService : IBetterSaveOverrideServic
             await Task.Delay(50, cancellationToken).ConfigureAwait(false);
             await saveGate.WaitAsync(cancellationToken).ConfigureAwait(false);
             lockTaken = true;
-            string? currentPath = await currentBeatmapLocator
+            string currentPath = await currentBeatmapLocator
                 .FindCurrentBeatmapAsync(cancellationToken)
                 .ConfigureAwait(false);
             if (!string.Equals(currentPath, eventArgs.FullPath, StringComparison.OrdinalIgnoreCase) || !isOsuForeground())

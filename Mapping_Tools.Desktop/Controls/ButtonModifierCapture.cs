@@ -19,33 +19,33 @@ internal sealed class ButtonModifierCapture
             InputElement.PointerPressedEvent,
             OnPointerPressed,
             RoutingStrategies.Tunnel,
-            handledEventsToo: true);
+            true);
         target.AddHandler(
             InputElement.PointerCaptureLostEvent,
             OnPointerCaptureLost,
             RoutingStrategies.Bubble,
-            handledEventsToo: true);
+            true);
         target.AddHandler(
             InputElement.KeyDownEvent,
             OnKeyDown,
             RoutingStrategies.Tunnel,
-            handledEventsToo: true);
+            true);
         target.AddHandler(
             InputElement.KeyUpEvent,
             OnKeyUp,
             RoutingStrategies.Bubble,
-            handledEventsToo: true);
+            true);
         target.AddHandler(
             InputElement.LostFocusEvent,
             OnLostFocus,
             RoutingStrategies.Bubble,
-            handledEventsToo: true);
+            true);
     }
 
     /// <summary>Returns and clears the modifiers captured for the next activation.</summary>
     public KeyModifiers Consume()
     {
-        KeyModifiers modifiers = pendingModifiers;
+        var modifiers = pendingModifiers;
         pendingModifiers = KeyModifiers.None;
         return modifiers;
     }

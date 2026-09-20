@@ -356,8 +356,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
             string sourceFullPath = Path.GetFullPath(input.Path);
             string relative = Path.GetRelativePath(sourceFullPath, exportFullPath);
             if (relative is "."
-                || relative is not null
-                && !relative.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+                || !relative.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
                     .Any(part => part is ".."))
                 throw new InvalidOperationException(
                     $"The export directory '{exportPath}' must not be the same as or inside mapset '{input.Path}'.");
@@ -376,7 +375,6 @@ public sealed class MapsetMergerService : IMapsetMergerService
 
         // Check storyboard count not over the max
         if (storyboards.Count > max_mapset_maps) throw new InvalidDataException("Storyboard limit exceeded in mapset: " + input.Name);
-
     }
 
     private static string SafeRelativePath(string path)

@@ -306,6 +306,7 @@ public static class MathHelper
         double absB = Math.Abs(b);
         double diff = Math.Abs(a - b);
 
+        // ReSharper disable once CompareOfFloatsByEqualityOperator
         if (a == b)
             // Shortcut, handles infinities
             return true;
@@ -332,6 +333,7 @@ public static class MathHelper
     [SuppressMessage("ReSharper", "CompareOfdoublesByEqualityOperator")]
     public static bool ApproximatelyEquivalent(double a, double b, double tolerance)
     {
+        // ReSharper disable once CompareOfFloatsByEqualityOperator
         if (a == b)
             // Early bailout, handles infinities
             return true;
@@ -355,7 +357,7 @@ public static class MathHelper
         return array[0];
     }
 
-    // Secant 
+    // Secant
     /// <summary>
     ///     Computes the secant of an angle in radians.
     /// </summary>
@@ -377,7 +379,7 @@ public static class MathHelper
         return 1 / Math.Sin(x);
     }
 
-    // Cotangent 
+    // Cotangent
     /// <summary>
     ///     Computes the cotangent of an angle in radians.
     /// </summary>
@@ -388,7 +390,7 @@ public static class MathHelper
         return 1 / Math.Tan(x);
     }
 
-    // Inverse Sine 
+    // Inverse Sine
     /// <summary>
     ///     Computes the principal inverse sine using the ratio identity.
     /// </summary>
@@ -399,7 +401,7 @@ public static class MathHelper
         return Math.Atan(x / Math.Sqrt(-x * x + 1));
     }
 
-    // Inverse Cosine 
+    // Inverse Cosine
     /// <summary>
     ///     Computes the principal inverse cosine using the ratio identity.
     /// </summary>
@@ -411,7 +413,7 @@ public static class MathHelper
     }
 
 
-    // Inverse Secant 
+    // Inverse Secant
     /// <summary>
     ///     Computes the principal inverse secant.
     /// </summary>
@@ -422,7 +424,7 @@ public static class MathHelper
         return 2 * Math.Atan(1) - Math.Atan(Math.Sign(x) / Math.Sqrt(x * x - 1));
     }
 
-    // Inverse Cosecant 
+    // Inverse Cosecant
     /// <summary>
     ///     Computes the principal inverse cosecant.
     /// </summary>
@@ -433,7 +435,7 @@ public static class MathHelper
         return Math.Atan(Math.Sign(x) / Math.Sqrt(x * x - 1));
     }
 
-    // Inverse Cotangent 
+    // Inverse Cotangent
     /// <summary>
     ///     Computes the principal inverse cotangent.
     /// </summary>
@@ -444,7 +446,7 @@ public static class MathHelper
         return 2 * Math.Atan(1) - Math.Atan(x);
     }
 
-    // Hyperbolic Sine 
+    // Hyperbolic Sine
     /// <summary>
     ///     Computes the hyperbolic sine.
     /// </summary>
@@ -455,7 +457,7 @@ public static class MathHelper
         return (Math.Exp(x) - Math.Exp(-x)) / 2;
     }
 
-    // Hyperbolic Cosine 
+    // Hyperbolic Cosine
     /// <summary>
     ///     Computes the hyperbolic cosine.
     /// </summary>
@@ -466,7 +468,7 @@ public static class MathHelper
         return (Math.Exp(x) + Math.Exp(-x)) / 2;
     }
 
-    // Hyperbolic Tangent 
+    // Hyperbolic Tangent
     /// <summary>
     ///     Computes the hyperbolic tangent.
     /// </summary>
@@ -477,7 +479,7 @@ public static class MathHelper
         return (Math.Exp(x) - Math.Exp(-x)) / (Math.Exp(x) + Math.Exp(-x));
     }
 
-    // Hyperbolic Secant 
+    // Hyperbolic Secant
     /// <summary>
     ///     Computes the hyperbolic secant.
     /// </summary>
@@ -488,7 +490,7 @@ public static class MathHelper
         return 2 / (Math.Exp(x) + Math.Exp(-x));
     }
 
-    // Hyperbolic Cosecant 
+    // Hyperbolic Cosecant
     /// <summary>
     ///     Computes the hyperbolic cosecant.
     /// </summary>
@@ -499,7 +501,7 @@ public static class MathHelper
         return 2 / (Math.Exp(x) - Math.Exp(-x));
     }
 
-    // Hyperbolic Cotangent 
+    // Hyperbolic Cotangent
     /// <summary>
     ///     Computes the hyperbolic cotangent.
     /// </summary>
@@ -510,7 +512,7 @@ public static class MathHelper
         return (Math.Exp(x) + Math.Exp(-x)) / (Math.Exp(x) - Math.Exp(-x));
     }
 
-    // Inverse Hyperbolic Sine 
+    // Inverse Hyperbolic Sine
     /// <summary>
     ///     Computes the inverse hyperbolic sine.
     /// </summary>
@@ -521,7 +523,7 @@ public static class MathHelper
         return Math.Log(x + Math.Sqrt(x * x + 1));
     }
 
-    // Inverse Hyperbolic Cosine 
+    // Inverse Hyperbolic Cosine
     /// <summary>
     ///     Computes the inverse hyperbolic cosine.
     /// </summary>
@@ -532,7 +534,7 @@ public static class MathHelper
         return Math.Log(x + Math.Sqrt(x * x - 1));
     }
 
-    // Inverse Hyperbolic Tangent 
+    // Inverse Hyperbolic Tangent
     /// <summary>
     ///     Computes the inverse hyperbolic tangent.
     /// </summary>
@@ -543,7 +545,7 @@ public static class MathHelper
         return Math.Log((1 + x) / (1 - x)) / 2;
     }
 
-    // Inverse Hyperbolic Secant 
+    // Inverse Hyperbolic Secant
     /// <summary>
     ///     Computes the inverse hyperbolic secant.
     /// </summary>
@@ -554,7 +556,7 @@ public static class MathHelper
         return Math.Log((Math.Sqrt(-x * x + 1) + 1) / x);
     }
 
-    // Inverse Hyperbolic Cosecant 
+    // Inverse Hyperbolic Cosecant
     /// <summary>
     ///     Computes the inverse hyperbolic cosecant.
     /// </summary>
@@ -565,7 +567,7 @@ public static class MathHelper
         return Math.Log((Math.Sign(x) * Math.Sqrt(x * x + 1) + 1) / x);
     }
 
-    // Inverse Hyperbolic Cotangent 
+    // Inverse Hyperbolic Cotangent
     /// <summary>
     ///     Computes the inverse hyperbolic cotangent.
     /// </summary>
@@ -576,7 +578,7 @@ public static class MathHelper
         return Math.Log((x + 1) / (x - 1)) / 2;
     }
 
-    // Logarithm to base N 
+    // Logarithm to base N
     /// <summary>
     ///     Computes a logarithm in an arbitrary base by change of base.
     /// </summary>

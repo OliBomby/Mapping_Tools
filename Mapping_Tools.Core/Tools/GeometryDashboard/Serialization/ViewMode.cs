@@ -22,4 +22,3 @@ public enum ViewMode
     /// <summary>Show the complete generated graph.</summary>
     Everything = 1 << 4,
 }
-

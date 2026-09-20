@@ -25,4 +25,3 @@ public interface IUserNotificationService
         Models.UserNotification notification,
         CancellationToken cancellationToken = default);
 }
-

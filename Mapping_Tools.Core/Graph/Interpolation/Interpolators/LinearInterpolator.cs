@@ -24,4 +24,3 @@ public sealed class LinearInterpolator : CustomInterpolator, IDerivableInterpola
         return 0.5 * t2 * t2 - 0.5 * t1 * t1;
     }
 }
-

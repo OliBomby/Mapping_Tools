@@ -11,4 +11,3 @@ public interface IGraphMarkerGenerator
     /// <returns>The generated marker sequence.</returns>
     IEnumerable<GraphMarker> GenerateMarkers(double start, double end, GraphMarkerOrientation orientation, int maxMarkers);
 }
-

@@ -9,15 +9,13 @@ public sealed class SliderPicturatorProject : SliderPicturatorServiceOptions
     /// <summary>Gets or sets the approximate preview segment count.</summary>
     public long SegmentCount { get; set; }
 
-    private bool useMapComboColors;
-
     /// <summary>Gets or sets whether the map palette supplies the track colour.</summary>
     public bool UseMapComboColors
     {
-        get => useMapComboColors;
+        get;
         set
         {
-            useMapComboColors = value;
+            field = value;
             SetTrackColorOverride = !value;
         }
     }

@@ -1,9 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
 using Mapping_Tools.Infrastructure.Files;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Infrastructure.Tests.Files;
 
 [TestClass]
+[SuppressMessage("ReSharper", "AccessToDisposedClosure")]
 public sealed class PhysicalBeatmapsetFileSystemTests : IDisposable
 {
     private readonly string root = Path.Combine(
@@ -61,11 +63,11 @@ public sealed class PhysicalBeatmapsetFileSystemTests : IDisposable
         string export = Path.Combine(root, "export");
         Directory.CreateDirectory(export);
         string original = Path.Combine(export, "same.txt");
-        File.WriteAllText(original, "original");
+        await File.WriteAllTextAsync(original, "original");
         string firstSource = Path.Combine(root, "first.txt");
         string secondSource = Path.Combine(root, "second.txt");
-        File.WriteAllText(firstSource, "first");
-        File.WriteAllText(secondSource, "second");
+        await File.WriteAllTextAsync(firstSource, "first");
+        await File.WriteAllTextAsync(secondSource, "second");
 
         using var transaction =
             new PhysicalBeatmapsetFileSystem().BeginTransaction(export);
@@ -80,7 +82,7 @@ public sealed class PhysicalBeatmapsetFileSystemTests : IDisposable
 
         // Assert
         await act.Should().ThrowAsync<IOException>();
-        File.ReadAllText(original).Should().Be("original");
+        (await File.ReadAllTextAsync(original)).Should().Be("original");
         Directory.Exists(Path.Combine(export, "new-directory")).Should().BeFalse();
         Directory.Exists(Path.Combine(export, "failure.txt")).Should().BeTrue();
         Directory.GetDirectories(root, ".export.mapset-merger-*", SearchOption.TopDirectoryOnly)

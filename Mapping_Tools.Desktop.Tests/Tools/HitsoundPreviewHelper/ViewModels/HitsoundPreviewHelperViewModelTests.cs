@@ -1,16 +1,14 @@
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
-using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Tools.HitsoundPreviewHelper;
 using Mapping_Tools.Application.Tools.RhythmGuide;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.ViewModels;
-using Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.ViewModels.Adapters;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.Services;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.ViewModels;
-using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Tools.HitsoundPreviewHelper.ViewModels;
@@ -37,15 +35,19 @@ public sealed class HitsoundPreviewHelperViewModelTests
     }
 
     [TestMethod]
-    public async Task RunCommand_UsesSelectedWorkspaceMapsAndPublishesLegacyCompletion()
+    public async Task RunCommand_UsesSelectedWorkspaceMapsAndPublishesSuccess()
     {
         // Arrange
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["first.osu", "second.osu"]);
         RecordingPreviewService preview = new();
+        UserNotificationService notifications = new();
+        List<UserNotification> published = [];
+        notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
         var viewModel = CreateViewModel(
             preview,
-            workspace);
+            workspace,
+            notifications: notifications);
         viewModel.AddCommand.Execute(null);
 
         // Act
@@ -55,7 +57,10 @@ public sealed class HitsoundPreviewHelperViewModelTests
         preview.Options.Should().NotBeNull();
         preview.Paths.Should().Equal("first.osu", "second.osu");
         preview.Options!.Items.Should().ContainSingle();
-        viewModel.ResultSummary.Should().Be("Done!");
+        published.Where(notification =>
+                notification.Severity == UserNotificationSeverity.Success
+                && notification.Message == "Done!")
+            .Should().ContainSingle();
         viewModel.Progress.Should().Be(0);
         viewModel.IsRunning.Should().BeFalse();
     }
@@ -65,7 +70,10 @@ public sealed class HitsoundPreviewHelperViewModelTests
     {
         // Arrange
         RecordingPreviewService preview = new();
-        var viewModel = CreateViewModel(preview);
+        UserNotificationService notifications = new();
+        List<UserNotification> published = [];
+        notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
+        var viewModel = CreateViewModel(preview, notifications: notifications);
         viewModel.AddCommand.Execute(null);
 
         // Act
@@ -74,7 +82,10 @@ public sealed class HitsoundPreviewHelperViewModelTests
         // Assert
         preview.Paths.Should().Equal("current.osu");
         preview.QuickRun.Should().BeTrue();
-        viewModel.ResultSummary.Should().Be("Placed 1 preview hitsounds.");
+        published.Where(notification =>
+                notification.Severity == UserNotificationSeverity.Success
+                && notification.Message == "Placed 1 preview hitsounds.")
+            .Should().ContainSingle();
     }
 
     [TestMethod]
@@ -113,17 +124,19 @@ public sealed class HitsoundPreviewHelperViewModelTests
     private static HitsoundPreviewHelperViewModel CreateViewModel(
         RecordingPreviewService? preview = null,
         TestBeatmapWorkspace? workspace = null,
-        RecordingRhythmGuideWindowService? windowService = null)
+        RecordingRhythmGuideWindowService? windowService = null,
+        IUserNotificationService? notifications = null)
     {
-        UserNotificationService notifications = new();
+        var notificationService = notifications ?? new UserNotificationService();
         ToolExecutionService execution = new(
-            notifications,
+            notificationService,
             TimeProvider.System);
         var windows = windowService ?? new RecordingRhythmGuideWindowService();
-        TestBeatmapWorkspace effectiveWorkspace = workspace ?? new TestBeatmapWorkspace
-        {
-            QuickRunPath = "current.osu",
-        };
+        var effectiveWorkspace = workspace
+                                 ?? new TestBeatmapWorkspace
+                                 {
+                                     QuickRunPath = "current.osu",
+                                 };
         RhythmGuideViewModel rhythmGuide = new(
             new StubRhythmGuideService(),
             execution,
@@ -139,7 +152,7 @@ public sealed class HitsoundPreviewHelperViewModelTests
             effectiveWorkspace,
             new RecordingCurrentBeatmapLocator("current.osu"),
             new DesktopApplicationSettings(),
-            notifications,
+            notificationService,
             windows,
             rhythmGuide,
             new TestApplicationDirectories());

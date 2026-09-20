@@ -6,4 +6,3 @@ public interface IRequireInit
     /// <summary>Recomputes any cached shape values from the current template properties.</summary>
     void Init();
 }
-

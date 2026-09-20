@@ -15,34 +15,34 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <AvaloniaResource Include="Assets\**" />
+    <AvaloniaResource Include="Assets\**"/>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia.Markup.Xaml.Loader" Version="12.1.0" PrivateAssets="All" Publish="True" />
-    <PackageReference Include="HotAvalonia" Version="3.*" PrivateAssets="All" Publish="True" />
-    <PackageReference Include="Avalonia" Version="12.1.0" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.0" />
-    <PackageReference Include="ProDataGrid" Version="12.1.0.4" />
-    <PackageReference Include="Avalonia.Desktop" Version="12.1.0" />
-    <PackageReference Include="Avalonia.Controls.ColorPicker" Version="12.1.0" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.0" />
+    <PackageReference Include="Avalonia.Markup.Xaml.Loader" Version="12.1.0" PrivateAssets="All" Publish="True"/>
+    <PackageReference Include="HotAvalonia" Version="3.*" PrivateAssets="All" Publish="True"/>
+    <PackageReference Include="Avalonia" Version="12.1.0"/>
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.0"/>
+    <PackageReference Include="ProDataGrid" Version="12.1.0.4"/>
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.0"/>
+    <PackageReference Include="Avalonia.Controls.ColorPicker" Version="12.1.0"/>
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.0"/>
     <PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.3">
       <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
       <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
-    <PackageReference Include="DialogHost.Avalonia" Version="0.12.3" />
-    <PackageReference Include="Material.Avalonia" Version="3.17.0" />
-    <PackageReference Include="Material.Icons.Avalonia" Version="3.0.2" />
-    <PackageReference Include="Markdown.Avalonia" Version="12.0.0-a3" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.9" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.9" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2"/>
+    <PackageReference Include="DialogHost.Avalonia" Version="0.12.3"/>
+    <PackageReference Include="Material.Avalonia" Version="3.17.0"/>
+    <PackageReference Include="Material.Icons.Avalonia" Version="3.0.2"/>
+    <PackageReference Include="Markdown.Avalonia" Version="12.0.0-a3"/>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.9"/>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.9"/>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Mapping_Tools.Application\Mapping_Tools.Application.csproj" />
-    <ProjectReference Include="..\Mapping_Tools.Infrastructure\Mapping_Tools.Infrastructure.csproj" />
+    <ProjectReference Include="..\Mapping_Tools.Application\Mapping_Tools.Application.csproj"/>
+    <ProjectReference Include="..\Mapping_Tools.Infrastructure\Mapping_Tools.Infrastructure.csproj"/>
   </ItemGroup>
 
   <Target Name="RenamePublishedAppHost" AfterTargets="Publish">
@@ -55,7 +55,7 @@
 
     <Move SourceFiles="$(PublishedAppHostSource)"
           DestinationFiles="$(PublishedAppHostDestination)"
-          Condition="Exists('$(PublishedAppHostSource)')" />
+          Condition="Exists('$(PublishedAppHostSource)')"/>
   </Target>
 
   <!-- These assemblies back Windows-only live-editor, overlay, and global-hook
@@ -71,7 +71,7 @@
       <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)"
                              Condition="'%(ResolvedFileToPublish.Filename)' == 'EditorReader' Or
                                         '%(ResolvedFileToPublish.Filename)' == 'NonInvasiveKeyboardHookLibrary.Core' Or
-                                        '%(ResolvedFileToPublish.Filename)' == 'NAudio.Wasapi'" />
+                                        '%(ResolvedFileToPublish.Filename)' == 'NAudio.Wasapi'"/>
     </ItemGroup>
   </Target>
 </Project>

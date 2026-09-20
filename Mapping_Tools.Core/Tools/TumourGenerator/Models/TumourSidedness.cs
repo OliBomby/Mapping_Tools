@@ -18,4 +18,3 @@ public enum TumourSidedness
     /// <summary>Chooses each tumour side from the layer's random sequence.</summary>
     Random,
 }
-

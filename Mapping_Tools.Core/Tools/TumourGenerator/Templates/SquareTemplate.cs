@@ -57,7 +57,7 @@ internal sealed class SquareTemplate : TumourTemplateBase, IRequireInit
         return PathType.Linear;
     }
 
-    public override Func<double, double>? GetDistanceRelation()
+    public override Func<double, double> GetDistanceRelation()
     {
         double length = Length;
         double width = Width;
@@ -74,4 +74,3 @@ internal sealed class SquareTemplate : TumourTemplateBase, IRequireInit
             : (t - margin) * scaleX / length + marginLength / length;
     }
 }
-

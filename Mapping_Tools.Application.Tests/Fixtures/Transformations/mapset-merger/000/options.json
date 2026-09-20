@@ -2,11 +2,15 @@
   "Mapsets": [
     {
       "Name": "E2E-A",
-      "Beatmaps": ["../../../Mapsets/multi-difficulty/normal.osu"]
+      "Beatmaps": [
+        "../../../Mapsets/multi-difficulty/normal.osu"
+      ]
     },
     {
       "Name": "E2E-B",
-      "Beatmaps": ["../../../Mapsets/multi-difficulty/expert.osu"]
+      "Beatmaps": [
+        "../../../Mapsets/multi-difficulty/expert.osu"
+      ]
     }
   ],
   "MoveSbToBeatmap": false,

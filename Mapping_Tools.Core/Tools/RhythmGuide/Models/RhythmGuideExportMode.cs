@@ -9,4 +9,3 @@ public enum RhythmGuideExportMode
     /// <summary>Adds generated guide objects to an existing target beatmap.</summary>
     AddToMap,
 }
-

@@ -16,4 +16,3 @@ public enum BeatmapEditingSource
     /// </summary>
     LiveEditor,
 }
-

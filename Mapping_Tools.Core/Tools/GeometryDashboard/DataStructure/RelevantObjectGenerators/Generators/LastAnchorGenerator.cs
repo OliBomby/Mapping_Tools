@@ -32,7 +32,7 @@ public sealed class LastAnchorGenerator : RelevantObjectsGenerator
     {
         var hitObject = relevantHitObject.HitObject;
         if (hitObject.CurvePoints is null || hitObject.CurvePoints.Count == 0) return null;
-        return hitObject.IsSlider && hitObject.CurvePoints is { Count: > 0 }
+        return hitObject is { IsSlider: true, CurvePoints.Count: > 0 }
             ? new RelevantPoint(hitObject.CurvePoints.Last()) { CustomTime = hitObject.EndTime }
             : null;
     }

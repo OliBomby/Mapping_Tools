@@ -11,7 +11,7 @@ namespace Mapping_Tools.Core.BeatmapHelper;
 public static class FileFormatHelper
 {
     private static readonly string[] osuDictionaryKeyOrder =
-    {
+    [
         "AudioFilename",
         "AudioLeadIn",
         "AudioHash",
@@ -52,7 +52,7 @@ public static class FileFormatHelper
         "ApproachRate",
         "SliderMultiplier",
         "SliderTickRate",
-    };
+    ];
 
     private static readonly HashSet<string> osuDictionaryKeyOrderSet = new(osuDictionaryKeyOrder, StringComparer.Ordinal);
 
@@ -171,7 +171,7 @@ public static class FileFormatHelper
     public static IEnumerable<string> GetCategoryLines(IEnumerable<string> lines, string category, string[] categoryIdentifiers = null)
     {
         if (categoryIdentifiers == null)
-            categoryIdentifiers = new[] { "[" };
+            categoryIdentifiers = ["["];
 
         bool atCategory = false;
 

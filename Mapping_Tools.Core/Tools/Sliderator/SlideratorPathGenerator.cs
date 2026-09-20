@@ -153,7 +153,7 @@ public sealed class SlideratorPathGenerator
                 double progress = (i - start[majorAxis]) / delta[majorAxis];
                 double minor = start[1 - majorAxis] + progress * delta[1 - majorAxis];
                 int j = (int)Math.Round(minor);
-                Vector2 latticePoint = majorAxis == 1 ? new Vector2(j, i) : new Vector2(i, j);
+                var latticePoint = majorAxis == 1 ? new Vector2(j, i) : new Vector2(i, j);
                 double projected = MathHelper.Clamp(
                     progress + (j - minor) * delta[1 - majorAxis] / lengthSquared,
                     0,

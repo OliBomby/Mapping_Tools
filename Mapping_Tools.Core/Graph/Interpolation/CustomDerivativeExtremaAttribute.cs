@@ -14,4 +14,3 @@ public sealed class CustomDerivativeExtremaAttribute : Attribute
     /// <summary>Gets the normalized positions at which derivative extrema are known.</summary>
     public double[] ExtremaPositions { get; }
 }
-

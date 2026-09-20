@@ -21,4 +21,3 @@ public sealed class UserNotificationPublishedEventArgs : EventArgs
     /// </summary>
     public UserNotification Notification { get; }
 }
-

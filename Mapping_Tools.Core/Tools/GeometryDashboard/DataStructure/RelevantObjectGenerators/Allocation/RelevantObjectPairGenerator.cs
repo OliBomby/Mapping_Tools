@@ -23,7 +23,7 @@ public static class RelevantObjectPairGenerator
     {
         if (collection is null || dependencies.Length == 0)
             // Handle special case
-            return new[] { Array.Empty<IRelevantObject>() };
+            return [[]];
 
         var sortedObjects = collection.GetSortedSubset(new HashSet<Type>(dependencies));
         List<IRelevantObject[]> combinations = [];
@@ -82,7 +82,7 @@ public static class RelevantObjectPairGenerator
     {
         if (collection is null || dependencies.Length == 0)
             // Handle special case
-            return new[] { Array.Empty<IRelevantObject>() };
+            return [[]];
 
         // Count how many of every type are in the neededCombinations
         Dictionary<Type, int> neededCombinations = new();
@@ -91,11 +91,11 @@ public static class RelevantObjectPairGenerator
         // Check if the collection contains enough inheritable items to ever satisfy the needed combinations
         foreach ((var type, int count) in neededCombinations)
             if (!collection.TryGetValue(type, out var list) || list.Count(o => o.IsInheritable) < count)
-                return Array.Empty<IRelevantObject[]>();
+                return [];
 
         // Make all combinations for every individual type & only get inheritable
         var allCombinations = neededCombinations.Select(pair =>
-            CombinationsRecursion(collection[pair.Key].Where(o => o.IsInheritable).ToArray(), pair.Value));
+            CombinationsRecursion([.. collection[pair.Key].Where(o => o.IsInheritable)], pair.Value));
         // Construct all parameter combinations
         // Make combinations of combinations
         return CartesianProduct(allCombinations).Select(o => o.SelectMany(x => x).ToArray());
@@ -107,12 +107,12 @@ public static class RelevantObjectPairGenerator
     /// <returns>The Cartesian product.</returns>
     public static IEnumerable<IEnumerable<T>> CartesianProduct<T>(IEnumerable<IEnumerable<T>> sequences)
     {
-        IEnumerable<IEnumerable<T>> emptyProduct = new[] { Enumerable.Empty<T>() };
+        IEnumerable<IEnumerable<T>> emptyProduct = [[]];
         // Flatten collection
         return sequences.Aggregate(emptyProduct, (accumulator, sequence) =>
             from accseq in accumulator
             from item in sequence
-            select accseq.Concat(new[] { item }));
+            select accseq.Concat([item]));
     }
 
     private static IEnumerable<int[]> CombinationsRecursion(int m, int n)

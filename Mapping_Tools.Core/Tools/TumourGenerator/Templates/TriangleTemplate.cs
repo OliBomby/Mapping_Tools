@@ -44,4 +44,3 @@ internal sealed class TriangleTemplate : TumourTemplateBase
         return null;
     }
 }
-

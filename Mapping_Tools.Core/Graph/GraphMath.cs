@@ -75,7 +75,7 @@ public static class GraphMath
     /// <returns>The maximum value, or zero when there are no segments.</returns>
     public static double GetMaxValue(IReadOnlyList<GraphAnchor> anchors)
     {
-        return GetExtremum(anchors, true, false);
+        return GetExtremum(anchors, true);
     }
 
     /// <summary>Gets the smallest value at anchors and declared curve extrema.</summary>
@@ -83,7 +83,7 @@ public static class GraphMath
     /// <returns>The minimum value, or zero when there are no segments.</returns>
     public static double GetMinValue(IReadOnlyList<GraphAnchor> anchors)
     {
-        return GetExtremum(anchors, false, false);
+        return GetExtremum(anchors, false);
     }
 
     /// <summary>Gets the largest derivative at segment endpoints and declared extrema.</summary>
@@ -144,6 +144,7 @@ public static class GraphMath
     {
         var previous = anchors[0];
         var next = anchors[^1];
+
         foreach (var anchor in anchors)
             if (anchor.Pos.X < x)
             {
@@ -158,19 +159,28 @@ public static class GraphMath
         return (previous, next);
     }
 
-    private static double GetExtremum(IReadOnlyList<GraphAnchor> anchors, bool maximum, bool integral)
+    private static double GetExtremum(IReadOnlyList<GraphAnchor> anchors, bool maximum)
     {
         if (anchors.Count == 0) return 0;
         if (anchors.Count == 1) return anchors[0].Pos.Y;
+
         double result = maximum ? double.NegativeInfinity : double.PositiveInfinity;
+
         for (int index = 1; index < anchors.Count; index++)
         {
             var previous = anchors[index - 1];
             var next = anchors[index];
             var difference = next.Pos - previous.Pos;
-            double[] positions = next.Interpolator.GetType().GetCustomAttributes(typeof(CustomExtremaAttribute), false)
-                .OfType<CustomExtremaAttribute>().SelectMany(attribute => attribute.ExtremaPositions).ToArray();
-            if (positions.Length == 0) positions = [0, 1];
+
+            double[] positions =
+            [
+                .. next.Interpolator.GetType().GetCustomAttributes(typeof(CustomExtremaAttribute), false)
+                    .OfType<CustomExtremaAttribute>().SelectMany(attribute => attribute.ExtremaPositions),
+            ];
+
+            if (positions.Length == 0)
+                positions = [0, 1];
+
             foreach (double position in positions)
             {
                 double value = previous.Pos.Y + difference.Y * next.Interpolator.GetInterpolation(position);
@@ -184,7 +194,9 @@ public static class GraphMath
     private static double GetDerivativeExtremum(IReadOnlyList<GraphAnchor> anchors, bool maximum)
     {
         if (anchors.Count < 2) return 0;
+
         double result = maximum ? double.NegativeInfinity : double.PositiveInfinity;
+
         for (int index = 1; index < anchors.Count; index++)
         {
             var previous = anchors[index - 1];
@@ -192,9 +204,16 @@ public static class GraphMath
             double dx = next.Pos.X - previous.Pos.X;
             if (Math.Abs(dx) < Precision.DOUBLE_EPSILON) continue;
             double slope = next.Pos.Y - previous.Pos.Y;
-            double[] positions = next.Interpolator.GetType().GetCustomAttributes(typeof(CustomDerivativeExtremaAttribute), false)
-                .OfType<CustomDerivativeExtremaAttribute>().SelectMany(attribute => attribute.ExtremaPositions).ToArray();
-            if (positions.Length == 0) positions = [0, 1];
+
+            double[] positions =
+            [
+                .. next.Interpolator.GetType().GetCustomAttributes(typeof(CustomDerivativeExtremaAttribute), false)
+                    .OfType<CustomDerivativeExtremaAttribute>().SelectMany(attribute => attribute.ExtremaPositions),
+            ];
+
+            if (positions.Length == 0)
+                positions = [0, 1];
+
             foreach (double position in positions)
             {
                 double derivative = next.Interpolator is IDerivableInterpolator derivable
@@ -213,6 +232,7 @@ public static class GraphMath
 
         double accumulated = 0;
         double result = maximum ? 0 : double.PositiveInfinity;
+
         for (int index = 1; index < anchors.Count; index++)
         {
             var previous = anchors[index - 1];
@@ -227,13 +247,16 @@ public static class GraphMath
                 endIntegral = integrable.GetIntegral(0, 1) * difference.X * difference.Y + difference.X * previous.Pos.Y;
                 integralAt = position => integrable.GetIntegral(0, position) * difference.X * difference.Y + position * difference.X * previous.Pos.Y;
 
-                double[] extremaPositions = next.Interpolator.GetType()
-                    .GetCustomAttributes(typeof(CustomIntegralExtremaAttribute), false)
-                    .OfType<CustomIntegralExtremaAttribute>()
-                    .SelectMany(attribute => attribute.ExtremaPositions)
-                    .Append(0)
-                    .Append(1)
-                    .ToArray();
+                double[] extremaPositions =
+                [
+                    .. next.Interpolator.GetType()
+                        .GetCustomAttributes(typeof(CustomIntegralExtremaAttribute), false)
+                        .OfType<CustomIntegralExtremaAttribute>()
+                        .SelectMany(attribute => attribute.ExtremaPositions),
+
+                    0,
+                    1,
+                ];
                 double localExtremum = maximum
                     ? extremaPositions.Select(integralAt).Max()
                     : extremaPositions.Select(integralAt).Min();
@@ -289,4 +312,3 @@ public static class GraphMath
         return double.IsInfinity(result) ? 0 : result;
     }
 }
-

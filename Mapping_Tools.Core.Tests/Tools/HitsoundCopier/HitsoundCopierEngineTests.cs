@@ -3,6 +3,7 @@ using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.BeatmapHelper.Events;
 using Mapping_Tools.Core.HitsoundStuff;
+using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.HitsoundCopier;
 using Mapping_Tools.Core.Tools.HitsoundCopier.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -46,7 +47,7 @@ public sealed class HitsoundCopierEngineTests
         };
 
         // Act
-        Action act = () => HitsoundCopierEngine.Validate(options);
+        var act = () => HitsoundCopierEngine.Validate(options);
 
         // Assert
         act.Should().Throw<ArgumentException>();
@@ -85,13 +86,12 @@ public sealed class HitsoundCopierEngineTests
         // Arrange
         TimingPoint redline = new(0, 1000, 4, SampleSet.Normal, 0, 100, true, false, false);
         Beatmap target = new(
-        [
-            new HitObject("256,192,100,2,0,L|396:192,1,140,0|1,0:0|2:0,0:0:0:0:"),
-            new HitObject("256,192,2100,2,0,L|396:192,1,140,0|1,0:0|3:0,0:0:0:0:"),
-        ],
-        [redline],
-        redline,
-        globalSv: 1.4);
+            [
+                new HitObject("256,192,100,2,0,L|396:192,1,140,0|1,0:0|2:0,0:0:0:0:"),
+                new HitObject("256,192,2100,2,0,L|396:192,1,140,0|1,0:0|3:0,0:0:0:0:"),
+            ],
+            [redline],
+            redline);
         Beatmap source = new();
         HitsoundCopierEngineOptions options = new()
         {
@@ -116,7 +116,7 @@ public sealed class HitsoundCopierEngineTests
         target.BeatmapTiming.TimingPoints
             .Where(point => point.Offset is 1100 or 3100)
             .Should().HaveCount(2)
-            .And.OnlyContain(point => point.SampleSet == SampleSet.Drum && point.Volume == 5);
+            .And.OnlyContain(point => point.SampleSet == SampleSet.Drum && Precision.AlmostEquals(point.Volume, 5));
     }
 
     [TestMethod]
@@ -128,15 +128,14 @@ public sealed class HitsoundCopierEngineTests
         {
             CustomIndex = 1,
         };
-        Beatmap source = new([sourceObject], [sourceTiming], sourceTiming, 1.4);
-        TimingPoint targetTiming = sourceTiming.Copy();
+        Beatmap source = new([sourceObject], [sourceTiming], sourceTiming);
+        var targetTiming = sourceTiming.Copy();
         Beatmap target = new(
-        [
-            new HitObject("256,192,0,2,0,L|396:192,1,140,0|0:0,0:0:0:0:"),
-        ],
-        [targetTiming],
-        targetTiming,
-        1.4);
+            [
+                new HitObject("256,192,0,2,0,L|396:192,1,140,0|0:0,0:0:0:0:"),
+            ],
+            [targetTiming],
+            targetTiming);
         HitsoundCopierEngineOptions options = new()
         {
             CopyMode = HitsoundCopierCopyMode.OverwriteOnlyDefined,
@@ -157,8 +156,8 @@ public sealed class HitsoundCopierEngineTests
 
         // Assert
         result.GeneratedSampleCount.Should().Be(1);
-        target.BeatmapTiming.Greenlines.Should().Contain(point => point.Offset == 500);
-        target.BeatmapTiming.Greenlines.Should().NotContain(point => point.Offset == 505);
+        target.BeatmapTiming.Greenlines.Should().Contain(point => Precision.AlmostEquals(point.Offset, 500));
+        target.BeatmapTiming.Greenlines.Should().NotContain(point => Precision.AlmostEquals(point.Offset, 505));
         target.BeatmapTiming.GetGreenlineAtTime(500).SampleIndex.Should().Be(100);
     }
 

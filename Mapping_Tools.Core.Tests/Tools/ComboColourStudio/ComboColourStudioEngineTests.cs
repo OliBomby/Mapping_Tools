@@ -103,7 +103,7 @@ public sealed class ComboColourStudioEngineTests
         beatmap.ComboColours.Add(new ComboColour(RgbaColour.FromRgb(10, 20, 30)));
 
         // Act
-        ComboColourEngineOptions result = ComboColourStudioEngine.ImportComboColours(beatmap);
+        var result = ComboColourStudioEngine.ImportComboColours(beatmap);
 
         // Assert
         result.ComboColours.Select(colour => colour.Name).Should().Equal("Combo1");
@@ -121,7 +121,7 @@ public sealed class ComboColourStudioEngineTests
         beatmap.HitObjects.Add(CreateCircle(0, true, 0));
 
         // Act
-        ComboColourEngineOptions result = ComboColourStudioEngine.ImportColourHax(beatmap, 2);
+        var result = ComboColourStudioEngine.ImportColourHax(beatmap, 2);
 
         // Assert
         result.MaxBurstLength.Should().Be(2);
@@ -139,7 +139,7 @@ public sealed class ComboColourStudioEngineTests
         project.AddColourPoint(5, [new SpecialColour(RgbaColour.White, "Combo2")]);
 
         // Act
-        Action act = () => ComboColourStudioEngine.Validate(project);
+        var act = () => ComboColourStudioEngine.Validate(project);
 
         // Assert
         act.Should().Throw<ArgumentException>()
@@ -156,7 +156,7 @@ public sealed class ComboColourStudioEngineTests
         project.ComboColours[1].Name = project.ComboColours[0].Name;
 
         // Act
-        Action act = () => ComboColourStudioEngine.Validate(project);
+        var act = () => ComboColourStudioEngine.Validate(project);
 
         // Assert
         act.Should().Throw<ArgumentException>()

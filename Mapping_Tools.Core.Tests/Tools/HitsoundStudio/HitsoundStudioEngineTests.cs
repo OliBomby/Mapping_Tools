@@ -1,5 +1,6 @@
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
+using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.HitsoundStudio;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -109,7 +110,7 @@ public sealed class HitsoundStudioEngineTests
             false,
             true,
             false,
-            sample => false);
+            _ => false);
 
         // Assert
         result.Events.Should().ContainSingle();
@@ -131,6 +132,6 @@ public sealed class HitsoundStudioEngineTests
 
         // Assert
         positions.Should().HaveCount(24);
-        positions.Values.Should().OnlyContain(position => position.Y == 192);
+        positions.Values.Should().OnlyContain(position => Precision.AlmostEquals(position.Y, 192));
     }
 }

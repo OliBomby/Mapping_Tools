@@ -14,4 +14,3 @@ public enum BetterSaveStatus
     /// <summary>Opening live state, creating the backup, or saving failed.</summary>
     Failed,
 }
-

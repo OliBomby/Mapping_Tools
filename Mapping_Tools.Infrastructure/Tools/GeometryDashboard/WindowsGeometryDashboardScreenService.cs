@@ -34,7 +34,7 @@ public sealed class WindowsGeometryDashboardScreenService : IGeometryDashboardSc
         bool enumerated = WindowsNativeMethods.EnumDisplayMonitors(
             0,
             0,
-            (monitor, deviceContext, ref bounds, data) =>
+            (monitor, _, ref _, _) =>
             {
                 if (TryReadScreen(monitor, out var screen)) screens.Add(screen!);
 

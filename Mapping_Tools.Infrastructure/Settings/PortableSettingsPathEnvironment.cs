@@ -11,9 +11,9 @@ namespace Mapping_Tools.Infrastructure.Settings;
 /// </summary>
 public sealed class PortableSettingsPathEnvironment : ISettingsPathEnvironment
 {
-    private readonly Func<bool> isWindows;
-    private readonly Func<string, string?> getEnvironmentVariable;
     private readonly Func<string, bool> directoryExists;
+    private readonly Func<string, string?> getEnvironmentVariable;
+    private readonly Func<bool> isWindows;
 
     /// <summary>
     ///     Creates an environment using the current operating system and process
@@ -52,7 +52,6 @@ public sealed class PortableSettingsPathEnvironment : ISettingsPathEnvironment
         if (OperatingSystem.IsWindows() && isWindows()) return FindWindowsInstallation();
 
         foreach (string candidate in GetNonWindowsCandidates())
-        {
             try
             {
                 if (directoryExists(candidate)) return candidate;
@@ -66,7 +65,6 @@ public sealed class PortableSettingsPathEnvironment : ISettingsPathEnvironment
             catch (UnauthorizedAccessException)
             {
             }
-        }
 
         return null;
     }

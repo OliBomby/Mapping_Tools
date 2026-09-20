@@ -47,7 +47,7 @@ public static class TimingCopierEngine
 
             // If a greenline exists at the same time as a redline then the redline ceizes to exist
             // Else convert the redline to a greenline: Inherited = false & MpB = -100
-            if (greenlineHere.Offset != redline.Offset)
+            if (!Precision.AlmostEquals(greenlineHere.Offset, redline.Offset))
             {
                 var newGreenline = redline.Copy();
                 newGreenline.Uninherited = false;
@@ -193,8 +193,7 @@ public static class TimingCopierEngine
                 "Timing Copier received an unknown resnapping mode.",
                 nameof(options));
         if (options.BeatDivisors is null
-            || options.BeatDivisors.Length == 0
-            || options.BeatDivisors.Any(divisor => divisor is null))
+            || options.BeatDivisors.Length == 0)
             throw new ArgumentException(
                 "Timing Copier requires at least one beat divisor.",
                 nameof(options));

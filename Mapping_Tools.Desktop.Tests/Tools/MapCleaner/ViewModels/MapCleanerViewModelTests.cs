@@ -2,20 +2,18 @@ using System.Globalization;
 using Avalonia.Data;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
+using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.QuickRun.Models;
-using Mapping_Tools.Application.Settings.Models;
-using Mapping_Tools.Desktop.Controls.Timeline;
-using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.MapCleaner;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Tools.MapCleaner.Models;
+using Mapping_Tools.Desktop.Controls.Timeline;
 using Mapping_Tools.Desktop.Converters;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services.Hosted;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.MapCleaner.ViewModels;
-using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Tools.MapCleaner.ViewModels;
@@ -24,13 +22,16 @@ namespace Mapping_Tools.Desktop.Tests.Tools.MapCleaner.ViewModels;
 public sealed class MapCleanerViewModelTests
 {
     [TestMethod]
-    public async Task RunCommand_WithWorkspaceSelection_PreservesLegacySummaryAndTimelineKinds()
+    public async Task RunCommand_WithWorkspaceSelection_PublishesSuccessAndPreservesTimelineKinds()
     {
         // Arrange
         RecordingCleaner cleaner = new();
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["map.osu"]);
-        var viewModel = Create(cleaner, workspace);
+        UserNotificationService notifications = new();
+        List<UserNotification> published = [];
+        notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
+        var viewModel = Create(cleaner, workspace, notifications: notifications);
 
         // Act
         await viewModel.RunCommand.ExecuteAsync(null);
@@ -38,7 +39,10 @@ public sealed class MapCleanerViewModelTests
         // Assert
         cleaner.Paths.Should().Equal("map.osu");
         cleaner.QuickRun.Should().BeFalse();
-        viewModel.ResultSummary.Should().Be("Successfully removed 16 greenlines and resnapped 20 objects!");
+        published.Where(notification =>
+                notification.Severity == UserNotificationSeverity.Success
+                && notification.Message == "Successfully removed 16 greenlines and resnapped 20 objects!")
+            .Should().ContainSingle();
         viewModel.Markers.Should().HaveCount(3);
         viewModel.Markers.Select(marker => marker.Kind)
             .Should().Equal(
@@ -197,18 +201,20 @@ public sealed class MapCleanerViewModelTests
     private static MapCleanerViewModel Create(
         RecordingCleaner cleaner,
         TestBeatmapWorkspace? workspace = null,
-        string? currentPath = null)
+        string? currentPath = null,
+        IUserNotificationService? notifications = null)
     {
-        UserNotificationService notifications = new();
+        var notificationService = notifications ?? new UserNotificationService();
         DesktopApplicationSettings settings = new();
-        TestBeatmapWorkspace effectiveWorkspace = workspace ?? new TestBeatmapWorkspace();
+        var effectiveWorkspace = workspace ?? new TestBeatmapWorkspace();
         effectiveWorkspace.QuickRunPath = currentPath;
         return new MapCleanerViewModel(
             cleaner,
-            new ToolExecutionService(notifications, TimeProvider.System),
+            new ToolExecutionService(notificationService, TimeProvider.System),
             effectiveWorkspace,
             settings,
-            new RecordingPlatformLauncher());
+            new RecordingPlatformLauncher(),
+            notificationService);
     }
 
     private sealed class RecordingCleaner : IMapCleanerService
@@ -217,7 +223,8 @@ public sealed class MapCleanerViewModelTests
 
         public bool QuickRun { get; private set; }
 
-        public Task<MapCleanerResult> CleanAsync(IReadOnlyList<string> paths, MapCleanerServiceOptions.MapCleanerCleanupOptions options, bool quickRun = false, IProgress<double>? progress = null,
+        public Task<MapCleanerResult> CleanAsync(IReadOnlyList<string> paths, MapCleanerServiceOptions.MapCleanerCleanupOptions options, bool quickRun = false,
+            IProgress<double>? progress = null,
             CancellationToken cancellationToken = default)
         {
             Paths = paths;
@@ -226,5 +233,4 @@ public sealed class MapCleanerViewModelTests
             return Task.FromResult(new MapCleanerResult(20, 0, 16, [1000], [2000], [3000], 5000));
         }
     }
-
 }

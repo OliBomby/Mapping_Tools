@@ -1,4 +1,5 @@
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.AutoFail;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -47,7 +48,7 @@ public sealed class AutoFailDetectorEngineTests
         [
             new()
             {
-                Pos = new(256, 192),
+                Pos = new Vector2(256, 192),
                 Time = 1000,
                 ObjectType = 2,
                 Repeat = 1,
@@ -55,7 +56,7 @@ public sealed class AutoFailDetectorEngineTests
             },
             new()
             {
-                Pos = new(256, 192),
+                Pos = new Vector2(256, 192),
                 Time = 1200,
                 EndTime = 1200,
                 ObjectType = 1,

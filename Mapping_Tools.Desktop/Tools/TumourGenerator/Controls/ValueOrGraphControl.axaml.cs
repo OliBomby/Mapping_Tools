@@ -40,11 +40,11 @@ public partial class ValueOrGraphControl : UserControl
         GraphEditorViewModel viewModel = new(GraphState?.Clone() ?? CreateDefaultValueGraphState());
         GraphEditorDialog dialog = new(viewModel);
         dialog.Close = result => DialogHostInteraction.Close(
-            DialogHostInteraction.RootIdentifier,
+            DialogHostInteraction.ROOT_IDENTIFIER,
             result);
         object? result = await DialogHostInteraction.ShowAsync(
             dialog,
-            DialogHostInteraction.RootIdentifier);
+            DialogHostInteraction.ROOT_IDENTIFIER);
         if (result is true) SetCurrentValue(GraphStateProperty, viewModel.GraphState.Clone());
 
         eventArgs.Handled = true;

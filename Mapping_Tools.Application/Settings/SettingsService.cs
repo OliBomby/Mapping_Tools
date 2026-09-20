@@ -10,8 +10,8 @@ namespace Mapping_Tools.Application.Settings;
 public sealed class SettingsService : ISettingsService
 {
     private readonly ISettingsPathService paths;
-    private readonly ISettingsStore store;
     private readonly Func<ApplicationSettings> settingsFactory;
+    private readonly ISettingsStore store;
 
     /// <summary>
     ///     Creates a settings coordinator.

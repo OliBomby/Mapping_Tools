@@ -1,6 +1,5 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives.PopupPositioning;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
@@ -10,7 +9,6 @@ using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels.Adapters;
-using Mapping_Tools.Desktop.ViewModels;
 
 namespace Mapping_Tools.Desktop.Tools.ComboColourStudio.Views;
 
@@ -29,7 +27,7 @@ public partial class ComboColourStudioView : UserControl
     private void ColourPointsSelectionChanged(object? sender, SelectionChangedEventArgs eventArgs)
     {
         if (DataContext is ComboColourStudioViewModel viewModel && sender is DataGrid grid)
-            viewModel.SetSelectedColourPoints(grid.SelectedItems?.OfType<ObservableColourPoint>() ?? []);
+            viewModel.SetSelectedColourPoints(grid.SelectedItems.OfType<ObservableColourPoint>());
     }
 
     private async void AddColourPointButtonClick(object? sender, RoutedEventArgs eventArgs)

@@ -1,6 +1,4 @@
-using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Mapping_Tools.Desktop.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution.ToolExecution;
@@ -15,10 +13,7 @@ namespace Mapping_Tools.Desktop.ViewModels;
 /// </summary>
 public abstract class SingleRunToolViewModel : ObservableValidator
 {
-    private bool isRunning;
-    private double progress;
     private long runGeneration;
-    private WeakReference<Visual>? validationScope;
 
     /// <summary>
     ///     Creates a single-run tool presentation model.
@@ -35,7 +30,6 @@ public abstract class SingleRunToolViewModel : ObservableValidator
         Tool = tool ?? throw new ArgumentNullException(nameof(tool));
 
         RunCommand = new AsyncRelayCommand(RunAsync, CanRun);
-        CancelCommand = new RelayCommand(Cancel);
     }
 
     /// <summary>Gets the canonical application metadata for this tool.</summary>
@@ -47,25 +41,22 @@ public abstract class SingleRunToolViewModel : ObservableValidator
     /// <summary>Gets whether the ordinary tool run is currently active.</summary>
     public bool IsRunning
     {
-        get => isRunning;
+        get;
         private set
         {
-            if (SetProperty(ref isRunning, value)) RunCommand.NotifyCanExecuteChanged();
+            if (SetProperty(ref field, value)) RunCommand.NotifyCanExecuteChanged();
         }
     }
 
     /// <summary>Gets the current ordinary-run completion as a percentage for the legacy progress-bar binding.</summary>
     public double Progress
     {
-        get => progress;
-        private set => SetProperty(ref progress, value);
+        get;
+        private set => SetProperty(ref field, value);
     }
 
     /// <summary>Gets the command that starts the tool's ordinary run.</summary>
     public IAsyncRelayCommand RunCommand { get; }
-
-    /// <summary>Gets the command that requests cancellation of the active run.</summary>
-    public IRelayCommand CancelCommand { get; }
 
     /// <summary>
     ///     Validates data-annotation attributes before the run state is entered.
@@ -75,7 +66,7 @@ public abstract class SingleRunToolViewModel : ObservableValidator
     protected virtual bool PrepareRun()
     {
         ValidateAllProperties();
-        return !HasErrors && !HasControlValidationErrors();
+        return !HasErrors;
     }
 
     /// <summary>Executes the feature-specific ordinary run.</summary>
@@ -91,7 +82,7 @@ public abstract class SingleRunToolViewModel : ObservableValidator
     {
         ArgumentNullException.ThrowIfNull(operation);
 
-        if (IsRunning || HasControlValidationErrors()) return;
+        if (IsRunning) return;
 
         IsRunning = true;
         Progress = 0;
@@ -112,33 +103,16 @@ public abstract class SingleRunToolViewModel : ObservableValidator
     /// <returns>A progress receiver for the tool execution service.</returns>
     protected IProgress<ToolExecutionProgress> CreateProgress()
     {
-        long runGeneration = Volatile.Read(ref this.runGeneration);
+        long runGeneration2 = Volatile.Read(ref runGeneration);
         return new Progress<ToolExecutionProgress>(value =>
         {
-            if (IsRunning && Volatile.Read(ref this.runGeneration) == runGeneration) Progress = value.Progress * 100;
+            if (IsRunning && Volatile.Read(ref runGeneration) == runGeneration2) Progress = value.Progress * 100;
         });
     }
 
     private bool CanRun()
     {
         return !IsRunning;
-    }
-
-    internal void SetValidationScope(Visual scope)
-    {
-        validationScope = new WeakReference<Visual>(scope);
-    }
-
-    internal void ClearValidationScope(Visual scope)
-    {
-        if (validationScope?.TryGetTarget(out Visual? target) != true || ReferenceEquals(target, scope))
-            validationScope = null;
-    }
-
-    private bool HasControlValidationErrors()
-    {
-        return validationScope?.TryGetTarget(out Visual? scope) == true
-            && ToolValidationHelper.HasErrors(scope);
     }
 
     private async Task RunAsync()
@@ -150,11 +124,6 @@ public abstract class SingleRunToolViewModel : ObservableValidator
     private static void ClearFocusedElement()
     {
         if (Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-            desktop.MainWindow?.FocusManager?.Focus(null);
-    }
-
-    private void Cancel()
-    {
-        Execution.Cancel(Tool.Id);
+            desktop.MainWindow?.FocusManager.Focus(null);
     }
 }

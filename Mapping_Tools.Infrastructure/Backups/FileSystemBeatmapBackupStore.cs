@@ -96,12 +96,11 @@ public sealed class FileSystemBeatmapBackupStore : IBeatmapBackupStore
 
     private static bool IsEditorReaderBackup(string fileName)
     {
-        const int timestampLength = 19;
-        if (fileName.Length <= timestampLength + 1) return false;
+        const int timestamp_length = 19;
+        if (fileName.Length <= timestamp_length + 1) return false;
 
-        ReadOnlySpan<char> suffix = fileName.AsSpan(timestampLength + 1);
+        var suffix = fileName.AsSpan(timestamp_length + 1);
         int separator = suffix.IndexOf('_');
         return separator >= 0 && suffix[separator..].StartsWith("_2_", StringComparison.Ordinal);
     }
-
 }

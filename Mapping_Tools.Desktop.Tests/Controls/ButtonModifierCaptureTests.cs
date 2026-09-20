@@ -16,7 +16,7 @@ public sealed class ButtonModifierCaptureTests
         // Arrange
         Button button = new();
         ButtonModifierCapture capture = new(button);
-        KeyModifiers observedModifiers = KeyModifiers.None;
+        var observedModifiers = KeyModifiers.None;
         button.Click += (_, _) => observedModifiers = capture.Consume();
         Pointer pointer = new(1, PointerType.Mouse, true);
         PointerPointProperties pressedProperties = new(
@@ -58,7 +58,7 @@ public sealed class ButtonModifierCaptureTests
         // Arrange
         Button button = new();
         ButtonModifierCapture capture = new(button);
-        KeyModifiers observedModifiers = KeyModifiers.None;
+        var observedModifiers = KeyModifiers.None;
         button.Click += (_, _) => observedModifiers = capture.Consume();
         Pointer pointer = new(1, PointerType.Mouse, true);
         PointerPointProperties pressedProperties = new(
@@ -100,7 +100,7 @@ public sealed class ButtonModifierCaptureTests
         // Arrange
         Button button = new();
         ButtonModifierCapture capture = new(button);
-        KeyModifiers observedModifiers = KeyModifiers.None;
+        var observedModifiers = KeyModifiers.None;
         button.Click += (_, _) => observedModifiers = capture.Consume();
         KeyEventArgs keyDown = new()
         {

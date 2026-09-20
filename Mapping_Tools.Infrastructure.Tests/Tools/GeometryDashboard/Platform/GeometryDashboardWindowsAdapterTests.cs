@@ -1,11 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Settings.Models;
-using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Settings.Models;
-using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 using Mapping_Tools.Infrastructure.Editor;
 using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Infrastructure.Platform;
@@ -17,6 +16,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Mapping_Tools.Infrastructure.Tests.Tools.GeometryDashboard.Platform;
 
 [TestClass]
+[SuppressMessage("ReSharper", "AccessToDisposedClosure")]
 public sealed class GeometryDashboardWindowsAdapterTests
 {
     [TestMethod]
@@ -393,7 +393,7 @@ public sealed class GeometryDashboardWindowsAdapterTests
             windows,
             screens,
             () => false);
-        using var host = new WindowsGeometryDashboardOverlayService(coordinates, windows, () => false);
+        var host = new WindowsGeometryDashboardOverlayService(coordinates, windows, () => false);
 
         // Act
         host.Dispose();
@@ -513,7 +513,7 @@ public sealed class GeometryDashboardWindowsAdapterTests
         act.Should().Throw<ArgumentOutOfRangeException>();
     }
 
-    private sealed class EmptyTextFileStore : Mapping_Tools.Application.Abstractions.ITextFileStore
+    private sealed class EmptyTextFileStore : Application.Abstractions.ITextFileStore
     {
         public IReadOnlyList<string> ReadAllLines(string path) => [];
         public void WriteAllLines(string path, IEnumerable<string> lines) { }
@@ -530,14 +530,14 @@ public sealed class GeometryDashboardWindowsAdapterTests
 
     private sealed class FixedProcessDiscovery(GeometryDashboardProcess? process) : IGeometryDashboardProcessDiscovery
     {
-        public Task<GeometryDashboardProcess?> FindAsync(CancellationToken cancellationToken = default) => Task.FromResult<GeometryDashboardProcess?>(process);
+        public Task<GeometryDashboardProcess?> FindAsync(CancellationToken cancellationToken = default) => Task.FromResult(process);
     }
 
     private sealed class MutableWindowService(GeometryDashboardWindow window) : IGeometryDashboardWindowService
     {
         public GeometryDashboardWindow Window { get; set; } = window;
         public GeometryDashboardWindow? GetWindow(PlatformWindowId window) => Window.Id == window ? Window : null;
-        public GeometryDashboardWindow? GetMainWindow(GeometryDashboardProcess process) => Window;
+        public GeometryDashboardWindow GetMainWindow(GeometryDashboardProcess process) => Window;
         public IReadOnlyList<GeometryDashboardWindow> GetTopLevelWindows() => [Window];
     }
 
@@ -546,7 +546,7 @@ public sealed class GeometryDashboardWindowsAdapterTests
         GeometryDashboardScreen? windowScreen = null) : IGeometryDashboardScreenService
     {
         public IReadOnlyList<GeometryDashboardScreen> GetScreens() => [screen];
-        public GeometryDashboardScreen? GetPrimaryScreen() => screen;
-        public GeometryDashboardScreen? GetScreenForWindow(PlatformWindowId window) => windowScreen ?? screen;
+        public GeometryDashboardScreen GetPrimaryScreen() => screen;
+        public GeometryDashboardScreen GetScreenForWindow(PlatformWindowId window) => windowScreen ?? screen;
     }
 }

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.GeometryDashboard;
@@ -12,6 +13,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Mapping_Tools.Application.Tests.Tools.GeometryDashboard;
 
 [TestClass]
+[SuppressMessage("ReSharper", "AccessToDisposedClosure")]
 public sealed class GeometryDashboardServiceTests
 {
     [TestMethod]
@@ -34,12 +36,8 @@ public sealed class GeometryDashboardServiceTests
         HitObject initialHitObject = new("64,96,1000,1,0,0:0:0:0:");
         HitObject selectedHitObject = new("64,96,1000,1,0,0:0:0:0:");
         HitObject finalHitObject = new("64,96,1000,1,0,0:0:0:0:");
-        var snapshots = new RuntimeStub(
-        [
-            CreateRuntimeSnapshot(initialHitObject, 0, []),
-            CreateRuntimeSnapshot(selectedHitObject, 0, [selectedHitObject]),
-            CreateRuntimeSnapshot(finalHitObject, 1, [finalHitObject]),
-        ]);
+        var snapshots = new RuntimeStub(CreateRuntimeSnapshot(initialHitObject, 0, []), CreateRuntimeSnapshot(selectedHitObject, 0, [selectedHitObject]),
+            CreateRuntimeSnapshot(finalHitObject, 1, [finalHitObject]));
         GeometryDashboardServiceOptions project = new();
         project.CurrentPreferences.UpdateMode = UpdateMode.TimeChange;
         using var service = CreateService(new InputStub(true), snapshots, project: project);
@@ -436,10 +434,10 @@ public sealed class GeometryDashboardServiceTests
         : IGeometryDashboardRuntime
     {
         private readonly Queue<GeometryDashboardRuntimeSnapshot?> snapshots = new(snapshots);
-
-        public bool IsProcessRunning { get; set; } = true;
         public Exception? ReadException { get; set; }
         public GeometryDashboardRuntimeSnapshot? RepeatedSnapshot { get; set; }
+
+        public bool IsProcessRunning { get; set; } = true;
 
         public Task<GeometryDashboardRuntimeSnapshot?> ReadAsync(
             CancellationToken cancellationToken = default)
@@ -453,9 +451,8 @@ public sealed class GeometryDashboardServiceTests
     {
         private readonly TaskCompletionSource cursorSetReached = new(
             TaskCreationOptions.RunContinuationsAsynchronously);
-        private int cursorSetCount;
 
-        public bool IsSupported => isSupported;
+        private int cursorSetCount;
         public bool SnapHotkeyDown { get; set; }
         public bool SelectHotkeyDown { get; set; }
         public bool LeftMouseButtonDown { get; set; }
@@ -465,6 +462,8 @@ public sealed class GeometryDashboardServiceTests
         public Action? MouseButtonRead { get; set; }
         public int CursorSetCount => Volatile.Read(ref cursorSetCount);
         public Task CursorSetReached => cursorSetReached.Task;
+
+        public bool IsSupported => isSupported;
 
         public bool IsHotkeyDown(HotkeySettings? hotkey)
         {
@@ -497,10 +496,10 @@ public sealed class GeometryDashboardServiceTests
 
     private sealed class OverlayStub : IGeometryDashboardOverlayService
     {
+        public GeometryDashboardOverlayScene LastScene { get; private set; } = GeometryDashboardOverlayScene.Empty;
         public bool IsSupported => true;
         public bool IsVisible { get; private set; }
         public string? ConfigurationStatus => null;
-        public GeometryDashboardOverlayScene LastScene { get; private set; } = GeometryDashboardOverlayScene.Empty;
 
         public void Update(GeometryDashboardOverlayScene scene, GeometryDashboardOverlayOptions options)
         {
@@ -508,7 +507,11 @@ public sealed class GeometryDashboardServiceTests
             IsVisible = true;
         }
 
-        public void Hide() => IsVisible = false;
+        public void Hide()
+        {
+            IsVisible = false;
+        }
+
         public void Dispose() { }
     }
 }

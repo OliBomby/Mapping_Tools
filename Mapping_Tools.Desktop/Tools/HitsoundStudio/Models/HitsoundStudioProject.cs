@@ -12,7 +12,7 @@ public sealed class HitsoundStudioProject : HitsoundStudioServiceOptions
     /// <returns>A project whose mutable application data is not shared with this instance.</returns>
     public new HitsoundStudioProject Clone()
     {
-        HitsoundStudioServiceOptions copy = base.Clone();
+        var copy = base.Clone();
         return new HitsoundStudioProject
         {
             BaseBeatmap = copy.BaseBeatmap,

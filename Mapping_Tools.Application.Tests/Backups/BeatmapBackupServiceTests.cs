@@ -388,13 +388,14 @@ public sealed class BeatmapBackupServiceTests
         var store = CreateStore();
         var service = CreateService(store, CreateSettings());
         using CancellationTokenSource source = new();
-        source.Cancel();
+        await source.CancelAsync();
 
         // Act
         Func<Task> act3 = () => service.CreateAsync(
             [map_path],
             BeatmapBackupReason.Automatic,
             true,
+            // ReSharper disable once AccessToDisposedClosure
             source.Token);
 
         // Assert
@@ -454,25 +455,18 @@ public sealed class BeatmapBackupServiceTests
         return changed;
     }
 
-    private sealed class FixedTimeProvider : TimeProvider
+    private sealed class FixedTimeProvider(DateTimeOffset time) : TimeProvider
     {
-        private readonly DateTimeOffset now;
-
-        public FixedTimeProvider(DateTimeOffset now)
-        {
-            this.now = now;
-        }
-
         public override TimeZoneInfo LocalTimeZone =>
             TimeZoneInfo.CreateCustomTimeZone(
                 "Test",
-                now.Offset,
+                time.Offset,
                 "Test",
                 "Test");
 
         public override DateTimeOffset GetUtcNow()
         {
-            return now.ToUniversalTime();
+            return time.ToUniversalTime();
         }
     }
 
@@ -605,11 +599,11 @@ public sealed class BeatmapBackupServiceTests
 
         private static bool IsEditorReaderBackup(string path)
         {
-            const int timestampLength = 19;
+            const int timestamp_length = 19;
             string fileName = Path.GetFileName(path);
-            if (fileName.Length <= timestampLength + 1) return false;
+            if (fileName.Length <= timestamp_length + 1) return false;
 
-            ReadOnlySpan<char> suffix = fileName.AsSpan(timestampLength + 1);
+            ReadOnlySpan<char> suffix = fileName.AsSpan(timestamp_length + 1);
             int separator = suffix.IndexOf('_');
             return separator >= 0 && suffix[separator..].StartsWith("_2_", StringComparison.Ordinal);
         }

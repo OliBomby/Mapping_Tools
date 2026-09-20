@@ -52,7 +52,7 @@ public sealed class PatternGalleryCollectionRenameViewModelTests
     {
         // Arrange
         PatternGalleryCollectionRenameViewModel viewModel = new("Collection", "Directory");
-        object? result = new object();
+        object? result = new();
         viewModel.Close = value => result = value;
 
         // Act

@@ -20,4 +20,3 @@ public sealed class HitsoundStudioStandardResult
     /// <summary>Gets the schema used by the events.</summary>
     public SampleSchema Schema { get; }
 }
-

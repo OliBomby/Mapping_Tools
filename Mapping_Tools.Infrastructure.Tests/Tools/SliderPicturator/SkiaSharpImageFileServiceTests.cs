@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Mapping_Tools.Core.Images;
 using Mapping_Tools.Infrastructure.Tools.SliderPicturator;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -6,6 +7,7 @@ using SkiaSharp;
 namespace Mapping_Tools.Infrastructure.Tests.Tools.SliderPicturator;
 
 [TestClass]
+[SuppressMessage("ReSharper", "AccessToDisposedClosure")]
 public sealed class SkiaSharpImageFileServiceTests
 {
     [TestMethod]
@@ -61,7 +63,7 @@ public sealed class SkiaSharpImageFileServiceTests
     {
         // Arrange
         using CancellationTokenSource cancellation = new();
-        cancellation.Cancel();
+        await cancellation.CancelAsync();
         SkiaSharpImageFileService sut = new();
 
         // Act

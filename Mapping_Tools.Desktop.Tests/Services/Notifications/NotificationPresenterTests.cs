@@ -32,7 +32,7 @@ public sealed class NotificationPresenterTests
                 exception));
 
         // Assert
-        MessageDialogRequest<bool> request = dialogs.LastMessageRequest
+        var request = dialogs.LastMessageRequest
             .Should()
             .BeOfType<MessageDialogRequest<bool>>()
             .Subject;

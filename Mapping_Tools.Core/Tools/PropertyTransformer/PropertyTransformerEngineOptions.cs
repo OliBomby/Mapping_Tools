@@ -106,5 +106,4 @@ public class PropertyTransformerEngineOptions
 
     /// <summary>Gets or sets the inclusive upper time filter, or <c>-1</c> for no upper bound.</summary>
     public double MaxTimeFilter { get; set; } = -1;
-
 }

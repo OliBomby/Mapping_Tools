@@ -92,7 +92,7 @@ public static class GraphInterpolatorCatalog
         ArgumentNullException.ThrowIfNull(interpolator);
         double[] positions = interpolator.GetType().GetCustomAttributes(typeof(CustomExtremaAttribute), false)
             .OfType<CustomExtremaAttribute>().SelectMany(attribute => attribute.ExtremaPositions).DefaultIfEmpty(0).ToArray();
-        if (positions.Length == 1 && positions[0] == 0) positions = [0, 1];
+        if (positions is [0]) positions = [0, 1];
 
         return positions.Max(position => Math.Abs(interpolator.GetInterpolation(position)));
     }
@@ -107,7 +107,7 @@ public static class GraphInterpolatorCatalog
 
         double[] positions = interpolator.GetType().GetCustomAttributes(typeof(CustomDerivativeExtremaAttribute), false)
             .OfType<CustomDerivativeExtremaAttribute>().SelectMany(attribute => attribute.ExtremaPositions).DefaultIfEmpty(0).ToArray();
-        if (positions.Length == 1 && positions[0] == 0) positions = [0, 1];
+        if (positions is [0]) positions = [0, 1];
 
         return positions.Max(position => Math.Abs(derivable.GetDerivative(position)));
     }

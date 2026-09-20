@@ -3,7 +3,6 @@ namespace Mapping_Tools.Application.Updates.Models;
 /// <summary>
 ///     Reports a normalized package-preparation progress value.
 /// </summary>
-/// <param name="Progress">A value in the inclusive range zero through one.</param>
 public sealed class UpdateProgressChangedEventArgs : EventArgs
 {
     /// <summary>Creates a progress notification.</summary>
@@ -19,4 +18,3 @@ public sealed class UpdateProgressChangedEventArgs : EventArgs
     /// <summary>Gets the normalized package-preparation progress.</summary>
     public double Progress { get; }
 }
-

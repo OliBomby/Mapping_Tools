@@ -6,7 +6,6 @@ using Mapping_Tools.Desktop.Tools.MapsetMerger.ViewModels;
 using Mapping_Tools.Desktop.Tools.MapsetMerger.Views;
 using Microsoft.Extensions.DependencyInjection;
 
-
 namespace Mapping_Tools.Desktop.Tools.MapsetMerger;
 
 /// <summary>Describes and composes the Mapset Merger plugin feature.</summary>

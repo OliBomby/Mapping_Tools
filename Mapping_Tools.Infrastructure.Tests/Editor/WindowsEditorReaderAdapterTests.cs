@@ -1,19 +1,21 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Mapping_Tools.Application.Settings.Models;
-using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Infrastructure.Editor;
+using Mapping_Tools.Infrastructure.Files;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Infrastructure.Tests.Editor;
 
 [TestClass]
+[SuppressMessage("ReSharper", "AccessToDisposedClosure")]
 public sealed class WindowsEditorReaderAdapterTests
 {
     [TestMethod]
     public async Task FindCurrentBeatmapAsync_WhenOsuIsOutsideEditor_UsesInGameMemoryReader()
     {
         // Arrange
-        const string expectedPath = @"C:\osu!\Songs\123 Artist - Title\map.osu";
+        const string expected_path = @"C:\osu!\Songs\123 Artist - Title\map.osu";
         int memoryReadCount = 0;
         WindowsEditorReaderAdapter sut = new(
             new ApplicationSettings
@@ -29,14 +31,14 @@ public sealed class WindowsEditorReaderAdapterTests
             _ =>
             {
                 memoryReadCount++;
-                return expectedPath;
+                return expected_path;
             });
 
         // Act
         string result = await sut.FindCurrentBeatmapAsync();
 
         // Assert
-        result.Should().Be(expectedPath);
+        result.Should().Be(expected_path);
         memoryReadCount.Should().Be(1);
         sut.Dispose();
     }

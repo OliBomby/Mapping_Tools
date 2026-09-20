@@ -15,24 +15,24 @@ using Mapping_Tools.Desktop.Shell;
 namespace Mapping_Tools.Desktop.ViewModels;
 
 /// <summary>
-/// Presents current-map selection and safety-copy actions in the desktop shell.
+///     Presents current-map selection and safety-copy actions in the desktop shell.
 /// </summary>
 public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDisposable
 {
-    private readonly IBeatmapWorkspace workspace;
+    private readonly IApplicationDirectories applicationDirectories;
     private readonly IBeatmapBackupService backupService;
-    private readonly IQuickUndoCommandService quickUndoService;
+    private readonly IDialogService dialogs;
+    private readonly IUiDispatcher dispatcher;
     private readonly IFilePicker filePicker;
     private readonly IFileRevealService fileRevealService;
-    private readonly IApplicationDirectories applicationDirectories;
-    private readonly ApplicationSettings settings;
-    private readonly IDialogService dialogs;
     private readonly IUserNotificationService notifications;
-    private readonly IUiDispatcher dispatcher;
+    private readonly IQuickUndoCommandService quickUndoService;
+    private readonly ApplicationSettings settings;
+    private readonly IBeatmapWorkspace workspace;
     private bool disposed;
 
     /// <summary>
-    /// Creates shell workspace state over the process-lifetime selection and backup services.
+    ///     Creates shell workspace state over the process-lifetime selection and backup services.
     /// </summary>
     /// <param name="workspace">Owns selected paths and recent-map history.</param>
     /// <param name="backupService">Creates and restores durable safety copies.</param>
@@ -94,8 +94,17 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
     [NotifyCanExecuteChangedFor(nameof(RestoreBackupCommand))]
     public partial bool HasSingleSelection { get; private set; }
 
+    /// <summary>Stops observing process-lifetime workspace changes.</summary>
+    public void Dispose()
+    {
+        if (disposed) return;
+
+        disposed = true;
+        workspace.SelectionChanged -= OnSelectionChanged;
+    }
+
     /// <summary>
-    /// Installs paths supplied by the platform drag-and-drop adapter.
+    ///     Installs paths supplied by the platform drag-and-drop adapter.
     /// </summary>
     /// <param name="paths">Local file or directory paths in drop order.</param>
     public void SetDroppedPaths(IEnumerable<string> paths)
@@ -104,58 +113,48 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
         workspace.SetSelection(paths, BeatmapSelectionSource.DragAndDrop);
     }
 
-    /// <summary>Stops observing process-lifetime workspace changes.</summary>
-    public void Dispose()
-    {
-        if (disposed)
-        {
-            return;
-        }
-
-        disposed = true;
-        workspace.SelectionChanged -= OnSelectionChanged;
-    }
-
     [RelayCommand]
-    private Task OpenBeatmapAsync() =>
-        RunUserOperationAsync(
+    private Task OpenBeatmapAsync()
+    {
+        return RunUserOperationAsync(
             () => workspace.PickBeatmapsAsync(true),
             "Open beatmap");
+    }
 
     [RelayCommand]
     private async Task OpenCurrentBeatmapAsync()
     {
         await RunUserOperationAsync(async () =>
         {
-            CurrentBeatmapSelectionResult result =
+            var result =
                 await workspace.SelectCurrentBeatmapAsync();
             if (result.Status == CurrentBeatmapSelectionStatus.Unavailable)
-            {
                 await PublishAsync(
                     UserNotificationSeverity.Warning,
                     "Current beatmap unavailable",
                     "Mapping Tools could not determine the beatmap open in osu!.");
-            }
             else if (result.Status == CurrentBeatmapSelectionStatus.FileMissing)
-            {
                 await PublishAsync(
                     UserNotificationSeverity.Warning,
                     "Current beatmap is missing",
                     $"The path reported by osu! does not exist: {result.Path}");
-            }
         }, "Open current beatmap");
     }
 
-    private bool CanCreateBackup() => HasSelection;
+    private bool CanCreateBackup()
+    {
+        return HasSelection;
+    }
 
     [RelayCommand(CanExecute = nameof(CanCreateBackup))]
-    private Task CreateBackupAsync() =>
-        RunUserOperationAsync(async () =>
+    private Task CreateBackupAsync()
+    {
+        return RunUserOperationAsync(async () =>
         {
-            BeatmapBackupResult result = await backupService.CreateAsync(
+            var result = await backupService.CreateAsync(
                 workspace.SelectedPaths,
                 BeatmapBackupReason.User,
-                force: true);
+                true);
             int count = result.Artifacts.Count;
             await PublishAsync(
                 UserNotificationSeverity.Success,
@@ -164,25 +163,27 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
                     ? "The selected beatmap was copied to the backups folder."
                     : $"{count} selected beatmaps were copied to the backups folder.");
         }, "Generate backup");
+    }
 
-    private bool CanRestoreBackup() => HasSingleSelection;
+    private bool CanRestoreBackup()
+    {
+        return HasSingleSelection;
+    }
 
     [RelayCommand(CanExecute = nameof(CanRestoreBackup))]
-    private Task RestoreBackupAsync() =>
-        RunUserOperationAsync(async () =>
+    private Task RestoreBackupAsync()
+    {
+        return RunUserOperationAsync(async () =>
         {
-            IReadOnlyList<string> selected = await filePicker.PickOpenFilesAsync(
+            var selected = await filePicker.PickOpenFilesAsync(
                 new OpenFilePickerRequest
                 {
                     Title = "Load backup",
                     SuggestedStartLocation = settings.BackupsPath,
                     AllowMultiple = false,
-                    Filters = [CommonFilePickerFilters.BeatmapBackups]
+                    Filters = [CommonFilePickerFilters.BeatmapBackups],
                 });
-            if (selected.Count == 0)
-            {
-                return;
-            }
+            if (selected.Count == 0) return;
 
             string destination = workspace.SelectedPaths.Single();
             try
@@ -196,15 +197,12 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
                         "Load backup",
                         "The backup belongs to a different beatmap. Load it anyway?",
                         [
-                            new DialogChoice<bool>("Load anyway", true, IsDefault: true),
-                            new DialogChoice<bool>("Cancel", false, IsCancel: true)
+                            new DialogChoice<bool>("Load anyway", true, true),
+                            new DialogChoice<bool>("Cancel", false, IsCancel: true),
                         ],
-                        dismissResult: false,
-                        details: $"Backup: {exception.BackupFileName}{Environment.NewLine}Current: {exception.DestinationFileName}"));
-                if (!restore)
-                {
-                    return;
-                }
+                        false,
+                        $"Backup: {exception.BackupFileName}{Environment.NewLine}Current: {exception.DestinationFileName}"));
+                if (!restore) return;
 
                 await RestoreAsync(selected[0], destination, true);
             }
@@ -214,44 +212,50 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
                 "Backup loaded",
                 "The selected backup replaced the current beatmap successfully.");
         }, "Load backup");
+    }
 
     [RelayCommand]
-    private Task QuickUndoAsync() =>
-        RunUserOperationAsync(
+    private Task QuickUndoAsync()
+    {
+        return RunUserOperationAsync(
             () => quickUndoService.ExecuteAsync(),
             "QuickUndo");
+    }
 
     [RelayCommand]
-    private Task OpenBackupsFolderAsync() =>
-        RevealAsync(settings.BackupsPath, "backups folder");
+    private Task OpenBackupsFolderAsync()
+    {
+        return RevealAsync(settings.BackupsPath, "backups folder");
+    }
 
     [RelayCommand]
-    private Task OpenApplicationFolderAsync() =>
-        RevealAsync(applicationDirectories.ApplicationData, "Mapping Tools folder");
+    private Task OpenApplicationFolderAsync()
+    {
+        return RevealAsync(applicationDirectories.ApplicationData, "Mapping Tools folder");
+    }
 
     private Task RestoreAsync(
         string backupPath,
         string destinationPath,
-        bool allowDifferentFilename) =>
-        backupService.RestoreAsync(
+        bool allowDifferentFilename)
+    {
+        return backupService.RestoreAsync(
             backupPath,
             destinationPath,
-            allowDifferentFilename,
-            reloadEditor: false);
+            allowDifferentFilename);
+    }
 
     private async Task RevealAsync(string path, string description)
     {
         await RunUserOperationAsync(async () =>
-        {
-            bool accepted = await fileRevealService.RevealAsync(path);
-            if (!accepted)
             {
-                await PublishAsync(
-                    UserNotificationSeverity.Warning,
-                    "Could not open folder",
-                    $"The operating system did not open the {description}.");
-            }
-        }, $"Open {description}");
+                bool accepted = await fileRevealService.RevealAsync(path);
+                if (!accepted)
+                    await PublishAsync(
+                        UserNotificationSeverity.Warning,
+                        "Could not open folder",
+                        $"The operating system did not open the {description}.");
+            }, $"Open {description}");
     }
 
     private async Task RunUserOperationAsync(Func<Task> operation, string title)
@@ -276,8 +280,10 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
 
     private void OnSelectionChanged(
         object? sender,
-        BeatmapSelectionChangedEventArgs eventArgs) =>
+        BeatmapSelectionChangedEventArgs eventArgs)
+    {
         dispatcher.Post(() => RefreshSelection(eventArgs.Paths));
+    }
 
     private void RefreshSelection(IReadOnlyList<string> paths)
     {
@@ -295,7 +301,9 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
         UserNotificationSeverity severity,
         string title,
         string message,
-        Exception? exception = null) =>
-        notifications.PublishAsync(
+        Exception? exception = null)
+    {
+        return notifications.PublishAsync(
             new UserNotification(severity, title, message, exception));
+    }
 }

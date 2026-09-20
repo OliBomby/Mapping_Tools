@@ -29,7 +29,7 @@ internal sealed class RecordingBeatmapFileSystem : IBeatmapsetFileSystem
     public string? GetParentDirectory(string filePath)
     {
         return ParentDirectoryResolver?.Invoke(filePath)
-            ?? Path.GetDirectoryName(filePath);
+               ?? Path.GetDirectoryName(filePath);
     }
 
     public IReadOnlyList<string> ReadAllLines(string path)
@@ -97,12 +97,6 @@ internal sealed class RecordingBeatmapFileSystem : IBeatmapsetFileSystem
 
 internal sealed class RecordingFilePicker : IFilePicker
 {
-    public bool CanOpenFiles { get; init; } = true;
-
-    public bool CanSaveFiles { get; init; } = true;
-
-    public bool CanPickFolders { get; init; } = true;
-
     public IReadOnlyList<string> OpenFiles { get; init; } = [];
 
     public string? SavePath { get; init; }
@@ -114,6 +108,11 @@ internal sealed class RecordingFilePicker : IFilePicker
     public SaveFilePickerRequest? LastSaveRequest { get; private set; }
 
     public OpenFolderPickerRequest? LastFolderRequest { get; private set; }
+    public bool CanOpenFiles { get; init; } = true;
+
+    public bool CanSaveFiles { get; init; } = true;
+
+    public bool CanPickFolders { get; init; } = true;
 
     public Task<IReadOnlyList<string>> PickOpenFilesAsync(
         OpenFilePickerRequest request,

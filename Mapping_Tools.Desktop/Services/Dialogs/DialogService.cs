@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
@@ -60,13 +59,11 @@ public sealed class DialogService : IDialogService
             request.Details,
             choices);
 
-        Task<object?> dialogTask = dialog.ShowDialog<object?>(GetOwnerWindow());
-        using CancellationTokenRegistration registration = cancellationToken.Register(
-            () => Dispatcher.UIThread.Post(
-                () =>
-                {
-                    if (dialog.IsVisible) dialog.Close();
-                }));
+        var dialogTask = dialog.ShowDialog<object?>(GetOwnerWindow());
+        await using var registration = cancellationToken.Register(() => Dispatcher.UIThread.Post(() =>
+        {
+            if (dialog.IsVisible) dialog.Close();
+        }));
 
         object? result = await dialogTask;
         cancellationToken.ThrowIfCancellationRequested();
@@ -90,14 +87,14 @@ public sealed class DialogService : IDialogService
             request.CancelLabel,
             value => Validate(value, request),
             value => DialogHostInteraction.Close(
-                DialogHostInteraction.RootIdentifier,
+                DialogHostInteraction.ROOT_IDENTIFIER,
                 new ResultBox<TValue>((TValue)value!)),
-            () => DialogHostInteraction.Close(DialogHostInteraction.RootIdentifier));
+            () => DialogHostInteraction.Close(DialogHostInteraction.ROOT_IDENTIFIER));
         dialog.DataContext = viewModel;
 
         object? result = await DialogHostInteraction.ShowAsync(
             dialog,
-            DialogHostInteraction.RootIdentifier,
+            DialogHostInteraction.ROOT_IDENTIFIER,
             cancellationToken);
         return result is ResultBox<TValue> box
             ? new ValueDialogResult<TValue>(true, box.Value)
@@ -144,11 +141,11 @@ public sealed class DialogService : IDialogService
 
     private static Window GetOwnerWindow()
     {
-        if (global::Avalonia.Application.Current?.ApplicationLifetime
-                is IClassicDesktopStyleApplicationLifetime
-                {
-                    MainWindow: Window mainWindow,
-                }) return mainWindow;
+        if (Avalonia.Application.Current?.ApplicationLifetime
+            is IClassicDesktopStyleApplicationLifetime
+            {
+                MainWindow: { } mainWindow,
+            }) return mainWindow;
 
         throw new InvalidOperationException(
             "A desktop main window is required to show an owner-modal message dialog.");

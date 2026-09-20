@@ -11,4 +11,3 @@ public sealed record HitsoundSampleAssignment(
     int Index,
     SampleSet SampleSet,
     SampleSchema Schema);
-

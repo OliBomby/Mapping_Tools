@@ -39,4 +39,3 @@ public sealed class ToolExecutionRequest<T>
     /// </summary>
     public Func<ToolExecutionContext, Task<ToolExecutionOutput<T>>> Operation { get; }
 }
-

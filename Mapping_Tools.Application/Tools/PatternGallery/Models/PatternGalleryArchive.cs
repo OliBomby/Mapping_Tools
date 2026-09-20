@@ -6,4 +6,3 @@ public sealed record PatternGalleryArchive(
     string ProjectFileName,
     string ProjectJson,
     IReadOnlyList<PatternGalleryArchiveFile> PatternFiles);
-

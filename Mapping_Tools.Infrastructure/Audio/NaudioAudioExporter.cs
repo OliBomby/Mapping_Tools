@@ -98,5 +98,4 @@ public sealed class NaudioAudioExporter : IAudioExporter
             writer.WriteWaveData(buffer, read, source.WaveFormat);
         }
     }
-
 }

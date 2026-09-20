@@ -14,5 +14,4 @@ public class SliderCompletionatorServiceOptions : SliderCompletionatorEngineOpti
 
     /// <summary>Gets or sets the legacy time-code query used by Time mode.</summary>
     public string TimeCode { get; set; } = string.Empty;
-
 }

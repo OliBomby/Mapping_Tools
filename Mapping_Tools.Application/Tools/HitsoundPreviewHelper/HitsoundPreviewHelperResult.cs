@@ -6,4 +6,3 @@ namespace Mapping_Tools.Application.Tools.HitsoundPreviewHelper;
 public sealed record HitsoundPreviewHelperResult(
     IReadOnlyList<string> ProcessedPaths,
     int UpdatedEventCount);
-

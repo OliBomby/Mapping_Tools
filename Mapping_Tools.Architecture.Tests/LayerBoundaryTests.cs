@@ -200,7 +200,7 @@ public sealed class LayerBoundaryTests
 
     private static IEnumerable<string> FindDirectoryTokenViolations(
         string directory,
-        IEnumerable<string> forbiddenTokens)
+        IReadOnlyCollection<string> forbiddenTokens)
     {
         if (!Directory.Exists(directory)) yield break;
 

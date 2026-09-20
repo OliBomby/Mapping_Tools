@@ -19,12 +19,12 @@ public sealed class QuickRunCommand
         ToolDefinition definition,
         Func<CancellationToken, Task> execute)
         : this(
-            definition?.Id ?? throw new ArgumentNullException(nameof(definition)),
+            definition.Id ?? throw new ArgumentNullException(nameof(definition)),
             definition.DisplayName,
             definition.QuickRunTargets
-                ?? throw new ArgumentException(
-                    "The tool definition does not declare QuickRun targets.",
-                    nameof(definition)),
+            ?? throw new ArgumentException(
+                "The tool definition does not declare QuickRun targets.",
+                nameof(definition)),
             execute)
     {
     }
@@ -78,4 +78,3 @@ public sealed class QuickRunCommand
     /// </summary>
     public Func<CancellationToken, Task> Execute { get; }
 }
-

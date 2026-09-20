@@ -91,5 +91,4 @@ public sealed class NaudioAudioGenerator : IAudioGenerator
     {
         return Math.Abs(left - right) < 1e-12;
     }
-
 }

@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Execution.UserNotification;
@@ -10,6 +11,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Mapping_Tools.Infrastructure.Tests.Editor;
 
 [TestClass]
+[SuppressMessage("ReSharper", "AccessToDisposedClosure")]
 public sealed class WindowsBetterSaveOverrideServiceTests
 {
     [DataTestMethod]
@@ -39,6 +41,7 @@ public sealed class WindowsBetterSaveOverrideServiceTests
                 await File.WriteAllTextAsync(fixture.MapPath, "normal save");
                 break;
         }
+
         await fixture.Saved.Task.WaitAsync(TimeSpan.FromSeconds(5));
         await Task.Delay(300);
 
@@ -64,6 +67,7 @@ public sealed class WindowsBetterSaveOverrideServiceTests
             await Task.Delay(200);
             savesWhileLocked = fixture.SaveCount;
         }
+
         await fixture.Saved.Task.WaitAsync(TimeSpan.FromSeconds(5));
 
         // Assert
@@ -170,11 +174,6 @@ public sealed class WindowsBetterSaveOverrideServiceTests
         public ConcurrentQueue<UserNotification> Notifications { get; } = new();
         public WindowsBetterSaveOverrideService Service { get; }
 
-        public Task<string> FindCurrentBeatmapAsync(CancellationToken cancellationToken = default)
-        {
-            return FindCurrent?.Invoke(cancellationToken) ?? Task.FromResult(MapPath);
-        }
-
         public async Task<BetterSaveResult> ExecuteAsync(CancellationToken cancellationToken = default)
         {
             Interlocked.Increment(ref saveCount);
@@ -183,12 +182,16 @@ public sealed class WindowsBetterSaveOverrideServiceTests
             return new BetterSaveResult(BetterSaveStatus.Saved, MapPath);
         }
 
+        public Task<string> FindCurrentBeatmapAsync(CancellationToken cancellationToken = default)
+        {
+            return FindCurrent?.Invoke(cancellationToken) ?? Task.FromResult(MapPath);
+        }
+
         public void Dispose()
         {
             Service.Dispose();
             // Cancellation can still be unwinding an asynchronous hash read.
-            for (int attempt = 0; ; attempt++)
-            {
+            for (int attempt = 0;; attempt++)
                 try
                 {
                     Directory.Delete(DirectoryPath, true);
@@ -198,7 +201,6 @@ public sealed class WindowsBetterSaveOverrideServiceTests
                 {
                     Thread.Sleep(20);
                 }
-            }
         }
     }
 }

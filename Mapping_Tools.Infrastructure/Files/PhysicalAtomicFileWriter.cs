@@ -8,7 +8,7 @@ namespace Mapping_Tools.Infrastructure.Files;
 /// </summary>
 internal static class PhysicalAtomicFileWriter
 {
-    private const int bufferSize = 81920;
+    private const int buffer_size = 81920;
 
     internal static Encoding Utf8WithoutBom { get; } = new UTF8Encoding(false);
 
@@ -24,9 +24,9 @@ internal static class PhysicalAtomicFileWriter
         string temporaryPath = CreateTemporarySibling(fullDestinationPath);
         try
         {
-            using (FileStream stream = OpenTemporaryFile(temporaryPath))
+            using (var stream = OpenTemporaryFile(temporaryPath))
             {
-                using (StreamWriter writer = new(stream, encoding, bufferSize, leaveOpen: true))
+                using (StreamWriter writer = new(stream, encoding, buffer_size, true))
                 {
                     writer.Write(contents);
                     writer.Flush();
@@ -56,13 +56,13 @@ internal static class PhysicalAtomicFileWriter
         string temporaryPath = CreateTemporarySibling(fullDestinationPath);
         try
         {
-            await using (FileStream stream = OpenTemporaryFile(temporaryPath))
+            await using (var stream = OpenTemporaryFile(temporaryPath))
             {
                 await using (StreamWriter writer = new(
-                                   stream,
-                                   encoding,
-                                   bufferSize,
-                                   leaveOpen: true))
+                                 stream,
+                                 encoding,
+                                 buffer_size,
+                                 true))
                 {
                     await writer.WriteAsync(contents.AsMemory(), cancellationToken)
                         .ConfigureAwait(false);
@@ -95,13 +95,11 @@ internal static class PhysicalAtomicFileWriter
         string temporaryPath = CreateTemporarySibling(fullDestinationPath);
         try
         {
-            using (FileStream stream = OpenTemporaryFile(temporaryPath))
+            using (var stream = OpenTemporaryFile(temporaryPath))
             {
-                using (StreamWriter writer = new(stream, encoding, bufferSize, leaveOpen: true)
+                using (StreamWriter writer = new(stream, encoding, buffer_size, true))
                 {
-                    NewLine = newLine,
-                })
-                {
+                    writer.NewLine = newLine;
                     foreach (string line in lines)
                         writer.WriteLine(line);
 
@@ -134,26 +132,20 @@ internal static class PhysicalAtomicFileWriter
         string temporaryPath = CreateTemporarySibling(fullDestinationPath);
         try
         {
-            await using (FileStream stream = OpenTemporaryFile(temporaryPath))
+            await using (var stream = OpenTemporaryFile(temporaryPath))
             {
                 await using (StreamWriter writer = new(
-                                   stream,
-                                   encoding,
-                                   bufferSize,
-                                   leaveOpen: true)
+                                 stream,
+                                 encoding,
+                                 buffer_size,
+                                 true))
                 {
-                    NewLine = newLine,
-                })
-                {
+                    writer.NewLine = newLine;
                     foreach (string line in lines)
                     {
                         cancellationToken.ThrowIfCancellationRequested();
-                        if (line is null)
-                            await writer.WriteAsync(newLine.AsMemory(), cancellationToken)
-                                .ConfigureAwait(false);
-                        else
-                            await writer.WriteLineAsync(line.AsMemory(), cancellationToken)
-                                .ConfigureAwait(false);
+                        await writer.WriteLineAsync(line.AsMemory(), cancellationToken)
+                            .ConfigureAwait(false);
                     }
 
                     await writer.FlushAsync(cancellationToken).ConfigureAwait(false);
@@ -182,13 +174,13 @@ internal static class PhysicalAtomicFileWriter
         try
         {
             await using (FileStream source = new(
-                               fullSourcePath,
-                               FileMode.Open,
-                               FileAccess.Read,
-                               FileShare.Read,
-                               bufferSize,
-                               FileOptions.Asynchronous | FileOptions.SequentialScan))
-            await using (FileStream destination = OpenTemporaryFile(temporaryPath))
+                             fullSourcePath,
+                             FileMode.Open,
+                             FileAccess.Read,
+                             FileShare.Read,
+                             buffer_size,
+                             FileOptions.Asynchronous | FileOptions.SequentialScan))
+            await using (var destination = OpenTemporaryFile(temporaryPath))
             {
                 await source.CopyToAsync(destination, cancellationToken).ConfigureAwait(false);
                 await destination.FlushAsync(cancellationToken).ConfigureAwait(false);
@@ -210,7 +202,7 @@ internal static class PhysicalAtomicFileWriter
             FileMode.CreateNew,
             FileAccess.Write,
             FileShare.None,
-            bufferSize,
+            buffer_size,
             FileOptions.Asynchronous | FileOptions.WriteThrough);
     }
 

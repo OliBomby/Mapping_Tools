@@ -18,8 +18,8 @@ public sealed class HitsoundCopierFixtureTests : TransformationFixtureTestBase
     public async Task CopyAsync_AcceptedFixture_ProducesEquivalentOutput(string fixtureName)
     {
         // Arrange
-        using FixtureContext fixture = CreateFixture("hitsound-copier", fixtureName);
-        HitsoundCopierServiceOptions project = fixture.ReadProject<HitsoundCopierServiceOptions>();
+        using var fixture = CreateFixture("hitsound-copier", fixtureName);
+        var project = fixture.ReadProject<HitsoundCopierServiceOptions>();
         HitsoundCopierService service = new(
             fixture.Gateway,
             new EmptyHitsoundSampleService(),

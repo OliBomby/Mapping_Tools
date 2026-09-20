@@ -19,17 +19,9 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
     IQuickRun,
     IShellProjectFeature<PropertyTransformerProject>
 {
-
-    private readonly ProjectDefinition<PropertyTransformerProject> definition = new(
-        "propertytransformerproject.json",
-        "Property Transformer Projects",
-        () => new PropertyTransformerProject(),
-        "property-transformer-project.json",
-        ToolConfigSchema.ForTool(PropertyTransformerToolDefinition.Definition.Id));
-
     private readonly IPropertyTransformerService propertyTransformer;
-    private readonly IBeatmapWorkspace workspace;
     private readonly DesktopApplicationSettings settings;
+    private readonly IBeatmapWorkspace workspace;
 
     /// <summary>
     ///     Creates a Property Transformer presentation model.
@@ -37,6 +29,7 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
     /// <param name="propertyTransformer">Runs the framework-independent transformation.</param>
     /// <param name="execution">Coordinates background execution and notifications.</param>
     /// <param name="workspace">Supplies the selected beatmap and storyboard paths.</param>
+    /// <param name="settings">Supplies the user settings.</param>
     public PropertyTransformerViewModel(
         IPropertyTransformerService propertyTransformer,
         IToolExecutionService execution,
@@ -190,18 +183,6 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
     [ObservableProperty]
     public partial bool SyncTimeFields { get; set; }
 
-    ProjectDefinition<PropertyTransformerProject> IShellProjectFeature<PropertyTransformerProject>.ProjectDefinition => definition;
-
-    PropertyTransformerProject IShellProjectFeature<PropertyTransformerProject>.Snapshot()
-    {
-        return Snapshot();
-    }
-
-    void IShellProjectFeature<PropertyTransformerProject>.Install(PropertyTransformerProject project)
-    {
-        Install(project);
-    }
-
     /// <summary>Runs Property Transformer against the current editor beatmap.</summary>
     /// <param name="cancellationToken">Cancels beatmap discovery or transformation.</param>
     /// <returns>A task that completes after QuickRun reaches a terminal state.</returns>
@@ -216,6 +197,23 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
             cancellationToken));
     }
 
+    ProjectDefinition<PropertyTransformerProject> IShellProjectFeature<PropertyTransformerProject>.ProjectDefinition { get; } = new(
+        "propertytransformerproject.json",
+        "Property Transformer Projects",
+        () => new PropertyTransformerProject(),
+        "property-transformer-project.json",
+        ToolConfigSchema.ForTool(PropertyTransformerToolDefinition.Definition.Id));
+
+    PropertyTransformerProject IShellProjectFeature<PropertyTransformerProject>.Snapshot()
+    {
+        return Snapshot();
+    }
+
+    void IShellProjectFeature<PropertyTransformerProject>.Install(PropertyTransformerProject project)
+    {
+        Install(project);
+    }
+
     /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
@@ -228,11 +226,11 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
         CancellationToken cancellationToken)
     {
         if (quickRun && paths.Count == 0) return;
-        PropertyTransformerProject options = Snapshot();
+        var options = Snapshot();
         await Execution.ExecuteAsync(
                 new ToolExecutionRequest<PropertyTransformerResult>(
-                Tool.Id,
-                Tool.DisplayName,
+                    Tool.Id,
+                    Tool.DisplayName,
                     async context =>
                     {
                         Progress<double> progress = new(value =>
@@ -417,8 +415,8 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
         PreviewTimeOffset = project.PreviewTimeOffset;
         ClipProperties = project.ClipProperties;
         EnableFilters = project.EnableFilters;
-        MatchFilter = project.MatchFilter?.ToArray() ?? [];
-        UnmatchFilter = project.UnmatchFilter?.ToArray() ?? [];
+        MatchFilter = project.MatchFilter.ToArray();
+        UnmatchFilter = project.UnmatchFilter.ToArray();
         MinTimeFilter = project.MinTimeFilter;
         MaxTimeFilter = project.MaxTimeFilter;
         SyncTimeFields = project.SyncTimeFields;

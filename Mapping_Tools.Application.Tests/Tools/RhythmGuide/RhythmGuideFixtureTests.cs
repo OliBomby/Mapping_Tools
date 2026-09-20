@@ -1,5 +1,5 @@
-using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tests.Execution;
+using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.RhythmGuide;
 using Mapping_Tools.Infrastructure.Files;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -14,8 +14,8 @@ public sealed class RhythmGuideFixtureTests : TransformationFixtureTestBase
     public async Task GenerateAsync_AcceptedFixture_ProducesEquivalentOutput(string fixtureName)
     {
         // Arrange
-        using FixtureContext fixture = CreateFixture("rhythm-guide", fixtureName);
-        RhythmGuideServiceOptions project = fixture.ReadProject<RhythmGuideServiceOptions>();
+        using var fixture = CreateFixture("rhythm-guide", fixtureName);
+        var project = fixture.ReadProject<RhythmGuideServiceOptions>();
         RhythmGuideService service = new(
             fixture.Gateway,
             new TestBeatmapBackupService(),
@@ -23,7 +23,7 @@ public sealed class RhythmGuideFixtureTests : TransformationFixtureTestBase
             new PhysicalBeatmapsetFileSystem());
 
         // Act
-        RhythmGuideResult result = await service.GenerateAsync(
+        var result = await service.GenerateAsync(
             project.GuideGeneratorArgs,
             CancellationToken.None);
         FixtureExecutionResult actual = new([result.ExportPath]);

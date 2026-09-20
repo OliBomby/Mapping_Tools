@@ -20,6 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Xml.Serialization;
@@ -788,7 +789,7 @@ public struct Vector2 : IEquatable<Vector2>
     /// </summary>
     /// <param name="left">First operand</param>
     /// <param name="right">Second operand</param>
-    /// <returns>The mirror projection of the input</returns>
+    /// <param name="result">The mirror projection of the input</param>
     public static void Mirror(ref Vector2 left, ref Line2 right, out Vector2 result)
     {
         var nearest = Line2.NearestPoint(right, left);
@@ -812,7 +813,7 @@ public struct Vector2 : IEquatable<Vector2>
     /// </summary>
     /// <param name="left">First operand</param>
     /// <param name="right">Second operand</param>
-    /// <returns>The closest point on the line</returns>
+    /// <param name="result">The closest point on the line</param>
     public static void Snap(ref Vector2 left, ref Line2 right, out Vector2 result)
     {
         result = Line2.NearestPoint(right, left);
@@ -1096,9 +1097,9 @@ public struct Vector2 : IEquatable<Vector2>
     /// <summary>Indicates whether the current vector is equal to another vector.</summary>
     /// <param name="other">A vector to compare with this vector.</param>
     /// <returns>true if the current vector is equal to the vector parameter; otherwise, false.</returns>
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     public bool Equals(Vector2 other)
     {
-        return
-            X == other.X && Y == other.Y;
+        return X == other.X && Y == other.Y;
     }
 }

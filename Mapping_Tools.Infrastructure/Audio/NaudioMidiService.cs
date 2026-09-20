@@ -47,13 +47,13 @@ public sealed class NaudioMidiService : IMidiService
                 case PatchChangeEvent patchChange:
                     patches[patchChange.Channel] = patchChange.Patch;
                     break;
-                case ControlChangeEvent control when control.Controller == MidiController.BankSelect:
+                case ControlChangeEvent { Controller: MidiController.BankSelect } control:
                     banks[control.Channel] = control.ControllerValue << 7 | (banks.TryGetValue(control.Channel, out int currentBank) ? currentBank & 0x7f : 0);
                     break;
-                case ControlChangeEvent control when control.Controller == MidiController.BankSelectLsb:
+                case ControlChangeEvent { Controller: MidiController.BankSelectLsb } control:
                     banks[control.Channel] = control.ControllerValue & 0x7f | (banks.TryGetValue(control.Channel, out int currentBankForLsb) ? currentBankForLsb >> 7 << 7 : 0);
                     break;
-                case ControlChangeEvent control when control.Controller == MidiController.MainVolume:
+                case ControlChangeEvent { Controller: MidiController.MainVolume } control:
                     volumes.Add(new MidiVolumeChange(
                         CalculateTime(control.AbsoluteTime, tempos, cumulativeTimes, file.DeltaTicksPerQuarterNote),
                         control.Channel,

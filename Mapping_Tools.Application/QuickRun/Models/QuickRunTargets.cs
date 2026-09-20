@@ -32,4 +32,3 @@ public enum QuickRunTargets
     /// </summary>
     Always = NoSelection | SingleSelection | MultipleSelection,
 }
-

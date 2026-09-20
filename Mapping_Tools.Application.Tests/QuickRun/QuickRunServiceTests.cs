@@ -246,13 +246,14 @@ public sealed class QuickRunServiceTests
     {
         // Arrange
         using CancellationTokenSource source = new();
-        source.Cancel();
+        await source.CancelAsync();
         var service = CreateService(
             new QuickRunCommandRegistry(),
             new RecordingLiveBeatmapReader(Snapshot(0)),
             new ApplicationSettings());
 
         // Act
+        // ReSharper disable once AccessToDisposedClosure
         Func<Task> act3 = () => service.RunAsync(source.Token);
 
         // Assert
@@ -342,5 +343,4 @@ public sealed class QuickRunServiceTests
             5,
             selectedHitObjects: hitObjects.Take(selectedCount).ToArray());
     }
-
 }

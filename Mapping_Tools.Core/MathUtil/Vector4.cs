@@ -20,6 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Xml.Serialization;
@@ -2024,9 +2025,9 @@ public struct Vector4 : IEquatable<Vector4>
     /// <summary>Indicates whether the current vector is equal to another vector.</summary>
     /// <param name="other">A vector to compare with this vector.</param>
     /// <returns>true if the current vector is equal to the vector parameter; otherwise, false.</returns>
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     public bool Equals(Vector4 other)
     {
-        return
-            X == other.X && Y == other.Y && Z == other.Z && W == other.W;
+        return X == other.X && Y == other.Y && Z == other.Z && W == other.W;
     }
 }

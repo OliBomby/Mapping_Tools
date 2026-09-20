@@ -11,7 +11,7 @@ using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.QuickRun.Models;
 using Mapping_Tools.Application.Settings.Contracts;
-using Mapping_Tools.Core.Settings.Models;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.AutoFail;
 using Mapping_Tools.Application.Tools.ComboColourStudio;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
@@ -24,6 +24,7 @@ using Mapping_Tools.Application.Tools.SliderMerger;
 using Mapping_Tools.Application.Tools.TimingHelper;
 using Mapping_Tools.Application.Updates.Contracts;
 using Mapping_Tools.Application.Workspace.Contracts;
+using Mapping_Tools.Core.Settings.Models;
 using Mapping_Tools.Desktop.Composition;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services;
@@ -49,6 +50,7 @@ using Mapping_Tools.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 namespace Mapping_Tools.Desktop.Tests.Composition;
 
 [TestClass]
@@ -94,7 +96,7 @@ public sealed class DependencyInjectionTests
             typeof(ISettingsPathService),
             typeof(ISettingsService),
             typeof(DesktopApplicationSettings),
-            typeof(Mapping_Tools.Application.Settings.Models.ApplicationSettings),
+            typeof(ApplicationSettings),
             typeof(TimeProvider),
             typeof(ITextFileStore),
             typeof(IUserNotificationService),

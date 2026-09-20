@@ -1,4 +1,5 @@
-using Mapping_Tools.Application.Updates.Contracts;
+using Onova.Services;
+using IPackageResolver = Mapping_Tools.Application.Updates.Contracts.IPackageResolver;
 
 namespace Mapping_Tools.Infrastructure.Updates;
 
@@ -7,7 +8,7 @@ namespace Mapping_Tools.Infrastructure.Updates;
 /// </summary>
 public sealed class LocalUpdatePackageResolver : IPackageResolver
 {
-    private readonly Onova.Services.LocalPackageResolver resolver;
+    private readonly LocalPackageResolver resolver;
 
     /// <summary>
     ///     Creates a resolver for a package in a local directory.
@@ -19,7 +20,7 @@ public sealed class LocalUpdatePackageResolver : IPackageResolver
         ArgumentException.ThrowIfNullOrWhiteSpace(directoryPath);
         ArgumentException.ThrowIfNullOrWhiteSpace(packageFilePattern);
 
-        resolver = new Onova.Services.LocalPackageResolver(
+        resolver = new LocalPackageResolver(
             directoryPath,
             packageFilePattern);
     }

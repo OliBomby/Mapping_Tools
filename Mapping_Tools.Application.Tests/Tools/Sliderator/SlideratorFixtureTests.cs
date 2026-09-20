@@ -18,9 +18,9 @@ public sealed class SlideratorFixtureTests : TransformationFixtureTestBase
     public async Task RunAsync_AcceptedFixture_ProducesEquivalentOutput(string fixtureName)
     {
         // Arrange
-        using FixtureContext fixture = CreateFixture("sliderator", fixtureName);
-        SlideratorServiceOptions project = fixture.ReadProject<SlideratorServiceOptions>();
-        HitObject sourceSlider = ReadLegacySlider(fixture);
+        using var fixture = CreateFixture("sliderator", fixtureName);
+        var project = fixture.ReadProject<SlideratorServiceOptions>();
+        var sourceSlider = ReadLegacySlider(fixture);
         ApplySlideratorTransientState(project, sourceSlider);
         SlideratorService service = new(fixture.Gateway, new ApplicationSettings());
 

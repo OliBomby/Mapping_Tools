@@ -12,7 +12,7 @@ public static class MyExtensions
     /// <returns>The number of non-empty tokens.</returns>
     public static int WordCount(this string str)
     {
-        return str.Split(new[] { ' ', '.', '?' },
+        return str.Split([' ', '.', '?'],
             StringSplitOptions.RemoveEmptyEntries).Length;
     }
 

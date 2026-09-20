@@ -51,14 +51,11 @@ internal sealed class RecordingBeatmapEditingGateway : IBeatmapEditingGateway
         cancellationToken.ThrowIfCancellationRequested();
         OpenRequests.Add((path, livePreference));
 
-        if (OpenBeatmapFailure is not null)
-        {
-            return Task.FromException<BeatmapEditingSession>(OpenBeatmapFailure);
-        }
+        if (OpenBeatmapFailure is not null) return Task.FromException<BeatmapEditingSession>(OpenBeatmapFailure);
 
-        BeatmapEditingSession result = OpenBeatmapFactory?.Invoke(path, livePreference)
-            ?? Session
-            ?? throw new NotSupportedException("No beatmap-open behavior was configured.");
+        var result = OpenBeatmapFactory?.Invoke(path, livePreference)
+                     ?? Session
+                     ?? throw new NotSupportedException("No beatmap-open behavior was configured.");
         LastOpenedSession = result;
         return Task.FromResult(result);
     }
@@ -69,13 +66,10 @@ internal sealed class RecordingBeatmapEditingGateway : IBeatmapEditingGateway
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        if (OpenStoryboardFailure is not null)
-        {
-            return Task.FromException<StoryboardEditingSession>(OpenStoryboardFailure);
-        }
+        if (OpenStoryboardFailure is not null) return Task.FromException<StoryboardEditingSession>(OpenStoryboardFailure);
 
-        StoryboardEditingSession result = OpenStoryboardFactory?.Invoke(path)
-            ?? throw new NotSupportedException("No storyboard-open behavior was configured.");
+        var result = OpenStoryboardFactory?.Invoke(path)
+                     ?? throw new NotSupportedException("No storyboard-open behavior was configured.");
         OpenStoryboardRequests.Add((path, result));
         LastOpenedStoryboard = result;
         return Task.FromResult(result);
@@ -89,10 +83,7 @@ internal sealed class RecordingBeatmapEditingGateway : IBeatmapEditingGateway
         cancellationToken.ThrowIfCancellationRequested();
         EditingSessionSaveRequests.Add((session, reloadEditor));
 
-        if (SaveFailure is not null)
-        {
-            return Task.FromException(SaveFailure);
-        }
+        if (SaveFailure is not null) return Task.FromException(SaveFailure);
 
         SaveEditingSessionAction?.Invoke(session, reloadEditor);
         CompletedEditingSessionSaveRequests.Add((session, reloadEditor));
@@ -107,10 +98,7 @@ internal sealed class RecordingBeatmapEditingGateway : IBeatmapEditingGateway
         cancellationToken.ThrowIfCancellationRequested();
         SessionSaveRequests.Add((session, reloadEditor));
 
-        if (SaveFailure is not null)
-        {
-            return Task.FromException(SaveFailure);
-        }
+        if (SaveFailure is not null) return Task.FromException(SaveFailure);
 
         SaveSessionAction?.Invoke(session, reloadEditor);
         CompletedSessionSaveRequests.Add((session, reloadEditor));

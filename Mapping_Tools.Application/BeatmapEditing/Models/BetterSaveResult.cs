@@ -10,4 +10,3 @@ public sealed record BetterSaveResult(
     BetterSaveStatus Status,
     string? Path = null,
     Exception? Exception = null);
-

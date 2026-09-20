@@ -20,4 +20,3 @@ public interface ISettingsService
     /// <param name="settings">The complete settings snapshot to store.</param>
     void Save(ApplicationSettings settings);
 }
-

@@ -1,7 +1,13 @@
 {
   "BaseBeatmap": "../../../Beatmaps/ComplicatedTestMap.osu",
   "Sample": "../../../Audio/drum-hitnormal60.wav",
-  "Times": [15, 334, 526, 942, 2109],
+  "Times": [
+    15,
+    334,
+    526,
+    942,
+    2109
+  ],
   "HitsoundDiffName": "E2E Hitsounds",
   "HitsoundExportMode": "Standard",
   "HitsoundExportGameMode": "Standard",

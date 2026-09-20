@@ -10,17 +10,19 @@
 
 ## Fixture characteristics
 
-| Item | Positive fixture |
-|---|---:|
-| Hit objects | 440 |
-| Sliders | 215 |
-| Circles | 223 |
-| Spinners | 2 |
-| Redlines | 1 |
-| Greenlines | 8 |
-| Approach rate | 8 |
-| Overall difficulty | 5 |
+| Item               | Positive fixture |
+|--------------------|-----------------:|
+| Hit objects        |              440 |
+| Sliders            |              215 |
+| Circles            |              223 |
+| Spinners           |                2 |
+| Redlines           |                1 |
+| Greenlines         |                8 |
+| Approach rate      |                8 |
+| Overall difficulty |                5 |
 
-The compact seed correctly exercises the clean path, but the real-world 2B map is the behavioral baseline because it exercises both confirmed and potential unloading detection. Default AR/OD, 9 ms physics-update leniency, and no automatic fix were used. Neither input was modified.
+The compact seed correctly exercises the clean path, but the real-world 2B map is the behavioral baseline because it
+exercises both confirmed and potential unloading detection. Default AR/OD, 9 ms physics-update leniency, and no
+automatic fix were used. Neither input was modified.
 
 Status: accepted by Olivier on 2026-07-19.

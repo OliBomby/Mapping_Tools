@@ -18,4 +18,3 @@ public sealed record HitsoundCopierResult(
     /// <summary>Gets the number of target maps written.</summary>
     public int ProcessedCount => ProcessedPaths.Count;
 }
-

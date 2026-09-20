@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Mapping_Tools.Core.Audio;
 using Mapping_Tools.Core.Audio.Effects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -5,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Mapping_Tools.Core.Tests.Audio;
 
 [TestClass]
+[SuppressMessage("ReSharper", "AccessToDisposedClosure")]
 public sealed class AudioBoundaryTests
 {
     [TestMethod]
@@ -85,5 +87,4 @@ public sealed class AudioBoundaryTests
         // Assert
         act.Should().Throw<OperationCanceledException>();
     }
-
 }

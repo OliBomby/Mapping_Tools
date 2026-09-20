@@ -15,4 +15,3 @@ public interface IQuickRunService
     /// <returns>A typed dispatch outcome; ordinary live-read and command failures are captured.</returns>
     Task<QuickRunResult> RunAsync(CancellationToken cancellationToken = default);
 }
-

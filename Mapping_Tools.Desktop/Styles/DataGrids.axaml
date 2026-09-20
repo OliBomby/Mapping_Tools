@@ -73,7 +73,8 @@
         <Setter Property="Fill" Value="{DynamicResource MaterialTextFieldBoxHoverBackgroundBrush}" />
         <Setter Property="Opacity" Value="1" />
     </Style>
-    <Style Selector="DataGridRow:selected /template/ Rectangle#BackgroundRectangle,
+    <Style
+        Selector="DataGridRow:selected /template/ Rectangle#BackgroundRectangle,
                            DataGridRow:selected:pointerover /template/ Rectangle#BackgroundRectangle">
         <Setter Property="Fill" Value="{DynamicResource MaterialSelectionBrush}" />
         <Setter Property="Opacity" Value="1" />
@@ -91,7 +92,8 @@
     <Style Selector="DataGridCell:cell-selected">
         <Setter Property="Background" Value="{DynamicResource MaterialSelectionBrush}" />
     </Style>
-    <Style Selector="DataGridCell:cell-selected:pointerover,
+    <Style
+        Selector="DataGridCell:cell-selected:pointerover,
                            DataGridCell:cell-selected:focus">
         <Setter Property="Background" Value="{DynamicResource MaterialSelectionBrush}" />
     </Style>

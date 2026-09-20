@@ -4,12 +4,9 @@ using Avalonia.Data;
 using Avalonia.VisualTree;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
-using Mapping_Tools.Application.Settings.Models;
-using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.ComboColourStudio;
 using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Converters;
-using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -134,7 +131,7 @@ public sealed class ToolControlTests
         StackPanel view = new();
         view.Children.Add(input);
         view.Children.Add(runButton);
-        Button button = runButton.GetVisualDescendants().OfType<Button>().Single();
+        var button = runButton.GetVisualDescendants().OfType<Button>().Single();
         input.Text = "not a number";
 
         // Act

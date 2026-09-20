@@ -2,10 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
-using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
-using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.SliderCompletionator;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
@@ -25,15 +22,7 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
     IQuickRun,
     IShellProjectFeature<SliderCompletionatorProject>
 {
-
     private readonly ISliderCompletionatorService completionator;
-
-    private readonly ProjectDefinition<SliderCompletionatorProject> definition = new(
-        "slidercompletionatorproject.json",
-        "Slider Completionator Projects",
-        static () => new SliderCompletionatorProject(),
-        "slider-completionator-project.json",
-        ToolConfigSchema.ForTool(SliderCompletionatorToolDefinition.Definition.Id));
 
     private readonly DesktopApplicationSettings settings;
     private readonly IBeatmapWorkspace workspace;
@@ -159,7 +148,12 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
             cancellationToken));
     }
 
-    ProjectDefinition<SliderCompletionatorProject> IShellProjectFeature<SliderCompletionatorProject>.ProjectDefinition => definition;
+    ProjectDefinition<SliderCompletionatorProject> IShellProjectFeature<SliderCompletionatorProject>.ProjectDefinition { get; } = new(
+        "slidercompletionatorproject.json",
+        "Slider Completionator Projects",
+        static () => new SliderCompletionatorProject(),
+        "slider-completionator-project.json",
+        ToolConfigSchema.ForTool(SliderCompletionatorToolDefinition.Definition.Id));
 
     SliderCompletionatorProject IShellProjectFeature<SliderCompletionatorProject>.Snapshot()
     {
@@ -174,7 +168,7 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
     /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
-        IReadOnlyList<string> paths = ImportModeSetting == HitObjectSelectionMode.Selected
+        var paths = ImportModeSetting == HitObjectSelectionMode.Selected
             ? [await workspace.ResolveQuickRunBeatmapAsync()]
             : workspace.SelectedPaths;
         await RunPathsAsync(
@@ -190,11 +184,11 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
     {
         if (paths.Count == 0) return;
 
-        SliderCompletionatorProject options = Snapshot();
+        var options = Snapshot();
         await Execution.ExecuteAsync(
                 new ToolExecutionRequest<SliderCompletionatorResult>(
-                Tool.Id,
-                Tool.DisplayName,
+                    Tool.Id,
+                    Tool.DisplayName,
                     async context =>
                     {
                         var result = await completionator.CompleteAsync(
@@ -238,7 +232,7 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
     {
         ImportModeSetting = project.ImportModeSetting;
         FreeVariableSetting = project.FreeVariableSetting;
-        TimeCode = project.TimeCode ?? string.Empty;
+        TimeCode = project.TimeCode;
         Duration = project.Duration;
         EndTime = project.EndTime;
         Length = project.Length;

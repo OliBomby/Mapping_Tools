@@ -5,7 +5,6 @@ using Mapping_Tools.Desktop.Tools.TumourGenerator.ViewModels;
 using Mapping_Tools.Desktop.Tools.TumourGenerator.Views;
 using Microsoft.Extensions.DependencyInjection;
 
-
 namespace Mapping_Tools.Desktop.Tools.TumourGenerator;
 
 /// <summary>Describes and composes the Tumour Generator plugin feature.</summary>

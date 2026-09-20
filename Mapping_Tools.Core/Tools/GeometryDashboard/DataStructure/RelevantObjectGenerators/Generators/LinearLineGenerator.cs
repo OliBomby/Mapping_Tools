@@ -30,7 +30,7 @@ public sealed class LinearLineGenerator : RelevantObjectsGenerator
     public RelevantLine? GetRelevantObjects(RelevantHitObject relevantHitObject)
     {
         var hitObject = relevantHitObject.HitObject;
-        return hitObject.IsSlider && hitObject.SliderType == PathType.Linear && hitObject.CurvePoints is { Count: >= 1 }
+        return hitObject is { IsSlider: true, SliderType: PathType.Linear, CurvePoints.Count: >= 1 }
             ? new RelevantLine(Line2.FromPoints(hitObject.Pos, hitObject.CurvePoints.Last()))
             : null;
     }

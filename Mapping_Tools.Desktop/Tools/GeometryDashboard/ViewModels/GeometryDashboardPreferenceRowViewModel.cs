@@ -10,8 +10,6 @@ namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 /// <summary>Edits one neutral geometry appearance group.</summary>
 public sealed class GeometryDashboardPreferenceRowViewModel : ObservableObject
 {
-    private readonly bool hasSizeOption;
-    private readonly string name;
     private string? pendingColorText;
 
     /// <summary>Creates a row over one cloned appearance group.</summary>
@@ -23,13 +21,13 @@ public sealed class GeometryDashboardPreferenceRowViewModel : ObservableObject
         RelevantObjectPreferences preference,
         bool hasSizeOption)
     {
-        this.name = name;
+        Name = name;
         Preference = preference;
-        this.hasSizeOption = hasSizeOption;
+        HasSizeOption = hasSizeOption;
     }
 
     /// <summary>Gets the stable preference-group label.</summary>
-    public string Name => name;
+    public string Name { get; }
 
     /// <summary>Gets the Core appearance settings.</summary>
     public RelevantObjectPreferences Preference { get; }
@@ -55,7 +53,7 @@ public sealed class GeometryDashboardPreferenceRowViewModel : ObservableObject
         get => pendingColorText ?? Preference.Color.ToString();
         set
         {
-            string hex = (value ?? string.Empty).TrimStart('#');
+            string hex = value.TrimStart('#');
             if (hex.Length == 6) hex = "FF" + hex;
             if (hex.Length == 8
                 && byte.TryParse(hex[..2], NumberStyles.HexNumber, null, out byte a)
@@ -116,7 +114,7 @@ public sealed class GeometryDashboardPreferenceRowViewModel : ObservableObject
     }
 
     /// <summary>Gets whether point size applies to this group.</summary>
-    public bool HasSizeOption => hasSizeOption;
+    public bool HasSizeOption { get; }
 
     /// <summary>Gets or sets the dash pattern.</summary>
     public DashStylesEnum DashStyle

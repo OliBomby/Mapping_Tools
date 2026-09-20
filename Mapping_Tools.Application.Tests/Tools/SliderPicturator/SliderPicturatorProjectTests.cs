@@ -14,7 +14,7 @@ public sealed class SliderPicturatorValidationTests
         SliderPicturatorServiceOptions project = new() { PictureFile = "image.png", Quality = 102 };
 
         // Act
-        Action act = () => SliderPicturatorEngine.Validate(project);
+        var act = () => SliderPicturatorEngine.Validate(project);
 
         // Assert
         act.Should().Throw<ArgumentException>();

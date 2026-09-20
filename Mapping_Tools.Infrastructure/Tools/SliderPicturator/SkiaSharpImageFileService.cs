@@ -22,7 +22,7 @@ public sealed class SkiaSharpImageFileService : IImageFileService
         try
         {
             byte[] encodedImage = await File.ReadAllBytesAsync(path, cancellationToken).ConfigureAwait(false);
-            SKImageInfo bounds = SKBitmap.DecodeBounds(encodedImage);
+            var bounds = SKBitmap.DecodeBounds(encodedImage);
             if (bounds.Width <= 0 || bounds.Height <= 0)
                 throw new InvalidDataException("The image has no pixels.");
 
@@ -31,8 +31,8 @@ public sealed class SkiaSharpImageFileService : IImageFileService
                 bounds.Height,
                 SKColorType.Rgba8888,
                 SKAlphaType.Unpremul);
-            using SKBitmap bitmap = SKBitmap.Decode(encodedImage, rgbaInfo)
-                                      ?? throw new InvalidDataException("SkiaSharp could not decode the image.");
+            using var bitmap = SKBitmap.Decode(encodedImage, rgbaInfo)
+                               ?? throw new InvalidDataException("SkiaSharp could not decode the image.");
 
             byte[] pixels = new byte[checked(bitmap.Width * bitmap.Height * 4)];
             nint sourceAddress = bitmap.GetPixels();

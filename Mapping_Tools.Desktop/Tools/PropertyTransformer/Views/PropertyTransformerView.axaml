@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Mapping_Tools.Desktop.Tools.PropertyTransformer.ViewModels"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
-        xmlns:converters="using:Mapping_Tools.Desktop.Converters"
+             xmlns:converters="using:Mapping_Tools.Desktop.Converters"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"

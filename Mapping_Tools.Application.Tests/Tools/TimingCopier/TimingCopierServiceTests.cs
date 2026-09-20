@@ -19,7 +19,7 @@ public sealed class TimingCopierServiceTests
             "Fixtures",
             "Beatmaps",
             "standard-feature-rich.osu");
-        RecordingBeatmapEditingGateway gateway = CreateGateway(fixture);
+        var gateway = CreateGateway(fixture);
         TimingCopierService service = new(gateway);
         TimingCopierServiceOptions options = new()
         {
@@ -52,7 +52,7 @@ public sealed class TimingCopierServiceTests
             "Fixtures",
             "Beatmaps",
             "standard-feature-rich.osu");
-        RecordingBeatmapEditingGateway gateway = CreateGateway(fixture);
+        var gateway = CreateGateway(fixture);
         gateway.SaveSessionAction = (_, _) =>
         {
             if (gateway.SessionSaveRequests.Count == 2)
@@ -84,7 +84,7 @@ public sealed class TimingCopierServiceTests
             "Fixtures",
             "Beatmaps",
             "standard-feature-rich.osu");
-        RecordingBeatmapEditingGateway gateway = CreateGateway(fixture);
+        var gateway = CreateGateway(fixture);
         TimingCopierService service = new(gateway);
         TimingCopierServiceOptions options = new()
         {
@@ -110,7 +110,7 @@ public sealed class TimingCopierServiceTests
             "Fixtures",
             "Beatmaps",
             "standard-feature-rich.osu");
-        RecordingBeatmapEditingGateway gateway = CreateGateway(fixture);
+        var gateway = CreateGateway(fixture);
         TimingCopierService service = new(gateway);
         TimingCopierServiceOptions options = new()
         {
@@ -142,5 +142,4 @@ public sealed class TimingCopierServiceTests
             },
         };
     }
-
 }

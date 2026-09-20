@@ -11,4 +11,3 @@ public interface IGraphInterpolator
     /// <returns>The normalized interpolated value.</returns>
     double GetInterpolation(double t);
 }
-

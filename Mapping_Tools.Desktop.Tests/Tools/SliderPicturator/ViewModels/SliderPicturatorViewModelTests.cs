@@ -1,7 +1,6 @@
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
-using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.SliderPicturator;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Images;
@@ -10,7 +9,6 @@ using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.SliderPicturator.Models;
 using Mapping_Tools.Desktop.Tools.SliderPicturator.ViewModels;
-using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Tools.SliderPicturator.ViewModels;

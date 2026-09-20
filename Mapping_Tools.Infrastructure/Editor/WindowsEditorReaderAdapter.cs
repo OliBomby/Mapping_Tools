@@ -13,6 +13,7 @@ using Mapping_Tools.Infrastructure.Tools.GeometryDashboard;
 using OsuMemoryDataProvider;
 using OsuMemoryDataProvider.OsuMemoryModels;
 using OsuMemoryDataProvider.OsuMemoryModels.Direct;
+using HitObject = Editor_Reader.HitObject;
 
 namespace Mapping_Tools.Infrastructure.Editor;
 
@@ -29,9 +30,9 @@ public sealed class WindowsEditorReaderAdapter :
     private readonly IApplicationDirectories directories;
     private readonly Func<Process?> findProcess;
     private readonly Func<bool> isWindows;
-    private readonly object lifecycleGate = new();
+    private readonly Lock lifecycleGate = new();
     private readonly Func<Process, string?> readCurrentBeatmapFromMemory;
-    private readonly EditorReader reader = new();
+    private readonly EditorReader readerAdapter = new();
     private readonly SemaphoreSlim readerLock = new(1, 1);
     private readonly ApplicationSettings settings;
     private int activeReads;
@@ -87,7 +88,11 @@ public sealed class WindowsEditorReaderAdapter :
     public async Task<string> FindCurrentBeatmapAsync(
         CancellationToken cancellationToken = default)
     {
-        ObjectDisposedException.ThrowIf(disposed, this);
+        lock (lifecycleGate)
+        {
+            ObjectDisposedException.ThrowIf(disposed, this);
+        }
+
         if (!isWindows())
             throw new InvalidOperationException(
                 "Current osu! beatmap lookup is unavailable on this platform.");
@@ -105,6 +110,7 @@ public sealed class WindowsEditorReaderAdapter :
 
             cancellationToken.ThrowIfCancellationRequested();
             string? path = await Task.Run(
+                    // ReSharper disable once AccessToDisposedClosure
                     () => FindCurrentBeatmap(process),
                     cancellationToken)
                 .ConfigureAwait(false);
@@ -172,6 +178,7 @@ public sealed class WindowsEditorReaderAdapter :
 
             cancellationToken.ThrowIfCancellationRequested();
             var snapshot = await Task.Run(
+                    // ReSharper disable once AccessToDisposedClosure
                     () => ReadSnapshot(process),
                     cancellationToken)
                 .ConfigureAwait(false);
@@ -209,20 +216,20 @@ public sealed class WindowsEditorReaderAdapter :
 
     private LiveBeatmapSnapshot ReadSnapshot(Process process)
     {
-        reader.SetProcess(process);
-        reader.autoDeStack = true;
-        reader.FetchAll();
+        readerAdapter.SetProcess(process);
+        readerAdapter.autoDeStack = true;
+        readerAdapter.FetchAll();
 
         try
         {
             return EditorReaderSnapshotConverter.Convert(
-                reader,
+                readerAdapter,
                 settings.SongsPath,
-                reader.EditorTime());
+                readerAdapter.EditorTime());
         }
         catch (InvalidDataException)
         {
-            WriteDiagnosticLog(reader);
+            WriteDiagnosticLog(readerAdapter);
             throw;
         }
     }
@@ -247,13 +254,13 @@ public sealed class WindowsEditorReaderAdapter :
             || !IsActiveEditor(process))
             return null;
 
-        reader.SetProcess(process);
-        reader.FetchHOM();
-        reader.FetchBeatmap();
+        readerAdapter.SetProcess(process);
+        readerAdapter.FetchHOM();
+        readerAdapter.FetchBeatmap();
         return Path.Combine(
             settings.SongsPath,
-            reader.ContainingFolder,
-            reader.Filename);
+            readerAdapter.ContainingFolder,
+            readerAdapter.Filename);
     }
 
     private static bool IsActiveEditor(Process process)
@@ -299,14 +306,15 @@ public sealed class WindowsEditorReaderAdapter :
             $"EditorTime: {reader.EditorTime()}",
             $"ProcessTitle: {reader.ProcessTitle()}",
             "[HitObjects]",
+
+            .. reader.hitObjects?.ToList().Select(item => item.ToString())
+               ?? [],
+
+            "[TimingPoints]",
+
+            .. reader.controlPoints?.ToList().Select(item => item.ToString())
+               ?? [],
         ];
-        lines.AddRange(
-            reader.hitObjects?.ToList().Select(item => item.ToString())
-            ?? []);
-        lines.Add("[TimingPoints]");
-        lines.AddRange(
-            reader.controlPoints?.ToList().Select(item => item.ToString())
-            ?? []);
         File.WriteAllLines(path, lines);
     }
 }
@@ -315,6 +323,7 @@ internal static class CurrentBeatmapMemoryReader
 {
     private static readonly StructuredOsuMemoryReader structuredReader =
         StructuredOsuMemoryReader.Instance;
+
     private static readonly OsuBaseAddresses osuBaseAddresses = new();
     private static readonly object readerGate = new();
 
@@ -344,7 +353,7 @@ internal static class CurrentBeatmapMemoryReader
         return structuredReader.TryReadProperty(
             readObject,
             propertyName,
-            out var readResult)
+            out object readResult)
             ? readResult as string
             : null;
     }
@@ -388,8 +397,8 @@ internal static class EditorReaderSnapshotConverter
             .ToList();
         return new LiveBeatmapSnapshot(
             path,
-            reader.bookmarks.Select(value => (double)value).ToList(),
-            reader.controlPoints.Select(ConvertControlPoint).ToList(),
+            [.. reader.bookmarks.Select(value => (double)value)],
+            [.. reader.controlPoints.Select(ConvertControlPoint)],
             hitObjects,
             reader.PreviewTime,
             reader.SliderMultiplier,
@@ -400,7 +409,7 @@ internal static class EditorReaderSnapshotConverter
             selectedHitObjects);
     }
 
-    private static bool IsInvalid(Editor_Reader.HitObject hitObject)
+    private static bool IsInvalid(HitObject hitObject)
     {
         return hitObject.SegmentCount > 9000 || hitObject.Type == 0 || hitObject.SampleSet > 1000 || hitObject.SampleSetAdditions > 1000 || hitObject.SampleVolume > 1000;
     }
@@ -419,7 +428,7 @@ internal static class EditorReaderSnapshotConverter
             (controlPoint.EffectFlags & 8) > 0);
     }
 
-    private static Core.BeatmapHelper.HitObject ConvertHitObject(Editor_Reader.HitObject source)
+    private static Core.BeatmapHelper.HitObject ConvertHitObject(HitObject source)
     {
         Core.BeatmapHelper.HitObject hitObject = new()
         {
@@ -458,17 +467,21 @@ internal static class EditorReaderSnapshotConverter
                 source.SoundTypeList?.ToList() ?? [];
             hitObject.EdgeSampleSets = source.SampleSetList is null
                 ? []
-                : Array.ConvertAll(
+                :
+                [
+                    .. Array.ConvertAll(
                         source.SampleSetList,
-                        value => (SampleSet)value)
-                    .ToList();
+                        value => (SampleSet)value),
+                ];
             hitObject.EdgeAdditionSets =
                 source.SampleSetAdditionsList is null
                     ? []
-                    : Array.ConvertAll(
+                    :
+                    [
+                        .. Array.ConvertAll(
                             source.SampleSetAdditionsList,
-                            value => (SampleSet)value)
-                        .ToList();
+                            value => (SampleSet)value),
+                    ];
 
             Pad(hitObject.EdgeHitsounds, hitObject.Repeat + 1, 0);
             Pad(hitObject.EdgeSampleSets, hitObject.Repeat + 1, SampleSet.None);

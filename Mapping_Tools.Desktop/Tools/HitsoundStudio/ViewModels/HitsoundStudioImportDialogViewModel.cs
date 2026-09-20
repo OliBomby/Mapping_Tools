@@ -1,9 +1,8 @@
-using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Platform.FilePicker;
-using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
+using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
 
@@ -12,12 +11,9 @@ namespace Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels;
 /// <summary>Owns the typed fields of the layer import form.</summary>
 public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObject
 {
-    private readonly IFilePicker filePicker;
     private readonly ICurrentBeatmapLocator currentBeatmap;
+    private readonly IFilePicker filePicker;
     private readonly IBeatmapWorkspace workspace;
-    private IAsyncRelayCommand? pickSampleCommand;
-    private IAsyncRelayCommand? pickSourceCommand;
-    private IAsyncRelayCommand? loadSourceCommand;
 
     /// <summary>Creates an import form with WPF-compatible defaults.</summary>
     /// <param name="defaultName">The suggested layer name.</param>
@@ -70,17 +66,17 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
     [ObservableProperty]
     public partial string MidiPath { get; set; } = string.Empty;
 
-    /// <summary>Gets or sets the stack X filter text.</summary>
+    /// <summary>Gets or sets the stack X filter.</summary>
     [ObservableProperty]
-    public partial string XText { get; set; } = "-1";
+    public partial double X { get; set; } = -1;
 
-    /// <summary>Gets or sets the stack Y filter text.</summary>
+    /// <summary>Gets or sets the stack Y filter.</summary>
     [ObservableProperty]
-    public partial string YText { get; set; } = "-1";
+    public partial double Y { get; set; } = -1;
 
-    /// <summary>Gets or sets the MIDI offset text.</summary>
+    /// <summary>Gets or sets the MIDI offset.</summary>
     [ObservableProperty]
-    public partial string OffsetText { get; set; } = "0";
+    public partial double Offset { get; set; }
 
     /// <summary>Gets or sets whether source volumes create separate layers.</summary>
     [ObservableProperty]
@@ -108,19 +104,21 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
 
     /// <summary>Gets or sets whether MIDI lengths are part of layer identity.</summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsLengthSettingsVisible))]
     public partial bool DiscriminateLengths { get; set; }
 
     /// <summary>Gets or sets whether MIDI velocities are part of layer identity.</summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsVelocitySettingsVisible))]
     public partial bool DiscriminateVelocities { get; set; }
 
     /// <summary>Gets or sets the MIDI length roughness.</summary>
     [ObservableProperty]
-    public partial string LengthRoughnessText { get; set; } = "2";
+    public partial double LengthRoughness { get; set; } = 2;
 
     /// <summary>Gets or sets the MIDI velocity roughness.</summary>
     [ObservableProperty]
-    public partial string VelocityRoughnessText { get; set; } = "10";
+    public partial double VelocityRoughness { get; set; } = 10;
 
     /// <summary>Gets the validation message.</summary>
     [ObservableProperty]
@@ -170,13 +168,13 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
     public IRelayCommand CancelCommand { get; }
 
     /// <summary>Gets the source picker command.</summary>
-    public IAsyncRelayCommand PickSourceCommand => pickSourceCommand ??= new AsyncRelayCommand(PickSourceAsync);
+    public IAsyncRelayCommand PickSourceCommand => field ??= new AsyncRelayCommand(PickSourceAsync);
 
     /// <summary>Gets the command that fills source paths from the current osu! beatmap.</summary>
-    public IAsyncRelayCommand LoadSourceCommand => loadSourceCommand ??= new AsyncRelayCommand(LoadSourceAsync);
+    public IAsyncRelayCommand LoadSourceCommand => field ??= new AsyncRelayCommand(LoadSourceAsync);
 
     /// <summary>Gets the sample picker command.</summary>
-    public IAsyncRelayCommand PickSampleCommand => pickSampleCommand ??= new AsyncRelayCommand(PickSampleAsync);
+    public IAsyncRelayCommand PickSampleCommand => field ??= new AsyncRelayCommand(PickSampleAsync);
 
     /// <summary>Gets or sets the modal close callback.</summary>
     internal Action<object?> Close { get; set; } = _ => { };
@@ -184,10 +182,7 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
     partial void OnImportTypeChanged(ImportType value)
     {
         int tabIndex = GetTabIndex(value);
-        if (SelectedTabIndex != tabIndex)
-        {
-            SelectedTabIndex = tabIndex;
-        }
+        if (SelectedTabIndex != tabIndex) SelectedTabIndex = tabIndex;
 
         OnPropertyChanged(nameof(IsSimpleImport));
         OnPropertyChanged(nameof(IsSimpleOrStackImport));
@@ -210,16 +205,6 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
             4 => ImportType.Storyboard,
             _ => ImportType.None,
         };
-    }
-
-    partial void OnDiscriminateLengthsChanged(bool value)
-    {
-        OnPropertyChanged(nameof(IsLengthSettingsVisible));
-    }
-
-    partial void OnDiscriminateVelocitiesChanged(bool value)
-    {
-        OnPropertyChanged(nameof(IsVelocitySettingsVisible));
     }
 
     private async Task PickSourceAsync()
@@ -275,16 +260,6 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
     private void Accept()
     {
         Error = string.Empty;
-        if (!TryParse(XText, -1, out double x)
-            || !TryParse(YText, -1, out double y)
-            || !TryParse(OffsetText, 0, out double offset)
-            || !TryParse(LengthRoughnessText, 2, out double lengthRoughness)
-            || !TryParse(VelocityRoughnessText, 10, out double velocityRoughness))
-        {
-            Error = "Numeric import fields must contain valid invariant numbers.";
-            return;
-        }
-
         string sourceText = ImportType == ImportType.MIDI ? MidiPath : SourcePaths;
         string[] paths = sourceText.Split(
             ['\r', '\n', '|'],
@@ -303,9 +278,9 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
             Hitsound = Hitsound,
             SamplePath = SamplePath,
             Paths = paths,
-            X = x,
-            Y = y,
-            Offset = offset,
+            X = X,
+            Y = Y,
+            Offset = Offset,
             DiscriminateVolumes = DiscriminateVolumes,
             DetectDuplicateSamples = DetectDuplicateSamples,
             RemoveDuplicates = RemoveDuplicates,
@@ -314,17 +289,9 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
             DiscriminateKeys = DiscriminateKeys,
             DiscriminateLengths = DiscriminateLengths,
             DiscriminateVelocities = DiscriminateVelocities,
-            LengthRoughness = lengthRoughness,
-            VelocityRoughness = velocityRoughness,
+            LengthRoughness = LengthRoughness,
+            VelocityRoughness = VelocityRoughness,
         });
-    }
-
-    private static bool TryParse(string text, double fallback, out double value)
-    {
-        return string.IsNullOrWhiteSpace(text)
-            ? (value = fallback) == fallback
-            : double.TryParse(text, NumberStyles.Float,
-                CultureInfo.InvariantCulture, out value);
     }
 
     private static int GetTabIndex(ImportType importType)

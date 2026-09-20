@@ -262,7 +262,7 @@ public sealed class DialogAndValidationTests
 
         // Assert
         result.Should().BeOfType<BindingNotification>();
-        ((BindingNotification)result!).ErrorType
+        ((BindingNotification)result).ErrorType
             .Should()
             .Be(BindingErrorType.DataValidationError);
     }

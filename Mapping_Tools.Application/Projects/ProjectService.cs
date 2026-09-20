@@ -12,8 +12,8 @@ namespace Mapping_Tools.Application.Projects;
 /// </summary>
 public sealed class ProjectService : IProjectService
 {
-    private const string autoSaveDirectoryName = "Autosaves";
-    private const string projectsDirectoryName = "Projects";
+    private const string auto_save_directory_name = "Autosaves";
+    private const string projects_directory_name = "Projects";
     private readonly IApplicationDirectories directories;
     private readonly IFilePicker filePicker;
     private readonly IProjectStore store;
@@ -40,7 +40,7 @@ public sealed class ProjectService : IProjectService
         ArgumentNullException.ThrowIfNull(definition);
         return Path.Combine(
             directories.ApplicationData,
-            autoSaveDirectoryName,
+            auto_save_directory_name,
             definition.AutoSaveFileName);
     }
 
@@ -73,7 +73,7 @@ public sealed class ProjectService : IProjectService
         ArgumentNullException.ThrowIfNull(definition);
         return Path.Combine(
             directories.ApplicationData,
-            projectsDirectoryName,
+            projects_directory_name,
             definition.ProjectFolderName);
     }
 
@@ -204,7 +204,7 @@ public sealed class ProjectService : IProjectService
         if (paths.Count == 0) return null;
 
         string path = paths[0];
-        TProject project = await store.LoadAsync<TProject>(
+        var project = await store.LoadAsync<TProject>(
             definition.ConfigSchema,
             path,
             cancellationToken);

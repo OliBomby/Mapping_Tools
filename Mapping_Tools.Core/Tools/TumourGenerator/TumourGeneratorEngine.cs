@@ -35,6 +35,15 @@ public sealed class TumourGeneratorEngine
     /// <summary>Gets or sets the ordered layers applied to each slider.</summary>
     public IReadOnlyList<TumourLayer> TumourLayers { get; set; } = [];
 
+    /// <summary>Gets the reconstruction strategy used after path edits.</summary>
+    public Reconstructor Reconstructor { get; init; } = new();
+
+    /// <summary>Gets or sets the random source used by unseeded random layers.</summary>
+    public Random Random { get; set; } = new();
+
+    /// <summary>Gets the slider lengths observed at active layer boundaries.</summary>
+    public IReadOnlyList<double> LayerLengths => layerLengths;
+
     /// <summary>
     ///     Validates the framework-independent Tumour Generator settings,
     ///     including every layer graph and its ordered anchors.
@@ -79,8 +88,7 @@ public sealed class TumourGeneratorEngine
             || !double.IsFinite(graph.MaxX)
             || !double.IsFinite(graph.MaxY)
             || graph.MinX > graph.MaxX
-            || graph.MinY > graph.MaxY
-            || graph.Anchors is null)
+            || graph.MinY > graph.MaxY)
             throw new ArgumentException("Tumour Generator contains an invalid graph.", parameterName);
 
         double previousX = double.NegativeInfinity;
@@ -90,7 +98,6 @@ public sealed class TumourGeneratorEngine
             if (!double.IsFinite(anchor.Pos.X)
                 || !double.IsFinite(anchor.Pos.Y)
                 || !double.IsFinite(anchor.Tension)
-                || anchor.Interpolator is null
                 || !double.IsFinite(anchor.Interpolator.P)
                 || anchor.Pos.X < previousX)
                 throw new ArgumentException("Tumour Generator contains an invalid graph anchor.", parameterName);
@@ -98,15 +105,6 @@ public sealed class TumourGeneratorEngine
             previousX = anchor.Pos.X;
         }
     }
-
-    /// <summary>Gets the reconstruction strategy used after path edits.</summary>
-    public Reconstructor Reconstructor { get; init; } = new();
-
-    /// <summary>Gets or sets the random source used by unseeded random layers.</summary>
-    public Random Random { get; set; } = new();
-
-    /// <summary>Gets the slider lengths observed at active layer boundaries.</summary>
-    public IReadOnlyList<double> LayerLengths => layerLengths;
 
     /// <summary>
     ///     Applies all active layers to one slider and updates its path and velocity.
@@ -232,7 +230,7 @@ public sealed class TumourGeneratorEngine
         var (anchors, pathType) = JustMiddleAnchors
             ? ReconstructOnlyMiddle(pathWithHints)
             : Reconstructor.Reconstruct(pathWithHints);
-        if (anchors is null || anchors.Count < 2) return false;
+        if (anchors.Count < 2) return false;
 
         // Set the new slider path
         hitObject.SetSliderPath(new SliderPath(pathType, anchors.ToArray()));
@@ -318,7 +316,6 @@ public sealed class TumourGeneratorEngine
         startPoint = start.Value;
         endPoint = end.Value;
         double startProgress = ToProgress(startPoint.CumulativeLength, tumourStart, tumourEnd, totalLength);
-        double endProgress = endPoint.CumulativeLength / totalLength;
         double startT = startPoint.T;
         double endT = endPoint.T;
         double distance = endPoint.CumulativeLength - startPoint.CumulativeLength;
@@ -354,10 +351,10 @@ public sealed class TumourGeneratorEngine
             tumourTemplate.GetCriticalPoints(),
             out var ensuredPoints);
         if (pointsBetweenStartEnd < wantedPointsBetween)
-            pointsBetweenStartEnd += path.Subdivide(start, end, wantedPointsBetween);
+            path.Subdivide(start, end, wantedPointsBetween);
         // Make sure the curvature is maintained by making sure there is at least one point between each critical point
         // And a point between start and the red point before it and a point between end and the red point after it
-        pointsBetweenStartEnd += path.EnsureLocalCurvature(start, end, ensuredPoints);
+        path.EnsureLocalCurvature(start, end, ensuredPoints);
 
         double startDistance = startPoint.CumulativeLength;
         var current = start;

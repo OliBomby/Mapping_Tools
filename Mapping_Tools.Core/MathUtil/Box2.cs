@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'License.txt', which is part of this source code package.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.InteropServices;
 
@@ -155,6 +156,7 @@ public struct Box2 : IEquatable<Box2>
     /// <summary>
     ///     Equality comparator.
     /// </summary>
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     public static bool operator ==(Box2 left, Box2 right) =>
         left.Bottom == right.Bottom && left.Top == right.Top && left.Left == right.Left && left.Right == right.Right;
 

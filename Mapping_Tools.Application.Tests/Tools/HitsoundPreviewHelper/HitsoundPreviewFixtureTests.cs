@@ -13,8 +13,8 @@ public sealed class HitsoundPreviewFixtureTests : TransformationFixtureTestBase
     public async Task ApplyAsync_AcceptedFixture_ProducesEquivalentOutput(string fixtureName)
     {
         // Arrange
-        using FixtureContext fixture = CreateFixture("hitsound-preview", fixtureName);
-        HitsoundPreviewHelperServiceOptions project = fixture.ReadProject<HitsoundPreviewHelperServiceOptions>();
+        using var fixture = CreateFixture("hitsound-preview", fixtureName);
+        var project = fixture.ReadProject<HitsoundPreviewHelperServiceOptions>();
         HitsoundPreviewHelperService service = new(fixture.Gateway, new ApplicationSettings());
 
         // Act

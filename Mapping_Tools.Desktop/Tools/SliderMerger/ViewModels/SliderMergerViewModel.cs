@@ -2,10 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
-using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
-using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.SliderMerger;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
@@ -25,13 +22,6 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
     IQuickRun,
     IShellProjectFeature<SliderMergerProject>
 {
-    private readonly ProjectDefinition<SliderMergerProject> definition = new(
-        "slidermergerproject.json",
-        "Slider Merger Projects",
-        static () => new SliderMergerProject(),
-        "slider-merger-project.json",
-        ToolConfigSchema.ForTool(SliderMergerToolDefinition.Definition.Id));
-
     private readonly ISliderMergerService merger;
     private readonly DesktopApplicationSettings settings;
     private readonly IBeatmapWorkspace workspace;
@@ -105,7 +95,12 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
             cancellationToken));
     }
 
-    ProjectDefinition<SliderMergerProject> IShellProjectFeature<SliderMergerProject>.ProjectDefinition => definition;
+    ProjectDefinition<SliderMergerProject> IShellProjectFeature<SliderMergerProject>.ProjectDefinition { get; } = new(
+        "slidermergerproject.json",
+        "Slider Merger Projects",
+        static () => new SliderMergerProject(),
+        "slider-merger-project.json",
+        ToolConfigSchema.ForTool(SliderMergerToolDefinition.Definition.Id));
 
     SliderMergerProject IShellProjectFeature<SliderMergerProject>.Snapshot()
     {
@@ -178,7 +173,7 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
     {
         ArgumentNullException.ThrowIfNull(project);
         ImportModeSetting = project.ImportModeSetting;
-        TimeCode = project.TimeCode ?? string.Empty;
+        TimeCode = project.TimeCode;
         ConnectionModeSetting = project.ConnectionModeSetting;
         Leniency = project.Leniency;
         LinearOnLinear = project.LinearOnLinear;

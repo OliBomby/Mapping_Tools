@@ -87,7 +87,7 @@ public sealed class AutoFailService : IAutoFailService
         await editingGateway.SaveAsync(
             session,
             reloadEditor,
-            cancellationToken: cancellationToken).ConfigureAwait(false);
+            cancellationToken).ConfigureAwait(false);
     }
 
     private static void Validate(AutoFailServiceOptions options)

@@ -17,4 +17,3 @@ public interface IMidiService
     /// <param name="cancellationToken">Token checked while building tracks.</param>
     Task ExportAsync(MidiExportRequest request, CancellationToken cancellationToken = default);
 }
-

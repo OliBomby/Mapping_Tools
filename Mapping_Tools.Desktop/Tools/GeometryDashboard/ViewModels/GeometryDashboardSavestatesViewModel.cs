@@ -79,9 +79,8 @@ public sealed partial class GeometryDashboardSavestatesViewModel : ObservableObj
         lock (Project)
         {
             foreach (var slot in slots)
-            {
-                if (Project.SaveSlots.Remove(slot)) SaveSlots.Remove(slot);
-            }
+                if (Project.SaveSlots.Remove(slot))
+                    SaveSlots.Remove(slot);
         }
 
         refreshHotkeys();

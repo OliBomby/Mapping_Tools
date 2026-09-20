@@ -15,4 +15,3 @@ public enum HitsoundStudioExportMode
     /// <summary>Writes the generated SoundFont notes as a MIDI file.</summary>
     Midi,
 }
-

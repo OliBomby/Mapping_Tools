@@ -12,9 +12,9 @@ public sealed class AudioFormat : IEquatable<AudioFormat>
     /// <param name="channels">The number of interleaved channels.</param>
     public AudioFormat(int sampleRate, int channels)
     {
-        if (sampleRate <= 0) throw new ArgumentOutOfRangeException(nameof(sampleRate));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(sampleRate);
 
-        if (channels <= 0) throw new ArgumentOutOfRangeException(nameof(channels));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channels);
 
         SampleRate = sampleRate;
         Channels = channels;

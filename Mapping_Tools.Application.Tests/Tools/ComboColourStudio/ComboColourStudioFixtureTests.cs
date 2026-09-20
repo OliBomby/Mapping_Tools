@@ -13,8 +13,8 @@ public sealed class ComboColourStudioFixtureTests : TransformationFixtureTestBas
     public async Task ApplyAsync_AcceptedFixture_ProducesEquivalentOutput(string fixtureName)
     {
         // Arrange
-        using FixtureContext fixture = CreateFixture("combo-colour-studio", fixtureName);
-        ComboColourServiceOptions project = fixture.ReadProject<ComboColourServiceOptions>();
+        using var fixture = CreateFixture("combo-colour-studio", fixtureName);
+        var project = fixture.ReadProject<ComboColourServiceOptions>();
         ComboColourStudioService service = new(fixture.Gateway, new ApplicationSettings());
 
         // Act

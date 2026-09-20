@@ -1,6 +1,5 @@
 using Avalonia;
 using Avalonia.Headless;
-using Mapping_Tools.Desktop;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests;

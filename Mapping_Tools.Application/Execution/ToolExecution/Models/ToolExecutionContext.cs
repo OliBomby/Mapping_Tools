@@ -6,14 +6,14 @@ namespace Mapping_Tools.Application.Execution.ToolExecution.Models;
 /// </summary>
 public sealed class ToolExecutionContext
 {
-    private readonly IProgress<ToolExecutionProgress>? progress;
+    private readonly IProgress<ToolExecutionProgress>? progressReporter;
 
     internal ToolExecutionContext(
         CancellationToken cancellationToken,
-        IProgress<ToolExecutionProgress>? progress)
+        IProgress<ToolExecutionProgress>? progressReporter)
     {
         CancellationToken = cancellationToken;
-        this.progress = progress;
+        this.progressReporter = progressReporter;
     }
 
     /// <summary>
@@ -29,6 +29,6 @@ public sealed class ToolExecutionContext
     public void ReportProgress(double progress, string? stage = null)
     {
         CancellationToken.ThrowIfCancellationRequested();
-        this.progress?.Report(new ToolExecutionProgress(progress, stage));
+        progressReporter?.Report(new ToolExecutionProgress(progress, stage));
     }
 }

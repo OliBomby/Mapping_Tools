@@ -34,7 +34,6 @@ public sealed class RhythmGuideToolRegistration : IMappingToolDefinition
         ArgumentNullException.ThrowIfNull(services);
         services.AddSingleton<IRhythmGuideService, RhythmGuideService>();
         services.AddSingleton<IRhythmGuideWindowService>(provider =>
-            new AvaloniaRhythmGuideWindowService(
-                () => provider.GetRequiredService<MainWindow>()));
+            new AvaloniaRhythmGuideWindowService(() => provider.GetRequiredService<MainWindow>()));
     }
 }

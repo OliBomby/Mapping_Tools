@@ -1,10 +1,9 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Models;
-using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.ComboColourStudio;
 using Mapping_Tools.Core.BeatmapHelper;
-using Mapping_Tools.Core.Tools.ComboColourStudio.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Application.Tests.Tools.ComboColourStudio;
@@ -17,7 +16,7 @@ public sealed class ComboColourStudioServiceTests
     {
         // Arrange
         BeatmapEditingSession editor = new(
-            File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "Fixtures", "Beatmaps", "standard-feature-rich.osu")).ToList(),
+            (await File.ReadAllLinesAsync(Path.Combine(AppContext.BaseDirectory, "Fixtures", "Beatmaps", "standard-feature-rich.osu"))).ToList(),
             new NoOpTextFileStore
             {
                 ParentFolderResolver = _ => @"C:\set",
@@ -52,11 +51,11 @@ public sealed class ComboColourStudioServiceTests
     {
         // Arrange
         BeatmapEditingSession editor = new(
-            File.ReadAllLines(Path.Combine(
+            (await File.ReadAllLinesAsync(Path.Combine(
                 AppContext.BaseDirectory,
                 "Fixtures",
                 "Beatmaps",
-                "standard-feature-rich.osu")).ToList(),
+                "standard-feature-rich.osu"))).ToList(),
             new NoOpTextFileStore
             {
                 ParentFolderResolver = _ => @"C:\set",
@@ -78,12 +77,12 @@ public sealed class ComboColourStudioServiceTests
     public async Task ImportComboColoursAsync_WithLiveMap_ReturnsPaletteAndUsesPreferLive()
     {
         // Arrange
-        BeatmapEditingSession editor = CreateSession();
+        var editor = CreateSession();
         RecordingBeatmapEditingGateway gateway = new(editor);
         ComboColourStudioService service = new(gateway, new ApplicationSettings());
 
         // Act
-        ComboColourEngineOptions result = await service.ImportComboColoursAsync(editor.Path);
+        var result = await service.ImportComboColoursAsync(editor.Path);
 
         // Assert
         gateway.OpenRequests.Single().Preference.Should().Be(LiveBeatmapPreference.PreferLive);
@@ -95,12 +94,12 @@ public sealed class ComboColourStudioServiceTests
     public async Task ImportColourHaxAsync_WithLiveMap_ReturnsInferredProjectAndUsesPreferLive()
     {
         // Arrange
-        BeatmapEditingSession editor = CreateSession();
+        var editor = CreateSession();
         RecordingBeatmapEditingGateway gateway = new(editor);
         ComboColourStudioService service = new(gateway, new ApplicationSettings());
 
         // Act
-        ComboColourEngineOptions result = await service.ImportColourHaxAsync(editor.Path, 2);
+        var result = await service.ImportColourHaxAsync(editor.Path, 2);
 
         // Assert
         gateway.OpenRequests.Single().Preference.Should().Be(LiveBeatmapPreference.PreferLive);
@@ -122,5 +121,4 @@ public sealed class ComboColourStudioServiceTests
                 CombinePathResolver = Path.Combine,
             }) { Path = @"C:\set\map.osu" };
     }
-
 }

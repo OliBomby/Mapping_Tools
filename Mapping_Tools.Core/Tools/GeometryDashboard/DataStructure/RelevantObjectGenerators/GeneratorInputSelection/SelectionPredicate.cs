@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject;
 
 namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
@@ -65,6 +66,7 @@ public sealed class SelectionPredicate : IEquatable<SelectionPredicate>, IClonea
     }
 
     /// <inheritdoc />
+    [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
     public override int GetHashCode()
     {
         unchecked

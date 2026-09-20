@@ -19,8 +19,8 @@ public static class SliderPathUtil
     /// <returns>Adjusted anchors and, through <paramref name="newPathType" />, any required type conversion.</returns>
     public static List<Vector2> MoveAnchorsToLength(List<Vector2> anchors, PathType pathType, double newLength, out PathType newPathType)
     {
-        var sliderPath = new SliderPath(pathType, anchors.ToArray(), newLength);
-        double fullLength = new SliderPath(pathType, anchors.ToArray()).Distance;
+        var sliderPath = new SliderPath(pathType, [.. anchors], newLength);
+        double fullLength = new SliderPath(pathType, [.. anchors]).Distance;
 
         return MoveAnchorsToLength(sliderPath, fullLength, newLength, out newPathType);
     }
@@ -36,7 +36,7 @@ public static class SliderPathUtil
     /// <returns>Adjusted anchors preserving the original path as far as possible.</returns>
     public static List<Vector2> MoveAnchorsToLength(List<Vector2> anchors, PathType pathType, double fullLength, double newLength, out PathType newPathType)
     {
-        var sliderPath = new SliderPath(pathType, anchors.ToArray(), newLength);
+        var sliderPath = new SliderPath(pathType, [.. anchors], newLength);
 
         return MoveAnchorsToLength(sliderPath, fullLength, newLength, out newPathType);
     }
@@ -51,8 +51,8 @@ public static class SliderPathUtil
     /// <returns>Anchors ending at the requested completion.</returns>
     public static List<Vector2> MoveAnchorsToCompletion(List<Vector2> anchors, PathType pathType, double completion, out PathType newPathType)
     {
-        double fullLength = new SliderPath(pathType, anchors.ToArray()).Distance;
-        var sliderPath = new SliderPath(pathType, anchors.ToArray(), completion * fullLength);
+        double fullLength = new SliderPath(pathType, [.. anchors]).Distance;
+        var sliderPath = new SliderPath(pathType, [.. anchors], completion * fullLength);
 
         return MoveAnchorsToLength(sliderPath, fullLength, sliderPath.Distance, out newPathType);
     }
@@ -256,7 +256,7 @@ public static class SliderPathUtil
     {
         for (int i = 1; i < anchors.Count; i++)
         {
-            var subdivision = new BezierSubdivision(new List<Vector2> { anchors[i - 1], anchors[i] });
+            var subdivision = new BezierSubdivision([anchors[i - 1], anchors[i]]);
             yield return subdivision;
         }
     }

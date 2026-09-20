@@ -1,6 +1,5 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:converters="using:Avalonia.Data.Converters"
         xmlns:controls="using:Mapping_Tools.Desktop.Controls"
         xmlns:vm="using:Mapping_Tools.Desktop.ViewModels.Dialogs"
         x:Class="Mapping_Tools.Desktop.Views.Dialogs.MessageDialog"
@@ -34,14 +33,14 @@
                       VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="16" Spacing="12">
                 <SelectableTextBlock Text="{Binding Message}"
-                           FontSize="14"
-                           TextWrapping="Wrap" />
+                                     FontSize="14"
+                                     TextWrapping="Wrap" />
                 <Expander Header="Show Error Details"
                           IsVisible="{Binding HasDetails}">
                     <SelectableTextBlock Text="{Binding Details}"
                                          Padding="8"
-                               Opacity="0.75"
-                               TextWrapping="Wrap" />
+                                         Opacity="0.75"
+                                         TextWrapping="Wrap" />
                 </Expander>
             </StackPanel>
         </ScrollViewer>

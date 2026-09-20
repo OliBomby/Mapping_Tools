@@ -371,10 +371,10 @@ public class Beatmap : ITextFile
         Editor = new Dictionary<string, StringValue>();
         Metadata = new Dictionary<string, StringValue>();
         Difficulty = new Dictionary<string, StringValue>();
-        ComboColours = new List<ComboColour>();
+        ComboColours = [];
         SpecialColours = new Dictionary<string, ComboColour>();
         StoryBoard = new StoryBoard();
-        HitObjects = new List<HitObject>();
+        HitObjects = [];
         BeatmapTiming = new Timing(1.4);
 
         FillBasicMetadata();
@@ -610,7 +610,7 @@ public class Beatmap : ITextFile
         int comboIndex = 0;
 
         // If there are no combo colours use the default combo colours so the hitobjects still have something
-        var actingComboColours = ComboColours.Count == 0 ? ComboColour.GetDefaultComboColours() : ComboColours.ToArray();
+        var actingComboColours = ComboColours.Count == 0 ? ComboColour.GetDefaultComboColours() : [.. ComboColours];
 
         foreach (var hitObject in HitObjects)
         {
@@ -645,7 +645,7 @@ public class Beatmap : ITextFile
         int colourIndex = 0;
 
         // If there are no combo colours use the default combo colours so the hitobjects still have something
-        var actingComboColours = ComboColours.Count == 0 ? ComboColour.GetDefaultComboColours() : ComboColours.ToArray();
+        var actingComboColours = ComboColours.Count == 0 ? ComboColour.GetDefaultComboColours() : [.. ComboColours];
 
         foreach (var hitObject in HitObjects)
         {
@@ -769,7 +769,7 @@ public class Beatmap : ITextFile
         }
         catch (KeyNotFoundException)
         {
-            return new List<double>();
+            return [];
         }
     }
 
@@ -904,7 +904,7 @@ public class Beatmap : ITextFile
         {
             // If there is not start bracket, then we assume that there is no list of combo numbers in the code
             // -1 means just get any combo number
-            comboNumbers = new[] { -1 };
+            comboNumbers = [-1];
         }
         else
         {
@@ -970,7 +970,7 @@ public class Beatmap : ITextFile
     {
         var newBeatmap = (Beatmap)MemberwiseClone();
         newBeatmap.HitObjects = HitObjects?.Select(h => h.DeepCopy()).ToList();
-        newBeatmap.BeatmapTiming = new Timing(BeatmapTiming.TimingPoints.Select(t => t.Copy()).ToList(), BeatmapTiming.SliderMultiplier);
+        newBeatmap.BeatmapTiming = new Timing([.. BeatmapTiming.TimingPoints.Select(t => t.Copy())], BeatmapTiming.SliderMultiplier);
         newBeatmap.GiveObjectsGreenlines();
         return newBeatmap;
     }

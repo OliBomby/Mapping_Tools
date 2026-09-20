@@ -47,4 +47,3 @@ public sealed class SingleCurveInterpolator2 : CustomInterpolator, IDerivableInt
         return (Math.Pow(2, p * t) / (p * Math.Log(2)) - t) / (Math.Pow(2, p) - 1);
     }
 }
-

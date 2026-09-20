@@ -1,3 +1,4 @@
+using System.Globalization;
 using Mapping_Tools.Core.MathUtil;
 
 namespace Mapping_Tools.Core.Tools.Sliderator;
@@ -31,6 +32,7 @@ public static class SliderInvisiblator
         // Before rounding sbPositions, calculate starting coordinate for each ms' final segment to make the sliderball rotate appropriately
         var finalSegmentStarts = new Vector2[duration + 1];
         double savedAngle = 0;
+
         // We don't care about msLastSegStart[0] so we'll leave it at 0. Technically we could save one Vector2's worth of space here but it would make indexing harder to read than necessary.
         // Find the first angle - we can't calculate the angle between points that are the same, but the sliderball's rotation should be the same as it was before.
         for (int index = 1; index <= duration; index++)
@@ -63,57 +65,69 @@ public static class SliderInvisiblator
 
         var controlPoints = new Vector2[8 + 4 * (duration - 1)];
         Vector2 maxXY = new(768, 412);
-        List<Vector2> currentPath = [];
+        List<Vector2> currentPath =
+        [
+            sliderballPositions[0],
+            new(67141632 + maxXY.X, sliderballPositions[0].Y),
+            new(67141632 + maxXY.X, 33587200 - Snaptol / 6f + maxXY.Y),
+            new(67141632 + maxXY.X, finalSegmentStarts[1].Y),
+            finalSegmentStarts[1],
+            sliderballPositions[1], // The precision of bpm calculation might be important when trying to be this precise with virtual sliderball position. Although the bpm is stored as a G17, it's written to the .osu as a G15 because that's the default for ToString().
+            // So we will be using G15 to not fuck people over in the editor as they use this tool and continue mapping.
+        ];
         // First ms travel adds SNAPTOL
-        currentPath.Add(sliderballPositions[0]);
-        currentPath.Add(new Vector2(67141632 + maxXY.X, sliderballPositions[0].Y));
-        currentPath.Add(new Vector2(67141632 + maxXY.X, 33587200 - Snaptol / 6f + maxXY.Y));
-        currentPath.Add(new Vector2(67141632 + maxXY.X, finalSegmentStarts[1].Y));
-        currentPath.Add(finalSegmentStarts[1]);
-        currentPath.Add(sliderballPositions[1]);
 
         // The precision of bpm calculation might be important when trying to be this precise with virtual sliderball position. Although the bpm is stored as a G17, it's written to the .osu as a G15 because that's the default for ToString().
         // So we will be using G15 to not fuck people over in the editor as they use this tool and continue mapping.
         double frameDistance = OsuStableDistance(currentPath) - 2 * Snaptol / 3d;
         double mpb = 100 * globalSv / frameDistance;
-        mpb = double.Parse(mpb.ToString());
+        mpb = double.Parse(mpb.ToString(CultureInfo.InvariantCulture));
         frameDistance = 100 * globalSv / mpb;
         currentPath.ToArray().CopyTo(controlPoints, 0);
 
         int controlPointIndex = 6;
         double correction = 0;
+
         for (int index = 2; index <= duration; index++)
         {
             currentPath.Clear();
+
             // The first point on this path is the last point of the previous path
             currentPath.Add(sliderballPositions[index - 1]);
+
             // verticalTravel tells us how far down we need to go before going over and back up
             double verticalTravel = correction
                                     + frameDistance
                                     - (Math.Abs(sliderballPositions[index - 1].X - finalSegmentStarts[index].X)
-                                        + sliderballPositions[index - 1].Y
-                                        - finalSegmentStarts[index].Y
-                                        + Snaptol);
+                                       + sliderballPositions[index - 1].Y
+                                       - finalSegmentStarts[index].Y
+                                       + Snaptol);
+
             currentPath.Add(new Vector2(
                 sliderballPositions[index - 1].X,
                 (float)(sliderballPositions[index - 1].Y + verticalTravel / 2)));
-            if (sliderballPositions[index - 1].X != finalSegmentStarts[index].X)
+
+            if (!Precision.AlmostEquals(sliderballPositions[index - 1].X, finalSegmentStarts[index].X))
                 currentPath.Add(new Vector2(
                     finalSegmentStarts[index].X,
                     (float)(sliderballPositions[index - 1].Y + verticalTravel / 2)));
 
             currentPath.Add(finalSegmentStarts[index]);
             currentPath.Add(sliderballPositions[index]);
+
             // Here we calculate what osu! finds for the distance travelled here, so that we can correct for it on the next iteration.
             correction += frameDistance - OsuStableDistance(currentPath);
+
             // Copy curMsPath into controlPoints. We use ctrlPtIdx-1 because we have the last point of the previous path in this path as well.
             currentPath.ToArray().CopyTo(controlPoints, controlPointIndex - 1);
+
             // Update ctrlPtIdx
             controlPointIndex += currentPath.Count - 1;
         }
 
         var output = new Vector2[controlPointIndex + 2];
         Array.Copy(controlPoints, output, controlPointIndex);
+
         // Add extra segment of length 0 to end for sliderend snapping abuse
         var lastPoint = sliderballPositions[duration];
         output[controlPointIndex] = lastPoint;

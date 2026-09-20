@@ -18,7 +18,7 @@ public sealed class RhythmGuideServiceTests
         // Arrange
         RecordingTextFileStore files = new();
         Dictionary<string, BeatmapEditingSession> sessions = [];
-        RecordingBeatmapEditingGateway gateway = CreateGateway(sessions);
+        var gateway = CreateGateway(sessions);
         TestBeatmapBackupService backups = new();
         sessions["source.osu"] = CreateSession("source.osu", files, true);
         sessions["target.osu"] = CreateSession("target.osu", files, false);
@@ -53,7 +53,7 @@ public sealed class RhythmGuideServiceTests
         // Arrange
         RecordingTextFileStore files = new();
         Dictionary<string, BeatmapEditingSession> sessions = [];
-        RecordingBeatmapEditingGateway gateway = CreateGateway(sessions);
+        var gateway = CreateGateway(sessions);
         sessions["source.osu"] = CreateSession("source.osu", files, true);
         RhythmGuideService service = new(
             gateway,
@@ -83,7 +83,7 @@ public sealed class RhythmGuideServiceTests
         // Arrange
         RecordingTextFileStore files = new();
         Dictionary<string, BeatmapEditingSession> sessions = [];
-        RecordingBeatmapEditingGateway gateway = CreateGateway(sessions);
+        var gateway = CreateGateway(sessions);
         sessions["source.osu"] = CreateSession("source.osu", files, true);
         RhythmGuideService service = new(
             gateway,
@@ -152,5 +152,4 @@ public sealed class RhythmGuideServiceTests
             OpenBeatmapFactory = (path, _) => sessions[path],
         };
     }
-
 }

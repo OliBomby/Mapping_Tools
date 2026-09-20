@@ -2,7 +2,6 @@ using Mapping_Tools.Application.Backups;
 using Mapping_Tools.Application.Backups.Contracts;
 using Mapping_Tools.Application.Backups.Models;
 using Mapping_Tools.Application.BeatmapEditing;
-using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Settings.Models;

@@ -20,7 +20,7 @@ public sealed class SliderCompletionatorServiceTests
             "Fixtures",
             "Beatmaps",
             "standard-feature-rich.osu");
-        RecordingBeatmapEditingGateway gateway = CreateGateway(fixture);
+        var gateway = CreateGateway(fixture);
         SliderCompletionatorService service = new(gateway, new ApplicationSettings());
         SliderCompletionatorServiceOptions options = new();
 
@@ -46,7 +46,7 @@ public sealed class SliderCompletionatorServiceTests
             "Fixtures",
             "Beatmaps",
             "standard-feature-rich.osu");
-        RecordingBeatmapEditingGateway gateway = CreateGateway(fixture);
+        var gateway = CreateGateway(fixture);
         SliderCompletionatorService service = new(gateway, new ApplicationSettings());
         SliderCompletionatorServiceOptions options = new()
         {
@@ -76,7 +76,7 @@ public sealed class SliderCompletionatorServiceTests
             "Fixtures",
             "Beatmaps",
             "standard-feature-rich.osu");
-        RecordingBeatmapEditingGateway gateway = CreateGateway(fixture, 1_000_000);
+        var gateway = CreateGateway(fixture, 1_000_000);
         SliderCompletionatorService service = new(gateway, new ApplicationSettings());
         SliderCompletionatorServiceOptions options = new()
         {
@@ -106,7 +106,7 @@ public sealed class SliderCompletionatorServiceTests
             "Fixtures",
             "Beatmaps",
             "standard-feature-rich.osu");
-        RecordingBeatmapEditingGateway gateway = CreateGateway(fixture);
+        var gateway = CreateGateway(fixture);
         SliderCompletionatorService service = new(gateway, new ApplicationSettings());
 
         // Act
@@ -135,5 +135,4 @@ public sealed class SliderCompletionatorServiceTests
             },
         };
     }
-
 }

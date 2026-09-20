@@ -124,5 +124,4 @@ public sealed class SlideratorServiceTests
             source,
             [slider]);
     }
-
 }

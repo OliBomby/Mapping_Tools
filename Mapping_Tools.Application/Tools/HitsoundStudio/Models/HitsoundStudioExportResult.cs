@@ -46,4 +46,3 @@ public sealed class HitsoundStudioExportResult
     /// <summary>Gets the legacy detailed completion text.</summary>
     public string DetailedSummary { get; }
 }
-

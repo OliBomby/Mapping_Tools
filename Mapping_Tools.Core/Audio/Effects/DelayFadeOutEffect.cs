@@ -1,5 +1,3 @@
-using Mapping_Tools.Core.Audio;
-
 namespace Mapping_Tools.Core.Audio.Effects;
 
 /// <summary>Leaves a clip unchanged for a delay and then linearly fades it to silence.</summary>

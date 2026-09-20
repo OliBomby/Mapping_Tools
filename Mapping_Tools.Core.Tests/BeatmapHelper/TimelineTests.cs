@@ -15,7 +15,7 @@ public class TimelineTests
         var circle = new HitObject("256,192,1000,1,2,0:0:0:0:");
 
         // Act
-        var timeline = new Timeline(new List<HitObject> { circle, spinner }, new Timing(1.4));
+        var timeline = new Timeline([circle, spinner], new Timing(1.4));
 
         // Assert
         timeline.TimelineObjects.Select(x => x.Time).ToArray().Should().Equal(500d, 1000d, 1500d);

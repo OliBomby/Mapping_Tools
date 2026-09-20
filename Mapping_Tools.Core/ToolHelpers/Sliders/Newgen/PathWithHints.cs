@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using Mapping_Tools.Core.MathUtil;
 
 namespace Mapping_Tools.Core.ToolHelpers.Sliders.Newgen;
@@ -11,18 +10,16 @@ public class PathWithHints
     /// <summary>
     ///     Invariant: Non-overlapping and sorted
     /// </summary>
-    [NotNull] private readonly List<ReconstructionHint> reconstructionHints = new();
+    private readonly List<ReconstructionHint> reconstructionHints = [];
 
     /// <summary>
     ///     Gets the stable linked-list path whose nodes are referenced by reconstruction hints.
     /// </summary>
-    [NotNull]
     public LinkedList<PathPoint> Path { get; } = new();
 
     /// <summary>
     ///     Gets non-overlapping hints sorted by path interval.
     /// </summary>
-    [NotNull]
     public IReadOnlyList<ReconstructionHint> ReconstructionHints => reconstructionHints;
 
     /// <summary>

@@ -77,7 +77,7 @@ public static class SliderMergerEngine
             mergedWithPrevious = true;
 
             // Preserve the legacy hidden geometry easter egg for existing projects.
-            if (options.Leniency == 727)
+            if (Precision.AlmostEquals(options.Leniency, 727))
             {
                 survivor.SetAllCurvePoints(MakePenis(survivor.GetAllCurvePoints(), survivor.PixelLength));
                 survivor.PixelLength *= 2;
@@ -239,14 +239,14 @@ public static class SliderMergerEngine
 
     private static EdgeData GetTailEdges(HitObject hitObject)
     {
-        return hitObject.IsSlider && hitObject.EdgeHitsounds is { Count: > 0 }
+        return hitObject is { IsSlider: true, EdgeHitsounds.Count: > 0 }
             ? GetEdge(hitObject, hitObject.EdgeHitsounds.Count - 1)
             : GetEdge(hitObject, 0);
     }
 
     private static EdgeData GetEdge(HitObject hitObject, int index)
     {
-        if (hitObject.IsSlider && hitObject.EdgeHitsounds is { Count: > 0 } edgeHitsounds && index < edgeHitsounds.Count)
+        if (hitObject is { IsSlider: true, EdgeHitsounds: { Count: > 0 } edgeHitsounds } && index < edgeHitsounds.Count)
         {
             var sampleSet = hitObject.EdgeSampleSets is { Count: > 0 } edgeSampleSets && index < edgeSampleSets.Count
                 ? edgeSampleSets[index]

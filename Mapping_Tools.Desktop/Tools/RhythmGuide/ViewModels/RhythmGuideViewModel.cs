@@ -4,9 +4,7 @@ using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Platform.FilePicker;
-using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
-using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.RhythmGuide;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
@@ -77,7 +75,7 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets the destination beatmap path.</summary>
     [ObservableProperty]
-    public partial string ExportPath { get; set; } = string.Empty;
+    public partial string ExportPath { get; set; }
 
     /// <summary>Gets or sets whether the guide creates or extends a beatmap.</summary>
     [ObservableProperty]
@@ -218,9 +216,9 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
         };
     }
 
-    private RhythmGuideProject.RhythmGuideRunOptions CreateOptions()
+    private RhythmGuideServiceOptions.RhythmGuideRunOptions CreateOptions()
     {
-        return new RhythmGuideProject.RhythmGuideRunOptions
+        return new RhythmGuideServiceOptions.RhythmGuideRunOptions
         {
             Paths = SourcePaths.ToArray(),
             ExportPath = ExportPath,
@@ -235,23 +233,23 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
 
     private void Install(RhythmGuideProject project)
     {
-        var options = project?.GuideGeneratorArgs
+        var options = project.GuideGeneratorArgs
             ?? throw new InvalidDataException("The Rhythm Guide project is incomplete.");
-        SourcePaths = options.Paths?.ToArray() ?? [];
-        ExportPath = options.ExportPath ?? string.Empty;
+        SourcePaths = options.Paths.ToArray();
+        ExportPath = options.ExportPath;
         ExportMode = options.ExportMode;
         OutputGameMode = options.OutputGameMode;
-        OutputName = options.OutputName ?? string.Empty;
+        OutputName = options.OutputName;
         NcEverything = options.NcEverything;
         SelectionMode = options.SelectionMode;
-        beatDivisors = options.BeatDivisors?.ToArray() ?? [];
+        beatDivisors = options.BeatDivisors.ToArray();
     }
 
     private static RhythmGuideProject CreateDefaultProject(string exportPath)
     {
         return new RhythmGuideProject
         {
-            GuideGeneratorArgs = new RhythmGuideProject.RhythmGuideRunOptions { ExportPath = exportPath },
+            GuideGeneratorArgs = new RhythmGuideServiceOptions.RhythmGuideRunOptions { ExportPath = exportPath },
         };
     }
 

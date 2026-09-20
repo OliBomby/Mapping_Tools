@@ -6,7 +6,6 @@ using Mapping_Tools.Desktop.Tools.Sliderator.ViewModels;
 using Mapping_Tools.Desktop.Tools.Sliderator.Views;
 using Microsoft.Extensions.DependencyInjection;
 
-
 namespace Mapping_Tools.Desktop.Tools.Sliderator;
 
 /// <summary>Describes and composes the Sliderator plugin feature.</summary>

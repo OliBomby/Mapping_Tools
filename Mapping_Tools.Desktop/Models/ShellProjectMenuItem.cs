@@ -31,4 +31,3 @@ public sealed class ShellProjectMenuItem
     /// <summary>Gets the icon rendered beside the item.</summary>
     public MaterialIconKind Icon { get; }
 }
-

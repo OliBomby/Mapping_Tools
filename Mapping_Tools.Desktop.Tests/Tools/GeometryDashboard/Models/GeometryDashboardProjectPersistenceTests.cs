@@ -17,7 +17,7 @@ public sealed class GeometryDashboardProjectPersistenceTests
 
         // Act
         string json = serializer.Serialize(project);
-        using JsonDocument document = JsonDocument.Parse(json);
+        using var document = JsonDocument.Parse(json);
 
         // Assert
         document.RootElement.GetProperty("KeepRunning").GetBoolean().Should().BeTrue();
@@ -42,7 +42,7 @@ public sealed class GeometryDashboardProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        GeometryDashboardProject project = serializer.Deserialize<GeometryDashboardProject>(json);
+        var project = serializer.Deserialize<GeometryDashboardProject>(json);
 
         // Assert
         project.KeepRunning.Should().BeTrue();

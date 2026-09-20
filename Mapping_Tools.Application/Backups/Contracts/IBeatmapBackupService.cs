@@ -1,6 +1,5 @@
 using Mapping_Tools.Application.Backups.Models;
 using Mapping_Tools.Application.BeatmapEditing;
-using Mapping_Tools.Application.BeatmapEditing.Models;
 
 namespace Mapping_Tools.Application.Backups.Contracts;
 
@@ -97,7 +96,8 @@ public interface IBeatmapBackupService
     /// <returns>The restore result, or <see langword="null" /> when no backup exists.</returns>
     /// <exception cref="DirectoryNotFoundException">The configured backup directory is unavailable.</exception>
     /// <exception cref="BeatmapBackupIncompatibleException">
-    ///     The newest eligible backup has different metadata and <paramref name="allowDifferentFilename" /> is <see langword="false" />
+    ///     The newest eligible backup has different metadata and <paramref name="allowDifferentFilename" /> is
+    ///     <see langword="false" />
     ///     .
     /// </exception>
     /// <exception cref="OperationCanceledException">Cancellation occurs before lookup or restoration finishes.</exception>

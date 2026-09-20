@@ -8,7 +8,7 @@ namespace Mapping_Tools.Application.Projects.Models;
 /// </summary>
 public sealed class ToolConfigSchema
 {
-    private const int initialVersion = 1;
+    private const int initial_version = 1;
 
     /// <summary>
     ///     Creates a schema with an optional ordered set of version migrations.
@@ -31,13 +31,11 @@ public sealed class ToolConfigSchema
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(id);
 
-        List<IConfigMigration> configuredMigrations = (migrations ?? []).ToList();
-        if (configuredMigrations.Any(migration => migration is null))
-            throw new ArgumentException("The migration collection cannot contain null values.", nameof(migrations));
+        List<IConfigMigration> configuredMigrations = [.. migrations ?? []];
 
-        if (configuredMigrations.Any(migration => migration.ToVersion <= initialVersion))
+        if (configuredMigrations.Any(migration => migration.ToVersion <= initial_version))
             throw new ArgumentException(
-                $"Configuration migrations must target a version greater than {initialVersion}.",
+                $"Configuration migrations must target a version greater than {initial_version}.",
                 nameof(migrations));
 
         if (configuredMigrations
@@ -48,9 +46,9 @@ public sealed class ToolConfigSchema
                 nameof(migrations));
 
         int currentVersion = configuredMigrations.Count == 0
-            ? initialVersion
+            ? initial_version
             : configuredMigrations.Max(migration => migration.ToVersion);
-        if (Enumerable.Range(initialVersion + 1, currentVersion - initialVersion)
+        if (Enumerable.Range(initial_version + 1, currentVersion - initial_version)
             .Except(configuredMigrations.Select(migration => migration.ToVersion))
             .Any())
             throw new ArgumentException(

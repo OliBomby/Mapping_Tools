@@ -24,7 +24,7 @@ public sealed class GraphControlTests
 
         // Assert
         dialogHost.Should().BeOfType<DialogHost>();
-        ((DialogHost)dialogHost!).CloseOnClickAway.Should().BeTrue();
+        ((DialogHost)dialogHost).CloseOnClickAway.Should().BeTrue();
     }
 
     [TestMethod]
@@ -236,11 +236,11 @@ public sealed class GraphControlTests
     public void WheelZoomFactor_UsesScrollUpToZoomInDirection()
     {
         // Arrange
-        const double scrollDelta = 1;
+        const double scroll_delta = 1;
 
         // Act
-        double zoomInFactor = GraphControl.GetWheelZoomFactor(scrollDelta);
-        double zoomOutFactor = GraphControl.GetWheelZoomFactor(-scrollDelta);
+        double zoomInFactor = GraphControl.GetWheelZoomFactor(scroll_delta);
+        double zoomOutFactor = GraphControl.GetWheelZoomFactor(-scroll_delta);
 
         // Assert
         zoomInFactor.Should().BeGreaterThan(1);

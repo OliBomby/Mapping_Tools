@@ -6,7 +6,11 @@ namespace Mapping_Tools.Core.BeatmapHelper;
 /// </summary>
 public class Timeline
 {
-    /// <inheritdoc />
+    /// <summary>
+    ///     Creates a timeline from a list of hit objects and a timing object.
+    /// </summary>
+    /// <param name="hitObjects">The hit objects to expand into timeline events.</param>
+    /// <param name="timing">The timing object used to calculate temporal lengths and timing points.</param>
     public Timeline(List<HitObject> hitObjects, Timing timing)
     {
         // Convert all the HitObjects to TimeLineObjects
@@ -52,7 +56,10 @@ public class Timeline
         TimelineObjects = TimelineObjects.OrderBy(o => o.Time).ToList();
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Creates a timeline from a list of timeline objects.
+    /// </summary>
+    /// <param name="timeLineObjects">The timeline objects to include in the timeline.</param>
     public Timeline(List<TimelineObject> timeLineObjects)
     {
         TimelineObjects = timeLineObjects;
@@ -66,9 +73,9 @@ public class Timeline
     /// <summary>
     ///     Finds expanded events inside an inclusive millisecond range.
     /// </summary>
-    /// <param name="start"></param>
-    /// <param name="end"></param>
-    /// <returns></returns>
+    /// <param name="start">The start time of the range.</param>
+    /// <param name="end">The end time of the range.</param>
+    /// <returns>A list of timeline objects within the specified range.</returns>
     public List<TimelineObject> GetTimeLineObjectsInRange(double start, double end)
     {
         return TimelineObjects.FindAll(o => o.Time >= start && o.Time <= end);
@@ -77,7 +84,7 @@ public class Timeline
     /// <summary>
     ///     Resolves active timing and inherited sample settings for every expanded event.
     /// </summary>
-    /// <param name="timing"></param>
+    /// <param name="timing">The timing object used to resolve timing points.</param>
     public void GiveTimingPoints(Timing timing)
     {
         foreach (var tlo in TimelineObjects)
@@ -87,16 +94,16 @@ public class Timeline
             var tp = timing.GetTimingPointAtTime(tlo.Time);
             tlo.TimingPoint = tp;
             var red = timing.GetRedlineAtTime(tlo.Time);
-            tlo.UninheritedTimingPoint = tp;
+            tlo.UninheritedTimingPoint = red;
         }
     }
 
     /// <summary>
     ///     Finds the chronologically nearest expanded event, optionally requiring a copyable edge.
     /// </summary>
-    /// <param name="time"></param>
-    /// <param name="needCopyable"></param>
-    /// <returns></returns>
+    /// <param name="time">The time to find the nearest timeline object to.</param>
+    /// <param name="needCopyable">Whether the nearest timeline object must be copyable.</param>
+    /// <returns>The nearest timeline object, or null if none are found.</returns>
     public TimelineObject GetNearestTlo(double time, bool needCopyable = false)
     {
         if (TimelineObjects.Count == 0) return null;

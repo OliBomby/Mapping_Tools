@@ -1,6 +1,5 @@
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
-using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.Sliderator.Contracts;
 using Mapping_Tools.Application.Tools.Sliderator.Models;
 using Mapping_Tools.Core.BeatmapHelper;
@@ -14,7 +13,6 @@ using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.Sliderator.Models;
 using Mapping_Tools.Desktop.Tools.Sliderator.ViewModels;
-using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Tools.Sliderator.ViewModels;
@@ -269,7 +267,7 @@ public sealed class SlideratorViewModelTests
         await viewModel.ClearGraphCommand.ExecuteAsync(null);
 
         // Assert
-        var request = ((MessageDialogRequest<bool>)dialogs.LastMessageRequest!);
+        var request = (MessageDialogRequest<bool>)dialogs.LastMessageRequest!;
         request.Choices.Select(choice => choice.Label).Should().Equal("YES", "NO");
         viewModel.GraphState.Anchors.Should().HaveCount(2);
         viewModel.GraphState.Anchors[0].Pos.Should().Be(new Vector2(0, 0));
@@ -411,7 +409,7 @@ public sealed class SlideratorViewModelTests
         TestDialogService dialogs = new();
         var viewModel = Create(
             service,
-            new RecordingCurrentBeatmapLocator(null),
+            new RecordingCurrentBeatmapLocator(),
             dialogs);
 
         // Act
@@ -500,7 +498,7 @@ public sealed class SlideratorViewModelTests
         TestBeatmapWorkspace? workspace = null)
     {
         RecordingCurrentBeatmapLocator effectiveCurrentBeatmap =
-            currentBeatmap ?? new RecordingCurrentBeatmapLocator(null);
+            currentBeatmap ?? new RecordingCurrentBeatmapLocator();
         TestBeatmapWorkspace effectiveWorkspace = workspace ?? new TestBeatmapWorkspace();
         effectiveWorkspace.QuickRunPath = effectiveCurrentBeatmap.Path;
         return new SlideratorViewModel(

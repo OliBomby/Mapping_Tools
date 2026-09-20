@@ -48,5 +48,4 @@ public sealed class NaudioAudioClipMixer : IAudioClipMixer
 
         return new AudioClip(new AudioFormat(sampleRate, channels), samples);
     }
-
 }

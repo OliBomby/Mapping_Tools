@@ -32,9 +32,9 @@ internal sealed class MappingToolQuickRunHostedService : IHostedService
             if (registry.Commands.All(command => command.Id != tool.Definition.Id))
                 registry.Register(new QuickRunCommand(
                     tool.Definition,
-                    cancellationToken => ExecuteOnUiThreadAsync(
+                    cancellationToken2 => ExecuteOnUiThreadAsync(
                         tool.Execute,
-                        cancellationToken)));
+                        cancellationToken2)));
 
         return Task.CompletedTask;
     }

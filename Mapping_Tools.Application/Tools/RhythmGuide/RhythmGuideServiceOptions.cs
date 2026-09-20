@@ -22,6 +22,5 @@ public class RhythmGuideServiceOptions
 
         /// <summary>Gets or sets the destination beatmap path.</summary>
         public string ExportPath { get; set; } = string.Empty;
-
     }
 }

@@ -76,7 +76,7 @@ public sealed class ProjectAutosaveCoordinatorTests
         var coordinator = CreateCoordinator(projects);
 
         // Act
-        Task saveTask = coordinator.SaveOnShutdown(feature);
+        var saveTask = coordinator.SaveOnShutdown(feature);
         await projects.AutoSaveStarted.Task;
 
         // Assert

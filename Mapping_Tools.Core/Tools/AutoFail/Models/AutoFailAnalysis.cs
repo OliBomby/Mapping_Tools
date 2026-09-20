@@ -10,4 +10,3 @@ public sealed record AutoFailAnalysis(
     IReadOnlyList<double> UnloadingObjects,
     IReadOnlyList<double> PotentialUnloadingObjects,
     IReadOnlyList<double> Disruptors);
-

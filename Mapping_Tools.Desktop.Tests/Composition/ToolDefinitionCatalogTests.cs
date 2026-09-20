@@ -19,7 +19,7 @@ public sealed class ToolDefinitionCatalogTests
         ServiceCollection services = new();
 
         // Act
-        ToolDefinitionCatalog catalog = ToolDefinitionCatalog.Discover(
+        var catalog = ToolDefinitionCatalog.Discover(
             [typeof(ToolDefinitionCatalogTests).Assembly]);
         catalog.RegisterServices(services);
 
@@ -37,7 +37,7 @@ public sealed class ToolDefinitionCatalogTests
         List<(Assembly Assembly, Exception Exception)> failures = [];
 
         // Act
-        ToolDefinitionCatalog catalog = ToolDefinitionCatalog.Discover(
+        var catalog = ToolDefinitionCatalog.Discover(
             [unloadableAssembly, typeof(ToolDefinitionCatalogTests).Assembly],
             (assembly, exception) => failures.Add((assembly, exception)));
 

@@ -1,6 +1,4 @@
 using Avalonia.Controls;
-using Avalonia.Input;
-using Avalonia.Interactivity;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 
@@ -24,5 +22,4 @@ public sealed partial class GeometryDashboardGeneratorSettingsWindow : Window
 
         collectionViewModel.SetSelectedPredicates(listBox.SelectedItems?.OfType<SelectionPredicate>() ?? []);
     }
-
 }

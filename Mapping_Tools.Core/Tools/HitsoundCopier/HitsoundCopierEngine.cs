@@ -46,7 +46,7 @@ public static class HitsoundCopierEngine
         ArgumentException.ThrowIfNullOrWhiteSpace(mapDirectory);
         Validate(options);
 
-        Dictionary<string, string> samples = firstSamples is null
+        var samples = firstSamples is null
             ? new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             : new Dictionary<string, string>(firstSamples, StringComparer.OrdinalIgnoreCase);
         string sourceDirectory = string.IsNullOrWhiteSpace(sourceMapDirectory)
@@ -67,10 +67,7 @@ public static class HitsoundCopierEngine
         if (options.CopyBodyHitsounds || options.CopyStoryboardedSamples || options.MuteSliderends)
         {
             target.GiveObjectsGreenlines();
-            if (source.HitObjects.Count > 0 && source.BeatmapTiming.TimingPoints.Count > 0)
-            {
-                source.GiveObjectsGreenlines();
-            }
+            if (source.HitObjects.Count > 0 && source.BeatmapTiming.TimingPoints.Count > 0) source.GiveObjectsGreenlines();
         }
 
         // Get the first timing point time of both beatmaps, so we can prevent hitobjects from adding greenlines before the first redline
@@ -84,7 +81,7 @@ public static class HitsoundCopierEngine
                 : double.PositiveInfinity);
 
         // Save tlo times where timingpoint volume is 5%.
-        var preservedMuteTimes = options.CopyVolumes && options.AlwaysPreserve5Volume
+        var preservedMuteTimes = options is { CopyVolumes: true, AlwaysPreserve5Volume: true }
             ? targetTimeline.TimelineObjects
                 .Where(item =>
                     Math.Abs(item.SampleVolume) < Precision.DOUBLE_EPSILON
@@ -161,15 +158,13 @@ public static class HitsoundCopierEngine
             {
                 // Remove timingpoints in beatmapTo that are in a sliderbody/spinnerbody for both beatmapTo and BeatmapFrom
                 foreach (var point in target.HitObjects
-                              .SelectMany(item => item.BodyHitsounds)
-                              .Where(point =>
-                                  !point.Uninherited
-                                  && source.HitObjects.Any(item =>
-                                      item.Time < point.Offset && item.EndTime > point.Offset))
+                             .SelectMany(item => item.BodyHitsounds)
+                             .Where(point =>
+                                 !point.Uninherited
+                                 && source.HitObjects.Any(item =>
+                                     item.Time < point.Offset && item.EndTime > point.Offset))
                              .ToList())
-                {
                     target.BeatmapTiming.Remove(point);
-                }
 
                 // Get timingpointschanges for every timingpoint from beatmapFrom that is in a sliderbody/spinnerbody for both beatmapTo and BeatmapFrom
                 changes.AddRange(
@@ -197,10 +192,7 @@ public static class HitsoundCopierEngine
         if (options.CopyStoryboardedSamples)
         {
             targetTimeline.GiveTimingPoints(target.BeatmapTiming);
-            if (options.CopyMode == HitsoundCopierCopyMode.OverwriteEverything)
-            {
-                target.StoryboardSoundSamples.Clear();
-            }
+            if (options.CopyMode == HitsoundCopierCopyMode.OverwriteEverything) target.StoryboardSoundSamples.Clear();
 
             HashSet<StoryboardSoundSample> existing = new(target.StoryboardSoundSamples);
             var mode = (GameMode)target.General["Mode"].IntValue;
@@ -311,7 +303,7 @@ public static class HitsoundCopierEngine
         IBeatDivisor[]? divisors,
         string parameterName)
     {
-        if (divisors is null || divisors.Length == 0 || divisors.Any(divisor => divisor is null))
+        if (divisors is null || divisors.Length == 0)
             throw new ArgumentException(
                 "Hitsound Copier requires beat divisors for its filter.",
                 parameterName);
@@ -387,8 +379,8 @@ public static class HitsoundCopierEngine
             else if (options.CopyToSliderTicks
                      && FindSliderTickInRange(
                          targetBeatmap,
-                          sourceItem.Time - options.TemporalLeniency,
-                          sourceItem.Time + options.TemporalLeniency,
+                         sourceItem.Time - options.TemporalLeniency,
+                         sourceItem.Time + options.TemporalLeniency,
                          out double tickTime,
                          out var tickSlider)
                      && customSampledTimes.Add((int)tickTime))
@@ -414,7 +406,7 @@ public static class HitsoundCopierEngine
                         tickTime,
                         assignment,
                         options,
-                        addRevert: true);
+                        true);
                     generatedCount += assignment.Schema.Count;
                 }
             }
@@ -453,7 +445,7 @@ public static class HitsoundCopierEngine
                 sourceItem.Time,
                 assignment,
                 options,
-                addRevert: false);
+                false);
             // Make sure the slider with the slider ticks uses auto sampleset so the customized greenlines control the hitsounds
             slider!.SampleSet = SampleSet.None;
             generatedCount += assignment.Schema.Count;
@@ -711,17 +703,13 @@ public static class HitsoundCopierEngine
                      && !double.IsNaN(item.SliderVelocity)
                      && item.Time < end
                      && item.EndTime > start))
-        {
-            foreach (double tick in item.GetSliderTickTimes(tickRate))
+        foreach (double tick in item.GetSliderTickTimes(tickRate))
+            if (tick >= start && tick <= end)
             {
-                if (tick >= start && tick <= end)
-                {
-                    time = tick;
-                    slider = item;
-                    return true;
-                }
+                time = tick;
+                slider = item;
+                return true;
             }
-        }
 
         time = -1;
         slider = null;

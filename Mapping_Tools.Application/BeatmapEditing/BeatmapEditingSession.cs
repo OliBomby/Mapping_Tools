@@ -34,6 +34,7 @@ public sealed class BeatmapEditingSession : EditingSession
     ///     <see langword="null" /> when no read failed.
     /// </param>
     /// <param name="liveEditorTime">The editor playhead captured with live state, when available.</param>
+    /// <param name="path">The path to the beatmap file.</param>
     public BeatmapEditingSession(
         List<string> lines,
         ITextFileStore fileStore,

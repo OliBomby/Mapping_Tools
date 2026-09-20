@@ -80,7 +80,7 @@ internal sealed class OggVorbisFileWriter : IDisposable
         double conversion = (double)format.SampleRate / SampleRate;
         int sampleCount = count / bytesPerSample / format.Channels;
         int outputCount = Math.Max(0, (int)(sampleCount / conversion));
-        float[][] output = Enumerable.Range(0, Channels)
+        float[][] outputSamples = Enumerable.Range(0, Channels)
             .Select(_ => new float[outputCount])
             .ToArray();
 
@@ -90,7 +90,7 @@ internal sealed class OggVorbisFileWriter : IDisposable
             int sourceIndex = (int)(sample * conversion) * format.Channels * bytesPerSample;
             if (channel < format.Channels) sourceIndex += channel * bytesPerSample;
 
-            output[channel][sample] = format.Encoding switch
+            outputSamples[channel][sample] = format.Encoding switch
             {
                 WaveFormatEncoding.Pcm when format.BitsPerSample == 8 => data[sourceIndex] / 128f,
                 WaveFormatEncoding.Pcm when format.BitsPerSample == 16 =>
@@ -100,7 +100,7 @@ internal sealed class OggVorbisFileWriter : IDisposable
             };
         }
 
-        processingState.WriteData(output, outputCount);
+        processingState.WriteData(outputSamples, outputCount);
         while (!oggStream.Finished && processingState.PacketOut(out var packet))
         {
             oggStream.PacketIn(packet);

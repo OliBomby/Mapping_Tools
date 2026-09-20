@@ -12,7 +12,7 @@ public sealed class PortableFileRevealServiceTests
     public async Task RevealAsync_OnWindowsFile_UsesExplorerSelectionArguments()
     {
         // Arrange
-        using TestPath testPath = TestPath.File();
+        using var testPath = TestPath.File();
         ProcessStartInfo? started = null;
         PortableFileRevealService service = new(
             () => PortableFileRevealPlatform.Windows,
@@ -35,7 +35,7 @@ public sealed class PortableFileRevealServiceTests
     public async Task RevealAsync_OnMacOsFile_UsesOpenRevealArguments()
     {
         // Arrange
-        using TestPath testPath = TestPath.File();
+        using var testPath = TestPath.File();
         ProcessStartInfo? started = null;
         PortableFileRevealService service = new(
             () => PortableFileRevealPlatform.MacOs,
@@ -59,7 +59,7 @@ public sealed class PortableFileRevealServiceTests
     public async Task RevealAsync_OnLinuxFile_OpensContainingDirectory()
     {
         // Arrange
-        using TestPath testPath = TestPath.File();
+        using var testPath = TestPath.File();
         ProcessStartInfo? started = null;
         PortableFileRevealService service = new(
             () => PortableFileRevealPlatform.Linux,
@@ -82,7 +82,7 @@ public sealed class PortableFileRevealServiceTests
     public async Task RevealAsync_WhenFileManagerExecutableIsMissing_ReturnsFalse()
     {
         // Arrange
-        using TestPath testPath = TestPath.Directory();
+        using var testPath = TestPath.Directory();
         PortableFileRevealService service = new(
             () => PortableFileRevealPlatform.Linux,
             _ => throw new Win32Exception("xdg-open is unavailable"));
@@ -102,6 +102,15 @@ public sealed class PortableFileRevealServiceTests
         }
 
         public string Path { get; }
+
+        public void Dispose()
+        {
+            string? directory = System.IO.Directory.Exists(Path)
+                ? Path
+                : System.IO.Path.GetDirectoryName(Path);
+            if (directory is not null && System.IO.Directory.Exists(directory))
+                System.IO.Directory.Delete(directory, true);
+        }
 
         public static TestPath File()
         {
@@ -123,15 +132,6 @@ public sealed class PortableFileRevealServiceTests
                 Guid.NewGuid().ToString("N"));
             System.IO.Directory.CreateDirectory(path);
             return new TestPath(path);
-        }
-
-        public void Dispose()
-        {
-            string? directory = System.IO.Directory.Exists(Path)
-                ? Path
-                : System.IO.Path.GetDirectoryName(Path);
-            if (directory is not null && System.IO.Directory.Exists(directory))
-                System.IO.Directory.Delete(directory, true);
         }
     }
 }

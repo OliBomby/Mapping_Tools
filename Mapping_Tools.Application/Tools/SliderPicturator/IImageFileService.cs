@@ -11,4 +11,3 @@ public interface IImageFileService
     /// <returns>The decoded RGBA image.</returns>
     Task<RgbaImage> LoadAsync(string path, CancellationToken cancellationToken = default);
 }
-

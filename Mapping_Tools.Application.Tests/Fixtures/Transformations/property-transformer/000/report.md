@@ -9,12 +9,14 @@
 
 ## Semantic comparison
 
-| Item | Before | After | Difference |
-|---|---:|---:|---:|
-| Bookmarks | 20 | 20 | every timestamp +5 ms |
-| Timing points | 831 | 831 | 0 |
-| Hit objects | 924 | 924 | 0 |
+| Item          | Before | After |            Difference |
+|---------------|-------:|------:|----------------------:|
+| Bookmarks     |     20 |    20 | every timestamp +5 ms |
+| Timing points |    831 |   831 |                     0 |
+| Hit objects   |    924 |   924 |                     0 |
 
-The operation changed every bookmark by exactly the configured +5 ms. The beatmap serializer also normalized whitespace around several General and Editor property separators and inserted one blank line; these are textual changes without changed values. The backup is byte-identical to the seed.
+The operation changed every bookmark by exactly the configured +5 ms. The beatmap serializer also normalized whitespace
+around several General and Editor property separators and inserted one blank line; these are textual changes without
+changed values. The backup is byte-identical to the seed.
 
 Status: accepted by Olivier on 2026-07-18.

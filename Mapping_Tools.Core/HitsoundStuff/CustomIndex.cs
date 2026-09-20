@@ -11,12 +11,12 @@ public class CustomIndex
     /// <summary>
     ///     The complete normal/soft/drum by normal/whistle/finish/clap key space.
     /// </summary>
-    public static readonly List<string> AllKeys = new()
-    {
+    public static readonly List<string> AllKeys =
+    [
         "normal-hitnormal", "normal-hitwhistle", "normal-hitfinish", "normal-hitclap",
         "soft-hitnormal", "soft-hitwhistle", "soft-hitfinish", "soft-hitclap",
         "drum-hitnormal", "drum-hitwhistle", "drum-hitfinish", "drum-hitclap",
-    };
+    ];
 
     private readonly SampleGeneratingArgsComparer comparer;
 

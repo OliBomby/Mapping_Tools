@@ -3,8 +3,6 @@ using System.Reflection;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Desktop.Plugin;
 using Mapping_Tools.Desktop.Services.Hosted;
 using Mapping_Tools.Desktop.Shell;
@@ -63,20 +61,20 @@ internal sealed class ToolDefinitionCatalog
             services.AddSingleton(provider => new ShellFeatureRegistration(
                 registration.Definition.Id,
                 registration.Definition.DisplayName,
-                category: "Tools",
+                "Tools",
                 registration.Definition.Description,
                 registration.Definition.SearchTerms,
                 () => (ObservableObject)provider.GetRequiredService(registration.ViewModelType),
-                horizontalScrollBarVisibility: ToAvaloniaScrollBarVisibility(registration.HorizontalScrollBarVisibility),
-                verticalScrollBarVisibility: ToAvaloniaScrollBarVisibility(registration.VerticalScrollBarVisibility)));
+                ToAvaloniaScrollBarVisibility(registration.HorizontalScrollBarVisibility),
+                ToAvaloniaScrollBarVisibility(registration.VerticalScrollBarVisibility)));
 
             if (registration.Definition.QuickRunTargets is not null)
                 services.AddSingleton(provider => new MappingToolQuickRunRegistration(
                     registration.Definition,
                     cancellationToken => (provider.GetRequiredService(registration.ViewModelType) as IQuickRun
-                                           ?? throw new InvalidOperationException(
-                                               $"Feature '{registration.Definition.Id}' declares QuickRun but "
-                                               + $"{registration.ViewModelType.Name} does not implement IQuickRun."))
+                                          ?? throw new InvalidOperationException(
+                                              $"Feature '{registration.Definition.Id}' declares QuickRun but "
+                                              + $"{registration.ViewModelType.Name} does not implement IQuickRun."))
                         .RunQuickAsync(cancellationToken)));
         }
     }
@@ -102,7 +100,7 @@ internal sealed class ToolDefinitionCatalog
         {
             if (type.IsAbstract
                 || type.ContainsGenericParameters
-                || !type.IsDefined(typeof(MappingToolDefinitionAttribute), inherit: false)
+                || !type.IsDefined(typeof(MappingToolDefinitionAttribute), false)
                 || !typeof(IMappingToolDefinition).IsAssignableFrom(type))
                 continue;
 
@@ -180,7 +178,7 @@ internal sealed class ToolDefinitionCatalog
             ToolScrollBarVisibility.Disabled => ScrollBarVisibility.Disabled,
             ToolScrollBarVisibility.Hidden => ScrollBarVisibility.Hidden,
             ToolScrollBarVisibility.Visible => ScrollBarVisibility.Visible,
-            _ => throw new ArgumentOutOfRangeException(nameof(visibility), visibility, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(visibility), visibility, null),
         };
     }
 }

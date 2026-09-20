@@ -10,7 +10,7 @@ namespace Mapping_Tools.Application.QuickRun;
 public sealed class QuickRunCommandRegistry : IQuickRunCommandRegistry
 {
     private readonly List<QuickRunCommand> commands = [];
-    private readonly object gate = new();
+    private readonly Lock gate = new();
     private string? currentCommandId;
 
     /// <inheritdoc />

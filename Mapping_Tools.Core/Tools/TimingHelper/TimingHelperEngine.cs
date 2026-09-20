@@ -60,9 +60,8 @@ public static class TimingHelperEngine
             timing.Add(new TimingPoint(0, 1000, 4, SampleSet.Soft, 0, 100, true, false, false));
 
         // Remove multiple markers on the same tick
-        List<Marker> newMarkers =
-            [.. markers.Where((marker, index) => index == 0 || Math.Abs(marker.Time - markers[index - 1].Time) >= options.Leniency + Precision.DOUBLE_EPSILON)];
-        markers = newMarkers;
+        // ReSharper disable once AccessToModifiedClosure
+        markers = [.. markers.Where((marker, index) => index == 0 || Math.Abs(marker.Time - markers[index - 1].Time) >= options.Leniency + Precision.DOUBLE_EPSILON)];
 
         // Calculate the beats between time and the last time or redline for each time
         // Time the same is 0
@@ -79,7 +78,7 @@ public static class TimingHelperEngine
 
             // Avoid problems
             if (MathHelper.ApproximatelyEquivalent(beatsFromRedline, 0, 0.0001)) beatsFromRedline = options.BeatDivisors.Min(divisor => divisor.GetValue());
-            if (time == redline.Offset) beatsFromRedline = 0;
+            if (Precision.AlmostEquals(time, redline.Offset)) beatsFromRedline = 0;
 
             // Initialize the beats from last marker
             double beatsFromLastMarker = beatsFromRedline;
@@ -99,11 +98,11 @@ public static class TimingHelperEngine
 
                 // Avoid problems
                 if (MathHelper.ApproximatelyEquivalent(beatsFromLastMarker, 0, 0.0001)) beatsFromLastMarker = options.BeatDivisors.Min(divisor => divisor.GetValue());
-                if (lastTime == time) beatsFromLastMarker = 0;
+                if (Precision.AlmostEquals(lastTime, time)) beatsFromLastMarker = 0;
             }
 
             // Set the variable
-            marker.BeatsFromLastMarker = options.BeatsBetween != -1
+            marker.BeatsFromLastMarker = !Precision.AlmostEquals(options.BeatsBetween, -1)
                 ? options.BeatsBetween
                 : beatsFromLastMarker;
         }
@@ -246,8 +245,7 @@ public static class TimingHelperEngine
                 "Timing Helper leniency must be a finite non-negative value.",
                 nameof(options));
         if (options.BeatDivisors is null
-            || options.BeatDivisors.Length == 0
-            || options.BeatDivisors.Any(divisor => divisor is null))
+            || options.BeatDivisors.Length == 0)
             throw new ArgumentException(
                 "Timing Helper requires at least one beat divisor.",
                 nameof(options));

@@ -6,7 +6,6 @@ using Mapping_Tools.Desktop.Tools.SliderPicturator.Views;
 using Mapping_Tools.Infrastructure.Tools.SliderPicturator;
 using Microsoft.Extensions.DependencyInjection;
 
-
 namespace Mapping_Tools.Desktop.Tools.SliderPicturator;
 
 /// <summary>Describes and composes the Slider Picturator plugin feature.</summary>

@@ -183,7 +183,8 @@ public sealed class ToolExecutionServiceTests
             "Mapset Merger",
             async context =>
             {
-                source.Cancel();
+                // ReSharper disable once AccessToDisposedClosure
+                await source.CancelAsync();
                 await Task.Delay(Timeout.InfiniteTimeSpan, context.CancellationToken);
                 return new ToolExecutionOutput<int>(1);
             });
@@ -203,7 +204,7 @@ public sealed class ToolExecutionServiceTests
         // Arrange
         var service = CreateService();
         using CancellationTokenSource source = new();
-        source.Cancel();
+        await source.CancelAsync();
         ToolExecutionRequest<int> request = new(
             "retryable",
             "Retryable",
@@ -252,14 +253,14 @@ public sealed class ToolExecutionServiceTests
     {
         // Arrange
         // Act
-        Action act1 = () => new ToolExecutionProgress(double.NaN);
+        Action act1 = () => _ = new ToolExecutionProgress(double.NaN);
 
         // Assert
         act1.Should().Throw<ArgumentOutOfRangeException>();
-        Action act2 = () => new ToolExecutionProgress(-0.01);
+        Action act2 = () => _ = new ToolExecutionProgress(-0.01);
 
         act2.Should().Throw<ArgumentOutOfRangeException>();
-        Action act3 = () => new ToolExecutionProgress(1.01);
+        Action act3 = () => _ = new ToolExecutionProgress(1.01);
 
         act3.Should().Throw<ArgumentOutOfRangeException>();
     }
@@ -272,7 +273,7 @@ public sealed class ToolExecutionServiceTests
         int published = 0;
         notifications.Published += (_, _) => published++;
         using CancellationTokenSource source = new();
-        source.Cancel();
+        await source.CancelAsync();
 
         // Act
         var act4 = () => notifications.PublishAsync(
@@ -280,6 +281,7 @@ public sealed class ToolExecutionServiceTests
                 UserNotificationSeverity.Information,
                 "Title",
                 "Message"),
+            // ReSharper disable once AccessToDisposedClosure
             source.Token);
 
         // Assert

@@ -32,18 +32,18 @@ public class ViewLocator : IDataTemplate
         string name = param.GetType().FullName!.Replace("ViewModel", "View", StringComparison.Ordinal);
         var type = Type.GetType(name)
                    ?? AppDomain.CurrentDomain.GetAssemblies()
-                       .Select(assembly => GetType(assembly, name))
+                       .Select(assembly => getTypeFromAssembly(assembly, name))
                        .FirstOrDefault(candidate => candidate is not null);
 
         if (type != null) return (Control)Activator.CreateInstance(type)!;
 
         return new TextBlock { Text = "Not Found: " + name };
 
-        static Type? GetType(Assembly assembly, string fullName)
+        static Type? getTypeFromAssembly(Assembly assembly, string fullName)
         {
             try
             {
-                return assembly.GetType(fullName, throwOnError: false);
+                return assembly.GetType(fullName, false);
             }
             catch (ReflectionTypeLoadException)
             {

@@ -7,7 +7,6 @@ using Mapping_Tools.Desktop.Tools.PatternGallery.Views;
 using Mapping_Tools.Infrastructure.Tools.PatternGallery;
 using Microsoft.Extensions.DependencyInjection;
 
-
 namespace Mapping_Tools.Desktop.Tools.PatternGallery;
 
 /// <summary>Describes and composes the Pattern Gallery plugin feature.</summary>

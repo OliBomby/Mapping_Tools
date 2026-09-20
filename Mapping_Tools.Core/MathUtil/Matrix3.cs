@@ -354,7 +354,7 @@ public struct Matrix3 : IEquatable<Matrix3>
     /// <summary>
     ///     Returns the rotation component of this instance. Quite slow.
     /// </summary>
-    /// <param name="row_normalise">
+    /// <param name="rowNormalise">
     ///     Whether the method should row-normalise (i.e. remove scale from) the Matrix. Pass false if
     ///     you know it's already normalised.
     /// </param>
@@ -744,9 +744,9 @@ public struct Matrix3 : IEquatable<Matrix3>
     /// <exception cref="InvalidOperationException">Thrown if the Matrix3 is singular.</exception>
     public static void Invert(ref Matrix3 mat, out Matrix3 result)
     {
-        int[] colIdx = { 0, 0, 0 };
-        int[] rowIdx = { 0, 0, 0 };
-        int[] pivotIdx = { -1, -1, -1 };
+        int[] colIdx = [0, 0, 0];
+        int[] rowIdx = [0, 0, 0];
+        int[] pivotIdx = [-1, -1, -1];
 
         double[,] inverse =
         {

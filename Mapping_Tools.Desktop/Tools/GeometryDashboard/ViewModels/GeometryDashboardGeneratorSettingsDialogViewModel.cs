@@ -148,14 +148,15 @@ public sealed partial class GeometryDashboardGeneratorSettingsDialogViewModel : 
             InputPredicates.Predicates.RemoveAt(index);
             InputPredicateRows.RemoveAt(index);
         }
+
         SelectedPredicates.Clear();
         SelectedPredicate = null;
     }
 
     private static IEnumerable<PropertyInfo> GetSharedProperties(GeneratorSettings settings)
     {
-        Type settingsType = settings.GetType();
-        Type sharedType = settingsType.BaseType == typeof(GeneratorSettings)
+        var settingsType = settings.GetType();
+        var sharedType = settingsType.BaseType == typeof(GeneratorSettings)
             ? typeof(GeneratorSettings)
             : settingsType;
 
@@ -164,7 +165,7 @@ public sealed partial class GeometryDashboardGeneratorSettingsDialogViewModel : 
 
     private static IEnumerable<PropertyInfo> GetSpecificProperties(GeneratorSettings settings)
     {
-        Type settingsType = settings.GetType();
+        var settingsType = settings.GetType();
         if (settingsType.BaseType != typeof(GeneratorSettings))
             return [];
 
@@ -191,24 +192,20 @@ public sealed partial class GeometryDashboardGeneratorSettingsDialogViewModel : 
         GeneratorSettings settings,
         IEnumerable<PropertyInfo> properties)
     {
-        foreach (var property in properties.Where(property => property.CanRead
-                                                               && property.CanWrite
-                                                               && property.PropertyType == typeof(SelectionPredicateCollection)))
-        {
+        foreach (var property in properties.Where(property => property is { CanRead: true, CanWrite: true }
+                                                              && property.PropertyType == typeof(SelectionPredicateCollection)))
             if (property.GetValue(settings) is SelectionPredicateCollection collection)
             {
                 string name = property.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ?? property.Name;
                 yield return new GeometryDashboardPredicateCollectionViewModel(name, collection);
             }
-        }
     }
 
     private static int IndexOfReference(IList<SelectionPredicate> predicates, SelectionPredicate predicate)
     {
         for (int index = 0; index < predicates.Count; index++)
-        {
-            if (ReferenceEquals(predicates[index], predicate)) return index;
-        }
+            if (ReferenceEquals(predicates[index], predicate))
+                return index;
 
         return -1;
     }

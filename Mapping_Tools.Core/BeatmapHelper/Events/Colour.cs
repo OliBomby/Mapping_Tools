@@ -9,24 +9,24 @@ namespace Mapping_Tools.Core.BeatmapHelper.Events;
 public class Colour : Event, IHasStartTime
 {
     /// <summary>
+    ///     Initializes an empty background colour transformation.
+    /// </summary>
+    public Colour()
+    {
+    }
+
+    /// <summary>
     ///     Gets or sets the serialized event token, normally <c>3</c>.
     /// </summary>
     public string EventType { get; set; }
-
-    /// <inheritdoc />
-    public double StartTime { get; set; }
 
     /// <summary>
     ///     Gets or sets the background colour applied from <see cref="StartTime" /> onward.
     /// </summary>
     public RgbaColour Color { get; set; }
 
-    /// <summary>
-    ///     Initializes an empty background colour transformation.
-    /// </summary>
-    public Colour()
-    {
-    }
+    /// <inheritdoc />
+    public double StartTime { get; set; }
 
     /// <inheritdoc />
     public override string GetLine()

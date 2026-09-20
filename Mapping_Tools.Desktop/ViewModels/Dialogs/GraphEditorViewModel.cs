@@ -13,7 +13,7 @@ public sealed class GraphEditorViewModel : ObservableObject
     /// <param name="graphState">The graph state to edit.</param>
     public GraphEditorViewModel(GraphState graphState)
     {
-        this.graphState = graphState?.Clone() ?? throw new ArgumentNullException(nameof(graphState));
+        this.graphState = graphState.Clone() ?? throw new ArgumentNullException(nameof(graphState));
         AcceptCommand = new RelayCommand(Accept);
         CancelCommand = new RelayCommand(Cancel);
     }

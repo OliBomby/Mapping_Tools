@@ -10,4 +10,3 @@ public sealed record SlideratorResult(
     string Path,
     SlideratorApplyResult Applied,
     bool EditorReloaded);
-

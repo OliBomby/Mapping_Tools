@@ -1,6 +1,5 @@
 using Mapping_Tools.Desktop.Tools.RhythmGuide.ViewModels;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.Views;
-using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Views;
 
 namespace Mapping_Tools.Desktop.Tools.RhythmGuide.Services;

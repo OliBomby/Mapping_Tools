@@ -13,7 +13,7 @@ internal sealed class NoOpTextFileStore : ITextFileStore
     public IReadOnlyList<string> ReadAllLines(string path)
     {
         return ReadResult
-            ?? throw new NotSupportedException("Reading was not configured for this test store.");
+               ?? throw new NotSupportedException("Reading was not configured for this test store.");
     }
 
     public void WriteAllLines(string path, IEnumerable<string> lines)

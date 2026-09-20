@@ -10,5 +10,4 @@ public sealed partial class GeometryDashboardPreferencesWindow : Window
     {
         InitializeComponent();
     }
-
 }

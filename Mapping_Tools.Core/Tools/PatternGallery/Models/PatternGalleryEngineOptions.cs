@@ -90,7 +90,7 @@ public class PatternGalleryEngineOptions
             ScaleToNewCircleSize = ScaleToNewCircleSize,
             ScaleToNewTiming = ScaleToNewTiming,
             SnapToNewTiming = SnapToNewTiming,
-            BeatDivisors = BeatDivisors?.ToArray() ?? [],
+            BeatDivisors = [.. BeatDivisors],
             FixGlobalSv = FixGlobalSv,
             FixBpmSv = FixBpmSv,
             FixColourHax = FixColourHax,

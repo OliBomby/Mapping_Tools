@@ -76,12 +76,6 @@ public sealed class HitsoundPreviewHelperService : IHitsoundPreviewHelperService
         return new HitsoundPreviewHelperResult(processedPaths, updatedEventCount);
     }
 
-    private static void Validate(HitsoundPreviewHelperServiceOptions options)
-    {
-        ArgumentNullException.ThrowIfNull(options);
-        HitsoundPreviewHelperEngine.Validate(options.Items);
-    }
-
     /// <inheritdoc />
     public async Task<IReadOnlyList<Vector2>> GetSelectedZonePositionsAsync(
         string path,
@@ -96,5 +90,11 @@ public sealed class HitsoundPreviewHelperService : IHitsoundPreviewHelperService
             .Select(hitObject => new Vector2(hitObject.Pos.X, mania ? -1 : hitObject.Pos.Y))
             .Distinct()
             .ToArray();
+    }
+
+    private static void Validate(HitsoundPreviewHelperServiceOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        HitsoundPreviewHelperEngine.Validate(options.Items);
     }
 }

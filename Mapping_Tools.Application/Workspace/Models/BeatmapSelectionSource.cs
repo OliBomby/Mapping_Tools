@@ -36,4 +36,3 @@ public enum BeatmapSelectionSource
     /// </summary>
     CurrentEditor,
 }
-

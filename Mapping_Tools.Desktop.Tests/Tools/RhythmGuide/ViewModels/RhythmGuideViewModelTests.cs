@@ -1,15 +1,12 @@
 using CommunityToolkit.Mvvm.Input;
-using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
-using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.RhythmGuide;
 using Mapping_Tools.Core.Tools.RhythmGuide.Models;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.Services;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.ViewModels;
-using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Tools.RhythmGuide.ViewModels;

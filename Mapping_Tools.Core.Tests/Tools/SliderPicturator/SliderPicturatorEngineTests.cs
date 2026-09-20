@@ -156,9 +156,9 @@ public sealed class SliderPicturatorEngineTests
         };
 
         // Act
-        RgbaColour defaultPixel = SliderPicturatorEngine.Recolor(image, defaultOptions).Image.GetPixel(0, 0);
-        RgbaColour opaqueBlackPixel = SliderPicturatorEngine.Recolor(image, opaqueBlackOptions).Image.GetPixel(0, 0);
-        RgbaColour transparentPixel = SliderPicturatorEngine.Recolor(image, transparentOptions).Image.GetPixel(0, 0);
+        var defaultPixel = SliderPicturatorEngine.Recolor(image, defaultOptions).Image.GetPixel(0, 0);
+        var opaqueBlackPixel = SliderPicturatorEngine.Recolor(image, opaqueBlackOptions).Image.GetPixel(0, 0);
+        var transparentPixel = SliderPicturatorEngine.Recolor(image, transparentOptions).Image.GetPixel(0, 0);
 
         // Assert
         defaultPixel.Should().Be(opaqueBlackPixel);

@@ -9,8 +9,8 @@ namespace Mapping_Tools.Desktop.Tools.HitsoundStudio.Views;
 /// <summary>Presents the Avalonia Hitsound Studio editor and export surface.</summary>
 public sealed partial class HitsoundStudioView : UserControl
 {
-    private readonly ButtonModifierCapture raiseButtonModifiers;
     private readonly ButtonModifierCapture lowerButtonModifiers;
+    private readonly ButtonModifierCapture raiseButtonModifiers;
 
     /// <summary>Creates the Hitsound Studio view.</summary>
     public HitsoundStudioView()

@@ -52,7 +52,8 @@ public struct LineSegment : IEquatable<LineSegment>
     /// </summary>
     /// <param name="left">First operand</param>
     /// <param name="right">Second operand</param>
-    /// <returns>The intersection the two inputs</returns>
+    /// <param name="result">The intersection the two inputs</param>
+    /// <returns>Whether the intersection exists</returns>
     public static bool Intersection(ref LineSegment left, ref LineSegment right, out Vector2 result)
     {
         var s1 = left.P2 - left.P1;
@@ -68,7 +69,7 @@ public struct LineSegment : IEquatable<LineSegment>
         double s = (-s1.Y * (left.P1.X - right.P1.X) + s1.X * (left.P1.Y - right.P1.Y)) / denom;
         double t = (s2.X * (left.P1.Y - right.P1.Y) - s2.Y * (left.P1.X - right.P1.X)) / denom;
 
-        if (s >= 0 && s <= 1 && t >= 0 && t <= 1)
+        if (s is >= 0 and <= 1 && t is >= 0 and <= 1)
         {
             // Collision detected
             result = new Vector2(left.P1.X + t * s1.X, left.P1.Y + t * s1.Y);
@@ -96,7 +97,7 @@ public struct LineSegment : IEquatable<LineSegment>
     /// </summary>
     /// <param name="l">The line segment</param>
     /// <param name="p">The point</param>
-    /// <returns>The intersection the two inputs</returns>
+    /// <param name="result">The distance between the line segment and the point</param>
     public static void Distance(ref LineSegment l, ref Vector2 p, out double result)
     {
         // Return minimum distance between line segment vw and point p
@@ -108,7 +109,7 @@ public struct LineSegment : IEquatable<LineSegment>
         } // v == w case
 
         // Consider the line extending the segment, parameterized as v + t (w - v).
-        // We find projection of point p onto the line. 
+        // We find projection of point p onto the line.
         // It falls where t = [(p-v) . (w-v)] / |w-v|^2
         // We clamp t from [0,1] to handle points outside the segment vw.
         double t = Math.Max(0, Math.Min(1, Vector2.Dot(p - l.P1, l.P2 - l.P1) / l2));

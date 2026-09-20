@@ -23,8 +23,8 @@ internal sealed class WindowsGeometryDashboardOverlayHost
     private const uint extended_style_layered = 0x00080000;
     private const uint extended_style_no_activate = 0x08000000;
     private const uint window_style_popup = 0x80000000;
-    private static readonly SKColor green_yellow = new(173, 255, 47);
     private const int border_thickness = 3;
+    private static readonly SKColor greenYellow = new(173, 255, 47);
     private static readonly object classGate = new();
     private static readonly Dictionary<nint, bool> borderStates = [];
     private static readonly Dictionary<nint, OverlayPaintState> paintStates = [];
@@ -183,16 +183,16 @@ internal sealed class WindowsGeometryDashboardOverlayHost
         IsVisible = true;
     }
 
-    internal void SetBorder(bool enabled)
+    internal void SetBorder(bool newBorderEnabled)
     {
         if (disposed) return;
 
-        borderEnabled = enabled;
+        borderEnabled = newBorderEnabled;
         if (window == 0) return;
 
         lock (classGate)
         {
-            borderStates[window] = enabled;
+            borderStates[window] = newBorderEnabled;
         }
 
         Invalidate();
@@ -238,7 +238,6 @@ internal sealed class WindowsGeometryDashboardOverlayHost
             disposed = true;
             IsVisible = false;
             TargetWindow = null;
-            GC.SuppressFinalize(this);
         }
     }
 
@@ -338,7 +337,7 @@ internal sealed class WindowsGeometryDashboardOverlayHost
         if (message == WindowsNativeMethods.WINDOW_MESSAGE_PAINT)
         {
             WindowsNativeMethods.Paintstruct paint;
-            nint deviceContext = WindowsNativeMethods.BeginPaint(window, out paint);
+            WindowsNativeMethods.BeginPaint(window, out paint);
             WindowsNativeMethods.EndPaint(window, ref paint);
             return 0;
         }
@@ -450,10 +449,10 @@ internal sealed class WindowsGeometryDashboardOverlayHost
                 throw new InvalidOperationException("Windows could not select the Geometry Dashboard overlay buffer.");
 
             SKImageInfo imageInfo = new(width, height, SKColorType.Bgra8888, SKAlphaType.Premul);
-            using (SKSurface surface = SKSurface.Create(imageInfo, pixels, checked(width * 4))
-                                       ?? throw new InvalidOperationException("SkiaSharp could not create the overlay surface."))
+            using (var surface = SKSurface.Create(imageInfo, pixels, checked(width * 4))
+                                 ?? throw new InvalidOperationException("SkiaSharp could not create the overlay surface."))
             {
-                SKCanvas canvas = surface.Canvas;
+                var canvas = surface.Canvas;
                 canvas.Clear(SKColors.Transparent);
                 if (state is not null) DrawFrame(canvas, state);
                 if (drawBorder) DrawBorder(canvas, width, height);
@@ -491,9 +490,7 @@ internal sealed class WindowsGeometryDashboardOverlayHost
                     0,
                     ref blend,
                     WindowsNativeMethods.UPDATE_LAYERED_WINDOW_ALPHA))
-            {
                 return false;
-            }
 
             return true;
         }
@@ -509,17 +506,15 @@ internal sealed class WindowsGeometryDashboardOverlayHost
     {
         foreach (var shape in state.Scene.Shapes)
         {
-            using SKPathEffect? pathEffect = ToPathEffect(shape.DashStyle);
-            using SKPaint paint = new()
-            {
-                Color = ToSkiaColor(shape.Color, shape.Opacity),
-                IsAntialias = true,
-                Style = SKPaintStyle.Stroke,
-                StrokeWidth = (float)Math.Max(0.1, shape.Thickness),
-                PathEffect = pathEffect,
-            };
+            using var pathEffect = ToPathEffect(shape.DashStyle);
+            using SKPaint paint = new();
+            paint.Color = ToSkiaColor(shape.Color, shape.Opacity);
+            paint.IsAntialias = true;
+            paint.Style = SKPaintStyle.Stroke;
+            paint.StrokeWidth = (float)Math.Max(0.1, shape.Thickness);
+            paint.PathEffect = pathEffect;
 
-            SKPoint start = ToClientPoint(shape.Start, state);
+            var start = ToClientPoint(shape.Start, state);
             switch (shape.Kind)
             {
                 case GeometryDashboardOverlayShapeKind.Point:
@@ -561,13 +556,11 @@ internal sealed class WindowsGeometryDashboardOverlayHost
 
     private static void DrawBorder(SKCanvas canvas, int width, int height)
     {
-        using SKPaint paint = new()
-        {
-            Color = green_yellow,
-            IsAntialias = false,
-            Style = SKPaintStyle.Stroke,
-            StrokeWidth = 1,
-        };
+        using SKPaint paint = new();
+        paint.Color = greenYellow;
+        paint.IsAntialias = false;
+        paint.Style = SKPaintStyle.Stroke;
+        paint.StrokeWidth = 1;
 
         for (int index = 0; index < border_thickness; index++)
         {
@@ -580,7 +573,7 @@ internal sealed class WindowsGeometryDashboardOverlayHost
     {
         if (state.Transform is null) return default;
 
-        Vector2 overlayPoint = state.Transform.EditorToOverlayCoordinate(point);
+        var overlayPoint = state.Transform.EditorToOverlayCoordinate(point);
         Vector2 relative = new(
             overlayPoint.X - state.PhysicalBounds.Left,
             overlayPoint.Y - state.PhysicalBounds.Top);

@@ -1,17 +1,16 @@
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
+using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.QuickRun.Models;
-using Mapping_Tools.Application.Settings.Models;
-using Mapping_Tools.Desktop.Controls.Timeline;
-using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.AutoFail;
+using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.AutoFail.Models;
+using Mapping_Tools.Desktop.Controls.Timeline;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services.Hosted;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.AutoFailDetector.ViewModels;
-using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Tools.AutoFailDetector.ViewModels;
@@ -20,22 +19,27 @@ namespace Mapping_Tools.Desktop.Tests.Tools.AutoFailDetector.ViewModels;
 public sealed class AutoFailDetectorViewModelTests
 {
     [TestMethod]
-    public async Task RunCommand_WithWorkspaceMap_InstallsLegacySummaryAndFilteredMarkers()
+    public async Task RunCommand_WithWorkspaceMap_PublishesSuccessAndInstallsFilteredMarkers()
     {
         // Arrange
         RecordingAutoFailService service = new();
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["selected.osu"]);
-        var viewModel = CreateViewModel(service, workspace);
+        UserNotificationService notifications = new();
+        List<UserNotification> published = [];
+        notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
+        var viewModel = CreateViewModel(service, workspace, notifications: notifications);
 
         // Act
         await viewModel.RunCommand.ExecuteAsync(null);
 
         // Assert
         service.Options!.Path.Should().Be("selected.osu");
-        viewModel.ResultSummary.Should().Be(
-            "1 unloading objects detected and 2 potential unloading objects detected!");
-        viewModel.Markers.Should().ContainSingle(marker => marker.Time == 1000);
+        published.Where(notification =>
+                notification.Severity == UserNotificationSeverity.Success
+                && notification.Message == "1 unloading objects detected and 2 potential unloading objects detected!")
+            .Should().ContainSingle();
+        viewModel.Markers.Should().ContainSingle(marker => Precision.AlmostEquals(marker.Time, 1000));
         viewModel.Markers[0].Kind.Should().Be(TimelineMarkerKind.Removed);
     }
 
@@ -99,7 +103,11 @@ public sealed class AutoFailDetectorViewModelTests
         TestDialogService dialogs = new();
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["selected.osu"]);
-        var viewModel = CreateViewModel(service, workspace, dialogs: dialogs);
+        var viewModel = CreateViewModel(
+            service,
+            workspace,
+            dialogs: dialogs,
+            notifications: new UserNotificationService());
         viewModel.GetAutoFailFix = true;
 
         // Act
@@ -125,7 +133,14 @@ public sealed class AutoFailDetectorViewModelTests
         TestDialogService dialogs = new();
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["selected.osu"]);
-        var viewModel = CreateViewModel(service, workspace, dialogs: dialogs);
+        UserNotificationService notifications = new();
+        List<UserNotification> published = [];
+        notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
+        var viewModel = CreateViewModel(
+            service,
+            workspace,
+            dialogs: dialogs,
+            notifications: notifications);
         viewModel.GetAutoFailFix = true;
         viewModel.AutoPlaceFix = true;
 
@@ -134,7 +149,10 @@ public sealed class AutoFailDetectorViewModelTests
 
         // Assert
         service.ApplyFixRequestCount.Should().Be(1);
-        viewModel.ResultSummary.Should().EndWith(" Fix applied.");
+        published.Where(notification =>
+                notification.Severity == UserNotificationSeverity.Success
+                && notification.Message == "Applied the auto-fail fix.")
+            .Should().ContainSingle();
         service.QuickRun.Should().BeFalse();
     }
 
@@ -189,13 +207,14 @@ public sealed class AutoFailDetectorViewModelTests
         RecordingAutoFailService service,
         TestBeatmapWorkspace? workspace = null,
         string? currentPath = null,
-        TestDialogService? dialogs = null)
+        TestDialogService? dialogs = null,
+        IUserNotificationService? notifications = null)
     {
-        UserNotificationService notifications = new();
+        var notificationService = notifications ?? new UserNotificationService();
         ToolExecutionService execution = new(
-            notifications,
+            notificationService,
             TimeProvider.System);
-        TestBeatmapWorkspace effectiveWorkspace = workspace ?? new TestBeatmapWorkspace();
+        var effectiveWorkspace = workspace ?? new TestBeatmapWorkspace();
         effectiveWorkspace.QuickRunPath = currentPath;
         return new AutoFailDetectorViewModel(
             service,
@@ -203,7 +222,8 @@ public sealed class AutoFailDetectorViewModelTests
             effectiveWorkspace,
             new DesktopApplicationSettings(),
             dialogs ?? new TestDialogService(),
-            new RecordingPlatformLauncher());
+            new RecordingPlatformLauncher(),
+            notificationService);
     }
 
     private sealed class RecordingAutoFailService : IAutoFailService
@@ -254,5 +274,4 @@ public sealed class AutoFailDetectorViewModelTests
             return Task.CompletedTask;
         }
     }
-
 }

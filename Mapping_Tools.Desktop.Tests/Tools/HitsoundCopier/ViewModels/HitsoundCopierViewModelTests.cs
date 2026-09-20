@@ -1,6 +1,5 @@
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
-using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.HitsoundCopier;
 using Mapping_Tools.Application.Workspace.Models;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
@@ -20,12 +19,7 @@ public sealed class HitsoundCopierViewModelTests
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection([@"C:\Maps\selected.osu"], BeatmapSelectionSource.FilePicker);
         workspace.BeatmapPickerStartLocation = @"C:\Maps";
-        ApplicationSettings settings = new()
-        {
-            SongsPath = @"D:\Songs",
-            CurrentBeatmapDefaultFolder = true,
-        };
-        var viewModel = Create(picker, workspace, settings);
+        var viewModel = Create(picker, workspace);
         viewModel.PathFrom = @"E:\Other\source.osu";
 
         // Act
@@ -44,12 +38,7 @@ public sealed class HitsoundCopierViewModelTests
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection([@"C:\Maps\selected.osu"], BeatmapSelectionSource.FilePicker);
         workspace.BeatmapPickerStartLocation = @"C:\Maps";
-        ApplicationSettings settings = new()
-        {
-            SongsPath = @"D:\Songs",
-            CurrentBeatmapDefaultFolder = true,
-        };
-        var viewModel = Create(picker, workspace, settings);
+        var viewModel = Create(picker, workspace);
         viewModel.PathFrom = @"E:\Other\source.osu";
 
         // Act
@@ -68,12 +57,7 @@ public sealed class HitsoundCopierViewModelTests
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection([@"C:\Maps\selected.osu"], BeatmapSelectionSource.FilePicker);
         workspace.BeatmapPickerStartLocation = null;
-        ApplicationSettings settings = new()
-        {
-            SongsPath = @"D:\Songs",
-            CurrentBeatmapDefaultFolder = false,
-        };
-        var viewModel = Create(picker, workspace, settings);
+        var viewModel = Create(picker, workspace);
 
         // Act
         await viewModel.ImportBrowseCommand.ExecuteAsync(null);
@@ -85,8 +69,7 @@ public sealed class HitsoundCopierViewModelTests
 
     private static HitsoundCopierViewModel Create(
         TestFilePicker filePicker,
-        TestBeatmapWorkspace workspace,
-        ApplicationSettings settings)
+        TestBeatmapWorkspace workspace)
     {
         return new HitsoundCopierViewModel(
             new TestHitsoundCopier(),
@@ -105,7 +88,9 @@ public sealed class HitsoundCopierViewModelTests
             HitsoundCopierServiceOptions options,
             bool quickRun = false,
             IProgress<double>? progress = null,
-            CancellationToken cancellationToken = default) =>
+            CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
     }
 }

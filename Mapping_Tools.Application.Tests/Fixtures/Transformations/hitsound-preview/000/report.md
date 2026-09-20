@@ -10,11 +10,13 @@
 ## Semantic comparison
 
 | Target item | Before | After | Difference |
-|---|---:|---:|---:|
-| Redlines | 5 | 5 | 0 |
-| Greenlines | 4 | 4 | 0 |
-| Hit objects | 17 | 17 | 0 |
+|-------------|-------:|------:|-----------:|
+| Redlines    |      5 |     5 |          0 |
+| Greenlines  |      4 |     4 |          0 |
+| Hit objects |     17 |    17 |          0 |
 
-Every timeline event was assigned to the nearest configured X-position zone: left normal/index 1, centre soft whistle/index 2, or right drum clap/index 3. This updated object hitsound flags, slider edge hitsounds, samplesets, additions, and custom indices without changing object geometry or timing. The backup is byte-identical to the seed.
+Every timeline event was assigned to the nearest configured X-position zone: left normal/index 1, centre soft
+whistle/index 2, or right drum clap/index 3. This updated object hitsound flags, slider edge hitsounds, samplesets,
+additions, and custom indices without changing object geometry or timing. The backup is byte-identical to the seed.
 
 Status: accepted by Olivier on 2026-07-18.

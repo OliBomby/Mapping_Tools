@@ -12,4 +12,3 @@ public enum SelectedHitObjectMode
     /// <summary>Use only selected objects.</summary>
     OnlySelected,
 }
-

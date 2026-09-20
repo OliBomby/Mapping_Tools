@@ -70,5 +70,4 @@ public sealed class ToolDefinition
     ///     offered as a QuickRun target, or <see langword="null" /> when unsupported.
     /// </summary>
     public QuickRunTargets? QuickRunTargets { get; }
-
 }

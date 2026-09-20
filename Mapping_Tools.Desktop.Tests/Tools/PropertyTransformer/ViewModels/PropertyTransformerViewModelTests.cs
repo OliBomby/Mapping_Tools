@@ -1,13 +1,10 @@
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
-using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.PropertyTransformer;
 using Mapping_Tools.Core.Tools.PropertyTransformer;
-using Mapping_Tools.Desktop.Converters;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.PropertyTransformer.ViewModels;
-using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Tools.PropertyTransformer.ViewModels;
@@ -91,7 +88,7 @@ public sealed class PropertyTransformerViewModelTests
         // Arrange
         RecordingPropertyTransformer service = new();
         TestBeatmapWorkspace workspace = new() { QuickRunPath = "current.osu" };
-        var viewModel = Create(service, workspace: workspace);
+        var viewModel = Create(service, workspace);
 
         // Act
         await viewModel.RunQuickAsync(CancellationToken.None);
@@ -138,5 +135,4 @@ public sealed class PropertyTransformerViewModelTests
             return Task.FromResult(new PropertyTransformerResult(paths));
         }
     }
-
 }

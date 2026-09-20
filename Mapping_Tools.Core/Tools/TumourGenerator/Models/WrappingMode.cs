@@ -12,4 +12,3 @@ public enum WrappingMode
     /// <summary>Uses the path point's original angle without an additional offset.</summary>
     Absolute,
 }
-

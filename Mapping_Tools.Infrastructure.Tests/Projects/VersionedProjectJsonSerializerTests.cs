@@ -94,12 +94,12 @@ public sealed class VersionedProjectJsonSerializerTests
     public void Deserialize_WithLegacyProject_UsesCompatibilityReaderAndCanonicalSave()
     {
         // Arrange
-        const string legacyJson =
+        const string legacy_json =
             "{\"$type\":\"Mapping_Tools.Viewmodels.HitsoundCopierVm, Mapping Tools\",\"PathFrom\":\"source.osu\",\"PathTo\":\"target.osu\"}";
         VersionedProjectJsonSerializer serializer = new();
 
         // Act
-        HitsoundCopierServiceOptions project = serializer.Deserialize<HitsoundCopierServiceOptions>(legacyJson);
+        HitsoundCopierServiceOptions project = serializer.Deserialize<HitsoundCopierServiceOptions>(legacy_json);
         string canonicalJson = serializer.Serialize(project);
 
         // Assert

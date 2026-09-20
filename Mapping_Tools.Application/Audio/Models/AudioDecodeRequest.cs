@@ -14,4 +14,3 @@ public sealed class AudioDecodeRequest
     /// <summary>Gets the source audio path.</summary>
     public string Path { get; }
 }
-

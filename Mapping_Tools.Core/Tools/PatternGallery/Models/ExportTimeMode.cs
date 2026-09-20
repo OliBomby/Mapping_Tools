@@ -12,4 +12,3 @@ public enum ExportTimeMode
     /// <summary>Places the first object at the active editor playhead.</summary>
     Current,
 }
-

@@ -28,7 +28,7 @@ public sealed class FilePickerFilterTests
     {
         // Arrange
         // Act
-        Action act1 = () => new FilePickerFilter("Beatmaps", ["", " "]);
+        Action act1 = () => _ = new FilePickerFilter("Beatmaps", ["", " "]);
 
         // Assert
         act1.Should().Throw<ArgumentException>();

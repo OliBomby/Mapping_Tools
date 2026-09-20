@@ -14,4 +14,3 @@ public sealed record DesktopWorkingArea(
     double Width,
     double Height,
     bool IsPrimary);
-

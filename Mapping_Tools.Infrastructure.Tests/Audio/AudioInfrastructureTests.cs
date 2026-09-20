@@ -184,7 +184,7 @@ public sealed class AudioInfrastructureTests
         // Assert
         export.BytesWritten.Should().BeGreaterThan(0);
         result.IsEmpty.Should().BeFalse();
-        File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None).Dispose();
+        await File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None).DisposeAsync();
     }
 
     [TestMethod]

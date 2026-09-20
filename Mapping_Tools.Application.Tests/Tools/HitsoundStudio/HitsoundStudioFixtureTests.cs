@@ -1,10 +1,9 @@
-using Mapping_Tools.Application.Tools.HitsoundStudio;
-using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Tests.Execution;
 using Mapping_Tools.Application.Tests.TestDoubles;
-using Mapping_Tools.Application.Tools.MapCleaner;
+using Mapping_Tools.Application.Tools.HitsoundStudio;
 using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
+using Mapping_Tools.Application.Tools.MapCleaner;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.HitsoundStudio;
 using Mapping_Tools.Infrastructure.Audio;
@@ -21,8 +20,8 @@ public sealed class HitsoundStudioFixtureTests : TransformationFixtureTestBase
     public async Task ExportAsync_AcceptedFixture_ProducesEquivalentOutput(string fixtureName)
     {
         // Arrange
-        using FixtureContext fixture = CreateFixture("hitsound-studio", fixtureName);
-        HitsoundStudioServiceOptions project = fixture.ReadProject<HitsoundStudioServiceOptions>();
+        using var fixture = CreateFixture("hitsound-studio", fixtureName);
+        var project = fixture.ReadProject<HitsoundStudioServiceOptions>();
         project.ExportFolder = Path.Combine(Path.GetDirectoryName(fixture.TargetPath)!, "hitsound-studio-export");
         RecordingProgress<double> progress = new();
 

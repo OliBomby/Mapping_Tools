@@ -30,4 +30,3 @@ public sealed class GraphMarker
     /// <summary>Gets or sets whether the marker is visible.</summary>
     public bool Visible { get; set; } = true;
 }
-

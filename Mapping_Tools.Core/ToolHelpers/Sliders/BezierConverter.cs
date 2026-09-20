@@ -10,21 +10,25 @@ namespace Mapping_Tools.Core.ToolHelpers.Sliders;
 /// </summary>
 public static class BezierConverter
 {
-    private static readonly List<CircleBezierPreset> circlePresets = new()
-    {
-        new CircleBezierPreset(0.4993379862754501,
+    private static readonly List<CircleBezierPreset> circlePresets =
+    [
+        new(0.4993379862754501,
             GetPoints("1.0:0.0|1.0:0.2549893626632736|0.8778997558480327:0.47884446188920726")),
-        new CircleBezierPreset(1.7579419829169447,
+
+        new(1.7579419829169447,
             GetPoints("1.0:0.0|1.0:0.6263026|0.42931178:1.0990661|-0.18605515:0.9825393")),
-        new CircleBezierPreset(3.1385246920140215,
+
+        new(3.1385246920140215,
             GetPoints("1.0:0.0|1.0:0.87084764|0.002304826:1.5033062|-0.9973236:0.8739115|-0.9999953:0.0030679568")),
-        new CircleBezierPreset(5.69720464620727,
+
+        new(5.69720464620727,
             GetPoints(
                 "1.0:0.0|1.0:1.4137783|-1.4305235:2.0779421|-2.3410065:-0.94017583|0.05132711:-1.7309346|0.8331702:-0.5530167")),
-        new CircleBezierPreset(2 * Math.PI,
+
+        new(2 * Math.PI,
             GetPoints(
                 "1.0:0.0|1.0:1.2447058|-0.8526471:2.118367|-2.6211002:7.854936e-06|-0.8526448:-2.118357|1.0:-1.2447058|1.0:-2.4492937e-16")),
-    };
+    ];
 
     private static List<Vector2> GetPoints(string str)
     {

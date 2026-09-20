@@ -1,10 +1,12 @@
+using System.Diagnostics.CodeAnalysis;
 using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Desktop.Services.Platform;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Desktop.Tests.Platform;
+namespace Mapping_Tools.Desktop.Tests.Services.Platform;
 
 [TestClass]
+[SuppressMessage("ReSharper", "AccessToDisposedClosure")]
 public sealed class AvaloniaFilePickerTests
 {
     [TestMethod]
@@ -44,7 +46,7 @@ public sealed class AvaloniaFilePickerTests
             return null;
         });
         using CancellationTokenSource cancellation = new();
-        cancellation.Cancel();
+        await cancellation.CancelAsync();
 
         // Act
         Func<Task> act2 = () => picker.PickFoldersAsync(

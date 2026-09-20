@@ -20,15 +20,13 @@ public class HitObject : ITextLine, IComparable<HitObject>
     /// <summary>
     ///     Timing changes inside the slider body that affect slide, whistle, or tick samples.
     /// </summary>
-    public List<TimingPoint> BodyHitsounds = new();
+    public List<TimingPoint> BodyHitsounds = [];
 
     // Special combined with timeline
     /// <summary>
     ///     Expanded head, repeat, and tail events derived from this object's gameplay timeline.
     /// </summary>
-    public List<TimelineObject> TimelineObjects = new();
-
-    private int repeat;
+    public List<TimelineObject> TimelineObjects = [];
 
     /// <summary>
     ///     Creates an uninitialized object for serializers and incremental construction.
@@ -308,8 +306,8 @@ public class HitObject : ITextLine, IComparable<HitObject>
     /// </summary>
     public int Repeat
     {
-        get => IsSlider ? repeat : IsCircle ? 0 : 1;
-        set => repeat = value;
+        get => IsSlider ? field : IsCircle ? 0 : 1;
+        set;
     }
 
     /// <summary>
@@ -426,6 +424,7 @@ public class HitObject : ITextLine, IComparable<HitObject>
     {
         if (ReferenceEquals(this, other)) return 0;
         if (ReferenceEquals(null, other)) return 1;
+        // ReSharper disable once CompareOfFloatsByEqualityOperator
         if (Time == other.Time) return other.NewCombo.CompareTo(NewCombo);
         return Time.CompareTo(other.Time);
     }
@@ -484,8 +483,8 @@ public class HitObject : ITextLine, IComparable<HitObject>
 
             CurvePoints = points;
 
-            if (TryParseInt(values[6], out int repeat))
-                Repeat = repeat;
+            if (TryParseInt(values[6], out int parsedRepeat))
+                Repeat = parsedRepeat;
             else throw new BeatmapParsingException("Failed to parse repeat number of slider.", line);
 
             if (TryParseDouble(values[7], out double pixelLength))
@@ -726,7 +725,7 @@ public class HitObject : ITextLine, IComparable<HitObject>
     public List<double> GetSliderTickTimes(double sliderTickRate)
     {
         // Sliders with NaN velocity don't have ticks
-        if (!IsSlider || double.IsNaN(SliderVelocity)) return new List<double>();
+        if (!IsSlider || double.IsNaN(SliderVelocity)) return [];
 
         var ticks = new List<double>();
         double t = UnInheritedTimingPoint.MpB / sliderTickRate;
@@ -1121,9 +1120,8 @@ public class HitObject : ITextLine, IComparable<HitObject>
     /// <returns>The integer written in the hit-object type column.</returns>
     public int GetObjectType()
     {
-        var cs = new BitArray(new[] { ComboSkip });
-        return MathHelper.GetIntFromBitArray(new BitArray(new[]
-            { IsCircle, IsSlider, NewCombo, IsSpinner, cs[0], cs[1], cs[2], IsHoldNote }));
+        var cs = new BitArray([ComboSkip]);
+        return MathHelper.GetIntFromBitArray(new BitArray([IsCircle, IsSlider, NewCombo, IsSpinner, cs[0], cs[1], cs[2], IsHoldNote]));
     }
 
     /// <summary>
@@ -1132,13 +1130,13 @@ public class HitObject : ITextLine, IComparable<HitObject>
     /// <param name="type">The packed integer from the hit-object type column.</param>
     public void SetObjectType(int type)
     {
-        var b = new BitArray(new[] { type });
+        var b = new BitArray([type]);
         IsCircle = b[0];
         IsSlider = b[1];
         NewCombo = b[2];
         IsSpinner = b[3];
         // Spinners ignore combo skip on .osu parsing
-        ComboSkip = IsSpinner ? 0 : MathHelper.GetIntFromBitArray(new BitArray(new[] { b[4], b[5], b[6] }));
+        ComboSkip = IsSpinner ? 0 : MathHelper.GetIntFromBitArray(new BitArray([b[4], b[5], b[6]]));
         IsHoldNote = b[7];
     }
 
@@ -1176,7 +1174,7 @@ public class HitObject : ITextLine, IComparable<HitObject>
     /// <returns>The integer written in the hit-object hitsound column.</returns>
     public int GetHitsounds()
     {
-        return MathHelper.GetIntFromBitArray(new BitArray(new[] { Normal, Whistle, Finish, Clap }));
+        return MathHelper.GetIntFromBitArray(new BitArray([Normal, Whistle, Finish, Clap]));
     }
 
     /// <summary>
@@ -1185,7 +1183,7 @@ public class HitObject : ITextLine, IComparable<HitObject>
     /// <param name="hitsounds">The packed integer from the hit-object hitsound column.</param>
     public void SetHitsounds(int hitsounds)
     {
-        var b = new BitArray(new[] { hitsounds });
+        var b = new BitArray([hitsounds]);
         Normal = b[0];
         Whistle = b[1];
         Finish = b[2];
@@ -1273,8 +1271,8 @@ public class HitObject : ITextLine, IComparable<HitObject>
     public SliderPath GetSliderPath(bool fullLength = false)
     {
         return fullLength
-            ? new SliderPath(SliderType, GetAllCurvePoints().ToArray())
-            : new SliderPath(SliderType, GetAllCurvePoints().ToArray(), PixelLength);
+            ? new SliderPath(SliderType, [.. GetAllCurvePoints()])
+            : new SliderPath(SliderType, [.. GetAllCurvePoints()], PixelLength);
     }
 
     /// <summary>
@@ -1412,11 +1410,11 @@ public class HitObject : ITextLine, IComparable<HitObject>
         newHitObject.TimelineObjects = TimelineObjects?.Select(o => o.Copy()).ToList();
         newHitObject.CurvePoints = CurvePoints?.Copy();
         if (EdgeHitsounds != null)
-            newHitObject.EdgeHitsounds = new List<int>(EdgeHitsounds);
+            newHitObject.EdgeHitsounds = [.. EdgeHitsounds];
         if (EdgeSampleSets != null)
-            newHitObject.EdgeSampleSets = new List<SampleSet>(EdgeSampleSets);
+            newHitObject.EdgeSampleSets = [.. EdgeSampleSets];
         if (EdgeAdditionSets != null)
-            newHitObject.EdgeAdditionSets = new List<SampleSet>(EdgeAdditionSets);
+            newHitObject.EdgeAdditionSets = [.. EdgeAdditionSets];
         newHitObject.TimingPoint = TimingPoint?.Copy();
         newHitObject.HitsoundTimingPoint = HitsoundTimingPoint?.Copy();
         newHitObject.UnInheritedTimingPoint = UnInheritedTimingPoint?.Copy();

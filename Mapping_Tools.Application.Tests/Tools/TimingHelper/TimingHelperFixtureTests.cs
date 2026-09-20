@@ -13,8 +13,8 @@ public sealed class TimingHelperFixtureTests : TransformationFixtureTestBase
     public async Task AdjustAsync_AcceptedFixture_ProducesEquivalentOutput(string fixtureName)
     {
         // Arrange
-        using FixtureContext fixture = CreateFixture("timing-helper", fixtureName);
-        TimingHelperServiceOptions project = fixture.ReadProject<TimingHelperServiceOptions>();
+        using var fixture = CreateFixture("timing-helper", fixtureName);
+        var project = fixture.ReadProject<TimingHelperServiceOptions>();
         TimingHelperService service = new(fixture.Gateway, new ApplicationSettings());
 
         // Act

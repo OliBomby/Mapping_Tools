@@ -6,4 +6,3 @@ public sealed record PatternGalleryCollectionPaths(
     string Collection,
     string PatternFiles,
     string ProjectFile);
-

@@ -16,4 +16,3 @@ public sealed record BeatmapBackupArtifact(
     BeatmapBackupReason Reason,
     bool ContainsUnsavedState,
     DateTimeOffset CreatedAt);
-

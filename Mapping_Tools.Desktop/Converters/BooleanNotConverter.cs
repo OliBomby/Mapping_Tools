@@ -9,7 +9,7 @@ public sealed class BooleanNotConverter : IValueConverter
     /// <inheritdoc />
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        return value is bool boolean && !boolean;
+        return value is bool and false;
     }
 
     /// <inheritdoc />

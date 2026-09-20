@@ -59,11 +59,11 @@ public sealed class SliderCompletionatorService : ISliderCompletionatorService
                 .OpenBeatmapAsync(path, livePreference, cancellationToken)
                 .ConfigureAwait(false);
 
-            if (options.UseCurrentEditorTime && options.UseEndTime) editorTime ??= session.LiveEditorTime;
+            if (options is { UseCurrentEditorTime: true, UseEndTime: true }) editorTime ??= session.LiveEditorTime;
             sessions.Add((path, session));
         }
 
-        if (options.UseCurrentEditorTime && options.UseEndTime && editorTime is null)
+        if (options is { UseCurrentEditorTime: true, UseEndTime: true } && editorTime is null)
             throw new LiveBeatmapUnavailableException(
                 "The current editor time could not be read.");
 
@@ -92,7 +92,7 @@ public sealed class SliderCompletionatorService : ISliderCompletionatorService
                         session,
                         quickRun,
                         settings),
-                    cancellationToken: cancellationToken)
+                    cancellationToken)
                 .ConfigureAwait(false);
             processedPaths.Add(path);
             slidersCompleted += completed;

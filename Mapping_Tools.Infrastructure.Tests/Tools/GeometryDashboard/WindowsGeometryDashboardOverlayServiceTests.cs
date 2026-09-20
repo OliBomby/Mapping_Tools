@@ -102,11 +102,15 @@ public sealed class WindowsGeometryDashboardOverlayServiceTests
         service.IsVisible.Should().BeTrue();
     }
 
-    private static Task OnNewThread(Action action) =>
-        Task.Factory.StartNew(action, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+    private static Task OnNewThread(Action action)
+    {
+        return Task.Factory.StartNew(action, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+    }
 
-    private static void Update(WindowsGeometryDashboardOverlayService service) =>
+    private static void Update(WindowsGeometryDashboardOverlayService service)
+    {
         service.Update(GeometryDashboardOverlayScene.Empty, new GeometryDashboardOverlayOptions(new Box2(), false));
+    }
 
     private static WindowsGeometryDashboardOverlayService CreateService(Target target)
     {
@@ -148,20 +152,52 @@ public sealed class WindowsGeometryDashboardOverlayServiceTests
         public GeometryDashboardWindow Window { get; set; } = new(
             new PlatformWindowId(100), 1, "test.osu", new Box2(0, 0, 320, 240), true, true, Vector2.One, false);
 
-        public Task<GeometryDashboardProcess?> FindAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult<GeometryDashboardProcess?>(new(Window.ProcessId, Window.Id, Window.Title));
+        public Task<GeometryDashboardProcess?> FindAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<GeometryDashboardProcess?>(new GeometryDashboardProcess(Window.ProcessId, Window.Id, Window.Title));
+        }
 
-        public GeometryDashboardWindow? GetWindow(PlatformWindowId window) => window == Window.Id ? Window : null;
-        public GeometryDashboardWindow? GetMainWindow(GeometryDashboardProcess process) => Window;
-        public IReadOnlyList<GeometryDashboardWindow> GetTopLevelWindows() => [Window];
+        public GeometryDashboardWindow? GetWindow(PlatformWindowId window)
+        {
+            return window == Window.Id ? Window : null;
+        }
+
+        public GeometryDashboardWindow GetMainWindow(GeometryDashboardProcess process)
+        {
+            return Window;
+        }
+
+        public IReadOnlyList<GeometryDashboardWindow> GetTopLevelWindows()
+        {
+            return [Window];
+        }
     }
 
     private sealed class ConfigStore : ITextFileStore
     {
-        public IReadOnlyList<string> ReadAllLines(string path) => ["Fullscreen = false", "Letterboxing = false", "Width = 320", "Height = 240"];
-        public void WriteAllLines(string path, IEnumerable<string> lines) => throw new NotSupportedException();
-        public void Delete(string path) => throw new NotSupportedException();
-        public string GetParentFolder(string path) => string.Empty;
-        public string CombinePath(string parent, string child) => Path.Combine(parent, child);
+        public IReadOnlyList<string> ReadAllLines(string path)
+        {
+            return ["Fullscreen = false", "Letterboxing = false", "Width = 320", "Height = 240"];
+        }
+
+        public void WriteAllLines(string path, IEnumerable<string> lines)
+        {
+            throw new NotSupportedException();
+        }
+
+        public void Delete(string path)
+        {
+            throw new NotSupportedException();
+        }
+
+        public string GetParentFolder(string path)
+        {
+            return string.Empty;
+        }
+
+        public string CombinePath(string parent, string child)
+        {
+            return Path.Combine(parent, child);
+        }
     }
 }

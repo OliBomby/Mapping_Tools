@@ -14,7 +14,10 @@
   "ScaleToNewCircleSize": false,
   "ScaleToNewTiming": true,
   "SnapToNewTiming": true,
-  "BeatDivisors": ["1/16", "1/12"],
+  "BeatDivisors": [
+    "1/16",
+    "1/12"
+  ],
   "FixGlobalSv": true,
   "FixBpmSv": false,
   "FixColourHax": true,

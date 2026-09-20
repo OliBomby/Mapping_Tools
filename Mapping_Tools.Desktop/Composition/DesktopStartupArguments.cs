@@ -2,41 +2,41 @@ namespace Mapping_Tools.Desktop.Composition;
 
 internal static class DesktopStartupArguments
 {
-    private const string localUpdateFileOption = "--update-file";
+    private const string local_update_file_option = "--update-file";
 
     internal static string? GetLocalUpdatePackagePath(IReadOnlyList<string> arguments)
     {
         ArgumentNullException.ThrowIfNull(arguments);
 
         string? packagePath = null;
-        for (var index = 0; index < arguments.Count; index++)
+        for (int index = 0; index < arguments.Count; index++)
         {
             string argument = arguments[index];
             string? value = null;
-            if (string.Equals(argument, localUpdateFileOption, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(argument, local_update_file_option, StringComparison.OrdinalIgnoreCase))
             {
                 if (++index >= arguments.Count || string.IsNullOrWhiteSpace(arguments[index]))
                     throw new ArgumentException(
-                        $"The {localUpdateFileOption} option requires a file path.",
+                        $"The {local_update_file_option} option requires a file path.",
                         nameof(arguments));
 
                 value = arguments[index];
             }
             else if (argument.StartsWith(
-                         localUpdateFileOption + "=",
+                         local_update_file_option + "=",
                          StringComparison.OrdinalIgnoreCase))
             {
-                value = argument[(localUpdateFileOption.Length + 1)..];
+                value = argument[(local_update_file_option.Length + 1)..];
                 if (string.IsNullOrWhiteSpace(value))
                     throw new ArgumentException(
-                        $"The {localUpdateFileOption} option requires a file path.",
+                        $"The {local_update_file_option} option requires a file path.",
                         nameof(arguments));
             }
 
             if (value is null) continue;
             if (packagePath is not null)
                 throw new ArgumentException(
-                    $"The {localUpdateFileOption} option may only be specified once.",
+                    $"The {local_update_file_option} option may only be specified once.",
                     nameof(arguments));
 
             packagePath = Path.GetFullPath(value);

@@ -39,7 +39,7 @@ public sealed class VersionedProjectJsonSerializer : IProjectSerializer
         ArgumentNullException.ThrowIfNull(schema);
         ArgumentException.ThrowIfNullOrWhiteSpace(json);
 
-        JObject document = ParseObject(json);
+        var document = ParseObject(json);
         if (!TryReadVersion(document, out int version))
             return legacyReader.Read<TProject>(json);
 
@@ -57,13 +57,12 @@ public sealed class VersionedProjectJsonSerializer : IProjectSerializer
         while (version < currentVersion)
         {
             int targetVersion = version + 1;
-            IConfigMigration migration = schema.Migrations.FirstOrDefault(
-                candidate => candidate.ToVersion == targetVersion)
-                ?? throw new InvalidDataException(
-                    $"No configuration migration exists for schema '{schema.Id}' and target version {targetVersion}.");
-            JsonObject migrated = JsonNode.Parse(document.ToString(Formatting.None)) as JsonObject
-                                  ?? throw new JsonSerializationException(
-                                      "The project document root must be a JSON object.");
+            var migration = schema.Migrations.FirstOrDefault(candidate => candidate.ToVersion == targetVersion)
+                            ?? throw new InvalidDataException(
+                                $"No configuration migration exists for schema '{schema.Id}' and target version {targetVersion}.");
+            var migrated = JsonNode.Parse(document.ToString(Formatting.None)) as JsonObject
+                           ?? throw new JsonSerializationException(
+                               "The project document root must be a JSON object.");
             migration.Apply(migrated);
             document = JObject.Parse(migrated.ToJsonString());
             version = targetVersion;
@@ -77,16 +76,12 @@ public sealed class VersionedProjectJsonSerializer : IProjectSerializer
     {
         try
         {
-            JToken token = JToken.Parse(json);
+            var token = JToken.Parse(json);
             if (token.Type == JTokenType.Null)
                 throw new InvalidDataException("The project document contained a JSON null root.");
 
             return token as JObject
                    ?? throw new JsonSerializationException("The project document root must be a JSON object.");
-        }
-        catch (InvalidDataException)
-        {
-            throw;
         }
         catch (JsonException exception)
         {
@@ -96,7 +91,7 @@ public sealed class VersionedProjectJsonSerializer : IProjectSerializer
 
     private static bool TryReadVersion(JObject document, out int version)
     {
-        JToken? value = document["$version"];
+        var value = document["$version"];
         if (value is null)
         {
             version = default;
@@ -114,6 +109,7 @@ public sealed class VersionedProjectJsonSerializer : IProjectSerializer
         {
             throw new JsonSerializationException("The project document version must be an integer.", exception);
         }
+
         if (version < 1)
             throw new JsonSerializationException("The project document version must be positive.");
 

@@ -4,11 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
-using Mapping_Tools.Desktop.Converters;
-using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
-using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.Sliderator;
 using Mapping_Tools.Application.Tools.Sliderator.Contracts;
 using Mapping_Tools.Application.Tools.Sliderator.Models;
@@ -20,6 +16,7 @@ using Mapping_Tools.Core.Graph.Interpolation;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.Sliderator;
 using Mapping_Tools.Core.Tools.Sliderator.Models;
+using Mapping_Tools.Desktop.Converters;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
@@ -38,20 +35,12 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 {
     private readonly ICurrentBeatmapLocator currentBeatmap;
 
-    private readonly ProjectDefinition<SlideratorProject> definition = new(
-        "slideratorproject.json",
-        "Sliderator Projects",
-        static () => new SlideratorProject(),
-        "sliderator-project.json",
-        ToolConfigSchema.ForTool(SlideratorToolDefinition.Definition.Id));
-
     private readonly IDialogService dialogs;
     private readonly DesktopApplicationSettings settings;
 
     private readonly ISlideratorService sliderator;
     private readonly IBeatmapWorkspace workspace;
     private GraphState? acceptedGraphState;
-    private GraphState graphState = SlideratorEngineOptions.CreatePositionGraph(3);
     private bool settingGraphState;
     private bool synchronizingGraphBounds;
 
@@ -79,8 +68,6 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         this.dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
         ImportCommand = new AsyncRelayCommand(ImportAsync);
-        MoveLeftCommand = new AsyncRelayCommand(() => MoveLeftAsync(false));
-        MoveRightCommand = new AsyncRelayCommand(() => MoveRightAsync(false));
         GraphToggleCommand = new RelayCommand(ToggleGraphMode);
         ClearGraphCommand = new AsyncRelayCommand(ClearGraphAsync);
         ScaleCompleteCommand = new AsyncRelayCommand(ScaleCompleteAsync);
@@ -231,15 +218,15 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     /// <summary>Gets or sets the shared Core graph state.</summary>
     public GraphState GraphState
     {
-        get => graphState;
+        get;
         set
         {
             ArgumentNullException.ThrowIfNull(value);
             if (!settingGraphState) ClipGraphAnchorToVelocityLimit(value);
 
-            if (ReferenceEquals(graphState, value)) return;
+            if (ReferenceEquals(field, value)) return;
 
-            graphState = value;
+            field = value;
             acceptedGraphState = value.Clone();
             double graphWidth = value.MaxX - value.MinX;
             if (double.IsFinite(graphWidth) && !Precision.AlmostEquals(GraphBeats, graphWidth))
@@ -255,11 +242,11 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
                 }
             }
 
-            OnPropertyChanged(nameof(GraphState));
+            OnPropertyChanged();
             OnPropertyChanged(nameof(ExpectedSegments));
             UpdateGraphDerivedValues();
         }
-    }
+    } = SlideratorEngineOptions.CreatePositionGraph(3);
 
     /// <summary>Gets the graph's display label.</summary>
     public string GraphModeText => GraphModeSetting == SlideratorGraphMode.Position ? "X" : "V";
@@ -319,12 +306,6 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     /// <summary>Gets the import command.</summary>
     public IAsyncRelayCommand ImportCommand { get; }
 
-    /// <summary>Gets the previous-slider command.</summary>
-    public IAsyncRelayCommand MoveLeftCommand { get; }
-
-    /// <summary>Gets the next-slider command.</summary>
-    public IAsyncRelayCommand MoveRightCommand { get; }
-
     /// <summary>Gets the graph-mode command.</summary>
     public IRelayCommand GraphToggleCommand { get; }
 
@@ -363,11 +344,19 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
                 true,
                 true,
                 cancellationToken,
-                useEditorReadPreference: false);
+                false);
         });
     }
 
-    ProjectDefinition<SlideratorProject> IShellProjectFeature<SlideratorProject>.ProjectDefinition => definition;
+    ProjectDefinition<SlideratorProject> IShellProjectFeature<SlideratorProject>.ProjectDefinition
+    {
+        get;
+    } = new(
+        "slideratorproject.json",
+        "Sliderator Projects",
+        static () => new SlideratorProject(),
+        "sliderator-project.json",
+        ToolConfigSchema.ForTool(SlideratorToolDefinition.Definition.Id));
 
     SlideratorProject IShellProjectFeature<SlideratorProject>.Snapshot()
     {
@@ -409,7 +398,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
                 false,
                 true,
                 cancellationToken,
-                useEditorReadPreference: true);
+                true);
         });
         return succeeded;
     }
@@ -496,7 +485,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
             settings.AlwaysQuickRun,
             settings.AlwaysQuickRun,
             CancellationToken.None,
-            useEditorReadPreference: false);
+            false);
     }
 
     private async Task ImportAsync()
@@ -505,7 +494,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         try
         {
             path = ImportModeSetting == HitObjectSelectionMode.Selected
-                ? await workspace.ResolveQuickRunBeatmapAsync(updateSelection: false)
+                ? await workspace.ResolveQuickRunBeatmapAsync(false)
                 : workspace.SelectedPaths.FirstOrDefault();
         }
         catch (OperationCanceledException)
@@ -598,7 +587,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
                 }),
             CreateProgress(),
             cancellationToken);
-        return execution.Status == ToolExecutionStatus.Succeeded && execution.Value is not null;
+        return execution is { Status: ToolExecutionStatus.Succeeded, Value: not null };
     }
 
     private SlideratorProject Snapshot()
@@ -637,9 +626,9 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     private void Install(SlideratorProject project)
     {
         ImportModeSetting = project.ImportModeSetting;
-        TimeCode = project.TimeCode ?? string.Empty;
+        TimeCode = project.TimeCode;
         LoadedHitObjects.Clear();
-        foreach (HitObject hitObject in project.LoadedHitObjects ?? []) LoadedHitObjects.Add(hitObject);
+        foreach (var hitObject in project.LoadedHitObjects) LoadedHitObjects.Add(hitObject);
         VisibleHitObjectIndex = project.VisibleHitObjectIndex;
         GlobalSv = project.GlobalSv;
         GraphBeats = project.GraphBeats;
@@ -660,7 +649,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         ExportAsStream = project.ExportAsStream;
         ExportAsInvisibleSlider = project.ExportAsInvisibleSlider;
         DoEditorRead = project.DoEditorRead;
-        GraphState state = project.GraphState.Clone();
+        var state = project.GraphState.Clone();
         state.MinY = GraphMinY;
         state.MaxY = GraphMaxY;
         SetGraphState(state);
@@ -686,6 +675,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         OnPropertyChanged(nameof(VisibleHitObject));
     }
 
+    // ReSharper disable once UnusedParameterInPartialMethod
     partial void OnVisibleHitObjectIndexChanged(int value)
     {
         UpdateVisibleHitObject();
@@ -695,18 +685,16 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     {
         if (!synchronizingGraphBounds && double.IsFinite(value) && value >= 0)
         {
-            GraphState state = GraphState.Clone();
+            var state = GraphState.Clone();
             double oldMinX = state.MinX;
             double oldWidth = state.MaxX - oldMinX;
             state.MaxX = oldMinX + value;
             if (oldWidth > Precision.DOUBLE_EPSILON)
-            {
                 foreach (var anchor in state.Anchors)
                 {
                     double x = oldMinX + value * (anchor.Pos.X - oldMinX) / oldWidth;
                     anchor.Pos = new Vector2((float)x, anchor.Pos.Y);
                 }
-            }
 
             SetGraphState(state);
         }
@@ -730,6 +718,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         UpdateGraphDerivedValues();
     }
 
+    // ReSharper disable once UnusedParameterInPartialMethod
     partial void OnGlobalSvChanged(double value)
     {
         UpdateGraphDerivedValues();
@@ -739,7 +728,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     {
         if (GraphModeSetting == SlideratorGraphMode.Velocity)
         {
-            GraphState state = GraphState.Clone();
+            var state = GraphState.Clone();
             state.MinY = -value;
             state.MaxY = value;
             SetGraphState(state);
@@ -749,6 +738,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         UpdateGraphDerivedValues();
     }
 
+    // ReSharper disable once UnusedParameterInPartialMethod
     partial void OnGraphModeSettingChanged(SlideratorGraphMode value)
     {
         OnPropertyChanged(nameof(GraphModeText));
@@ -785,7 +775,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         var candidateAnchor = candidate.Anchors[anchorIndex];
         var acceptedAnchor = acceptedGraphState.Anchors[anchorIndex];
         bool positionChanged = Math.Abs(candidateAnchor.Pos.X - acceptedAnchor.Pos.X) > 1e-9
-            || Math.Abs(candidateAnchor.Pos.Y - acceptedAnchor.Pos.Y) > 1e-9;
+                               || Math.Abs(candidateAnchor.Pos.Y - acceptedAnchor.Pos.Y) > 1e-9;
         bool tensionChanged = Math.Abs(candidateAnchor.Tension - acceptedAnchor.Tension) > 1e-9;
         bool interpolatorChanged = candidateAnchor.Interpolator.GetType() != acceptedAnchor.Interpolator.GetType();
         if (!positionChanged && !tensionChanged && !interpolatorChanged)
@@ -878,14 +868,12 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     private static int FindChangedAnchorIndex(GraphState previous, GraphState candidate)
     {
         for (int index = 0; index < candidate.Anchors.Count; index++)
-        {
             if (index >= previous.Anchors.Count
                 || Math.Abs(previous.Anchors[index].Pos.X - candidate.Anchors[index].Pos.X) > 1e-9
                 || Math.Abs(previous.Anchors[index].Pos.Y - candidate.Anchors[index].Pos.Y) > 1e-9
                 || Math.Abs(previous.Anchors[index].Tension - candidate.Anchors[index].Tension) > 1e-9
                 || previous.Anchors[index].Interpolator.GetType() != candidate.Anchors[index].Interpolator.GetType())
                 return index;
-        }
 
         return -1;
     }
@@ -893,13 +881,13 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     private bool IsGraphOverSpeedLimit(GraphState state, int anchorIndex, double velocityLimit)
     {
         return IsAnchorOverSpeedLimit(state, anchorIndex, velocityLimit)
-            || !IsVelocityWithinLimit(GetMaximumVelocity(state), velocityLimit);
+               || !IsVelocityWithinLimit(GetMaximumVelocity(state), velocityLimit);
     }
 
     private bool IsAnchorOverSpeedLimit(GraphState state, int anchorIndex, double velocityLimit)
     {
         return IsPreviousSegmentOverSpeedLimit(state, anchorIndex, velocityLimit)
-            || IsNextSegmentOverSpeedLimit(state, anchorIndex, velocityLimit);
+               || IsNextSegmentOverSpeedLimit(state, anchorIndex, velocityLimit);
     }
 
     private bool IsPreviousSegmentOverSpeedLimit(GraphState state, int anchorIndex, double velocityLimit)
@@ -1094,11 +1082,11 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
     private void ToggleGraphMode()
     {
-        SlideratorGraphMode mode = GraphModeSetting == SlideratorGraphMode.Position
+        var mode = GraphModeSetting == SlideratorGraphMode.Position
             ? SlideratorGraphMode.Velocity
             : SlideratorGraphMode.Position;
 
-        GraphState state = GraphState.Clone();
+        var state = GraphState.Clone();
         state.MinY = mode == SlideratorGraphMode.Position ? 0 : -VelocityLimit;
         state.MaxY = mode == SlideratorGraphMode.Position ? 1 : VelocityLimit;
         if (mode == SlideratorGraphMode.Position && state.Anchors.Count > 0)
@@ -1161,7 +1149,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
         double target = result.Value;
 
-        GraphState state = GraphState.Clone();
+        var state = GraphState.Clone();
         foreach (var anchor in state.Anchors) anchor.Pos = new Vector2(anchor.Pos.X, (float)(anchor.Pos.Y * target / maximum));
 
         SetGraphState(state);

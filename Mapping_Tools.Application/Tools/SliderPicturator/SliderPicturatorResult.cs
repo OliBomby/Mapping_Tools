@@ -4,4 +4,3 @@ namespace Mapping_Tools.Application.Tools.SliderPicturator;
 /// <param name="Path">The beatmap path written by the operation.</param>
 /// <param name="SegmentCount">The estimated slider segment count.</param>
 public sealed record SliderPicturatorResult(string Path, long SegmentCount);
-

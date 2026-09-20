@@ -26,9 +26,9 @@ public sealed record MapCleanerResult(
             ObjectsResnapped + other.ObjectsResnapped,
             SamplesRemoved + other.SamplesRemoved,
             TimingPointsRemoved + other.TimingPointsRemoved,
-            TimingPointsAdded.Concat(other.TimingPointsAdded).ToArray(),
-            TimingPointsChanged.Concat(other.TimingPointsChanged).ToArray(),
-            TimingPointsRemovedAt.Concat(other.TimingPointsRemovedAt).ToArray(),
+            [.. TimingPointsAdded, .. other.TimingPointsAdded],
+            [.. TimingPointsChanged, .. other.TimingPointsChanged],
+            [.. TimingPointsRemovedAt, .. other.TimingPointsRemovedAt],
             Math.Max(TimelineEndTime, other.TimelineEndTime));
     }
 }

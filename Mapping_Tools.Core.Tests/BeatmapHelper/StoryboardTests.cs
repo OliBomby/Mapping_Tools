@@ -34,7 +34,7 @@ public class StoryboardTests
         };
 
         // Act
-        Action act1 = () => new StoryBoard(lines);
+        Action act1 = () => _ = new StoryBoard(lines);
 
         // Assert
         act1.Should().Throw<BeatmapParsingException>();

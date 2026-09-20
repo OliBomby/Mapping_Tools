@@ -22,11 +22,13 @@
                     <TextBox Margin="0,0,5,0" materialAssists:TextFieldAssist.Label="Copy hitsounds from"
                              Text="{Binding PathFrom, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                              ToolTip.Tip="Hitsounds get copied from this map." />
-                    <Button Grid.Column="1" Classes="flat path-picker" Cursor="Hand" Command="{Binding ImportLoadCommand}"
+                    <Button Grid.Column="1" Classes="flat path-picker" Cursor="Hand"
+                            Command="{Binding ImportLoadCommand}"
                             VerticalAlignment="Bottom" ToolTip.Tip="Fetch the selected beatmap from your osu! client.">
                         <materialIcons:MaterialIcon Width="30" Height="30" Kind="RestoreFromTrash" />
                     </Button>
-                    <Button Grid.Column="3" Classes="flat path-picker" Cursor="Hand" Command="{Binding ImportBrowseCommand}"
+                    <Button Grid.Column="3" Classes="flat path-picker" Cursor="Hand"
+                            Command="{Binding ImportBrowseCommand}"
                             VerticalAlignment="Bottom" ToolTip.Tip="Select beatmaps with File Explorer.">
                         <materialIcons:MaterialIcon Width="30" Height="30" Kind="Folder" />
                     </Button>
@@ -37,17 +39,20 @@
                              ToolTip.Tip="Hitsounds get copied to these maps. You can input multiple maps separated with '|'." />
                     <TextBlock Grid.Column="1" Margin="3,15,2,0" Padding="0,0,3,0" FontStyle="Italic"
                                Text="{Binding ExportMapCountText}" />
-                    <Button Grid.Column="2" Classes="flat path-picker" Cursor="Hand" Command="{Binding ExportLoadCommand}"
+                    <Button Grid.Column="2" Classes="flat path-picker" Cursor="Hand"
+                            Command="{Binding ExportLoadCommand}"
                             VerticalAlignment="Bottom" ToolTip.Tip="Fetch the selected beatmap from your osu! client.">
                         <materialIcons:MaterialIcon Width="30" Height="30" Kind="RestoreFromTrash" />
                     </Button>
-                    <Button Grid.Column="4" Classes="flat path-picker" Cursor="Hand" Command="{Binding ExportBrowseCommand}"
+                    <Button Grid.Column="4" Classes="flat path-picker" Cursor="Hand"
+                            Command="{Binding ExportBrowseCommand}"
                             VerticalAlignment="Bottom" ToolTip.Tip="Select beatmaps with File Explorer.">
                         <materialIcons:MaterialIcon Width="30" Height="30" Kind="Folder" />
                     </Button>
                 </Grid>
 
-                <ComboBox Margin="0,20,0,0" Cursor="Hand" ItemsSource="{Binding CopyModes}" SelectedItem="{Binding CopyMode}"
+                <ComboBox Margin="0,20,0,0" Cursor="Hand" ItemsSource="{Binding CopyModes}"
+                          SelectedItem="{Binding CopyMode}"
                           materialAssists:ComboBoxAssist.Label="Copying mode"
                           ToolTip.Tip="'Overwrite everything' works like traditional hitsound copiers and 'Overwrite only defined' will only copy over hitsounds from the source beatmap and keep all the other hitsounds intact.">
                     <ComboBox.ItemTemplate>
@@ -123,7 +128,6 @@
                                   ToolTip.Tip="Sampleset of the muted sliderend." />
                     </Grid>
                 </StackPanel>
-                <TextBlock Margin="0,10,0,0" Text="{Binding ResultSummary}" TextWrapping="Wrap" />
             </StackPanel>
             <controls:ToolRunButton Margin="10" HorizontalAlignment="Right" VerticalAlignment="Bottom"
                                     RunCommand="{Binding RunCommand}" />

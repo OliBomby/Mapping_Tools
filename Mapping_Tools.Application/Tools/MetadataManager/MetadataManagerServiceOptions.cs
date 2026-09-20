@@ -13,5 +13,4 @@ public class MetadataManagerServiceOptions : MetadataManagerEngineOptions
 {
     /// <summary>Gets or sets the vertical-bar-separated target beatmap paths.</summary>
     public string ExportPath { get; set; } = string.Empty;
-
 }
