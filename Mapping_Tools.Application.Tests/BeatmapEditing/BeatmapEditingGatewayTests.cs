@@ -174,7 +174,7 @@ public sealed class BeatmapEditingGatewayTests
         var gateway = CreateGateway(
             store,
             reader,
-            new ApplicationSettings { UseEditorReader = false });
+            new ApplicationSettings { BeatmapLiveStateReading = BeatmapLiveStateReadingMode.Disabled });
 
         // Act
         Func<Task> act2 = () => gateway.OpenBeatmapAsync(

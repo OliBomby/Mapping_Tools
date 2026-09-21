@@ -148,15 +148,51 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
             false);
     }
 
-    /// <summary>Gets or sets whether live editor memory may be read.</summary>
-    public bool UseEditorReader
+    /// <summary>Gets the available current-beatmap fetching modes.</summary>
+    public IReadOnlyList<CurrentBeatmapFetchingMode> CurrentBeatmapFetchingModes { get; } =
+        Enum.GetValues<CurrentBeatmapFetchingMode>();
+
+    /// <summary>Gets or sets how the current beatmap path is fetched.</summary>
+    public CurrentBeatmapFetchingMode CurrentBeatmapFetching
     {
-        get => settings.UseEditorReader;
+        get => settings.CurrentBeatmapFetching;
         set => SetProperty(
-            settings.UseEditorReader,
+            settings.CurrentBeatmapFetching,
             value,
             settings,
-            static (settings, enabled) => settings.UseEditorReader = enabled,
+            static (settings, selected) => settings.CurrentBeatmapFetching = selected,
+            false);
+    }
+
+    /// <summary>Gets the available beatmap live-state reading modes.</summary>
+    public IReadOnlyList<BeatmapLiveStateReadingMode> BeatmapLiveStateReadingModes { get; } =
+        Enum.GetValues<BeatmapLiveStateReadingMode>();
+
+    /// <summary>Gets or sets how unsaved beatmap editor state is read.</summary>
+    public BeatmapLiveStateReadingMode BeatmapLiveStateReading
+    {
+        get => settings.BeatmapLiveStateReading;
+        set => SetProperty(
+            settings.BeatmapLiveStateReading,
+            value,
+            settings,
+            static (settings, selected) => settings.BeatmapLiveStateReading = selected,
+            false);
+    }
+
+    /// <summary>Gets the available editor reload modes.</summary>
+    public IReadOnlyList<EditorReloadMode> EditorReloadModes { get; } =
+        Enum.GetValues<EditorReloadMode>();
+
+    /// <summary>Gets or sets how the osu! editor is reloaded after a save.</summary>
+    public EditorReloadMode EditorReload
+    {
+        get => settings.EditorReload;
+        set => SetProperty(
+            settings.EditorReload,
+            value,
+            settings,
+            static (settings, selected) => settings.EditorReload = selected,
             false);
     }
 
@@ -174,18 +210,6 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
                     false))
                 betterSaveOverride.Configure(settings.SongsPath, value);
         }
-    }
-
-    /// <summary>Gets or sets whether tool execution reloads osu! after saving.</summary>
-    public bool AutoReload
-    {
-        get => settings.AutoReload;
-        set => SetProperty(
-            settings.AutoReload,
-            value,
-            settings,
-            static (settings, enabled) => settings.AutoReload = enabled,
-            false);
     }
 
     /// <summary>Gets or sets whether ordinary Run actions use each feature's QuickRun path.</summary>

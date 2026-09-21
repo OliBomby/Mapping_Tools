@@ -2,7 +2,7 @@ namespace Mapping_Tools.Application.Workspace.Contracts;
 
 /// <summary>
 ///     Locates the beatmap currently open in osu! without exposing process-memory
-///     or Editor Reader types to the workspace.
+///     or backend-specific types to the workspace.
 /// </summary>
 public interface ICurrentBeatmapLocator
 {

@@ -136,13 +136,13 @@ public sealed class GeometryDashboardServiceTests
     {
         // Arrange
         using var service = CreateService(new InputStub(true),
-            settings: new ApplicationSettings { UseEditorReader = false });
+            settings: new ApplicationSettings { BeatmapLiveStateReading = BeatmapLiveStateReadingMode.Disabled });
 
         // Act
         await service.RefreshOnceAsync();
 
         // Assert
-        service.State.Status.Should().Be("Unable to run: enable Editor Reader in Preferences.");
+        service.State.Status.Should().Be("Unable to run: enable beatmap live-state reading in Preferences.");
         service.State.IsConnected.Should().BeFalse();
     }
 

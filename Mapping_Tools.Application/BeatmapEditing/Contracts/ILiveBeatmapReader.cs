@@ -11,7 +11,7 @@ public interface ILiveBeatmapReader
     /// <summary>
     ///     Attempts to capture a validated editor snapshot.
     /// </summary>
-    /// <param name="cancellationToken">Cancels process discovery or a pending memory read.</param>
+    /// <param name="cancellationToken">Cancels process discovery or a pending backend read.</param>
     /// <returns>
     ///     The live snapshot, or <see langword="null" /> when osu! is not running or
     ///     no beatmap is open in its editor.

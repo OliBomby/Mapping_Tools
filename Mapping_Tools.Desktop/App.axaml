@@ -29,6 +29,9 @@
             <converters:RgbaColourToAvaloniaBrushConverter x:Key="RgbaColourToAvaloniaBrushConverter" />
             <converters:MaterialIconConverter x:Key="MaterialIconConverter" />
             <converters:EnumEqualsConverter x:Key="EnumEqualsConverter" />
+            <converters:CurrentBeatmapFetchingModeConverter x:Key="CurrentBeatmapFetchingModeConverter" />
+            <converters:BeatmapLiveStateReadingModeConverter x:Key="BeatmapLiveStateReadingModeConverter" />
+            <converters:EditorReloadModeConverter x:Key="EditorReloadModeConverter" />
         </ResourceDictionary>
     </Application.Resources>
 

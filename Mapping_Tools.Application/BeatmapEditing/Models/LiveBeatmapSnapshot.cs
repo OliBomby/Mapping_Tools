@@ -4,7 +4,7 @@ namespace Mapping_Tools.Application.BeatmapEditing.Models;
 
 /// <summary>
 ///     Carries the editor-facing parts of an unsaved osu! beatmap without exposing
-///     the third-party Editor Reader library beyond the infrastructure boundary.
+///     any backend-specific IPC or memory-reader types beyond the infrastructure boundary.
 /// </summary>
 public sealed record LiveBeatmapSnapshot
 {
@@ -65,7 +65,7 @@ public sealed record LiveBeatmapSnapshot
     public IReadOnlyList<double> Bookmarks { get; }
 
     /// <summary>
-    ///     Gets the complete live timing section after Editor Reader validation.
+    ///     Gets the complete live timing section after backend validation.
     /// </summary>
     public IReadOnlyList<TimingPoint> TimingPoints { get; }
 

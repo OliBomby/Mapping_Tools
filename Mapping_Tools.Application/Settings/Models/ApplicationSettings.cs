@@ -40,15 +40,14 @@ public class ApplicationSettings
     /// </summary>
     public bool MakeBackups { get; set; } = true;
 
-    /// <summary>
-    ///     Allows operations to prefer unsaved editor state exposed by Editor Reader.
-    /// </summary>
-    public bool UseEditorReader { get; set; } = true;
+    /// <summary>Chooses how the current beatmap path is fetched.</summary>
+    public CurrentBeatmapFetchingMode CurrentBeatmapFetching { get; set; } = CurrentBeatmapFetchingMode.MemoryRead;
 
-    /// <summary>
-    ///     Allows QuickRun mutations of a live editor session to reload osu! after saving.
-    /// </summary>
-    public bool AutoReload { get; set; } = true;
+    /// <summary>Chooses how unsaved beatmap editor state is read.</summary>
+    public BeatmapLiveStateReadingMode BeatmapLiveStateReading { get; set; } = BeatmapLiveStateReadingMode.EditorReader;
+
+    /// <summary>Chooses how the osu! editor is reloaded after a save.</summary>
+    public EditorReloadMode EditorReload { get; set; } = EditorReloadMode.SimulatedKeypress;
 
     /// <summary>
     ///     Enables selection-count-based QuickRun target resolution.

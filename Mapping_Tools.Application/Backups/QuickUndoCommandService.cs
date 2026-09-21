@@ -70,7 +70,7 @@ public sealed class QuickUndoCommandService : IQuickUndoCommandService
             var restore = await backupService
                 .QuickUndoAsync(
                     path,
-                    reloadEditor: settings.AutoReload,
+                    reloadEditor: settings.EditorReload != EditorReloadMode.Disabled,
                     cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
             if (restore is null)

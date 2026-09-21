@@ -30,8 +30,8 @@ public sealed class HeadlessApplicationWorkflowTests
         ApplicationSettings settings = new()
         {
             SmartQuickRunEnabled = false,
-            UseEditorReader = false,
-            AutoReload = false,
+            BeatmapLiveStateReading = BeatmapLiveStateReadingMode.Disabled,
+            EditorReload = EditorReloadMode.Disabled,
         };
         var store = CreateStore();
         RecordingBackupService backups = new(store);

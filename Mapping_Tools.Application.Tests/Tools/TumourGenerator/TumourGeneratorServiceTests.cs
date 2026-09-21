@@ -157,7 +157,7 @@ public sealed class TumourGeneratorServiceTests
         RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.LiveEditor));
         TumourGeneratorService service = new(
             gateway,
-            new ApplicationSettings { AutoReload = false });
+            new ApplicationSettings { EditorReload = EditorReloadMode.Disabled });
 
         // Act
         var result = await service.RunAsync(

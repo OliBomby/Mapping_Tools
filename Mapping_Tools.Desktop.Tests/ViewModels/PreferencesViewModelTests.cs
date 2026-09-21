@@ -195,7 +195,7 @@ public sealed class PreferencesViewModelTests
         // Arrange
         var settings = CreateSettings();
         settings.OverrideOsuSave = true;
-        settings.AutoReload = true;
+        settings.EditorReload = EditorReloadMode.SimulatedKeypress;
         settings.AlwaysQuickRun = true;
         settings.SmartQuickRunEnabled = true;
         settings.NoneQuickRunTool = "Cleaner";
@@ -210,7 +210,7 @@ public sealed class PreferencesViewModelTests
 
         // Assert
         viewModel.OverrideOsuSave.Should().BeTrue();
-        viewModel.AutoReload.Should().BeTrue();
+        viewModel.EditorReload.Should().Be(EditorReloadMode.SimulatedKeypress);
         viewModel.AlwaysQuickRun.Should().BeTrue();
         viewModel.SmartQuickRunEnabled.Should().BeTrue();
         viewModel.NoneQuickRunTool.Should().Be("Cleaner");

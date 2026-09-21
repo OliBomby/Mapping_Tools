@@ -3,6 +3,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.TumourGenerator;
 using Mapping_Tools.Application.Tools.TumourGenerator.Models;
 using Mapping_Tools.Core.BeatmapHelper;
@@ -299,7 +300,10 @@ public sealed class TumourGeneratorViewModelTests
         TestBeatmapWorkspace? workspace = null,
         bool activate = true)
     {
-        DesktopApplicationSettings settings = new() { AutoReload = autoReload };
+        DesktopApplicationSettings settings = new()
+        {
+            EditorReload = autoReload ? EditorReloadMode.SimulatedKeypress : EditorReloadMode.Disabled,
+        };
         TumourGeneratorViewModel viewModel = new(
             service,
             new ToolExecutionService(

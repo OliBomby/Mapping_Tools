@@ -69,7 +69,7 @@ public sealed class PropertyTransformerServiceTests
         RecordingBeatmapEditingGateway gateway = new(editor);
         PropertyTransformerService service = new(
             gateway,
-            new ApplicationSettings { AutoReload = true });
+            new ApplicationSettings { EditorReload = EditorReloadMode.SimulatedKeypress });
 
         // Act
         await service.TransformAsync(

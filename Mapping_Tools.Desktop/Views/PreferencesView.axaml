@@ -99,6 +99,47 @@
                 </Button>
             </Grid>
 
+            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                <ComboBox Width="200"
+                          HorizontalAlignment="Left"
+                          ItemsSource="{Binding CurrentBeatmapFetchingModes}"
+                          SelectedItem="{Binding CurrentBeatmapFetching, Mode=TwoWay}"
+                          materialAssists:ComboBoxAssist.Label="Current beatmap fetching"
+                          ToolTip.Tip="Choose how Mapping Tools finds the beatmap currently open in osu!.">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                        <TextBlock Text="{Binding Converter={StaticResource CurrentBeatmapFetchingModeConverter}}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <ComboBox Width="200"
+                          Margin="15 0 0 0"
+                          HorizontalAlignment="Left"
+                          ItemsSource="{Binding BeatmapLiveStateReadingModes}"
+                          SelectedItem="{Binding BeatmapLiveStateReading, Mode=TwoWay}"
+                          materialAssists:ComboBoxAssist.Label="Beatmap live state reading"
+                          ToolTip.Tip="Choose how Mapping Tools reads unsaved state from the beatmap editor.">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                        <TextBlock Text="{Binding Converter={StaticResource BeatmapLiveStateReadingModeConverter}}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <ComboBox Width="200"
+                          Margin="15 0 0 0"
+                          HorizontalAlignment="Left"
+                          ItemsSource="{Binding EditorReloadModes}"
+                          SelectedItem="{Binding EditorReload, Mode=TwoWay}"
+                          materialAssists:ComboBoxAssist.Label="Editor reload"
+                          ToolTip.Tip="Choose how the osu! editor is reloaded after QuickRun.">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                        <TextBlock Text="{Binding Converter={StaticResource EditorReloadModeConverter}}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </StackPanel>
+
             <TextBox MaxWidth="150"
                      Margin="0,10,0,0"
                      HorizontalAlignment="Left"
@@ -110,14 +151,12 @@
                      ToolTip.Tip="Select the maximum number of backup files. The oldest beatmap backups in the backups folder will automatically get removed whenever it goes over this limit." />
 
             <StackPanel Margin="5,10,0,0">
-                <CheckBox Classes="preference-check"
-                          HorizontalAlignment="Left"
+                <CheckBox HorizontalAlignment="Left"
                           Content="Make automatic backups"
                           IsChecked="{Binding MakeBackups, Mode=TwoWay}"
                           ToolTip.Tip="Automatically make a backup whenever you run a mapping tool." />
                 <StackPanel Orientation="Horizontal">
-                    <CheckBox Classes="preference-check"
-                              HorizontalAlignment="Left"
+                    <CheckBox HorizontalAlignment="Left"
                               Content="Make periodic backups"
                               IsChecked="{Binding MakePeriodicBackups, Mode=TwoWay}"
                               ToolTip.Tip="Periodically make automatic backups when the editor is open. This is useful if you forget to save often or accidentally delete your map. It will only make backups if there are changes in the beatmap." />
@@ -132,31 +171,18 @@
                                                       Converter={StaticResource ConstantTimeSpanConverter}}"
                              ToolTip.Tip="The time between each automatic periodic backup while the editor is open." />
                 </StackPanel>
-                <CheckBox Classes="preference-check"
-                          HorizontalAlignment="Left"
+                <CheckBox HorizontalAlignment="Left"
                           Content="Current beatmap default folder in all tools"
                           IsChecked="{Binding CurrentBeatmapDefaultFolder, Mode=TwoWay}"
                           ToolTip.Tip="Enable this to get the current beatmap folder as the default folder whenever you open a file explorer in a tool which doesn't use current beatmap (e.g. Hitsound Copier). Else it will default to the last used folder." />
-                <CheckBox Classes="preference-check"
-                          HorizontalAlignment="Left"
-                          Content="Enable Editor Reader"
-                          IsChecked="{Binding UseEditorReader, Mode=TwoWay}"
-                          ToolTip.Tip="Enable functionality of Editor Reader. Editor Reader reads the memory of your osu! client to get live data from your editor. It can sometimes break, so you can choose to not use it." />
-                <CheckBox Classes="preference-check"
-                          HorizontalAlignment="Left"
-                          Content="Override osu! save with BetterSave™"
-                          IsChecked="{Binding OverrideOsuSave, Mode=TwoWay}"
-                          ToolTip.Tip="Automatically BetterSave after every osu! save. As a side-effect, this will also overwrite manual .osu changes if you have the editor open." />
-                <CheckBox Classes="preference-check"
-                          HorizontalAlignment="Left"
-                          Content="Auto reload after QuickRun"
-                          IsChecked="{Binding AutoReload, Mode=TwoWay}"
-                          ToolTip.Tip="Enable this to automatically reload the editor after every QuickRun." />
-                <CheckBox Classes="preference-check"
-                          HorizontalAlignment="Left"
+                <CheckBox HorizontalAlignment="Left"
                           Content="Always use QuickRun"
                           IsChecked="{Binding AlwaysQuickRun, Mode=TwoWay}"
                           ToolTip.Tip="Enable this to use QuickRun even when you press the button to run normally." />
+                <CheckBox HorizontalAlignment="Left"
+                          Content="Override osu! save with BetterSave™"
+                          IsChecked="{Binding OverrideOsuSave, Mode=TwoWay}"
+                          ToolTip.Tip="Automatically BetterSave after every osu! save. As a side-effect, this will also overwrite manual .osu changes if you have the editor open." />
             </StackPanel>
 
             <StackPanel Margin="5,10,0,0">

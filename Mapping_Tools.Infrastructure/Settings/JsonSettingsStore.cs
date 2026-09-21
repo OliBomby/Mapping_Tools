@@ -61,6 +61,9 @@ public sealed class JsonSettingsStore : ISettingsStore
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         };
         canonicalOptions.Converters.Add(new JsonStringEnumConverter<ApplicationTheme>());
+        canonicalOptions.Converters.Add(new JsonStringEnumConverter<CurrentBeatmapFetchingMode>());
+        canonicalOptions.Converters.Add(new JsonStringEnumConverter<BeatmapLiveStateReadingMode>());
+        canonicalOptions.Converters.Add(new JsonStringEnumConverter<EditorReloadMode>());
 
         legacyOptions = new JsonSerializerOptions(canonicalOptions);
         legacyOptions.Converters.Add(new WindowBoundsJsonConverter());
@@ -86,8 +89,8 @@ public sealed class JsonSettingsStore : ISettingsStore
         JsonObject document = ParseObject(json);
         if (!TryReadVersion(document, out int version))
         {
-            ApplicationSettings legacySettings = Deserialize(json, legacyOptions);
-            if (!hasPreferences) Save(legacySettings);
+            SettingsMigrationV2.ApplyLegacy(document);
+            ApplicationSettings legacySettings = Deserialize(document.ToJsonString(), legacyOptions);
             return legacySettings;
         }
 
@@ -118,7 +121,7 @@ public sealed class JsonSettingsStore : ISettingsStore
         }
 
         ApplicationSettings settings = Deserialize(document.ToJsonString(), canonicalOptions);
-        if (requiresRewrite || !hasPreferences) Save(settings);
+        if (requiresRewrite && hasPreferences) Save(settings);
         return settings;
     }
 

@@ -11,7 +11,7 @@ namespace Mapping_Tools.Application.BeatmapEditing;
 
 /// <summary>
 ///     Builds editable documents from disk and deliberately overlays live state
-///     only when Editor Reader identifies the exact same beatmap.
+    ///     only when the configured live-state reader identifies the exact same beatmap.
 /// </summary>
 public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
 {
@@ -29,9 +29,9 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
     /// <param name="backupService">
     ///     Creates the configured durable pre-save snapshot before an existing document is overwritten.
     /// </param>
-    /// <param name="liveReader">The platform adapter that reads osu!'s editor memory.</param>
+    /// <param name="liveReader">The selected platform adapter that reads osu!'s editor state.</param>
     /// <param name="reloadService">The platform adapter that refreshes osu! after a save.</param>
-    /// <param name="settings">The current preference controlling Editor Reader use.</param>
+    /// <param name="settings">The current preference controlling live-state reading.</param>
     public BeatmapEditingGateway(
         ITextFileStore fileStore,
         IBeatmapBackupService backupService,
@@ -58,7 +58,7 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
         BeatmapEditingSession diskSession = new(path, fileStore);
         if (livePreference == LiveBeatmapPreference.DiskOnly) return diskSession;
 
-        if (!settings.UseEditorReader)
+        if (settings.BeatmapLiveStateReading == BeatmapLiveStateReadingMode.Disabled)
             return livePreference == LiveBeatmapPreference.RequireLive
                 ? throw new LiveBeatmapUnavailableException(
                     "Live editor state is disabled in Mapping Tools settings.")
@@ -76,7 +76,9 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
                         "No active osu! beatmap editor could be read.")
                     : diskSession;
 
-            if (!string.Equals(snapshot.Path, path, StringComparison.Ordinal))
+            string snapshotPath = Path.GetFullPath(snapshot.Path);
+            string requestedPath = Path.GetFullPath(path);
+            if (!string.Equals(snapshotPath, requestedPath, StringComparison.Ordinal))
                 return livePreference == LiveBeatmapPreference.RequireLive
                     ? throw new LiveBeatmapUnavailableException(
                         $"osu! is editing '{snapshot.Path}', not the requested beatmap '{path}'.")

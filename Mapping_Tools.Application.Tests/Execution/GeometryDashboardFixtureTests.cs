@@ -59,7 +59,7 @@ public sealed class GeometryDashboardFixtureTests
             []);
         RecordingGeometryDashboardRuntime runtime = new(new GeometryDashboardRuntimeSnapshot(liveBeatmap, true));
         using GeometryDashboardService service = new(
-            new ApplicationSettings { UseEditorReader = true },
+            new ApplicationSettings { BeatmapLiveStateReading = BeatmapLiveStateReadingMode.EditorReader },
             project,
             runtime,
             new SimulatedGeometryDashboardInput(),

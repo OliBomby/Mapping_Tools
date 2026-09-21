@@ -38,6 +38,7 @@ using Mapping_Tools.Desktop.Views;
 using Mapping_Tools.Infrastructure.Audio;
 using Mapping_Tools.Infrastructure.Backups;
 using Mapping_Tools.Infrastructure.Editor;
+using Mapping_Tools.Infrastructure.Editor.Mtipc;
 using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Infrastructure.Migration;
 using Mapping_Tools.Infrastructure.Platform;
@@ -177,20 +178,52 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<IBeatmapBackupStore, FileSystemBeatmapBackupStore>();
         services.AddSingleton<IBeatmapBackupService, BeatmapBackupService>();
         services.AddSingleton<IQuickUndoCommandService, QuickUndoCommandService>();
+        services.AddSingleton<MtipcLiveBeatmapReader>(provider =>
+            new MtipcLiveBeatmapReader(
+                provider.GetRequiredService<ApplicationSettings>()));
+        services.AddSingleton<MtipcCurrentBeatmapLocator>(provider =>
+            new MtipcCurrentBeatmapLocator(
+                provider.GetRequiredService<ApplicationSettings>()));
+        services.AddSingleton<MtipcEditorReloadService>();
+
         if (OperatingSystem.IsWindows())
         {
             services.AddSingleton<WindowsEditorReaderAdapter>();
+            services.AddSingleton<WindowsMemoryCurrentBeatmapLocator>();
+            services.AddSingleton<WindowsOsuEditorReloadService>();
             services.AddSingleton<ILiveBeatmapReader>(provider =>
-                provider.GetRequiredService<WindowsEditorReaderAdapter>());
+                new ConfiguredLiveBeatmapReader(
+                    provider.GetRequiredService<ApplicationSettings>(),
+                    provider.GetRequiredService<WindowsEditorReaderAdapter>(),
+                    provider.GetRequiredService<MtipcLiveBeatmapReader>()));
             services.AddSingleton<ICurrentBeatmapLocator>(provider =>
-                provider.GetRequiredService<WindowsEditorReaderAdapter>());
-            services.AddSingleton<IEditorReloadService, WindowsOsuEditorReloadService>();
+                new ConfiguredCurrentBeatmapLocator(
+                    provider.GetRequiredService<ApplicationSettings>(),
+                    provider.GetRequiredService<WindowsMemoryCurrentBeatmapLocator>(),
+                    provider.GetRequiredService<MtipcCurrentBeatmapLocator>()));
+            services.AddSingleton<IEditorReloadService>(provider =>
+                new ConfiguredEditorReloadService(
+                    provider.GetRequiredService<ApplicationSettings>(),
+                    provider.GetRequiredService<WindowsOsuEditorReloadService>(),
+                    provider.GetRequiredService<MtipcEditorReloadService>()));
         }
         else
         {
-            services.AddSingleton<ILiveBeatmapReader, UnsupportedPlatformLiveBeatmapReader>();
-            services.AddSingleton<ICurrentBeatmapLocator, UnsupportedPlatformCurrentBeatmapLocator>();
-            services.AddSingleton<IEditorReloadService, UnsupportedPlatformEditorReloadService>();
+            services.AddSingleton<ILiveBeatmapReader>(provider =>
+                new ConfiguredLiveBeatmapReader(
+                    provider.GetRequiredService<ApplicationSettings>(),
+                    new UnsupportedPlatformLiveBeatmapReader(),
+                    provider.GetRequiredService<MtipcLiveBeatmapReader>()));
+            services.AddSingleton<ICurrentBeatmapLocator>(provider =>
+                new ConfiguredCurrentBeatmapLocator(
+                    provider.GetRequiredService<ApplicationSettings>(),
+                    new UnsupportedPlatformCurrentBeatmapLocator(),
+                    provider.GetRequiredService<MtipcCurrentBeatmapLocator>()));
+            services.AddSingleton<IEditorReloadService>(provider =>
+                new ConfiguredEditorReloadService(
+                    provider.GetRequiredService<ApplicationSettings>(),
+                    new UnsupportedPlatformEditorReloadService(),
+                    provider.GetRequiredService<MtipcEditorReloadService>()));
         }
 
         services.AddSingleton<IBeatmapEditingGateway, BeatmapEditingGateway>();

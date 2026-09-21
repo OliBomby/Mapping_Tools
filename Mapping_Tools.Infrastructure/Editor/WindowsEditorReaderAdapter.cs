@@ -5,7 +5,6 @@ using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Settings.Models;
-using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.MathUtil;
@@ -18,20 +17,16 @@ using HitObject = Editor_Reader.HitObject;
 namespace Mapping_Tools.Infrastructure.Editor;
 
 /// <summary>
-///     Reads the current osu!stable beatmap through its in-game memory model and
-///     reads unsaved editor state through Editor Reader, then translates the
-///     vendor-specific memory models into application contracts.
+///     Reads unsaved osu!stable editor state through Editor Reader, then translates
+///     the vendor-specific memory models into application contracts.
 /// </summary>
 public sealed class WindowsEditorReaderAdapter :
     ILiveBeatmapReader,
-    ICurrentBeatmapLocator,
     IDisposable
 {
     private readonly IApplicationDirectories directories;
-    private readonly Func<Process?> findProcess;
     private readonly Func<bool> isWindows;
     private readonly Lock lifecycleGate = new();
-    private readonly Func<Process, string?> readCurrentBeatmapFromMemory;
     private readonly EditorReader readerAdapter = new();
     private readonly SemaphoreSlim readerLock = new(1, 1);
     private readonly ApplicationSettings settings;
@@ -50,9 +45,7 @@ public sealed class WindowsEditorReaderAdapter :
         : this(
             settings,
             directories,
-            OperatingSystem.IsWindows,
-            OsuProcessDiscovery.FindStableProcess,
-            process => CurrentBeatmapMemoryReader.TryRead(process, settings.SongsPath))
+            OperatingSystem.IsWindows)
     {
     }
 
@@ -60,87 +53,10 @@ public sealed class WindowsEditorReaderAdapter :
         ApplicationSettings settings,
         IApplicationDirectories directories,
         Func<bool> isWindows)
-        : this(
-            settings,
-            directories,
-            isWindows,
-            OsuProcessDiscovery.FindStableProcess,
-            process => CurrentBeatmapMemoryReader.TryRead(process, settings.SongsPath))
-    {
-    }
-
-    internal WindowsEditorReaderAdapter(
-        ApplicationSettings settings,
-        IApplicationDirectories directories,
-        Func<bool> isWindows,
-        Func<Process?> findProcess,
-        Func<Process, string?> readCurrentBeatmapFromMemory)
     {
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         this.directories = directories ?? throw new ArgumentNullException(nameof(directories));
         this.isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
-        this.findProcess = findProcess ?? throw new ArgumentNullException(nameof(findProcess));
-        this.readCurrentBeatmapFromMemory = readCurrentBeatmapFromMemory
-                                            ?? throw new ArgumentNullException(nameof(readCurrentBeatmapFromMemory));
-    }
-
-    /// <inheritdoc />
-    public async Task<string> FindCurrentBeatmapAsync(
-        CancellationToken cancellationToken = default)
-    {
-        lock (lifecycleGate)
-        {
-            ObjectDisposedException.ThrowIf(disposed, this);
-        }
-
-        if (!isWindows())
-            throw new InvalidOperationException(
-                "Current osu! beatmap lookup is unavailable on this platform.");
-
-        EnterRead();
-        bool lockTaken = false;
-        try
-        {
-            await readerLock.WaitAsync(cancellationToken).ConfigureAwait(false);
-            lockTaken = true;
-            using var process = findProcess();
-            if (process is null)
-                throw new InvalidOperationException(
-                    "Open a beatmap in osu! before using the current editor state.");
-
-            cancellationToken.ThrowIfCancellationRequested();
-            string? path = await Task.Run(
-                    // ReSharper disable once AccessToDisposedClosure
-                    () => FindCurrentBeatmap(process),
-                    cancellationToken)
-                .ConfigureAwait(false);
-            cancellationToken.ThrowIfCancellationRequested();
-            if (string.IsNullOrWhiteSpace(path))
-                throw new InvalidOperationException(
-                    "Open a beatmap in osu! before using the current editor state.");
-
-            return path;
-        }
-        catch (OperationCanceledException)
-        {
-            throw;
-        }
-        catch (InvalidOperationException)
-        {
-            throw;
-        }
-        catch (Exception exception)
-        {
-            throw new InvalidOperationException(
-                "Could not determine the beatmap currently open in osu!.",
-                exception);
-        }
-        finally
-        {
-            if (lockTaken) readerLock.Release();
-
-            ExitRead();
-        }
     }
 
     /// <summary>
@@ -232,35 +148,6 @@ public sealed class WindowsEditorReaderAdapter :
             WriteDiagnosticLog(readerAdapter);
             throw;
         }
-    }
-
-    private string? FindCurrentBeatmap(Process process)
-    {
-        string? path = null;
-        try
-        {
-            path = readCurrentBeatmapFromMemory(process);
-        }
-        catch
-        {
-            // Editor Reader is still a useful fallback when the in-game reader
-            // cannot read the current beatmap object.
-        }
-
-        if (!string.IsNullOrWhiteSpace(path)) return path;
-
-        if (string.IsNullOrWhiteSpace(settings.SongsPath)
-            || !settings.UseEditorReader
-            || !IsActiveEditor(process))
-            return null;
-
-        readerAdapter.SetProcess(process);
-        readerAdapter.FetchHOM();
-        readerAdapter.FetchBeatmap();
-        return Path.Combine(
-            settings.SongsPath,
-            readerAdapter.ContainingFolder,
-            readerAdapter.Filename);
     }
 
     private static bool IsActiveEditor(Process process)
@@ -386,10 +273,10 @@ internal static class EditorReaderSnapshotConverter
             throw new InvalidDataException(
                 "Editor Reader returned inconsistent object or timing-point data.");
 
-        string path = Path.Combine(
+        string path = Path.GetFullPath(Path.Combine(
             songsPath,
             reader.ContainingFolder,
-            reader.Filename);
+            reader.Filename));
         var hitObjects = reader.hitObjects.Select(ConvertHitObject).ToList();
         var selectedHitObjects = reader.hitObjects
             .Select((source, index) => source.IsSelected ? hitObjects[index] : null)

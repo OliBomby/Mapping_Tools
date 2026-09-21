@@ -144,7 +144,7 @@ public sealed class BeatmapWorkspaceViewModelTests
         ApplicationSettings settings = new()
         {
             BackupsPath = @"C:\Backups",
-            AutoReload = autoReload,
+            EditorReload = autoReload ? EditorReloadMode.SimulatedKeypress : EditorReloadMode.Disabled,
         };
         return new BeatmapWorkspaceViewModel(
             workspace,

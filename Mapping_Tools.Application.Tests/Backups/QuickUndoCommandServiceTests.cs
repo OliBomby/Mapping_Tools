@@ -119,7 +119,10 @@ public sealed class QuickUndoCommandServiceTests
         return new QuickUndoCommandService(
             locator,
             backups,
-            new ApplicationSettings { AutoReload = autoReload },
+            new ApplicationSettings
+            {
+                EditorReload = autoReload ? EditorReloadMode.SimulatedKeypress : EditorReloadMode.Disabled,
+            },
             notifications);
     }
 

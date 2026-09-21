@@ -8,11 +8,11 @@ public static class AutomaticEditorReloadPolicy
 {
     /// <summary>
     ///     Returns whether the save belongs to a QuickRun mutation of a live
-    ///     editor session while automatic reload is enabled.
+    ///     editor session while editor reload is enabled.
     /// </summary>
     /// <param name="session">The target beatmap session being saved.</param>
     /// <param name="quickRun">Whether the mutation was started by QuickRun.</param>
-    /// <param name="settings">The application preferences controlling auto reload.</param>
+    /// <param name="settings">The application preferences controlling editor reload.</param>
     /// <returns><see langword="true" /> only when all automatic reload conditions are met.</returns>
     public static bool ShouldReloadEditor(
         BeatmapEditingSession session,
@@ -24,6 +24,6 @@ public static class AutomaticEditorReloadPolicy
 
         return quickRun
                && session.Source == BeatmapEditingSource.LiveEditor
-               && settings.AutoReload;
+               && settings.EditorReload != EditorReloadMode.Disabled;
     }
 }

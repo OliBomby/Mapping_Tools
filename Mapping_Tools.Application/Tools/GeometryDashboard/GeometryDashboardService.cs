@@ -364,9 +364,9 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
             return;
         }
 
-        if (!applicationSettings.UseEditorReader)
+        if (applicationSettings.BeatmapLiveStateReading == BeatmapLiveStateReadingMode.Disabled)
         {
-            PublishUnavailableState("Unable to run: enable Editor Reader in Preferences.");
+            PublishUnavailableState("Unable to run: enable beatmap live-state reading in Preferences.");
             return;
         }
 
