@@ -6,7 +6,7 @@
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:materialIcons="using:Material.Icons.Avalonia"
              xmlns:patternGallery="clr-namespace:Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels"
-             xmlns:virtualizingWrapPanel="clr-namespace:Mapping_Tools.Desktop.Controls.VirtualizingWrapPanel"
+             xmlns:virtualizingWrapPanel="clr-namespace:Avalonia.Labs.Controls;assembly=Avalonia.Labs.Panels"
              x:Class="Mapping_Tools.Desktop.Tools.PatternGallery.Views.PatternGalleryView"
              x:Name="Root"
              x:DataType="patternGallery:PatternGalleryViewModel">
