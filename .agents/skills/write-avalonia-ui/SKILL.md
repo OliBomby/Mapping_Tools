@@ -26,7 +26,7 @@ Use only official Avalonia documentation, the Avalonia 12.1.0 tagged source/rele
 - Use `[NotifyPropertyChangedFor]` and `[NotifyCanExecuteChangedFor]` for static dependent notifications instead of manual `OnPropertyChanged` calls.
 - Use `[RelayCommand]` for synchronous and asynchronous view-model actions when the generated command has the required execution and cancellation semantics.
 - Keep a manual property when it normalizes input, directly adapts a non-observable model without duplicate state, or requires setter ordering that generator hooks cannot preserve clearly.
-- Keep enum types in the view model property. Use a binding converter for the view if the enum is not directly displayable. Avoid exposing a string property for an enum.
+- Use a binding converter for the view if the enum is not directly displayable. Avoid exposing a string property for an enum. One converter per enum.
 
 ## View implementation standard
 
