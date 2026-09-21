@@ -57,18 +57,8 @@ public sealed class QuickRunService : IQuickRunService
                 var snapshot = await liveReader
                     .ReadAsync(cancellationToken)
                     .ConfigureAwait(false);
-                if (snapshot is null)
-                {
-                    await PublishAsync(
-                            UserNotificationSeverity.Warning,
-                            "QuickRun",
-                            "QuickRun could not determine the current osu! editor selection.")
-                        .ConfigureAwait(false);
-                    return new QuickRunResult(QuickRunStatus.EditorUnavailable);
-                }
-
                 string configuredName = GetConfiguredName(
-                    snapshot.SelectedHitObjects.Count);
+                    snapshot?.SelectedHitObjects.Count ?? 0);
                 command = string.Equals(
                     configuredName,
                     current_tool_sentinel,
