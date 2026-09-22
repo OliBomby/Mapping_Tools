@@ -245,7 +245,7 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
                             .ConfigureAwait(false);
                         return new ToolExecutionOutput<PropertyTransformerResult>(
                             result,
-                            quickRun ? null : "Done!");
+                            "Done!");
                     }),
                 CreateProgress(),
                 cancellationToken)

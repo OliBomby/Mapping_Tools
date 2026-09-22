@@ -154,7 +154,7 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
                             context.CancellationToken);
                         return new ToolExecutionOutput<TimingHelperResult>(
                             result,
-                            quick ? null : $"Successfully added {result.RedlinesAdded} redlines!");
+                            $"Successfully added {result.RedlinesAdded} redlines!");
                     }),
                 CreateProgress(),
                 cancellationToken)

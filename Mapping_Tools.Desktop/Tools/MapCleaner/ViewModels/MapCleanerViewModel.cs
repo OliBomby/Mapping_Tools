@@ -195,7 +195,7 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
                         context.CancellationToken);
                     return new ToolExecutionOutput<MapCleanerResult>(
                         result,
-                        quick ? null : Summarize(result, options));
+                        Summarize(result, options));
                 }),
             CreateProgress(),
             cancellationToken);

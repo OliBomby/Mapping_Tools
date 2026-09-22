@@ -325,7 +325,7 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
                         context.CancellationToken);
                     return new ToolExecutionOutput<HitsoundCopierResult>(
                         result,
-                        quick ? null : $"Successfully copied hitsounds to {result.ProcessedCount} " + $"{(result.ProcessedCount == 1 ? "beatmap" : "beatmaps")}!");
+                        $"Successfully copied hitsounds to {result.ProcessedCount} " + $"{(result.ProcessedCount == 1 ? "beatmap" : "beatmaps")}!");
                 }),
             CreateProgress());
     }

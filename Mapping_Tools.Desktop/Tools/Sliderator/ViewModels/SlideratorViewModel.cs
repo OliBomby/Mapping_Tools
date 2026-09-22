@@ -343,7 +343,6 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
             await RunPathAsync(
                 path,
                 true,
-                true,
                 cancellationToken,
                 false);
         });
@@ -385,7 +384,6 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
             succeeded = await RunPathAsync(
                 path,
                 false,
-                true,
                 cancellationToken,
                 true);
         });
@@ -472,7 +470,6 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         await RunPathAsync(
             path,
             settings.AlwaysQuickRun,
-            settings.AlwaysQuickRun,
             CancellationToken.None,
             false);
     }
@@ -543,10 +540,8 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         }
     }
 
-    private async Task<bool> RunPathAsync(
-        string path,
+    private async Task<bool> RunPathAsync(string path,
         bool quickRun,
-        bool suppressSummary,
         CancellationToken cancellationToken,
         bool useEditorReadPreference)
     {
@@ -572,7 +567,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
                         preferLiveEditor);
                     return new ToolExecutionOutput<SlideratorResult>(
                         result,
-                        suppressSummary ? null : "Done!");
+                        "Done!");
                 }),
             CreateProgress(),
             cancellationToken);

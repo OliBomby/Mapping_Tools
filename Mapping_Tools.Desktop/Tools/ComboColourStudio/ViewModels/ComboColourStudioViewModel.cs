@@ -447,7 +447,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
                         context.CancellationToken);
                     return new ToolExecutionOutput<ComboColourStudioRunResult>(
                         result,
-                        quick ? null : $"Successfully exported colours to {result.ProcessedCount} " + $"{(result.ProcessedCount == 1 ? "beatmap" : "beatmaps")}!");
+                        $"Successfully exported colours to {result.ProcessedCount} " + $"{(result.ProcessedCount == 1 ? "beatmap" : "beatmaps")}!");
                 }),
             CreateProgress(),
             cancellationToken);

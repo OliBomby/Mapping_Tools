@@ -249,7 +249,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
                         context.CancellationToken);
                     return new ToolExecutionOutput<HitsoundPreviewHelperResult>(
                         applied,
-                        quick ? null : "Done!");
+                        $"Placed {applied.UpdatedEventCount} preview hitsounds.");
                 }),
             CreateProgress(),
             cancellationToken);

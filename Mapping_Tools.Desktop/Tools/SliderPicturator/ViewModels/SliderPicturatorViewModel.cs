@@ -426,7 +426,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
                     context.CancellationToken);
                 return new ToolExecutionOutput<SliderPicturatorResult>(
                     result,
-                    quick ? null : "Done!");
+                    "Done!");
             }), CreateProgress(), cancellationToken);
         if (execution is { Status: ToolExecutionStatus.Succeeded, Value: { } result2 })
             SegmentCount = result2.SegmentCount;

@@ -101,7 +101,7 @@ public sealed partial class SampleToolViewModel : SingleRunToolViewModel,
                         .ConfigureAwait(false);
                     return new ToolExecutionOutput<int>(
                         changedCount,
-                        quick ? null : Summarize(changedCount, paths.Count, tag));
+                        Summarize(changedCount, paths.Count, tag));
                 }),
             CreateProgress(),
             cancellationToken);

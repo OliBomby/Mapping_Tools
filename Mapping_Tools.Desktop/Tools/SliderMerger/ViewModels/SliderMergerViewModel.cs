@@ -149,7 +149,7 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
                         string message = $"Successfully merged {result.ObjectsMerged} " + $"{(result.ObjectsMerged == 1 ? "slider" : "sliders")}!";
                         return new ToolExecutionOutput<SliderMergerResult>(
                             result,
-                            quick ? null : message);
+                            message);
                     }),
                 CreateProgress(),
                 cancellationToken)

@@ -202,7 +202,7 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
                         string message = $"Successfully completed {result.SlidersCompleted} " + $"{(result.SlidersCompleted == 1 ? "slider" : "sliders")}!";
                         return new ToolExecutionOutput<SliderCompletionatorResult>(
                             result,
-                            quick ? null : message);
+                            message);
                     }),
                 CreateProgress(),
                 cancellationToken)

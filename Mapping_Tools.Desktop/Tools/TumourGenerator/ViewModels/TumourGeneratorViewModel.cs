@@ -626,7 +626,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
                     string summary = $"Successfully generated tumours on {result.SlidersTumourated} " + $"{(result.SlidersTumourated == 1 ? "slider" : "sliders")}" + "!";
                     return new ToolExecutionOutput<TumourRunResult>(
                         result,
-                        quick ? null : summary);
+                        summary);
                 }),
             CreateProgress(),
             cancellationToken);
