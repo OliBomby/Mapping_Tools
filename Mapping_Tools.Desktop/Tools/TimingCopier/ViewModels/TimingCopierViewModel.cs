@@ -10,6 +10,7 @@ using Mapping_Tools.Application.Tools.TimingCopier;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Tools.TimingCopier.Models;
+using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tools.TimingCopier.Models;
 using Mapping_Tools.Desktop.ViewModels;
@@ -22,7 +23,7 @@ namespace Mapping_Tools.Desktop.Tools.TimingCopier.ViewModels;
 public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
     IShellProjectFeature<TimingCopierProject>
 {
-    private readonly ICurrentBeatmapLocator currentBeatmapLocator;
+    private readonly ICurrentBeatmapDialogService currentBeatmapService;
 
     private readonly IFilePicker filePicker;
     private readonly IUserNotificationService notifications;
@@ -36,22 +37,22 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
     /// <param name="timingCopier">Runs the framework-independent timing transformation.</param>
     /// <param name="execution">Coordinates background execution, cancellation, and notifications.</param>
     /// <param name="filePicker">Presents native beatmap file dialogs.</param>
-    /// <param name="currentBeatmapLocator">Finds the beatmap currently open in osu!.</param>
-    /// <param name="notifications">Publishes picker and current-map failures.</param>
+    /// <param name="currentBeatmapService">Fetches the current beatmap and presents lookup feedback.</param>
+    /// <param name="notifications">Publishes picker failures.</param>
     /// <param name="workspace">Supplies the current shell map selection for picker locations.</param>
     public TimingCopierViewModel(
         ITimingCopierService timingCopier,
         IToolExecutionService execution,
         IFilePicker filePicker,
-        ICurrentBeatmapLocator currentBeatmapLocator,
+        ICurrentBeatmapDialogService currentBeatmapService,
         IUserNotificationService notifications,
         IBeatmapWorkspace workspace)
         : base(execution, TimingCopierToolDefinition.Definition)
     {
         this.timingCopier = timingCopier ?? throw new ArgumentNullException(nameof(timingCopier));
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
-        this.currentBeatmapLocator = currentBeatmapLocator
-                                     ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
+        this.currentBeatmapService = currentBeatmapService
+                                     ?? throw new ArgumentNullException(nameof(currentBeatmapService));
         this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
     }
@@ -111,21 +112,8 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task ImportLoadAsync()
     {
-        try
-        {
-            string path = await currentBeatmapLocator.FindCurrentBeatmapAsync();
-            if (!string.IsNullOrWhiteSpace(path)) ImportPath = path;
-        }
-        catch (OperationCanceledException)
-        {
-        }
-        catch (Exception exception)
-        {
-            await PublishFailureAsync(
-                "Could not fetch the source beatmap",
-                "The selected beatmap could not be obtained from osu!.",
-                exception);
-        }
+        string? path = await currentBeatmapService.FetchAsync();
+        if (path is not null) ImportPath = path;
     }
 
     /// <summary>Opens a native picker for the source beatmap.</summary>
@@ -143,21 +131,8 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task ExportLoadAsync()
     {
-        try
-        {
-            string path = await currentBeatmapLocator.FindCurrentBeatmapAsync();
-            if (!string.IsNullOrWhiteSpace(path)) ExportPath = path;
-        }
-        catch (OperationCanceledException)
-        {
-        }
-        catch (Exception exception)
-        {
-            await PublishFailureAsync(
-                "Could not fetch the target beatmap",
-                "The selected beatmap could not be obtained from osu!.",
-                exception);
-        }
+        string? path = await currentBeatmapService.FetchAsync();
+        if (path is not null) ExportPath = path;
     }
 
     /// <summary>Opens a native multi-select picker for target beatmaps.</summary>

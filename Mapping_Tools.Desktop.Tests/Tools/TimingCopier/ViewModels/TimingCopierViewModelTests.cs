@@ -109,7 +109,7 @@ public sealed class TimingCopierViewModelTests
                 new UserNotificationService(),
                 TimeProvider.System),
             filePicker ?? new TestFilePicker(),
-            new RecordingCurrentBeatmapLocator(),
+            new TestCurrentBeatmapDialogService(),
             new UserNotificationService(),
             workspace ?? new TestBeatmapWorkspace());
     }

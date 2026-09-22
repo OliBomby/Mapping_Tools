@@ -12,6 +12,7 @@ using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.HitsoundCopier.Models;
+using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tools.HitsoundCopier.Models;
 using Mapping_Tools.Desktop.ViewModels;
@@ -24,7 +25,7 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     IQuickRun
 {
     private readonly IHitsoundCopierService copier;
-    private readonly ICurrentBeatmapLocator currentBeatmap;
+    private readonly ICurrentBeatmapDialogService currentBeatmapService;
 
     private readonly IFilePicker filePicker;
     private readonly IUserNotificationService notifications;
@@ -34,21 +35,22 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     /// <param name="copier">Supplies the Hitsound Copier service.</param>
     /// <param name="execution">Supplies the tool execution service.</param>
     /// <param name="filePicker">Supplies the file picker service.</param>
-    /// <param name="currentBeatmap">Supplies the current beatmap locator service.</param>
+    /// <param name="currentBeatmapService">Fetches the current beatmap and presents lookup feedback.</param>
     /// <param name="workspace">Supplies the shell's selected beatmap for QuickRun fallback.</param>
     /// <param name="notifications">Supplies the user notification service.</param>
     public HitsoundCopierViewModel(
         IHitsoundCopierService copier,
         IToolExecutionService execution,
         IFilePicker filePicker,
-        ICurrentBeatmapLocator currentBeatmap,
+        ICurrentBeatmapDialogService currentBeatmapService,
         IBeatmapWorkspace workspace,
         IUserNotificationService notifications)
         : base(execution, HitsoundCopierToolDefinition.Definition)
     {
         this.copier = copier ?? throw new ArgumentNullException(nameof(copier));
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
-        this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        this.currentBeatmapService = currentBeatmapService
+                                     ?? throw new ArgumentNullException(nameof(currentBeatmapService));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
     }
@@ -208,14 +210,14 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task ImportLoadAsync()
     {
-        await SetCurrentPathAsync(path => PathFrom = path, "source");
+        await SetCurrentPathAsync(path => PathFrom = path);
     }
 
     /// <summary>Fetches the current osu! map into the target field.</summary>
     [RelayCommand]
     private async Task ExportLoadAsync()
     {
-        await SetCurrentPathAsync(path => PathTo = path, "target");
+        await SetCurrentPathAsync(path => PathTo = path);
     }
 
     /// <summary>Opens a single-map source picker.</summary>
@@ -328,17 +330,10 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
             CreateProgress());
     }
 
-    private async Task SetCurrentPathAsync(Action<string> setter, string label)
+    private async Task SetCurrentPathAsync(Action<string> setter)
     {
-        try
-        {
-            string path = await currentBeatmap.FindCurrentBeatmapAsync();
-            if (!string.IsNullOrWhiteSpace(path)) setter(path);
-        }
-        catch (Exception exception)
-        {
-            await PublishFailureAsync($"Could not fetch the {label} beatmap", exception);
-        }
+        string? path = await currentBeatmapService.FetchAsync();
+        if (path is not null) setter(path);
     }
 
     private async Task PickAsync(

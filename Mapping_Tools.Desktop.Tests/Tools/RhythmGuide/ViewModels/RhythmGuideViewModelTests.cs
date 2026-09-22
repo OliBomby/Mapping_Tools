@@ -79,6 +79,21 @@ public sealed class RhythmGuideViewModelTests
     }
 
     [TestMethod]
+    public async Task UseCurrentSourceCommand_WhenLookupFails_ShowsOriginalErrorMessage()
+    {
+        // Arrange
+        TestCurrentBeatmapDialogService currentBeatmap = new();
+        var viewModel = CreateViewModel(currentBeatmap: currentBeatmap);
+
+        // Act
+        await ExecuteAsync(viewModel.UseCurrentSourceCommand);
+
+        // Assert
+        currentBeatmap.FetchCount.Should().Be(1);
+        viewModel.SourcePaths.Should().BeEmpty();
+    }
+
+    [TestMethod]
     public async Task RunCommand_WithAddToMap_PublishesDoneMessageAndRevealsExport()
     {
         // Arrange
@@ -104,7 +119,8 @@ public sealed class RhythmGuideViewModelTests
         TestFilePicker? filePicker = null,
         UserNotificationService? notifications = null,
         TestBeatmapWorkspace? workspace = null,
-        TestFileRevealService? fileReveal = null)
+        TestFileRevealService? fileReveal = null,
+        TestCurrentBeatmapDialogService? currentBeatmap = null)
     {
         notifications ??= new UserNotificationService();
         ToolExecutionService execution = new(
@@ -115,7 +131,7 @@ public sealed class RhythmGuideViewModelTests
             execution,
             filePicker ?? new TestFilePicker(),
             fileReveal ?? new TestFileRevealService(),
-            new RecordingCurrentBeatmapLocator(),
+            currentBeatmap ?? new TestCurrentBeatmapDialogService(),
             workspace ?? new TestBeatmapWorkspace(),
             new StubRhythmGuideWindowService(),
             new TestApplicationDirectories());

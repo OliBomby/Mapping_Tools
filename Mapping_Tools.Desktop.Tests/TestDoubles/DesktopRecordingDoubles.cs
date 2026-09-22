@@ -9,6 +9,8 @@ internal sealed class RecordingCurrentBeatmapLocator(string? path = null) : ICur
 {
     public string? Path { get; set; } = path;
 
+    public Exception? Failure { get; set; }
+
     public int FindCount { get; private set; }
 
     public Task<string> FindCurrentBeatmapAsync(
@@ -16,6 +18,8 @@ internal sealed class RecordingCurrentBeatmapLocator(string? path = null) : ICur
     {
         cancellationToken.ThrowIfCancellationRequested();
         FindCount++;
+        if (Failure is not null) return Task.FromException<string>(Failure);
+
         return string.IsNullOrWhiteSpace(Path)
             ? Task.FromException<string>(new InvalidOperationException(
                 "Open a beatmap in osu! before using the current editor state."))

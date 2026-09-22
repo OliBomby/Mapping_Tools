@@ -27,7 +27,7 @@ public sealed class SlideratorViewModelTests
         RecordingSliderator service = new();
         var viewModel = Create(
             service,
-            new RecordingCurrentBeatmapLocator("current.osu"));
+            new TestCurrentBeatmapDialogService { Path = "current.osu" });
         viewModel.BeatSnapDivisor = 8;
         viewModel.ManualVelocity = true;
         viewModel.NewVelocity = 1;
@@ -307,7 +307,7 @@ public sealed class SlideratorViewModelTests
         RecordingSliderator service = new();
         var viewModel = Create(
             service,
-            new RecordingCurrentBeatmapLocator("current.osu"));
+            new TestCurrentBeatmapDialogService { Path = "current.osu" });
         viewModel.LoadedHitObjects.Add(new HitObject("64,64,0,2,0,L|164:64,1,100"));
 
         // Act
@@ -327,7 +327,7 @@ public sealed class SlideratorViewModelTests
         RecordingSliderator service = new();
         var viewModel = Create(
             service,
-            new RecordingCurrentBeatmapLocator("current.osu"));
+            new TestCurrentBeatmapDialogService { Path = "current.osu" });
         await viewModel.ImportCommand.ExecuteAsync(null);
 
         // Act
@@ -346,7 +346,7 @@ public sealed class SlideratorViewModelTests
         RecordingSliderator service = new();
         var viewModel = Create(
             service,
-            new RecordingCurrentBeatmapLocator("current.osu"));
+            new TestCurrentBeatmapDialogService { Path = "current.osu" });
         HitObject slider = new("64,64,0,2,0,L|164:64,1,100");
         ((IShellProjectFeature<SlideratorProject>)viewModel).Install(
             new SlideratorProject
@@ -387,7 +387,7 @@ public sealed class SlideratorViewModelTests
         TestDialogService dialogs = new();
         var viewModel = Create(
             service,
-            new RecordingCurrentBeatmapLocator("current.osu"),
+            new TestCurrentBeatmapDialogService { Path = "current.osu" },
             dialogs);
         HitObject slider = new("64,64,0,2,0,L|164:64,1,100");
         viewModel.LoadedHitObjects.Add(slider);
@@ -409,7 +409,7 @@ public sealed class SlideratorViewModelTests
         TestDialogService dialogs = new();
         var viewModel = Create(
             service,
-            new RecordingCurrentBeatmapLocator(),
+            new TestCurrentBeatmapDialogService(),
             dialogs);
 
         // Act
@@ -430,7 +430,7 @@ public sealed class SlideratorViewModelTests
     {
         // Arrange
         RecordingSliderator service = new();
-        RecordingCurrentBeatmapLocator currentBeatmap = new();
+        TestCurrentBeatmapDialogService currentBeatmap = new();
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["selected.osu"]);
         var viewModel = Create(service, currentBeatmap, workspace: workspace);
@@ -441,7 +441,7 @@ public sealed class SlideratorViewModelTests
 
         // Assert
         service.ImportPath.Should().Be("selected.osu");
-        currentBeatmap.FindCount.Should().Be(0);
+        currentBeatmap.FetchCount.Should().Be(0);
     }
 
     [TestMethod]
@@ -451,7 +451,7 @@ public sealed class SlideratorViewModelTests
         RecordingSliderator service = new() { ReturnEmptyImport = true };
         var viewModel = Create(
             service,
-            new RecordingCurrentBeatmapLocator("current.osu"));
+            new TestCurrentBeatmapDialogService { Path = "current.osu" });
         viewModel.LoadedHitObjects.Add(new HitObject("64,64,0,2,0,L|164:64,1,100"));
 
         // Act
@@ -493,12 +493,12 @@ public sealed class SlideratorViewModelTests
 
     private static SlideratorViewModel Create(
         RecordingSliderator service,
-        RecordingCurrentBeatmapLocator? currentBeatmap = null,
+        TestCurrentBeatmapDialogService? currentBeatmap = null,
         TestDialogService? dialogs = null,
         TestBeatmapWorkspace? workspace = null)
     {
-        RecordingCurrentBeatmapLocator effectiveCurrentBeatmap =
-            currentBeatmap ?? new RecordingCurrentBeatmapLocator();
+        TestCurrentBeatmapDialogService effectiveCurrentBeatmap =
+            currentBeatmap ?? new TestCurrentBeatmapDialogService { Path = "current.osu" };
         TestBeatmapWorkspace effectiveWorkspace = workspace ?? new TestBeatmapWorkspace();
         effectiveWorkspace.QuickRunPath = effectiveCurrentBeatmap.Path;
         return new SlideratorViewModel(

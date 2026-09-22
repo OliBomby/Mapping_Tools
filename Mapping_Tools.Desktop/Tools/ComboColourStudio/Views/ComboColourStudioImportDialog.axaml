@@ -7,7 +7,7 @@
              x:DataType="viewModels:ComboColourStudioImportDialogViewModel"
              HorizontalAlignment="Center"
              VerticalAlignment="Center">
-    <Grid Margin="8" RowDefinitions="Auto,Auto,Auto,Auto">
+    <Grid Margin="8" RowDefinitions="Auto,Auto,Auto">
         <TextBlock Text="Import from beatmap:" />
 
         <Grid Grid.Row="1" Margin="0,6,0,0" ColumnDefinitions="*,Auto,5,Auto">
@@ -34,16 +34,9 @@
             </Button>
         </Grid>
 
-        <TextBlock Grid.Row="2"
-                   Margin="0,8,0,0"
-                   Foreground="{DynamicResource MaterialValidationErrorBrush}"
-                   Text="{Binding Error}"
-                   TextWrapping="Wrap" />
-
-        <StackPanel Grid.Row="3"
+        <StackPanel Grid.Row="2"
                     Orientation="Horizontal"
-                    HorizontalAlignment="Center"
-                    Margin="0,16,0,0">
+                    HorizontalAlignment="Center">
             <Button Classes="dialog-action primary"
                     Theme="{StaticResource MaterialFlatButton}"
                     Content="ACCEPT"

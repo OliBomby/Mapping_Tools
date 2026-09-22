@@ -75,7 +75,7 @@ public sealed class PatternGalleryFileImportViewModelTests
     public async Task UseCurrentCommand_WithAvailableBeatmap_UpdatesFilePath()
     {
         // Arrange
-        var currentBeatmap = new RecordingCurrentBeatmapLocator("current.osu");
+        var currentBeatmap = new TestCurrentBeatmapDialogService { Path = "current.osu" };
         var viewModel = CreateViewModel(
             "initial.osu",
             currentBeatmap: currentBeatmap);
@@ -85,20 +85,20 @@ public sealed class PatternGalleryFileImportViewModelTests
 
         // Assert
         viewModel.FilePath.Should().Be("current.osu");
-        currentBeatmap.FindCount.Should().Be(1);
+        currentBeatmap.FetchCount.Should().Be(1);
     }
 
     private static PatternGalleryFileImportViewModel CreateViewModel(
         string path,
         TestFilePicker? filePicker = null,
-        RecordingCurrentBeatmapLocator? currentBeatmap = null,
+        TestCurrentBeatmapDialogService? currentBeatmap = null,
         TestBeatmapWorkspace? workspace = null)
     {
         return new PatternGalleryFileImportViewModel(
             "Pattern",
             path,
             filePicker ?? new TestFilePicker(),
-            currentBeatmap ?? new RecordingCurrentBeatmapLocator(),
+            currentBeatmap ?? new TestCurrentBeatmapDialogService(),
             workspace ?? new TestBeatmapWorkspace());
     }
 }

@@ -43,7 +43,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
 {
     private static readonly TimeSpan searchDebounceInterval = TimeSpan.FromMilliseconds(150);
     private readonly IPatternGalleryArchiveService archives;
-    private readonly ICurrentBeatmapLocator currentBeatmap;
+    private readonly ICurrentBeatmapDialogService currentBeatmapService;
 
     private readonly ProjectDefinition<PatternGalleryProject> definition = new(
         "patterngalleryproject.json",
@@ -81,7 +81,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     /// <param name="archives">Reads and creates collection ZIP files.</param>
     /// <param name="execution">Coordinates cancellable tool runs.</param>
     /// <param name="workspace">Supplies ordinary-run beatmap selection.</param>
-    /// <param name="currentBeatmap">Finds the beatmap open in osu!.</param>
+    /// <param name="currentBeatmapService">Fetches the current beatmap and presents lookup feedback.</param>
     /// <param name="filePicker">Presents native file and save dialogs.</param>
     /// <param name="reveal">Reveals files in the platform file manager.</param>
     /// <param name="projects">Loads and saves explicit collection JSON.</param>
@@ -97,7 +97,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         IPatternGalleryArchiveService archives,
         IToolExecutionService execution,
         IBeatmapWorkspace workspace,
-        ICurrentBeatmapLocator currentBeatmap,
+        ICurrentBeatmapDialogService currentBeatmapService,
         IFilePicker filePicker,
         IFileRevealService reveal,
         IProjectService projects,
@@ -113,7 +113,8 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         this.files = files ?? throw new ArgumentNullException(nameof(files));
         this.archives = archives ?? throw new ArgumentNullException(nameof(archives));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
-        this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        this.currentBeatmapService = currentBeatmapService
+                                     ?? throw new ArgumentNullException(nameof(currentBeatmapService));
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         this.reveal = reveal ?? throw new ArgumentNullException(nameof(reveal));
         this.projects = projects ?? throw new ArgumentNullException(nameof(projects));
@@ -409,24 +410,8 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         string? name = await ShowSelectedDialogAsync($"Pattern {Project.Patterns.Count + 1}");
         if (string.IsNullOrWhiteSpace(name)) return;
 
-        string sourcePath;
-        try
-        {
-            sourcePath = await currentBeatmap.FindCurrentBeatmapAsync();
-        }
-        catch (Exception exception)
-        {
-            await PublishErrorAsync(
-                $"Could not read the current osu! beatmap: {exception.Message}",
-                exception);
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(sourcePath))
-        {
-            await PublishWarningAsync("Open a beatmap in osu! before importing selected objects.");
-            return;
-        }
+        string? sourcePath = await currentBeatmapService.FetchAsync();
+        if (sourcePath is null) return;
 
         try
         {
@@ -541,7 +526,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             defaultName,
             defaultPath,
             filePicker,
-            currentBeatmap,
+            currentBeatmapService,
             workspace);
         PatternGalleryFileImportDialog dialog = new() { DataContext = viewModel };
         viewModel.Close = value => DialogHostInteraction.Close(

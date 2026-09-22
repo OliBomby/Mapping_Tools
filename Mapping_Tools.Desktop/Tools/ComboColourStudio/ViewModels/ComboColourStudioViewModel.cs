@@ -12,6 +12,7 @@ using Mapping_Tools.Application.Tools.ComboColourStudio;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.ComboColourStudio.Models;
+using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.Models;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels.Adapters;
@@ -29,7 +30,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     IShellProjectFeature<ComboColourProject>,
     IQuickRun
 {
-    private readonly ICurrentBeatmapLocator currentBeatmap;
+    private readonly ICurrentBeatmapDialogService currentBeatmapService;
 
     private readonly IFilePicker filePicker;
     private readonly ILiveBeatmapReader liveReader;
@@ -43,7 +44,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     /// <param name="execution">Coordinates cancellation and notifications.</param>
     /// <param name="notifications">Publishes user-facing operation failures.</param>
     /// <param name="workspace">Supplies ordinary-run target maps.</param>
-    /// <param name="currentBeatmap">Finds the map open in osu! for QuickRun.</param>
+    /// <param name="currentBeatmapService">Fetches the current beatmap and presents lookup feedback.</param>
     /// <param name="liveReader">Supplies the current editor time for point insertion.</param>
     /// <param name="filePicker">Presents the import picker.</param>
     public ComboColourStudioViewModel(
@@ -51,7 +52,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         IToolExecutionService execution,
         IUserNotificationService notifications,
         IBeatmapWorkspace workspace,
-        ICurrentBeatmapLocator currentBeatmap,
+        ICurrentBeatmapDialogService currentBeatmapService,
         ILiveBeatmapReader liveReader,
         IFilePicker filePicker)
         : base(execution, ComboColourStudioToolDefinition.Definition)
@@ -59,7 +60,8 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         this.studio = studio ?? throw new ArgumentNullException(nameof(studio));
         this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
-        this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        this.currentBeatmapService = currentBeatmapService
+                                     ?? throw new ArgumentNullException(nameof(currentBeatmapService));
         this.liveReader = liveReader ?? throw new ArgumentNullException(nameof(liveReader));
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         RebuildPresentation();
@@ -336,18 +338,8 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task UseCurrentImportAsync()
     {
-        try
-        {
-            ImportPath = await currentBeatmap.FindCurrentBeatmapAsync();
-        }
-        catch (InvalidOperationException exception)
-        {
-            await notifications.PublishAsync(new UserNotification(
-                UserNotificationSeverity.Error,
-                "Could not read current beatmap",
-                exception.Message,
-                exception));
-        }
+        string? path = await currentBeatmapService.FetchAsync();
+        if (path is not null) ImportPath = path;
     }
 
     /// <inheritdoc />
@@ -400,19 +392,10 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     {
         string defaultPath = ImportPath;
         if (string.IsNullOrWhiteSpace(defaultPath))
-        {
-            try
-            {
-                defaultPath = await currentBeatmap.FindCurrentBeatmapAsync();
-            }
-            catch (InvalidOperationException)
-            {
-                // The dialog still provides an explicit browse and current-map action.
-            }
-        }
+            defaultPath = workspace.SelectedPaths.FirstOrDefault() ?? string.Empty;
 
         ComboColourStudioImportDialogViewModel viewModel =
-            new(defaultPath, currentBeatmap, workspace, filePicker);
+            new(defaultPath, currentBeatmapService, workspace, filePicker);
         ComboColourStudioImportDialog dialog = new() { DataContext = viewModel };
         viewModel.Close = value => DialogHostInteraction.Close(
             DialogHostInteraction.ROOT_IDENTIFIER,

@@ -106,7 +106,7 @@ public sealed class MetadataManagerViewModelTests
             metadataManager ?? new RecordingMetadataManagerService(),
             execution,
             filePicker ?? new TestFilePicker(),
-            new RecordingCurrentBeatmapLocator(),
+            new TestCurrentBeatmapDialogService(),
             workspace ?? new TestBeatmapWorkspace(),
             notifications,
             new TestApplicationDirectories());

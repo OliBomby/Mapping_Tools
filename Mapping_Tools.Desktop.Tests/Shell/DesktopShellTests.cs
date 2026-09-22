@@ -731,7 +731,8 @@ public sealed class DesktopShellTests
             resolvedSettings,
             new TestDialogService(),
             resolvedNotifications,
-            workspaceDispatcher);
+            workspaceDispatcher,
+            new TestCurrentBeatmapDialogService());
         MainViewModel viewModel = new(
             new ShellFeatureRegistry(registrations ?? [Registration("get-started", "Get started")]),
             resolvedQuickRunRegistry,

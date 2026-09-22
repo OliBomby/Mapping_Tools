@@ -113,24 +113,27 @@ public sealed class BeatmapWorkspaceViewModelTests
     }
 
     [TestMethod]
-    public async Task OpenCurrentBeatmapCommand_WhenLookupUnavailable_PublishesWarning()
+    public async Task OpenCurrentBeatmapCommand_WhenLookupSucceeds_SetsCurrentSelection()
     {
         // Arrange
         TestBeatmapWorkspace workspace = new();
-        UserNotificationService notifications = new();
-        List<UserNotification> published = [];
-        notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
+        TestCurrentBeatmapDialogService currentBeatmap = new()
+        {
+            Path = "current.osu",
+        };
+        TestDialogService dialogs = new();
         using var viewModel = CreateViewModel(
             workspace,
-            notifications: notifications);
+            currentBeatmap: currentBeatmap,
+            dialogs: dialogs);
 
         // Act
         await viewModel.OpenCurrentBeatmapCommand.ExecuteAsync(null);
 
         // Assert
-        published.Should().ContainSingle();
-        published[0].Severity.Should().Be(UserNotificationSeverity.Warning);
-        published[0].Title.Should().Be("Current beatmap unavailable");
+        workspace.SelectedPaths.Should().Equal("current.osu");
+        workspace.LastSelectionSource.Should().Be(BeatmapSelectionSource.CurrentEditor);
+        dialogs.MessageCount.Should().Be(0);
     }
 
     private static BeatmapWorkspaceViewModel CreateViewModel(
@@ -139,7 +142,8 @@ public sealed class BeatmapWorkspaceViewModelTests
         TestFilePicker? picker = null,
         TestDialogService? dialogs = null,
         IUserNotificationService? notifications = null,
-        bool autoReload = false)
+        bool autoReload = false,
+        TestCurrentBeatmapDialogService? currentBeatmap = null)
     {
         ApplicationSettings settings = new()
         {
@@ -156,6 +160,7 @@ public sealed class BeatmapWorkspaceViewModelTests
             settings,
             dialogs ?? new TestDialogService(),
             notifications ?? new UserNotificationService(),
-            new ImmediateTestDispatcher());
+            new ImmediateTestDispatcher(),
+            currentBeatmap ?? new TestCurrentBeatmapDialogService());
     }
 }

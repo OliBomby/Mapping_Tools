@@ -11,6 +11,7 @@ using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.RhythmGuide.Models;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.Services;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.Models;
 using Mapping_Tools.Desktop.ViewModels;
@@ -21,7 +22,7 @@ namespace Mapping_Tools.Desktop.Tools.RhythmGuide.ViewModels;
 public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
     IShellProjectFeature<RhythmGuideProject>
 {
-    private readonly ICurrentBeatmapLocator currentBeatmapLocator;
+    private readonly ICurrentBeatmapDialogService currentBeatmapService;
     private readonly ProjectDefinition<RhythmGuideProject> definition;
     private readonly IFilePicker filePicker;
     private readonly IFileRevealService fileRevealService;
@@ -36,7 +37,7 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
     /// <param name="execution">Coordinates cancellation, backup, and notifications.</param>
     /// <param name="filePicker">Selects source and destination beatmap files.</param>
     /// <param name="fileRevealService">Reveals the completed beatmap in the platform file manager.</param>
-    /// <param name="currentBeatmapLocator">Finds the beatmap open in osu!.</param>
+    /// <param name="currentBeatmapService">Fetches the current beatmap and presents lookup feedback.</param>
     /// <param name="workspace">Supplies the shared default beatmap picker location.</param>
     /// <param name="windowService">Opens the auxiliary Rhythm Guide window.</param>
     /// <param name="directories">Supplies the default export directory.</param>
@@ -45,7 +46,7 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
         IToolExecutionService execution,
         IFilePicker filePicker,
         IFileRevealService fileRevealService,
-        ICurrentBeatmapLocator currentBeatmapLocator,
+        ICurrentBeatmapDialogService currentBeatmapService,
         IBeatmapWorkspace workspace,
         IRhythmGuideWindowService windowService,
         IApplicationDirectories directories)
@@ -54,7 +55,8 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
         this.rhythmGuide = rhythmGuide ?? throw new ArgumentNullException(nameof(rhythmGuide));
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         this.fileRevealService = fileRevealService ?? throw new ArgumentNullException(nameof(fileRevealService));
-        this.currentBeatmapLocator = currentBeatmapLocator ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
+        this.currentBeatmapService = currentBeatmapService
+                                     ?? throw new ArgumentNullException(nameof(currentBeatmapService));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         this.windowService = windowService ?? throw new ArgumentNullException(nameof(windowService));
         ArgumentNullException.ThrowIfNull(directories);
@@ -136,19 +138,17 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
                 AllowMultiple = true,
                 Filters = [CommonFilePickerFilters.Beatmaps],
             });
-        if (paths.Count > 0) SourcePaths = paths.ToArray();
+        if (paths.Count > 0)
+        {
+            SourcePaths = paths.ToArray();
+        }
     }
 
     [RelayCommand]
     private async Task UseCurrentSourceAsync()
     {
-        try
-        {
-            SourcePaths = [await currentBeatmapLocator.FindCurrentBeatmapAsync()];
-        }
-        catch (InvalidOperationException)
-        {
-        }
+        string? path = await FetchCurrentBeatmapAsync();
+        if (path is not null) SourcePaths = [path];
     }
 
     [RelayCommand]
@@ -163,19 +163,17 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
                 AllowMultiple = false,
                 Filters = [CommonFilePickerFilters.Beatmaps],
             });
-        if (paths.Count > 0) ExportPath = paths[0];
+        if (paths.Count > 0)
+        {
+            ExportPath = paths[0];
+        }
     }
 
     [RelayCommand]
     private async Task UseCurrentExportAsync()
     {
-        try
-        {
-            ExportPath = await currentBeatmapLocator.FindCurrentBeatmapAsync();
-        }
-        catch (InvalidOperationException)
-        {
-        }
+        string? path = await FetchCurrentBeatmapAsync();
+        if (path is not null) ExportPath = path;
     }
 
     /// <inheritdoc />
@@ -243,6 +241,11 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
         NcEverything = options.NcEverything;
         SelectionMode = options.SelectionMode;
         beatDivisors = options.BeatDivisors.ToArray();
+    }
+
+    private async Task<string?> FetchCurrentBeatmapAsync()
+    {
+        return await currentBeatmapService.FetchAsync();
     }
 
     private static RhythmGuideProject CreateDefaultProject(string exportPath)

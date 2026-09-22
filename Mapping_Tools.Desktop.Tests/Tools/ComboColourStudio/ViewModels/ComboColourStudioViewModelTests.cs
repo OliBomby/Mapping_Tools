@@ -196,7 +196,7 @@ public sealed class ComboColourStudioViewModelTests
                 TimeProvider.System),
             notificationService,
             new TestBeatmapWorkspace(),
-            new RecordingCurrentBeatmapLocator(),
+            new TestCurrentBeatmapDialogService(),
             liveReader ?? new RecordingLiveBeatmapReader((LiveBeatmapSnapshot?)null),
             new TestFilePicker());
     }

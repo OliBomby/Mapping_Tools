@@ -77,7 +77,7 @@ public sealed class HitsoundCopierViewModelTests
                 new UserNotificationService(),
                 TimeProvider.System),
             filePicker,
-            new RecordingCurrentBeatmapLocator(),
+            new TestCurrentBeatmapDialogService(),
             workspace,
             new UserNotificationService());
     }

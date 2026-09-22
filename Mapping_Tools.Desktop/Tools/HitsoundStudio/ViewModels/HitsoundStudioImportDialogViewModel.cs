@@ -5,31 +5,35 @@ using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
+using Mapping_Tools.Desktop.Services.Dialogs;
 
 namespace Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels;
 
 /// <summary>Owns the typed fields of the layer import form.</summary>
 public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObject
 {
-    private readonly ICurrentBeatmapLocator currentBeatmap;
+    private readonly ICurrentBeatmapDialogService currentBeatmapService;
     private readonly IFilePicker filePicker;
     private readonly IBeatmapWorkspace workspace;
 
     /// <summary>Creates an import form with WPF-compatible defaults.</summary>
     /// <param name="defaultName">The suggested layer name.</param>
-    /// <param name="currentBeatmap">Locates the beatmap currently open in osu!.</param>
+    /// <param name="currentBeatmapService">Fetches the current beatmap and presents lookup feedback.</param>
     /// <param name="workspace">Supplies the shared default beatmap picker location.</param>
     /// <param name="filePicker">Presents the native file picker.</param>
     public HitsoundStudioImportDialogViewModel(
         string defaultName,
-        ICurrentBeatmapLocator currentBeatmap,
+        ICurrentBeatmapDialogService currentBeatmapService,
         IBeatmapWorkspace workspace,
         IFilePicker filePicker)
     {
-        this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        this.currentBeatmapService = currentBeatmapService
+                                     ?? throw new ArgumentNullException(nameof(currentBeatmapService));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         Name = defaultName;
+        IReadOnlyList<string> selectedPaths = workspace.SelectedPaths;
+        BeatmapPath = selectedPaths.FirstOrDefault() ?? string.Empty;
         AcceptCommand = new RelayCommand(Accept);
         CancelCommand = new RelayCommand(() => Close(null));
     }
@@ -58,9 +62,9 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
     [ObservableProperty]
     public partial string SamplePath { get; set; } = string.Empty;
 
-    /// <summary>Gets or sets source paths separated by newlines.</summary>
+    /// <summary>Gets or sets the beatmap path used by beatmap-based imports.</summary>
     [ObservableProperty]
-    public partial string SourcePaths { get; set; } = string.Empty;
+    public partial string BeatmapPath { get; set; } = string.Empty;
 
     /// <summary>Gets or sets the MIDI source path.</summary>
     [ObservableProperty]
@@ -119,10 +123,6 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
     /// <summary>Gets or sets the MIDI velocity roughness.</summary>
     [ObservableProperty]
     public partial double VelocityRoughness { get; set; } = 10;
-
-    /// <summary>Gets the validation message.</summary>
-    [ObservableProperty]
-    public partial string Error { get; private set; } = string.Empty;
 
     /// <summary>Gets all import modes.</summary>
     public IReadOnlyList<ImportType> ImportTypes { get; } = Enum.GetValues<ImportType>();
@@ -215,9 +215,7 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
             SuggestedStartLocation = ImportType == ImportType.MIDI
                 ? null
                 : workspace.GetBeatmapPickerStartLocation(
-                    Path.GetDirectoryName(SourcePaths
-                        .Split(['\r', '\n', '|'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                        .FirstOrDefault())),
+                    Path.GetDirectoryName(BeatmapPath)),
             AllowMultiple = false,
             Filters = ImportType == ImportType.MIDI
                 ? [new FilePickerFilter("MIDI files", ["*.mid"])]
@@ -227,23 +225,15 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
         if (ImportType == ImportType.MIDI)
             MidiPath = paths[0];
         else
-            SourcePaths = string.Join(Environment.NewLine, paths);
+            BeatmapPath = paths[0];
     }
 
-    private async Task LoadSourceAsync()
+    internal async Task LoadSourceAsync()
     {
-        try
-        {
-            SourcePaths = await currentBeatmap.FindCurrentBeatmapAsync();
-            Error = string.Empty;
-        }
-        catch (OperationCanceledException)
-        {
-        }
-        catch (Exception exception)
-        {
-            Error = exception.Message;
-        }
+        string? path = await currentBeatmapService.FetchAsync();
+        if (path is null) return;
+
+        BeatmapPath = path;
     }
 
     private async Task PickSampleAsync()
@@ -259,16 +249,13 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
 
     private void Accept()
     {
-        Error = string.Empty;
-        string sourceText = ImportType == ImportType.MIDI ? MidiPath : SourcePaths;
-        string[] paths = sourceText.Split(
-            ['\r', '\n', '|'],
-            StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        if (ImportType != ImportType.None && paths.Length == 0)
-        {
-            Error = "Choose or enter at least one source path.";
+        string sourcePath = ImportType == ImportType.MIDI ? MidiPath : BeatmapPath;
+        if (ImportType != ImportType.None && string.IsNullOrWhiteSpace(sourcePath))
             return;
-        }
+
+        string[] paths = ImportType == ImportType.None || string.IsNullOrWhiteSpace(sourcePath)
+            ? []
+            : [sourcePath.Trim()];
 
         Close(new HitsoundStudioImportRequest
         {

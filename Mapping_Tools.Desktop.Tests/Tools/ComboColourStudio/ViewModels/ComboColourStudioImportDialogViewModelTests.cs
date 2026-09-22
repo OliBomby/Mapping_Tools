@@ -8,7 +8,7 @@ namespace Mapping_Tools.Desktop.Tests.Tools.ComboColourStudio.ViewModels;
 public sealed class ComboColourStudioImportDialogViewModelTests
 {
     [TestMethod]
-    public void AcceptCommand_WithBlankPath_LeavesDialogOpenAndReportsValidationError()
+    public void AcceptCommand_WithBlankPath_LeavesDialogOpen()
     {
         // Arrange
         var viewModel = CreateViewModel();
@@ -21,7 +21,6 @@ public sealed class ComboColourStudioImportDialogViewModelTests
 
         // Assert
         result.Should().BeNull();
-        viewModel.Error.Should().Be("A beatmap path is required.");
     }
 
     [TestMethod]
@@ -30,7 +29,7 @@ public sealed class ComboColourStudioImportDialogViewModelTests
         // Arrange
         TestFilePicker filePicker = new() { OpenFiles = ["selected.osu"] };
         ComboColourStudioImportDialogViewModel viewModel =
-            new("initial.osu", new RecordingCurrentBeatmapLocator(), new TestBeatmapWorkspace
+            new("initial.osu", new TestCurrentBeatmapDialogService(), new TestBeatmapWorkspace
             {
                 BeatmapPickerStartLocation = @"C:\Maps",
             }, filePicker);
@@ -48,7 +47,7 @@ public sealed class ComboColourStudioImportDialogViewModelTests
     public async Task UseCurrentCommand_WithAvailableBeatmap_UpdatesPath()
     {
         // Arrange
-        var currentBeatmap = new RecordingCurrentBeatmapLocator("current.osu");
+        var currentBeatmap = new TestCurrentBeatmapDialogService { Path = "current.osu" };
         ComboColourStudioImportDialogViewModel viewModel =
             new("initial.osu", currentBeatmap, new TestBeatmapWorkspace(), new TestFilePicker());
 
@@ -57,14 +56,14 @@ public sealed class ComboColourStudioImportDialogViewModelTests
 
         // Assert
         viewModel.Path.Should().Be("current.osu");
-        currentBeatmap.FindCount.Should().Be(1);
+        currentBeatmap.FetchCount.Should().Be(1);
     }
 
     private static ComboColourStudioImportDialogViewModel CreateViewModel()
     {
         return new ComboColourStudioImportDialogViewModel(
             string.Empty,
-            new RecordingCurrentBeatmapLocator(),
+            new TestCurrentBeatmapDialogService(),
             new TestBeatmapWorkspace(),
             new TestFilePicker());
     }

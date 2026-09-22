@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.Workspace.Contracts;
+using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Tools.PatternGallery.Models;
 
 namespace Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels;
@@ -10,7 +11,7 @@ namespace Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels;
 /// <summary>Owns the pattern-file import dialog state and picker actions.</summary>
 public sealed partial class PatternGalleryFileImportViewModel : ObservableValidator
 {
-    private readonly ICurrentBeatmapLocator currentBeatmap;
+    private readonly ICurrentBeatmapDialogService currentBeatmapService;
     private readonly IFilePicker filePicker;
     private readonly IBeatmapWorkspace workspace;
 
@@ -18,17 +19,18 @@ public sealed partial class PatternGalleryFileImportViewModel : ObservableValida
     /// <param name="defaultName">The suggested display name.</param>
     /// <param name="defaultPath">The selected source path.</param>
     /// <param name="filePicker">Presents the native pattern-file picker.</param>
-    /// <param name="currentBeatmap">Locates the beatmap currently open in osu!.</param>
+    /// <param name="currentBeatmapService">Fetches the current beatmap and presents lookup feedback.</param>
     /// <param name="workspace">Supplies the shared default beatmap picker location.</param>
     public PatternGalleryFileImportViewModel(
         string defaultName,
         string defaultPath,
         IFilePicker filePicker,
-        ICurrentBeatmapLocator currentBeatmap,
+        ICurrentBeatmapDialogService currentBeatmapService,
         IBeatmapWorkspace workspace)
     {
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
-        this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        this.currentBeatmapService = currentBeatmapService
+                                     ?? throw new ArgumentNullException(nameof(currentBeatmapService));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         Name = defaultName;
         FilePath = defaultPath;
@@ -87,7 +89,8 @@ public sealed partial class PatternGalleryFileImportViewModel : ObservableValida
 
     private async Task UseCurrentAsync()
     {
-        FilePath = await currentBeatmap.FindCurrentBeatmapAsync();
+        string? path = await currentBeatmapService.FetchAsync();
+        if (path is not null) FilePath = path;
     }
 
     private async Task BrowseAsync()

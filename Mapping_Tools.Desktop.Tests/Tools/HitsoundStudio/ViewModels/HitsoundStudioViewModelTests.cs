@@ -247,7 +247,7 @@ public sealed class HitsoundStudioViewModelTests
     public async Task LoadBaseBeatmapCommand_WhenCurrentBeatmapIsAvailable_SetsBaseBeatmap()
     {
         // Arrange
-        RecordingCurrentBeatmapLocator currentBeatmap = new("current.osu");
+        TestCurrentBeatmapDialogService currentBeatmap = new() { Path = "current.osu" };
         var viewModel = CreateViewModel(
             new RecordingHitsoundStudioService(),
             new RecordingAudioGenerator(),
@@ -259,14 +259,14 @@ public sealed class HitsoundStudioViewModelTests
 
         // Assert
         viewModel.BaseBeatmap.Should().Be("current.osu");
-        currentBeatmap.FindCount.Should().Be(1);
+        currentBeatmap.FetchCount.Should().Be(1);
     }
 
     [TestMethod]
-    public async Task LoadBaseBeatmapCommand_WhenCurrentBeatmapIsUnavailable_PreservesBaseBeatmapAndReportsError()
+    public async Task LoadBaseBeatmapCommand_WhenCurrentBeatmapIsUnavailable_PreservesBaseBeatmap()
     {
         // Arrange
-        RecordingCurrentBeatmapLocator currentBeatmap = new();
+        TestCurrentBeatmapDialogService currentBeatmap = new();
         UserNotificationService notifications = new();
         List<UserNotification> published = [];
         notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
@@ -283,11 +283,8 @@ public sealed class HitsoundStudioViewModelTests
 
         // Assert
         viewModel.BaseBeatmap.Should().Be("existing.osu");
-        var notification = published.Should().ContainSingle().Which;
-        notification.Severity.Should().Be(UserNotificationSeverity.Error);
-        notification.Title.Should().Be("Load current beatmap failed");
-        notification.Message.Should().Be(
-            "Open a beatmap in osu! before using the current editor state.");
+        published.Should().BeEmpty();
+        currentBeatmap.FetchCount.Should().Be(1);
     }
 
     [TestMethod]
@@ -495,7 +492,7 @@ public sealed class HitsoundStudioViewModelTests
         RecordingHitsoundStudioService service,
         RecordingAudioGenerator audioGenerator,
         RecordingPlaybackService playback,
-        RecordingCurrentBeatmapLocator? currentBeatmap = null,
+        TestCurrentBeatmapDialogService? currentBeatmap = null,
         UserNotificationService? notifications = null,
         TestDialogService? dialogs = null,
         TestBeatmapWorkspace? workspace = null,
@@ -512,7 +509,7 @@ public sealed class HitsoundStudioViewModelTests
             dialogs ?? new TestDialogService(),
             notifications,
             execution,
-            currentBeatmap ?? new RecordingCurrentBeatmapLocator(),
+            currentBeatmap ?? new TestCurrentBeatmapDialogService(),
             workspace ?? new TestBeatmapWorkspace(),
             filePicker ?? new TestFilePicker(),
             new StubHitsoundStudioFileSystem(),

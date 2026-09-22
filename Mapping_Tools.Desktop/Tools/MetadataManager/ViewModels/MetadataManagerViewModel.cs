@@ -13,6 +13,7 @@ using Mapping_Tools.Application.Tools.MetadataManager;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.MetadataManager;
+using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels.Adapters;
 using Mapping_Tools.Desktop.Tools.MetadataManager.Models;
@@ -27,7 +28,7 @@ namespace Mapping_Tools.Desktop.Tools.MetadataManager.ViewModels;
 public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     IShellProjectFeature<MetadataManagerProject>
 {
-    private readonly ICurrentBeatmapLocator currentBeatmapLocator;
+    private readonly ICurrentBeatmapDialogService currentBeatmapService;
     private readonly ProjectDefinition<MetadataManagerProject> definition;
     private readonly IFilePicker filePicker;
 
@@ -39,7 +40,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     /// <param name="metadataManager">Imports and exports metadata through application ports.</param>
     /// <param name="execution">Coordinates background execution, cancellation, and notifications.</param>
     /// <param name="filePicker">Presents native beatmap file dialogs.</param>
-    /// <param name="currentBeatmapLocator">Finds the beatmap currently open in osu!.</param>
+    /// <param name="currentBeatmapService">Fetches the current beatmap and presents lookup feedback.</param>
     /// <param name="workspace">Supplies the shared default beatmap picker location.</param>
     /// <param name="notifications">Publishes project and picker failures.</param>
     /// <param name="directories">Supplies the default export directory.</param>
@@ -47,7 +48,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         IMetadataManagerService metadataManager,
         IToolExecutionService execution,
         IFilePicker filePicker,
-        ICurrentBeatmapLocator currentBeatmapLocator,
+        ICurrentBeatmapDialogService currentBeatmapService,
         IBeatmapWorkspace workspace,
         IUserNotificationService notifications,
         IApplicationDirectories directories)
@@ -55,7 +56,8 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     {
         this.metadataManager = metadataManager ?? throw new ArgumentNullException(nameof(metadataManager));
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
-        this.currentBeatmapLocator = currentBeatmapLocator ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
+        this.currentBeatmapService = currentBeatmapService
+                                     ?? throw new ArgumentNullException(nameof(currentBeatmapService));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
         ArgumentNullException.ThrowIfNull(directories);
@@ -196,20 +198,8 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task UseCurrentImportAsync()
     {
-        try
-        {
-            ImportPath = await currentBeatmapLocator.FindCurrentBeatmapAsync();
-        }
-        catch (OperationCanceledException)
-        {
-        }
-        catch (Exception exception)
-        {
-            await PublishFailureAsync(
-                "Could not fetch the current beatmap",
-                "The current osu! beatmap could not be obtained.",
-                exception);
-        }
+        string? path = await currentBeatmapService.FetchAsync();
+        if (path is not null) ImportPath = path;
     }
 
     [RelayCommand]
@@ -263,20 +253,8 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task UseCurrentExportAsync()
     {
-        try
-        {
-            ExportPath = await currentBeatmapLocator.FindCurrentBeatmapAsync();
-        }
-        catch (OperationCanceledException)
-        {
-        }
-        catch (Exception exception)
-        {
-            await PublishFailureAsync(
-                "Could not fetch the current beatmap",
-                "The current osu! beatmap could not be obtained.",
-                exception);
-        }
+        string? path = await currentBeatmapService.FetchAsync();
+        if (path is not null) ExportPath = path;
     }
 
     [RelayCommand]

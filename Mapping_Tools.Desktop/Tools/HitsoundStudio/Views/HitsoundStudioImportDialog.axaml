@@ -95,7 +95,7 @@
                             </Button>
                         </Grid>
                         <Grid Margin="0,15,0,0" ColumnDefinitions="*,Auto,5,Auto">
-                            <TextBox Text="{Binding SourcePaths, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                            <TextBox Text="{Binding BeatmapPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      materialAssists:TextFieldAssist.Label="Source beatmap"
                                      ToolTip.Tip="The source beatmap to import the hitsound stack from." />
                             <Button Grid.Column="1"
@@ -138,9 +138,9 @@
                                  materialAssists:TextFieldAssist.Label="Name"
                                  ToolTip.Tip="The name prefix for imported hitsound layers." />
                         <Grid Margin="0,15,0,0" ColumnDefinitions="*,Auto,5,Auto">
-                            <TextBox Text="{Binding SourcePaths, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                            <TextBox Text="{Binding BeatmapPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      materialAssists:TextFieldAssist.Label="Source beatmap"
-                                     ToolTip.Tip="One or more beatmaps to import hitsounds from." />
+                                     ToolTip.Tip="The beatmap to import hitsounds from." />
                             <Button Grid.Column="1"
                                     Classes="flat path-picker"
                                     Cursor="Hand"
@@ -234,7 +234,7 @@
                                  materialAssists:TextFieldAssist.Label="Name"
                                  ToolTip.Tip="The name prefix for imported storyboard layers." />
                         <Grid Margin="0,15,0,0" ColumnDefinitions="*,Auto,5,Auto">
-                            <TextBox Text="{Binding SourcePaths, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                            <TextBox Text="{Binding BeatmapPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                      materialAssists:TextFieldAssist.Label="Source beatmap"
                                      ToolTip.Tip="The source beatmap to import the storyboarded samples from." />
                             <Button Grid.Column="1"

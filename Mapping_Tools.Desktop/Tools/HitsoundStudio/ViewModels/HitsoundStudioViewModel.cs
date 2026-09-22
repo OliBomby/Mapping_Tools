@@ -45,7 +45,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     IDisposable
 {
     private readonly IAudioGenerator audioGenerator;
-    private readonly ICurrentBeatmapLocator currentBeatmap;
+    private readonly ICurrentBeatmapDialogService currentBeatmapService;
     private readonly ProjectDefinition<HitsoundStudioProject> definition;
     private readonly IFilePicker filePicker;
     private readonly IBeatmapsetFileSystem files;
@@ -74,7 +74,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     /// <param name="messageDialogs">Shows typed confirmations and diagnostics.</param>
     /// <param name="notifications">Publishes user-visible operation outcomes.</param>
     /// <param name="execution">Coordinates keyed cancellation and completion.</param>
-    /// <param name="currentBeatmap">Finds the beatmap open in osu!.</param>
+    /// <param name="currentBeatmapService">Fetches the current beatmap and presents lookup feedback.</param>
     /// <param name="workspace">Provides ordinary selected beatmaps.</param>
     /// <param name="filePicker">Presents source and folder pickers.</param>
     /// <param name="files">Checks the export directory before the legacy create prompt.</param>
@@ -89,7 +89,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         IDialogService messageDialogs,
         IUserNotificationService notifications,
         IToolExecutionService execution,
-        ICurrentBeatmapLocator currentBeatmap,
+        ICurrentBeatmapDialogService currentBeatmapService,
         IBeatmapWorkspace workspace,
         IFilePicker filePicker,
         IBeatmapsetFileSystem files,
@@ -104,7 +104,8 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         this.playback = playback ?? throw new ArgumentNullException(nameof(playback));
         this.messageDialogs = messageDialogs ?? throw new ArgumentNullException(nameof(messageDialogs));
         this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
-        this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        this.currentBeatmapService = currentBeatmapService
+                                     ?? throw new ArgumentNullException(nameof(currentBeatmapService));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         this.files = files ?? throw new ArgumentNullException(nameof(files));
@@ -440,8 +441,8 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         var paths = workspace.SelectedPaths;
         if (settings.AlwaysQuickRun)
         {
-            string current = await currentBeatmap.FindCurrentBeatmapAsync();
-            paths = string.IsNullOrWhiteSpace(current) ? [] : [current];
+            string? current = await currentBeatmapService.FetchAsync();
+            paths = current is null ? [] : [current];
         }
 
         await RunExportAsync(paths, CancellationToken.None);
@@ -761,18 +762,8 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task LoadBaseBeatmapAsync()
     {
-        try
-        {
-            BaseBeatmap = await currentBeatmap.FindCurrentBeatmapAsync();
-        }
-        catch (InvalidOperationException exception)
-        {
-            await PublishNotificationAsync(
-                UserNotificationSeverity.Error,
-                "Load current beatmap failed",
-                exception.Message,
-                exception);
-        }
+        string? path = await currentBeatmapService.FetchAsync();
+        if (path is not null) BaseBeatmap = path;
     }
 
     /// <summary>Chooses the fallback sample file.</summary>
@@ -818,18 +809,8 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task LoadEditImportPathAsync()
     {
-        try
-        {
-            EditImportPath = await currentBeatmap.FindCurrentBeatmapAsync();
-        }
-        catch (InvalidOperationException exception)
-        {
-            await PublishNotificationAsync(
-                UserNotificationSeverity.Error,
-                "Load current beatmap failed",
-                exception.Message,
-                exception);
-        }
+        string? path = await currentBeatmapService.FetchAsync();
+        if (path is not null) EditImportPath = path;
     }
 
     /// <summary>Chooses the selected layers' imported source sample.</summary>
@@ -1323,15 +1304,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     private async Task<HitsoundStudioImportRequest?> ShowImportDialogAsync(string defaultName)
     {
         HitsoundStudioImportDialogViewModel viewModel =
-            new(defaultName, currentBeatmap, workspace, filePicker);
-        try
-        {
-            viewModel.SourcePaths = await currentBeatmap.FindCurrentBeatmapAsync();
-        }
-        catch (InvalidOperationException)
-        {
-            // A current beatmap is a convenience default, not a prerequisite for opening the dialog.
-        }
+            new(defaultName, currentBeatmapService, workspace, filePicker);
 
         HitsoundStudioImportDialog dialog = new() { DataContext = viewModel };
         viewModel.Close = dialog.Close;

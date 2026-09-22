@@ -33,7 +33,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     IQuickRun,
     IShellProjectFeature<SlideratorProject>
 {
-    private readonly ICurrentBeatmapLocator currentBeatmap;
+    private readonly ICurrentBeatmapDialogService currentBeatmapService;
 
     private readonly IDialogService dialogs;
     private readonly DesktopApplicationSettings settings;
@@ -49,21 +49,22 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     /// </summary>
     /// <param name="sliderator">Runs the Core engine through Application ports.</param>
     /// <param name="execution">Coordinates background work, cancellation, and notifications.</param>
-    /// <param name="currentBeatmap">Finds the map currently open in osu!.</param>
+    /// <param name="currentBeatmapService">Fetches the current beatmap and presents lookup feedback.</param>
     /// <param name="workspace">Supplies the shell's selected beatmap paths for disk-based imports.</param>
     /// <param name="settings">Supplies the AlwaysQuickRun preference.</param>
     /// <param name="dialogs">Presents validation, confirmation, and scaling dialogs.</param>
     public SlideratorViewModel(
         ISlideratorService sliderator,
         IToolExecutionService execution,
-        ICurrentBeatmapLocator currentBeatmap,
+        ICurrentBeatmapDialogService currentBeatmapService,
         IBeatmapWorkspace workspace,
         DesktopApplicationSettings settings,
         IDialogService dialogs)
         : base(execution, SlideratorToolDefinition.Definition)
     {
         this.sliderator = sliderator ?? throw new ArgumentNullException(nameof(sliderator));
-        this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        this.currentBeatmapService = currentBeatmapService
+                                     ?? throw new ArgumentNullException(nameof(currentBeatmapService));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         this.dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
@@ -373,20 +374,8 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     /// <returns><see langword="true" /> when the placement completed successfully.</returns>
     public async Task<bool> RunFastPlacementAsync(CancellationToken cancellationToken = default)
     {
-        string path;
-        try
-        {
-            path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
-        }
-        catch (OperationCanceledException)
-        {
-            throw;
-        }
-        catch (Exception exception)
-        {
-            await ShowMessageAsync(exception.Message);
-            return false;
-        }
+        string? path = await currentBeatmapService.FetchAsync(cancellationToken);
+        if (path is null) return false;
 
         if (VisibleHitObject is null) return false;
 

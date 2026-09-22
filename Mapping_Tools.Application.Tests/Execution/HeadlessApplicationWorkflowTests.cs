@@ -59,8 +59,7 @@ public sealed class HeadlessApplicationWorkflowTests
             new RecordingCurrentBeatmapLocator(map_path),
             TimeProvider.System,
             notifications);
-        var selection =
-            await workspace.SelectCurrentBeatmapAsync();
+        workspace.SetSelection([map_path]);
         List<UserNotification> published = [];
         notifications.Published += (_, args) => published.Add(args.Notification);
         ToolExecutionService execution = new(
@@ -110,7 +109,6 @@ public sealed class HeadlessApplicationWorkflowTests
         var quickRunResult = await quickRun.RunAsync();
 
         // Assert
-        selection.Status.Should().Be(CurrentBeatmapSelectionStatus.Selected);
         workspace.SelectedPaths.ToArray().Should().Equal(map_path);
         quickRunResult.Status.Should().Be(QuickRunStatus.Executed);
         toolResult.Should().NotBeNull();

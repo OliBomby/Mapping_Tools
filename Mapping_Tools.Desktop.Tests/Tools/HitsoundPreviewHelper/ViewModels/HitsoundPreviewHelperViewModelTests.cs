@@ -142,7 +142,7 @@ public sealed class HitsoundPreviewHelperViewModelTests
             execution,
             new TestFilePicker(),
             new TestFileRevealService(),
-            new RecordingCurrentBeatmapLocator("current.osu"),
+            new TestCurrentBeatmapDialogService { Path = "current.osu" },
             effectiveWorkspace,
             windows,
             new TestApplicationDirectories());
@@ -150,7 +150,7 @@ public sealed class HitsoundPreviewHelperViewModelTests
             preview ?? new RecordingPreviewService(),
             execution,
             effectiveWorkspace,
-            new RecordingCurrentBeatmapLocator("current.osu"),
+            new TestCurrentBeatmapDialogService { Path = "current.osu" },
             new DesktopApplicationSettings(),
             notificationService,
             windows,

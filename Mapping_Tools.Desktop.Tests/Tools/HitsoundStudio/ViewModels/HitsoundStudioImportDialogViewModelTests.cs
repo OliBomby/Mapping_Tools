@@ -9,13 +9,31 @@ namespace Mapping_Tools.Desktop.Tests.Tools.HitsoundStudio.ViewModels;
 public sealed class HitsoundStudioImportDialogViewModelTests
 {
     [TestMethod]
+    public void Constructor_UsesSelectedMapsForLegacyImportDefaults()
+    {
+        // Arrange
+        TestBeatmapWorkspace workspace = new();
+        workspace.SetSelection(["first.osu", "second.osu"]);
+
+        // Act
+        HitsoundStudioImportDialogViewModel viewModel = new(
+            "Layer 1",
+            new TestCurrentBeatmapDialogService(),
+            workspace,
+            new TestFilePicker());
+
+        // Assert
+        viewModel.BeatmapPath.Should().Be("first.osu");
+    }
+
+    [TestMethod]
     public async Task PickSourceCommand_WithBeatmapImport_UsesSharedBeatmapPickerLocation()
     {
         // Arrange
         TestFilePicker filePicker = new() { OpenFiles = ["source.osu"] };
         HitsoundStudioImportDialogViewModel viewModel = new(
             "Layer 1",
-            new RecordingCurrentBeatmapLocator(),
+            new TestCurrentBeatmapDialogService(),
             new TestBeatmapWorkspace
             {
                 BeatmapPickerStartLocation = @"C:\Maps",
@@ -29,7 +47,7 @@ public sealed class HitsoundStudioImportDialogViewModelTests
         await viewModel.PickSourceCommand.ExecuteAsync(null);
 
         // Assert
-        viewModel.SourcePaths.Should().Be("source.osu");
+        viewModel.BeatmapPath.Should().Be("source.osu");
         filePicker.LastOpenRequest!.SuggestedStartLocation.Should().Be(@"C:\Maps");
     }
 
@@ -40,7 +58,7 @@ public sealed class HitsoundStudioImportDialogViewModelTests
         TestFilePicker filePicker = new() { OpenFiles = ["source.mid"] };
         HitsoundStudioImportDialogViewModel viewModel = new(
             "Layer 1",
-            new RecordingCurrentBeatmapLocator(),
+            new TestCurrentBeatmapDialogService(),
             new TestBeatmapWorkspace
             {
                 BeatmapPickerStartLocation = @"C:\Maps",
@@ -56,5 +74,28 @@ public sealed class HitsoundStudioImportDialogViewModelTests
         // Assert
         viewModel.MidiPath.Should().Be("source.mid");
         filePicker.LastOpenRequest!.SuggestedStartLocation.Should().BeNull();
+    }
+
+    [TestMethod]
+    public async Task LoadSourceCommand_UpdatesBeatmapPath()
+    {
+        // Arrange
+        TestCurrentBeatmapDialogService currentBeatmap = new() { Path = "current.osu" };
+        HitsoundStudioImportDialogViewModel viewModel = new(
+            "Layer 1",
+            currentBeatmap,
+            new TestBeatmapWorkspace(),
+            new TestFilePicker())
+        {
+            ImportType = ImportType.Stack,
+            BeatmapPath = "selected.osu",
+        };
+
+        // Act
+        await viewModel.LoadSourceCommand.ExecuteAsync(null);
+
+        // Assert
+        currentBeatmap.FetchCount.Should().Be(1);
+        viewModel.BeatmapPath.Should().Be("current.osu");
     }
 }

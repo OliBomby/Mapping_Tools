@@ -10,8 +10,8 @@ using Mapping_Tools.Application.Workspace.Models;
 namespace Mapping_Tools.Application.Workspace;
 
 /// <summary>
-///     Coordinates selected paths, persisted recent history, native file picking,
-///     and live osu! lookup without relying on a window or view model.
+///     Coordinates selected paths, persisted recent history, and native file
+///     picking without relying on a window or view model.
 /// </summary>
 public sealed class BeatmapWorkspace : IBeatmapWorkspace
 {
@@ -179,37 +179,6 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
         return string.IsNullOrWhiteSpace(selectedParent)
             ? settings.SongsPath
             : selectedParent;
-    }
-
-    /// <inheritdoc />
-    public async Task<CurrentBeatmapSelectionResult> SelectCurrentBeatmapAsync(
-        CancellationToken cancellationToken = default)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        string path;
-        try
-        {
-            path = await currentBeatmapLocator.FindCurrentBeatmapAsync(
-                cancellationToken);
-        }
-        catch (InvalidOperationException)
-        {
-            return new CurrentBeatmapSelectionResult(
-                CurrentBeatmapSelectionStatus.Unavailable,
-                null);
-        }
-
-        cancellationToken.ThrowIfCancellationRequested();
-
-        if (!fileSystem.FileExists(path))
-            return new CurrentBeatmapSelectionResult(
-                CurrentBeatmapSelectionStatus.FileMissing,
-                path);
-
-        SetSelection([path], BeatmapSelectionSource.CurrentEditor);
-        return new CurrentBeatmapSelectionResult(
-            CurrentBeatmapSelectionStatus.Selected,
-            path);
     }
 
     /// <inheritdoc />

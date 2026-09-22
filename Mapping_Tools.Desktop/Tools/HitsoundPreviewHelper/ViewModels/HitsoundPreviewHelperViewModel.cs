@@ -12,6 +12,7 @@ using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.Models;
 using Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.ViewModels.Adapters;
@@ -29,7 +30,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     IQuickRun,
     IShellProjectFeature<HitsoundPreviewHelperProject>
 {
-    private readonly ICurrentBeatmapLocator currentBeatmap;
+    private readonly ICurrentBeatmapDialogService currentBeatmapService;
     private readonly ProjectDefinition<HitsoundPreviewHelperProject> definition;
     private readonly IUserNotificationService notifications;
 
@@ -45,7 +46,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     /// <param name="previewService">Runs the framework-independent preview transformation.</param>
     /// <param name="execution">Coordinates cancellation, backup, notifications, and reload.</param>
     /// <param name="workspace">Supplies selected beatmap paths for ordinary runs.</param>
-    /// <param name="currentBeatmap">Finds the beatmap currently open in osu!.</param>
+    /// <param name="currentBeatmapService">Fetches the current beatmap and presents lookup feedback.</param>
     /// <param name="settings">Supplies QuickRun preferences.</param>
     /// <param name="notifications">Publishes recoverable input and selection messages.</param>
     /// <param name="rhythmGuideWindow">Opens the shared Rhythm Guide auxiliary surface.</param>
@@ -55,7 +56,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
         IHitsoundPreviewHelperService previewService,
         IToolExecutionService execution,
         IBeatmapWorkspace workspace,
-        ICurrentBeatmapLocator currentBeatmap,
+        ICurrentBeatmapDialogService currentBeatmapService,
         DesktopApplicationSettings settings,
         IUserNotificationService notifications,
         IRhythmGuideWindowService rhythmGuideWindow,
@@ -65,7 +66,8 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     {
         this.previewService = previewService ?? throw new ArgumentNullException(nameof(previewService));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
-        this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        this.currentBeatmapService = currentBeatmapService
+                                     ?? throw new ArgumentNullException(nameof(currentBeatmapService));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
         this.rhythmGuideWindow = rhythmGuideWindow ?? throw new ArgumentNullException(nameof(rhythmGuideWindow));
@@ -142,8 +144,8 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
         IReadOnlyList<string> paths = workspace.SelectedPaths;
         if (settings.AlwaysQuickRun)
         {
-            string quickPath = await currentBeatmap.FindCurrentBeatmapAsync();
-            paths = string.IsNullOrWhiteSpace(quickPath) ? [] : [quickPath];
+            string? quickPath = await currentBeatmapService.FetchAsync();
+            paths = quickPath is null ? [] : [quickPath];
         }
 
         await RunPathsAsync(paths, settings.AlwaysQuickRun, CancellationToken.None);
@@ -162,7 +164,8 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     {
         try
         {
-            string path = await currentBeatmap.FindCurrentBeatmapAsync();
+            string? path = await currentBeatmapService.FetchAsync();
+            if (path is null) return;
             var positions =
                 await previewService.GetSelectedZonePositionsAsync(path);
             if (positions.Count == 0)

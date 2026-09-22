@@ -112,6 +112,7 @@ internal static class DesktopServiceRegistration
             toolAssemblies ?? [typeof(DesktopServiceRegistration).Assembly]);
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<IDialogService, DialogService>();
+        services.AddSingleton<ICurrentBeatmapDialogService, CurrentBeatmapDialogService>();
 
         services.AddSingleton<IFilePicker>(provider =>
         {

@@ -15,6 +15,7 @@ using Mapping_Tools.Application.Tools.MapsetMerger.Models;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.Tools.MapsetMerger;
 using Mapping_Tools.Core.Tools.MapsetMerger.Models;
+using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tools.MapsetMerger.Models;
 using Mapping_Tools.Desktop.ViewModels;
@@ -28,7 +29,7 @@ namespace Mapping_Tools.Desktop.Tools.MapsetMerger.ViewModels;
 /// </summary>
 public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShellProjectFeature<MapsetMergerProject>
 {
-    private readonly ICurrentBeatmapLocator currentBeatmap;
+    private readonly ICurrentBeatmapDialogService currentBeatmapService;
 
     private readonly IFilePicker filePicker;
 
@@ -41,7 +42,7 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
     /// <param name="execution">Coordinates cancellation and background execution.</param>
     /// <param name="filePicker">Presents source and export folder pickers.</param>
     /// <param name="workspace">Supplies the selected beatmap used by the ordinary add action.</param>
-    /// <param name="currentBeatmap">Finds the beatmap currently open in osu!.</param>
+    /// <param name="currentBeatmapService">Fetches the current beatmap and presents lookup feedback.</param>
     /// <param name="directories">Supplies the default export folder.</param>
     /// <param name="notifications">Publishes user-facing validation, cancellation, and failure messages.</param>
     public MapsetMergerViewModel(
@@ -49,7 +50,7 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
         IToolExecutionService execution,
         IFilePicker filePicker,
         IBeatmapWorkspace workspace,
-        ICurrentBeatmapLocator currentBeatmap,
+        ICurrentBeatmapDialogService currentBeatmapService,
         IApplicationDirectories directories,
         IUserNotificationService notifications)
         : base(execution, MapsetMergerToolDefinition.Definition)
@@ -57,7 +58,8 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
         this.merger = merger ?? throw new ArgumentNullException(nameof(merger));
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
-        this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        this.currentBeatmapService = currentBeatmapService
+                                     ?? throw new ArgumentNullException(nameof(currentBeatmapService));
         this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
         ArgumentNullException.ThrowIfNull(directories);
         ExportPath = directories.Exports;
@@ -113,19 +115,11 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
     [RelayCommand]
     private async Task AddMapsetFromCurrentAsync()
     {
-        try
-        {
+        string? path = await currentBeatmapService.FetchAsync();
+        if (path is not null)
             await AddMapsetFromPathAsync(
-                await currentBeatmap.FindCurrentBeatmapAsync(),
+                path,
                 "Open a beatmap in osu! or select one in the shell before adding a mapset.");
-        }
-        catch (Exception exception)
-        {
-            await PublishErrorAsync(
-                "Could not read the current osu! beatmap",
-                exception.Message,
-                exception);
-        }
     }
 
     private async Task AddMapsetFromPathAsync(string? beatmapPath, string unavailableMessage)

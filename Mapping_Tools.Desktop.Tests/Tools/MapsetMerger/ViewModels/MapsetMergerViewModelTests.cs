@@ -89,7 +89,7 @@ public sealed class MapsetMergerViewModelTests
             execution,
             filePicker ?? new TestFilePicker(),
             workspace ?? new TestBeatmapWorkspace(),
-            new RecordingCurrentBeatmapLocator(),
+            new TestCurrentBeatmapDialogService(),
             new TestApplicationDirectories(),
             notificationService);
     }

@@ -283,37 +283,6 @@ public sealed class BeatmapWorkspaceTests
     }
 
     [TestMethod]
-    public async Task SelectCurrentBeatmapAsync_WithLiveStatuses_DistinguishesOutcomes()
-    {
-        // Arrange
-        RecordingBeatmapFileSystem fileSystem = new();
-        RecordingCurrentBeatmapLocator locator = new();
-        var workspace = CreateWorkspace(
-            new ApplicationSettings(),
-            fileSystem: fileSystem,
-            locator: locator);
-        workspace.SetSelection(["fallback.osu"]);
-
-        // Act
-        var unavailable =
-            await workspace.SelectCurrentBeatmapAsync();
-        locator.Path = "stale.osu";
-        var missing =
-            await workspace.SelectCurrentBeatmapAsync();
-        locator.Path = "live.osu";
-        fileSystem.ExistingPaths.Add("live.osu");
-        var selected =
-            await workspace.SelectCurrentBeatmapAsync();
-
-        // Assert
-        unavailable.Status.Should().Be(CurrentBeatmapSelectionStatus.Unavailable);
-        missing.Status.Should().Be(CurrentBeatmapSelectionStatus.FileMissing);
-        missing.Path.Should().Be("stale.osu");
-        selected.Status.Should().Be(CurrentBeatmapSelectionStatus.Selected);
-        workspace.SelectedPaths.ToArray().Should().Equal("live.osu");
-    }
-
-    [TestMethod]
     public async Task ResolveQuickRunBeatmapAsync_WithLiveMap_UsesItAndUpdatesShellSelection()
     {
         // Arrange

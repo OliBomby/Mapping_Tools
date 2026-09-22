@@ -67,15 +67,26 @@ internal sealed class TestBetterSaveOverrideService : IBetterSaveOverrideService
     }
 }
 
+internal sealed class TestCurrentBeatmapDialogService : ICurrentBeatmapDialogService
+{
+    public string? Path { get; set; }
+
+    public int FetchCount { get; private set; }
+
+    public Task<string?> FetchAsync(CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        FetchCount++;
+        return Task.FromResult(Path);
+    }
+}
+
 internal sealed class TestBeatmapWorkspace : IBeatmapWorkspace
 {
     private readonly List<RecentBeatmap> recentMaps = [];
     private readonly List<string> selectedPaths = [];
 
     public BeatmapSelectionSource? LastSelectionSource { get; private set; }
-
-    public CurrentBeatmapSelectionResult CurrentBeatmapResult { get; set; } =
-        new(CurrentBeatmapSelectionStatus.Unavailable, null);
 
     public string? QuickRunPath { get; set; }
 
@@ -137,12 +148,6 @@ internal sealed class TestBeatmapWorkspace : IBeatmapWorkspace
     public string? GetBeatmapPickerStartLocation(string? currentDirectory = null)
     {
         return BeatmapPickerStartLocation ?? currentDirectory;
-    }
-
-    public Task<CurrentBeatmapSelectionResult> SelectCurrentBeatmapAsync(
-        CancellationToken cancellationToken = default)
-    {
-        return Task.FromResult(CurrentBeatmapResult);
     }
 
     public async Task<string> ResolveQuickRunBeatmapAsync(

@@ -100,14 +100,6 @@ public interface IBeatmapWorkspace
     string? GetBeatmapPickerStartLocation(string? currentDirectory = null);
 
     /// <summary>
-    ///     Attempts to replace the selection with the beatmap reported by osu!.
-    /// </summary>
-    /// <param name="cancellationToken">Cancels live beatmap discovery.</param>
-    /// <returns>A status distinguishing selection, unavailable lookup, and a stale path.</returns>
-    Task<CurrentBeatmapSelectionResult> SelectCurrentBeatmapAsync(
-        CancellationToken cancellationToken = default);
-
-    /// <summary>
     ///     Resolves the beatmap used by legacy-compatible QuickRun. The beatmap
     ///     currently open in osu! wins when it can be resolved to an existing
     ///     file; otherwise the first shell-selected beatmap is returned.

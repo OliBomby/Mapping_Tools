@@ -21,6 +21,7 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
 {
     private readonly IApplicationDirectories applicationDirectories;
     private readonly IBeatmapBackupService backupService;
+    private readonly ICurrentBeatmapDialogService currentBeatmapDialogService;
     private readonly IDialogService dialogs;
     private readonly IUiDispatcher dispatcher;
     private readonly IFilePicker filePicker;
@@ -44,6 +45,7 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
     /// <param name="dialogs">Asks for an explicit override when backup metadata differs.</param>
     /// <param name="notifications">Publishes completion and recoverable failure outcomes.</param>
     /// <param name="dispatcher">Marshals workspace notifications onto the UI thread.</param>
+    /// <param name="currentBeatmapDialogService">Fetches the current editor beatmap and presents lookup feedback.</param>
     public BeatmapWorkspaceViewModel(
         IBeatmapWorkspace workspace,
         IBeatmapBackupService backupService,
@@ -54,7 +56,8 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
         ApplicationSettings settings,
         IDialogService dialogs,
         IUserNotificationService notifications,
-        IUiDispatcher dispatcher)
+        IUiDispatcher dispatcher,
+        ICurrentBeatmapDialogService currentBeatmapDialogService)
     {
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         this.backupService = backupService ?? throw new ArgumentNullException(nameof(backupService));
@@ -66,6 +69,8 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
         this.dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
         this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
         this.dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
+        this.currentBeatmapDialogService = currentBeatmapDialogService
+                                            ?? throw new ArgumentNullException(nameof(currentBeatmapDialogService));
 
         this.workspace.SelectionChanged += OnSelectionChanged;
         this.workspace.RestoreMostRecent();
@@ -126,18 +131,9 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
     {
         await RunUserOperationAsync(async () =>
         {
-            var result =
-                await workspace.SelectCurrentBeatmapAsync();
-            if (result.Status == CurrentBeatmapSelectionStatus.Unavailable)
-                await PublishAsync(
-                    UserNotificationSeverity.Warning,
-                    "Current beatmap unavailable",
-                    "Mapping Tools could not determine the beatmap open in osu!.");
-            else if (result.Status == CurrentBeatmapSelectionStatus.FileMissing)
-                await PublishAsync(
-                    UserNotificationSeverity.Warning,
-                    "Current beatmap is missing",
-                    $"The path reported by osu! does not exist: {result.Path}");
+            string? path = await currentBeatmapDialogService.FetchAsync();
+            if (path is not null)
+                workspace.SetSelection([path], BeatmapSelectionSource.CurrentEditor);
         }, "Open current beatmap");
     }
 
