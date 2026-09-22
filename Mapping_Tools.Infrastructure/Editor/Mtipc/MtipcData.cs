@@ -9,7 +9,7 @@ internal sealed record MtipcControlPointData(double BeatLength, double Offset, i
     int SampleSet, int TimeSignature, int Volume, int EffectFlags, bool TimingChange);
 
 internal sealed record MtipcHitObjectData(double SpatialLength, int StartTime, int EndTime, int Type,
-    int SoundType, int SegmentCount, Vector2 Position, string? SampleFile, int SampleVolume, int SampleSet,
-    int SampleSetAdditions, int CustomSampleSet, bool IsSelected, int CurveType,
+    int SoundType, int SegmentCount, Vector2 Position, Vector2 EndPosition, string? SampleFile, int SampleVolume,
+    int SampleSet, int SampleSetAdditions, int CustomSampleSet, bool IsSelected, int CurveType,
     IReadOnlyList<Vector2> CurvePoints, IReadOnlyList<int> SoundTypeList, IReadOnlyList<int> SampleSetList,
     IReadOnlyList<int> SampleSetAdditionsList);

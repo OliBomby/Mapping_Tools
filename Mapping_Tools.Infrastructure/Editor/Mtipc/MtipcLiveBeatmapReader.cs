@@ -64,7 +64,7 @@ public sealed class MtipcLiveBeatmapReader : ILiveBeatmapReader
         var hitObject = new HitObject
         {
             PixelLength = source.SpatialLength, Time = source.StartTime, ObjectType = source.Type,
-            EndTime = source.EndTime, Hitsounds = source.SoundType, Pos = source.Position, EndPos = source.Position,
+            EndTime = source.EndTime, Hitsounds = source.SoundType, Pos = source.Position, EndPos = source.EndPosition,
             Filename = source.SampleFile ?? string.Empty, SampleVolume = source.SampleVolume,
             SampleSet = (SampleSet)source.SampleSet, AdditionSet = (SampleSet)source.SampleSetAdditions,
             CustomIndex = source.CustomSampleSet,

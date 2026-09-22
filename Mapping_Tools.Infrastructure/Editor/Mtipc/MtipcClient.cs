@@ -9,6 +9,21 @@ internal sealed class MtipcClient
 {
     private const int HandshakeMagic = 1337;
     private const int ConnectTimeoutMilliseconds = 1000;
+    private static readonly MtipcSession defaultSession = new(Connect);
+    private readonly MtipcSession session;
+
+    public MtipcClient() : this(defaultSession)
+    {
+    }
+
+    internal MtipcClient(Func<CancellationToken, MtipcConnection> connectionProvider) : this(new MtipcSession(connectionProvider))
+    {
+    }
+
+    internal MtipcClient(MtipcSession session)
+    {
+        this.session = session ?? throw new ArgumentNullException(nameof(session));
+    }
 
     public MtipcBeatmapData ReadBeatmap(CancellationToken cancellationToken) => Send(
         MtipcMessageType.ReadBeatmap,
@@ -48,7 +63,7 @@ internal sealed class MtipcClient
         MtipcMessageType.ReadObjects, reader => ReadCounted(reader, ReadObject), cancellationToken);
 
     public double ReadEditorTime(CancellationToken cancellationToken) => Send(
-        MtipcMessageType.EditorTime, static reader => reader.ReadDouble(), cancellationToken);
+        MtipcMessageType.EditorTime, static reader => (double)reader.ReadInt32(), cancellationToken);
 
     public void ReloadEditor(CancellationToken cancellationToken) => Send(
         MtipcMessageType.ReloadEditor, static _ => true, cancellationToken);
@@ -66,11 +81,14 @@ internal sealed class MtipcClient
         int sampleVolume = reader.ReadInt32();
         int sampleSet = reader.ReadInt32();
         int sampleSetAdditions = reader.ReadInt32();
-        int customSampleSet = reader.ReadInt32();
+        // Protocol version 1 does not include a custom sample set field.
+        const int customSampleSet = 0;
         bool isSelected = reader.ReadBoolean();
-        position = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+        _ = reader.ReadSingle();
+        _ = reader.ReadSingle();
 
         int curveType = 0;
+        Vector2 endPosition = position;
         IReadOnlyList<Vector2> curvePoints = [];
         IReadOnlyList<int> soundTypeList = [];
         IReadOnlyList<int> sampleSetList = [];
@@ -81,8 +99,7 @@ internal sealed class MtipcClient
             bool unifiedSoundAddition = reader.ReadBoolean();
             _ = reader.ReadDouble();
             curveType = reader.ReadInt32();
-            _ = reader.ReadSingle();
-            _ = reader.ReadSingle();
+            endPosition = new Vector2(reader.ReadSingle(), reader.ReadSingle());
             curvePoints = ReadPoints(reader);
             if (!unifiedSoundAddition)
             {
@@ -93,8 +110,8 @@ internal sealed class MtipcClient
         }
 
         return new MtipcHitObjectData(spatialLength, startTime, endTime, type, soundType, segmentCount, position,
-            sampleFile, sampleVolume, sampleSet, sampleSetAdditions, customSampleSet, isSelected, curveType,
-            curvePoints, soundTypeList, sampleSetList, sampleSetAdditionsList);
+            endPosition, sampleFile, sampleVolume, sampleSet, sampleSetAdditions, customSampleSet, isSelected,
+            curveType, curvePoints, soundTypeList, sampleSetList, sampleSetAdditionsList);
     }
 
     private static Vector2[] ReadPoints(BinaryReader reader)
@@ -128,27 +145,72 @@ internal sealed class MtipcClient
         return count;
     }
 
-    private T Send<T>(MtipcMessageType messageType, Func<BinaryReader, T> readResponse, CancellationToken cancellationToken)
+    private T Send<T>(MtipcMessageType messageType, Func<BinaryReader, T> readResponse, CancellationToken cancellationToken) =>
+        session.Send(messageType, readResponse, cancellationToken);
+
+    internal sealed class MtipcSession
     {
-        cancellationToken.ThrowIfCancellationRequested();
-        using Stream stream = Connect(cancellationToken);
-        if (stream.CanTimeout)
+        private readonly object synchronization = new();
+        private readonly Func<CancellationToken, MtipcConnection> connectionProvider;
+        private MtipcConnection? connection;
+
+        public MtipcSession(Func<CancellationToken, MtipcConnection> connectionProvider)
         {
-            stream.ReadTimeout = ConnectTimeoutMilliseconds;
-            stream.WriteTimeout = ConnectTimeoutMilliseconds;
+            this.connectionProvider = connectionProvider ?? throw new ArgumentNullException(nameof(connectionProvider));
         }
-        using var reader = new BinaryReader(stream);
-        using var writer = new BinaryWriter(stream);
-        writer.Write(HandshakeMagic);
-        writer.Flush();
-        _ = reader.ReadInt32();
-        writer.Write((int)messageType);
-        writer.Flush();
-        cancellationToken.ThrowIfCancellationRequested();
-        return readResponse(reader);
+
+        public T Send<T>(MtipcMessageType messageType, Func<BinaryReader, T> readResponse, CancellationToken cancellationToken)
+        {
+            lock (synchronization)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                MtipcConnection activeConnection = GetConnection(cancellationToken);
+                try
+                {
+                    activeConnection.WriteMessage((int)messageType);
+                    cancellationToken.ThrowIfCancellationRequested();
+                    using BinaryReader response = activeConnection.ReadMessage();
+                    return readResponse(response);
+                }
+                catch
+                {
+                    Disconnect();
+                    throw;
+                }
+            }
+        }
+
+        private MtipcConnection GetConnection(CancellationToken cancellationToken)
+        {
+            if (connection is not null) return connection;
+
+            MtipcConnection newConnection = connectionProvider(cancellationToken);
+            try
+            {
+                newConnection.SetTimeout(ConnectTimeoutMilliseconds);
+                newConnection.WriteMessage((int)MtipcMessageType.Hello);
+                using BinaryReader handshake = newConnection.ReadMessage();
+                if (handshake.ReadInt32() != HandshakeMagic)
+                    throw new InvalidDataException("MTIPC returned an invalid handshake response.");
+
+                connection = newConnection;
+                return newConnection;
+            }
+            catch
+            {
+                newConnection.Dispose();
+                throw;
+            }
+        }
+
+        private void Disconnect()
+        {
+            connection?.Dispose();
+            connection = null;
+        }
     }
 
-    private static Stream Connect(CancellationToken cancellationToken)
+    private static MtipcConnection Connect(CancellationToken cancellationToken)
     {
         Exception? lastException = null;
         if (OperatingSystem.IsWindows())
@@ -157,7 +219,8 @@ internal sealed class MtipcClient
             {
                 var pipe = new NamedPipeClientStream(".", "mtipc", PipeDirection.InOut, PipeOptions.WriteThrough);
                 pipe.Connect(ConnectTimeoutMilliseconds);
-                return pipe;
+                pipe.ReadMode = PipeTransmissionMode.Message;
+                return new MtipcConnection(pipe, isPipe: true);
             }
             catch (Exception exception) when (exception is IOException or TimeoutException or UnauthorizedAccessException)
             {
@@ -166,14 +229,14 @@ internal sealed class MtipcClient
         }
         else
         {
-            try { return ConnectSocket(new UnixDomainSocketEndPoint("/tmp/mtipc.sock"), cancellationToken); }
+            try { return new MtipcConnection(ConnectSocket(new UnixDomainSocketEndPoint("/tmp/mtipc.sock"), cancellationToken), isPipe: false); }
             catch (Exception exception) when (exception is SocketException or IOException or TimeoutException)
             {
                 lastException = exception;
             }
         }
 
-        try { return ConnectSocket(new IPEndPoint(IPAddress.Loopback, 41337), cancellationToken); }
+        try { return new MtipcConnection(ConnectSocket(new IPEndPoint(IPAddress.Loopback, 41337), cancellationToken), isPipe: false); }
         catch (Exception exception) when (exception is SocketException or IOException or TimeoutException)
         {
             throw new IOException("MTIPC server is unavailable.", exception ?? lastException);
