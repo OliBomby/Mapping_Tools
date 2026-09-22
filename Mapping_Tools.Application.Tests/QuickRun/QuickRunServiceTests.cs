@@ -161,41 +161,27 @@ public sealed class QuickRunServiceTests
     }
 
     [TestMethod]
-    public async Task RunAsync_WhenEditorIsUnavailable_TreatsSelectionAsEmpty()
-    {
-        // Arrange
-        List<string> invoked = [];
-        var registry = RegistryWithRoutingCommands(invoked);
-        var service = CreateService(
-            registry,
-            new RecordingLiveBeatmapReader((LiveBeatmapSnapshot?)null),
-            new ApplicationSettings
-            {
-                SmartQuickRunEnabled = true,
-                NoneQuickRunTool = "None",
-                SingleQuickRunTool = "Single",
-                MultipleQuickRunTool = "Multiple",
-            });
-
-        // Act
-        var result = await service.RunAsync();
-
-        // Assert
-        result.Status.Should().Be(QuickRunStatus.Executed);
-        result.CommandId.Should().Be("none");
-        invoked.Should().Equal("none");
-    }
-
-    [TestMethod]
-    public async Task RunAsync_WithStaleTool_ReturnsTypedWarning()
+    public async Task RunAsync_WithMissingEditorOrStaleTool_ReturnsTypedWarnings()
     {
         // Arrange
         List<UserNotification> notifications = [];
         UserNotificationService notificationService = new();
         notificationService.Published +=
             (_, args) => notifications.Add(args.Notification);
-        var service = CreateService(
-            new QuickRunCommandRegistry(),
+        QuickRunCommandRegistry registry = new();
+        var unavailable = CreateService(
+            registry,
+            new RecordingLiveBeatmapReader((LiveBeatmapSnapshot?)null),
+            new ApplicationSettings(),
+            notificationService);
+
+        // Act
+        var unavailableResult = await unavailable.RunAsync();
+
+        // Assert
+        unavailableResult.Status.Should().Be(QuickRunStatus.EditorUnavailable);
+        var stale = CreateService(
+            registry,
             new RecordingLiveBeatmapReader(Snapshot(1)),
             new ApplicationSettings
             {
@@ -203,13 +189,11 @@ public sealed class QuickRunServiceTests
             },
             notificationService);
 
-        // Act
-        var result = await service.RunAsync();
+        var staleResult = await stale.RunAsync();
 
-        // Assert
-        result.Status.Should().Be(QuickRunStatus.CommandNotFound);
-        notifications.Should().ContainSingle();
-        notifications[0].Severity.Should().Be(UserNotificationSeverity.Warning);
+        staleResult.Status.Should().Be(QuickRunStatus.CommandNotFound);
+        notifications.Count.Should().Be(2);
+        notifications.All(notification => notification.Severity == UserNotificationSeverity.Warning).Should().BeTrue();
     }
 
     [TestMethod]
