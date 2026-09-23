@@ -370,7 +370,16 @@ public sealed class SharpHookGlobalHotkeyService : IGlobalHotkeyService
 
     internal static EventMask NormalizeModifiers(EventMask mask)
     {
-        return mask & (EventMask.Alt | EventMask.Ctrl | EventMask.Shift | EventMask.Meta);
+        EventMask result = EventMask.None;
+        if (mask.HasAlt()) result |= EventMask.Alt;
+
+        if (mask.HasCtrl()) result |= EventMask.Ctrl;
+
+        if (mask.HasShift()) result |= EventMask.Shift;
+
+        if (mask.HasMeta()) result |= EventMask.Meta;
+
+        return result;
     }
 
     private static bool IsSupportedPlatform()

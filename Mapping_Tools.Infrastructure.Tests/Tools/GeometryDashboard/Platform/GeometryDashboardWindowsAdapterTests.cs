@@ -555,6 +555,23 @@ public sealed class GeometryDashboardWindowsAdapterTests
     }
 
     [TestMethod]
+    public void NormalizeModifiers_WithPhysicalModifierBits_ReturnsAggregateFlags()
+    {
+        // Arrange
+        EventMask mask = EventMask.LeftAlt |
+                         EventMask.RightCtrl |
+                         EventMask.LeftShift |
+                         EventMask.RightMeta |
+                         EventMask.CapsLock;
+
+        // Act
+        EventMask actual = SharpHookGlobalHotkeyService.NormalizeModifiers(mask);
+
+        // Assert
+        actual.Should().Be(EventMask.Alt | EventMask.Ctrl | EventMask.Shift | EventMask.Meta);
+    }
+
+    [TestMethod]
     public void ConvertKeyToVirtualKey_WithUnsupportedKey_Throws()
     {
         // Arrange
