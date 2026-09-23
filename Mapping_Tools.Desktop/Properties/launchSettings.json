@@ -7,7 +7,7 @@
     "Mapping Tools (Local Updater)": {
       "commandName": "Project",
       "workingDirectory": ".",
-      "commandLineArgs": "--update-file \"bin\\Release\\net10.0\\win-x64\\publish\\publish-v9.9.9.zip\""
+      "commandLineArgs": "--update-file \"bin\\Release\\net10.0\\win-x64\\publish\\releases.win-x64.json\""
     }
   }
 }

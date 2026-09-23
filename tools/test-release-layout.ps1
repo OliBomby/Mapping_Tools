@@ -2,102 +2,111 @@
 param()
 
 $testRoot = Join-Path ([System.IO.Path]::GetTempPath()) "mapping-tools-release-layout-$([Guid]::NewGuid())"
-$assetDirectory = Join-Path $testRoot 'release-assets'
 $validator = Join-Path $PSScriptRoot 'validate-release-layout.ps1'
+$version = '1.2.3'
+$rids = @('win-x86', 'win-x64', 'linux-x64', 'linux-arm64', 'osx-x64', 'osx-arm64')
+
+function New-FixtureFile([string]$path) {
+    Set-Content -LiteralPath $path -Value 'fixture' -NoNewline
+}
 
 try {
-    New-Item -ItemType Directory -Path $assetDirectory -Force | Out-Null
+    New-Item -ItemType Directory -Path $testRoot -Force | Out-Null
 
-    $publishes = @(
-        @{ Rid = 'win-x86'; Executable = 'Mapping Tools.exe'; Asset = 'mapping-tools-windows-x86.zip' },
-        @{ Rid = 'win-x64'; Executable = 'Mapping Tools.exe'; Asset = 'mapping-tools-windows-x64.zip' },
-        @{ Rid = 'linux-x64'; Executable = 'Mapping Tools'; Asset = 'mapping-tools-linux-x64.zip' },
-        @{ Rid = 'linux-arm64'; Executable = 'Mapping Tools'; Asset = 'mapping-tools-linux-arm64.zip' },
-        @{ Rid = 'osx-x64'; Executable = 'Mapping Tools'; Asset = 'mapping-tools-osx-x64.zip' },
-        @{ Rid = 'osx-arm64'; Executable = 'Mapping Tools'; Asset = 'mapping-tools-osx-arm64.zip' }
-    )
-
-    $publishDirectories = @()
-    $archives = @()
-    $executableNames = @()
-    $assetNames = @()
-    $archiveExecutableNames = @()
-
-    foreach ($publish in $publishes) {
-        $directory = Join-Path $testRoot "Mapping_Tools.Desktop/bin/Release/net10.0/$($publish.Rid)/publish"
+    foreach ($rid in $rids) {
+        $directory = Join-Path $testRoot "velopack-$rid"
         New-Item -ItemType Directory -Path $directory -Force | Out-Null
 
-        @(
-            $publish.Executable,
-            'Mapping_Tools.Desktop.dll',
-            'Mapping_Tools.Desktop.deps.json',
-            'Mapping_Tools.Desktop.runtimeconfig.json'
-        ) | ForEach-Object {
-            Set-Content -LiteralPath (Join-Path $directory $_) -Value 'fixture' -NoNewline
-        }
+        $full = "MappingTools-$version-$rid-full.nupkg"
+        $delta = "MappingTools-$version-$rid-delta.nupkg"
+        New-FixtureFile (Join-Path $directory $full)
+        New-FixtureFile (Join-Path $directory $delta)
 
-        $archive = Join-Path $assetDirectory $publish.Asset
-        if ($publish.Rid -like 'osx-*') {
-            $bundle = Join-Path $testRoot 'Mapping Tools.app/Contents/MacOS'
-            New-Item -ItemType Directory -Path $bundle -Force | Out-Null
-            Get-ChildItem -LiteralPath $directory -File | ForEach-Object {
-                Copy-Item -LiteralPath $_.FullName -Destination (Join-Path $bundle $_.Name)
+        switch -Regex ($rid) {
+            '^win-' {
+                New-FixtureFile (Join-Path $directory "MappingTools-$rid-Setup.exe")
+                New-FixtureFile (Join-Path $directory "MappingTools-$rid-Portable.zip")
             }
-            Set-Content -LiteralPath (Join-Path $testRoot 'Mapping Tools.app/Contents/Info.plist') -Value '<plist />' -NoNewline
-            Compress-Archive -Path (Join-Path $testRoot 'Mapping Tools.app') -DestinationPath $archive -Force
-            $archiveExecutableNames += 'Mapping Tools.app/Contents/MacOS/Mapping Tools'
-        }
-        else {
-            $files = Get-ChildItem -LiteralPath $directory -File | Sort-Object Name |
-                Select-Object -ExpandProperty FullName
-            Compress-Archive -Path $files -DestinationPath $archive -Force
-            $archiveExecutableNames += $publish.Executable
+            '^linux-' {
+                $appImage = Join-Path $directory "MappingTools-$rid.AppImage"
+                New-FixtureFile $appImage
+                if (-not $IsWindows) {
+                    & chmod +x -- $appImage
+                    if ($LASTEXITCODE -ne 0) {
+                        throw "Could not mark Linux AppImage fixture executable: $appImage"
+                    }
+                }
+            }
+            '^osx-' {
+                New-FixtureFile (Join-Path $directory "MappingTools-$rid-Setup.pkg")
+                New-FixtureFile (Join-Path $directory "MappingTools-$rid-Portable.zip")
+            }
         }
 
-        $publishDirectories += $directory
-        $archives += $archive
-        $executableNames += $publish.Executable
-        $assetNames += $publish.Asset
+        $feed = @{
+            Assets = @(
+                @{
+                    PackageId = "MappingTools-$rid"
+                    Version = $version
+                    Type = 'Full'
+                    FileName = $full
+                    SHA1 = 'fixture'
+                    Size = 7
+                },
+                @{
+                    PackageId = "MappingTools-$rid"
+                    Version = $version
+                    Type = 'Delta'
+                    FileName = $delta
+                    SHA1 = 'fixture'
+                    Size = 7
+                }
+            )
+        }
+        $feed | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $directory "releases.$rid.json")
+        @(
+            @{ RelativeFileName = $full; Type = 'Full' },
+            @{ RelativeFileName = $delta; Type = 'Delta' }
+        ) |
+            ConvertTo-Json -Depth 5 |
+            Set-Content -LiteralPath (Join-Path $directory "assets.$rid.json")
+        New-FixtureFile (Join-Path $directory "RELEASES-$rid")
+
+        if ($rid -eq 'win-x86' -or $rid -eq 'win-x64') {
+            $bridgeDirectory = Join-Path $testRoot "bridge-$rid"
+            New-Item -ItemType Directory -Path $bridgeDirectory -Force | Out-Null
+            New-FixtureFile (Join-Path $bridgeDirectory 'Mapping Tools.exe')
+            $bridgeName = if ($rid -eq 'win-x86') { 'release.zip' } else { 'release_x64.zip' }
+            Compress-Archive -Path (Join-Path $bridgeDirectory '*') `
+                -DestinationPath (Join-Path $directory $bridgeName) -Force
+        }
+
+        & $validator `
+            -Channel $rid `
+            -RuntimeIdentifier $rid `
+            -ExpectedVersion $version `
+            -ReleaseDirectory $directory `
+            -RequireLegacyBridge:($rid -like 'win-*')
     }
 
-    $compatibilityX86 = Join-Path $assetDirectory 'release.zip'
-    $compatibilityX64 = Join-Path $assetDirectory 'release_x64.zip'
-    Copy-Item $archives[0] $compatibilityX86
-    Copy-Item $archives[1] $compatibilityX64
-
-    $installerX86 = Join-Path $testRoot 'mapping_tools_installer_x86.exe'
-    $installerX64 = Join-Path $testRoot 'mapping_tools_installer_x64.exe'
-    Set-Content -LiteralPath $installerX86 -Value 'fixture' -NoNewline
-    Set-Content -LiteralPath $installerX64 -Value 'fixture' -NoNewline
-
-    & $validator `
-        -PublishDirectory $publishDirectories `
-        -Archive $archives `
-        -ExecutableName $executableNames `
-        -AssetName $assetNames `
-        -ArchiveExecutableName $archiveExecutableNames `
-        -CompatibilityArchiveX86 $compatibilityX86 `
-        -CompatibilityArchiveX64 $compatibilityX64 `
-        -InstallerX86 $installerX86 `
-        -InstallerX64 $installerX64
-
-    Remove-Item -LiteralPath (Join-Path $publishDirectories[2] 'Mapping Tools')
+    $invalidDirectory = Join-Path $testRoot 'velopack-invalid'
+    Copy-Item -LiteralPath (Join-Path $testRoot 'velopack-linux-x64') -Destination $invalidDirectory -Recurse
+    Remove-Item -LiteralPath (Join-Path $invalidDirectory "MappingTools-$version-linux-x64-full.nupkg")
     try {
         & $validator `
-            -PublishDirectory $publishDirectories `
-            -Archive $archives `
-            -ExecutableName $executableNames `
-            -AssetName $assetNames `
-            -ArchiveExecutableName $archiveExecutableNames
-        throw 'Validator accepted a publish missing its user-facing executable.'
+            -Channel 'linux-x64' `
+            -RuntimeIdentifier 'linux-x64' `
+            -ExpectedVersion $version `
+            -ReleaseDirectory $invalidDirectory
+        throw 'Validator accepted a feed whose current full package is missing.'
     }
     catch {
-        if ($_.Exception.Message -eq 'Validator accepted a publish missing its user-facing executable.') {
+        if ($_.Exception.Message -eq 'Validator accepted a feed whose current full package is missing.') {
             throw
         }
     }
 
-    Write-Host 'Release-layout fixture tests passed for all six desktop RIDs.'
+    Write-Host 'Velopack release-layout fixture tests passed for all six channels.'
 }
 finally {
     if (Test-Path -LiteralPath $testRoot) {

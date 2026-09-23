@@ -43,4 +43,4 @@ See the [Trello board](https://trello.com/b/iTmmw3eP/mapping-tools).
 - [NonInvasiveKeyboardHook](https://github.com/kfirprods/NonInvasiveKeyboardHook)
 - [Overlay.NET](https://github.com/lolp1/Overlay.NET)
 - [.NET Ogg Vorbis Encoder](https://github.com/SteveLillis/.NET-Ogg-Vorbis-Encoder)
-- [Onova](https://github.com/Tyrrrz/Onova)
+- [Velopack](https://github.com/velopack/velopack)

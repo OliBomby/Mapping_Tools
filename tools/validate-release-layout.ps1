@@ -1,289 +1,150 @@
 [CmdletBinding()]
 param(
+    [Parameter(Mandatory = $true)]
+    [ValidateSet('win-x86', 'win-x64', 'linux-x64', 'linux-arm64', 'osx-x64', 'osx-arm64')]
+    [string]$Channel,
+
+    [Parameter(Mandatory = $true)]
+    [ValidateSet('win-x86', 'win-x64', 'linux-x64', 'linux-arm64', 'osx-x64', 'osx-arm64')]
+    [string]$RuntimeIdentifier,
+
+    [Parameter(Mandatory = $true)]
     [string]$ExpectedVersion,
 
     [Parameter(Mandatory = $true)]
-    [string[]]$PublishDirectory,
+    [string]$ReleaseDirectory,
 
-    [Parameter(Mandatory = $true)]
-    [string[]]$Archive,
-
-    [Parameter(Mandatory = $true)]
-    [string[]]$ExecutableName,
-
-    [Parameter(Mandatory = $true)]
-    [string[]]$AssetName,
-
-    [string[]]$ArchiveExecutableName,
-
-    [string]$CompatibilityArchiveX86,
-
-    [string]$CompatibilityArchiveX64,
-
-    [string]$InstallerX86,
-
-    [string]$InstallerX64
+    [switch]$RequireLegacyBridge
 )
 
-if ($PublishDirectory.Count -ne $Archive.Count -or
-    $PublishDirectory.Count -ne $ExecutableName.Count -or
-    $PublishDirectory.Count -ne $AssetName.Count) {
-    throw 'Publish directories, archives, executable names, and asset names must have matching counts.'
+if ($Channel -cne $RuntimeIdentifier) {
+    throw "The Velopack channel '$Channel' must equal the runtime identifier '$RuntimeIdentifier'."
 }
 
-if ($ArchiveExecutableName.Count -ne 0 -and
-    $ArchiveExecutableName.Count -ne $PublishDirectory.Count) {
-    throw 'Archive executable names must be omitted or have the same count as the publish directories.'
+if (-not (Test-Path -LiteralPath $ReleaseDirectory -PathType Container)) {
+    throw "Missing Velopack release directory: $ReleaseDirectory"
 }
 
-if ($PublishDirectory.Count -eq 0) {
-    throw 'At least one desktop publish must be supplied.'
-}
-
-$isWindowsHost = [System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT
-
-function Get-ZipEntryNames([string]$archive) {
+function Get-ZipEntryNames([string]$archivePath) {
     Add-Type -AssemblyName System.IO.Compression.FileSystem
-    $zip = [System.IO.Compression.ZipFile]::OpenRead((Resolve-Path -LiteralPath $archive))
+    $zip = [System.IO.Compression.ZipFile]::OpenRead((Resolve-Path -LiteralPath $archivePath))
     try {
-        return @($zip.Entries | ForEach-Object FullName)
+        return @($zip.Entries | ForEach-Object { $_.FullName.TrimStart('/') })
     }
     finally {
         $zip.Dispose()
     }
 }
 
-function Get-FileSha256([string]$path) {
-    $sha256 = [System.Security.Cryptography.SHA256]::Create()
-    $fileStream = [System.IO.File]::OpenRead((Resolve-Path -LiteralPath $path))
-    try {
-        return [System.BitConverter]::ToString($sha256.ComputeHash($fileStream)).Replace('-', '')
-    }
-    finally {
-        $fileStream.Dispose()
-        $sha256.Dispose()
+function Assert-File([string]$path, [string]$description) {
+    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+        throw "Missing $description`: $path"
     }
 }
 
-function Assert-ArchiveLayout(
-    [string]$archivePath,
-    [string]$expectedExecutableName) {
-    $separatorIndex = $expectedExecutableName.LastIndexOf('/')
-    $archivePrefix = if ($separatorIndex -ge 0) {
-        $expectedExecutableName.Substring(0, $separatorIndex + 1)
-    }
-    else {
-        ''
-    }
-    $archiveRoot = $archivePrefix.TrimEnd('/')
-    $archiveScope = $archiveRoot
-    if ($expectedExecutableName.EndsWith(
-            '.app/Contents/MacOS/Mapping Tools',
-            [StringComparison]::OrdinalIgnoreCase)) {
-        $contentsMarker = '/Contents/'
-        $contentsIndex = $expectedExecutableName.IndexOf(
-            $contentsMarker,
-            [StringComparison]::OrdinalIgnoreCase)
-        $archiveScope = $expectedExecutableName.Substring(0, $contentsIndex)
-    }
-    $entries = Get-ZipEntryNames $archivePath
-    $entrySet = [System.Collections.Generic.HashSet[string]]::new(
-        [System.StringComparer]::OrdinalIgnoreCase)
+$feedPath = Join-Path $ReleaseDirectory "releases.$Channel.json"
+$assetsPath = Join-Path $ReleaseDirectory "assets.$Channel.json"
+Assert-File $feedPath 'Velopack release feed'
+Assert-File $assetsPath 'Velopack assets manifest'
 
-    foreach ($entry in $entries) {
-        $normalizedEntry = $entry.TrimStart('/')
-        [void]$entrySet.Add($normalizedEntry)
-        if ($normalizedEntry -match '[/\\]' -and
-            ([string]::IsNullOrWhiteSpace($archiveScope) -or
-             -not $normalizedEntry.StartsWith("$archiveScope/", [StringComparison]::OrdinalIgnoreCase))) {
-            throw "Release archive '$archivePath' contains a non-root entry '$entry'."
+try {
+    $feed = Get-Content -LiteralPath $feedPath -Raw | ConvertFrom-Json
+    $assetsManifest = Get-Content -LiteralPath $assetsPath -Raw | ConvertFrom-Json
+}
+catch {
+    throw "Velopack metadata is not valid JSON: $($_.Exception.Message)"
+}
+
+$feedAssets = @($feed.Assets)
+if ($feedAssets.Count -eq 0) {
+    throw "Velopack feed '$feedPath' contains no assets."
+}
+$assetsManifestEntries = @($assetsManifest)
+if ($assetsManifestEntries.Count -eq 0) {
+    throw "Velopack assets manifest '$assetsPath' contains no assets."
+}
+
+$currentAssets = @($feedAssets | Where-Object { [string]$_.Version -eq $ExpectedVersion })
+$currentFullAssets = @($currentAssets | Where-Object { [string]$_.Type -eq 'Full' })
+if ($currentFullAssets.Count -ne 1) {
+    throw "Velopack feed '$feedPath' must contain exactly one full asset for version '$ExpectedVersion'."
+}
+
+foreach ($asset in $feedAssets) {
+    $fileName = [string]$asset.FileName
+    if ([string]::IsNullOrWhiteSpace($fileName) -or
+        [System.IO.Path]::IsPathRooted($fileName) -or
+        $fileName.Replace('\', '/') -match '(^|/)\.\.(?:/|$)') {
+        throw "Velopack feed '$feedPath' contains an unsafe asset path '$fileName'."
+    }
+
+    if ([string]$asset.Version -eq $ExpectedVersion) {
+        Assert-File (Join-Path $ReleaseDirectory ([System.IO.Path]::GetFileName($fileName))) "current Velopack asset '$fileName'"
+    }
+}
+
+$currentDeltaAssets = @($currentAssets | Where-Object { [string]$_.Type -eq 'Delta' })
+if ($currentDeltaAssets.Count -gt 1) {
+    throw "Velopack feed '$feedPath' contains more than one delta for version '$ExpectedVersion'."
+}
+
+$releaseFiles = @(Get-ChildItem -LiteralPath $ReleaseDirectory -File)
+switch -Regex ($RuntimeIdentifier) {
+    '^win-' {
+        if (-not ($releaseFiles | Where-Object Name -like '*-Setup.exe')) {
+            throw "Windows release '$Channel' did not produce a per-user Velopack Setup.exe."
         }
-        if ($normalizedEntry -match '\.zip$') {
-            throw "Release archive '$archivePath' contains a nested ZIP archive '$normalizedEntry'."
-        }
-    }
-
-    $required = @(
-        $expectedExecutableName,
-        ($archivePrefix + 'Mapping_Tools.Desktop.dll'),
-        ($archivePrefix + 'Mapping_Tools.Desktop.deps.json'),
-        ($archivePrefix + 'Mapping_Tools.Desktop.runtimeconfig.json')
-    )
-
-    if ($expectedExecutableName.EndsWith(
-            '.app/Contents/MacOS/Mapping Tools',
-            [StringComparison]::OrdinalIgnoreCase)) {
-        $contentsMarker = '/Contents/MacOS/'
-        $contentsIndex = $expectedExecutableName.IndexOf(
-            $contentsMarker,
-            [StringComparison]::OrdinalIgnoreCase)
-        $contentsPrefix = $expectedExecutableName.Substring(
-            0,
-            $contentsIndex + '/Contents/'.Length)
-        $required += $contentsPrefix + 'Info.plist'
-    }
-
-    foreach ($entry in $required) {
-        if (-not $entrySet.Contains($entry)) {
-            throw "Release archive '$archivePath' is missing '$entry'."
+        if (-not ($releaseFiles | Where-Object Name -like '*-Portable.zip')) {
+            throw "Windows release '$Channel' did not produce the Velopack portable package."
         }
     }
+    '^linux-' {
+        $appImage = $releaseFiles | Where-Object Name -like '*.AppImage' | Select-Object -First 1
+        if ($null -eq $appImage) {
+            throw "Linux release '$Channel' did not produce an AppImage."
+        }
+        if ($env:OS -ne 'Windows_NT') {
+            $getUnixFileMode = [System.IO.File].GetMethod(
+                'GetUnixFileMode',
+                [Type[]]@([string]))
+            if ($null -eq $getUnixFileMode) {
+                throw 'This PowerShell runtime cannot inspect Unix executable permissions.'
+            }
 
-    if ($entrySet.Contains(($archivePrefix + 'Mapping Tools.dll'))) {
-        throw "Release archive '$archivePath' contains the removed WPF assembly."
-    }
-
-    $preRenameAppHost = if ($expectedExecutableName.EndsWith('Mapping Tools.exe', [StringComparison]::OrdinalIgnoreCase)) {
-        ($archivePrefix + 'Mapping_Tools.Desktop.exe')
-    }
-    else {
-        ($archivePrefix + 'Mapping_Tools.Desktop')
-    }
-
-    if ($entrySet.Contains($preRenameAppHost)) {
-        throw "Release archive '$archivePath' contains the pre-rename Avalonia apphost."
-    }
-
-    if ($expectedExecutableName.EndsWith('Mapping Tools', [StringComparison]::OrdinalIgnoreCase) -and -not $isWindowsHost) {
-        $zip = [System.IO.Compression.ZipFile]::OpenRead((Resolve-Path -LiteralPath $archivePath))
-        try {
-            $executableEntry = $zip.Entries |
-                Where-Object FullName -eq $expectedExecutableName |
-                Select-Object -First 1
-            $unixMode = ([int64]$executableEntry.ExternalAttributes -shr 16) -band 0x1ff
-            if (($unixMode -band 0x40) -eq 0) {
-                throw "Release archive '$archivePath' does not preserve the executable mode for '$expectedExecutableName'."
+            $mode = [System.IO.File]::GetUnixFileMode($appImage.FullName)
+            if (([int]$mode -band 0x40) -eq 0) {
+                throw "Linux AppImage '$($appImage.Name)' is not executable."
             }
         }
-        finally {
-            $zip.Dispose()
+    }
+    '^osx-' {
+        if (-not ($releaseFiles | Where-Object Name -like '*.pkg')) {
+            throw "macOS release '$Channel' did not produce a pkg installer."
+        }
+        if (-not ($releaseFiles | Where-Object Name -like '*-Portable.zip')) {
+            throw "macOS release '$Channel' did not produce a portable package."
         }
     }
 }
 
-for ($index = 0; $index -lt $PublishDirectory.Count; $index++) {
-    $publishPath = $PublishDirectory[$index]
-    $archivePath = $Archive[$index]
-    $expectedExecutableName = $ExecutableName[$index]
-    $expectedArchiveExecutableName = if ($ArchiveExecutableName.Count -eq 0) {
-        $expectedExecutableName
-    }
-    else {
-        $ArchiveExecutableName[$index]
-    }
-    $expectedAssetName = $AssetName[$index]
-
-    if (-not (Test-Path -LiteralPath $publishPath -PathType Container)) {
-        throw "Missing publish directory: $publishPath"
+if ($RequireLegacyBridge) {
+    if ($RuntimeIdentifier -notlike 'win-*') {
+        throw 'The legacy Program Files bridge is only valid for Windows releases.'
     }
 
-    if ($publishPath -notlike '*Mapping_Tools.Desktop*') {
-        throw "Primary release directory must come from Mapping_Tools.Desktop: $publishPath"
+    $bridgeName = if ($RuntimeIdentifier -eq 'win-x86') { 'release.zip' } else { 'release_x64.zip' }
+    $bridgePath = Join-Path $ReleaseDirectory $bridgeName
+    Assert-File $bridgePath 'legacy migration bridge'
+
+    $bridgeEntries = [System.Collections.Generic.HashSet[string]]::new(
+        [System.StringComparer]::OrdinalIgnoreCase)
+    foreach ($entry in Get-ZipEntryNames $bridgePath) {
+        [void]$bridgeEntries.Add($entry)
     }
 
-    if ([System.IO.Path]::GetFileName($archivePath) -cne $expectedAssetName) {
-        throw "Archive '$archivePath' does not have the deterministic asset name '$expectedAssetName'."
-    }
-
-    $executablePath = Join-Path $publishPath $expectedExecutableName
-    if (-not (Test-Path -LiteralPath $executablePath -PathType Leaf)) {
-        throw "Missing user-facing executable: $executablePath"
-    }
-
-    if ($expectedExecutableName -eq 'Mapping Tools' -and -not $isWindowsHost) {
-        $unixMode = [System.IO.File]::GetUnixFileMode((Resolve-Path -LiteralPath $executablePath))
-        if (([int]$unixMode -band 0x40) -eq 0) {
-            throw "Unix publish apphost '$executablePath' is not executable."
-        }
-    }
-
-    $requiredPublishFiles = @(
-        'Mapping_Tools.Desktop.dll',
-        'Mapping_Tools.Desktop.deps.json',
-        'Mapping_Tools.Desktop.runtimeconfig.json'
-    )
-
-    foreach ($file in $requiredPublishFiles) {
-        if (-not (Test-Path -LiteralPath (Join-Path $publishPath $file) -PathType Leaf)) {
-            throw "Publish directory '$publishPath' is missing '$file'."
-        }
-    }
-
-    if (Test-Path -LiteralPath (Join-Path $publishPath 'Mapping Tools.dll') -PathType Leaf) {
-        throw "Publish directory '$publishPath' contains a removed WPF assembly."
-    }
-
-    $preRenameAppHost = if ($expectedExecutableName -eq 'Mapping Tools.exe') {
-        'Mapping_Tools.Desktop.exe'
-    }
-    else {
-        'Mapping_Tools.Desktop'
-    }
-
-    if (Test-Path -LiteralPath (Join-Path $publishPath $preRenameAppHost) -PathType Leaf) {
-        throw "Publish directory '$publishPath' was not renamed to '$expectedExecutableName'."
-    }
-
-    if ($ExpectedVersion) {
-        $fileVersion = [System.Diagnostics.FileVersionInfo]::GetVersionInfo(
-            (Resolve-Path -LiteralPath (Join-Path $publishPath 'Mapping_Tools.Desktop.dll'))).FileVersion
-        if ($fileVersion -ne $ExpectedVersion) {
-            throw "Unexpected file version '$fileVersion' in $publishPath; expected '$ExpectedVersion'."
-        }
-    }
-
-    if (-not (Test-Path -LiteralPath $archivePath -PathType Leaf)) {
-        throw "Missing release archive: $archivePath"
-    }
-
-    Assert-ArchiveLayout $archivePath $expectedArchiveExecutableName
-}
-
-if ([string]::IsNullOrWhiteSpace($CompatibilityArchiveX86) -xor
-    [string]::IsNullOrWhiteSpace($CompatibilityArchiveX64)) {
-    throw 'Both Windows compatibility archives must be supplied together.'
-}
-
-if (-not [string]::IsNullOrWhiteSpace($CompatibilityArchiveX86)) {
-    $compatibilityArchives = @(
-        $CompatibilityArchiveX86,
-        $CompatibilityArchiveX64
-    )
-    $canonicalWindowsArchives = @($Archive[0], $Archive[1])
-    $compatibilityNames = @('release.zip', 'release_x64.zip')
-
-    for ($index = 0; $index -lt $compatibilityArchives.Count; $index++) {
-        $compatibilityArchive = $compatibilityArchives[$index]
-        if ([System.IO.Path]::GetFileName($compatibilityArchive) -cne $compatibilityNames[$index]) {
-            throw "Windows compatibility archive '$compatibilityArchive' has an unexpected name."
-        }
-        if (-not (Test-Path -LiteralPath $compatibilityArchive -PathType Leaf)) {
-            throw "Missing Windows compatibility archive: $compatibilityArchive"
-        }
-
-        $canonicalHash = Get-FileSha256 $canonicalWindowsArchives[$index]
-        $compatibilityHash = Get-FileSha256 $compatibilityArchive
-        if ($canonicalHash -cne $compatibilityHash) {
-            throw "Windows compatibility archive '$compatibilityArchive' is not an exact canonical-asset copy."
-        }
+    if ($bridgeEntries.Count -ne 1 -or -not $bridgeEntries.Contains('Mapping Tools.exe')) {
+        throw "Legacy migration bridge '$bridgePath' must contain only the Velopack installer named 'Mapping Tools.exe'."
     }
 }
 
-if ([string]::IsNullOrWhiteSpace($InstallerX86) -xor
-    [string]::IsNullOrWhiteSpace($InstallerX64)) {
-    throw 'Both Windows installer outputs must be supplied together.'
-}
-
-if (-not [string]::IsNullOrWhiteSpace($InstallerX86)) {
-    $installers = @($InstallerX86, $InstallerX64)
-    $installerNames = @('mapping_tools_installer_x86.exe', 'mapping_tools_installer_x64.exe')
-    for ($index = 0; $index -lt $installers.Count; $index++) {
-        $installer = $installers[$index]
-        if ([System.IO.Path]::GetFileName($installer) -cne $installerNames[$index]) {
-            throw "Windows installer '$installer' has an unexpected name."
-        }
-        if (-not (Test-Path -LiteralPath $installer -PathType Leaf)) {
-            throw "Missing Windows installer output: $installer"
-        }
-    }
-}
+Write-Host "Validated Velopack channel '$Channel' for version '$ExpectedVersion'."

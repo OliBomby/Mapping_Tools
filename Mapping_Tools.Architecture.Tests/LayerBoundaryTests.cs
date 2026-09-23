@@ -149,7 +149,7 @@ public sealed class LayerBoundaryTests
     }
 
     [TestMethod]
-    public void UpdaterBoundary_KeepsOnovaAndDesktopPlatformTypesOutOfApplication()
+    public void UpdaterBoundary_KeepsVelopackAndDesktopPlatformTypesOutOfApplication()
     {
         // Arrange
         string applicationUpdates = Path.Combine(
@@ -167,13 +167,13 @@ public sealed class LayerBoundaryTests
             "Composition");
         string[] forbiddenApplicationTokens =
         [
-            "Onova",
+            "Velopack",
             "System.Net.Http",
             "System.Diagnostics.Process",
             "System.IO",
         ];
-        string[] forbiddenDesktopTokens = ["Onova", "System.Diagnostics.Process"];
-        string[] forbiddenDesktopCompositionTokens = ["Onova.Services", "System.Diagnostics.Process"];
+        string[] forbiddenDesktopTokens = ["Velopack", "System.Diagnostics.Process"];
+        string[] forbiddenDesktopCompositionTokens = ["Velopack.Sources", "Velopack.UpdateManager", "System.Diagnostics.Process"];
 
         // Act
         string[] violations =
@@ -186,16 +186,16 @@ public sealed class LayerBoundaryTests
             repositoryRoot,
             "Mapping_Tools.Infrastructure",
             "Mapping_Tools.Infrastructure.csproj");
-        bool infrastructureOwnsOnova = XDocument.Load(infrastructureProject)
+        bool infrastructureOwnsVelopack = XDocument.Load(infrastructureProject)
             .Descendants("PackageReference")
             .Any(element => string.Equals(
                 element.Attribute("Include")?.Value,
-                "Onova",
+                "Velopack",
                 StringComparison.OrdinalIgnoreCase));
 
         // Assert
         violations.Should().BeEmpty(string.Join(Environment.NewLine, violations));
-        infrastructureOwnsOnova.Should().BeTrue();
+        infrastructureOwnsVelopack.Should().BeTrue();
     }
 
     private static IEnumerable<string> FindDirectoryTokenViolations(

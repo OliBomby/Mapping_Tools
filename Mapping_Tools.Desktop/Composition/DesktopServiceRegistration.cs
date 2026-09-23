@@ -1,5 +1,4 @@
 using System.Reflection;
-using System.Runtime.InteropServices;
 using Avalonia.Controls;
 using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.Audio;
@@ -51,9 +50,6 @@ namespace Mapping_Tools.Desktop.Composition;
 
 internal static class DesktopServiceRegistration
 {
-    private const string repository_name = "Mapping_Tools";
-    private const string repository_owner = "OliBomby";
-
     /// <summary>
     ///     Registers the Avalonia shell, platform adapters, application paths,
     ///     settings pipeline, and typed project persistence as desktop-lifetime
@@ -83,30 +79,18 @@ internal static class DesktopServiceRegistration
                 "Mapping Tools");
             return httpClient;
         });
-        services.AddSingleton<IPackageResolver>(provider =>
-        {
-            var httpClient = provider.GetRequiredService<HttpClient>();
-            if (localUpdatePackagePath is not null)
-                return new LocalUpdatePackageResolver(
-                    Path.GetDirectoryName(localUpdatePackagePath)!,
-                    Path.GetFileName(localUpdatePackagePath));
-
-            return new GithubUpdatePackageResolver(
-                httpClient,
-                repository_owner,
-                repository_name,
-                GetUpdateAssetName());
-        });
-        services.AddSingleton<IUpdateGateway, OnovaUpdateGateway>();
+        services.AddSingleton<IUpdateGateway>(provider =>
+            new VelopackUpdateGateway(
+                provider.GetRequiredService<HttpClient>(),
+                localUpdatePackagePath));
         services.AddSingleton<IUpdateService, UpdateService>();
-        if (OperatingSystem.IsWindows())
-            services.AddSingleton<IUpdaterInteractionService>(provider =>
-                new AvaloniaUpdaterInteractionService(
-                    () => provider.GetRequiredService<MainWindow>(),
-                    provider.GetRequiredService<IUpdateService>(),
-                    provider.GetRequiredService<IUserNotificationService>(),
-                    () => provider.GetRequiredService<IDialogService>(),
-                    provider.GetRequiredService<IUiDispatcher>()));
+        services.AddSingleton<IUpdaterInteractionService>(provider =>
+            new AvaloniaUpdaterInteractionService(
+                () => provider.GetRequiredService<MainWindow>(),
+                provider.GetRequiredService<IUpdateService>(),
+                provider.GetRequiredService<IUserNotificationService>(),
+                () => provider.GetRequiredService<IDialogService>(),
+                provider.GetRequiredService<IUiDispatcher>()));
         services.AddSingleton<BeatmapWorkspaceViewModel>();
         services.AddDesktopFeatures(
             toolAssemblies ?? [typeof(DesktopServiceRegistration).Assembly]);
@@ -251,19 +235,5 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<ProjectAutosaveCoordinator>();
 
         return services;
-    }
-
-    private static string GetUpdateAssetName()
-    {
-        if (OperatingSystem.IsWindows())
-            return RuntimeInformation.ProcessArchitecture == Architecture.X86
-                ? "release.zip"
-                : "release_x64.zip";
-
-        string platform = OperatingSystem.IsMacOS() ? "osx" : "linux";
-        string architecture = RuntimeInformation.ProcessArchitecture == Architecture.Arm64
-            ? "arm64"
-            : "x64";
-        return $"mapping-tools-{platform}-{architecture}.zip";
     }
 }

@@ -1,5 +1,7 @@
 ﻿using Avalonia;
 
+using Velopack;
+
 namespace Mapping_Tools.Desktop;
 
 internal sealed class Program
@@ -14,6 +16,10 @@ internal sealed class Program
     [STAThread]
     public static void Main(string[] args)
     {
+        VelopackApp.Build()
+            .SetAutoApplyOnStartup(false)
+            .Run();
+
         AppDomain.CurrentDomain.UnhandledException += (_, eventArgs) =>
         {
             if (eventArgs.ExceptionObject is Exception exception) App.WriteCrashLog(exception);
