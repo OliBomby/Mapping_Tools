@@ -15,10 +15,6 @@
       <HintPath>..\lib\EditorReader.dll</HintPath>
       <Private>true</Private>
     </Reference>
-    <Reference Include="NonInvasiveKeyboardHookLibrary.Core">
-      <HintPath>..\lib\NonInvasiveKeyboardHookLibrary.Core.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
   </ItemGroup>
 
   <ItemGroup>
@@ -33,6 +29,7 @@
     <PackageReference Include="NVorbis" Version="0.10.3"/>
     <PackageReference Include="OggVorbisEncoder" Version="1.2.0"/>
     <PackageReference Include="OsuMemoryDataProvider" Version="0.10.3"/>
+    <PackageReference Include="SharpHook" Version="8.0.0"/>
     <PackageReference Include="Velopack" Version="1.2.0"/>
   </ItemGroup>
 

@@ -40,7 +40,7 @@ See the [Trello board](https://trello.com/b/iTmmw3eP/mapping-tools).
 - [NAudio Vorbis](https://github.com/naudio/Vorbis)
 - [OsuMemoryDataProvider](https://github.com/Piotrekol)
 - [Editor Reader](https://github.com/Karoo13/EditorReader)
-- [NonInvasiveKeyboardHook](https://github.com/kfirprods/NonInvasiveKeyboardHook)
+- [SharpHook](https://github.com/TolikPylypchuk/SharpHook)
 - [Overlay.NET](https://github.com/lolp1/Overlay.NET)
 - [.NET Ogg Vorbis Encoder](https://github.com/SteveLillis/.NET-Ogg-Vorbis-Encoder)
 - [Velopack](https://github.com/velopack/velopack)

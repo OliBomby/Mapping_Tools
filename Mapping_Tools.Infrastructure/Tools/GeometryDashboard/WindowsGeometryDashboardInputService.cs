@@ -55,7 +55,7 @@ public sealed class WindowsGeometryDashboardInputService : IGeometryDashboardInp
         int virtualKey;
         try
         {
-            virtualKey = WindowsGlobalHotkeyService.ConvertLegacyKeyToVirtualKey(
+            virtualKey = WindowsKeyCodeConverter.ConvertLegacyKeyToVirtualKey(
                 hotkey.Key);
         }
         catch (ArgumentOutOfRangeException)

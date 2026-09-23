@@ -12,6 +12,7 @@ using Mapping_Tools.Infrastructure.Tools.GeometryDashboard;
 using Mapping_Tools.Infrastructure.Tools.GeometryDashboard.Contracts;
 using Mapping_Tools.Infrastructure.Tools.GeometryDashboard.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SharpHook.Data;
 
 namespace Mapping_Tools.Infrastructure.Tests.Tools.GeometryDashboard.Platform;
 
@@ -469,7 +470,7 @@ public sealed class GeometryDashboardWindowsAdapterTests
     public void Start_WhenPlatformIsUnavailable_DoesNotInvokeNativeHook()
     {
         // Arrange
-        WindowsGlobalHotkeyService sut = new(() => false);
+        SharpHookGlobalHotkeyService sut = new(() => false);
         sut.SetBinding(
             "geometry",
             new HotkeySettings(56, 0),
@@ -495,7 +496,7 @@ public sealed class GeometryDashboardWindowsAdapterTests
 
         // Act
         int[] actualVirtualKeys = legacyKeys
-            .Select(WindowsGlobalHotkeyService.ConvertLegacyKeyToVirtualKey)
+            .Select(WindowsKeyCodeConverter.ConvertLegacyKeyToVirtualKey)
             .ToArray();
 
         // Assert
@@ -503,10 +504,61 @@ public sealed class GeometryDashboardWindowsAdapterTests
     }
 
     [TestMethod]
+    public void ConvertLegacyKeyToSharpHookKey_WithCommonAvaloniaKeys_PreservesShortcutMeaning()
+    {
+        // Arrange
+        int[] legacyKeys = [44, 41, 77, 101, 32, 122, 132, 141];
+        KeyCode[] expectedKeys =
+        [
+            KeyCode.VcA,
+            KeyCode.Vc7,
+            KeyCode.VcNumPad3,
+            KeyCode.VcF12,
+            KeyCode.VcDelete,
+            KeyCode.VcBrowserBack,
+            KeyCode.VcMediaNext,
+            KeyCode.VcEquals,
+        ];
+
+        // Act
+        KeyCode[] actualKeys = legacyKeys
+            .Select(SharpHookGlobalHotkeyService.ConvertLegacyKeyToSharpHookKey)
+            .ToArray();
+
+        // Assert
+        actualKeys.Should().Equal(expectedKeys);
+    }
+
+    [TestMethod]
+    public void ConvertLegacyModifiersToEventMask_WithAllLegacyFlags_PreservesModifierMeaning()
+    {
+        // Arrange
+
+        // Act
+        EventMask actual = SharpHookGlobalHotkeyService.ConvertLegacyModifiersToEventMask(15);
+
+        // Assert
+        actual.Should().Be(EventMask.Alt | EventMask.Ctrl | EventMask.Shift | EventMask.Meta);
+    }
+
+    [TestMethod]
+    public void ConvertEventMaskToLegacyModifiers_WithLockState_IgnoresNonModifierBits()
+    {
+        // Arrange
+        EventMask mask = EventMask.Alt | EventMask.Ctrl | EventMask.CapsLock | EventMask.NumLock;
+
+        // Act
+        int actual = SharpHookGlobalHotkeyService.ConvertEventMaskToLegacyModifiers(mask);
+
+        // Assert
+        actual.Should().Be(3);
+    }
+
+    [TestMethod]
     public void ConvertLegacyKeyToVirtualKey_WithUnsupportedPersistedValue_Throws()
     {
         // Arrange
-        Action act = () => WindowsGlobalHotkeyService.ConvertLegacyKeyToVirtualKey(156);
+        Action act = () => WindowsKeyCodeConverter.ConvertLegacyKeyToVirtualKey(156);
 
         // Act
         // Assert

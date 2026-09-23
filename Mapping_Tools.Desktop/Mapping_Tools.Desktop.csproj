@@ -59,9 +59,9 @@
           Condition="Exists('$(PublishedAppHostSource)')"/>
   </Target>
 
-  <!-- These assemblies back Windows-only live-editor, overlay, and global-hook
-       adapters. The shared Infrastructure assembly keeps compile-time
-       references, while Unix bundles omit those unused runtime assets. -->
+  <!-- These assemblies back Windows-only live-editor and overlay adapters.
+       The shared Infrastructure assembly keeps compile-time references,
+       while Unix bundles omit those unused runtime assets. -->
   <Target Name="ExcludeWindowsOnlyRuntimeAssets"
           BeforeTargets="_GetCurrentAndPriorPublishFileWrites;_ComputeResolvedFilesToPublishTypes"
           Condition="'$(RuntimeIdentifier)' == 'linux-x64' Or
@@ -71,7 +71,6 @@
     <ItemGroup>
       <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)"
                              Condition="'%(ResolvedFileToPublish.Filename)' == 'EditorReader' Or
-                                        '%(ResolvedFileToPublish.Filename)' == 'NonInvasiveKeyboardHookLibrary.Core' Or
                                         '%(ResolvedFileToPublish.Filename)' == 'NAudio.Wasapi'"/>
     </ItemGroup>
   </Target>

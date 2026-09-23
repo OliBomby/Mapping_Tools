@@ -152,10 +152,7 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<QuickRunService>();
         services.AddSingleton<IQuickRunService>(provider =>
             provider.GetRequiredService<QuickRunService>());
-        if (OperatingSystem.IsWindows())
-            services.AddSingleton<IGlobalHotkeyService, WindowsGlobalHotkeyService>();
-        else
-            services.AddSingleton<IGlobalHotkeyService, UnsupportedPlatformGlobalHotkeyService>();
+        services.AddSingleton<IGlobalHotkeyService, SharpHookGlobalHotkeyService>();
 
         services.AddSingleton<GlobalHotkeyHostedService>();
         services.AddSingleton<IHotkeyBindingCoordinator>(provider =>
