@@ -1,9 +1,11 @@
 namespace Mapping_Tools.Core.Settings.Models;
 
 /// <summary>
-///     Preserves the numeric WPF <c>Key</c> and <c>ModifierKeys</c> values
-///     while platform adapters translate them to native input.
+///     Stores Avalonia <c>Key</c> and <c>KeyModifiers</c> values without making
+///     the frontend framework a dependency of the shared settings model.
+///     The numeric representation remains stable for existing settings and
+///     project documents.
 /// </summary>
-/// <param name="Key">The persisted WPF key-enum value; zero disables the binding.</param>
-/// <param name="Modifiers">Persisted Alt, Control, Shift, and Windows flag bits.</param>
+/// <param name="Key">The Avalonia key-enum value; zero disables the binding.</param>
+/// <param name="Modifiers">The Avalonia Alt, Control, Shift, and Meta flag bits.</param>
 public sealed record HotkeySettings(int Key, int Modifiers);

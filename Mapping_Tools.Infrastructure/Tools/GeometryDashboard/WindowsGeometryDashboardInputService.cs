@@ -8,7 +8,7 @@ namespace Mapping_Tools.Infrastructure.Tools.GeometryDashboard;
 
 /// <summary>
 ///     Reads and moves global Windows input for Geometry Dashboard while keeping
-///     the persisted WPF-compatible hotkey values in the neutral Core model.
+///     the Avalonia hotkey values in the neutral Core model.
 /// </summary>
 public sealed class WindowsGeometryDashboardInputService : IGeometryDashboardInputService
 {
@@ -55,7 +55,7 @@ public sealed class WindowsGeometryDashboardInputService : IGeometryDashboardInp
         int virtualKey;
         try
         {
-            virtualKey = WindowsKeyCodeConverter.ConvertLegacyKeyToVirtualKey(
+            virtualKey = WindowsKeyCodeConverter.ConvertKeyToVirtualKey(
                 hotkey.Key);
         }
         catch (ArgumentOutOfRangeException)

@@ -9,7 +9,7 @@ namespace Mapping_Tools.Desktop.Tests.Controls;
 public sealed class HotkeyEditorTests
 {
     [TestMethod]
-    public void TryGetLegacyKey_WithSupportedAvaloniaNames_ReturnsWpfKeyValues()
+    public void TryGetKey_WithSupportedAvaloniaNames_ReturnsAvaloniaKeyValues()
     {
         // Arrange
         string[] names =
@@ -18,7 +18,9 @@ public sealed class HotkeyEditorTests
         // Act
         int[] values = names.Select(name =>
         {
-            HotkeyEditor.TryGetLegacyKey(name, out int value).Should().BeTrue();
+            if (!HotkeyEditor.TryGetKey(name, out int value))
+                throw new InvalidOperationException($"The key name '{name}' was not supported.");
+
             return value;
         }).ToArray();
 
@@ -27,7 +29,7 @@ public sealed class HotkeyEditorTests
     }
 
     [TestMethod]
-    public void Format_WithLegacyModifiers_UsesStableReadableOrder()
+    public void Format_WithAllModifiers_UsesStableReadableOrder()
     {
         // Arrange
         HotkeySettings hotkey = new(56, 15);

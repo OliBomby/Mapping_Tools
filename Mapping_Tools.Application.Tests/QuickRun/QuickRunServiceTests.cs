@@ -261,20 +261,31 @@ public sealed class QuickRunServiceTests
     }
 
     [TestMethod]
-    public void ConvertLegacyKeyToVirtualKey_WithLegacyHotkeys_MapsValuesAndRejectsInvalid()
+    public void ConvertKeyToVirtualKey_WithConfiguredHotkeys_MapsValues()
     {
         // Arrange
-        // Act
-        // Assert
-        WindowsKeyCodeConverter.ConvertLegacyKeyToVirtualKey(56).Should().Be(0x4D);
-        WindowsKeyCodeConverter.ConvertLegacyKeyToVirtualKey(62).Should().Be(0x53);
-        WindowsKeyCodeConverter.ConvertLegacyKeyToVirtualKey(69).Should().Be(0x5A);
-        WindowsKeyCodeConverter.ConvertLegacyKeyToVirtualKey(122).Should().Be(0xA6);
-        WindowsKeyCodeConverter.ConvertLegacyKeyToVirtualKey(132).Should().Be(0xB0);
-        WindowsKeyCodeConverter.ConvertLegacyKeyToVirtualKey(141).Should().Be(0xBB);
-        Action act4 = () => WindowsKeyCodeConverter.ConvertLegacyKeyToVirtualKey(-1);
+        int[] keys = [56, 62, 69, 122, 132, 141];
+        int[] expectedVirtualKeys = [0x4D, 0x53, 0x5A, 0xA6, 0xB0, 0xBB];
 
-        act4.Should().Throw<ArgumentOutOfRangeException>();
+        // Act
+        int[] actualVirtualKeys = keys
+            .Select(WindowsKeyCodeConverter.ConvertKeyToVirtualKey)
+            .ToArray();
+
+        // Assert
+        actualVirtualKeys.Should().Equal(expectedVirtualKeys);
+    }
+
+    [TestMethod]
+    public void ConvertKeyToVirtualKey_WithUnsupportedKey_Throws()
+    {
+        // Arrange
+
+        // Act
+        Action act = () => WindowsKeyCodeConverter.ConvertKeyToVirtualKey(-1);
+
+        // Assert
+        act.Should().Throw<ArgumentOutOfRangeException>();
     }
 
     private static QuickRunCommand Command(

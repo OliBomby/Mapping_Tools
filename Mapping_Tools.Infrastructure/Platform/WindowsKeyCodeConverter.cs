@@ -1,22 +1,22 @@
 namespace Mapping_Tools.Infrastructure.Platform;
 
 /// <summary>
-///     Converts persisted Avalonia/WPF key values to Windows virtual-key
+///     Converts Avalonia key values to Windows virtual-key
 ///     values for the Geometry Dashboard's native input adapter.
 /// </summary>
 internal static class WindowsKeyCodeConverter
 {
-    internal static int ConvertLegacyKeyToVirtualKey(int key)
+    internal static int ConvertKeyToVirtualKey(int key)
     {
-        if (key is >= 18 and <= 43) return key + 14; // WPF Space through D9 follow the Win32 sequence.
+        if (key is >= 18 and <= 43) return key + 14; // Avalonia Space through D9 follow the Win32 sequence.
 
-        if (key is >= 44 and <= 72) return key + 21; // WPF A through Apps follow the Win32 sequence.
+        if (key is >= 44 and <= 72) return key + 21; // Avalonia A through Apps follow the Win32 sequence.
 
-        if (key is >= 74 and <= 83) return key + 22; // WPF NumPad0-NumPad9 to Win32 numpad keys.
+        if (key is >= 74 and <= 83) return key + 22; // Avalonia NumPad0-NumPad9 to Win32 numpad keys.
 
-        if (key is >= 90 and <= 113) return key + 22; // WPF F1-F24 to Win32 function keys.
+        if (key is >= 90 and <= 113) return key + 22; // Avalonia F1-F24 to Win32 function keys.
 
-        if (key is >= 116 and <= 121) return key + 44; // WPF left/right modifier keys.
+        if (key is >= 116 and <= 121) return key + 44; // Avalonia left/right modifier keys.
 
         if (key is >= 122 and <= 139) return key + 44; // Browser, media, and launch keys.
 
@@ -59,7 +59,7 @@ internal static class WindowsKeyCodeConverter
             _ => throw new ArgumentOutOfRangeException(
                 nameof(key),
                 key,
-                "The persisted WPF key is not supported by the Windows input adapter."),
+                "The Avalonia key is not supported by the Windows input adapter."),
         };
     }
 }

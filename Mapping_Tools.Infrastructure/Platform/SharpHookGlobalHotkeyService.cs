@@ -10,8 +10,8 @@ namespace Mapping_Tools.Infrastructure.Platform;
 ///     supported Windows, macOS, and Linux desktop platforms.
 /// </summary>
 /// <remarks>
-///     Persisted key values originate from Avalonia's WPF-compatible key
-///     values and are converted to platform-neutral SharpHook key codes.
+///     Avalonia key values are converted to platform-neutral SharpHook key
+///     codes at the registration boundary.
 /// </remarks>
 public sealed class SharpHookGlobalHotkeyService : IGlobalHotkeyService
 {
@@ -134,10 +134,9 @@ public sealed class SharpHookGlobalHotkeyService : IGlobalHotkeyService
         if (hotkey is not null && hotkey.Key != 0)
         {
             binding = new Binding(
-                ConvertLegacyKeyToSharpHookKey(hotkey.Key),
-                hotkey.Modifiers,
+                ConvertKeyToSharpHookKey(hotkey.Key),
+                ConvertModifiersToEventMask(hotkey.Modifiers),
                 callback);
-            _ = ConvertLegacyModifiersToEventMask(hotkey.Modifiers);
         }
 
         bool startHook = false;
@@ -249,7 +248,7 @@ public sealed class SharpHookGlobalHotkeyService : IGlobalHotkeyService
         }
     }
 
-    internal static KeyCode ConvertLegacyKeyToSharpHookKey(int key)
+    internal static KeyCode ConvertKeyToSharpHookKey(int key)
     {
         if (key is >= 34 and <= 43) return digit_keys[key - 34];
 
@@ -348,14 +347,14 @@ public sealed class SharpHookGlobalHotkeyService : IGlobalHotkeyService
         };
     }
 
-    internal static EventMask ConvertLegacyModifiersToEventMask(int modifiers)
+    internal static EventMask ConvertModifiersToEventMask(int modifiers)
     {
         const int known_modifiers = 1 | 2 | 4 | 8;
         if ((modifiers & ~known_modifiers) != 0)
             throw new ArgumentOutOfRangeException(
                 nameof(modifiers),
                 modifiers,
-                "Only legacy Alt, Control, Shift, and Windows modifiers are supported.");
+                "Only Alt, Control, Shift, and Meta modifiers are supported.");
 
         EventMask result = EventMask.None;
         if ((modifiers & 1) != 0) result |= EventMask.Alt;
@@ -369,18 +368,9 @@ public sealed class SharpHookGlobalHotkeyService : IGlobalHotkeyService
         return result;
     }
 
-    internal static int ConvertEventMaskToLegacyModifiers(EventMask mask)
+    internal static EventMask NormalizeModifiers(EventMask mask)
     {
-        int result = 0;
-        if ((mask & EventMask.Alt) != 0) result |= 1;
-
-        if ((mask & EventMask.Ctrl) != 0) result |= 2;
-
-        if ((mask & EventMask.Shift) != 0) result |= 4;
-
-        if ((mask & EventMask.Meta) != 0) result |= 8;
-
-        return result;
+        return mask & (EventMask.Alt | EventMask.Ctrl | EventMask.Shift | EventMask.Meta);
     }
 
     private static bool IsSupportedPlatform()
@@ -393,7 +383,7 @@ public sealed class SharpHookGlobalHotkeyService : IGlobalHotkeyService
     private void OnKeyPressed(object? sender, KeyboardHookEventArgs eventArgs)
     {
         KeyCode key = eventArgs.Data.KeyCode;
-        int modifiers = ConvertEventMaskToLegacyModifiers(eventArgs.RawEvent.Mask);
+        EventMask modifiers = NormalizeModifiers(eventArgs.RawEvent.Mask);
         List<Func<CancellationToken, Task>> callbacks;
 
         lock (gate)
@@ -455,6 +445,6 @@ public sealed class SharpHookGlobalHotkeyService : IGlobalHotkeyService
 
     private sealed record Binding(
         KeyCode Key,
-        int Modifiers,
+        EventMask Modifiers,
         Func<CancellationToken, Task> Callback);
 }

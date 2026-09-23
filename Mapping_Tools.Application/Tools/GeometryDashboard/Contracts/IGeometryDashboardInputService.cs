@@ -15,7 +15,7 @@ public interface IGeometryDashboardInputService
     /// <summary>
     ///     Tests a persisted activation or editing hotkey using exact modifier-state matching.
     /// </summary>
-    /// <param name="hotkey">The legacy-compatible key and modifier values.</param>
+    /// <param name="hotkey">The Avalonia key and modifier values.</param>
     /// <returns><see langword="true" /> only while the complete combination is held.</returns>
     bool IsHotkeyDown(HotkeySettings? hotkey);
 

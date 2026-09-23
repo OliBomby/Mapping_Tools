@@ -210,7 +210,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         ApplyDashboardState(dashboardService.State);
     }
 
-    /// <summary>Executes the selection toggle using the legacy Shift/Ctrl modifiers.</summary>
+    /// <summary>Executes the selection toggle using the Shift/Ctrl modifiers.</summary>
     /// <param name="modifiers">The modifiers captured from the dashboard button press.</param>
     public void ToggleSelected(KeyModifiers modifiers = KeyModifiers.None)
     {
@@ -218,7 +218,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         ApplyDashboardState(dashboardService.State);
     }
 
-    /// <summary>Executes the lock toggle using the legacy Shift/Ctrl modifiers.</summary>
+    /// <summary>Executes the lock toggle using the Shift/Ctrl modifiers.</summary>
     /// <param name="modifiers">The modifiers captured from the dashboard button press.</param>
     public void ToggleLocked(KeyModifiers modifiers = KeyModifiers.None)
     {
@@ -226,7 +226,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         ApplyDashboardState(dashboardService.State);
     }
 
-    /// <summary>Executes the inheritable toggle using the legacy Shift/Ctrl modifiers.</summary>
+    /// <summary>Executes the inheritable toggle using the Shift/Ctrl modifiers.</summary>
     /// <param name="modifiers">The modifiers captured from the dashboard button press.</param>
     public void ToggleInheritable(KeyModifiers modifiers = KeyModifiers.None)
     {
