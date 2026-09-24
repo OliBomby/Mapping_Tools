@@ -13,12 +13,6 @@ public sealed class MtipcLiveBeatmapReader : ILiveBeatmapReader
     private readonly MtipcClient client = new();
     private readonly Func<string> songsPathProvider;
 
-    /// <summary>Initializes an MTIPC reader using osu!'s songs directory.</summary>
-    public MtipcLiveBeatmapReader(string songsPath)
-    {
-        this.songsPathProvider = () => songsPath;
-    }
-
     /// <summary>Initializes an MTIPC reader using the live application settings.</summary>
     /// <param name="settings">Settings containing the osu! Songs directory.</param>
     public MtipcLiveBeatmapReader(ApplicationSettings settings)
@@ -49,7 +43,6 @@ public sealed class MtipcLiveBeatmapReader : ILiveBeatmapReader
                 beatmap.SliderTickRate, beatmap.ApproachRate, beatmap.CircleSize, editorTime,
                 objects.Select((value, index) => value.IsSelected ? hitObjects[index] : null).OfType<HitObject>().ToList());
         }
-        catch (OperationCanceledException) { throw; }
         catch (EndOfStreamException) { return null; }
         catch (SocketException) { return null; }
         catch (IOException) { return null; }

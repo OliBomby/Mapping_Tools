@@ -11,7 +11,6 @@ using Mapping_Tools.Application.QuickRun.Models;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Workspace;
-using Mapping_Tools.Application.Workspace.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

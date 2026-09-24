@@ -40,7 +40,7 @@ internal sealed class MtipcConnection : IDisposable
 
     private byte[] ReadPipeMessage()
     {
-        var buffer = new byte[1024];
+        byte[] buffer = new byte[1024];
         using var payload = new MemoryStream();
         do
         {
@@ -62,7 +62,7 @@ internal sealed class MtipcConnection : IDisposable
 
     private byte[] ReadExact(int length)
     {
-        var bytes = new byte[length];
+        byte[] bytes = new byte[length];
         int offset = 0;
         while (offset < bytes.Length)
         {

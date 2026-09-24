@@ -15,7 +15,7 @@ namespace Mapping_Tools.Infrastructure.Platform;
 /// </remarks>
 public sealed class SharpHookGlobalHotkeyService : IGlobalHotkeyService
 {
-    private static readonly KeyCode[] digit_keys =
+    private static readonly KeyCode[] digitKeys =
     [
         KeyCode.Vc0,
         KeyCode.Vc1,
@@ -29,7 +29,7 @@ public sealed class SharpHookGlobalHotkeyService : IGlobalHotkeyService
         KeyCode.Vc9,
     ];
 
-    private static readonly KeyCode[] letter_keys =
+    private static readonly KeyCode[] letterKeys =
     [
         KeyCode.VcA,
         KeyCode.VcB,
@@ -59,7 +59,7 @@ public sealed class SharpHookGlobalHotkeyService : IGlobalHotkeyService
         KeyCode.VcZ,
     ];
 
-    private static readonly KeyCode[] function_keys =
+    private static readonly KeyCode[] functionKeys =
     [
         KeyCode.VcF1,
         KeyCode.VcF2,
@@ -87,7 +87,7 @@ public sealed class SharpHookGlobalHotkeyService : IGlobalHotkeyService
         KeyCode.VcF24,
     ];
 
-    private static readonly KeyCode[] numpad_keys =
+    private static readonly KeyCode[] numpadKeys =
     [
         KeyCode.VcNumPad0,
         KeyCode.VcNumPad1,
@@ -192,7 +192,7 @@ public sealed class SharpHookGlobalHotkeyService : IGlobalHotkeyService
 
         try
         {
-            IGlobalHook startedHook = currentHook!;
+            IGlobalHook startedHook = currentHook;
             _ = startedHook.RunAsync(GlobalHookType.Keyboard, true).ContinueWith(
                 task => OnHookStopped(startedHook, task),
                 CancellationToken.None,
@@ -201,7 +201,7 @@ public sealed class SharpHookGlobalHotkeyService : IGlobalHotkeyService
         }
         catch
         {
-            OnHookStopped(currentHook!, null);
+            OnHookStopped(currentHook, null);
         }
     }
 
@@ -250,13 +250,13 @@ public sealed class SharpHookGlobalHotkeyService : IGlobalHotkeyService
 
     internal static KeyCode ConvertKeyToSharpHookKey(int key)
     {
-        if (key is >= 34 and <= 43) return digit_keys[key - 34];
+        if (key is >= 34 and <= 43) return digitKeys[key - 34];
 
-        if (key is >= 44 and <= 69) return letter_keys[key - 44];
+        if (key is >= 44 and <= 69) return letterKeys[key - 44];
 
-        if (key is >= 74 and <= 83) return numpad_keys[key - 74];
+        if (key is >= 74 and <= 83) return numpadKeys[key - 74];
 
-        if (key is >= 90 and <= 113) return function_keys[key - 90];
+        if (key is >= 90 and <= 113) return functionKeys[key - 90];
 
         return key switch
         {

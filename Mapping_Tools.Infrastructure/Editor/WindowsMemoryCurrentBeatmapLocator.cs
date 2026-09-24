@@ -10,28 +10,22 @@ namespace Mapping_Tools.Infrastructure.Editor;
 /// </summary>
 public sealed class WindowsMemoryCurrentBeatmapLocator : ICurrentBeatmapLocator
 {
-    private readonly ApplicationSettings settings;
     private readonly Func<Process?> findProcess;
     private readonly Func<Process, string?> readCurrentBeatmap;
 
     /// <summary>Initializes the memory-backed current-beatmap locator.</summary>
     /// <param name="settings">Settings containing osu!'s Songs directory.</param>
     public WindowsMemoryCurrentBeatmapLocator(ApplicationSettings settings)
-        : this(
-            settings,
-            OperatingSystem.IsWindows,
+        : this(OperatingSystem.IsWindows,
             OsuProcessDiscovery.FindStableProcess,
             process => CurrentBeatmapMemoryReader.TryRead(process, settings.SongsPath))
     {
     }
 
-    internal WindowsMemoryCurrentBeatmapLocator(
-        ApplicationSettings settings,
-        Func<bool> isWindows,
+    internal WindowsMemoryCurrentBeatmapLocator(Func<bool> isWindows,
         Func<Process?> findProcess,
         Func<Process, string?> readCurrentBeatmap)
     {
-        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         this.isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
         this.findProcess = findProcess ?? throw new ArgumentNullException(nameof(findProcess));
         this.readCurrentBeatmap = readCurrentBeatmap ?? throw new ArgumentNullException(nameof(readCurrentBeatmap));

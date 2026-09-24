@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Infrastructure.Editor;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -16,9 +15,7 @@ public sealed class WindowsMemoryCurrentBeatmapLocatorTests
         // Arrange
         const string expected_path = @"C:\osu!\Songs\123 Artist - Title\map.osu";
         int memoryReadCount = 0;
-        WindowsMemoryCurrentBeatmapLocator sut = new(
-            new ApplicationSettings { SongsPath = @"C:\osu!\Songs" },
-            () => true,
+        WindowsMemoryCurrentBeatmapLocator sut = new(() => true,
             Process.GetCurrentProcess,
             _ =>
             {
@@ -38,9 +35,7 @@ public sealed class WindowsMemoryCurrentBeatmapLocatorTests
     public async Task FindCurrentBeatmapAsync_WhenOsuIsClosed_ThrowsUnavailableError()
     {
         // Arrange
-        WindowsMemoryCurrentBeatmapLocator sut = new(
-            new ApplicationSettings { SongsPath = @"C:\osu!\Songs" },
-            () => true,
+        WindowsMemoryCurrentBeatmapLocator sut = new(() => true,
             () => null,
             _ => "unused.osu");
 

@@ -80,7 +80,6 @@ public sealed class WindowsEditorReaderAdapter :
     public async Task<LiveBeatmapSnapshot?> ReadAsync(
         CancellationToken cancellationToken = default)
     {
-        ObjectDisposedException.ThrowIf(disposed, this);
         if (!isWindows()) return null;
 
         EnterRead();
