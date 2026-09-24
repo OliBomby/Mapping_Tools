@@ -40,3 +40,50 @@ jobs:
 
       - name: Desktop tests
         run: dotnet test Mapping_Tools.Desktop.Tests/Mapping_Tools.Desktop.Tests.csproj --configuration Release --no-build
+
+  quality-metrics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: |
+          dotnet restore Mapping_Tools.slnx
+          dotnet tool restore
+
+      - name: Measure test coverage
+        shell: pwsh
+        run: ./tools/measure-coverage.ps1
+
+      - name: Measure Core mutation score
+        shell: pwsh
+        run: ./tools/measure-mutation.ps1
+
+      - name: Publish job summary
+        if: always()
+        shell: pwsh
+        run: |
+          foreach ($file in @('coverage-report/coverage-summary.md', 'coverage-report/mutation-summary.md')) {
+            if (Test-Path $file) {
+              Get-Content $file -Raw | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+            }
+          }
+
+      - name: Upload detailed reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-reports
+          path: |
+            coverage-report/merged
+            coverage-report/mutation
+            coverage-report/*-summary.md
+          if-no-files-found: warn

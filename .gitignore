@@ -336,3 +336,7 @@ packages/
 
 # Local reference checkout
 .reference/
+
+# Local quality reports
+coverage-report/
+StrykerOutput/

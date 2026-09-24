@@ -1,0 +1,11 @@
+{
+  "stryker-config": {
+    "project": "Mapping_Tools.Core.csproj",
+    "reporters": ["dots", "markdown", "json"],
+    "thresholds": {
+      "high": 80,
+      "low": 60,
+      "break": 0
+    }
+  }
+}
