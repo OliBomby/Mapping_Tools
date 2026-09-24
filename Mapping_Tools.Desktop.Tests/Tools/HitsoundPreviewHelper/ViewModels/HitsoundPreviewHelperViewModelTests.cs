@@ -59,7 +59,7 @@ public sealed class HitsoundPreviewHelperViewModelTests
         preview.Options!.Items.Should().ContainSingle();
         published.Where(notification =>
                 notification.Severity == UserNotificationSeverity.Success
-                && notification.Message == "Done!")
+                && notification.Message == "Placed 1 preview hitsounds.")
             .Should().ContainSingle();
         viewModel.Progress.Should().Be(0);
         viewModel.IsRunning.Should().BeFalse();

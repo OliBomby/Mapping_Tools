@@ -32,7 +32,7 @@ public sealed class BeatmapWorkspaceTests
         // Assert
         workspace.SelectedPaths.ToArray().Should().Equal(@"C:\Maps\first.osu", @"C:\Maps\second.osb");
         workspace.RecentMaps.Select(recent => recent.Path).ToArray().Should().Equal(@"C:\Maps\second.osb", @"C:\Maps\first.osu");
-        workspace.RecentMaps.All(recent => recent.DisplayDate == fixedNow.DateTime.ToString(CultureInfo.InvariantCulture)).Should().BeTrue();
+        workspace.RecentMaps.All(recent => recent.DisplayDate == fixedNow.DateTime.ToString(CultureInfo.CurrentCulture)).Should().BeTrue();
         (notification?.Source).Should().Be(BeatmapSelectionSource.DragAndDrop);
         (notification?.Paths.ToArray()).Should().Equal(workspace.SelectedPaths.ToArray());
     }

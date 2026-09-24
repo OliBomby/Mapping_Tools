@@ -81,7 +81,7 @@ public static class SliderInvisiblator
         // So we will be using G15 to not fuck people over in the editor as they use this tool and continue mapping.
         double frameDistance = OsuStableDistance(currentPath) - 2 * Snaptol / 3d;
         double mpb = 100 * globalSv / frameDistance;
-        mpb = double.Parse(mpb.ToString(CultureInfo.InvariantCulture));
+        mpb = double.Parse(mpb.ToString(CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
         frameDistance = 100 * globalSv / mpb;
         currentPath.ToArray().CopyTo(controlPoints, 0);
 

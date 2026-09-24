@@ -57,6 +57,9 @@ public sealed class TumourGeneratorEngine
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(options.TumourLayers);
+        if (options.TumourLayers.Count == 0)
+            throw new ArgumentException("Tumour Generator requires at least one layer.", nameof(options));
+
         if (!double.IsFinite(options.Scale) || options.Scale < 0)
             throw new ArgumentException("Tumour Generator scale must be finite and non-negative.", nameof(options));
 

@@ -13,7 +13,7 @@ public interface IGlobalHotkeyService
     ///     A null or disabled key removes the binding.
     /// </summary>
     /// <param name="id">A stable owner key used for later replacement.</param>
-    /// <param name="hotkey">Avalonia key and modifier data, or <see langword="null" /> to unbind.</param>
+    /// <param name="hotkey">Key and modifier data, or <see langword="null" /> to unbind.</param>
     /// <param name="callback">Work scheduled when the key combination is pressed globally.</param>
     void SetBinding(
         string id,

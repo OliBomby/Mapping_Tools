@@ -41,7 +41,7 @@ public sealed class PreferenceModeConverterTests
         ];
 
         // Assert
-        labels.Should().Equal("Disabled", "Editor reader", "MTIPC");
+        labels.Should().Equal("Disabled", "Memory read", "MTIPC");
     }
 
     [TestMethod]

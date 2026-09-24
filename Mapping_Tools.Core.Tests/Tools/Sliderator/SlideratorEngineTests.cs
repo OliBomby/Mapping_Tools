@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Graph;
@@ -81,6 +82,32 @@ public sealed class SlideratorEngineTests
         controlPoints.Length.Should().BeGreaterThan(2);
         frameDistance.Should().BeGreaterThan(0);
         controlPoints[^1].Should().Be(sliderballPositions[^1]);
+    }
+
+    [TestMethod]
+    public void Invisiblate_WithCommaDecimalCulture_ReturnsFiniteFrameDistanceAndControlPoints()
+    {
+        // Arrange
+        CultureInfo originalCulture = CultureInfo.CurrentCulture;
+        Vector2[] sliderballPositions = Enumerable.Range(0, 101)
+            .Select(index => new Vector2(64 + index, 64))
+            .ToArray();
+
+        // Act
+        (Vector2[] controlPoints, double frameDistance) result;
+        try
+        {
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("nl-NL");
+            result = SliderInvisiblator.Invisiblate(100, sliderballPositions);
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = originalCulture;
+        }
+
+        // Assert
+        result.frameDistance.Should().BeGreaterThan(1);
+        result.controlPoints.Should().OnlyContain(point => double.IsFinite(point.X) && double.IsFinite(point.Y));
     }
 
     [TestMethod]

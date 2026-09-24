@@ -8,14 +8,14 @@ namespace Mapping_Tools.Application.QuickRun.Contracts;
 public interface IHotkeyBindingCoordinator
 {
     /// <summary>Replaces or removes the global QuickRun binding.</summary>
-    /// <param name="hotkey">Avalonia key and modifier data, or null to disable it.</param>
+    /// <param name="hotkey">Key and modifier data, or null to disable it.</param>
     void ApplyQuickRun(HotkeySettings? hotkey);
 
     /// <summary>Replaces or removes the global QuickUndo binding.</summary>
-    /// <param name="hotkey">Avalonia key and modifier data, or null to disable it.</param>
+    /// <param name="hotkey">Key and modifier data, or null to disable it.</param>
     void ApplyQuickUndo(HotkeySettings? hotkey);
 
     /// <summary>Replaces or removes the global BetterSave binding.</summary>
-    /// <param name="hotkey">Avalonia key and modifier data, or null to disable it.</param>
+    /// <param name="hotkey">Key and modifier data, or null to disable it.</param>
     void ApplyBetterSave(HotkeySettings? hotkey);
 }
