@@ -105,7 +105,7 @@
                           ItemsSource="{Binding CurrentBeatmapFetchingModes}"
                           SelectedItem="{Binding CurrentBeatmapFetching, Mode=TwoWay}"
                           materialAssists:ComboBoxAssist.Label="Current beatmap fetching"
-                          ToolTip.Tip="Choose how Mapping Tools finds the beatmap currently open in osu!.">
+                          ToolTip.Tip="Choose how Mapping Tools finds the beatmap currently open in osu!. Gosumemory mode requires gosumemory running locally on port 24050.">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                         <TextBlock Text="{Binding Converter={StaticResource CurrentBeatmapFetchingModeConverter}}" />

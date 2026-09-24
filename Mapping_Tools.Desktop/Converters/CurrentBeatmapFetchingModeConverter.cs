@@ -16,6 +16,7 @@ public sealed class CurrentBeatmapFetchingModeConverter : IValueConverter
                 CurrentBeatmapFetchingMode.Disabled => "Disabled",
                 CurrentBeatmapFetchingMode.MemoryRead => "Memory read",
                 CurrentBeatmapFetchingMode.Mtipc => "MTIPC",
+                CurrentBeatmapFetchingMode.Gosumemory => "Gosumemory/Tosu",
                 _ => string.Empty,
             }
             : string.Empty;

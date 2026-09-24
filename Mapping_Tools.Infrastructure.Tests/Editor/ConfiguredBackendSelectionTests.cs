@@ -61,7 +61,12 @@ public sealed class ConfiguredBackendSelectionTests
         };
         var memoryReader = new RecordingCurrentBeatmapLocator();
         var mtipcReader = new RecordingCurrentBeatmapLocator();
-        var sut = new ConfiguredCurrentBeatmapLocator(settings, memoryReader, mtipcReader);
+        var gosumemoryReader = new RecordingCurrentBeatmapLocator();
+        var sut = new ConfiguredCurrentBeatmapLocator(
+            settings,
+            memoryReader,
+            mtipcReader,
+            gosumemoryReader);
 
         // Act
         Func<Task> act = () => sut.FindCurrentBeatmapAsync();

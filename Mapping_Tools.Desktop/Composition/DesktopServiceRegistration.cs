@@ -166,6 +166,10 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<MtipcCurrentBeatmapLocator>(provider =>
             new MtipcCurrentBeatmapLocator(
                 provider.GetRequiredService<ApplicationSettings>()));
+        services.AddSingleton<GosumemoryCurrentBeatmapLocator>(provider =>
+            new GosumemoryCurrentBeatmapLocator(
+                provider.GetRequiredService<HttpClient>(),
+                provider.GetRequiredService<ApplicationSettings>()));
         services.AddSingleton<MtipcEditorReloadService>();
 
         if (OperatingSystem.IsWindows())
@@ -182,7 +186,8 @@ internal static class DesktopServiceRegistration
                 new ConfiguredCurrentBeatmapLocator(
                     provider.GetRequiredService<ApplicationSettings>(),
                     provider.GetRequiredService<WindowsMemoryCurrentBeatmapLocator>(),
-                    provider.GetRequiredService<MtipcCurrentBeatmapLocator>()));
+                    provider.GetRequiredService<MtipcCurrentBeatmapLocator>(),
+                    provider.GetRequiredService<GosumemoryCurrentBeatmapLocator>()));
             services.AddSingleton<IEditorReloadService>(provider =>
                 new ConfiguredEditorReloadService(
                     provider.GetRequiredService<ApplicationSettings>(),
@@ -200,7 +205,8 @@ internal static class DesktopServiceRegistration
                 new ConfiguredCurrentBeatmapLocator(
                     provider.GetRequiredService<ApplicationSettings>(),
                     new UnsupportedPlatformCurrentBeatmapLocator(),
-                    provider.GetRequiredService<MtipcCurrentBeatmapLocator>()));
+                    provider.GetRequiredService<MtipcCurrentBeatmapLocator>(),
+                    provider.GetRequiredService<GosumemoryCurrentBeatmapLocator>()));
             services.AddSingleton<IEditorReloadService>(provider =>
                 new ConfiguredEditorReloadService(
                     provider.GetRequiredService<ApplicationSettings>(),
