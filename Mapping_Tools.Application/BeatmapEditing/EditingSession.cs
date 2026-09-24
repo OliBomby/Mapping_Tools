@@ -87,7 +87,7 @@ public class EditingSession
     public virtual void SaveFile(List<string> lines)
     {
         BeforeSave(lines);
-        FileStore.WriteAllLines(Path, lines);
+        WriteCurrentDocument(lines);
     }
 
     /// <summary>
@@ -97,7 +97,15 @@ public class EditingSession
     {
         var lines = TextFile.GetLines();
         BeforeSave(lines);
-        FileStore.WriteAllLines(Path, lines);
+        WriteCurrentDocument(lines);
+    }
+
+    private void WriteCurrentDocument(List<string> lines)
+    {
+        if (TextFile is Beatmap && FileStore is IAutomaticBeatmapFilenameStore automaticNames)
+            Path = automaticNames.WriteBeatmap(Path, lines);
+        else
+            FileStore.WriteAllLines(Path, lines);
     }
 
     /// <summary>

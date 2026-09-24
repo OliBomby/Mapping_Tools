@@ -130,6 +130,11 @@ public sealed class BeatmapEditingSession : EditingSession
     /// <remarks>This method also updates <see cref="EditingSession.Path" />.</remarks>
     public void SaveFileWithNameUpdate()
     {
+        if (FileStore is IAutomaticBeatmapFilenameStore automaticNames)
+        {
+            Path = automaticNames.WriteBeatmap(Path, Beatmap.GetLines());
+            return;
+        }
         string parentFolder = GetParentFolder();
         FileStore.Delete(Path);
         Path = FileStore.CombinePath(parentFolder, Beatmap.GetFileName());

@@ -38,6 +38,7 @@ using Mapping_Tools.Infrastructure.Audio;
 using Mapping_Tools.Infrastructure.Backups;
 using Mapping_Tools.Infrastructure.Editor;
 using Mapping_Tools.Infrastructure.Editor.Mtipc;
+using Mapping_Tools.Infrastructure.Editor.Mtipc2;
 using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Infrastructure.Migration;
 using Mapping_Tools.Infrastructure.Platform;
@@ -139,9 +140,19 @@ internal static class DesktopServiceRegistration
         services.AddSingleton(TimeProvider.System);
         services.AddSingleton<PhysicalBeatmapsetFileSystem>();
         services.AddSingleton<IBeatmapsetFileSystem>(provider =>
-            provider.GetRequiredService<PhysicalBeatmapsetFileSystem>());
+            new Mtipc2BeatmapsetFileSystem(
+                provider.GetRequiredService<ApplicationSettings>(),
+                provider.GetRequiredService<Mtipc2Client>(),
+                provider.GetRequiredService<Mtipc2TextFileStore>(),
+                provider.GetRequiredService<PhysicalBeatmapsetFileSystem>()));
+        services.AddSingleton<Mtipc2Client>();
+        services.AddSingleton<Mtipc2TextFileStore>(provider =>
+            new Mtipc2TextFileStore(
+                provider.GetRequiredService<ApplicationSettings>(),
+                provider.GetRequiredService<Mtipc2Client>(),
+                provider.GetRequiredService<PhysicalBeatmapsetFileSystem>()));
         services.AddSingleton<ITextFileStore>(provider =>
-            provider.GetRequiredService<PhysicalBeatmapsetFileSystem>());
+            provider.GetRequiredService<Mtipc2TextFileStore>());
         services.AddSingleton<IUserNotificationService, UserNotificationService>();
         services.AddSingleton<ToolExecutionService>();
         services.AddSingleton<IToolExecutionService>(provider =>
@@ -183,11 +194,9 @@ internal static class DesktopServiceRegistration
                     provider.GetRequiredService<WindowsEditorReaderAdapter>(),
                     provider.GetRequiredService<MtipcLiveBeatmapReader>()));
             services.AddSingleton<ICurrentBeatmapLocator>(provider =>
-                new ConfiguredCurrentBeatmapLocator(
+                new Mtipc2CurrentBeatmapLocator(
                     provider.GetRequiredService<ApplicationSettings>(),
-                    provider.GetRequiredService<WindowsMemoryCurrentBeatmapLocator>(),
-                    provider.GetRequiredService<MtipcCurrentBeatmapLocator>(),
-                    provider.GetRequiredService<GosumemoryCurrentBeatmapLocator>()));
+                    provider.GetRequiredService<Mtipc2Client>()));
             services.AddSingleton<IEditorReloadService>(provider =>
                 new ConfiguredEditorReloadService(
                     provider.GetRequiredService<ApplicationSettings>(),
@@ -202,11 +211,9 @@ internal static class DesktopServiceRegistration
                     new UnsupportedPlatformLiveBeatmapReader(),
                     provider.GetRequiredService<MtipcLiveBeatmapReader>()));
             services.AddSingleton<ICurrentBeatmapLocator>(provider =>
-                new ConfiguredCurrentBeatmapLocator(
+                new Mtipc2CurrentBeatmapLocator(
                     provider.GetRequiredService<ApplicationSettings>(),
-                    new UnsupportedPlatformCurrentBeatmapLocator(),
-                    provider.GetRequiredService<MtipcCurrentBeatmapLocator>(),
-                    provider.GetRequiredService<GosumemoryCurrentBeatmapLocator>()));
+                    provider.GetRequiredService<Mtipc2Client>()));
             services.AddSingleton<IEditorReloadService>(provider =>
                 new ConfiguredEditorReloadService(
                     provider.GetRequiredService<ApplicationSettings>(),
@@ -214,7 +221,10 @@ internal static class DesktopServiceRegistration
                     provider.GetRequiredService<MtipcEditorReloadService>()));
         }
 
-        services.AddSingleton<IBeatmapEditingGateway, BeatmapEditingGateway>();
+        services.AddSingleton<IBeatmapEditingGateway>(provider =>
+            new Mtipc2BeatmapEditingGateway(
+                provider.GetRequiredService<Mtipc2TextFileStore>(),
+                provider.GetRequiredService<Mtipc2Client>()));
         services.AddSingleton<IBetterSaveService, BetterSaveService>();
         services.AddSingleton<IAudioClipMixer, NaudioAudioClipMixer>();
         services.AddSingleton<IAudioDecoder, NaudioAudioDecoder>();
