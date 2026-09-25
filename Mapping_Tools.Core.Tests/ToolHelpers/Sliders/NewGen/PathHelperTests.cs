@@ -9,6 +9,55 @@ namespace Mapping_Tools.Core.Tests.ToolHelpers.Sliders.NewGen;
 [TestClass]
 public class PathHelperTests
 {
+    [DataTestMethod]
+    [DataRow(0)]
+    [DataRow(4)]
+    public void CreatePathWithHints_WithSplinePathType_PreservesSourceTypeAndAnchors(int pathTypeValue)
+    {
+        // Arrange
+        Mapping_Tools.Core.BeatmapHelper.Enums.PathType pathType =
+            (Mapping_Tools.Core.BeatmapHelper.Enums.PathType)pathTypeValue;
+        Vector2[] anchors = [new(0, 0), new(40, 60), new(90, -20), new(140, 30)];
+        Mapping_Tools.Core.BeatmapHelper.SliderPathStuff.SliderPath sliderPath = new(pathType, anchors);
+
+        // Act
+        PathWithHints result = PathHelper.CreatePathWithHints(sliderPath);
+
+        // Assert
+        result.ReconstructionHints.Should().ContainSingle();
+        result.ReconstructionHints[0].PathType.Should().Be(pathType);
+        result.ReconstructionHints[0].Anchors.Should().Equal(anchors);
+        result.Path.First!.Value.Pos.Should().Be(anchors[0]);
+        result.Path.Last!.Value.Pos.Should().Be(anchors[^1]);
+    }
+
+    [TestMethod]
+    public void CreatePathWithHints_WithLinearPath_CreatesOneTypedHintPerEdge()
+    {
+        // Arrange
+        Vector2[] anchors = [new(0, 0), new(10, 0), new(10, 10)];
+        Mapping_Tools.Core.BeatmapHelper.SliderPathStuff.SliderPath sliderPath = new(
+            Mapping_Tools.Core.BeatmapHelper.Enums.PathType.Linear,
+            anchors);
+
+        // Act
+        PathWithHints result = PathHelper.CreatePathWithHints(sliderPath);
+
+        // Assert
+        result.Path.Should().OnlyContain(point => point.Red);
+        result.ReconstructionHints.Should().HaveCount(2);
+        result.ReconstructionHints.Select(hint => hint.PathType)
+            .Should().Equal(
+                Mapping_Tools.Core.BeatmapHelper.Enums.PathType.Linear,
+                Mapping_Tools.Core.BeatmapHelper.Enums.PathType.Linear);
+        result.ReconstructionHints[0].Anchors.Should().Equal(anchors);
+        result.ReconstructionHints[1].Anchors.Should().Equal(anchors);
+        result.ReconstructionHints[0].Start.Value.Pos.Should().Be(anchors[0]);
+        result.ReconstructionHints[0].End.Value.Pos.Should().Be(anchors[1]);
+        result.ReconstructionHints[1].Start.Value.Pos.Should().Be(anchors[1]);
+        result.ReconstructionHints[1].End.Value.Pos.Should().Be(anchors[2]);
+    }
+
     [TestMethod]
     public void CreatePathWithHints_StandardPath_MarksExpectedRedAnchors()
     {

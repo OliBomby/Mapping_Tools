@@ -32,6 +32,6 @@ if (-not $scoreLine) {
 }
 
 $scoreLine = $scoreLine.TrimStart('#', ' ') -replace '(?<=\d),(?=\d)', '.'
-$summary = "## Core mutation testing`n`n$scoreLine`n`nMutation testing currently covers Mapping_Tools.Core with Mapping_Tools.Core.Tests.`n"
+$summary = "## Core mutation testing`n`n$scoreLine`n`nMutation testing covers Mapping_Tools.Core with Mapping_Tools.Core.Tests; the MathUtil namespace is excluded.`n"
 Set-Content -Path (Join-Path $reportDirectory 'mutation-summary.md') -Value $summary
 Write-Output $summary

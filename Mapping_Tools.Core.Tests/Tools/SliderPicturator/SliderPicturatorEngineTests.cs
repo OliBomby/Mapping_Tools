@@ -1,4 +1,5 @@
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Images;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.SliderPicturator;
@@ -163,5 +164,159 @@ public sealed class SliderPicturatorEngineTests
         // Assert
         defaultPixel.Should().Be(opaqueBlackPixel);
         defaultPixel.Should().NotBe(transparentPixel);
+    }
+
+    [TestMethod]
+    public void ApplyToBeatmap_WithDurationBasedVelocity_InsertsSliderAndRestoresTiming()
+    {
+        // Arrange
+        TimingPoint redline = new(0, 500, 4, SampleSet.Normal, 0, 100, true, false, false);
+        Beatmap beatmap = new([], [redline], redline);
+        List<Vector2> path = [new(256, 192), new(356, 192)];
+        SliderPicturatorEngineOptions options = new()
+        {
+            TimeCode = 1000,
+            Duration = 500,
+            CurrentTrackColor = RgbaColour.FromRgb(10, 20, 30),
+            BorderColor = RgbaColour.FromRgb(40, 50, 60),
+        };
+
+        // Act
+        SliderPicturatorEngine.ApplyToBeatmap(beatmap, path, 0, options);
+
+        // Assert
+        beatmap.HitObjects.Should().ContainSingle();
+        beatmap.HitObjects[0].IsSlider.Should().BeTrue();
+        beatmap.HitObjects[0].Time.Should().Be(999);
+        beatmap.HitObjects[0].PixelLength.Should().BeApproximately(100, 0.000001);
+        beatmap.BeatmapTiming.GetMpBAtTime(999).Should().BeApproximately(700, 0.000001);
+        beatmap.BeatmapTiming.GetMpBAtTime(1000).Should().BeApproximately(500, 0.000001);
+        beatmap.SpecialColours["SliderTrackOverride"].Color.Should().Be(RgbaColour.FromRgb(10, 20, 30));
+        beatmap.SpecialColours["SliderBorder"].Color.Should().Be(RgbaColour.FromRgb(40, 50, 60));
+    }
+
+    [TestMethod]
+    public void ApplyToBeatmap_WithFrameDistance_UsesDistanceBasedVelocityAndSkipsColourChanges()
+    {
+        // Arrange
+        TimingPoint redline = new(0, 500, 4, SampleSet.Normal, 0, 100, true, false, false);
+        Beatmap beatmap = new([], [redline], redline);
+        List<Vector2> path = [new(256, 192), new(356, 192)];
+        SliderPicturatorEngineOptions options = new()
+        {
+            TimeCode = 1000,
+            Duration = 500,
+            SetBeatmapColors = false,
+        };
+
+        // Act
+        SliderPicturatorEngine.ApplyToBeatmap(beatmap, path, 10, options);
+
+        // Assert
+        beatmap.HitObjects.Should().ContainSingle();
+        beatmap.BeatmapTiming.GetMpBAtTime(999).Should().BeApproximately(14, 0.000001);
+        beatmap.SpecialColours.Should().BeEmpty();
+    }
+
+    [TestMethod]
+    public void Picturate_WithSelectedSlider_AddsSliderballFramesToGeneratedPath()
+    {
+        // Arrange
+        RgbaImage image = new(2, 2,
+            [255, 255, 255, 255, 0, 0, 0, 255, 0, 0, 0, 255, 255, 255, 255, 255]);
+        HitObject selected = new("256,192,100,2,0,L|270:192,1,14,0|0,0:0|0:0,0:0:0:0:")
+        {
+            TemporalLength = 4,
+        };
+        SliderPicturatorEngineOptions options = new()
+        {
+            SelectedSlider = selected,
+            ViewportSize = 1,
+        };
+
+        // Act
+        (List<Vector2> path, double frameDistance) = SliderPicturatorEngine.Picturate(image, 4, options);
+
+        // Assert
+        frameDistance.Should().BeGreaterThan(0);
+        path.Should().HaveCountGreaterThan(10);
+        path.Should().Contain(selected.SliderPath.SliderballPositionAt(1, 4).Rounded());
+    }
+
+    [TestMethod]
+    public void Recolor_WithBlackBorderAndTrackPixels_ClassifiesEachColourSeparately()
+    {
+        // Arrange
+        RgbaImage image = new(3, 1,
+            [0, 0, 0, 255, 255, 0, 0, 255, 100, 100, 100, 255]);
+        SliderPicturatorEngineOptions options = new()
+        {
+            CurrentTrackColor = RgbaColour.FromRgb(100, 100, 100),
+            BorderColor = RgbaColour.FromRgb(255, 0, 0),
+            BackgroundColor = RgbaColour.FromRgb(0, 0, 0),
+            BlackOn = true,
+            BorderOn = true,
+            Quality = 1,
+        };
+
+        // Act
+        var (recoloured, segments) = SliderPicturatorEngine.Recolor(image, options);
+
+        // Assert
+        recoloured.GetPixel(0, 0).Should().Be(RgbaColour.FromRgb(0, 0, 0));
+        recoloured.GetPixel(1, 0).Should().Be(RgbaColour.FromRgb(255, 0, 0));
+        var track = recoloured.GetPixel(2, 0);
+        track.R.Should().Be(track.G);
+        track.G.Should().Be(track.B);
+        track.R.Should().BeGreaterThan(0);
+        segments.Should().BeGreaterThan(3);
+    }
+
+    [TestMethod]
+    public void Picturate_WithBlueChannelDisabled_IgnoresBlueOnlyDifferences()
+    {
+        // Arrange
+        RgbaImage blueAtFirstPixel = new(2, 1,
+            [20, 40, 0, 255, 80, 100, 0, 255]);
+        RgbaImage blueAtSecondPixel = new(2, 1,
+            [20, 40, 255, 255, 80, 100, 255, 255]);
+        SliderPicturatorEngineOptions options = new()
+        {
+            RedOn = true,
+            GreenOn = true,
+            BlueOn = false,
+            Quality = 1,
+        };
+
+        // Act
+        var first = SliderPicturatorEngine.Picturate(blueAtFirstPixel, 4, options);
+        var second = SliderPicturatorEngine.Picturate(blueAtSecondPixel, 4, options);
+
+        // Assert
+        first.Path.Should().Equal(second.Path);
+        first.FrameDistance.Should().Be(second.FrameDistance);
+    }
+
+    [TestMethod]
+    public void Recolor_WithSelectedSlider_AddsFrameSegmentsProportionalToSliderDuration()
+    {
+        // Arrange
+        RgbaImage image = new(2, 1, [255, 255, 255, 255, 0, 0, 0, 255]);
+        SliderPicturatorEngineOptions options = new() { Quality = 1 };
+        long baseSegments = SliderPicturatorEngine.Recolor(image, options).SegmentCount;
+        HitObject selectedSlider = new("256,192,100,2,0,L|270:192,1,14,0|0,0:0|0:0,0:0:0:0:")
+        {
+            TemporalLength = 4,
+        };
+        options.SelectedSlider = selectedSlider;
+
+        // Act
+        long shortDurationSegments = SliderPicturatorEngine.Recolor(image, options).SegmentCount;
+        selectedSlider.TemporalLength = 8;
+        long longDurationSegments = SliderPicturatorEngine.Recolor(image, options).SegmentCount;
+
+        // Assert
+        shortDurationSegments.Should().BeGreaterThan(baseSegments);
+        (longDurationSegments - baseSegments).Should().Be(2 * (shortDurationSegments - baseSegments));
     }
 }

@@ -165,43 +165,7 @@ public struct SliderPath : IEquatable<SliderPath>
     public Vector2 SliderballPositionAt(int ms, int timeLength)
     {
         EnsureInitialised();
-
-        int msSegmentIndex = IndexOfDistance(ProgressToDistance((double)ms / timeLength));
-        if (msSegmentIndex != 0)
-        {
-            int testMsIndex;
-            int minMsInSegment = 0;
-            int maxMsInSegment = timeLength;
-            for (int testMs = ms; testMs >= 0; testMs--)
-            {
-                testMsIndex = IndexOfDistance(ProgressToDistance((double)testMs / timeLength));
-                if (testMsIndex != msSegmentIndex)
-                {
-                    minMsInSegment = testMs + 1;
-                    break;
-                }
-            }
-
-            for (int testMs = ms; testMs <= timeLength; testMs++)
-            {
-                testMsIndex = IndexOfDistance(ProgressToDistance((double)testMs / timeLength));
-                if (testMsIndex != msSegmentIndex)
-                {
-                    maxMsInSegment = testMs - 1;
-                    break;
-                }
-            }
-
-            int totalMsInSegment = maxMsInSegment - minMsInSegment + 1;
-            double msFracOfSegment = (double)(ms - minMsInSegment + 1) / totalMsInSegment;
-
-            var p0 = calculatedPath[msSegmentIndex - 1];
-            var p1 = calculatedPath[msSegmentIndex];
-
-            return p0 + (p1 - p0) * msFracOfSegment;
-        }
-
-        return calculatedPath[0];
+        return PositionAt(timeLength <= 0 ? 0 : (double)ms / timeLength);
     }
 
     /// <summary>
@@ -216,32 +180,8 @@ public struct SliderPath : IEquatable<SliderPath>
         EnsureInitialised();
 
         var sbPositions = new Vector2[timeLength + 1];
-        int[] msPerSegment = new int[cumulativeLength.Count];
         for (int i = 0; i < timeLength + 1; i++)
-        {
-            int idx = IndexOfDistance(ProgressToDistance((double)i / timeLength));
-            if (idx < 0) idx = 0;
-            if (idx >= cumulativeLength.Count) idx = cumulativeLength.Count - 1;
-            msPerSegment[idx]++;
-        }
-
-        int curMs = 0;
-        for (int j = 0; j < msPerSegment[0]; j++)
-        {
-            sbPositions[curMs] = calculatedPath[0];
-            curMs++;
-        }
-
-        for (int i = 1; i < cumulativeLength.Count; i++)
-        {
-            var p0 = calculatedPath[i - 1];
-            var p1 = calculatedPath[i];
-            for (int j = 1; j < msPerSegment[i] + 1; j++)
-            {
-                sbPositions[curMs] = p0 + (p1 - p0) * j / msPerSegment[i];
-                curMs++;
-            }
-        }
+            sbPositions[i] = SliderballPositionAt(i, timeLength);
 
         return sbPositions;
     }
@@ -449,11 +389,13 @@ public struct SliderPath : IEquatable<SliderPath>
     /// <returns>A hash code for this path value.</returns>
     public override int GetHashCode()
     {
-        int hashCode = -1383746172;
-        if (ExpectedDistance.HasValue)
-            hashCode = hashCode * -1521134295 + EqualityComparer<double?>.Default.GetHashCode(ExpectedDistance);
-        hashCode = hashCode * -1521134295 + Type.GetHashCode();
-        hashCode = hashCode * -1521134295 + EqualityComparer<Vector2[]>.Default.GetHashCode(controlPoints);
-        return hashCode;
+        HashCode hashCode = new();
+        hashCode.Add(ExpectedDistance);
+        hashCode.Add(Type);
+        if (controlPoints is not null)
+            foreach (var point in controlPoints)
+                hashCode.Add(point);
+
+        return hashCode.ToHashCode();
     }
 }

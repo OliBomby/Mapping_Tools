@@ -71,4 +71,149 @@ public class TimingTests
         // Assert
         snapped.Should().BeApproximately(1110, 0.0001);
     }
+
+    [TestMethod]
+    public void GetBeatLength_AcrossRedline_SumsEachTempoSegmentAndPreservesDirection()
+    {
+        // Arrange
+        var timing = new Timing(
+        [
+            CreateRedline(0, 500),
+            CreateRedline(1000, 250),
+        ],
+        1.4);
+
+        // Act
+        double forward = timing.GetBeatLength(500, 1500);
+        double backward = timing.GetBeatLength(1500, 500);
+
+        // Assert
+        forward.Should().BeApproximately(3, 0.000001);
+        backward.Should().BeApproximately(-3, 0.000001);
+    }
+
+    [TestMethod]
+    public void GetMilliseconds_AcrossBeatDomainRedline_UsesTempoOnEachSide()
+    {
+        // Arrange
+        var timing = new Timing(
+        [
+            CreateRedline(0, 500),
+            CreateRedline(2, 250),
+        ],
+        1.4);
+
+        // Act
+        double milliseconds = timing.GetMilliseconds(4, originTime: 100);
+
+        // Assert
+        milliseconds.Should().BeApproximately(1600, 0.000001);
+    }
+
+    [TestMethod]
+    public void WalkMillisecondsInBeatTime_CrossesRedlineInBothDirections()
+    {
+        // Arrange
+        var timing = new Timing(
+        [
+            CreateRedline(0, 500),
+            CreateRedline(2, 250),
+        ],
+        1.4);
+
+        // Act
+        double forward = timing.WalkMillisecondsInBeatTime(0, 1500);
+        double backward = timing.WalkMillisecondsInBeatTime(4, -1500);
+
+        // Assert
+        forward.Should().BeApproximately(4, 0.000001);
+        backward.Should().BeApproximately(0, 0.000001);
+    }
+
+    [TestMethod]
+    public void WalkBeatsInMillisecondTime_CrossesRedlineInBothDirections()
+    {
+        // Arrange
+        var timing = new Timing(
+        [
+            CreateRedline(0, 500),
+            CreateRedline(1000, 250),
+        ],
+        1.4);
+
+        // Act
+        double forward = timing.WalkBeatsInMillisecondTime(3);
+        double backward = timing.WalkBeatsInMillisecondTime(-2, 1250);
+
+        // Assert
+        forward.Should().BeApproximately(1250, 0.000001);
+        backward.Should().BeApproximately(500, 0.000001);
+    }
+
+    [TestMethod]
+    public void Resnap_WhenNearestTickCrossesNextRedline_UsesNextRedlineOffset()
+    {
+        // Arrange
+        var timing = new Timing(
+        [
+            CreateRedline(1000, 500),
+            CreateRedline(1490, 250),
+        ],
+        1.4);
+
+        // Act
+        double snapped = timing.Resnap(1489, [new RationalBeatDivisor(4)]);
+
+        // Assert
+        snapped.Should().Be(1490);
+    }
+
+    [TestMethod]
+    public void ResnapBeatTime_WhenNearestTickCrossesNextRedline_UsesNextRedlineOffset()
+    {
+        // Arrange
+        var timing = new Timing(
+        [
+            CreateRedline(0, 500),
+            CreateRedline(0.7, 250),
+        ],
+        1.4);
+
+        // Act
+        double snapped = timing.ResnapBeatTime(0.69, [new RationalBeatDivisor(4)]);
+
+        // Assert
+        snapped.Should().BeApproximately(0.7, 0.000001);
+    }
+
+    [TestMethod]
+    public void CalculateSliderTemporalLength_WithNaNOrOutOfRangeVelocity_UsesSafeVelocityBounds()
+    {
+        // Arrange
+        var timing = new Timing([CreateRedline(0, 500)], 1.4);
+
+        // Act
+        double defaultLength = timing.CalculateSliderTemporalLength(0, 140, double.NaN);
+        double tooFast = timing.CalculateSliderTemporalLength(0, 140, -5000);
+        double tooSlow = timing.CalculateSliderTemporalLength(0, 140, -1);
+
+        // Assert
+        defaultLength.Should().BeApproximately(500, 0.000001);
+        tooFast.Should().BeApproximately(5000, 0.000001);
+        tooSlow.Should().BeApproximately(50, 0.000001);
+    }
+
+    private static TimingPoint CreateRedline(double offset, double millisecondsPerBeat)
+    {
+        return new TimingPoint(
+            offset,
+            millisecondsPerBeat,
+            4,
+            SampleSet.Normal,
+            0,
+            100,
+            true,
+            false,
+            false);
+    }
 }

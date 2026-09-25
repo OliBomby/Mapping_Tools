@@ -1306,6 +1306,7 @@ public class HitObject : ITextLine, IComparable<HitObject>
     {
         Pos = controlPoints.First();
         CurvePoints = controlPoints.GetRange(1, controlPoints.Count - 1);
+        AdditionalSliderTypes = [];
     }
 
     private PathType GetPathType(string[] sliderData)
@@ -1409,6 +1410,7 @@ public class HitObject : ITextLine, IComparable<HitObject>
         newHitObject.BodyHitsounds = BodyHitsounds?.Select(o => o.Copy()).ToList();
         newHitObject.TimelineObjects = TimelineObjects?.Select(o => o.Copy()).ToList();
         newHitObject.CurvePoints = CurvePoints?.Copy();
+        newHitObject.AdditionalSliderTypes = AdditionalSliderTypes?.ToList();
         if (EdgeHitsounds != null)
             newHitObject.EdgeHitsounds = [.. EdgeHitsounds];
         if (EdgeSampleSets != null)

@@ -59,4 +59,77 @@ public class BeatmapTests
         // Assert
         matches.Should().Equal(beatmap.HitObjects[0], beatmap.HitObjects[1]);
     }
+
+    [TestMethod]
+    public void GetBookmarkedObjects_IncludesObjectsAtBothLeniencyBoundaries()
+    {
+        // Arrange
+        HitObject circle = new("64,96,1000,1,0,0:0:0:0:");
+        HitObject hold = new("128,192,2000,128,0,3000:0:0:0:0:");
+        HitObject unmarked = new("192,96,4000,1,0,0:0:0:0:");
+        Beatmap beatmap = new([circle, hold, unmarked], [], globalSv: 1.4);
+        beatmap.Bookmarks = [995.4, 3004.6];
+
+        // Act
+        List<HitObject> bookmarked = beatmap.GetBookmarkedObjects();
+
+        // Assert
+        beatmap.GetBookmarks().Should().Equal(995, 3005);
+        bookmarked.Should().Equal(circle, hold);
+    }
+
+    [TestMethod]
+    public void GetHitObjectsWithRangeInRange_IncludesObjectsThatOverlapEitherBoundary()
+    {
+        // Arrange
+        HitObject before = new("64,96,1000,1,0,0:0:0:0:");
+        HitObject overlapping = new("128,192,2000,128,0,3000:0:0:0:0:");
+        HitObject after = new("192,96,4000,1,0,0:0:0:0:");
+        Beatmap beatmap = new([before, overlapping, after], [], globalSv: 1.4);
+
+        // Act
+        List<HitObject> matches = beatmap.GetHitObjectsWithRangeInRange(2500, 4000);
+
+        // Assert
+        matches.Should().Equal(overlapping, after);
+    }
+
+    [TestMethod]
+    public void UpdateStacking_OnCoincidentCircles_OffsetsEarlierCircleByOneStack()
+    {
+        // Arrange
+        HitObject first = new("64,96,1000,1,0,0:0:0:0:");
+        HitObject second = new("64,96,1050,1,0,0:0:0:0:");
+        Beatmap beatmap = new([first, second], [], globalSv: 1.4);
+
+        // Act
+        beatmap.UpdateStacking();
+
+        // Assert
+        first.StackCount.Should().Be(1);
+        second.StackCount.Should().Be(0);
+        first.StackedPos.Should().NotBe(first.Pos);
+        second.StackedPos.Should().Be(second.Pos);
+    }
+
+    [TestMethod]
+    public void DeepCopy_MutatingCopiedHitObjectsAndTimingLeavesOriginalUnchanged()
+    {
+        // Arrange
+        TimingPoint redline = new(0, 500, 4, Mapping_Tools.Core.BeatmapHelper.Enums.SampleSet.Normal,
+            0, 100, true, false, false);
+        HitObject originalObject = new("64,96,1000,1,0,0:0:0:0:");
+        Beatmap original = new([originalObject], [redline], redline);
+
+        // Act
+        Beatmap copy = original.DeepCopy();
+        copy.HitObjects[0].Time = 2000;
+        copy.BeatmapTiming.TimingPoints[0].Offset = 500;
+
+        // Assert
+        original.HitObjects[0].Time.Should().Be(1000);
+        original.BeatmapTiming.TimingPoints[0].Offset.Should().Be(0);
+        copy.HitObjects[0].Time.Should().Be(2000);
+        copy.BeatmapTiming.TimingPoints[0].Offset.Should().Be(500);
+    }
 }

@@ -194,7 +194,8 @@ public static class HitsoundCopierEngine
             targetTimeline.GiveTimingPoints(target.BeatmapTiming);
             if (options.CopyMode == HitsoundCopierCopyMode.OverwriteEverything) target.StoryboardSoundSamples.Clear();
 
-            HashSet<StoryboardSoundSample> existing = new(target.StoryboardSoundSamples);
+            HashSet<(double Time, StoryboardLayer Layer, string FilePath, double Volume)> existing =
+                [.. target.StoryboardSoundSamples.Select(sample => (sample.StartTime, sample.Layer, sample.FilePath, sample.Volume))];
             var mode = (GameMode)target.General["Mode"].IntValue;
             foreach (var sample in source.StoryboardSoundSamples)
             {
@@ -220,11 +221,10 @@ public static class HitsoundCopierEngine
                     sample.Layer,
                     sample.FilePath,
                     sample.Volume);
-                if (!existing.Contains(copy))
+                if (existing.Add((copy.StartTime, copy.Layer, copy.FilePath, copy.Volume)))
                 {
                     // Add the StoryboardSoundSamples from beatmapFrom to beatmapTo if it doesn't already have the sample
                     target.StoryboardSoundSamples.Add(copy);
-                    existing.Add(copy);
                 }
             }
 

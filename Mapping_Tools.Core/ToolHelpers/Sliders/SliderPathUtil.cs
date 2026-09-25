@@ -93,6 +93,7 @@ public static class SliderPathUtil
                     break;
                 case PathType.Catmull:
                 case PathType.PerfectCurve:
+                case PathType.BSpline:
                     // Convert to bezier and then extend
                     newPathType = PathType.Bezier;
                     newAnchors = BezierConverter.ConvertToBezier(sliderPath).ControlPoints;
@@ -110,6 +111,7 @@ public static class SliderPathUtil
             {
                 case PathType.Catmull:
                 case PathType.Bezier:
+                case PathType.BSpline:
                     newPathType = PathType.Bezier;
 
                     // Convert in case the path type is catmull

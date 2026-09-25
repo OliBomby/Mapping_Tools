@@ -6,7 +6,7 @@
         <Configuration>
           <Format>cobertura</Format>
           <Include>[Mapping_Tools.Core]*,[Mapping_Tools.Application]*,[Mapping_Tools.Infrastructure]*,[Mapping_Tools.Desktop]*</Include>
-          <ExcludeByFile>**/obj/**</ExcludeByFile>
+          <ExcludeByFile>**/obj/**,**/MathUtil/**/*.cs</ExcludeByFile>
         </Configuration>
       </DataCollector>
     </DataCollectors>

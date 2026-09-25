@@ -155,11 +155,14 @@ public sealed class PatternGalleryMaker
 
     private static void RemoveStoryboard(Beatmap beatmap)
     {
-        beatmap.StoryboardLayerFail.Clear();
-        beatmap.StoryboardLayerPass.Clear();
-        beatmap.StoryboardLayerBackground.Clear();
-        beatmap.StoryboardLayerForeground.Clear();
-        beatmap.StoryboardLayerOverlay.Clear();
+        var source = beatmap.StoryBoard;
+        beatmap.StoryBoard = new StoryBoard
+        {
+            BackgroundAndVideoEvents = source.BackgroundAndVideoEvents.ToList(),
+            BreakPeriods = source.BreakPeriods.ToList(),
+            StoryboardSoundSamples = source.StoryboardSoundSamples.ToList(),
+            ForceAddOverlayLayer = source.ForceAddOverlayLayer,
+        };
     }
 
     private void RemoveEverythingThatIsNotTheseHitObjects(Beatmap beatmap, List<HitObject> hitObjects)

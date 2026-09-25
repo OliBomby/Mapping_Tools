@@ -116,6 +116,166 @@ public class HitsoundDomainTests
     }
 
     [TestMethod]
+    public void ReloadCompatible_WithStackWildcard_IsDirectionalAndRequiresMatchingPath()
+    {
+        // Arrange
+        LayerImportArgs wildcard = new(ImportType.Stack) { Path = "map.osu", X = -1, Y = 192 };
+        LayerImportArgs specific = new(ImportType.Stack) { Path = "map.osu", X = 256, Y = 192 };
+        LayerImportArgs otherPath = new(ImportType.Stack) { Path = "other.osu", X = 256, Y = 192 };
+
+        // Act
+        bool wildcardAcceptsSpecific = wildcard.ReloadCompatible(specific);
+        bool specificAcceptsWildcard = specific.ReloadCompatible(wildcard);
+        bool wildcardAcceptsOtherPath = wildcard.ReloadCompatible(otherPath);
+
+        // Assert
+        wildcardAcceptsSpecific.Should().BeTrue();
+        specificAcceptsWildcard.Should().BeFalse();
+        wildcardAcceptsOtherPath.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void ReloadCompatible_WithHitsounds_RequiresSampleAndOptionalVolumeMatch()
+    {
+        // Arrange
+        LayerImportArgs layer = new(ImportType.Hitsounds)
+        {
+            Path = "map.osu", SamplePath = "sample.wav", Volume = 0.5,
+        };
+        LayerImportArgs otherVolume = new(ImportType.Hitsounds)
+        {
+            Path = "map.osu", SamplePath = "sample.wav", Volume = 0.8,
+        };
+        LayerImportArgs otherSample = new(ImportType.Hitsounds)
+        {
+            Path = "map.osu", SamplePath = "other.wav", Volume = 0.5,
+        };
+
+        // Act
+        bool ignoresVolume = layer.ReloadCompatible(otherVolume);
+        bool rejectsSample = layer.ReloadCompatible(otherSample);
+        layer.DiscriminateVolumes = true;
+        bool rejectsVolume = layer.ReloadCompatible(otherVolume);
+
+        // Assert
+        ignoresVolume.Should().BeTrue();
+        rejectsSample.Should().BeFalse();
+        rejectsVolume.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void ReloadCompatible_WithMidiSelectors_RequiresSpecifiedValuesOnly()
+    {
+        // Arrange
+        LayerImportArgs wildcard = new(ImportType.MIDI)
+        {
+            Path = "notes.mid", Bank = -1, Patch = 2, Key = -1, Length = 500, Velocity = -1,
+        };
+        LayerImportArgs matching = new(ImportType.MIDI)
+        {
+            Path = "notes.mid", Bank = 3, Patch = 2, Key = 60, Length = 500, Velocity = 80,
+        };
+        LayerImportArgs otherLength = new(ImportType.MIDI)
+        {
+            Path = "notes.mid", Bank = 3, Patch = 2, Key = 60, Length = 501, Velocity = 80,
+        };
+
+        // Act
+        bool compatible = wildcard.ReloadCompatible(matching);
+        bool differentLengthCompatible = wildcard.ReloadCompatible(otherLength);
+        bool reverseCompatible = matching.ReloadCompatible(wildcard);
+
+        // Assert
+        compatible.Should().BeTrue();
+        differentLengthCompatible.Should().BeFalse();
+        reverseCompatible.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void ReloadCompatible_WithDifferentImportTypes_RejectsEvenWildcardNone()
+    {
+        // Arrange
+        LayerImportArgs none = new(ImportType.None);
+        LayerImportArgs midi = new(ImportType.MIDI);
+        LayerImportArgs anotherNone = new(ImportType.None) { Path = "different" };
+
+        // Act
+        bool differentType = none.ReloadCompatible(midi);
+        bool bothNone = none.ReloadCompatible(anotherNone);
+
+        // Assert
+        differentType.Should().BeFalse();
+        bothNone.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public void ReloadCompatible_WithMidiSelectors_RejectsEachSpecifiedSelectorMismatch()
+    {
+        // Arrange
+        LayerImportArgs selected = new(ImportType.MIDI)
+        {
+            Path = "notes.mid", Bank = 1, Patch = 2, Key = 60, Length = 500, Velocity = 80,
+        };
+        LayerImportArgs[] changed =
+        [
+            new(ImportType.MIDI) { Path = "other.mid", Bank = 1, Patch = 2, Key = 60, Length = 500, Velocity = 80 },
+            new(ImportType.MIDI) { Path = "notes.mid", Bank = 3, Patch = 2, Key = 60, Length = 500, Velocity = 80 },
+            new(ImportType.MIDI) { Path = "notes.mid", Bank = 1, Patch = 3, Key = 60, Length = 500, Velocity = 80 },
+            new(ImportType.MIDI) { Path = "notes.mid", Bank = 1, Patch = 2, Key = 61, Length = 500, Velocity = 80 },
+            new(ImportType.MIDI) { Path = "notes.mid", Bank = 1, Patch = 2, Key = 60, Length = 500, Velocity = 81 },
+        ];
+
+        // Act
+        bool[] compatible = changed.Select(selected.ReloadCompatible).ToArray();
+
+        // Assert
+        compatible.Should().OnlyContain(value => !value);
+    }
+
+    [TestMethod]
+    public void ReloadCompatible_WithDiscriminatedVolumeAtToleranceBoundary_RejectsDifference()
+    {
+        // Arrange
+        LayerImportArgs layer = new(ImportType.Hitsounds)
+        {
+            Path = "map.osu", SamplePath = "sample.wav", Volume = 0,
+            DiscriminateVolumes = true,
+        };
+        LayerImportArgs other = new(ImportType.Hitsounds)
+        {
+            Path = "map.osu", SamplePath = "sample.wav", Volume = Precision.DOUBLE_EPSILON,
+        };
+
+        // Act
+        bool compatible = layer.ReloadCompatible(other);
+
+        // Assert
+        compatible.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void ReloadCompatible_WithDefaultSelectors_AcceptsAnyMidiNote()
+    {
+        // Arrange
+        LayerImportArgs wildcard = new(ImportType.MIDI) { Path = "notes.mid" };
+        LayerImportArgs specific = new(ImportType.MIDI)
+        {
+            Path = "notes.mid", Bank = 1, Patch = 2, Key = 60, Length = 500, Velocity = 80,
+        };
+
+        // Act
+        bool compatible = wildcard.ReloadCompatible(specific);
+
+        // Assert
+        compatible.Should().BeTrue();
+        wildcard.Bank.Should().Be(-1);
+        wildcard.Patch.Should().Be(-1);
+        wildcard.Key.Should().Be(-1);
+        wildcard.Length.Should().Be(-1);
+        wildcard.Velocity.Should().Be(-1);
+    }
+
+    [TestMethod]
     public void HitsoundLayer_RemoveDuplicatesUsesDomainPrecision()
     {
         // Arrange

@@ -127,11 +127,14 @@ public struct Box2 : IEquatable<Box2>
     /// <returns>Whether this box contains the point.</returns>
     public bool Contains(Vector2 point, bool closedRegion)
     {
-        bool xOK = closedRegion == Left <= Right ? point.X >= Left != point.X > Right : point.X > Left != point.X >= Right;
+        double minX = Math.Min(Left, Right);
+        double maxX = Math.Max(Left, Right);
+        double minY = Math.Min(Top, Bottom);
+        double maxY = Math.Max(Top, Bottom);
 
-        bool yOK = closedRegion == Top <= Bottom ? point.Y >= Top != point.Y > Bottom : point.Y > Top != point.Y >= Bottom;
-
-        return xOK && yOK;
+        return closedRegion
+            ? point.X >= minX && point.X <= maxX && point.Y >= minY && point.Y <= maxY
+            : point.X > minX && point.X < maxX && point.Y > minY && point.Y < maxY;
     }
 
     /// <summary>

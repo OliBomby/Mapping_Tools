@@ -57,6 +57,7 @@ public static class BezierConverter
             PathType.PerfectCurve => ConvertCircleToBezier(sliderPath),
             PathType.Catmull => ConvertCatmullToBezier(sliderPath),
             PathType.Bezier => sliderPath,
+            PathType.BSpline => ConvertBSplineToBezier(sliderPath),
             _ => throw new ArgumentOutOfRangeException(),
         };
     }
@@ -73,6 +74,7 @@ public static class BezierConverter
             PathType.PerfectCurve => ConvertCircleToBezierAnchors(anchors),
             PathType.Catmull => ConvertCatmullToBezierAnchors(anchors),
             PathType.Bezier => anchors,
+            PathType.BSpline => ConvertBSplineToBezierAnchors(anchors),
             _ => throw new ArgumentOutOfRangeException(),
         };
     }
@@ -184,6 +186,19 @@ public static class BezierConverter
 
         var newPath = new SliderPath(PathType.Bezier, newAnchors, catmullPath.ExpectedDistance);
         return newPath;
+    }
+
+    private static SliderPath ConvertBSplineToBezier(SliderPath bsplinePath)
+    {
+        var fullBSpline = new SliderPath(PathType.BSpline, [.. bsplinePath.ControlPoints]);
+        var newAnchors = ConvertLinearToBezierAnchors(fullBSpline.CalculatedPath.ToList()).ToArray();
+        return new SliderPath(PathType.Bezier, newAnchors, bsplinePath.ExpectedDistance);
+    }
+
+    private static List<Vector2> ConvertBSplineToBezierAnchors(List<Vector2> bsplineAnchors)
+    {
+        var bsplinePath = new SliderPath(PathType.BSpline, [.. bsplineAnchors]);
+        return ConvertLinearToBezierAnchors(bsplinePath.CalculatedPath.ToList());
     }
 
     /// <summary>

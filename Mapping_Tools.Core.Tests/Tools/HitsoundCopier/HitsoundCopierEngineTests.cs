@@ -161,6 +161,136 @@ public sealed class HitsoundCopierEngineTests
         target.BeatmapTiming.GetGreenlineAtTime(500).SampleIndex.Should().Be(100);
     }
 
+    [TestMethod]
+    public void Apply_WithHitObjectAtLeniencyBoundary_CopiesOnlyWhenWithinTolerance()
+    {
+        // Arrange
+        Beatmap source = CreateCircleBeatmap(1000, 2);
+        Beatmap targetOutside = CreateCircleBeatmap(1005, 8);
+        Beatmap targetInside = CreateCircleBeatmap(1005, 8);
+        HitsoundCopierEngineOptions options = new()
+        {
+            CopyMode = HitsoundCopierCopyMode.OverwriteOnlyDefined,
+            CopyBodyHitsounds = false,
+            TemporalLeniency = 4,
+        };
+
+        // Act
+        var outside = HitsoundCopierEngine.Apply(targetOutside, source, options, @"C:\maps");
+        options.TemporalLeniency = 5;
+        var inside = HitsoundCopierEngine.Apply(targetInside, source, options, @"C:\maps");
+
+        // Assert
+        outside.MatchedHitsoundCount.Should().Be(0);
+        targetOutside.HitObjects[0].Hitsounds.Should().Be(8);
+        inside.MatchedHitsoundCount.Should().Be(1);
+        targetInside.HitObjects[0].Hitsounds.Should().Be(2);
+    }
+
+    [TestMethod]
+    public void Apply_WithStoryboardSampleAtHitObjectTime_SkipsSampleWhenConfigured()
+    {
+        // Arrange
+        Beatmap source = LoadStoryboardFixture();
+        source.StoryboardSoundSamples.Clear();
+        source.StoryboardSoundSamples.Add(new StoryboardSoundSample(1000, StoryboardLayer.Foreground, "sample.wav", 80));
+        Beatmap target = CreateCircleBeatmap(1000, 2);
+        HitsoundCopierEngineOptions options = new()
+        {
+            CopyHitsounds = false,
+            CopyBodyHitsounds = false,
+            CopyStoryboardedSamples = true,
+            IgnoreHitsoundSatisfiedSamples = false,
+            IgnoreWheneverHitsound = true,
+        };
+
+        // Act
+        HitsoundCopierEngine.Apply(target, source, options, @"C:\maps");
+
+        // Assert
+        target.StoryboardSoundSamples.Should().BeEmpty();
+    }
+
+    [TestMethod]
+    public void Apply_WithRepeatedStoryboardSample_AddsOnlyOneCopy()
+    {
+        // Arrange
+        Beatmap source = LoadStoryboardFixture();
+        source.StoryboardSoundSamples.Clear();
+        source.StoryboardSoundSamples.Add(new StoryboardSoundSample(100, StoryboardLayer.Foreground, "sample.wav", 80));
+        source.StoryboardSoundSamples.Add(new StoryboardSoundSample(100, StoryboardLayer.Foreground, "sample.wav", 80));
+        Beatmap target = LoadStoryboardFixture();
+        target.StoryboardSoundSamples.Clear();
+        HitsoundCopierEngineOptions options = new()
+        {
+            CopyHitsounds = false,
+            CopyBodyHitsounds = false,
+            CopyStoryboardedSamples = true,
+            IgnoreHitsoundSatisfiedSamples = false,
+        };
+
+        // Act
+        HitsoundCopierEngine.Apply(target, source, options, @"C:\maps");
+
+        // Assert
+        target.StoryboardSoundSamples.Should().ContainSingle()
+            .Which.StartTime.Should().Be(100);
+    }
+
+    [DataTestMethod]
+    [DataRow(-1d)]
+    [DataRow(double.NaN)]
+    [DataRow(double.PositiveInfinity)]
+    public void Validate_WithInvalidTemporalLeniency_Throws(double leniency)
+    {
+        // Arrange
+        HitsoundCopierEngineOptions options = new() { TemporalLeniency = leniency };
+
+        // Act
+        var act = () => HitsoundCopierEngine.Validate(options);
+
+        // Assert
+        act.Should().Throw<ArgumentOutOfRangeException>();
+    }
+
+    [TestMethod]
+    public void Apply_OverwriteVolumes_PreservesFivePercentMuteOnlyWhenConfigured()
+    {
+        // Arrange
+        TimingPoint redline = new(0, 500, 4, SampleSet.Normal, 0, 100, true, false, false);
+        TimingPoint mute = new(500, -100, 4, SampleSet.Normal, 0, 5, false, false, false);
+        Beatmap source = CreateCircleBeatmap(1000, 2);
+        Beatmap preserved = new([new HitObject("256,192,1000,1,0,0:0:0:0:")],
+            [redline.Copy(), mute.Copy()], redline.Copy());
+        Beatmap overwritten = new([new HitObject("256,192,1000,1,0,0:0:0:0:")],
+            [redline.Copy(), mute.Copy()], redline.Copy());
+        HitsoundCopierEngineOptions options = new()
+        {
+            CopyHitsounds = false,
+            CopyBodyHitsounds = false,
+            CopyVolumes = true,
+            AlwaysPreserve5Volume = true,
+        };
+
+        // Act
+        HitsoundCopierEngine.Apply(preserved, source, options, @"C:\maps");
+        options.AlwaysPreserve5Volume = false;
+        HitsoundCopierEngine.Apply(overwritten, source, options, @"C:\maps");
+
+        // Assert
+        preserved.BeatmapTiming.GetTimingPointAtTime(1000).Volume.Should().Be(5);
+        overwritten.BeatmapTiming.GetTimingPointAtTime(1000).Volume.Should().Be(100);
+    }
+
+    private static Beatmap CreateCircleBeatmap(int time, int hitsound)
+    {
+        TimingPoint redline = new(0, 500, 4, SampleSet.Normal, 0, 100, true, false, false);
+        return new Beatmap(
+            [new HitObject($"256,192,{time},1,{hitsound},0:0:0:0:")],
+            [redline],
+            redline);
+    }
+
     private static Beatmap LoadFixture()
     {
         return new Beatmap(

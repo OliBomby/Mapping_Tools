@@ -87,7 +87,7 @@ $overallLines = Format-Coverage $coverage.summary.coveredlines $coverage.summary
 $overallBranches = Format-Coverage $coverage.summary.coveredbranches $coverage.summary.totalbranches
 $summaryLines += "| **Overall** | **$overallLines** | **$overallBranches** |"
 $summaryLines += ''
-$summaryLines += 'Each project row measures its production assembly across all four test projects.'
+$summaryLines += 'Each project row measures its production assembly across all four test projects; the MathUtil namespace is excluded.'
 $summary = $summaryLines -join [Environment]::NewLine
 
 Set-Content -Path (Join-Path $reportDirectory 'coverage-summary.md') -Value $summary

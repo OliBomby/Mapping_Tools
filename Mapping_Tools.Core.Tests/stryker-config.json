@@ -1,6 +1,10 @@
 {
   "stryker-config": {
     "project": "Mapping_Tools.Core.csproj",
+    "mutate": [
+      "**/*.cs",
+      "!**/MathUtil/**/*.cs"
+    ],
     "reporters": ["dots", "markdown", "json"],
     "thresholds": {
       "high": 80,

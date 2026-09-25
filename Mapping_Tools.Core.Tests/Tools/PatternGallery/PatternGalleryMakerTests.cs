@@ -1,5 +1,6 @@
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.BeatmapHelper.Events;
 using Mapping_Tools.Core.Tools.PatternGallery;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -55,5 +56,55 @@ public sealed class PatternGalleryMakerTests
         // Assert
         act.Should().Throw<InvalidOperationException>()
             .WithMessage("No selected hit objects found.");
+    }
+
+    [TestMethod]
+    public void FromSelected_WithOneObject_KeepsRequiredTimingAndRemovesStoryboardFromCopy()
+    {
+        // Arrange
+        TimingPoint redline = new(0, 500, 4, SampleSet.Normal, 0, 70, true, false, false);
+        HitObject first = new("64,96,1000,1,0,0:0:0:0:");
+        HitObject selected = new("128,96,2000,1,0,0:0:0:0:");
+        HitObject last = new("192,96,3000,1,0,0:0:0:0:");
+        Beatmap source = new([first, selected, last], [redline], redline);
+        source.StoryboardLayerForeground.Add(new Sprite { FilePath = "image.png" });
+        PatternGalleryMaker maker = new();
+
+        // Act
+        var pattern = maker.FromSelected(source, "Selected", [selected], out Beatmap extracted);
+
+        // Assert
+        pattern.ObjectCount.Should().Be(1);
+        extracted.HitObjects.Select(item => item.Time).Should().Equal(2000);
+        extracted.BeatmapTiming.Redlines.Should().ContainSingle().Which.Offset.Should().Be(0);
+        extracted.StoryboardLayerForeground.Should().BeEmpty();
+        source.HitObjects.Should().HaveCount(3);
+        source.StoryboardLayerForeground.Should().ContainSingle();
+    }
+
+    [TestMethod]
+    public void FromBeatmapFiltered_WithInclusiveBounds_ExtractsOnlyObjectsInRange()
+    {
+        // Arrange
+        TimingPoint redline = new(0, 500, 4, SampleSet.Normal, 0, 70, true, false, false);
+        Beatmap source = new(
+            [
+                new HitObject("64,96,500,1,0,0:0:0:0:"),
+                new HitObject("64,96,1000,1,0,0:0:0:0:"),
+                new HitObject("64,96,2000,1,0,0:0:0:0:"),
+                new HitObject("64,96,2500,1,0,0:0:0:0:"),
+            ],
+            [redline],
+            redline);
+        PatternGalleryMaker maker = new();
+
+        // Act
+        var pattern = maker.FromBeatmapFiltered(source, "Window", null, 1000, 2000, out Beatmap extracted);
+
+        // Assert
+        pattern.ObjectCount.Should().Be(2);
+        pattern.Duration.Should().Be(TimeSpan.FromMilliseconds(1000));
+        extracted.HitObjects.Select(item => item.Time).Should().Equal(1000, 2000);
+        source.HitObjects.Should().HaveCount(4);
     }
 }

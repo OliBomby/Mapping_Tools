@@ -36,6 +36,34 @@ public sealed class SliderMergerEngineTests
     }
 
     [TestMethod]
+    public void Merge_TwoCircles_PreservesEachCircleSampleSetsOnItsSliderEdge()
+    {
+        // Arrange
+        HitObject first = new("64,64,0,1,2")
+        {
+            SampleSet = SampleSet.Drum,
+            AdditionSet = SampleSet.Soft,
+        };
+        HitObject second = new("164,64,100,1,8")
+        {
+            SampleSet = SampleSet.Normal,
+            AdditionSet = SampleSet.Drum,
+        };
+        Beatmap beatmap = CreateBeatmap(first, second);
+
+        // Act
+        SliderMergerEngine.Merge(
+            beatmap,
+            beatmap.HitObjects,
+            new SliderMergerEngineOptions { Leniency = 100 });
+
+        // Assert
+        HitObject slider = beatmap.HitObjects.Should().ContainSingle().Subject;
+        slider.EdgeSampleSets.Should().Equal(SampleSet.Drum, SampleSet.Normal);
+        slider.EdgeAdditionSets.Should().Equal(SampleSet.Soft, SampleSet.Drum);
+    }
+
+    [TestMethod]
     public void Merge_TwoSliders_WithLinearConnectionAddsGapAndKeepsBezierType()
     {
         // Arrange
@@ -62,10 +90,17 @@ public sealed class SliderMergerEngineTests
     [DataTestMethod]
     [DataRow(PathType.PerfectCurve)]
     [DataRow(PathType.Catmull)]
-    public void Merge_PerfectCurveOrCatmullSliderWithCircle_ConvertsResultToBezier(PathType pathType)
+    [DataRow(PathType.BSpline)]
+    public void Merge_CurvedSliderWithCircle_ConvertsResultToBezier(PathType pathType)
     {
         // Arrange
-        string pathToken = pathType == PathType.PerfectCurve ? "P" : "C";
+        string pathToken = pathType switch
+        {
+            PathType.PerfectCurve => "P",
+            PathType.Catmull => "C",
+            PathType.BSpline => "B4",
+            _ => throw new ArgumentOutOfRangeException(nameof(pathType)),
+        };
         HitObject first = new($"64,64,0,2,0,{pathToken}|114:164|164:64,1,100");
         HitObject second = new("200,64,100,1,0");
         var beatmap = CreateBeatmap(first, second);
@@ -194,6 +229,174 @@ public sealed class SliderMergerEngineTests
         // Assert
         act.Should().Throw<ArgumentException>();
         beatmap.HitObjects.Should().HaveCount(2);
+    }
+
+    [TestMethod]
+    public void Merge_WithObjectsOutsideLeniency_LeavesBothCirclesUntouched()
+    {
+        // Arrange
+        HitObject first = new("64,64,0,1,2");
+        HitObject second = new("164,64,100,1,8");
+        Beatmap beatmap = CreateBeatmap(first, second);
+
+        // Act
+        int merged = SliderMergerEngine.Merge(beatmap, beatmap.HitObjects,
+            new SliderMergerEngineOptions { Leniency = 99 });
+
+        // Assert
+        merged.Should().Be(0);
+        beatmap.HitObjects.Should().Equal(first, second);
+        first.IsCircle.Should().BeTrue();
+        second.IsCircle.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public void Merge_TwoCirclesWithLinearOnLinear_ProducesStraightLinearSlider()
+    {
+        // Arrange
+        HitObject first = new("64,64,0,1,2");
+        HitObject second = new("164,64,100,1,8");
+        Beatmap beatmap = CreateBeatmap(first, second);
+
+        // Act
+        SliderMergerEngine.Merge(beatmap, beatmap.HitObjects,
+            new SliderMergerEngineOptions { Leniency = 100, LinearOnLinear = true });
+
+        // Assert
+        HitObject slider = beatmap.HitObjects.Should().ContainSingle().Subject;
+        slider.SliderType.Should().Be(PathType.Linear);
+        slider.GetAllCurvePoints().Should().Equal(new Vector2(64, 64), new Vector2(164, 64));
+        slider.PixelLength.Should().Be(100);
+    }
+
+    [TestMethod]
+    public void Merge_TwoSlidersWithMoveConnection_TranslatesSecondPathWithoutAddingGapLength()
+    {
+        // Arrange
+        HitObject first = new("64,64,0,2,0,L|164:64,1,100");
+        HitObject second = new("200,64,100,2,0,L|300:64,1,100");
+        Beatmap beatmap = CreateBeatmap(first, second);
+        SliderMergerEngineOptions options = new()
+        {
+            Leniency = 50,
+            MergeOnSliderEnd = false,
+            ConnectionModeSetting = SliderMergerConnectionMode.Move,
+        };
+
+        // Act
+        SliderMergerEngine.Merge(beatmap, beatmap.HitObjects, options);
+
+        // Assert
+        HitObject slider = beatmap.HitObjects.Should().ContainSingle().Subject;
+        slider.PixelLength.Should().Be(200);
+        slider.GetAllCurvePoints()[^1].Should().Be(new Vector2(264, 64));
+    }
+
+    [TestMethod]
+    public void Merge_TwoLinearSlidersWithLinearOnLinear_RemainsLinearAndRemovesJoinDuplicates()
+    {
+        // Arrange
+        HitObject first = new("64,64,0,2,0,L|164:64,1,100");
+        HitObject second = new("200,64,100,2,0,L|300:64,1,100");
+        Beatmap beatmap = CreateBeatmap(first, second);
+        SliderMergerEngineOptions options = new()
+        {
+            Leniency = 50,
+            MergeOnSliderEnd = false,
+            ConnectionModeSetting = SliderMergerConnectionMode.Move,
+            LinearOnLinear = true,
+        };
+
+        // Act
+        int merged = SliderMergerEngine.Merge(beatmap, beatmap.HitObjects, options);
+
+        // Assert
+        merged.Should().Be(2);
+        HitObject slider = beatmap.HitObjects.Should().ContainSingle().Subject;
+        slider.SliderType.Should().Be(PathType.Linear);
+        slider.PixelLength.Should().Be(200);
+        slider.GetAllCurvePoints().Should().OnlyHaveUniqueItems();
+    }
+
+    [TestMethod]
+    public void Merge_CoincidentCircles_RemovesSecondWithoutCreatingZeroLengthSlider()
+    {
+        // Arrange
+        HitObject first = new("64,64,0,1,2");
+        HitObject second = new("64,64,100,1,8");
+        Beatmap beatmap = CreateBeatmap(first, second);
+
+        // Act
+        int merged = SliderMergerEngine.Merge(
+            beatmap,
+            beatmap.HitObjects,
+            new SliderMergerEngineOptions { Leniency = 0 });
+
+        // Assert
+        merged.Should().Be(2);
+        beatmap.HitObjects.Should().ContainSingle().Which.Should().BeSameAs(first);
+        first.IsCircle.Should().BeTrue();
+        first.IsSlider.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void Merge_UnsupportedObjectBetweenCircles_PreventsMergingAcrossIt()
+    {
+        // Arrange
+        HitObject first = new("64,64,0,1,2");
+        HitObject unsupported = new("64,64,100,1,0")
+        {
+            IsCircle = false,
+            IsSlider = false,
+            IsSpinner = true,
+        };
+        HitObject last = new("64,64,200,1,8");
+        Beatmap beatmap = CreateBeatmap(first, unsupported, last);
+
+        // Act
+        int merged = SliderMergerEngine.Merge(
+            beatmap,
+            beatmap.HitObjects,
+            new SliderMergerEngineOptions { Leniency = 0 });
+
+        // Assert
+        merged.Should().Be(0);
+        beatmap.HitObjects.Should().Equal(first, unsupported, last);
+    }
+
+    [TestMethod]
+    public void IsLinearBezier_RequiresEveryInteriorPointToRepeatANeighbor()
+    {
+        // Arrange
+        Vector2[] linear = [new(0, 0), new(10, 0), new(10, 0), new(20, 0)];
+        Vector2[] curved = [new(0, 0), new(10, 5), new(20, 0)];
+
+        // Act
+        bool isLinear = SliderMergerEngine.IsLinearBezier(linear);
+        bool isCurved = SliderMergerEngine.IsLinearBezier(curved);
+
+        // Assert
+        isLinear.Should().BeTrue();
+        isCurved.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void Merge_WithNonFiniteLeniency_ThrowsBeforeMutation()
+    {
+        // Arrange
+        HitObject first = new("64,64,0,1,2");
+        HitObject second = new("164,64,100,1,8");
+        Beatmap beatmap = CreateBeatmap(first, second);
+
+        // Act
+        Action act = () => SliderMergerEngine.Merge(
+            beatmap,
+            beatmap.HitObjects,
+            new SliderMergerEngineOptions { Leniency = double.NaN });
+
+        // Assert
+        act.Should().Throw<ArgumentException>();
+        beatmap.HitObjects.Should().Equal(first, second);
     }
 
     private static Beatmap CreateBeatmap(params HitObject[] objects)
