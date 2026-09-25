@@ -69,7 +69,7 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<MainWindow>();
         services.AddSingleton<INotificationSurface>(provider =>
             provider.GetRequiredService<MainWindow>());
-        services.AddSingleton<Func<Window>>(provider => () => provider.GetRequiredService<MainWindow>());
+        services.AddSingleton<Func<Window>>(provider => provider.GetRequiredService<MainWindow>);
         services.AddSingleton<IUiDispatcher, AvaloniaUiDispatcher>();
         services.AddSingleton<HttpClient>(_ =>
         {
@@ -123,7 +123,8 @@ internal static class DesktopServiceRegistration
                 typeof(DesktopApplicationSettings)));
         services.AddSingleton<ISettingsPathEnvironment, PortableSettingsPathEnvironment>();
         services.AddSingleton<ISettingsPathService, SettingsPathService>();
-        services.AddSingleton<Func<ApplicationSettings>>(static _ => static () => new DesktopApplicationSettings());
+        services.AddSingleton<Func<ApplicationSettings>>(static _ =>
+            static () => DesktopSettingsDefaults.Create(OperatingSystem.IsWindows()));
         services.AddSingleton<ISettingsService, SettingsService>();
         services.AddSingleton<DesktopApplicationSettings>(provider =>
             (DesktopApplicationSettings)provider
