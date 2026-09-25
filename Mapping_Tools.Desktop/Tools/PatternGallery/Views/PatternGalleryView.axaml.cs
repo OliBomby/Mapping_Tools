@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -7,6 +8,8 @@ using Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels;
 namespace Mapping_Tools.Desktop.Tools.PatternGallery.Views;
 
 /// <summary>Displays Pattern Gallery's collection cards and placement options.</summary>
+[SuppressMessage("ReSharper", "UnusedMember.Local")]
+[SuppressMessage("ReSharper", "UnusedParameter.Local")]
 public sealed partial class PatternGalleryView : UserControl
 {
     private readonly ButtonModifierCapture removeButtonModifiers;

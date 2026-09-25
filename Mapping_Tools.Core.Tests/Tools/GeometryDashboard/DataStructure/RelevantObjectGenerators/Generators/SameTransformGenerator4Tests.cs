@@ -20,7 +20,7 @@ public sealed class SameTransformGenerator4Tests
 
         // Assert
         next.Should().NotBeNull();
-        next!.Child.X.Should().BeApproximately(40, 0.000001);
+        next.Child.X.Should().BeApproximately(40, 0.000001);
         next.Child.Y.Should().BeApproximately(0, 0.000001);
     }
 
@@ -36,7 +36,7 @@ public sealed class SameTransformGenerator4Tests
 
         // Assert
         next.Should().NotBeNull();
-        next!.Child.X.Should().BeApproximately(0, 0.000001);
+        next.Child.X.Should().BeApproximately(0, 0.000001);
         next.Child.Y.Should().BeApproximately(0, 0.000001);
     }
 

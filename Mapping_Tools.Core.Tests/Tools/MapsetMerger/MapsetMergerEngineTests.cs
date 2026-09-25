@@ -65,10 +65,10 @@ public sealed class MapsetMergerEngineTests
     public void CombineReference_WithAbsoluteOrParentPath_RejectsReference(string reference)
     {
         // Arrange
-        const string mapsetName = "Pack";
+        const string mapset_name = "Pack";
 
         // Act
-        Action act = () => MapsetMergerEngine.CombineReference(mapsetName, reference);
+        Action act = () => MapsetMergerEngine.CombineReference(mapset_name, reference);
 
         // Assert
         act.Should().Throw<InvalidDataException>();

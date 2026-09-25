@@ -23,7 +23,7 @@ public sealed class ScaleRotateGeneratorTests
 
         // Assert
         transformed.Should().NotBeNull();
-        transformed!.Child.X.Should().BeApproximately(80, 0.000001);
+        transformed.Child.X.Should().BeApproximately(80, 0.000001);
         transformed.Child.Y.Should().BeApproximately(100, 0.000001);
     }
 
@@ -40,7 +40,7 @@ public sealed class ScaleRotateGeneratorTests
 
         // Assert
         transformed.Should().NotBeNull();
-        transformed!.Child.X.Should().BeApproximately(90, 0.000001);
+        transformed.Child.X.Should().BeApproximately(90, 0.000001);
         transformed.Child.Y.Should().BeApproximately(100, 0.000001);
     }
 
@@ -73,7 +73,7 @@ public sealed class ScaleRotateGeneratorTests
 
         // Assert
         transformed.Should().NotBeNull();
-        transformed!.Child.Centre.X.Should().BeApproximately(80, 0.000001);
+        transformed.Child.Centre.X.Should().BeApproximately(80, 0.000001);
         transformed.Child.Centre.Y.Should().BeApproximately(100, 0.000001);
         transformed.Child.Radius.Should().Be(10);
     }
@@ -91,7 +91,7 @@ public sealed class ScaleRotateGeneratorTests
 
         // Assert
         transformed.Should().NotBeNull();
-        transformed!.Child.PositionVector.X.Should().BeApproximately(90, 0.000001);
+        transformed.Child.PositionVector.X.Should().BeApproximately(90, 0.000001);
         transformed.Child.PositionVector.Y.Should().BeApproximately(100, 0.000001);
         transformed.Child.DirectionVector.X.Should().BeApproximately(-10, 0.000001);
         transformed.Child.DirectionVector.Y.Should().BeApproximately(0, 0.000001);

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
@@ -11,6 +12,8 @@ using Mapping_Tools.Desktop.Views.Dialogs;
 namespace Mapping_Tools.Desktop.Tools.TumourGenerator.Controls;
 
 /// <summary>Provides the legacy constant-text or modal-graph editing surface.</summary>
+[SuppressMessage("ReSharper", "UnusedMember.Local")]
+[SuppressMessage("ReSharper", "UnusedParameter.Local")]
 public partial class ValueOrGraphControl : UserControl
 {
     /// <summary>Identifies the graph state edited by this value control.</summary>

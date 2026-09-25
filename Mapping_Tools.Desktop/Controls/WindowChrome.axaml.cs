@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -8,6 +9,8 @@ namespace Mapping_Tools.Desktop.Controls;
 /// <summary>
 ///     Provides the shared title bar used by Mapping Tools dialog windows.
 /// </summary>
+[SuppressMessage("ReSharper", "UnusedParameter.Local")]
+[SuppressMessage("ReSharper", "UnusedMember.Local")]
 public sealed partial class WindowChrome : UserControl
 {
     /// <summary>Identifies the title displayed beside the application logo.</summary>

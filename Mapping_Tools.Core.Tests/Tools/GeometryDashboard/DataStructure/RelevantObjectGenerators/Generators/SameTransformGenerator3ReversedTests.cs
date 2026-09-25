@@ -20,7 +20,7 @@ public sealed class SameTransformGenerator3ReversedTests
 
         // Assert
         next.Should().NotBeNull();
-        next!.Child.X.Should().BeApproximately(20, 0.000001);
+        next.Child.X.Should().BeApproximately(20, 0.000001);
         next.Child.Y.Should().BeApproximately(10, 0.000001);
     }
 

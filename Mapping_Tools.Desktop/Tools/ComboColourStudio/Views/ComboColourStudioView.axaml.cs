@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -13,6 +14,8 @@ using Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels.Adapters;
 namespace Mapping_Tools.Desktop.Tools.ComboColourStudio.Views;
 
 /// <summary>Presents the Avalonia Combo Colour Studio editor.</summary>
+[SuppressMessage("ReSharper", "UnusedMember.Local")]
+[SuppressMessage("ReSharper", "UnusedParameter.Local")]
 public partial class ComboColourStudioView : UserControl
 {
     private readonly ButtonModifierCapture addColourPointButtonModifiers;

@@ -26,7 +26,7 @@ public sealed class SliderPathGeneratorTests
 
         // Assert
         result.Should().NotBeNull();
-        result!.Select(point => point.Child).Should().Equal(
+        result.Select(point => point.Child).Should().Equal(
             new Vector2(64, 96),
             new Vector2(89, 96),
             new Vector2(114, 96),
@@ -51,7 +51,7 @@ public sealed class SliderPathGeneratorTests
 
         // Assert
         result.Should().ContainSingle();
-        result![0].Child.Should().Be(new Vector2(64, 96));
+        result[0].Child.Should().Be(new Vector2(64, 96));
         result[0].CustomTime.Should().Be(1000);
     }
 

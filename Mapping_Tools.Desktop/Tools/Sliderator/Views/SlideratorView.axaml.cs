@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -16,6 +17,8 @@ using Mapping_Tools.Desktop.Tools.Sliderator.ViewModels;
 namespace Mapping_Tools.Desktop.Tools.Sliderator.Views;
 
 /// <summary>Displays Sliderator's graph, source controls, and shared object preview.</summary>
+[SuppressMessage("ReSharper", "UnusedMember.Local")]
+[SuppressMessage("ReSharper", "UnusedParameter.Local")]
 public sealed partial class SlideratorView : UserControl
 {
     private readonly ButtonModifierCapture moveLeftButtonModifiers;

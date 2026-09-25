@@ -276,7 +276,7 @@ public sealed class SliderPathTests
         // Act
         bool samePath = first.Equals(same);
         bool sameObject = first.Equals((object)same);
-        bool equalsNull = first.Equals((object)null!);
+        bool equalsNull = first.Equals(null!);
         bool equalsOtherType = first.Equals(new object());
 
         // Assert

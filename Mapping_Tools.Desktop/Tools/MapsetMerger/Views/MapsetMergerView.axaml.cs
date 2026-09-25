@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -7,6 +8,8 @@ using Mapping_Tools.Desktop.Tools.MapsetMerger.ViewModels;
 namespace Mapping_Tools.Desktop.Tools.MapsetMerger.Views;
 
 /// <summary>Hosts the Avalonia Mapset Merger form.</summary>
+[SuppressMessage("ReSharper", "UnusedMember.Local")]
+[SuppressMessage("ReSharper", "UnusedParameter.Local")]
 public partial class MapsetMergerView : UserControl
 {
     private readonly ButtonModifierCapture addMapsetButtonModifiers;

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.AutoFail;
@@ -7,6 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Mapping_Tools.Core.Tests.Tools.AutoFail;
 
 [TestClass]
+[SuppressMessage("ReSharper", "AccessToDisposedClosure")]
 public sealed class AutoFailDetectorEngineTests
 {
     [TestMethod]
@@ -157,7 +159,7 @@ public sealed class AutoFailDetectorEngineTests
         cancellation.Cancel();
 
         // Act
-        Action act = () => detector.GetFixPlans(cancellation.Token).ToList();
+        Action act = () => _ = detector.GetFixPlans(cancellation.Token).ToList();
 
         // Assert
         act.Should().Throw<OperationCanceledException>();

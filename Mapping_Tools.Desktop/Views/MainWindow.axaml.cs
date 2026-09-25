@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -22,6 +23,8 @@ namespace Mapping_Tools.Desktop.Views;
 /// <summary>
 ///     Hosts registered Avalonia features and captures safe normal-state window geometry.
 /// </summary>
+[SuppressMessage("ReSharper", "UnusedMember.Local")]
+[SuppressMessage("ReSharper", "UnusedParameter.Local")]
 public partial class MainWindow : Window, INotificationSurface
 {
     private static readonly WindowBounds defaultBounds = new(80, 60, 1500, 800);
@@ -306,7 +309,6 @@ public partial class MainWindow : Window, INotificationSurface
         if (eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed) BeginMoveDrag(eventArgs);
     }
 
-    // ReSharper disable once UnusedMember.Local
     private void AcceptFileDrop(object? _, DragEventArgs eventArgs)
     {
         eventArgs.DragEffects = eventArgs.DataTransfer.Formats.Contains(DataFormat.File)
@@ -315,7 +317,6 @@ public partial class MainWindow : Window, INotificationSurface
         eventArgs.Handled = true;
     }
 
-    // ReSharper disable once UnusedMember.Local
     private void OpenDroppedBeatmaps(object? _, DragEventArgs eventArgs)
     {
         IReadOnlyList<string> paths = eventArgs.DataTransfer.TryGetFiles()?

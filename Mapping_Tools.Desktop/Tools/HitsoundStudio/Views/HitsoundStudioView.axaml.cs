@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -7,6 +8,8 @@ using Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels;
 namespace Mapping_Tools.Desktop.Tools.HitsoundStudio.Views;
 
 /// <summary>Presents the Avalonia Hitsound Studio editor and export surface.</summary>
+[SuppressMessage("ReSharper", "UnusedMember.Local")]
+[SuppressMessage("ReSharper", "UnusedParameter.Local")]
 public sealed partial class HitsoundStudioView : UserControl
 {
     private readonly ButtonModifierCapture lowerButtonModifiers;

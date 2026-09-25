@@ -133,7 +133,7 @@ public abstract class Event : ITextLine
                     parentEvents.RemoveLast();
 
             // Add this event to the tree or return it if it's at the top level
-            var parent = parentEvents.Last.Value;
+            var parent = parentEvents.Last?.Value;
             if (parent == null)
             {
                 yield return ev;

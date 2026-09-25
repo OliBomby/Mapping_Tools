@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -8,6 +9,8 @@ using Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.Views;
 
 /// <summary>Hosts the Geometry Dashboard generator list and dashboard actions.</summary>
+[SuppressMessage("ReSharper", "UnusedMember.Local")]
+[SuppressMessage("ReSharper", "UnusedParameter.Local")]
 public sealed partial class GeometryDashboardView : UserControl
 {
     private readonly ButtonModifierCapture toggleInheritableButtonModifiers;

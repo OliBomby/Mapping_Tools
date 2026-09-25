@@ -21,7 +21,7 @@ public sealed class SymmetryGeneratorTests
 
         // Assert
         reflected.Should().NotBeNull();
-        reflected!.Child.X.Should().BeApproximately(5, 0.000001);
+        reflected.Child.X.Should().BeApproximately(5, 0.000001);
         reflected.Child.Y.Should().BeApproximately(-7, 0.000001);
     }
 
@@ -55,7 +55,7 @@ public sealed class SymmetryGeneratorTests
 
         // Assert
         reflected.Should().NotBeNull();
-        reflected!.Child.Centre.X.Should().BeApproximately(5, 0.000001);
+        reflected.Child.Centre.X.Should().BeApproximately(5, 0.000001);
         reflected.Child.Centre.Y.Should().BeApproximately(-7, 0.000001);
         reflected.Child.Radius.Should().Be(3);
     }
@@ -75,11 +75,11 @@ public sealed class SymmetryGeneratorTests
         // Assert
         forward.Should().NotBeNull();
         reverse.Should().NotBeNull();
-        forward!.Child.PositionVector.X.Should().BeApproximately(5, 0.000001);
+        forward.Child.PositionVector.X.Should().BeApproximately(5, 0.000001);
         forward.Child.PositionVector.Y.Should().BeApproximately(-7, 0.000001);
         forward.Child.DirectionVector.X.Should().BeApproximately(5, 0.000001);
         forward.Child.DirectionVector.Y.Should().BeApproximately(-2, 0.000001);
-        reverse!.Child.PositionVector.Should().Be(forward.Child.PositionVector);
+        reverse.Child.PositionVector.Should().Be(forward.Child.PositionVector);
         reverse.Child.DirectionVector.Should().Be(forward.Child.DirectionVector);
     }
 

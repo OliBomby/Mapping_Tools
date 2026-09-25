@@ -3,6 +3,7 @@ using Mapping_Tools.Core.Tools.PatternGallery.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
+using Mapping_Tools.Core.MathUtil;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Core.Tests.Tools.PatternGallery;
@@ -71,8 +72,8 @@ public sealed class PatternGalleryPlacerTests
 
         // Assert
         target.HitObjects.Select(item => item.Time).Should().Equal(1000, 3000, 5000, 7000);
-        target.HitObjects.Single(item => item.Time == 3000).Pos.X.Should().Be(256);
-        target.HitObjects.Single(item => item.Time == 1000).Pos.X.Should().Be(64);
+        target.HitObjects.Single(item => Precision.AlmostEquals(item.Time, 3000)).Pos.X.Should().Be(256);
+        target.HitObjects.Single(item => Precision.AlmostEquals(item.Time, 1000)).Pos.X.Should().Be(64);
     }
 
     [TestMethod]
@@ -88,7 +89,7 @@ public sealed class PatternGalleryPlacerTests
 
         // Assert
         target.HitObjects.Select(item => item.Time).Should().Equal(1000, 5000, 7000);
-        target.HitObjects.Single(item => item.Time == 5000).Pos.X.Should().Be(64);
+        target.HitObjects.Single(item => Precision.AlmostEquals(item.Time, 5000)).Pos.X.Should().Be(64);
     }
 
     [TestMethod]
@@ -146,7 +147,7 @@ public sealed class PatternGalleryPlacerTests
         placer.PlaceOsuPattern(pattern, target);
 
         // Assert
-        HitObject placed = target.HitObjects.Single(item => item.Time == 1000);
+        HitObject placed = target.HitObjects.Single(item => Precision.AlmostEquals(item.Time, 1000));
         placed.Pos.X.Should().BeApproximately(256, 0.001);
         placed.Pos.Y.Should().BeApproximately(292, 0.001);
     }

@@ -211,7 +211,7 @@ public sealed class HitsoundStudioEngineTests
             .BuildStandardTimingPoints(timing, [item]);
 
         // Assert
-        TimingPoint eventPoint = points.Single(point => point.Offset == 1000);
+        TimingPoint eventPoint = points.Single(point => Precision.AlmostEquals(point.Offset, 1000));
         eventPoint.Uninherited.Should().BeFalse();
         eventPoint.SampleSet.Should().Be(SampleSet.Normal);
         eventPoint.SampleIndex.Should().Be(12);

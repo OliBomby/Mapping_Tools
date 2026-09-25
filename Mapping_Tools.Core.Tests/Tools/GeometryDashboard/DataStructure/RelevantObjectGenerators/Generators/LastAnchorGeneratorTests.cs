@@ -21,7 +21,7 @@ public sealed class LastAnchorGeneratorTests
 
         // Assert
         point.Should().NotBeNull();
-        point!.Child.Should().Be(new Vector2(20, 0));
+        point.Child.Should().Be(new Vector2(20, 0));
         point.CustomTime.Should().Be(300);
     }
 

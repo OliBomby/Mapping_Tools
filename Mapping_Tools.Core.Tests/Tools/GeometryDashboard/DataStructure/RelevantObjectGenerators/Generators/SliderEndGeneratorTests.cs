@@ -24,7 +24,7 @@ public sealed class SliderEndGeneratorTests
 
         // Assert
         result.Should().NotBeNull();
-        result!.Child.Should().Be(new Vector2(114, 96));
+        result.Child.Should().Be(new Vector2(114, 96));
         result.CustomTime.Should().Be(1500);
     }
 

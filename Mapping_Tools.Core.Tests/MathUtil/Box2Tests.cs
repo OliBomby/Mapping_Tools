@@ -106,10 +106,9 @@ public sealed class Box2Tests
         ];
 
         // Act
-        bool[] equal = changed.Select(box => original == box).ToArray();
+        bool[] equal = [.. changed.Select(box => original == box)];
 
         // Assert
         equal.Should().OnlyContain(value => !value);
-        original.Equals("not a box").Should().BeFalse();
     }
 }

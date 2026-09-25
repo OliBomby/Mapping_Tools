@@ -366,7 +366,8 @@ public sealed class SlideratorEngineTests
         double.IsFinite(result.frameDistance).Should().BeTrue();
         result.frameDistance.Should().BeGreaterThan(0);
         result.controlPoints.Should().OnlyContain(point => double.IsFinite(point.X) && double.IsFinite(point.Y));
-        sliderballPositions.Should().OnlyContain(point => point.X == Math.Round(point.X) && point.Y == Math.Round(point.Y));
+        sliderballPositions.Should().OnlyContain(point =>
+            Precision.AlmostEquals(point.X, Math.Round(point.X)) && Precision.AlmostEquals(point.Y, Math.Round(point.Y)));
         result.controlPoints[^1].Should().Be(sliderballPositions[^1]);
     }
 

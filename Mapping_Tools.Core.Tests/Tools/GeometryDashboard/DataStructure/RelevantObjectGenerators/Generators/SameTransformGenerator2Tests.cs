@@ -21,7 +21,7 @@ public sealed class SameTransformGenerator2Tests
 
         // Assert
         next.Should().NotBeNull();
-        next!.Child.Should().Be(new Vector2(8, 11));
+        next.Child.Should().Be(new Vector2(8, 11));
     }
 
     [TestMethod]

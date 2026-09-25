@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -10,6 +11,8 @@ namespace Mapping_Tools.Desktop.Views.GetStarted;
 /// <summary>
 ///     Renders the Get started landing page inside the main shell.
 /// </summary>
+[SuppressMessage("ReSharper", "UnusedMember.Local")]
+[SuppressMessage("ReSharper", "UnusedParameter.Local")]
 public partial class GetStartedView : UserControl
 {
     /// <summary>Loads the compiled landing-page view.</summary>
