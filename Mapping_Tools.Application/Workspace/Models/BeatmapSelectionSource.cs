@@ -35,4 +35,9 @@ public enum BeatmapSelectionSource
     ///     The osu! integration reported its currently open beatmap.
     /// </summary>
     CurrentEditor,
+
+    /// <summary>
+    ///     An active osu!lazer external-edit folder supplied a temporary beatmap.
+    /// </summary>
+    LazerExternalEdit,
 }

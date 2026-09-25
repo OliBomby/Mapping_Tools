@@ -164,6 +164,18 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
             false);
     }
 
+    /// <summary>Gets or sets whether active osu!lazer external edits are detected automatically.</summary>
+    public bool AutoDetectLazerExternalEdit
+    {
+        get => settings.AutoDetectLazerExternalEdit;
+        set => SetProperty(
+            settings.AutoDetectLazerExternalEdit,
+            value,
+            settings,
+            static (settings, enabled) => settings.AutoDetectLazerExternalEdit = enabled,
+            false);
+    }
+
     /// <summary>Gets the available beatmap live-state reading modes.</summary>
     public IReadOnlyList<BeatmapLiveStateReadingMode> BeatmapLiveStateReadingModes { get; } =
         Enum.GetValues<BeatmapLiveStateReadingMode>();

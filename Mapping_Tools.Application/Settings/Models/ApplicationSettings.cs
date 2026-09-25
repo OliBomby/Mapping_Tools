@@ -43,6 +43,9 @@ public class ApplicationSettings
     /// <summary>Chooses how the current beatmap path is fetched.</summary>
     public CurrentBeatmapFetchingMode CurrentBeatmapFetching { get; set; } = CurrentBeatmapFetchingMode.MemoryRead;
 
+    /// <summary>Uses an active osu!lazer external-edit folder as the current beatmap and shell selection.</summary>
+    public bool AutoDetectLazerExternalEdit { get; set; } = true;
+
     /// <summary>Chooses how unsaved beatmap editor state is read.</summary>
     public BeatmapLiveStateReadingMode BeatmapLiveStateReading { get; set; } = BeatmapLiveStateReadingMode.EditorReader;
 

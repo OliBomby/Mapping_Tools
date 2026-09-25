@@ -12,6 +12,40 @@ namespace Mapping_Tools.Application.Tests.Workspace;
 [TestClass]
 public sealed class BeatmapWorkspaceTests
 {
+    [TestMethod]
+    public void SetSelection_WithTemporaryLazerBeatmap_DoesNotPersistRecentHistory()
+    {
+        // Arrange
+        ApplicationSettings settings = new();
+        BeatmapWorkspace workspace = CreateWorkspace(settings);
+
+        // Act
+        workspace.SetSelection(["temporary.osu"], BeatmapSelectionSource.LazerExternalEdit);
+
+        // Assert
+        workspace.SelectedPaths.Should().Equal("temporary.osu");
+        workspace.RecentMaps.Should().BeEmpty();
+    }
+
+    [TestMethod]
+    public void SelectedPaths_WhenTemporaryLazerFolderCloses_DoesNotWarnAboutMissingBeatmap()
+    {
+        // Arrange
+        UserNotificationService notifications = new();
+        List<UserNotification> published = [];
+        notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
+        BeatmapWorkspace workspace = CreateWorkspace(
+            new ApplicationSettings(), notifications: notifications);
+        workspace.SetSelection(["removed.osu"], BeatmapSelectionSource.LazerExternalEdit);
+
+        // Act
+        IReadOnlyList<string> selected = workspace.SelectedPaths;
+
+        // Assert
+        selected.Should().Equal("removed.osu");
+        published.Should().BeEmpty();
+    }
+
     private static readonly DateTimeOffset fixedNow =
         new(2026, 7, 25, 14, 30, 0, TimeSpan.Zero);
 

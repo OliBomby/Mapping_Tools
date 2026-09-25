@@ -170,6 +170,8 @@ internal static class DesktopServiceRegistration
             new GosumemoryCurrentBeatmapLocator(
                 provider.GetRequiredService<HttpClient>(),
                 provider.GetRequiredService<ApplicationSettings>()));
+        services.AddSingleton<LazerExternalEditBeatmapLocator>();
+        services.AddHostedService<LazerExternalEditSelectionHostedService>();
         services.AddSingleton<MtipcEditorReloadService>();
 
         if (OperatingSystem.IsWindows())
@@ -187,7 +189,8 @@ internal static class DesktopServiceRegistration
                     provider.GetRequiredService<ApplicationSettings>(),
                     provider.GetRequiredService<WindowsMemoryCurrentBeatmapLocator>(),
                     provider.GetRequiredService<MtipcCurrentBeatmapLocator>(),
-                    provider.GetRequiredService<GosumemoryCurrentBeatmapLocator>()));
+                    provider.GetRequiredService<GosumemoryCurrentBeatmapLocator>(),
+                    provider.GetRequiredService<LazerExternalEditBeatmapLocator>()));
             services.AddSingleton<IEditorReloadService>(provider =>
                 new ConfiguredEditorReloadService(
                     provider.GetRequiredService<ApplicationSettings>(),
@@ -206,7 +209,8 @@ internal static class DesktopServiceRegistration
                     provider.GetRequiredService<ApplicationSettings>(),
                     new UnsupportedPlatformCurrentBeatmapLocator(),
                     provider.GetRequiredService<MtipcCurrentBeatmapLocator>(),
-                    provider.GetRequiredService<GosumemoryCurrentBeatmapLocator>()));
+                    provider.GetRequiredService<GosumemoryCurrentBeatmapLocator>(),
+                    provider.GetRequiredService<LazerExternalEditBeatmapLocator>()));
             services.AddSingleton<IEditorReloadService>(provider =>
                 new ConfiguredEditorReloadService(
                     provider.GetRequiredService<ApplicationSettings>(),

@@ -26,6 +26,7 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
     private readonly ApplicationSettings settings;
     private readonly TimeProvider timeProvider;
     private string[] selectedPaths = [];
+    private bool selectedFromExternalEdit;
 
     /// <summary>
     ///     Creates workspace state backed by the same settings instance that will
@@ -68,7 +69,7 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
         {
             IReadOnlyList<string> paths = selectedPaths.ToArray();
             IReadOnlyList<string> missing = GetMissingSelectedPaths();
-            if (missing.Count > 0)
+            if (missing.Count > 0 && !selectedFromExternalEdit)
             {
                 _ = notifications.PublishAsync(
                     new UserNotification(
@@ -106,18 +107,20 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
             .Where(path => !string.IsNullOrWhiteSpace(path))
             .ToArray();
         selectedPaths = selection;
+        selectedFromExternalEdit = source == BeatmapSelectionSource.LazerExternalEdit;
 
         string displayDate = timeProvider
             .GetLocalNow()
             .DateTime
             .ToString(CultureInfo.CurrentCulture);
-        foreach (string path in selection)
-        {
-            settings.RecentMaps.RemoveAll(recent => string.Equals(recent.Path, path, StringComparison.Ordinal));
-            if (settings.RecentMaps.Count >= recent_map_limit) settings.RecentMaps.RemoveAt(settings.RecentMaps.Count - 1);
+        if (source != BeatmapSelectionSource.LazerExternalEdit)
+            foreach (string path in selection)
+            {
+                settings.RecentMaps.RemoveAll(recent => string.Equals(recent.Path, path, StringComparison.Ordinal));
+                if (settings.RecentMaps.Count >= recent_map_limit) settings.RecentMaps.RemoveAt(settings.RecentMaps.Count - 1);
 
-            settings.RecentMaps.Insert(0, new RecentBeatmap(path, displayDate));
-        }
+                settings.RecentMaps.Insert(0, new RecentBeatmap(path, displayDate));
+            }
 
         PublishSelection(source);
     }
@@ -127,6 +130,7 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
         BeatmapSelectionSource source = BeatmapSelectionSource.Programmatic)
     {
         selectedPaths = [];
+        selectedFromExternalEdit = false;
         PublishSelection(source);
     }
 

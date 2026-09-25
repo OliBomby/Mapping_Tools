@@ -152,6 +152,10 @@
 
             <StackPanel Margin="5,10,0,0">
                 <CheckBox HorizontalAlignment="Left"
+                          Content="Auto-detect osu!lazer external editing"
+                          IsChecked="{Binding AutoDetectLazerExternalEdit, Mode=TwoWay}"
+                          ToolTip.Tip="Select the beatmap in an active osu!lazer external-edit folder and use it for current-beatmap actions until the folder closes." />
+                <CheckBox HorizontalAlignment="Left"
                           Content="Make automatic backups"
                           IsChecked="{Binding MakeBackups, Mode=TwoWay}"
                           ToolTip.Tip="Automatically make a backup whenever you run a mapping tool." />
