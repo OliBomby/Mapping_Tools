@@ -472,3 +472,73 @@ jobs:
           generate_release_notes: true
           fail_on_unmatched_files: true
           files: release-assets/*
+
+  publish-nuget:
+    name: Publish NuGet packages
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Determine version from tag
+        shell: bash
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+
+      - name: Restore dependencies
+        run: dotnet restore Mapping_Tools.Desktop/Mapping_Tools.Desktop.csproj
+
+      - name: Pack application, core, desktop, and infrastructure
+        shell: bash
+        run: |
+          set -euo pipefail
+          package_dir="$RUNNER_TEMP/nuget-packages"
+          mkdir -p "$package_dir"
+
+          for project in Core Application Infrastructure Desktop; do
+            dotnet pack "Mapping_Tools.$project/Mapping_Tools.$project.csproj" \
+              --configuration Release \
+              --no-restore \
+              --output "$package_dir" \
+              -p:Version="$VERSION"
+
+            test -f "$package_dir/Mapping_Tools.$project.$VERSION.nupkg"
+          done
+
+      - name: Verify NuGet account
+        shell: bash
+        env:
+          NUGET_USER: ${{ vars.NUGET_USER }}
+        run: |
+          if [[ -z "$NUGET_USER" ]]; then
+            echo 'Set the NUGET_USER repository variable to the NuGet.org account with the trusted publishing policy.' >&2
+            exit 1
+          fi
+
+      - name: Log in to NuGet.org with OIDC
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ vars.NUGET_USER }}
+
+      - name: Push packages to NuGet.org
+        shell: bash
+        env:
+          NUGET_PUBLISH_TOKEN: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: |
+          set -euo pipefail
+          for project in Core Application Infrastructure Desktop; do
+            dotnet nuget push "$RUNNER_TEMP/nuget-packages/Mapping_Tools.$project.$VERSION.nupkg" \
+              --source https://api.nuget.org/v3/index.json \
+              --api-key "$NUGET_PUBLISH_TOKEN" \
+              --skip-duplicate
+          done

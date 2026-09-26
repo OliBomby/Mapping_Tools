@@ -15,6 +15,7 @@
       <HintPath>..\lib\EditorReader.dll</HintPath>
       <Private>true</Private>
     </Reference>
+    <None Include="..\lib\EditorReader.dll" Pack="true" PackagePath="runtimes/win/lib/net10.0/"/>
   </ItemGroup>
 
   <ItemGroup>
