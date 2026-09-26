@@ -645,6 +645,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
             DelegateToBpm = DelegateToBpm,
             RemoveSliderTicks = RemoveSliderTicks,
             AdvancedOptions = AdvancedOptions,
+            PreviewHitObject = PreviewHitObject.DeepCopy(),
         };
         project.TumourLayers = TumourLayers.Select(layer => layer.Snapshot()).ToList();
         return project;
@@ -684,6 +685,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         DelegateToBpm = project.DelegateToBpm;
         RemoveSliderTicks = project.RemoveSliderTicks;
         AdvancedOptions = project.AdvancedOptions;
+        PreviewHitObject = project.PreviewHitObject.DeepCopy();
 
         TumourLayers.Clear();
         foreach (var layer in project.TumourLayers)
