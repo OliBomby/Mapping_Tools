@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.GeometryDashboard;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
@@ -33,9 +34,9 @@ public sealed class GeometryDashboardServiceTests
     public async Task RefreshOnceAsync_WhenEditorSelectionChangesWithoutConfiguredRefresh_WaitsForConfiguredUpdate()
     {
         // Arrange
-        HitObject initialHitObject = new("64,96,1000,1,0,0:0:0:0:");
-        HitObject selectedHitObject = new("64,96,1000,1,0,0:0:0:0:");
-        HitObject finalHitObject = new("64,96,1000,1,0,0:0:0:0:");
+        HitObject initialHitObject = BeatmapEditingSessionTestFactory.DecodeHitObject("64,96,1000,1,0,0:0:0:0:");
+        HitObject selectedHitObject = BeatmapEditingSessionTestFactory.DecodeHitObject("64,96,1000,1,0,0:0:0:0:");
+        HitObject finalHitObject = BeatmapEditingSessionTestFactory.DecodeHitObject("64,96,1000,1,0,0:0:0:0:");
         var snapshots = new RuntimeStub(CreateRuntimeSnapshot(initialHitObject, 0, []), CreateRuntimeSnapshot(selectedHitObject, 0, [selectedHitObject]),
             CreateRuntimeSnapshot(finalHitObject, 1, [finalHitObject]));
         GeometryDashboardServiceOptions project = new();
@@ -60,8 +61,8 @@ public sealed class GeometryDashboardServiceTests
     public async Task RefreshOnceAsync_WhenVirtualPointsAreSelectedWithoutTimeChange_ReconcilesGeneratedChildrenImmediately()
     {
         // Arrange
-        HitObject first = new("64,96,1000,1,0,0:0:0:0:");
-        HitObject second = new("320,192,1000,1,0,0:0:0:0:");
+        HitObject first = BeatmapEditingSessionTestFactory.DecodeHitObject("64,96,1000,1,0,0:0:0:0:");
+        HitObject second = BeatmapEditingSessionTestFactory.DecodeHitObject("320,192,1000,1,0,0:0:0:0:");
         var snapshot = CreateRuntimeSnapshot([first, second], 0, []);
         var runtime = new RuntimeStub(snapshot) { RepeatedSnapshot = snapshot };
         var input = new InputStub(true);
@@ -115,7 +116,7 @@ public sealed class GeometryDashboardServiceTests
         bool processRunning, string expectedStatus)
     {
         // Arrange
-        var runtime = new RuntimeStub(CreateRuntimeSnapshot(new HitObject("64,96,1000,1,0,0:0:0:0:"), 0, []))
+        var runtime = new RuntimeStub(CreateRuntimeSnapshot(BeatmapEditingSessionTestFactory.DecodeHitObject("64,96,1000,1,0,0:0:0:0:"), 0, []))
         {
             IsProcessRunning = processRunning,
         };
@@ -152,7 +153,7 @@ public sealed class GeometryDashboardServiceTests
     public async Task RefreshOnceAsync_WithEditorSnapshot_ReportsRunningOrUnfocusedState(bool active)
     {
         // Arrange
-        var editor = CreateRuntimeSnapshot(new HitObject("64,96,1000,1,0,0:0:0:0:"), 0, []).Editor;
+        var editor = CreateRuntimeSnapshot(BeatmapEditingSessionTestFactory.DecodeHitObject("64,96,1000,1,0,0:0:0:0:"), 0, []).Editor;
         var snapshot = new GeometryDashboardRuntimeSnapshot(editor, active);
         using var service = CreateService(new InputStub(true), new RuntimeStub(snapshot));
 
@@ -204,7 +205,7 @@ public sealed class GeometryDashboardServiceTests
         // Arrange
         var input = new InputStub(true) { SnapHotkeyDown = true };
         var snapshot = CreateRuntimeSnapshot(
-            new HitObject("64,96,1000,1,0,0:0:0:0:"),
+            BeatmapEditingSessionTestFactory.DecodeHitObject("64,96,1000,1,0,0:0:0:0:"),
             0,
             []);
         var runtime = new RuntimeStub(snapshot) { RepeatedSnapshot = snapshot };
@@ -225,9 +226,9 @@ public sealed class GeometryDashboardServiceTests
     public async Task Start_WhenDraggingOffCenter_KeepsGrabOffsetAcrossSnappingTicks(bool multipleSelected)
     {
         // Arrange
-        HitObject held = new("64,96,1000,1,0,0:0:0:0:");
-        HitObject alsoHeld = new("140,96,1050,1,0,0:0:0:0:");
-        HitObject target = new("200,96,1100,1,0,0:0:0:0:");
+        HitObject held = BeatmapEditingSessionTestFactory.DecodeHitObject("64,96,1000,1,0,0:0:0:0:");
+        HitObject alsoHeld = BeatmapEditingSessionTestFactory.DecodeHitObject("140,96,1050,1,0,0:0:0:0:");
+        HitObject target = BeatmapEditingSessionTestFactory.DecodeHitObject("200,96,1100,1,0,0:0:0:0:");
         var snapshot = multipleSelected
             ? CreateRuntimeSnapshot([held, alsoHeld, target], 0, [held, alsoHeld])
             : CreateRuntimeSnapshot([held, target], 0, [held]);
@@ -254,9 +255,9 @@ public sealed class GeometryDashboardServiceTests
     public async Task Start_WhenDragMovesSinceLastRuntimeRead_RefreshesBeforeCapturingGrabOffset()
     {
         // Arrange
-        HitObject original = new("64,96,1000,1,0,0:0:0:0:");
-        HitObject moved = new("120,96,1000,1,0,0:0:0:0:");
-        HitObject target = new("200,96,1100,1,0,0:0:0:0:");
+        HitObject original = BeatmapEditingSessionTestFactory.DecodeHitObject("64,96,1000,1,0,0:0:0:0:");
+        HitObject moved = BeatmapEditingSessionTestFactory.DecodeHitObject("120,96,1000,1,0,0:0:0:0:");
+        HitObject target = BeatmapEditingSessionTestFactory.DecodeHitObject("200,96,1100,1,0,0:0:0:0:");
         var snapshot = CreateRuntimeSnapshot([original, target], 0, [original]);
         var liveSnapshot = CreateRuntimeSnapshot([moved, target], 0, [moved]);
         var runtime = new RuntimeStub(snapshot) { RepeatedSnapshot = snapshot };
@@ -287,9 +288,9 @@ public sealed class GeometryDashboardServiceTests
         UpdateMode updateMode)
     {
         // Arrange
-        HitObject original = new("64,96,1000,1,0,0:0:0:0:");
-        HitObject moved = new("120,96,1000,1,0,0:0:0:0:");
-        HitObject target = new("200,96,1100,1,0,0:0:0:0:");
+        HitObject original = BeatmapEditingSessionTestFactory.DecodeHitObject("64,96,1000,1,0,0:0:0:0:");
+        HitObject moved = BeatmapEditingSessionTestFactory.DecodeHitObject("120,96,1000,1,0,0:0:0:0:");
+        HitObject target = BeatmapEditingSessionTestFactory.DecodeHitObject("200,96,1100,1,0,0:0:0:0:");
         var liveSnapshot = CreateRuntimeSnapshot([moved, target], 0, [moved]);
         var runtime = new RuntimeStub(CreateRuntimeSnapshot([original, target], 0, []), liveSnapshot)
         {
@@ -325,7 +326,7 @@ public sealed class GeometryDashboardServiceTests
         bool mouseDown, bool selected, int cursorX)
     {
         // Arrange
-        HitObject hitObject = new("64,96,1000,1,0,0:0:0:0:");
+        HitObject hitObject = BeatmapEditingSessionTestFactory.DecodeHitObject("64,96,1000,1,0,0:0:0:0:");
         var snapshot = CreateRuntimeSnapshot(hitObject, 0, selected ? [hitObject] : []);
         var runtime = new RuntimeStub(snapshot) { RepeatedSnapshot = snapshot };
         var input = new InputStub(true)
@@ -350,8 +351,8 @@ public sealed class GeometryDashboardServiceTests
     public async Task Start_WhenMouseIsReleasedAndAnotherObjectIsGrabbed_ResetsAndRecapturesOffset()
     {
         // Arrange
-        HitObject held = new("64,96,1000,1,0,0:0:0:0:");
-        HitObject target = new("200,96,1100,1,0,0:0:0:0:");
+        HitObject held = BeatmapEditingSessionTestFactory.DecodeHitObject("64,96,1000,1,0,0:0:0:0:");
+        HitObject target = BeatmapEditingSessionTestFactory.DecodeHitObject("200,96,1100,1,0,0:0:0:0:");
         var snapshot = CreateRuntimeSnapshot([held, target], 0, [held]);
         var runtime = new RuntimeStub(snapshot) { RepeatedSnapshot = snapshot };
         var input = new InputStub(true)

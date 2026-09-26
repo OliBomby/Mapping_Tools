@@ -88,8 +88,8 @@ public class PathHelperTests
     public void CreatePathWithHints_StandardPath_MarksExpectedRedAnchors()
     {
         // Arrange
-        var slider =
-            new HitObject("42,179,300,2,0,B|135:234|219:171|219:171|194:100|194:100|266:53|345:48|405:117,1,500");
+        var slider = BeatmapTestData.DecodeHitObject(
+            "42,179,300,2,0,B|135:234|219:171|219:171|194:100|194:100|266:53|345:48|405:117,1,500");
 
         var sliderPath = slider.GetSliderPath();
 
@@ -114,9 +114,8 @@ public class PathHelperTests
     public void CreatePathWithHints_RepeatedRedAnchors_CreatesValidHints()
     {
         // Arrange
-        var slider =
-            new HitObject(
-                "42,179,300,2,0,B|42:179|42:179|42:179|42:179|135:234|219:171|219:171|219:171|219:171|194:100|194:100|194:100|194:100|194:100|194:100|266:53|345:48|405:117|405:117|405:117|405:117|405:117|405:117|405:117,1,450");
+        var slider = BeatmapTestData.DecodeHitObject(
+            "42,179,300,2,0,B|42:179|42:179|42:179|42:179|135:234|219:171|219:171|219:171|219:171|194:100|194:100|194:100|194:100|194:100|194:100|266:53|345:48|405:117|405:117|405:117|405:117|405:117|405:117|405:117,1,450");
 
         var sliderPath = slider.GetSliderPath();
 

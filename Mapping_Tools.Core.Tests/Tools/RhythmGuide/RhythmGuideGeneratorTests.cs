@@ -1,4 +1,5 @@
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Mapping_Tools.Core.Tools.RhythmGuide;
 using Mapping_Tools.Core.Tools.RhythmGuide.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -31,7 +32,7 @@ public sealed class RhythmGuideGeneratorTests
     }
 
     [TestMethod]
-    public void CreateNewMap_WithSource_RetainsRedlinesAndAppliesOutputMetadata()
+    public void CreateNewMap_Source_RetainsRedlinesAndAppliesOutputMetadata()
     {
         // Arrange
         var source = Load("standard-feature-rich.osu");
@@ -42,7 +43,11 @@ public sealed class RhythmGuideGeneratorTests
         };
 
         // Act
-        var result = RhythmGuideGenerator.CreateNewMap([source], options);
+        var result = RhythmGuideGenerator.CreateNewMap(
+            [source],
+            options,
+            new BeatmapDecoder(),
+            new BeatmapEncoder());
 
         // Assert
         result.Metadata["Version"].Value.Should().Be("Guide");
@@ -52,9 +57,9 @@ public sealed class RhythmGuideGeneratorTests
 
     private static Beatmap Load(string fileName)
     {
-        return new Beatmap(File.ReadAllLines(Path.Combine(
+        return new BeatmapDecoder().Decode(File.ReadAllText(Path.Combine(
             AppContext.BaseDirectory,
             "Resources",
-            fileName)).ToList());
+            fileName)));
     }
 }

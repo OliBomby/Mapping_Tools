@@ -54,12 +54,12 @@ public sealed class TimingHelperServiceTests
         {
             OpenBeatmapFactory = (path, _) =>
             {
-                return new BeatmapEditingSession(
-                    File.ReadAllLines(fixture).ToList(),
+                return BeatmapEditingSessionTestFactory.FromText(
+                    File.ReadAllText(fixture),
+                    path,
                     new NoOpTextFileStore(),
                     BeatmapEditingSource.Disk,
-                    [],
-                    path: path);
+                    []);
             },
         };
     }

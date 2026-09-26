@@ -14,7 +14,7 @@ public sealed class AnchorPointGeneratorTests
     {
         // Arrange
         AnchorPointGenerator generator = new();
-        RelevantHitObject circle = new(new HitObject("256,192,100,1,0,0:0:0:0:"));
+        RelevantHitObject circle = new(BeatmapTestData.DecodeHitObject("256,192,100,1,0,0:0:0:0:"));
 
         // Act
         IEnumerable<RelevantPoint>? points = generator.GetRelevantObjects(circle);
@@ -28,7 +28,8 @@ public sealed class AnchorPointGeneratorTests
     {
         // Arrange
         AnchorPointGenerator generator = new();
-        HitObject slider = new("0,0,100,2,0,L|10:0|20:0,1,20") { EndTime = 300 };
+        HitObject slider = BeatmapTestData.DecodeHitObject("0,0,100,2,0,L|10:0|20:0,1,20");
+        slider.EndTime = 300;
         RelevantHitObject relevantSlider = new(slider);
 
         // Act

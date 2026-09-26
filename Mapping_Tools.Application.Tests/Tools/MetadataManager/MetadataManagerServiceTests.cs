@@ -6,6 +6,7 @@ using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.MetadataManager;
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Mapping_Tools.Infrastructure.Files;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -55,7 +56,7 @@ public sealed class MetadataManagerServiceTests
         File.Exists(target).Should().BeFalse();
         backup.CreateRequests.Should().ContainSingle(request =>
             request.Paths.SequenceEqual(new[] { target }) && request.Reason == BeatmapBackupReason.Automatic && !request.Force);
-        Beatmap output = new((await File.ReadAllLinesAsync(result.ProcessedPaths[0])).ToList());
+        Beatmap output = new BeatmapDecoder().Decode(await File.ReadAllTextAsync(result.ProcessedPaths[0]));
         output.Metadata["Artist"].Value.Should().Be("E2E Fixture Artist");
         output.Metadata["Tags"].Value.Should().Be("e2e fixture");
         output.Metadata["BeatmapID"].Value.Should().Be("0");
@@ -77,12 +78,11 @@ public sealed class MetadataManagerServiceTests
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult(
-                new BeatmapEditingSession(
-                    path,
-                    fileStore,
-                    BeatmapEditingSource.Disk,
-                    []));
+            return Task.FromResult(BeatmapEditingSessionTestFactory.FromPath(
+                path,
+                fileStore,
+                BeatmapEditingSource.Disk,
+                []));
         }
 
         public Task<StoryboardEditingSession> OpenStoryboardAsync(

@@ -15,8 +15,8 @@ public sealed class HitsoundPreviewHelperEngineTests
     public void Apply_WithNearestZones_UpdatesOriginHitsoundsAndSampleFields()
     {
         // Arrange
-        HitObject first = new("64,96,1000,1,0,0:0:0:0:");
-        HitObject second = new("400,96,2000,1,0,0:0:0:0:");
+        HitObject first = BeatmapTestData.DecodeHitObject("64,96,1000,1,0,0:0:0:0:");
+        HitObject second = BeatmapTestData.DecodeHitObject("400,96,2000,1,0,0:0:0:0:");
         Beatmap beatmap = new(
             [first, second],
             [],
@@ -48,7 +48,7 @@ public sealed class HitsoundPreviewHelperEngineTests
     {
         // Arrange
         Beatmap beatmap = new(
-            [new HitObject("64,96,1000,1,0,0:0:0:0:")],
+            [BeatmapTestData.DecodeHitObject("64,96,1000,1,0,0:0:0:0:")],
             [],
             globalSv: 1.4);
 
@@ -66,7 +66,7 @@ public sealed class HitsoundPreviewHelperEngineTests
     public void Apply_WithEqualDistanceZones_PreservesZoneInputOrder()
     {
         // Arrange
-        HitObject selected = new("256,96,1000,1,0,0:0:0:0:");
+        HitObject selected = BeatmapTestData.DecodeHitObject("256,96,1000,1,0,0:0:0:0:");
         Beatmap beatmap = new(
             [selected],
             [],
@@ -94,11 +94,11 @@ public sealed class HitsoundPreviewHelperEngineTests
     public void Apply_WithSliderSpinnerAndHold_PreservesObjectSpecificSampleSemantics()
     {
         // Arrange
-        HitObject slider = new(
+        HitObject slider = BeatmapTestData.DecodeHitObject(
             "64,96,1000,2,0,B|164:96,1,100,0|0,0:0:0:0:");
-        HitObject spinner = new(
+        HitObject spinner = BeatmapTestData.DecodeHitObject(
             "256,192,2000,8,0,3000,0:0:0:0:");
-        HitObject hold = new(
+        HitObject hold = BeatmapTestData.DecodeHitObject(
             "256,192,4000,128,0,5000:0:0:0:0:");
         Beatmap beatmap = new(
             [slider, spinner, hold],
@@ -130,7 +130,7 @@ public sealed class HitsoundPreviewHelperEngineTests
     public void Apply_WhenCancelledBeforeMutation_LeavesBeatmapUnchanged()
     {
         // Arrange
-        HitObject selected = new("64,96,1000,1,0,0:0:0:0:");
+        HitObject selected = BeatmapTestData.DecodeHitObject("64,96,1000,1,0,0:0:0:0:");
         Beatmap beatmap = new(
             [selected],
             [],

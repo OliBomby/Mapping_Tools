@@ -1,4 +1,5 @@
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Core.Tests.BeatmapHelper;
@@ -7,36 +8,33 @@ namespace Mapping_Tools.Core.Tests.BeatmapHelper;
 public class StoryboardTests
 {
     [TestMethod]
-    public void ParseAndSerialize_PreservesStoryboardFileExactly()
+    public void DecodeAndEncode_StoryboardFixture_PreservesNormalizedContent()
     {
         // Arrange
         const string path = "Resources\\TestStoryboard.osb";
         string expectedContent = File.ReadAllText(path);
-        var storyboard = new StoryBoard(File.ReadAllLines(path).ToList());
+        var storyboard = new StoryboardDecoder().Decode(expectedContent);
 
         // Act
-        // Repository fixtures use LF line endings regardless of the host platform.
-        string actualContent = string.Join("\n", storyboard.GetLines());
+        string actualContent = new StoryboardEncoder().Encode(storyboard);
+        string expectedNormalized = expectedContent.Replace("\r\n", "\n").Replace('\r', '\n').TrimEnd('\n');
+        string actualNormalized = actualContent.Replace("\r\n", "\n").Replace('\r', '\n').TrimEnd('\n');
 
         // Assert
-        actualContent.Should().Be(expectedContent);
+        actualNormalized.Should().Be(expectedNormalized);
+        actualContent.Replace("\r\n", "").Should().NotContain("\n");
     }
 
     [TestMethod]
-    public void Parse_InvalidBreakTime_ThrowsBeatmapParsingException()
+    public void Decode_InvalidBreakTime_ThrowsBeatmapParsingException()
     {
         // Arrange
-        var lines = new List<string>
-        {
-            "[Events]",
-            "//Break Periods",
-            "2,not-a-time,2000",
-        };
+        const string text = "[Events]\r\n//Break Periods\r\n2,not-a-time,2000";
 
         // Act
-        Action act1 = () => _ = new StoryBoard(lines);
+        Action act = () => _ = new StoryboardDecoder().Decode(text);
 
         // Assert
-        act1.Should().Throw<BeatmapParsingException>();
+        act.Should().Throw<BeatmapParsingException>();
     }
 }

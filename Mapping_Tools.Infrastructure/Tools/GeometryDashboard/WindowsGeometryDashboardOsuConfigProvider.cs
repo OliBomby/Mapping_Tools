@@ -87,7 +87,8 @@ internal sealed class WindowsGeometryDashboardOsuConfigProvider
     private Dictionary<string, string> ReadValues(string path)
     {
         return new Dictionary<string, string>(
-            files.ReadAllLines(path)
+            files.ReadAllText(path)
+                .Split(["\r\n", "\n", "\r"], StringSplitOptions.None)
                 .Select(line => line.Split(['=', ':'], 2))
                 .Where(parts => parts.Length == 2)
                 .ToDictionary(

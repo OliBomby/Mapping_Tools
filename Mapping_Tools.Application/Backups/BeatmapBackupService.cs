@@ -7,6 +7,7 @@ using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 
 namespace Mapping_Tools.Application.Backups;
 
@@ -26,6 +27,7 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
     private readonly IBeatmapBackupStore store;
     private readonly ITextFileStore textFileStore;
     private readonly TimeProvider timeProvider;
+    private readonly IBeatmapDecoder beatmapDecoder;
 
     /// <summary>
     ///     Creates a process-lifetime backup coordinator whose serialization lock
@@ -36,18 +38,21 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
     /// <param name="reloadService">The osu! refresh port used only after a successful restore.</param>
     /// <param name="settings">The current backup directory, enablement, and retention policy.</param>
     /// <param name="timeProvider">Supplies deterministic local timestamps for filenames and tests.</param>
+    /// <param name="beatmapDecoder">Decodes beatmap metadata when validating a restore.</param>
     public BeatmapBackupService(
         IBeatmapBackupStore store,
         ITextFileStore textFileStore,
         IEditorReloadService reloadService,
         ApplicationSettings settings,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        IBeatmapDecoder beatmapDecoder)
     {
         this.store = store ?? throw new ArgumentNullException(nameof(store));
         this.textFileStore = textFileStore ?? throw new ArgumentNullException(nameof(textFileStore));
         this.reloadService = reloadService ?? throw new ArgumentNullException(nameof(reloadService));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         this.timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
+        this.beatmapDecoder = beatmapDecoder ?? throw new ArgumentNullException(nameof(beatmapDecoder));
     }
 
     /// <inheritdoc />
@@ -89,12 +94,12 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
                 .ConfigureAwait(false);
             List<BeatmapBackupArtifact> artifacts = [disk];
 
-            if (session.Source == BeatmapEditingSource.LiveEditor && !HasSameContentsAsDisk(session.Path, session.InitialBeatmapLines))
+            if (session.Source == BeatmapEditingSource.LiveEditor && !HasSameContentsAsDisk(session.Path, session.InitialBeatmapText))
                 // Save second copy with newest version if possible
                 artifacts.Add(
                     await WriteSnapshotAsync(
                             session.Path,
-                            session.InitialBeatmapLines,
+                            session.InitialBeatmapText,
                             reason,
                             createdAt,
                             true,
@@ -122,7 +127,8 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
         cancellationToken.ThrowIfCancellationRequested();
         if (!settings.MakePeriodicBackups) return null;
 
-        IReadOnlyList<string> lines = session.Beatmap.GetLines();
+        string serializedText = session.GetSerializedText();
+        IReadOnlyList<string> lines = ReadLines(serializedText);
         string hash = ComputeHash(lines);
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -137,7 +143,7 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
             // Save temp version
             var artifact = await WriteSnapshotAsync(
                     session.Path,
-                    lines,
+                    serializedText,
                     BeatmapBackupReason.Periodic,
                     createdAt,
                     false,
@@ -281,14 +287,6 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
         }
     }
 
-    private bool HasSameContentsAsDisk(
-        string path,
-        IReadOnlyList<string> serializedLines)
-    {
-        var diskLines = textFileStore.ReadAllLines(path);
-        return diskLines.SequenceEqual(serializedLines, StringComparer.Ordinal);
-    }
-
     private async Task<BeatmapBackupArtifact> CopySourceAsync(
         string sourcePath,
         BeatmapBackupReason reason,
@@ -321,7 +319,7 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
 
     private async Task<BeatmapBackupArtifact> WriteSnapshotAsync(
         string sourcePath,
-        IReadOnlyList<string> lines,
+        string serializedText,
         BeatmapBackupReason reason,
         DateTimeOffset createdAt,
         bool liveCompanion,
@@ -332,7 +330,7 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
             reason,
             createdAt,
             liveCompanion);
-        await store.WriteLinesAsync(destination, lines, cancellationToken)
+        await store.WriteLinesAsync(destination, ReadLines(serializedText), cancellationToken)
             .ConfigureAwait(false);
         return new BeatmapBackupArtifact(
             destination,
@@ -387,10 +385,12 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
 
         if (allowDifferentFilename) return;
 
-        BeatmapEditingSession backup = new(backupPath, textFileStore);
-        BeatmapEditingSession destination = new(destinationPath, textFileStore);
-        string backupFileName = backup.Beatmap.GetFileName();
-        string destinationFileName = destination.Beatmap.GetFileName();
+        string backupFileName = beatmapDecoder
+            .Decode(textFileStore.ReadAllText(backupPath))
+            .GetFileName();
+        string destinationFileName = beatmapDecoder
+            .Decode(textFileStore.ReadAllText(destinationPath))
+            .GetFileName();
         if (!string.Equals(
                 backupFileName,
                 destinationFileName,
@@ -444,5 +444,23 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
         }
 
         return Convert.ToHexString(hash.GetHashAndReset());
+    }
+
+    private bool HasSameContentsAsDisk(string path, string serializedText)
+    {
+        IReadOnlyList<string> diskLines = ReadLines(textFileStore.ReadAllText(path));
+        IReadOnlyList<string> serializedLines = ReadLines(serializedText);
+        return diskLines.SequenceEqual(serializedLines, StringComparer.Ordinal);
+    }
+
+    private static IReadOnlyList<string> ReadLines(string text)
+    {
+        using StringReader reader = new(text);
+        List<string> lines = [];
+        string? line;
+        while ((line = reader.ReadLine()) is not null)
+            lines.Add(line);
+
+        return lines;
     }
 }

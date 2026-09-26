@@ -125,13 +125,13 @@ public sealed class SliderCompletionatorServiceTests
         {
             OpenBeatmapFactory = (path, _) =>
             {
-                return new BeatmapEditingSession(
-                    File.ReadAllLines(fixture).ToList(),
+                return BeatmapEditingSessionTestFactory.FromText(
+                    File.ReadAllText(fixture),
+                    path,
                     new NoOpTextFileStore(),
                     BeatmapEditingSource.Disk,
                     [],
-                    liveEditorTime: editorTime,
-                    path: path);
+                    liveEditorTime: editorTime);
             },
         };
     }

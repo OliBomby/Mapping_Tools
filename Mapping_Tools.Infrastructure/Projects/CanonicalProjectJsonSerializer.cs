@@ -45,6 +45,7 @@ internal static class CanonicalProjectJsonSerializer
             Formatting = Formatting.Indented,
             Converters =
             [
+                new ProjectHitObjectJsonConverter(),
                 new CanonicalBeatDivisorConverter(),
                 new CanonicalGeneratorSettingsDictionaryConverter(),
                 new CanonicalGraphStateConverter(),

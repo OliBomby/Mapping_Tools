@@ -1,6 +1,7 @@
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.BeatmapHelper.Events;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Mapping_Tools.Core.Tools.PropertyTransformer;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -81,8 +82,8 @@ public sealed class PropertyTransformerEngineTests
     {
         // Arrange
         TimingPoint redline = new(0, 500, 4, SampleSet.Normal, 0, 100, true, false, false);
-        HitObject circle = new("256,192,1000,1,0,0:0:0:30:");
-        HitObject spinner = new("256,192,2000,8,0,3000,0:0:0:90:");
+        HitObject circle = BeatmapTestData.DecodeHitObject("256,192,1000,1,0,0:0:0:30:");
+        HitObject spinner = BeatmapTestData.DecodeHitObject("256,192,2000,8,0,3000,0:0:0:90:");
         Beatmap beatmap = new([circle, spinner], [redline], redline);
         PropertyTransformerEngineOptions options = new()
         {
@@ -156,7 +157,7 @@ public sealed class PropertyTransformerEngineTests
     {
         // Arrange
         Beatmap beatmap = Load("standard-feature-rich.osu");
-        Break breakPeriod = new("2,1000,2000");
+        Break breakPeriod = BeatmapTestData.DecodeBreak("2,1000,2000");
         Video video = new() { EventType = "Video", Filename = "background.mp4", StartTime = 500 };
         beatmap.BreakPeriods.Add(breakPeriod);
         beatmap.BackgroundAndVideoEvents.Add(video);
@@ -254,8 +255,8 @@ public sealed class PropertyTransformerEngineTests
 
     private static Beatmap Load(string fileName)
     {
-        return new Beatmap(
-            File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "Resources", fileName)).ToList());
+        return new BeatmapDecoder().Decode(
+            File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Resources", fileName)));
     }
 
     private sealed class RecordingProgress : IProgress<double>

@@ -6,6 +6,7 @@ using Mapping_Tools.Application.Tools.GeometryDashboard;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Settings.Models;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure;
@@ -28,7 +29,7 @@ public sealed class GeometryDashboardFixtureTests
         string beatmapPath = ResolveFixturePath(fixtureRoot, record.RootElement.GetProperty("sourceInput").GetString()!);
         string projectPath = ResolveFixturePath(fixtureRoot, record.RootElement.GetProperty("project").GetString()!);
         string expectedPath = ResolveFixturePath(fixtureRoot, record.RootElement.GetProperty("expectedOutput").GetString()!);
-        Beatmap beatmap = new((await File.ReadAllLinesAsync(beatmapPath)).ToList());
+        Beatmap beatmap = new BeatmapDecoder().Decode(await File.ReadAllTextAsync(beatmapPath));
         double[] visibleTimes = record.RootElement
             .GetProperty("visibleSourceObjects")
             .GetProperty("times")

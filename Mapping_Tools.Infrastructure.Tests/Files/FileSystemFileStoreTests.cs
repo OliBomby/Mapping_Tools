@@ -8,7 +8,7 @@ namespace Mapping_Tools.Infrastructure.Tests.Files;
 public sealed class PhysicalBeatmapsetFileSystemTextTests
 {
     [TestMethod]
-    public void WriteAllLines_WithOsuPath_UsesCrLfLineEndings()
+    public void WriteAllText_WithOsuPath_WritesCompleteText()
     {
         // Arrange
         string directory = Path.Combine(
@@ -16,16 +16,16 @@ public sealed class PhysicalBeatmapsetFileSystemTextTests
             $"MappingToolsFileStore-{Guid.NewGuid():N}");
         Directory.CreateDirectory(directory);
         string path = Path.Combine(directory, "map.osu");
+        const string text = "first\r\nsecond\r\n";
         PhysicalBeatmapsetFileSystem store = new();
 
         try
         {
             // Act
-            store.WriteAllLines(path, ["first", "second"]);
+            store.WriteAllText(path, text);
 
             // Assert
-            File.ReadAllBytes(path).Should().Equal(
-                Encoding.UTF8.GetBytes("first\r\nsecond\r\n"));
+            File.ReadAllBytes(path).Should().Equal(Encoding.UTF8.GetBytes(text));
         }
         finally
         {

@@ -16,13 +16,14 @@ public sealed class MapCleanerServiceTests
     public async Task CleanAsync_WithAcceptedFixture_UsesLiveStateAndBackupSaveBoundary()
     {
         // Arrange
-        BeatmapEditingSession editor = new(
-            (await File.ReadAllLinesAsync(Path.Combine(AppContext.BaseDirectory, "Fixtures", "Beatmaps", "standard-feature-rich.osu"))).ToList(),
+        BeatmapEditingSession editor = BeatmapEditingSessionTestFactory.FromText(
+            await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "Fixtures", "Beatmaps", "standard-feature-rich.osu")),
+            @"C:\set\map.osu",
             new NoOpTextFileStore
             {
                 ParentFolderResolver = _ => @"C:\set",
                 CombinePathResolver = Path.Combine,
-            }) { Path = @"C:\set\map.osu" };
+            });
         RecordingBeatmapEditingGateway gateway = new(editor);
         RecordingSamples samples = new();
         MapCleanerService service = new(

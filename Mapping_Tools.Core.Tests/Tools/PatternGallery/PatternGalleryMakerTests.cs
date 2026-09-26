@@ -16,8 +16,8 @@ public sealed class PatternGalleryMakerTests
         PatternGalleryMaker maker = new();
         List<HitObject> hitObjects =
         [
-            new("64,96,1000,1,0,0:0:0:0:"),
-            new("128,96,1250,1,0,0:0:0:0:"),
+            BeatmapTestData.DecodeHitObject("64,96,1000,1,0,0:0:0:0:"),
+            BeatmapTestData.DecodeHitObject("128,96,1250,1,0,0:0:0:0:"),
         ];
         List<TimingPoint> timingPoints =
             [new(0, 500, 4, SampleSet.Normal, 0, 70, true, false, false)];
@@ -46,7 +46,7 @@ public sealed class PatternGalleryMakerTests
         // Arrange
         PatternGalleryMaker maker = new();
         Beatmap beatmap = new(
-            [new HitObject("64,96,1000,1,0,0:0:0:0:")],
+            [BeatmapTestData.DecodeHitObject("64,96,1000,1,0,0:0:0:0:")],
             [],
             globalSv: 1.4);
 
@@ -63,9 +63,9 @@ public sealed class PatternGalleryMakerTests
     {
         // Arrange
         TimingPoint redline = new(0, 500, 4, SampleSet.Normal, 0, 70, true, false, false);
-        HitObject first = new("64,96,1000,1,0,0:0:0:0:");
-        HitObject selected = new("128,96,2000,1,0,0:0:0:0:");
-        HitObject last = new("192,96,3000,1,0,0:0:0:0:");
+        HitObject first = BeatmapTestData.DecodeHitObject("64,96,1000,1,0,0:0:0:0:");
+        HitObject selected = BeatmapTestData.DecodeHitObject("128,96,2000,1,0,0:0:0:0:");
+        HitObject last = BeatmapTestData.DecodeHitObject("192,96,3000,1,0,0:0:0:0:");
         Beatmap source = new([first, selected, last], [redline], redline);
         source.StoryboardLayerForeground.Add(new Sprite { FilePath = "image.png" });
         PatternGalleryMaker maker = new();
@@ -89,10 +89,10 @@ public sealed class PatternGalleryMakerTests
         TimingPoint redline = new(0, 500, 4, SampleSet.Normal, 0, 70, true, false, false);
         Beatmap source = new(
             [
-                new HitObject("64,96,500,1,0,0:0:0:0:"),
-                new HitObject("64,96,1000,1,0,0:0:0:0:"),
-                new HitObject("64,96,2000,1,0,0:0:0:0:"),
-                new HitObject("64,96,2500,1,0,0:0:0:0:"),
+                BeatmapTestData.DecodeHitObject("64,96,500,1,0,0:0:0:0:"),
+                BeatmapTestData.DecodeHitObject("64,96,1000,1,0,0:0:0:0:"),
+                BeatmapTestData.DecodeHitObject("64,96,2000,1,0,0:0:0:0:"),
+                BeatmapTestData.DecodeHitObject("64,96,2500,1,0,0:0:0:0:"),
             ],
             [redline],
             redline);

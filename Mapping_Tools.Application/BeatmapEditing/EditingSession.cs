@@ -1,115 +1,69 @@
 using Mapping_Tools.Application.Abstractions;
-using Mapping_Tools.Core.BeatmapHelper;
 
 namespace Mapping_Tools.Application.BeatmapEditing;
 
 /// <summary>
-///     Owns a mutable osu! text document for the duration of an editing session
-///     and provides the persistence operations used to load and save it.
+///     Provides persistence operations for a typed, mutable text document.
 /// </summary>
-public class EditingSession
+public abstract class EditingSession
 {
     /// <summary>
-    ///     Creates an editing session without loading a document.
+    ///     Creates a session backed by the supplied text-file store.
     /// </summary>
     /// <param name="fileStore">The persistence implementation used by the session.</param>
-    public EditingSession(ITextFileStore fileStore)
+    protected EditingSession(ITextFileStore fileStore)
     {
         FileStore = fileStore ?? throw new ArgumentNullException(nameof(fileStore));
     }
 
     /// <summary>
-    ///     Creates an editing session for an in-memory beatmap.
-    /// </summary>
-    /// <param name="lines">The serialized beatmap lines to parse.</param>
-    /// <param name="fileStore">The persistence implementation used when saving.</param>
-    public EditingSession(List<string> lines, ITextFileStore fileStore) : this(fileStore)
-    {
-        TextFile = new Beatmap(lines);
-    }
-
-    /// <summary>
-    ///     Loads and parses an osu! beatmap or storyboard from a path.
-    /// </summary>
-    /// <param name="path">The source file; <c>.osb</c> selects storyboard parsing.</param>
-    /// <param name="fileStore">The persistence implementation used to load and save.</param>
-    public EditingSession(string path, ITextFileStore fileStore) : this(fileStore)
-    {
-        Path = path;
-        var lines = ReadFile(path);
-        TextFile = path.EndsWith(".osb", StringComparison.OrdinalIgnoreCase)
-            ? new StoryBoard(lines)
-            : new Beatmap(lines);
-    }
-
-    /// <summary>
-    ///     Gets the persistence boundary used for all file and path operations.
+    ///     Gets the persistence boundary used for file and path operations.
     /// </summary>
     protected ITextFileStore FileStore { get; }
 
     /// <summary>
-    ///     Identifies the source file and the destination used by parameterless
-    ///     saves; assigning it retargets future writes without reloading the document.
+    ///     Identifies the source file and destination used by parameterless saves.
     /// </summary>
     public string Path { get; set; } = string.Empty;
 
     /// <summary>
-    ///     Owns the mutable parsed document that will be serialized on save. Its
-    ///     runtime type is <see cref="Beatmap" /> or <see cref="StoryBoard" />.
-    /// </summary>
-    public ITextFile TextFile { get; set; } = null!;
-
-    /// <summary>
-    ///     Reads a text file through the configured persistence boundary.
+    ///     Reads a complete text file through the configured persistence boundary.
     /// </summary>
     /// <param name="path">The source file.</param>
-    /// <returns>A mutable list containing the file's lines.</returns>
-    public List<string> ReadFile(string path)
+    /// <returns>The complete file contents.</returns>
+    public string ReadFile(string path)
     {
-        return new List<string>(FileStore.ReadAllLines(path));
+        return FileStore.ReadAllText(path);
     }
 
     /// <summary>
-    ///     Serializes the current document and writes it to a new path.
+    ///     Encodes and saves the current document to a new path without changing <see cref="Path" />.
     /// </summary>
-    /// <param name="path">The destination path. This does not change <see cref="Path" />.</param>
-    public virtual void SaveFile(string path)
+    /// <param name="path">The destination path.</param>
+    public void SaveFile(string path)
     {
-        var lines = TextFile.GetLines();
-        BeforeSave(lines);
-        FileStore.WriteAllLines(path, lines);
+        SaveFile(FileStore, path, EncodeDocument());
     }
 
     /// <summary>
-    ///     Writes caller-supplied serialized lines to <see cref="Path" />.
+    ///     Encodes and saves the current document to <see cref="Path" />.
     /// </summary>
-    /// <param name="lines">The complete serialized document.</param>
-    public virtual void SaveFile(List<string> lines)
+    public void SaveFile()
     {
-        BeforeSave(lines);
-        FileStore.WriteAllLines(Path, lines);
+        SaveFile(FileStore, Path, EncodeDocument());
     }
 
     /// <summary>
-    ///     Serializes the current document and writes it to <see cref="Path" />.
-    /// </summary>
-    public virtual void SaveFile()
-    {
-        var lines = TextFile.GetLines();
-        BeforeSave(lines);
-        FileStore.WriteAllLines(Path, lines);
-    }
-
-    /// <summary>
-    ///     Writes serialized lines with an explicitly supplied persistence implementation.
+    ///     Writes already serialized text through an explicitly supplied store.
     /// </summary>
     /// <param name="fileStore">The persistence implementation to use.</param>
     /// <param name="path">The destination file.</param>
-    /// <param name="lines">The complete serialized document.</param>
-    public static void SaveFile(ITextFileStore fileStore, string path, List<string> lines)
+    /// <param name="text">The complete serialized document.</param>
+    public static void SaveFile(ITextFileStore fileStore, string path, string text)
     {
         ArgumentNullException.ThrowIfNull(fileStore);
-        fileStore.WriteAllLines(path, lines);
+        ArgumentNullException.ThrowIfNull(text);
+        fileStore.WriteAllText(path, text);
     }
 
     /// <summary>
@@ -134,9 +88,13 @@ public class EditingSession
     }
 
     /// <summary>
-    ///     Allows specialized sessions to coordinate external state immediately
-    ///     before serialized lines are persisted.
+    ///     Encodes the session's current document for persistence.
     /// </summary>
-    /// <param name="lines">The exact lines that will be written.</param>
-    protected virtual void BeforeSave(List<string> lines) { }
+    /// <returns>The complete serialized document.</returns>
+    protected abstract string EncodeDocument();
+
+    internal string GetSerializedText()
+    {
+        return EncodeDocument();
+    }
 }

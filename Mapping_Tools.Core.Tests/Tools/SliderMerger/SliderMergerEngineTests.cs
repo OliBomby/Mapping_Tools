@@ -15,8 +15,8 @@ public sealed class SliderMergerEngineTests
     public void Merge_TwoCircles_CreatesSliderAndPreservesEndpointEdges()
     {
         // Arrange
-        HitObject first = new("64,64,0,1,2");
-        HitObject second = new("164,64,100,1,8");
+        HitObject first = BeatmapTestData.DecodeHitObject("64,64,0,1,2");
+        HitObject second = BeatmapTestData.DecodeHitObject("164,64,100,1,8");
         var beatmap = CreateBeatmap(first, second);
 
         // Act
@@ -40,16 +40,12 @@ public sealed class SliderMergerEngineTests
     public void Merge_TwoCircles_PreservesEachCircleSampleSetsOnItsSliderEdge()
     {
         // Arrange
-        HitObject first = new("64,64,0,1,2")
-        {
-            SampleSet = SampleSet.Drum,
-            AdditionSet = SampleSet.Soft,
-        };
-        HitObject second = new("164,64,100,1,8")
-        {
-            SampleSet = SampleSet.Normal,
-            AdditionSet = SampleSet.Drum,
-        };
+        HitObject first = BeatmapTestData.DecodeHitObject("64,64,0,1,2");
+        first.SampleSet = SampleSet.Drum;
+        first.AdditionSet = SampleSet.Soft;
+        HitObject second = BeatmapTestData.DecodeHitObject("164,64,100,1,8");
+        second.SampleSet = SampleSet.Normal;
+        second.AdditionSet = SampleSet.Drum;
         Beatmap beatmap = CreateBeatmap(first, second);
 
         // Act
@@ -68,8 +64,8 @@ public sealed class SliderMergerEngineTests
     public void Merge_TwoSliders_WithLinearConnectionAddsGapAndKeepsTypedSegments()
     {
         // Arrange
-        HitObject first = new("64,64,0,2,0,L|164:64,1,100");
-        HitObject second = new("200,64,100,2,0,L|300:64,1,100");
+        HitObject first = BeatmapTestData.DecodeHitObject("64,64,0,2,0,L|164:64,1,100");
+        HitObject second = BeatmapTestData.DecodeHitObject("200,64,100,2,0,L|300:64,1,100");
         var beatmap = CreateBeatmap(first, second);
         SliderMergerEngineOptions options = new()
         {
@@ -103,8 +99,8 @@ public sealed class SliderMergerEngineTests
             PathType.BSpline => "B4",
             _ => throw new ArgumentOutOfRangeException(nameof(pathType)),
         };
-        HitObject first = new($"64,64,0,2,0,{pathToken}|114:164|164:64,1,100");
-        HitObject second = new("200,64,100,1,0");
+        HitObject first = BeatmapTestData.DecodeHitObject($"64,64,0,2,0,{pathToken}|114:164|164:64,1,100");
+        HitObject second = BeatmapTestData.DecodeHitObject("200,64,100,1,0");
         var beatmap = CreateBeatmap(first, second);
 
         // Act
@@ -123,8 +119,8 @@ public sealed class SliderMergerEngineTests
     public void Merge_TruncatedCatmullWithSlider_ConnectsAtVisibleEndAfterCuttingSegment()
     {
         // Arrange
-        HitObject first = new("0,0,0,2,0,C|50:100|100:0,1,80");
-        HitObject second = new("120,0,100,2,0,L|170:0,1,50");
+        HitObject first = BeatmapTestData.DecodeHitObject("0,0,0,2,0,C|50:100|100:0,1,80");
+        HitObject second = BeatmapTestData.DecodeHitObject("120,0,100,2,0,L|170:0,1,50");
         Beatmap beatmap = CreateBeatmap(first, second);
         SliderMergerEngineOptions options = new()
         {
@@ -147,9 +143,9 @@ public sealed class SliderMergerEngineTests
     public void Merge_TruncatedMixedSlider_KeepsCompletedPerfectSegment()
     {
         // Arrange
-        HitObject first = new("0,0,0,2,0,L|100:0|P|100:0|150:50|200:0|L|200:0|300:0,1,300");
+        HitObject first = BeatmapTestData.DecodeHitObject("0,0,0,2,0,L|100:0|P|100:0|150:50|200:0|L|200:0|300:0,1,300");
         first.PixelLength = first.GetSliderPath(true).Distance - 50;
-        HitObject second = new("330,0,100,2,0,L|380:0,1,50");
+        HitObject second = BeatmapTestData.DecodeHitObject("330,0,100,2,0,L|380:0,1,50");
         Beatmap beatmap = CreateBeatmap(first, second);
         SliderMergerEngineOptions options = new()
         {
@@ -172,15 +168,13 @@ public sealed class SliderMergerEngineTests
     public void Merge_SliderAndCircle_RetainsExistingEdgeSamplesAndNormalizesRepeat()
     {
         // Arrange
-        HitObject first = new("64,64,0,2,0,L|164:64,2,100");
+        HitObject first = BeatmapTestData.DecodeHitObject("64,64,0,2,0,L|164:64,2,100");
         first.EdgeHitsounds = [2, 4, 8];
         first.EdgeSampleSets = [SampleSet.Drum, SampleSet.Soft, SampleSet.Normal];
         first.EdgeAdditionSets = [SampleSet.Soft, SampleSet.Normal, SampleSet.Drum];
-        HitObject second = new("200,64,100,1,8")
-        {
-            SampleSet = SampleSet.Drum,
-            AdditionSet = SampleSet.Soft,
-        };
+        HitObject second = BeatmapTestData.DecodeHitObject("200,64,100,1,8");
+        second.SampleSet = SampleSet.Drum;
+        second.AdditionSet = SampleSet.Soft;
         var beatmap = CreateBeatmap(first, second);
 
         // Act
@@ -201,12 +195,10 @@ public sealed class SliderMergerEngineTests
     public void Merge_CircleAndSlider_RetainsExistingEdgeDataWhenSourceIsIncomplete()
     {
         // Arrange
-        HitObject first = new("64,64,0,1,2")
-        {
-            SampleSet = SampleSet.Soft,
-            AdditionSet = SampleSet.Drum,
-        };
-        HitObject second = new("164,64,100,2,0,L|264:64,1,100");
+        HitObject first = BeatmapTestData.DecodeHitObject("64,64,0,1,2");
+        first.SampleSet = SampleSet.Soft;
+        first.AdditionSet = SampleSet.Drum;
+        HitObject second = BeatmapTestData.DecodeHitObject("164,64,100,2,0,L|264:64,1,100");
         second.EdgeHitsounds = [4];
         second.EdgeSampleSets = [];
         second.EdgeAdditionSets = [];
@@ -230,9 +222,9 @@ public sealed class SliderMergerEngineTests
     public void Merge_CircleSliderCircle_RetainsSurvivingSliderEdgeDataAndContinuesChain()
     {
         // Arrange
-        HitObject first = new("64,64,0,1,2");
-        HitObject second = new("164,64,100,2,0,L|264:64,1,100");
-        HitObject third = new("264,64,200,1,8");
+        HitObject first = BeatmapTestData.DecodeHitObject("64,64,0,1,2");
+        HitObject second = BeatmapTestData.DecodeHitObject("164,64,100,2,0,L|264:64,1,100");
+        HitObject third = BeatmapTestData.DecodeHitObject("264,64,200,1,8");
         var beatmap = CreateBeatmap(first, second, third);
 
         // Act
@@ -252,8 +244,8 @@ public sealed class SliderMergerEngineTests
     public void Merge_WithPlayableEndMatching_UsesSliderGeometry()
     {
         // Arrange
-        HitObject first = new("64,64,0,2,0,L|264:64,1,100");
-        HitObject second = new("164,64,100,1,0");
+        HitObject first = BeatmapTestData.DecodeHitObject("64,64,0,2,0,L|264:64,1,100");
+        HitObject second = BeatmapTestData.DecodeHitObject("164,64,100,1,0");
         var beatmap = CreateBeatmap(first, second);
         SliderMergerEngineOptions options = new() { Leniency = 0, MergeOnSliderEnd = true };
 
@@ -268,8 +260,8 @@ public sealed class SliderMergerEngineTests
     public void Merge_WithNegativeLeniency_ThrowsBeforeMutation()
     {
         // Arrange
-        HitObject first = new("64,64,0,1,0");
-        HitObject second = new("164,64,100,1,0");
+        HitObject first = BeatmapTestData.DecodeHitObject("64,64,0,1,0");
+        HitObject second = BeatmapTestData.DecodeHitObject("164,64,100,1,0");
         var beatmap = CreateBeatmap(first, second);
 
         // Act
@@ -287,8 +279,8 @@ public sealed class SliderMergerEngineTests
     public void Merge_WithObjectsOutsideLeniency_LeavesBothCirclesUntouched()
     {
         // Arrange
-        HitObject first = new("64,64,0,1,2");
-        HitObject second = new("164,64,100,1,8");
+        HitObject first = BeatmapTestData.DecodeHitObject("64,64,0,1,2");
+        HitObject second = BeatmapTestData.DecodeHitObject("164,64,100,1,8");
         Beatmap beatmap = CreateBeatmap(first, second);
 
         // Act
@@ -306,8 +298,8 @@ public sealed class SliderMergerEngineTests
     public void Merge_TwoCirclesWithLinearOnLinear_ProducesStraightLinearSlider()
     {
         // Arrange
-        HitObject first = new("64,64,0,1,2");
-        HitObject second = new("164,64,100,1,8");
+        HitObject first = BeatmapTestData.DecodeHitObject("64,64,0,1,2");
+        HitObject second = BeatmapTestData.DecodeHitObject("164,64,100,1,8");
         Beatmap beatmap = CreateBeatmap(first, second);
 
         // Act
@@ -325,8 +317,8 @@ public sealed class SliderMergerEngineTests
     public void Merge_TwoSlidersWithMoveConnection_TranslatesSecondPathWithoutAddingGapLength()
     {
         // Arrange
-        HitObject first = new("64,64,0,2,0,L|164:64,1,100");
-        HitObject second = new("200,64,100,2,0,L|300:64,1,100");
+        HitObject first = BeatmapTestData.DecodeHitObject("64,64,0,2,0,L|164:64,1,100");
+        HitObject second = BeatmapTestData.DecodeHitObject("200,64,100,2,0,L|300:64,1,100");
         Beatmap beatmap = CreateBeatmap(first, second);
         SliderMergerEngineOptions options = new()
         {
@@ -348,8 +340,8 @@ public sealed class SliderMergerEngineTests
     public void Merge_TwoLinearSlidersWithLinearOnLinear_RemainsLinearAndRemovesJoinDuplicates()
     {
         // Arrange
-        HitObject first = new("64,64,0,2,0,L|164:64,1,100");
-        HitObject second = new("200,64,100,2,0,L|300:64,1,100");
+        HitObject first = BeatmapTestData.DecodeHitObject("64,64,0,2,0,L|164:64,1,100");
+        HitObject second = BeatmapTestData.DecodeHitObject("200,64,100,2,0,L|300:64,1,100");
         Beatmap beatmap = CreateBeatmap(first, second);
         SliderMergerEngineOptions options = new()
         {
@@ -374,8 +366,8 @@ public sealed class SliderMergerEngineTests
     public void Merge_CoincidentCircles_RemovesSecondWithoutCreatingZeroLengthSlider()
     {
         // Arrange
-        HitObject first = new("64,64,0,1,2");
-        HitObject second = new("64,64,100,1,8");
+        HitObject first = BeatmapTestData.DecodeHitObject("64,64,0,1,2");
+        HitObject second = BeatmapTestData.DecodeHitObject("64,64,100,1,8");
         Beatmap beatmap = CreateBeatmap(first, second);
 
         // Act
@@ -395,14 +387,12 @@ public sealed class SliderMergerEngineTests
     public void Merge_UnsupportedObjectBetweenCircles_PreventsMergingAcrossIt()
     {
         // Arrange
-        HitObject first = new("64,64,0,1,2");
-        HitObject unsupported = new("64,64,100,1,0")
-        {
-            IsCircle = false,
-            IsSlider = false,
-            IsSpinner = true,
-        };
-        HitObject last = new("64,64,200,1,8");
+        HitObject first = BeatmapTestData.DecodeHitObject("64,64,0,1,2");
+        HitObject unsupported = BeatmapTestData.DecodeHitObject("64,64,100,1,0");
+        unsupported.IsCircle = false;
+        unsupported.IsSlider = false;
+        unsupported.IsSpinner = true;
+        HitObject last = BeatmapTestData.DecodeHitObject("64,64,200,1,8");
         Beatmap beatmap = CreateBeatmap(first, unsupported, last);
 
         // Act
@@ -446,8 +436,8 @@ public sealed class SliderMergerEngineTests
     public void Merge_WithNonFiniteLeniency_ThrowsBeforeMutation()
     {
         // Arrange
-        HitObject first = new("64,64,0,1,2");
-        HitObject second = new("164,64,100,1,8");
+        HitObject first = BeatmapTestData.DecodeHitObject("64,64,0,1,2");
+        HitObject second = BeatmapTestData.DecodeHitObject("164,64,100,1,8");
         Beatmap beatmap = CreateBeatmap(first, second);
 
         // Act

@@ -29,7 +29,7 @@ public sealed class ObjectVisualiserControlTests
     public void HitObjectProperty_AcceptsOneDomainObjectWithoutSceneState()
     {
         // Arrange
-        HitObject slider = new("100,200,0,2,0,L|200:200,1,100");
+        HitObject slider = DecodeHitObject("100,200,0,2,0,L|200:200,1,100");
         ObjectVisualiserControl control = new();
 
         // Act

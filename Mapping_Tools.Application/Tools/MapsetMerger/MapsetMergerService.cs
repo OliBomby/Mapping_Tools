@@ -6,6 +6,7 @@ using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Tools.MapsetMerger.Contracts;
 using Mapping_Tools.Application.Tools.MapsetMerger.Models;
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.MapsetMerger;
 using Mapping_Tools.Core.Tools.MapsetMerger.Models;
@@ -23,16 +24,24 @@ public sealed class MapsetMergerService : IMapsetMergerService
 
     private readonly IBeatmapEditingGateway editingGateway;
     private readonly IBeatmapsetFileSystem fileSystem;
+    private readonly IBeatmapEncoder beatmapEncoder;
+    private readonly IStoryboardEncoder storyboardEncoder;
 
     /// <summary>Creates the export service.</summary>
     /// <param name="editingGateway">Loads disk-only beatmaps and storyboards.</param>
     /// <param name="fileSystem">Reads and writes mapset components and owns staged output mutation.</param>
+    /// <param name="beatmapEncoder">Encodes beatmaps for export.</param>
+    /// <param name="storyboardEncoder">Encodes storyboards for export.</param>
     public MapsetMergerService(
         IBeatmapEditingGateway editingGateway,
-        IBeatmapsetFileSystem fileSystem)
+        IBeatmapsetFileSystem fileSystem,
+        IBeatmapEncoder beatmapEncoder,
+        IStoryboardEncoder storyboardEncoder)
     {
         this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
         this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+        this.beatmapEncoder = beatmapEncoder ?? throw new ArgumentNullException(nameof(beatmapEncoder));
+        this.storyboardEncoder = storyboardEncoder ?? throw new ArgumentNullException(nameof(storyboardEncoder));
     }
 
     /// <inheritdoc />
@@ -290,10 +299,9 @@ public sealed class MapsetMergerService : IMapsetMergerService
         Beatmap beatmap)
     {
         // Save beatmap in new location with unique diffname
-        EditingSession.SaveFile(
-            fileSystem,
+        fileSystem.WriteAllText(
             transaction.GetStagedPath(relativePath),
-            beatmap.GetLines());
+            beatmapEncoder.Encode(beatmap));
     }
 
     private void WriteStoryboard(
@@ -301,8 +309,9 @@ public sealed class MapsetMergerService : IMapsetMergerService
         string relativePath,
         StoryBoard storyboard)
     {
-        StoryboardEditingSession editor = new(storyboard.GetLines(), fileSystem);
-        editor.SaveFile(transaction.GetStagedPath(relativePath));
+        fileSystem.WriteAllText(
+            transaction.GetStagedPath(relativePath),
+            storyboardEncoder.Encode(storyboard));
     }
 
     private static string ResolveOutputPath(string requestedPath, ISet<string> usedOutputPaths)

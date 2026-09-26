@@ -1,5 +1,6 @@
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Core.Tests.BeatmapHelper;
@@ -8,16 +9,21 @@ namespace Mapping_Tools.Core.Tests.BeatmapHelper;
 public class BeatmapTests
 {
     [TestMethod]
-    public void GetLines_WithMixedSlider_UsesBeatmapFormatVersion()
+    public void Encode_WithMixedSlider_UsesBeatmapFormatVersion()
     {
         // Arrange
-        HitObject hitObject = new("64,96,1200,2,0,P|128:160|192:96|L|256:96,1,240");
+        HitObject hitObject = BeatmapTestData.DecodeHitObject("64,96,1200,2,0,P|128:160|192:96|L|256:96,1,240");
         Beatmap beatmap = new() { Version = 14, HitObjects = [hitObject] };
+        BeatmapEncoder encoder = new();
 
         // Act
-        string legacyLine = beatmap.GetLines().Single(line => line.StartsWith("64,96,1200,"));
+        string legacyLine = encoder.Encode(beatmap)
+            .Split("\r\n", StringSplitOptions.RemoveEmptyEntries)
+            .Single(line => line.StartsWith("64,96,1200,"));
         beatmap.Version = 128;
-        string lazerLine = beatmap.GetLines().Single(line => line.StartsWith("64,96,1200,"));
+        string lazerLine = encoder.Encode(beatmap)
+            .Split("\r\n", StringSplitOptions.RemoveEmptyEntries)
+            .Single(line => line.StartsWith("64,96,1200,"));
 
         // Assert
         legacyLine.Split(',')[5].Should().StartWith("B|");
@@ -30,32 +36,33 @@ public class BeatmapTests
     [DataRow("ComplicatedTestMap.osu")]
     [DataRow("Camellia - Body F10ating in the Zero Gravity Space (Orange_) [Nonsubmersible].osu")]
     [DataRow("THE ORAL CIGARETTES - GET BACK (Nikakis) [Sotarks_ Cataclysm].osu")]
-    public void BeatmapDocument_ParsesAndRoundTripsFixture(string filename)
+    public void DecodeAndEncode_Fixture_PreservesNormalizedDocument(string filename)
     {
         // Arrange
         string path = Path.Combine(AppContext.BaseDirectory, "Resources", filename);
-        string expected = File.ReadAllText(path);
+        string[] expectedLines = File.ReadAllLines(path);
 
         // Act
-        var beatmap = new Beatmap([.. File.ReadAllLines(path)]);
-        // Repository fixtures use LF line endings regardless of the host platform.
-        string actual = string.Join("\r\n", beatmap.GetLines());
+        var beatmap = new BeatmapDecoder().Decode(File.ReadAllText(path));
+        string actual = new BeatmapEncoder().Encode(beatmap);
+        string[] actualLines = actual.TrimEnd('\r', '\n').Split("\r\n", StringSplitOptions.None);
 
         // Assert
-        actual.Should().Be(expected);
+        actualLines.Should().Equal(expectedLines);
+        actual.Replace("\r\n", "").Should().NotContain("\n");
     }
 
     [DataTestMethod]
     [DataRow("catch.osu", 2)]
     [DataRow("mania.osu", 3)]
     [DataRow("taiko.osu", 1)]
-    public void BeatmapDocument_ParsesAdditionalModeFixture(string filename, int expectedMode)
+    public void Decode_AdditionalModeFixture_ParsesMode(string filename, int expectedMode)
     {
         // Arrange
         string path = Path.Combine(AppContext.BaseDirectory, "Resources", filename);
 
         // Act
-        var beatmap = new Beatmap([.. File.ReadAllLines(path)]);
+        var beatmap = new BeatmapDecoder().Decode(File.ReadAllText(path));
 
         // Assert
         beatmap.General["Mode"].IntValue.Should().Be(expectedMode);
@@ -81,9 +88,9 @@ public class BeatmapTests
     {
         // Arrange
         var beatmap = new Beatmap([
-            new HitObject("64,96,1000,5,0,0:0:0:0:"),
-            new HitObject("128,96,1100,1,0,0:0:0:0:"),
-            new HitObject("192,96,1200,1,0,0:0:0:0:"),
+            BeatmapTestData.DecodeHitObject("64,96,1000,5,0,0:0:0:0:"),
+            BeatmapTestData.DecodeHitObject("128,96,1100,1,0,0:0:0:0:"),
+            BeatmapTestData.DecodeHitObject("192,96,1200,1,0,0:0:0:0:"),
         ], [], globalSv: 1.4);
 
         // Act
@@ -97,9 +104,9 @@ public class BeatmapTests
     public void GetBookmarkedObjects_IncludesObjectsAtBothLeniencyBoundaries()
     {
         // Arrange
-        HitObject circle = new("64,96,1000,1,0,0:0:0:0:");
-        HitObject hold = new("128,192,2000,128,0,3000:0:0:0:0:");
-        HitObject unmarked = new("192,96,4000,1,0,0:0:0:0:");
+        HitObject circle = BeatmapTestData.DecodeHitObject("64,96,1000,1,0,0:0:0:0:");
+        HitObject hold = BeatmapTestData.DecodeHitObject("128,192,2000,128,0,3000:0:0:0:0:");
+        HitObject unmarked = BeatmapTestData.DecodeHitObject("192,96,4000,1,0,0:0:0:0:");
         Beatmap beatmap = new([circle, hold, unmarked], [], globalSv: 1.4);
         beatmap.Bookmarks = [995.4, 3004.6];
 
@@ -115,9 +122,9 @@ public class BeatmapTests
     public void GetHitObjectsWithRangeInRange_IncludesObjectsThatOverlapEitherBoundary()
     {
         // Arrange
-        HitObject before = new("64,96,1000,1,0,0:0:0:0:");
-        HitObject overlapping = new("128,192,2000,128,0,3000:0:0:0:0:");
-        HitObject after = new("192,96,4000,1,0,0:0:0:0:");
+        HitObject before = BeatmapTestData.DecodeHitObject("64,96,1000,1,0,0:0:0:0:");
+        HitObject overlapping = BeatmapTestData.DecodeHitObject("128,192,2000,128,0,3000:0:0:0:0:");
+        HitObject after = BeatmapTestData.DecodeHitObject("192,96,4000,1,0,0:0:0:0:");
         Beatmap beatmap = new([before, overlapping, after], [], globalSv: 1.4);
 
         // Act
@@ -131,8 +138,8 @@ public class BeatmapTests
     public void UpdateStacking_OnCoincidentCircles_OffsetsEarlierCircleByOneStack()
     {
         // Arrange
-        HitObject first = new("64,96,1000,1,0,0:0:0:0:");
-        HitObject second = new("64,96,1050,1,0,0:0:0:0:");
+        HitObject first = BeatmapTestData.DecodeHitObject("64,96,1000,1,0,0:0:0:0:");
+        HitObject second = BeatmapTestData.DecodeHitObject("64,96,1050,1,0,0:0:0:0:");
         Beatmap beatmap = new([first, second], [], globalSv: 1.4);
 
         // Act
@@ -151,7 +158,7 @@ public class BeatmapTests
         // Arrange
         TimingPoint redline = new(0, 500, 4, SampleSet.Normal,
             0, 100, true, false, false);
-        HitObject originalObject = new("64,96,1000,1,0,0:0:0:0:");
+        HitObject originalObject = BeatmapTestData.DecodeHitObject("64,96,1000,1,0,0:0:0:0:");
         Beatmap original = new([originalObject], [redline], redline);
 
         // Act

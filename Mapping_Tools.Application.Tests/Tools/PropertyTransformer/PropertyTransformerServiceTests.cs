@@ -20,12 +20,10 @@ public sealed class PropertyTransformerServiceTests
             "Fixtures",
             "Beatmaps",
             "standard-feature-rich.osu");
-        BeatmapEditingSession editor = new(
-            (await File.ReadAllLinesAsync(fixture)).ToList(),
-            new PhysicalBeatmapsetFileSystem())
-        {
-            Path = fixture,
-        };
+        BeatmapEditingSession editor = BeatmapEditingSessionTestFactory.FromText(
+            await File.ReadAllTextAsync(fixture),
+            fixture,
+            new PhysicalBeatmapsetFileSystem());
         RecordingBeatmapEditingGateway gateway = new(editor);
         PropertyTransformerService service = new(gateway, new ApplicationSettings());
         PropertyTransformerServiceOptions options = new()
@@ -60,12 +58,12 @@ public sealed class PropertyTransformerServiceTests
             "Fixtures",
             "Beatmaps",
             "standard-feature-rich.osu");
-        BeatmapEditingSession editor = new(
-            (await File.ReadAllLinesAsync(fixture)).ToList(),
+        BeatmapEditingSession editor = BeatmapEditingSessionTestFactory.FromText(
+            await File.ReadAllTextAsync(fixture),
+            fixture,
             new PhysicalBeatmapsetFileSystem(),
             BeatmapEditingSource.LiveEditor,
-            [],
-            path: fixture);
+            []);
         RecordingBeatmapEditingGateway gateway = new(editor);
         PropertyTransformerService service = new(
             gateway,

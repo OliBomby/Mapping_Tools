@@ -15,7 +15,7 @@ namespace Mapping_Tools.Core.BeatmapHelper;
 ///     hitsound, and slider data.
 /// </summary>
 [JsonObject(MemberSerialization.OptIn)]
-public class HitObject : ITextLine, IComparable<HitObject>
+public class HitObject : IComparable<HitObject>
 {
     /// <summary>
     ///     Timing changes inside the slider body that affect slide, whistle, or tick samples.
@@ -33,29 +33,6 @@ public class HitObject : ITextLine, IComparable<HitObject>
     /// </summary>
     public HitObject() { }
 
-    /// <summary>
-    ///     Parses one comma-separated line from an osu! <c>[HitObjects]</c> section.
-    /// </summary>
-    /// <param name="line">The complete hit-object line, including type-specific fields and sample extras.</param>
-    public HitObject(string line)
-    {
-        // Example lines:
-        // 74,183,57308,2,0,B|70:236,1,53.9999983520508,4|0,0:3|0:0,0:0:0:0:
-        // 295,347,57458,5,2,0:0:0:0:
-        // Mania:
-        // 128,192,78,1,0,0:0:0:0:
-        // 213,192,78,128,0,378:0:0:0:0:
-
-        SetLine(line);
-    }
-
-    /// <summary>Parses a hit-object line according to its beatmap format version.</summary>
-    /// <param name="line">The complete hit-object line.</param>
-    /// <param name="formatVersion">The containing beatmap's file format version.</param>
-    public HitObject(string line, int formatVersion)
-    {
-        SetLine(line, formatVersion);
-    }
 
     /// <summary>
     ///     Creates a hit object from decoded type and hitsound flags.
@@ -147,15 +124,6 @@ public class HitObject : ITextLine, IComparable<HitObject>
         Filename = string.Empty;
     }
 
-    /// <summary>
-    ///     Gets or sets the complete osu! hit-object line through <see cref="GetLine()" /> and <see cref="SetLine(string)" />.
-    /// </summary>
-    [JsonProperty]
-    public string Line
-    {
-        get => GetLine();
-        set => SetLine(value);
-    }
 
     /// <summary>
     ///     Base position of hit object.
@@ -408,10 +376,6 @@ public class HitObject : ITextLine, IComparable<HitObject>
     [JsonProperty]
     public TimingPoint? UnInheritedTimingPoint { get; set; }
 
-    /// <summary>
-    ///     When true, all coordinates and times will be serialized without rounding.
-    /// </summary>
-    public bool SaveWithFloatPrecision { get; set; }
 
     /// <summary>
     ///     Orders objects chronologically, placing new-combo objects before other objects at the same time.
@@ -428,258 +392,6 @@ public class HitObject : ITextLine, IComparable<HitObject>
     }
 
 
-    /// <inheritdoc />
-    public void SetLine(string line) => SetLine(line, 14);
-
-    /// <summary>Parses a hit-object line according to its beatmap format version.</summary>
-    /// <param name="line">The complete hit-object line.</param>
-    /// <param name="formatVersion">The containing beatmap's file format version.</param>
-    public void SetLine(string line, int formatVersion)
-    {
-        string[] values = line.Split(',');
-
-        if (values.Length <= 4)
-            throw new BeatmapParsingException("Hit object is missing values.", line);
-
-        if (TryParseDouble(values[0], out double x) && TryParseDouble(values[1], out double y))
-            Pos = new Vector2(x, y);
-        else throw new BeatmapParsingException("Failed to parse coordinate of hit object.", line);
-
-        // Let the end position be the same as the start position before changed later for sliders
-        EndPos = Pos;
-
-        if (TryParseDouble(values[2], out double t))
-            Time = t;
-        else throw new BeatmapParsingException("Failed to parse time of hit object.", line);
-
-        if (TryParseInt(values[3], out int type))
-            ObjectType = type;
-        else throw new BeatmapParsingException("Failed to parse type of hit object.", line);
-
-        if (TryParseInt(values[4], out int hitsounds))
-            Hitsounds = hitsounds;
-        else throw new BeatmapParsingException("Failed to parse hitsound of hit object.", line);
-
-        // Sliders remove extras and edges stuff if there are no hitsounds
-        if (IsSlider)
-        {
-            if (values.Length <= 7)
-                throw new BeatmapParsingException("Slider object is missing values.", line);
-
-            string[] sliderData = values[5].Split('|');
-
-            var points = new List<PathControlPoint> { new(Vector2.Zero, TryGetPathType(sliderData[0], out PathType firstType) ? firstType : PathType.Catmull) };
-            PathType? pendingType = null;
-            for (int tokenIndex = 0; tokenIndex < sliderData.Length; tokenIndex++)
-            {
-                string value = sliderData[tokenIndex];
-                if (TryGetPathType(value, out PathType segmentType))
-                {
-                    if (tokenIndex > 0) pendingType = segmentType;
-                    continue;
-                }
-
-                string[] spl = value.Split(':');
-
-                // It has to have 2 coordinates inside
-                if (spl.Length != 2) continue;
-
-                if (TryParseDouble(spl[0], out double ax) && TryParseDouble(spl[1], out double ay))
-                    points.Add(new PathControlPoint(new Vector2(ax, ay) - Pos, pendingType));
-                else throw new BeatmapParsingException("Failed to parse coordinate of slider anchor.", line);
-
-                pendingType = null;
-            }
-
-            if (formatVersion < 128)
-            {
-                var normalized = new List<PathControlPoint>();
-                PathType activeType = points[0].Type ?? firstType;
-                for (int index = 0; index < points.Count; index++)
-                {
-                    var point = points[index];
-                    if (point.Type.HasValue) activeType = point.Type.Value;
-                    if (index > 0 && index < points.Count - 1 && normalized[^1].Position == point.Position &&
-                        !normalized[^1].Type.HasValue)
-                    {
-                        normalized[^1].Type = activeType;
-                        continue;
-                    }
-
-                    if (index < points.Count - 1 && normalized.Count > 0 &&
-                        normalized[^1].Position == point.Position)
-                        point.Type ??= activeType;
-                    normalized.Add(point);
-                }
-
-                points = normalized;
-            }
-
-            ControlPoints = points;
-
-            if (TryParseInt(values[6], out int parsedRepeat))
-                Repeat = parsedRepeat;
-            else throw new BeatmapParsingException("Failed to parse repeat number of slider.", line);
-
-            if (TryParseDouble(values[7], out double pixelLength))
-                PixelLength = pixelLength;
-            else throw new BeatmapParsingException("Failed to parse pixel length of slider.", line);
-
-            // Edge hitsounds on 8
-            EdgeHitsounds = new List<int>(Repeat + 1);
-            if (values.Length > 8)
-            {
-                string[] split = values[8].Split('|');
-                for (int i = 0; i < Math.Min(split.Length, Repeat + 1); i++)
-                    EdgeHitsounds.Add(TryParseInt(split[i], out int ehs) ? ehs : hitsounds);
-            }
-
-            for (int i = EdgeHitsounds.Count; i < Repeat + 1; i++) EdgeHitsounds.Add(hitsounds);
-
-            // Edge samplesets on 9
-            EdgeSampleSets = new List<SampleSet>(Repeat + 1);
-            EdgeAdditionSets = new List<SampleSet>(Repeat + 1);
-            if (values.Length > 9)
-            {
-                string[] split = values[9].Split('|');
-                for (int i = 0; i < Math.Min(split.Length, Repeat + 1); i++)
-                {
-                    EdgeSampleSets.Add(TryParseInt(split[i].Split(':')[0], out int ess)
-                        ? (SampleSet)ess
-                        : SampleSet.None);
-                    EdgeAdditionSets.Add(TryParseInt(split[i].Split(':')[1], out int eas)
-                        ? (SampleSet)eas
-                        : SampleSet.None);
-                }
-            }
-
-            for (int i = EdgeSampleSets.Count; i < Repeat + 1; i++) EdgeSampleSets.Add(SampleSet.None);
-            for (int i = EdgeAdditionSets.Count; i < Repeat + 1; i++) EdgeAdditionSets.Add(SampleSet.None);
-
-            // Extras on 10
-            if (values.Length > 10)
-                Extras = values[10];
-            else
-                SetExtras();
-        }
-        else if (IsSpinner)
-        {
-            if (values.Length <= 5)
-                throw new BeatmapParsingException("Spinner object is missing values.", line);
-
-            if (TryParseDouble(values[5], out double et))
-                EndTime = et;
-            else throw new BeatmapParsingException("Failed to parse end time of spinner.", line);
-
-            TemporalLength = EndTime - Time;
-            Repeat = 1;
-
-            // Extras on 6
-            if (values.Length > 6)
-                Extras = values[6];
-            else
-                SetExtras();
-        }
-        else
-        {
-            // Circle or hold note
-            Repeat = 0;
-            EndTime = Time;
-            TemporalLength = 0;
-
-            // Extras on 5
-            if (values.Length > 5)
-                Extras = values[5];
-            else
-                SetExtras();
-        }
-    }
-
-    /// <inheritdoc />
-    public string GetLine() => GetLine(128);
-
-    /// <summary>Serializes this object for a specific osu! file format version.</summary>
-    /// <param name="formatVersion">The target osu! file format version.</param>
-    /// <returns>The hit-object line.</returns>
-    public string GetLine(int formatVersion)
-    {
-        var values = new List<string>
-        {
-            SaveWithFloatPrecision ? Pos.X.ToInvariant() : Pos.X.ToRoundInvariant(),
-            SaveWithFloatPrecision ? Pos.Y.ToInvariant() : Pos.Y.ToRoundInvariant(),
-            SaveWithFloatPrecision ? Time.ToInvariant() : Time.ToRoundInvariant(),
-            ObjectType.ToInvariant(),
-            Hitsounds.ToInvariant(),
-        };
-
-        if (IsSlider)
-        {
-            var builder = new StringBuilder();
-            bool mixedTypes = ControlPoints.Any(point => point.Type.HasValue && point.Type != ControlPoints[0].Type);
-            if (formatVersion < 128 && (mixedTypes || ControlPoints[0].Type == PathType.BSpline))
-            {
-                var bezier = BezierConverter.ConvertToBezierAnchors(ControlPoints);
-                builder.Append('B');
-                for (int index = 1; index < bezier.Count; index++)
-                {
-                    var point = bezier[index];
-                    var position = point.Position + Pos;
-                    string anchor = $"|{(SaveWithFloatPrecision ? position.X.ToInvariant() : position.X.ToRoundInvariant())}:{(SaveWithFloatPrecision ? position.Y.ToInvariant() : position.Y.ToRoundInvariant())}";
-                    builder.Append(anchor);
-                    if (point.Type.HasValue && index < bezier.Count - 1) builder.Append(anchor);
-                }
-            }
-            else
-            {
-                builder.Append(GetPathTypeString(ControlPoints.FirstOrDefault()?.Type ?? PathType.Linear));
-                for (int index = 1; index < ControlPoints.Count; index++)
-                {
-                    var point = ControlPoints[index];
-                    var p = point.Position + Pos;
-                    if (point.Type.HasValue && formatVersion >= 128)
-                        builder.Append('|').Append(GetPathTypeString(point.Type.Value));
-                    builder.Append($"|{(SaveWithFloatPrecision ? p.X.ToInvariant() : p.X.ToRoundInvariant())}:{(SaveWithFloatPrecision ? p.Y.ToInvariant() : p.Y.ToRoundInvariant())}");
-                    bool previousTypedAtSamePosition = ControlPoints[index - 1].Type.HasValue &&
-                        ControlPoints[index - 1].Position == point.Position;
-                    if (point.Type.HasValue && formatVersion < 128 && index < ControlPoints.Count - 1 &&
-                        !previousTypedAtSamePosition)
-                        builder.Append($"|{(SaveWithFloatPrecision ? p.X.ToInvariant() : p.X.ToRoundInvariant())}:{(SaveWithFloatPrecision ? p.Y.ToInvariant() : p.Y.ToRoundInvariant())}");
-                }
-            }
-
-            values.Add(builder.ToString());
-            values.Add(Repeat.ToInvariant());
-            values.Add(PixelLength.ToInvariant());
-
-            if (SliderExtras)
-            {
-                // Edge hitsounds, samplesets and extras
-                values.Add(string.Join("|", EdgeHitsounds.Select(p => p.ToInvariant())));
-
-                var builder2 = new StringBuilder();
-                for (int i = 0; i < EdgeSampleSets.Count(); i++)
-                    builder2.Append(
-                        $"|{EdgeSampleSets[i].ToIntInvariant()}:{EdgeAdditionSets[i].ToIntInvariant()}");
-                builder2.Remove(0, 1);
-                values.Add(builder2.ToString());
-
-                values.Add(Extras);
-            }
-        }
-        else if (IsSpinner)
-        {
-            values.Add(SaveWithFloatPrecision ? EndTime.ToInvariant() : EndTime.ToRoundInvariant());
-            values.Add(Extras);
-        }
-        else
-        {
-            // It's a circle or a hold note
-            // Hold note has a difference in GetExtras
-            values.Add(Extras);
-        }
-
-        return string.Join(",", values);
-    }
 
     /// <summary>
     ///     Calculates the final time from the start, per-span duration, and span count.
@@ -1132,14 +844,6 @@ public class HitObject : ITextLine, IComparable<HitObject>
                || !string.IsNullOrEmpty(Filename);
     }
 
-    /// <summary>
-    ///     Serializes the object as an osu! hit-object line.
-    /// </summary>
-    /// <returns>The same representation as <see cref="GetLine()" />.</returns>
-    public override string ToString()
-    {
-        return GetLine();
-    }
 
     /// <summary>
     ///     Packs gameplay kind, new-combo state, and combo-skip count into the osu! type bit field.
@@ -1224,7 +928,7 @@ public class HitObject : ITextLine, IComparable<HitObject>
     public string GetExtras()
     {
         if (IsHoldNote)
-            return string.Join(":", SaveWithFloatPrecision ? EndTime.ToInvariant() : EndTime.ToRoundInvariant(), SampleSet.ToIntInvariant(),
+            return string.Join(":", EndTime.ToRoundInvariant(), SampleSet.ToIntInvariant(),
                 AdditionSet.ToIntInvariant(), CustomIndex.ToInvariant(), SampleVolume.ToRoundInvariant(), Filename);
         return string.Join(":", SampleSet.ToIntInvariant(), AdditionSet.ToIntInvariant(), CustomIndex.ToInvariant(),
             SampleVolume.ToRoundInvariant(), Filename);
@@ -1390,7 +1094,7 @@ public class HitObject : ITextLine, IComparable<HitObject>
     /// </summary>
     public void Debug()
     {
-        Console.WriteLine(GetLine());
+        Console.WriteLine($"Hit object at {Pos} and {Time} ms");
         foreach (var tp in BodyHitsounds)
         {
             Console.WriteLine(@"bodyhitsound:");

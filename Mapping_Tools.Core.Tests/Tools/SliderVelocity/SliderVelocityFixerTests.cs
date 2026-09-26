@@ -84,8 +84,8 @@ public sealed class SliderVelocityFixerTests
             true,
             false,
             false);
-        HitObject selected = new("64,64,100,2,0,L|164:64,1,100");
-        HitObject unselected = new("64,64,300,2,0,L|164:64,1,100");
+        HitObject selected = BeatmapTestData.DecodeHitObject("64,64,100,2,0,L|164:64,1,100");
+        HitObject unselected = BeatmapTestData.DecodeHitObject("64,64,300,2,0,L|164:64,1,100");
         return (new Beatmap([selected, unselected], [redline], redline), selected, unselected);
     }
 }

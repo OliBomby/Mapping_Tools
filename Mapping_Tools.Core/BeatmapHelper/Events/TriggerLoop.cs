@@ -1,4 +1,4 @@
-﻿using static Mapping_Tools.Core.BeatmapHelper.FileFormatHelper;
+using static Mapping_Tools.Core.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Core.BeatmapHelper.Events;
 
@@ -20,27 +20,4 @@ public class TriggerLoop : Command, IHasEndTime
     /// <inheritdoc />
     public double EndTime { get; set; }
 
-    /// <inheritdoc />
-    public override string GetLine()
-    {
-        return
-            $"{EventType},{TriggerName},{(SaveWithFloatPrecision ? StartTime.ToInvariant() : StartTime.ToRoundInvariant())},{(SaveWithFloatPrecision ? EndTime.ToInvariant() : EndTime.ToRoundInvariant())}";
-    }
-
-    /// <inheritdoc />
-    public override void SetLine(string line)
-    {
-        string subLine = RemoveIndents(line);
-        string[] values = subLine.Split(',');
-
-        TriggerName = values[1];
-
-        if (TryParseDouble(values[2], out double startTime))
-            StartTime = startTime;
-        else throw new BeatmapParsingException("Failed to parse start time of event param.", line);
-
-        if (TryParseDouble(values[3], out double endTime))
-            EndTime = endTime;
-        else throw new BeatmapParsingException("Failed to parse end time of event param.", line);
-    }
 }

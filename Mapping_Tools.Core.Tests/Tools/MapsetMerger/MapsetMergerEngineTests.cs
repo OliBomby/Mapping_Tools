@@ -1,5 +1,6 @@
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Events;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Mapping_Tools.Core.Tools.MapsetMerger;
 using Mapping_Tools.Core.Tools.MapsetMerger.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -78,7 +79,8 @@ public sealed class MapsetMergerEngineTests
     public void RewriteBeatmapReferences_WithRepeatedCustomIndices_ReusesMapping()
     {
         // Arrange
-        Beatmap beatmap = new(File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "Resources", "standard-feature-rich.osu")).ToList());
+        Beatmap beatmap = new BeatmapDecoder().Decode(
+            File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Resources", "standard-feature-rich.osu")));
         beatmap.HitObjects.RemoveRange(3, beatmap.HitObjects.Count - 3);
         beatmap.BeatmapTiming.SetTimingPoints([beatmap.BeatmapTiming.TimingPoints[0]]);
         beatmap.HitObjects[0].CustomIndex = 7;

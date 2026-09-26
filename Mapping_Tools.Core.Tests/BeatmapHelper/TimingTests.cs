@@ -9,16 +9,16 @@ namespace Mapping_Tools.Core.Tests.BeatmapHelper;
 public class TimingTests
 {
     [TestMethod]
-    public void TimingPoint_ParseAndSerialize_PreservesLine()
+    public void DecodeTimingPoint_ValidLine_ParsesAndRoundTrips()
     {
         // Arrange
         const string line = "1000,500,4,2,3,75,1,9";
 
         // Act
-        var timingPoint = new TimingPoint(line);
+        var timingPoint = BeatmapTestData.DecodeTimingPoint(line);
 
         // Assert
-        timingPoint.GetLine().Should().Be(line);
+        BeatmapTestData.EncodeTimingPoint(timingPoint).Should().Be(line);
         timingPoint.SampleSet.Should().Be(SampleSet.Soft);
         timingPoint.Uninherited.Should().BeTrue();
         timingPoint.Kiai.Should().BeTrue();
@@ -32,18 +32,18 @@ public class TimingTests
         const string line = "1000,not-a-number,4,2,3,75,1,0";
 
         // Act
-        Action act1 = () => _ = new TimingPoint(line);
+        Action act = () => BeatmapTestData.DecodeTimingPoint(line);
 
         // Assert
-        act1.Should().Throw<BeatmapParsingException>();
+        act.Should().Throw<BeatmapParsingException>();
     }
 
     [TestMethod]
     public void Timing_SortsAndResnapsAgainstActiveRedline()
     {
         // Arrange
-        var laterGreenline = new TimingPoint("2000,-100,4,1,0,50,0,0");
-        var redline = new TimingPoint("1000,500,4,1,0,100,1,0");
+        var laterGreenline = BeatmapTestData.DecodeTimingPoint("2000,-100,4,1,0,50,0,0");
+        var redline = BeatmapTestData.DecodeTimingPoint("1000,500,4,1,0,100,1,0");
         var timing = new Timing([laterGreenline, redline], 1.4);
 
         // Act
@@ -58,7 +58,7 @@ public class TimingTests
     public void ResnapInRange_WhenSnapWouldCrossBoundary_KeepsOriginalTime()
     {
         // Arrange
-        var timing = new Timing(["1000,500,4,1,0,100,1,0"], 1.4);
+        var timing = new Timing([BeatmapTestData.DecodeTimingPoint("1000,500,4,1,0,100,1,0")], 1.4);
 
         // Act
         double snapped = timing.ResnapInRange(

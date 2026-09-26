@@ -208,7 +208,7 @@ public sealed class GeometryDashboardDomainTests
     public void PerfectCircleGenerators_WithMixedSlider_GenerateForEveryPerfectSegment()
     {
         // Arrange
-        HitObject slider = new("10,20,0,2,0,L|110:20|P|110:20|160:70|210:20|L|210:20|310:20|P|310:20|360:70|410:20,1,500");
+        HitObject slider = BeatmapTestData.DecodeHitObject("10,20,0,2,0,L|110:20|P|110:20|160:70|210:20|L|210:20|310:20|P|310:20|360:70|410:20,1,500");
         RelevantHitObject relevantSlider = new(slider);
         PerfectCircleGenerator circles = new();
         PerfectCircleBlanketGenerator blankets = new();

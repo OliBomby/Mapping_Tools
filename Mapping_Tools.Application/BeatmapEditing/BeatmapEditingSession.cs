@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 
 namespace Mapping_Tools.Application.BeatmapEditing;
 
@@ -11,49 +12,7 @@ namespace Mapping_Tools.Application.BeatmapEditing;
 /// </summary>
 public sealed class BeatmapEditingSession : EditingSession
 {
-    /// <summary>
-    ///     Creates a disk-backed beatmap editing session from serialized lines.
-    /// </summary>
-    /// <param name="lines">The serialized beatmap lines to parse.</param>
-    /// <param name="fileStore">The persistence implementation used by the session.</param>
-    public BeatmapEditingSession(List<string> lines, ITextFileStore fileStore)
-        : this(lines, fileStore, BeatmapEditingSource.Disk, [])
-    {
-    }
-
-    /// <summary>
-    ///     Creates a beatmap editing session from serialized lines and retains
-    ///     their initial state for a later backup.
-    /// </summary>
-    /// <param name="lines">The serialized beatmap lines to parse.</param>
-    /// <param name="fileStore">The persistence implementation used by the session.</param>
-    /// <param name="source">Whether the document came only from disk or was overlaid with live state.</param>
-    /// <param name="selectedHitObjects">Objects selected in osu! when live state was captured.</param>
-    /// <param name="liveReadFailure">
-    ///     A diagnostic from a best-effort live read that fell back to disk, or
-    ///     <see langword="null" /> when no read failed.
-    /// </param>
-    /// <param name="liveEditorTime">The editor playhead captured with live state, when available.</param>
-    /// <param name="path">The path to the beatmap file.</param>
-    public BeatmapEditingSession(
-        List<string> lines,
-        ITextFileStore fileStore,
-        BeatmapEditingSource source,
-        IReadOnlyList<HitObject> selectedHitObjects,
-        Exception? liveReadFailure = null,
-        double? liveEditorTime = null,
-        string path = "")
-        : base(lines, fileStore)
-    {
-        ArgumentNullException.ThrowIfNull(selectedHitObjects);
-
-        Path = path;
-        Source = source;
-        SelectedHitObjects = selectedHitObjects.ToArray();
-        LiveReadFailure = liveReadFailure;
-        LiveEditorTime = liveEditorTime;
-        InitialBeatmapLines = Beatmap.GetLines().ToArray();
-    }
+    private readonly IBeatmapEncoder encoder;
 
     /// <summary>
     ///     Loads a beatmap from a path and retains its initial serialized state
@@ -61,6 +20,8 @@ public sealed class BeatmapEditingSession : EditingSession
     /// </summary>
     /// <param name="path">The beatmap file to load.</param>
     /// <param name="fileStore">The persistence implementation used to load and save.</param>
+    /// <param name="decoder">The decoder used to create the beatmap model.</param>
+    /// <param name="encoder">The encoder used to serialize the beatmap model.</param>
     /// <param name="source">Whether the document came only from disk or was overlaid with live state.</param>
     /// <param name="selectedHitObjects">Objects selected in osu! when live state was captured.</param>
     /// <param name="liveReadFailure">
@@ -71,25 +32,31 @@ public sealed class BeatmapEditingSession : EditingSession
     public BeatmapEditingSession(
         string path,
         ITextFileStore fileStore,
+        IBeatmapDecoder decoder,
+        IBeatmapEncoder encoder,
         BeatmapEditingSource source = BeatmapEditingSource.Disk,
         IReadOnlyList<HitObject>? selectedHitObjects = null,
         Exception? liveReadFailure = null,
         double? liveEditorTime = null)
-        : base(path, fileStore)
+        : this(
+            DecodeFile(path, fileStore, decoder),
+            path,
+            fileStore,
+            encoder,
+            source,
+            selectedHitObjects ?? [],
+            liveReadFailure,
+            liveEditorTime)
     {
-        Source = source;
-        SelectedHitObjects = (selectedHitObjects ?? []).ToArray();
-        LiveReadFailure = liveReadFailure;
-        LiveEditorTime = liveEditorTime;
-        InitialBeatmapLines = Beatmap.GetLines().ToArray();
     }
 
     /// <summary>
-    ///     Creates a beatmap editing session around an already parsed beatmap.
+    ///     Creates a beatmap editing session around an already decoded beatmap.
     /// </summary>
     /// <param name="beatmap">The mutable beatmap owned by the session.</param>
     /// <param name="path">The source or destination path for the beatmap.</param>
     /// <param name="fileStore">The persistence implementation used when saving.</param>
+    /// <param name="encoder">The encoder used to serialize the beatmap model.</param>
     /// <param name="source">Whether the document came only from disk or was overlaid with live state.</param>
     /// <param name="selectedHitObjects">Objects selected in osu! when live state was captured.</param>
     /// <param name="liveReadFailure">
@@ -101,6 +68,7 @@ public sealed class BeatmapEditingSession : EditingSession
         Beatmap beatmap,
         string path,
         ITextFileStore fileStore,
+        IBeatmapEncoder encoder,
         BeatmapEditingSource source,
         IReadOnlyList<HitObject> selectedHitObjects,
         Exception? liveReadFailure = null,
@@ -110,19 +78,20 @@ public sealed class BeatmapEditingSession : EditingSession
         ArgumentNullException.ThrowIfNull(beatmap);
         ArgumentNullException.ThrowIfNull(selectedHitObjects);
 
+        Beatmap = beatmap;
         Path = path;
-        TextFile = beatmap;
+        this.encoder = encoder ?? throw new ArgumentNullException(nameof(encoder));
         Source = source;
         SelectedHitObjects = selectedHitObjects.ToArray();
         LiveReadFailure = liveReadFailure;
         LiveEditorTime = liveEditorTime;
-        InitialBeatmapLines = Beatmap.GetLines().ToArray();
+        InitialBeatmapText = this.encoder.Encode(Beatmap);
     }
 
     /// <summary>
     ///     Gets the parsed beatmap being transformed and persisted.
     /// </summary>
-    public Beatmap Beatmap => (Beatmap)TextFile;
+    public Beatmap Beatmap { get; }
 
     /// <summary>
     ///     Saves the beatmap and updates its filename from the beatmap metadata.
@@ -161,5 +130,22 @@ public sealed class BeatmapEditingSession : EditingSession
     /// <summary>
     ///     Gets the serialized document captured when this session was opened.
     /// </summary>
-    internal IReadOnlyList<string> InitialBeatmapLines { get; }
+    internal string InitialBeatmapText { get; }
+
+    /// <inheritdoc />
+    protected override string EncodeDocument()
+    {
+        return encoder.Encode(Beatmap);
+    }
+
+    private static Beatmap DecodeFile(
+        string path,
+        ITextFileStore fileStore,
+        IBeatmapDecoder decoder)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(path);
+        ArgumentNullException.ThrowIfNull(fileStore);
+        ArgumentNullException.ThrowIfNull(decoder);
+        return decoder.Decode(fileStore.ReadAllText(path));
+    }
 }

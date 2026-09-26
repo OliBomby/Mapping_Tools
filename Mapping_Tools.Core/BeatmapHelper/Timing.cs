@@ -45,17 +45,6 @@ public class Timing : IList<TimingPoint>
     }
 
     /// <summary>
-    ///     Parses timing-point lines and builds sorted timing indexes.
-    /// </summary>
-    /// <param name="timingLines">The timing lines.</param>
-    /// <param name="sliderMultiplier">The slider multiplier.</param>
-    public Timing(IEnumerable<string> timingLines, double sliderMultiplier)
-    {
-        SetTimingPoints([.. GetTimingPoints(timingLines)]);
-        SliderMultiplier = sliderMultiplier;
-    }
-
-    /// <summary>
     ///     Gets the timing points.
     /// </summary>
     public IReadOnlyList<TimingPoint> TimingPoints => timingPoints;
@@ -586,11 +575,6 @@ public class Timing : IList<TimingPoint>
     public double CalculateSliderLengthCustomSv(double time, double temporalLength, double sv)
     {
         return -10000 * temporalLength * SliderMultiplier / (GetMpBAtTime(time) * (double.IsNaN(sv) ? -100 : sv));
-    }
-
-    private static IEnumerable<TimingPoint> GetTimingPoints(IEnumerable<string> timingLines)
-    {
-        return timingLines.Select(line => new TimingPoint(line));
     }
 
     /// <summary>

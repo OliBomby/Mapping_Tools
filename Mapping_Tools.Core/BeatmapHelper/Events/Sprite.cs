@@ -1,4 +1,4 @@
-﻿using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.MathUtil;
 using static Mapping_Tools.Core.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Core.BeatmapHelper.Events;
@@ -28,35 +28,4 @@ public class Sprite : Event
     /// </summary>
     public Vector2 Pos { get; set; }
 
-    /// <inheritdoc />
-    public override string GetLine()
-    {
-        return $"Sprite,{Layer},{Origin},\"{FilePath}\",{Pos.X.ToInvariant()},{Pos.Y.ToInvariant()}";
-    }
-
-    /// <inheritdoc />
-    public override void SetLine(string line)
-    {
-        string[] values = line.Split(',');
-
-        if (values[0] != "Sprite") throw new BeatmapParsingException("This line is not a sprite.", line);
-
-        if (Enum.TryParse(values[1], out StoryboardLayer layer))
-            Layer = layer;
-        else throw new BeatmapParsingException("Failed to parse layer of sprite.", line);
-
-        if (Enum.TryParse(values[2], out Origin origin))
-            Origin = origin;
-        else throw new BeatmapParsingException("Failed to parse origin of sprite.", line);
-
-        FilePath = values[3].Trim('"');
-
-        if (!TryParseDouble(values[4], out double x))
-            throw new BeatmapParsingException("Failed to parse X position of sprite.", line);
-
-        if (!TryParseDouble(values[5], out double y))
-            throw new BeatmapParsingException("Failed to parse Y position of sprite.", line);
-
-        Pos = new Vector2(x, y);
-    }
 }

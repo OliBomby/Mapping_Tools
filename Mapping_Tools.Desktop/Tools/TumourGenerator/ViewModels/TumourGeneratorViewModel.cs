@@ -158,7 +158,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
             SetProperty(ref field, value);
             QueuePreview();
         }
-    } = new("0,0,0,2,0,L|256:0,1,256");
+    } = TumourGeneratorProject.CreatePreviewHitObject();
 
     /// <summary>Gets the most recently generated preview slider.</summary>
     public HitObject? TumouredPreviewHitObject

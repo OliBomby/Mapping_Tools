@@ -5,6 +5,7 @@ using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.RhythmGuide;
 using Mapping_Tools.Core.Tools.RhythmGuide.Models;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Application.Tests.Tools.RhythmGuide;
@@ -22,7 +23,13 @@ public sealed class RhythmGuideServiceTests
         TestBeatmapBackupService backups = new();
         sessions["source.osu"] = CreateSession("source.osu", files, true);
         sessions["target.osu"] = CreateSession("target.osu", files, false);
-        RhythmGuideService service = new(gateway, backups, new RecordingBeatmapFileSystem(), files);
+        RhythmGuideService service = new(
+            gateway,
+            backups,
+            new RecordingBeatmapFileSystem(),
+            files,
+            new BeatmapDecoder(),
+            new BeatmapEncoder());
         RhythmGuideServiceOptions.RhythmGuideRunOptions options = new()
         {
             Paths = ["source.osu"],
@@ -59,7 +66,9 @@ public sealed class RhythmGuideServiceTests
             gateway,
             new TestBeatmapBackupService(),
             new RecordingBeatmapFileSystem(),
-            files);
+            files,
+            new BeatmapDecoder(),
+            new BeatmapEncoder());
         RhythmGuideServiceOptions.RhythmGuideRunOptions options = new()
         {
             Paths = ["source.osu"],
@@ -92,7 +101,9 @@ public sealed class RhythmGuideServiceTests
             {
                 ExistingPaths = { "existing.osu" },
             },
-            files);
+            files,
+            new BeatmapDecoder(),
+            new BeatmapEncoder());
         RhythmGuideServiceOptions.RhythmGuideRunOptions options = new()
         {
             Paths = ["source.osu"],
@@ -136,12 +147,12 @@ public sealed class RhythmGuideServiceTests
             "[HitObjects]",
         ];
         if (includeObject) lines.Add("256,192,1000,1,0,0:0:0:0:");
-        return new BeatmapEditingSession(
-            lines,
+        return BeatmapEditingSessionTestFactory.FromText(
+            string.Join("\r\n", lines),
+            path,
             files,
             BeatmapEditingSource.Disk,
-            [],
-            path: path);
+            []);
     }
 
     private static RecordingBeatmapEditingGateway CreateGateway(

@@ -11,8 +11,8 @@ public class TimelineTests
     public void CircleAndSpinner_CreateChronologicalTimelineObjects()
     {
         // Arrange
-        var spinner = new HitObject("256,192,500,8,4,1500,0:0:0:0:");
-        var circle = new HitObject("256,192,1000,1,2,0:0:0:0:");
+        var spinner = BeatmapTestData.DecodeHitObject("256,192,500,8,4,1500,0:0:0:0:");
+        var circle = BeatmapTestData.DecodeHitObject("256,192,1000,1,2,0:0:0:0:");
 
         // Act
         var timeline = new Timeline([circle, spinner], new Timing(1.4));

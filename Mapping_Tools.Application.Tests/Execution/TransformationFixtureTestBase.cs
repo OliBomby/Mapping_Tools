@@ -3,6 +3,7 @@ using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Projects.Contracts;
+using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Infrastructure.Projects;
 
@@ -191,7 +192,7 @@ public abstract class TransformationFixtureTestBase
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult(new BeatmapEditingSession(path, files));
+            return Task.FromResult(BeatmapEditingSessionTestFactory.FromPath(path, files));
         }
 
         public Task<StoryboardEditingSession> OpenStoryboardAsync(
@@ -199,7 +200,7 @@ public abstract class TransformationFixtureTestBase
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult(new StoryboardEditingSession(path, files));
+            return Task.FromResult(BeatmapEditingSessionTestFactory.StoryboardFromPath(path, files));
         }
 
         public Task SaveAsync(

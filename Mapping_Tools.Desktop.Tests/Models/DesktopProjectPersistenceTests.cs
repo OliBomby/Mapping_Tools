@@ -79,8 +79,8 @@ public sealed class DesktopProjectPersistenceTests
     public void SerializeAndDeserialize_SlideratorProject_WithLoadedHitObjects_PreservesImportedState()
     {
         // Arrange
-        HitObject firstSlider = new("64,64,0,2,0,L|164:64,1,100");
-        HitObject secondSlider = new("164,64,1000,2,0,L|264:64,1,100");
+        HitObject firstSlider = DecodeHitObject("64,64,0,2,0,L|164:64,1,100");
+        HitObject secondSlider = DecodeHitObject("164,64,1000,2,0,L|264:64,1,100");
         SlideratorProject project = new()
         {
             LoadedHitObjects = [firstSlider, secondSlider],
@@ -95,8 +95,9 @@ public sealed class DesktopProjectPersistenceTests
 
         // Assert
         json.Should().Contain("\"LoadedHitObjects\"");
-        json.Should().Contain($"\"Line\": \"{firstSlider.Line}\"");
-        restored.LoadedHitObjects.Select(slider => slider.Line).Should().Equal(firstSlider.Line, secondSlider.Line);
+        json.Should().Contain($"\"Line\": \"{EncodeHitObject(firstSlider)}\"");
+        restored.LoadedHitObjects.Select(EncodeHitObject)
+            .Should().Equal(EncodeHitObject(firstSlider), EncodeHitObject(secondSlider));
         restored.VisibleHitObjectIndex.Should().Be(1);
         restored.DoEditorRead.Should().BeTrue();
     }
@@ -137,7 +138,7 @@ public sealed class DesktopProjectPersistenceTests
 
         // Assert
         project.LoadedHitObjects.Should().ContainSingle();
-        project.LoadedHitObjects[0].Line.Should().Be("64,64,1000,2,0,L|164:64,1,100");
+        EncodeHitObject(project.LoadedHitObjects[0]).Should().Be("64,64,1000,2,0,L|164:64,1,100");
         var timingPoint = project.LoadedHitObjects[0].TimingPoint;
         timingPoint.Should().NotBeNull();
         var meter = timingPoint.Meter;
@@ -176,7 +177,7 @@ public sealed class DesktopProjectPersistenceTests
         project.TrackColorPickerColor.Should().Be(new RgbaColour(255, 255, 255, 255));
         project.SetTrackColorOverride.Should().BeFalse();
         project.SelectedSlider.Should().NotBeNull();
-        project.SelectedSlider!.Line.Should().Be("32,64,100,2,0,L|200:64,1,168");
+        EncodeHitObject(project.SelectedSlider!).Should().Be("32,64,100,2,0,L|200:64,1,168");
     }
 
     [TestMethod]
@@ -201,7 +202,7 @@ public sealed class DesktopProjectPersistenceTests
     public void SerializeAndDeserialize_SliderPicturatorProject_WithSelectedSlider_PreservesSliderAndOmitsBackgroundColor()
     {
         // Arrange
-        HitObject selectedSlider = new("32,64,100,2,0,L|200:64,1,168");
+        HitObject selectedSlider = DecodeHitObject("32,64,100,2,0,L|200:64,1,168");
         SliderPicturatorProject project = new()
         {
             SelectedSlider = selectedSlider,
@@ -215,10 +216,10 @@ public sealed class DesktopProjectPersistenceTests
 
         // Assert
         json.Should().Contain("\"SelectedSlider\"");
-        json.Should().Contain($"\"Line\": \"{selectedSlider.Line}\"");
+        json.Should().Contain($"\"Line\": \"{EncodeHitObject(selectedSlider)}\"");
         json.Should().NotContain("BackgroundColor");
         restored.SelectedSlider.Should().NotBeNull();
-        restored.SelectedSlider!.Line.Should().Be(selectedSlider.Line);
+        EncodeHitObject(restored.SelectedSlider!).Should().Be(EncodeHitObject(selectedSlider));
         restored.BackgroundColor.Should().Be(RgbaColour.FromRgb(0, 0, 0));
     }
 }

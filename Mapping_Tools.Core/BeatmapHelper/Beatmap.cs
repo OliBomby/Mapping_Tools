@@ -7,10 +7,9 @@ using Mapping_Tools.Core.SystemTools;
 namespace Mapping_Tools.Core.BeatmapHelper;
 
 /// <summary>
-///     Class containing all the data from a .osu beatmap file. It also supports serialization to .osu format and helper
-///     methods to get data in specific ways.
+///     Holds the parsed data from an osu! beatmap and provides helper methods to query and modify it.
 /// </summary>
-public class Beatmap : ITextFile
+public class Beatmap
 {
     /// <summary>
     ///     Initializes a new Beatmap.
@@ -26,6 +25,7 @@ public class Beatmap : ITextFile
         StoryBoard = new StoryBoard();
         HitObjects = [];
         BeatmapTiming = new Timing(1.4);
+        Version = 128;
 
         FillBasicMetadata();
     }
@@ -62,16 +62,8 @@ public class Beatmap : ITextFile
     }
 
     /// <summary>
-    ///     Initializes the Beatmap file format.
-    /// </summary>
-    /// <param name="lines">List of strings where each string is another line in the .osu file.</param>
-    public Beatmap(List<string> lines) : this()
-    {
-        SetLines(lines);
-    }
-
-    /// <summary>
-    ///     The file format version of the .osu file. This is typically 14, but could be 128 for Lazer beatmaps.
+    ///     The osu! file format version used when encoding this beatmap. Decoders initialize it from the source header;
+    ///     newly created beatmaps default to version 128.
     /// </summary>
     public int Version { get; set; }
 
@@ -168,44 +160,37 @@ public class Beatmap : ITextFile
     public StoryBoard StoryBoard { get; set; }
 
     /// <summary>
-    ///     A list of all the lines of .osu code under the [Events] -> (Background and Video events) section.
-    ///     These strings are the actual .osu code and must be deserialized before use.
+    ///     The background and video events under the [Events] section.
     /// </summary>
     public List<Event> BackgroundAndVideoEvents => StoryBoard.BackgroundAndVideoEvents;
 
     /// <summary>
-    ///     A list of all the lines of .osu code under the [Events] -> (Break Periods) section.
-    ///     These strings are the actual .osu code and must be deserialized before use.
+    ///     The break periods under the [Events] section.
     /// </summary>
     public List<Break> BreakPeriods => StoryBoard.BreakPeriods;
 
     /// <summary>
-    ///     A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 0 (Background)) section.
-    ///     These strings are the actual .osu code and must be deserialized before use.
+    ///     The events under storyboard layer 0 (Background).
     /// </summary>
     public List<Event> StoryboardLayerBackground => StoryBoard.StoryboardLayerBackground;
 
     /// <summary>
-    ///     A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 1 (Fail)) section.
-    ///     These strings are the actual .osu code and must be deserialized before use.
+    ///     The events under storyboard layer 1 (Fail).
     /// </summary>
     public List<Event> StoryboardLayerFail => StoryBoard.StoryboardLayerFail;
 
     /// <summary>
-    ///     A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 2 (Pass)) section.
-    ///     These strings are the actual .osu code and must be deserialized before use.
+    ///     The events under storyboard layer 2 (Pass).
     /// </summary>
     public List<Event> StoryboardLayerPass => StoryBoard.StoryboardLayerPass;
 
     /// <summary>
-    ///     A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 3 (Foreground)) section.
-    ///     These strings are the actual .osu code and must be deserialized before use.
+    ///     The events under storyboard layer 3 (Foreground).
     /// </summary>
     public List<Event> StoryboardLayerForeground => StoryBoard.StoryboardLayerForeground;
 
     /// <summary>
-    ///     A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 4 (Overlay)) section.
-    ///     These strings are the actual .osu code and must be deserialized before use.
+    ///     The events under storyboard layer 4 (Overlay).
     /// </summary>
     public List<Event> StoryboardLayerOverlay => StoryBoard.StoryboardLayerOverlay;
 
@@ -225,152 +210,6 @@ public class Beatmap : ITextFile
     ///     The bookmarks are represented with just a double which is the time of the bookmark.
     /// </summary>
     public List<double> Bookmarks { get => GetBookmarks(); set => SetBookmarks(value); }
-
-    /// <summary>
-    ///     When true, all coordinates and times will be serialized without rounding.
-    /// </summary>
-    public bool SaveWithFloatPrecision { get; set; }
-
-    /// <summary>
-    ///     Deserializes an entire .osu file and stores the data to this object.
-    /// </summary>
-    /// <param name="lines">List of strings where each string is another line in the .osu file.</param>
-    public void SetLines(List<string> lines)
-    {
-        // Parse the version to determine whether this is a Lazer beatmap.
-        Version = FileFormatHelper.TryParseInt(lines[0][17..].Trim(), out int version) ? version : 14;
-
-        // We automatically upgrade beatmaps to at least version 14
-        if (Version < 14) Version = 14;
-
-        if (Version >= 128)
-            // Lazer beatmaps save with float precision
-            // This is a bit of a hacky way to handle Lazer compatibility as some tools might want to save without float precision.
-            SaveWithFloatPrecision = true;
-
-        // Load up all the shit
-        var generalLines = FileFormatHelper.GetCategoryLines(lines, "[General]");
-        var editorLines = FileFormatHelper.GetCategoryLines(lines, "[Editor]");
-        var metadataLines = FileFormatHelper.GetCategoryLines(lines, "[Metadata]");
-        var difficultyLines = FileFormatHelper.GetCategoryLines(lines, "[Difficulty]");
-        var timingLines = FileFormatHelper.GetCategoryLines(lines, "[TimingPoints]");
-        var colourLines = FileFormatHelper.GetCategoryLines(lines, "[Colours]");
-        var hitobjectLines = FileFormatHelper.GetCategoryLines(lines, "[HitObjects]");
-
-        FileFormatHelper.FillDictionary(General, generalLines);
-        FileFormatHelper.FillDictionary(Editor, editorLines);
-        FileFormatHelper.FillDictionary(Metadata, metadataLines);
-        FileFormatHelper.FillDictionary(Difficulty, difficultyLines);
-
-        foreach (string line in colourLines)
-            if (line.Substring(0, 5) == "Combo")
-                ComboColours.Add(new ComboColour(line));
-            else
-                SpecialColours[FileFormatHelper.SplitKeyValue(line).Item1] = new ComboColour(line);
-
-        foreach (string line in hitobjectLines) HitObjects.Add(new HitObject(line, Version));
-
-        // Give the lines to the storyboard
-        StoryBoard.SetLines(lines);
-
-        // Set the timing object
-        BeatmapTiming = new Timing(timingLines, Difficulty["SliderMultiplier"].DoubleValue);
-
-        SortHitObjects();
-        CalculateHitObjectComboStuff();
-        CalculateSliderEndTimes();
-        GiveObjectsGreenlines();
-    }
-
-    /// <summary>
-    ///     Serializes all data of this beatmap to .osu format.
-    /// </summary>
-    /// <returns>List of lines of .osu code.</returns>
-    public List<string> GetLines()
-    {
-        // Getting all the stuff
-        var lines = new List<string>
-        {
-            "osu file format v" + Version.ToInvariant(),
-            "",
-            "[General]",
-        };
-        FileFormatHelper.AddDictionaryToLines(General, lines, true);
-        lines.Add("");
-        lines.Add("[Editor]");
-        FileFormatHelper.AddDictionaryToLines(Editor, lines, true);
-        lines.Add("");
-        lines.Add("[Metadata]");
-        FileFormatHelper.AddDictionaryToLines(Metadata, lines, Version >= 128);
-        lines.Add("");
-        lines.Add("[Difficulty]");
-        FileFormatHelper.AddDictionaryToLines(Difficulty, lines, Version >= 128);
-        lines.Add("");
-        lines.Add("[Events]");
-        if (Version < 128)
-            lines.Add("//Background and Video events");
-        lines.AddRange(BackgroundAndVideoEvents.Select(e =>
-        {
-            e.SaveWithFloatPrecision = SaveWithFloatPrecision;
-            return e.GetLine();
-        }));
-        if (Version < 128)
-            lines.Add("//Break Periods");
-        lines.AddRange(BreakPeriods.Select(b =>
-        {
-            b.SaveWithFloatPrecision = SaveWithFloatPrecision;
-            return b.GetLine();
-        }));
-        if (Version < 128) // Lazer doesn't add these comments for some reason
-            lines.Add("//Storyboard Layer 0 (Background)");
-        lines.AddRange(Event.SerializeEventTree(StoryboardLayerBackground, saveWithFloatPrecision: SaveWithFloatPrecision));
-        if (Version < 128)
-            lines.Add("//Storyboard Layer 1 (Fail)");
-        lines.AddRange(Event.SerializeEventTree(StoryboardLayerFail, saveWithFloatPrecision: SaveWithFloatPrecision));
-        if (Version < 128)
-            lines.Add("//Storyboard Layer 2 (Pass)");
-        lines.AddRange(Event.SerializeEventTree(StoryboardLayerPass, saveWithFloatPrecision: SaveWithFloatPrecision));
-        if (Version < 128)
-            lines.Add("//Storyboard Layer 3 (Foreground)");
-        lines.AddRange(Event.SerializeEventTree(StoryboardLayerForeground, saveWithFloatPrecision: SaveWithFloatPrecision));
-        if (Version < 128)
-            lines.Add("//Storyboard Layer 4 (Overlay)");
-        lines.AddRange(Event.SerializeEventTree(StoryboardLayerOverlay, saveWithFloatPrecision: SaveWithFloatPrecision));
-        if (Version < 128)
-            lines.Add("//Storyboard Sound Samples");
-        lines.AddRange(StoryboardSoundSamples.Select(sbss =>
-        {
-            sbss.SaveWithFloatPrecision = SaveWithFloatPrecision;
-            return sbss.GetLine();
-        }));
-        lines.Add("");
-        lines.Add("[TimingPoints]");
-        lines.AddRange(BeatmapTiming.TimingPoints.Select(tp =>
-        {
-            tp.SaveWithFloatPrecision = SaveWithFloatPrecision;
-            return tp.GetLine();
-        }));
-        if (Version < 128)
-            lines.Add("");
-        if (ComboColours.Any())
-        {
-            lines.Add("");
-            lines.Add("[Colours]");
-            lines.AddRange(ComboColours.Select((t, i) => "Combo" + (i + 1) + (Version < 128 ? " : " : ": ") + t));
-            lines.AddRange(SpecialColours.Select(specialColour => specialColour.Key + (Version < 128 ? " : " : ": ") + specialColour.Value));
-        }
-
-        lines.Add("");
-        lines.Add("[HitObjects]");
-        lines.AddRange(HitObjects.Select(ho =>
-        {
-            ho.SaveWithFloatPrecision = SaveWithFloatPrecision;
-            return ho.GetLine(Version);
-        }));
-        lines.Add("");
-
-        return lines;
-    }
 
     /// <summary>
     ///     Populates required general, metadata, difficulty, and editor keys with new-beatmap defaults.

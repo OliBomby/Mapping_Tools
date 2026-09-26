@@ -119,7 +119,7 @@ public sealed class GeometryDashboardViewModelTests
     public async Task RefreshOnceAsync_WhenEditorIsUnfocused_ShowsGreenUnfocusedStatus()
     {
         // Arrange
-        var editor = CreateRuntimeSnapshot(new HitObject("64,96,1000,1,0,0:0:0:0:"), 0, []).Editor;
+        var editor = CreateRuntimeSnapshot(DecodeHitObject("64,96,1000,1,0,0:0:0:0:"), 0, []).Editor;
         using var viewModel = CreateViewModel(
             snapshots: new GeometryDashboardRuntimeSnapshot(editor, false));
 
@@ -210,9 +210,9 @@ public sealed class GeometryDashboardViewModelTests
     public async Task RefreshOnceAsync_WhenEditorSelectionChanges_SynchronizesRootSelectionState()
     {
         // Arrange
-        HitObject initialHitObject = new("64,96,1000,1,0,0:0:0:0:");
-        HitObject selectedHitObject = new("64,96,1000,1,0,0:0:0:0:");
-        HitObject finalHitObject = new("64,96,1000,1,0,0:0:0:0:");
+        HitObject initialHitObject = DecodeHitObject("64,96,1000,1,0,0:0:0:0:");
+        HitObject selectedHitObject = DecodeHitObject("64,96,1000,1,0,0:0:0:0:");
+        HitObject finalHitObject = DecodeHitObject("64,96,1000,1,0,0:0:0:0:");
         using var viewModel = CreateViewModel(
             snapshots:
             [
@@ -378,12 +378,12 @@ public sealed class GeometryDashboardViewModelTests
 
     private sealed class TextFileStoreStub : ITextFileStore
     {
-        public IReadOnlyList<string> ReadAllLines(string path)
+        public string ReadAllText(string path)
         {
-            return [];
+            return string.Empty;
         }
 
-        public void WriteAllLines(string path, IEnumerable<string> lines) { }
+        public void WriteAllText(string path, string text) { }
         public void Delete(string path) { }
 
         public string GetParentFolder(string path)

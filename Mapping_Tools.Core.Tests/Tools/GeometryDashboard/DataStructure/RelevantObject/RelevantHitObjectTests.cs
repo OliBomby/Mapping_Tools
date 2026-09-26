@@ -11,8 +11,8 @@ public sealed class RelevantHitObjectTests
     public void Difference_WithDifferentSliderTypes_ReturnsPositiveInfinity()
     {
         // Arrange
-        RelevantHitObject linear = new(new HitObject("64,96,1000,2,0,L|164:96,1,100,0|0,0:0|0:0,0:0:0:0:"));
-        RelevantHitObject bezier = new(new HitObject("64,96,1000,2,0,B|164:96,1,100,0|0,0:0|0:0,0:0:0:0:"));
+        RelevantHitObject linear = new(BeatmapTestData.DecodeHitObject("64,96,1000,2,0,L|164:96,1,100,0|0,0:0|0:0,0:0:0:0:"));
+        RelevantHitObject bezier = new(BeatmapTestData.DecodeHitObject("64,96,1000,2,0,B|164:96,1,100,0|0,0:0|0:0,0:0:0:0:"));
 
         // Act
         double difference = linear.Difference(bezier);
@@ -25,8 +25,8 @@ public sealed class RelevantHitObjectTests
     public void Difference_WithSameSliderTypeAndPointCount_ReturnsMeanSquaredCoordinateDifference()
     {
         // Arrange
-        RelevantHitObject first = new(new HitObject("64,96,1000,2,0,L|164:96|164:116,1,100,0|0,0:0|0:0,0:0:0:0:"));
-        RelevantHitObject second = new(new HitObject("66,96,1000,2,0,L|164:98|164:116,1,100,0|0,0:0|0:0,0:0:0:0:"));
+        RelevantHitObject first = new(BeatmapTestData.DecodeHitObject("64,96,1000,2,0,L|164:96|164:116,1,100,0|0,0:0|0:0,0:0:0:0:"));
+        RelevantHitObject second = new(BeatmapTestData.DecodeHitObject("66,96,1000,2,0,L|164:98|164:116,1,100,0|0,0:0|0:0,0:0:0:0:"));
 
         // Act
         double difference = first.Difference(second);

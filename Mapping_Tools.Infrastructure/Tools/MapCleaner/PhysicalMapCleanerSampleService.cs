@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using Mapping_Tools.Application.Tools.MapCleaner;
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 
 namespace Mapping_Tools.Infrastructure.Tools.MapCleaner;
@@ -9,6 +10,19 @@ namespace Mapping_Tools.Infrastructure.Tools.MapCleaner;
 public sealed class PhysicalMapCleanerSampleService : IMapCleanerSampleService
 {
     private static readonly string[] audioExtensions = [".wav", ".ogg", ".mp3"];
+    private readonly IBeatmapDecoder beatmapDecoder;
+    private readonly IStoryboardDecoder storyboardDecoder;
+
+    /// <summary>Creates a sample analyzer that decodes beatmap and storyboard references.</summary>
+    /// <param name="beatmapDecoder">Decodes beatmap files.</param>
+    /// <param name="storyboardDecoder">Decodes storyboard files.</param>
+    public PhysicalMapCleanerSampleService(
+        IBeatmapDecoder beatmapDecoder,
+        IStoryboardDecoder storyboardDecoder)
+    {
+        this.beatmapDecoder = beatmapDecoder ?? throw new ArgumentNullException(nameof(beatmapDecoder));
+        this.storyboardDecoder = storyboardDecoder ?? throw new ArgumentNullException(nameof(storyboardDecoder));
+    }
 
     /// <inheritdoc />
     public Task<IReadOnlyDictionary<string, string>> AnalyzeAsync(
@@ -59,13 +73,13 @@ public sealed class PhysicalMapCleanerSampleService : IMapCleanerSampleService
                     Path.GetFullPath(currentBeatmapPath),
                     StringComparison.OrdinalIgnoreCase)
                     ? currentBeatmap
-                    : new Beatmap(File.ReadAllLines(path).ToList());
+                    : beatmapDecoder.Decode(File.ReadAllText(path));
                 CollectUsed(beatmap, used, ref anyStandardSpinner);
             }
 
             foreach (string path in Directory.EnumerateFiles(directory, "*.osb"))
             {
-                StoryBoard storyboard = new(File.ReadAllLines(path).ToList());
+                StoryBoard storyboard = storyboardDecoder.Decode(File.ReadAllText(path));
                 used.UnionWith(storyboard.StoryboardSoundSamples.Select(sample =>
                     Path.GetFileNameWithoutExtension(sample.FilePath)));
             }

@@ -12,6 +12,7 @@ using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Application.Tests.Execution;
@@ -40,7 +41,11 @@ public sealed class HeadlessApplicationWorkflowTests
             backups,
             liveReader,
             new RecordingEditorReloadService(),
-            settings);
+            settings,
+            new BeatmapDecoder(),
+            new BeatmapEncoder(),
+            new StoryboardDecoder(),
+            new StoryboardEncoder());
         UserNotificationService notifications = new();
         BeatmapWorkspace workspace = new(
             settings,
@@ -127,7 +132,7 @@ public sealed class HeadlessApplicationWorkflowTests
             "Fixtures",
             "Beatmaps",
             "standard-feature-rich.osu");
-        return new RecordingTextFileStore(map_path, File.ReadAllLines(fixture));
+        return new RecordingTextFileStore(map_path, File.ReadAllText(fixture));
     }
 
     private sealed class RecordingBackupService : IBeatmapBackupService

@@ -89,9 +89,10 @@ public sealed class BetterSaveServiceTests
 
     private static BeatmapEditingSession CreateSession()
     {
-        return new BeatmapEditingSession(
-            ["osu file format v14", "", "[HitObjects]"],
-            new NoOpTextFileStore { ReadResult = [] },
+        return BeatmapEditingSessionTestFactory.FromText(
+            "osu file format v14\r\n\r\n[HitObjects]",
+            "",
+            new NoOpTextFileStore(),
             BeatmapEditingSource.LiveEditor,
             []);
     }

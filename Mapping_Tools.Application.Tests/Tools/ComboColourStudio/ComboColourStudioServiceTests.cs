@@ -15,13 +15,7 @@ public sealed class ComboColourStudioServiceTests
     public async Task ApplyAsync_WithMapAndValidProject_UsesLivePreferenceAndSavesProgress()
     {
         // Arrange
-        BeatmapEditingSession editor = new(
-            (await File.ReadAllLinesAsync(Path.Combine(AppContext.BaseDirectory, "Fixtures", "Beatmaps", "standard-feature-rich.osu"))).ToList(),
-            new NoOpTextFileStore
-            {
-                ParentFolderResolver = _ => @"C:\set",
-                CombinePathResolver = Path.Combine,
-            }) { Path = @"C:\set\map.osu" };
+        BeatmapEditingSession editor = CreateSession();
         RecordingBeatmapEditingGateway gateway = new(editor);
         ComboColourServiceOptions project = new();
         project.ComboColours.Clear();
@@ -50,17 +44,7 @@ public sealed class ComboColourStudioServiceTests
     public async Task ApplyAsync_WithoutTargetMaps_ThrowsValidationException()
     {
         // Arrange
-        BeatmapEditingSession editor = new(
-            (await File.ReadAllLinesAsync(Path.Combine(
-                AppContext.BaseDirectory,
-                "Fixtures",
-                "Beatmaps",
-                "standard-feature-rich.osu"))).ToList(),
-            new NoOpTextFileStore
-            {
-                ParentFolderResolver = _ => @"C:\set",
-                CombinePathResolver = Path.Combine,
-            });
+        BeatmapEditingSession editor = CreateSession();
         RecordingBeatmapEditingGateway gateway = new(editor);
         ComboColourServiceOptions project = new();
         project.AddComboColour();
@@ -109,16 +93,17 @@ public sealed class ComboColourStudioServiceTests
 
     private static BeatmapEditingSession CreateSession()
     {
-        return new BeatmapEditingSession(
-            File.ReadAllLines(Path.Combine(
+        return BeatmapEditingSessionTestFactory.FromText(
+            File.ReadAllText(Path.Combine(
                 AppContext.BaseDirectory,
                 "Fixtures",
                 "Beatmaps",
-                "standard-feature-rich.osu")).ToList(),
+                "standard-feature-rich.osu")),
+            @"C:\set\map.osu",
             new NoOpTextFileStore
             {
                 ParentFolderResolver = _ => @"C:\set",
                 CombinePathResolver = Path.Combine,
-            }) { Path = @"C:\set\map.osu" };
+            });
     }
 }

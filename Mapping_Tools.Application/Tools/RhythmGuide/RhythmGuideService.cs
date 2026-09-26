@@ -5,6 +5,7 @@ using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Mapping_Tools.Core.Tools.RhythmGuide;
 using Mapping_Tools.Core.Tools.RhythmGuide.Models;
 
@@ -17,22 +18,30 @@ public sealed class RhythmGuideService : IRhythmGuideService
     private readonly IBeatmapEditingGateway editingGateway;
     private readonly IBeatmapsetFileSystem fileSystem;
     private readonly ITextFileStore textFileStore;
+    private readonly IBeatmapDecoder beatmapDecoder;
+    private readonly IBeatmapEncoder beatmapEncoder;
 
     /// <summary>Creates a service that loads source maps and safely persists guide output.</summary>
     /// <param name="editingGateway">The live-aware, backup-before-write beatmap gateway.</param>
     /// <param name="backupService">Creates preference-respecting copies of every source before it is read.</param>
     /// <param name="fileSystem">Checks whether a destination already exists.</param>
     /// <param name="textFileStore">Writes newly created beatmap documents.</param>
+    /// <param name="beatmapDecoder">Decodes normalized source beatmaps for output generation.</param>
+    /// <param name="beatmapEncoder">Encodes normalized source beatmaps and saves output.</param>
     public RhythmGuideService(
         IBeatmapEditingGateway editingGateway,
         IBeatmapBackupService backupService,
         IBeatmapsetFileSystem fileSystem,
-        ITextFileStore textFileStore)
+        ITextFileStore textFileStore,
+        IBeatmapDecoder beatmapDecoder,
+        IBeatmapEncoder beatmapEncoder)
     {
         this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
         this.backupService = backupService ?? throw new ArgumentNullException(nameof(backupService));
         this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
         this.textFileStore = textFileStore ?? throw new ArgumentNullException(nameof(textFileStore));
+        this.beatmapDecoder = beatmapDecoder ?? throw new ArgumentNullException(nameof(beatmapDecoder));
+        this.beatmapEncoder = beatmapEncoder ?? throw new ArgumentNullException(nameof(beatmapEncoder));
     }
 
     /// <inheritdoc />
@@ -81,11 +90,16 @@ public sealed class RhythmGuideService : IRhythmGuideService
         var generated = RhythmGuideGenerator.CreateNewMap(
             sources,
             options,
+            beatmapDecoder,
+            beatmapEncoder,
             cancellationToken);
-        EditingSession output = new(generated.GetLines(), textFileStore)
-        {
-            Path = options.ExportPath,
-        };
+        BeatmapEditingSession output = new(
+            generated,
+            options.ExportPath,
+            textFileStore,
+            beatmapEncoder,
+            BeatmapEditingSource.Disk,
+            []);
         if (fileSystem.FileExists(options.ExportPath))
         {
             await editingGateway.SaveAsync(

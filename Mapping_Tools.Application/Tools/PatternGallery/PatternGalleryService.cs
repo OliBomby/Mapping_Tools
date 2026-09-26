@@ -7,6 +7,7 @@ using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.PatternGallery.Contracts;
 using Mapping_Tools.Application.Tools.PatternGallery.Models;
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Progress;
@@ -24,19 +25,27 @@ public sealed class PatternGalleryService : IPatternGalleryService
     private readonly IBeatmapEditingGateway editing;
     private readonly IPatternGalleryFileService files;
     private readonly ApplicationSettings settings;
+    private readonly IBeatmapDecoder beatmapDecoder;
+    private readonly IBeatmapEncoder beatmapEncoder;
 
     /// <summary>Creates the Pattern Gallery application use case.</summary>
     /// <param name="editing">Loads live or disk beatmaps and saves with backups.</param>
     /// <param name="files">Resolves collection files and performs file operations.</param>
     /// <param name="settings">Supplies the automatic editor reload preference.</param>
+    /// <param name="beatmapDecoder">Parses imported object and timing point text.</param>
+    /// <param name="beatmapEncoder">Encodes saved patterns.</param>
     public PatternGalleryService(
         IBeatmapEditingGateway editing,
         IPatternGalleryFileService files,
-        ApplicationSettings settings)
+        ApplicationSettings settings,
+        IBeatmapDecoder beatmapDecoder,
+        IBeatmapEncoder beatmapEncoder)
     {
         this.editing = editing ?? throw new ArgumentNullException(nameof(editing));
         this.files = files ?? throw new ArgumentNullException(nameof(files));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.beatmapDecoder = beatmapDecoder ?? throw new ArgumentNullException(nameof(beatmapDecoder));
+        this.beatmapEncoder = beatmapEncoder ?? throw new ArgumentNullException(nameof(beatmapEncoder));
     }
 
     /// <inheritdoc />
@@ -74,8 +83,13 @@ public sealed class PatternGalleryService : IPatternGalleryService
         Validate(project);
         cancellationToken.ThrowIfCancellationRequested();
 
-        var hitObjects = ParseLines(hitObjectText, line => new HitObject(line));
-        var timingPoints = ParseLines(timingPointText, line => new TimingPoint(line));
+        var hitObjects = ParseLines(
+            hitObjectText,
+            line => beatmapDecoder.Decode(CreateLineDocument("[HitObjects]", line)).HitObjects.Single());
+        var timingPoints = ParseLines(
+            timingPointText,
+            line => beatmapDecoder.Decode(CreateLineDocument("[TimingPoints]", line))
+                .BeatmapTiming.TimingPoints.Single());
 
         PatternGalleryMaker maker = new() { Padding = project.Padding };
         var pattern = maker.FromObjects(
@@ -312,13 +326,13 @@ public sealed class PatternGalleryService : IPatternGalleryService
         // Make sure the file handler always uses the right pattern files folder
         files.EnsureCollection(paths);
 
-        patternBeatmap.SaveWithFloatPrecision = true;
+        patternBeatmap.Version = 128;
         string destination = files.GetPatternPath(paths, pattern.FileName);
 
         // Save the modified pattern beatmap in the colleciton folder
         files.WritePatternBytes(
             destination,
-            Encoding.UTF8.GetBytes(string.Join("\r\n", patternBeatmap.GetLines())));
+            Encoding.UTF8.GetBytes(beatmapEncoder.Encode(patternBeatmap)));
     }
 
     private static void Validate(PatternGalleryServiceOptions project)
@@ -347,5 +361,12 @@ public sealed class PatternGalleryService : IPatternGalleryService
         }
 
         return result;
+    }
+
+    private static string CreateLineDocument(string section, string line)
+    {
+        // Preserve the legacy line-parser behavior, then SavePattern upgrades the
+        // complete result to v128 for full-precision output.
+        return $"osu file format v14\r\n\r\n[TimingPoints]\r\n{(section == "[TimingPoints]" ? line : string.Empty)}\r\n[HitObjects]\r\n{(section == "[HitObjects]" ? line : string.Empty)}";
     }
 }

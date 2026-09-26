@@ -4,9 +4,9 @@ using Mapping_Tools.Core.BeatmapHelper.Events;
 namespace Mapping_Tools.Core.BeatmapHelper;
 
 /// <summary>
-///     Parses and serializes the event collections shared by <c>.osu</c> and <c>.osb</c> files.
+///     Models event collections shared by <c>.osu</c> and <c>.osb</c> files.
 /// </summary>
-public class StoryBoard : ITextFile
+public class StoryBoard
 {
     /// <summary>
     ///     Initializes an empty storyboard.
@@ -21,15 +21,6 @@ public class StoryBoard : ITextFile
         StoryboardLayerForeground = [];
         StoryboardLayerOverlay = [];
         StoryboardSoundSamples = [];
-    }
-
-    /// <summary>
-    ///     Creates an empty storyboard with separate collections for every osu! event layer and category.
-    /// </summary>
-    /// <param name="lines">The lines.</param>
-    public StoryBoard(List<string> lines) : this()
-    {
-        SetLines(lines);
     }
 
     /// <summary>
@@ -76,127 +67,6 @@ public class StoryBoard : ITextFile
     ///     Whether to add the overlay layer header even if there are no events in that layer.
     /// </summary>
     public bool ForceAddOverlayLayer { get; set; }
-
-    /// <summary>
-    ///     Creates the base string lines for the storyboard file.
-    /// </summary>
-    /// <param name="lines"></param>
-    public void SetLines(List<string> lines)
-    {
-        // Load up all the stuff
-        var eventLines = FileFormatHelper.GetCategoryLines(lines, "[Events]").ToList();
-        var backgroundAndVideoEventsLines = new List<string>();
-        var breakPeriodsLines = new List<string>();
-        var storyboardLayerBackgroundLines = new List<string>();
-        var storyboardLayerFailLines = new List<string>();
-        var storyboardLayerPassLines = new List<string>();
-        var storyboardLayerForegroundLines = new List<string>();
-        var storyboardLayerOverlayLines = new List<string>();
-        var storyboardSoundSamplesLines = new List<string>();
-
-        string[] backgroundAndVideoIdentifiers =
-        [
-            "0", "1", "Video",
-        ];
-        string[] breakPeriodsIdentifiers =
-        [
-            "2", "Break",
-        ];
-        string[] soundSampleIdentifiers =
-        [
-            "5", "Sample",
-        ];
-        string[] categoryIdentifiers =
-        [
-            "//Storyboard Layer 0 (Background)",
-            "//Storyboard Layer 1 (Fail)",
-            "//Storyboard Layer 2 (Pass)",
-            "//Storyboard Layer 3 (Foreground)",
-            "//Storyboard Layer 4 (Overlay)",
-        ];
-        string lastCategory = categoryIdentifiers[0];
-
-        foreach (string line in eventLines)
-            if (backgroundAndVideoIdentifiers.Any(line.StartsWith))
-                backgroundAndVideoEventsLines.Add(line);
-            else if (breakPeriodsIdentifiers.Any(line.StartsWith))
-                breakPeriodsLines.Add(line);
-            else if (soundSampleIdentifiers.Any(line.StartsWith))
-                storyboardSoundSamplesLines.Add(line);
-            else if (categoryIdentifiers.Any(line.StartsWith))
-                lastCategory = line;
-            else if (!line.StartsWith("//"))
-                switch (lastCategory)
-                {
-                    case "//Storyboard Layer 0 (Background)":
-                        storyboardLayerBackgroundLines.Add(line);
-                        break;
-                    case "//Storyboard Layer 1 (Fail)":
-                        storyboardLayerFailLines.Add(line);
-                        break;
-                    case "//Storyboard Layer 2 (Pass)":
-                        storyboardLayerPassLines.Add(line);
-                        break;
-                    case "//Storyboard Layer 3 (Foreground)":
-                        storyboardLayerForegroundLines.Add(line);
-                        break;
-                    case "//Storyboard Layer 4 (Overlay)":
-                        storyboardLayerOverlayLines.Add(line);
-                        break;
-                }
-
-        ForceAddOverlayLayer = FileFormatHelper.CategoryExists(eventLines, "//Storyboard Layer 4 (Overlay)");
-
-        foreach (string line in backgroundAndVideoEventsLines) BackgroundAndVideoEvents.Add(Event.MakeEvent(line));
-        foreach (string line in breakPeriodsLines) BreakPeriods.Add(new Break(line));
-
-        StoryboardLayerBackground.AddRange(Event.ParseEventTree(storyboardLayerBackgroundLines));
-        StoryboardLayerFail.AddRange(Event.ParseEventTree(storyboardLayerFailLines));
-        StoryboardLayerPass.AddRange(Event.ParseEventTree(storyboardLayerPassLines));
-        StoryboardLayerForeground.AddRange(Event.ParseEventTree(storyboardLayerForegroundLines));
-        StoryboardLayerOverlay.AddRange(Event.ParseEventTree(storyboardLayerOverlayLines));
-
-        foreach (string line in storyboardSoundSamplesLines) StoryboardSoundSamples.Add(new StoryboardSoundSample(line));
-    }
-
-    /// <summary>
-    ///     Returns a list of string with all the serialized contents of this storyboard.
-    /// </summary>
-    /// <returns></returns>
-    public List<string> GetLines()
-    {
-        var lines = new List<string>();
-        AppendLines(lines);
-        return lines;
-    }
-
-    /// <summary>
-    ///     Appends all serialized contents of this storyboards to specified list of strings.
-    /// </summary>
-    /// <param name="lines"></param>
-    public void AppendLines(List<string> lines)
-    {
-        lines.Add("[Events]");
-        lines.Add("//Background and Video events");
-        lines.AddRange(BackgroundAndVideoEvents.Select(e => e.GetLine()));
-        lines.Add("//Storyboard Layer 0 (Background)");
-        lines.AddRange(Event.SerializeEventTree(StoryboardLayerBackground));
-        lines.Add("//Storyboard Layer 1 (Fail)");
-        lines.AddRange(Event.SerializeEventTree(StoryboardLayerFail));
-        lines.Add("//Storyboard Layer 2 (Pass)");
-        lines.AddRange(Event.SerializeEventTree(StoryboardLayerPass));
-        lines.Add("//Storyboard Layer 3 (Foreground)");
-        lines.AddRange(Event.SerializeEventTree(StoryboardLayerForeground));
-        if (ForceAddOverlayLayer || StoryboardLayerOverlay.Count > 0)
-        {
-            lines.Add("//Storyboard Layer 4 (Overlay)");
-            lines.AddRange(Event.SerializeEventTree(StoryboardLayerOverlay));
-        }
-
-        lines.Add("//Storyboard Sound Samples");
-        lines.AddRange(StoryboardSoundSamples.Select(sbss => sbss.GetLine()));
-        lines.Add("");
-    }
 
     /// <summary>
     ///     Grabs the specified file name of storyboard file.

@@ -115,7 +115,7 @@ public sealed class PatternGalleryPlacerTests
         // Arrange
         TimingPoint redline = new(0, 500, 4, SampleSet.Normal, 0, 100, true, false, false);
         Beatmap pattern = new(
-            [new HitObject("300,192,1000,2,0,L|320:192,1,20,0|0,0:0|0:0,0:0:0:0:")],
+            [BeatmapTestData.DecodeHitObject("300,192,1000,2,0,L|320:192,1,20,0|0,0:0|0:0,0:0:0:0:")],
             [redline],
             redline);
         Beatmap target = CreateBeatmap(256, 3000);
@@ -175,7 +175,7 @@ public sealed class PatternGalleryPlacerTests
     {
         // Arrange
         Beatmap pattern = CreateBeatmap(0, 1000);
-        pattern.HitObjects.Add(new HitObject("100,192,1500,1,0,0:0:0:0:"));
+        pattern.HitObjects.Add(BeatmapTestData.DecodeHitObject("100,192,1500,1,0,0:0:0:0:"));
         Beatmap target = CreateBeatmap(256, 3000);
         PatternGalleryPlacer placer = CreateUnsnappedPlacer(PatternOverwriteMode.NoOverwrite);
         placer.CustomScale = 2;
@@ -200,9 +200,9 @@ public sealed class PatternGalleryPlacerTests
         TimingPoint patternChange = new(1250, 250, 4, SampleSet.Normal, 0, 100, true, false, false);
         Beatmap pattern = new(
             [
-                new HitObject("64,192,1000,1,0,0:0:0:0:"),
-                new HitObject("64,192,1350,1,0,0:0:0:0:"),
-                new HitObject("64,192,1500,1,0,0:0:0:0:"),
+                BeatmapTestData.DecodeHitObject("64,192,1000,1,0,0:0:0:0:"),
+                BeatmapTestData.DecodeHitObject("64,192,1350,1,0,0:0:0:0:"),
+                BeatmapTestData.DecodeHitObject("64,192,1500,1,0,0:0:0:0:"),
             ],
             [patternStart, patternChange],
             patternStart);
@@ -243,7 +243,7 @@ public sealed class PatternGalleryPlacerTests
     {
         TimingPoint redline = new(0, 500, 4, SampleSet.Normal, 0, 100, true, false, false);
         List<HitObject> objects = times
-            .Select(time => new HitObject($"{x},192,{time},1,0,0:0:0:0:"))
+            .Select(time => BeatmapTestData.DecodeHitObject($"{x},192,{time},1,0,0:0:0:0:"))
             .ToList();
         return new Beatmap(objects, [redline], redline);
     }
@@ -252,7 +252,7 @@ public sealed class PatternGalleryPlacerTests
     {
         TimingPoint redline = new(0, beatLength, 4, SampleSet.Normal, 0, 100, true, false, false);
         List<HitObject> objects = times
-            .Select(time => new HitObject($"{x},192,{time},1,0,0:0:0:0:"))
+            .Select(time => BeatmapTestData.DecodeHitObject($"{x},192,{time},1,0,0:0:0:0:"))
             .ToList();
         return new Beatmap(objects, [redline], redline);
     }

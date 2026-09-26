@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using static Mapping_Tools.Core.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Core.BeatmapHelper.Events;
@@ -32,14 +32,6 @@ public class StoryboardSoundSample : Event, IEquatable<StoryboardSoundSample>, I
         Volume = volume;
     }
 
-    /// <summary>
-    ///     Parses a storyboard sound event from an osu! event line.
-    /// </summary>
-    /// <param name="line">A <c>Sample</c> or legacy <c>5</c> event line.</param>
-    public StoryboardSoundSample(string line)
-    {
-        SetLine(line);
-    }
 
     /// <summary>
     ///     The storyboard layer this event belongs to.
@@ -95,38 +87,4 @@ public class StoryboardSoundSample : Event, IEquatable<StoryboardSoundSample>, I
     /// </summary>
     public double StartTime { get; set; }
 
-    /// <inheritdoc />
-    public override string GetLine()
-    {
-        return $"Sample,{(SaveWithFloatPrecision ? StartTime.ToInvariant() : StartTime.ToRoundInvariant())},{Layer.ToIntInvariant()},\"{FilePath}\",{Volume.ToRoundInvariant()}";
-    }
-
-    /// <inheritdoc />
-    public sealed override void SetLine(string line)
-    {
-        string[] values = line.Split(',');
-
-        if (values[0] != "Sample" && values[0] != "5") throw new BeatmapParsingException("This line is not a storyboarded sample.", line);
-
-        if (TryParseDouble(values[1], out double t))
-            StartTime = t;
-        else throw new BeatmapParsingException("Failed to parse time of storyboarded sample.", line);
-
-        if (Enum.TryParse(values[2], out StoryboardLayer layer))
-            Layer = layer;
-        else throw new BeatmapParsingException("Failed to parse layer of storyboarded sample.", line);
-
-        FilePath = values[3].Trim('"');
-
-        if (values.Length > 4)
-        {
-            if (TryParseDouble(values[4], out double vol))
-                Volume = vol;
-            else throw new BeatmapParsingException("Failed to parse volume of storyboarded sample.", line);
-        }
-        else
-        {
-            Volume = 100;
-        }
-    }
 }

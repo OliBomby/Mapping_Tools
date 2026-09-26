@@ -8,17 +8,17 @@ internal sealed class RecordingTextFileStore : ITextFileStore
     {
     }
 
-    public RecordingTextFileStore(string path, IEnumerable<string> lines)
+    public RecordingTextFileStore(string path, string text)
     {
-        Files[path] = lines.ToList();
+        Files[path] = text;
     }
 
-    public Dictionary<string, List<string>> Files { get; } =
+    public Dictionary<string, string> Files { get; } =
         new(StringComparer.Ordinal);
 
     public List<string> ReadPaths { get; } = [];
 
-    public List<(string Path, IReadOnlyList<string> Lines)> WriteRequests { get; } = [];
+    public List<(string Path, string Text)> WriteRequests { get; } = [];
 
     public List<string> DeletedPaths { get; } = [];
 
@@ -30,17 +30,16 @@ internal sealed class RecordingTextFileStore : ITextFileStore
 
     public Func<string, string, string>? CombinePathResolver { get; init; }
 
-    public IReadOnlyList<string> ReadAllLines(string path)
+    public string ReadAllText(string path)
     {
         ReadPaths.Add(path);
-        return Files[path].ToList();
+        return Files[path];
     }
 
-    public void WriteAllLines(string path, IEnumerable<string> lines)
+    public void WriteAllText(string path, string text)
     {
-        IReadOnlyList<string> copiedLines = lines.ToArray();
-        WriteRequests.Add((path, copiedLines));
-        Files[path] = copiedLines.ToList();
+        WriteRequests.Add((path, text));
+        Files[path] = text;
     }
 
     public void Delete(string path)

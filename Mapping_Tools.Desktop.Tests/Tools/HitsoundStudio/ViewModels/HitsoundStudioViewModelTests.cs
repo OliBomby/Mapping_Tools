@@ -644,12 +644,12 @@ public sealed class HitsoundStudioViewModelTests
             return false;
         }
 
-        public IReadOnlyList<string> ReadAllLines(string path)
+        public string ReadAllText(string path)
         {
-            return [];
+            return string.Empty;
         }
 
-        public void WriteAllLines(string path, IEnumerable<string> lines)
+        public void WriteAllText(string path, string text)
         {
         }
 

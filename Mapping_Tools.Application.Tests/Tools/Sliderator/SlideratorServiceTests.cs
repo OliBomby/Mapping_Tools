@@ -115,12 +115,12 @@ public sealed class SlideratorServiceTests
             "64,64,0,2,0,L|164:64,1,100",
             "128,128,500,1,0,0:0:0:0:",
         ];
-        Beatmap beatmap = new(lines);
+        Beatmap beatmap = BeatmapEditingSessionTestFactory.DecodeText(string.Join("\r\n", lines));
         var slider = beatmap.HitObjects[0];
-        return new BeatmapEditingSession(
+        return BeatmapEditingSessionTestFactory.FromModel(
             beatmap,
             "",
-            new NoOpTextFileStore { ReadResult = [] },
+            new NoOpTextFileStore(),
             source,
             [slider]);
     }

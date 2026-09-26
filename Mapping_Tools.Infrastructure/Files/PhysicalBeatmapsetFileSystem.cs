@@ -17,25 +17,22 @@ public sealed class PhysicalBeatmapsetFileSystem : IBeatmapsetFileSystem
     }
 
     /// <inheritdoc />
-    public IReadOnlyList<string> ReadAllLines(string path)
+    public string ReadAllText(string path)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
-        return File.ReadAllLines(path);
+        return File.ReadAllText(path);
     }
 
     /// <inheritdoc />
-    public void WriteAllLines(string path, IEnumerable<string> lines)
+    public void WriteAllText(string path, string text)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
-        ArgumentNullException.ThrowIfNull(lines);
+        ArgumentNullException.ThrowIfNull(text);
 
-        PhysicalAtomicFileWriter.WriteLines(
+        PhysicalAtomicFileWriter.WriteText(
             path,
-            lines,
-            PhysicalAtomicFileWriter.Utf8WithoutBom,
-            path.EndsWith(".osu", StringComparison.OrdinalIgnoreCase)
-                ? "\r\n"
-                : Environment.NewLine);
+            text,
+            PhysicalAtomicFileWriter.Utf8WithoutBom);
     }
 
     /// <inheritdoc />

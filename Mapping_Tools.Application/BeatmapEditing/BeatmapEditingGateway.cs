@@ -6,6 +6,7 @@ using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 
 namespace Mapping_Tools.Application.BeatmapEditing;
 
@@ -20,6 +21,10 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
     private readonly ILiveBeatmapReader liveReader;
     private readonly IEditorReloadService reloadService;
     private readonly ApplicationSettings settings;
+    private readonly IBeatmapDecoder beatmapDecoder;
+    private readonly IBeatmapEncoder beatmapEncoder;
+    private readonly IStoryboardDecoder storyboardDecoder;
+    private readonly IStoryboardEncoder storyboardEncoder;
 
     /// <summary>
     ///     Creates the application service that arbitrates between durable files
@@ -32,18 +37,30 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
     /// <param name="liveReader">The selected platform adapter that reads osu!'s editor state.</param>
     /// <param name="reloadService">The platform adapter that refreshes osu! after a save.</param>
     /// <param name="settings">The current preference controlling live-state reading.</param>
+    /// <param name="beatmapDecoder">The beatmap decoder used when opening files.</param>
+    /// <param name="beatmapEncoder">The beatmap encoder used when saving files.</param>
+    /// <param name="storyboardDecoder">The storyboard decoder used when opening files.</param>
+    /// <param name="storyboardEncoder">The storyboard encoder used when saving files.</param>
     public BeatmapEditingGateway(
         ITextFileStore fileStore,
         IBeatmapBackupService backupService,
         ILiveBeatmapReader liveReader,
         IEditorReloadService reloadService,
-        ApplicationSettings settings)
+        ApplicationSettings settings,
+        IBeatmapDecoder beatmapDecoder,
+        IBeatmapEncoder beatmapEncoder,
+        IStoryboardDecoder storyboardDecoder,
+        IStoryboardEncoder storyboardEncoder)
     {
         this.fileStore = fileStore ?? throw new ArgumentNullException(nameof(fileStore));
         this.backupService = backupService ?? throw new ArgumentNullException(nameof(backupService));
         this.liveReader = liveReader ?? throw new ArgumentNullException(nameof(liveReader));
         this.reloadService = reloadService ?? throw new ArgumentNullException(nameof(reloadService));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.beatmapDecoder = beatmapDecoder ?? throw new ArgumentNullException(nameof(beatmapDecoder));
+        this.beatmapEncoder = beatmapEncoder ?? throw new ArgumentNullException(nameof(beatmapEncoder));
+        this.storyboardDecoder = storyboardDecoder ?? throw new ArgumentNullException(nameof(storyboardDecoder));
+        this.storyboardEncoder = storyboardEncoder ?? throw new ArgumentNullException(nameof(storyboardEncoder));
     }
 
     /// <inheritdoc />
@@ -55,7 +72,7 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         cancellationToken.ThrowIfCancellationRequested();
 
-        BeatmapEditingSession diskSession = new(path, fileStore);
+        BeatmapEditingSession diskSession = new(path, fileStore, beatmapDecoder, beatmapEncoder);
         if (livePreference == LiveBeatmapPreference.DiskOnly) return diskSession;
 
         if (settings.BeatmapLiveStateReading == BeatmapLiveStateReadingMode.Disabled)
@@ -89,6 +106,7 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
                 diskSession.Beatmap,
                 path,
                 fileStore,
+                beatmapEncoder,
                 BeatmapEditingSource.LiveEditor,
                 selected,
                 liveEditorTime: snapshot.EditorTime);
@@ -107,6 +125,7 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
                 diskSession.Beatmap,
                 path,
                 fileStore,
+                beatmapEncoder,
                 BeatmapEditingSource.Disk,
                 [],
                 exception);
@@ -126,7 +145,11 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         cancellationToken.ThrowIfCancellationRequested();
-        return Task.FromResult(new StoryboardEditingSession(path, fileStore));
+        return Task.FromResult(new StoryboardEditingSession(
+            path,
+            fileStore,
+            storyboardDecoder,
+            storyboardEncoder));
     }
 
     /// <inheritdoc />

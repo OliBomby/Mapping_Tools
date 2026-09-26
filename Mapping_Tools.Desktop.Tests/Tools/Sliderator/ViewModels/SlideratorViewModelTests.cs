@@ -212,8 +212,8 @@ public sealed class SlideratorViewModelTests
     {
         // Arrange
         var viewModel = Create(new RecordingSliderator());
-        HitObject firstSlider = new("64,64,0,2,0,L|164:64,1,100");
-        HitObject secondSlider = new("164,64,1000,2,0,L|264:64,1,100");
+        HitObject firstSlider = DecodeHitObject("64,64,0,2,0,L|164:64,1,100");
+        HitObject secondSlider = DecodeHitObject("164,64,1000,2,0,L|264:64,1,100");
         SlideratorProject project = new()
         {
             LoadedHitObjects = [firstSlider, secondSlider],
@@ -236,8 +236,8 @@ public sealed class SlideratorViewModelTests
     {
         // Arrange
         var viewModel = Create(new RecordingSliderator());
-        HitObject firstSlider = new("64,64,0,2,0,L|164:64,1,100");
-        HitObject secondSlider = new("164,64,1000,2,0,L|264:64,1,100");
+        HitObject firstSlider = DecodeHitObject("64,64,0,2,0,L|164:64,1,100");
+        HitObject secondSlider = DecodeHitObject("164,64,1000,2,0,L|264:64,1,100");
         viewModel.LoadedHitObjects.Add(firstSlider);
         viewModel.LoadedHitObjects.Add(secondSlider);
         viewModel.VisibleHitObjectIndex = 1;
@@ -308,7 +308,7 @@ public sealed class SlideratorViewModelTests
         var viewModel = Create(
             service,
             new TestCurrentBeatmapDialogService { Path = "current.osu" });
-        viewModel.LoadedHitObjects.Add(new HitObject("64,64,0,2,0,L|164:64,1,100"));
+        viewModel.LoadedHitObjects.Add(DecodeHitObject("64,64,0,2,0,L|164:64,1,100"));
 
         // Act
         bool succeeded = await viewModel.RunFastPlacementAsync();
@@ -347,7 +347,7 @@ public sealed class SlideratorViewModelTests
         var viewModel = Create(
             service,
             new TestCurrentBeatmapDialogService { Path = "current.osu" });
-        HitObject slider = new("64,64,0,2,0,L|164:64,1,100");
+        HitObject slider = DecodeHitObject("64,64,0,2,0,L|164:64,1,100");
         ((IShellProjectFeature<SlideratorProject>)viewModel).Install(
             new SlideratorProject
             {
@@ -368,8 +368,8 @@ public sealed class SlideratorViewModelTests
     {
         // Arrange
         var viewModel = Create(new RecordingSliderator());
-        viewModel.LoadedHitObjects.Add(new HitObject("64,64,0,2,0,L|164:64,1,100"));
-        viewModel.LoadedHitObjects.Add(new HitObject("164,64,1000,2,0,L|264:64,1,100"));
+        viewModel.LoadedHitObjects.Add(DecodeHitObject("64,64,0,2,0,L|164:64,1,100"));
+        viewModel.LoadedHitObjects.Add(DecodeHitObject("164,64,1000,2,0,L|264:64,1,100"));
         viewModel.Interaction = new FailedSlideratorInteraction();
 
         // Act
@@ -389,7 +389,7 @@ public sealed class SlideratorViewModelTests
             service,
             new TestCurrentBeatmapDialogService { Path = "current.osu" },
             dialogs);
-        HitObject slider = new("64,64,0,2,0,L|164:64,1,100");
+        HitObject slider = DecodeHitObject("64,64,0,2,0,L|164:64,1,100");
         viewModel.LoadedHitObjects.Add(slider);
 
         // Act
@@ -452,7 +452,7 @@ public sealed class SlideratorViewModelTests
         var viewModel = Create(
             service,
             new TestCurrentBeatmapDialogService { Path = "current.osu" });
-        viewModel.LoadedHitObjects.Add(new HitObject("64,64,0,2,0,L|164:64,1,100"));
+        viewModel.LoadedHitObjects.Add(DecodeHitObject("64,64,0,2,0,L|164:64,1,100"));
 
         // Act
         await viewModel.RunQuickAsync(CancellationToken.None);
@@ -535,7 +535,7 @@ public sealed class SlideratorViewModelTests
             ImportPath = path;
             IReadOnlyList<HitObject> sliders = ReturnEmptyImport
                 ? []
-                : [new HitObject("64,64,0,2,0,L|164:64,1,100")];
+                : [DecodeHitObject("64,64,0,2,0,L|164:64,1,100")];
             return Task.FromResult(new SlideratorImportResult(sliders, 1.4, true, true));
         }
 

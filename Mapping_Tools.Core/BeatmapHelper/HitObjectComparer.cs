@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 
 namespace Mapping_Tools.Core.BeatmapHelper;
 
@@ -69,9 +70,9 @@ public class HitObjectComparer : IEqualityComparer<HitObject>
     ///     Hashes the object's complete serialized line.
     /// </summary>
     /// <param name="obj">The object to hash.</param>
-    /// <returns>The ordinal string hash of <see cref="HitObject.GetLine()" />.</returns>
+    /// <returns>The ordinal string hash of the serialized hit-object data.</returns>
     public int GetHashCode(HitObject obj)
     {
-        return EqualityComparer<string>.Default.GetHashCode(obj.GetLine());
+        return EqualityComparer<string>.Default.GetHashCode(HitObjectTextCodec.Encode(obj, 128, fullPrecisionOverride: false));
     }
 }

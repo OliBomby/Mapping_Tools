@@ -50,11 +50,11 @@ public sealed class AutoFailServiceTests
     private static BeatmapEditingSession CreateSession()
     {
         string path = Path.Combine(AppContext.BaseDirectory, "Fixtures", "Beatmaps", "standard-autofail-2b.osu");
-        return new BeatmapEditingSession(
-            File.ReadAllLines(path).ToList(),
+        return BeatmapEditingSessionTestFactory.FromText(
+            File.ReadAllText(path),
+            "accepted.osu",
             new NoOpTextFileStore(),
             BeatmapEditingSource.Disk,
-            [],
-            path: "accepted.osu");
+            []);
     }
 }

@@ -10,7 +10,7 @@ namespace Mapping_Tools.Core.BeatmapHelper;
 /// <summary>
 ///     Models one redline or greenline from an osu! <c>[TimingPoints]</c> section.
 /// </summary>
-public class TimingPoint : ITextLine, IComparable<TimingPoint>
+public class TimingPoint : IComparable<TimingPoint>
 {
     /// <summary>
     ///     Creates a new <see cref="TimingPoint" />
@@ -60,15 +60,6 @@ public class TimingPoint : ITextLine, IComparable<TimingPoint>
         Uninherited = uninherited;
         Kiai = kiai;
         OmitFirstBarLine = omitFirstBarLine;
-    }
-
-    /// <summary>
-    ///     Creates a new Timing Point from the string line of the .osu file.
-    /// </summary>
-    /// <param name="line"></param>
-    public TimingPoint(string line) : this()
-    {
-        SetLine(line);
     }
 
     /// <summary>
@@ -141,12 +132,6 @@ public class TimingPoint : ITextLine, IComparable<TimingPoint>
     public bool OmitFirstBarLine { get; set; }
 
     /// <summary>
-    ///     When true, all coordinates and times will be serialized without rounding.
-    /// </summary>
-    [JsonIgnore]
-    public bool SaveWithFloatPrecision { get; set; }
-
-    /// <summary>
     ///     Orders timing points by offset, placing uninherited redlines before greenlines at the same time.
     /// </summary>
     /// <param name="other">The timing point to compare, or null.</param>
@@ -160,65 +145,6 @@ public class TimingPoint : ITextLine, IComparable<TimingPoint>
         return -Uninherited.CompareTo(other.Uninherited);
     }
 
-
-    /// <summary>
-    ///     Generates the line from the selected <see cref="TimingPoint" />
-    /// </summary>
-    /// <returns></returns>
-    public string GetLine()
-    {
-        int style = MathHelper.GetIntFromBitArray(new BitArray([Kiai, false, false, OmitFirstBarLine]));
-        return
-            $"{Offset.ToInvariant()},{MpB.ToInvariant()},{Meter.TempoNumerator.ToInvariant()},{SampleSet.ToIntInvariant()},{SampleIndex.ToInvariant()},{(SaveWithFloatPrecision ? Volume.ToInvariant() : Volume.ToRoundInvariant())},{Convert.ToInt32(Uninherited).ToInvariant()},{style.ToInvariant()}";
-    }
-
-    /// <summary>
-    ///     Sets a <see cref="TimingPoint" /> from the line of the beatmap file.
-    /// </summary>
-    /// <param name="line"></param>
-    /// <exception cref="BeatmapParsingException">If the beatmap can not be read correctly.</exception>
-    public void SetLine(string line)
-    {
-        string[] values = line.Split(',');
-
-        if (TryParseDouble(values[0], out double offset))
-            Offset = offset;
-        else throw new BeatmapParsingException("Failed to parse offset of timing point", line);
-
-        if (TryParseDouble(values[1], out double mpb))
-            MpB = mpb;
-        else throw new BeatmapParsingException("Failed to parse milliseconds per beat of timing point", line);
-
-        if (TryParseInt(values[2], out int meter))
-            Meter = new TempoSignature(meter);
-        else throw new BeatmapParsingException("Failed to parse meter of timing point", line);
-
-        if (Enum.TryParse(values[3], out SampleSet ss))
-            SampleSet = ss;
-        else throw new BeatmapParsingException("Failed to parse sampleset of timing point", line);
-
-        if (TryParseInt(values[4], out int ind))
-            SampleIndex = ind;
-        else throw new BeatmapParsingException("Failed to parse sample index of timing point", line);
-
-        if (TryParseDouble(values[5], out double vol))
-            Volume = vol;
-        else throw new BeatmapParsingException("Failed to parse volume of timing point", line);
-
-        Uninherited = values[6] == "1";
-
-        if (values.Length <= 7) return;
-        if (TryParseInt(values[7], out int style))
-        {
-            var b = new BitArray([style]);
-            Kiai = b[0];
-            OmitFirstBarLine = b[3];
-        }
-        else
-        {
-            throw new BeatmapParsingException("Failed to style of timing point", line);
-        }
-    }
 
     /// <summary>
     ///     Creates a new <see cref="TimingPoint" /> from the selected <see cref="TimingPoint" />.

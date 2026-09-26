@@ -7,6 +7,7 @@ using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Application.Tests.Backups;
@@ -129,9 +130,10 @@ public sealed class BeatmapBackupServiceTests
     {
         // Arrange
         var store = CreateStore();
-        Beatmap beatmap = new(store.ReadAllLines(map_path).ToList());
+        Beatmap beatmap = BeatmapEditingSessionTestFactory.DecodeText(
+            string.Join("\r\n", store.Files[map_path]));
         beatmap.Metadata["Version"] = new StringValue("Unsaved");
-        BeatmapEditingSession session = new(
+        BeatmapEditingSession session = BeatmapEditingSessionTestFactory.FromModel(
             beatmap,
             map_path,
             store,
@@ -165,11 +167,15 @@ public sealed class BeatmapBackupServiceTests
     {
         // Arrange
         var store = CreateStore();
-        BeatmapEditingSession session = new(
+        BeatmapEditingSession session = BeatmapEditingSessionTestFactory.FromPath(
             map_path,
             store,
             BeatmapEditingSource.LiveEditor);
-        store.Files[map_path] = session.Beatmap.GetLines();
+        store.Files[map_path] = new BeatmapEncoder()
+            .Encode(session.Beatmap)
+            .TrimEnd('\r', '\n')
+            .Split("\r\n", StringSplitOptions.None)
+            .ToList();
         var service = CreateService(store, CreateSettings());
 
         // Act
@@ -189,7 +195,7 @@ public sealed class BeatmapBackupServiceTests
     {
         // Arrange
         var store = CreateStore();
-        BeatmapEditingSession session = new(
+        BeatmapEditingSession session = BeatmapEditingSessionTestFactory.FromPath(
             map_path,
             store,
             BeatmapEditingSource.Disk,
@@ -418,7 +424,8 @@ public sealed class BeatmapBackupServiceTests
                 FileWrittenResolver = () => store.CopyOperations.Count >= 2,
             },
             settings,
-            new FixedTimeProvider(now));
+            new FixedTimeProvider(now),
+            new BeatmapDecoder());
     }
 
     private static ApplicationSettings CreateSettings()
@@ -562,14 +569,14 @@ public sealed class BeatmapBackupServiceTests
             return Task.CompletedTask;
         }
 
-        public IReadOnlyList<string> ReadAllLines(string path)
+        public string ReadAllText(string path)
         {
-            return Files[path].ToList();
+            return string.Join("\r\n", Files[path]);
         }
 
-        public void WriteAllLines(string path, IEnumerable<string> lines)
+        public void WriteAllText(string path, string text)
         {
-            Files[path] = lines.ToList();
+            Files[path] = ReadLines(text);
         }
 
         public void Delete(string path)
@@ -586,6 +593,13 @@ public sealed class BeatmapBackupServiceTests
         public string CombinePath(string parent, string child)
         {
             return Path.Combine(parent, child);
+        }
+
+        private static List<string> ReadLines(string text)
+        {
+            List<string> lines = text.Split(["\r\n", "\n", "\r"], StringSplitOptions.None).ToList();
+            if (text.EndsWith('\n') || text.EndsWith('\r')) lines.RemoveAt(lines.Count - 1);
+            return lines;
         }
 
         public void AddFile(

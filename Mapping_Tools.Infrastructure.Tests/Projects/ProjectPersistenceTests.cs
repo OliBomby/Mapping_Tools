@@ -13,6 +13,7 @@ using Mapping_Tools.Application.Tools.SliderPicturator;
 using Mapping_Tools.Application.Tools.TimingCopier;
 using Mapping_Tools.Application.Tools.TimingHelper;
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
@@ -110,7 +111,9 @@ public sealed class ProjectPersistenceTests
             new RationalBeatDivisor(1, 4),
             new Sample(),
             new ComboColour(RgbaColour.FromArgb(0x7F, 0x12, 0x34, 0x56)),
-            new HitObject("256,192,1000,1,2,0:0:0:0:"),
+            new BeatmapDecoder().Decode(
+                "osu file format v128\r\n[Difficulty]\r\nSliderMultiplier: 1.4\r\n[HitObjects]\r\n256,192,1000,1,2,0:0:0:0:")
+                .HitObjects.Single(),
             new HitsoundZone(),
         ];
 

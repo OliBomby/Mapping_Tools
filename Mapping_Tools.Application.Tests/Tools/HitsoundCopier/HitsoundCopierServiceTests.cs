@@ -57,7 +57,7 @@ public sealed class HitsoundCopierServiceTests
         Beatmap source = new([sourceObject], [sourceTiming], sourceTiming);
         TimingPoint targetTiming = sourceTiming.Copy();
         Beatmap target = new(
-            [new HitObject("256,192,0,2,0,L|396:192,1,140,0|0:0,0:0:0:0:")],
+            [BeatmapEditingSessionTestFactory.DecodeHitObject("256,192,0,2,0,L|396:192,1,140,0|0:0,0:0:0:0:")],
             [targetTiming],
             targetTiming);
         RecordingBeatmapEditingGateway gateway = CreateGateway(source, target);
@@ -98,7 +98,7 @@ public sealed class HitsoundCopierServiceTests
         Beatmap source = new([sourceObject], [sourceTiming], sourceTiming);
         TimingPoint targetTiming = sourceTiming.Copy();
         Beatmap target = new(
-            [new HitObject("256,192,0,2,0,L|396:192,1,140,0|0:0,0:0:0:0:")],
+            [BeatmapEditingSessionTestFactory.DecodeHitObject("256,192,0,2,0,L|396:192,1,140,0|0:0,0:0:0:0:")],
             [targetTiming],
             targetTiming);
         RecordingBeatmapEditingGateway gateway = CreateGateway(source, target);
@@ -225,12 +225,12 @@ public sealed class HitsoundCopierServiceTests
             OpenBeatmapFactory = (path, _) =>
             {
                 Beatmap beatmap = path == "source.osu" ? source : target;
-                return new BeatmapEditingSession(
-                    beatmap.GetLines(),
-                    new NoOpTextFileStore { ReadResult = [] },
+                return BeatmapEditingSessionTestFactory.FromModel(
+                    BeatmapEditingSessionTestFactory.CloneThroughText(beatmap),
+                    path,
+                    new NoOpTextFileStore(),
                     BeatmapEditingSource.Disk,
-                    [],
-                    path: path);
+                    []);
             },
         };
     }
@@ -241,12 +241,12 @@ public sealed class HitsoundCopierServiceTests
         {
             OpenBeatmapFactory = (path, _) =>
             {
-                return new BeatmapEditingSession(
-                    File.ReadAllLines(fixture).ToList(),
-                    new NoOpTextFileStore { ReadResult = [] },
+                return BeatmapEditingSessionTestFactory.FromModel(
+                    BeatmapEditingSessionTestFactory.DecodeText(File.ReadAllText(fixture)),
+                    path,
+                    new NoOpTextFileStore(),
                     BeatmapEditingSource.Disk,
-                    [],
-                    path: path);
+                    []);
             },
         };
     }

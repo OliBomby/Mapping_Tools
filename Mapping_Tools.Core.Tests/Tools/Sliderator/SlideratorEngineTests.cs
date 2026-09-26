@@ -251,7 +251,7 @@ public sealed class SlideratorEngineTests
     public void Validate_WithCircleSource_ThrowsInvalidOperationException()
     {
         // Arrange
-        HitObject circle = new("64,64,0,1,0");
+        HitObject circle = BeatmapTestData.DecodeHitObject("64,64,0,1,0");
 
         // Act
         Action act = () => SlideratorEngine.Validate(CreateOptions(), circle);
@@ -413,7 +413,7 @@ public sealed class SlideratorEngineTests
             true,
             false,
             false);
-        HitObject slider = new("64,64,0,2,0,L|164:64,1,100");
+        HitObject slider = BeatmapTestData.DecodeHitObject("64,64,0,2,0,L|164:64,1,100");
         Beatmap beatmap = new([slider], [redline], redline);
         beatmap.BeatmapTiming.SliderMultiplier = 1.4;
         return (beatmap, slider);

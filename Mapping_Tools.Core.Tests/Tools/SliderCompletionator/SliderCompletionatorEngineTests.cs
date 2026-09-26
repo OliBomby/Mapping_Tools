@@ -286,7 +286,7 @@ public sealed class SliderCompletionatorEngineTests
     {
         // Arrange
         var (beatmap, slider) = CreateSliderBeatmap();
-        HitObject circle = new("256,64,250,1,2");
+        HitObject circle = BeatmapTestData.DecodeHitObject("256,64,250,1,2");
         double originalCircleTime = circle.Time;
         double originalCircleLength = circle.PixelLength;
         SliderCompletionatorEngineOptions options = new()
@@ -319,7 +319,7 @@ public sealed class SliderCompletionatorEngineTests
             true,
             false,
             false);
-        HitObject slider = new("64,64,0,2,0,L|164:64,1,100");
+        HitObject slider = BeatmapTestData.DecodeHitObject("64,64,0,2,0,L|164:64,1,100");
         Beatmap beatmap = new([slider], [redline], redline);
         beatmap.BeatmapTiming.SliderMultiplier = 1.4;
         return (beatmap, slider);

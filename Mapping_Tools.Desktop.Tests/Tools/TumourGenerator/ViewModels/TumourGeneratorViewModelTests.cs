@@ -157,7 +157,7 @@ public sealed class TumourGeneratorViewModelTests
         viewModel.CurrentLayer!.TumourTemplateEnum = TumourTemplate.Square;
         viewModel.CurrentLayer.TumourParameter = TumourLayer.GetGraphState(12);
         viewModel.CurrentLayer.Name = "Custom";
-        viewModel.PreviewHitObject = new HitObject("32,64,100,2,0,L|200:64,1,168");
+        viewModel.PreviewHitObject = DecodeHitObject("32,64,100,2,0,L|200:64,1,168");
         IShellProjectFeature<TumourGeneratorProject> feature = viewModel;
 
         // Act
@@ -170,7 +170,7 @@ public sealed class TumourGeneratorViewModelTests
         viewModel.CurrentLayer!.Name.Should().Be("Custom");
         viewModel.CurrentLayer.TumourTemplateEnum.Should().Be(TumourTemplate.Square);
         viewModel.CurrentLayer.TumourParameter.GetValue(0).Should().Be(12);
-        viewModel.PreviewHitObject.Line.Should().Contain("32,64,100");
+        EncodeHitObject(viewModel.PreviewHitObject).Should().Contain("32,64,100");
     }
 
     [TestMethod]
@@ -265,7 +265,7 @@ public sealed class TumourGeneratorViewModelTests
         // Arrange
         RecordingGenerator service = new();
         var viewModel = Create(service);
-        viewModel.PreviewHitObject = new HitObject("32,64,100,2,0,L|200:64,1,168");
+        viewModel.PreviewHitObject = DecodeHitObject("32,64,100,2,0,L|200:64,1,168");
 
         // Act
         for (int attempt = 0; attempt < 50 && viewModel.TumouredPreviewHitObject is null; attempt++) await Task.Delay(10);
@@ -342,7 +342,7 @@ public sealed class TumourGeneratorViewModelTests
             return ImportException is not null
                 ? Task.FromException<TumourImportResult>(ImportException)
                 : Task.FromResult(new TumourImportResult(
-                    ReturnEmptyImport ? [] : [new HitObject("64,64,0,2,0,L|164:64,1,100")],
+                    ReturnEmptyImport ? [] : [DecodeHitObject("64,64,0,2,0,L|164:64,1,100")],
                     4,
                     true));
         }

@@ -37,7 +37,7 @@ public sealed class SliderPicturatorViewModelTests
     {
         // Arrange
         var viewModel = Create(new RecordingPicturator());
-        HitObject selectedSlider = new("32,64,100,2,0,L|200:64,1,168");
+        HitObject selectedSlider = DecodeHitObject("32,64,100,2,0,L|200:64,1,168");
         SliderPicturatorProject project = new() { SelectedSlider = selectedSlider };
         IShellProjectFeature<SliderPicturatorProject> feature = viewModel;
 
@@ -46,7 +46,7 @@ public sealed class SliderPicturatorViewModelTests
 
         // Assert
         viewModel.SelectedSlider.Should().NotBeNull();
-        viewModel.SelectedSlider!.Line.Should().Be(selectedSlider.Line);
+        EncodeHitObject(viewModel.SelectedSlider!).Should().Be(EncodeHitObject(selectedSlider));
     }
 
     [TestMethod]

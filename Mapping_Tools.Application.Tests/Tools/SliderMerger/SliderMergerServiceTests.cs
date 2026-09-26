@@ -121,8 +121,8 @@ public sealed class SliderMergerServiceTests
         {
             OpenBeatmapFactory = (path, _) =>
             {
-                HitObject first = new("64,64,0,1,0");
-                HitObject second = new("164,64,100,1,0");
+                HitObject first = BeatmapEditingSessionTestFactory.DecodeHitObject("64,64,0,1,0");
+                HitObject second = BeatmapEditingSessionTestFactory.DecodeHitObject("164,64,100,1,0");
                 TimingPoint redline = new(
                     0,
                     500,
@@ -133,20 +133,16 @@ public sealed class SliderMergerServiceTests
                     true,
                     false,
                     false);
-                BeatmapEditingSession editor = new(
-                    new Beatmap([first, second], [redline], redline).GetLines(),
-                    new NoOpTextFileStore())
-                {
-                    Path = path,
-                };
-                editor.Beatmap.CalculateHitObjectComboStuff();
-                editor.Beatmap.SetBookmarks([0, 100]);
-                return new BeatmapEditingSession(
-                    editor.Beatmap,
+                Beatmap beatmap = BeatmapEditingSessionTestFactory.CloneThroughText(
+                    new Beatmap([first, second], [redline], redline));
+                beatmap.CalculateHitObjectComboStuff();
+                beatmap.SetBookmarks([0, 100]);
+                return BeatmapEditingSessionTestFactory.FromModel(
+                    beatmap,
                     path,
                     new NoOpTextFileStore(),
                     BeatmapEditingSource.Disk,
-                    [editor.Beatmap.HitObjects[0]],
+                    [beatmap.HitObjects[0]],
                     liveEditorTime: null);
             },
         };

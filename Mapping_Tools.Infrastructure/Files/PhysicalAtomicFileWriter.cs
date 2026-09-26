@@ -81,42 +81,6 @@ internal static class PhysicalAtomicFileWriter
         }
     }
 
-    internal static void WriteLines(
-        string destinationPath,
-        IEnumerable<string> lines,
-        Encoding encoding,
-        string newLine)
-    {
-        ArgumentNullException.ThrowIfNull(lines);
-        ArgumentNullException.ThrowIfNull(encoding);
-        ArgumentNullException.ThrowIfNull(newLine);
-
-        string fullDestinationPath = PrepareDestination(destinationPath);
-        string temporaryPath = CreateTemporarySibling(fullDestinationPath);
-        try
-        {
-            using (var stream = OpenTemporaryFile(temporaryPath))
-            {
-                using (StreamWriter writer = new(stream, encoding, buffer_size, true))
-                {
-                    writer.NewLine = newLine;
-                    foreach (string line in lines)
-                        writer.WriteLine(line);
-
-                    writer.Flush();
-                }
-
-                stream.Flush(true);
-            }
-
-            File.Move(temporaryPath, fullDestinationPath, true);
-        }
-        finally
-        {
-            DeleteTemporary(temporaryPath);
-        }
-    }
-
     public static async Task WriteLinesAsync(
         string destinationPath,
         IReadOnlyList<string> lines,

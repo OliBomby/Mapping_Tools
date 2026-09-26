@@ -10,12 +10,13 @@ namespace Mapping_Tools.Core.Tests.BeatmapHelper;
 public class HitObjectTests
 {
     [TestMethod]
-    public void CircleLine_ParsesAndRoundTrips()
+    public void DecodeHitObject_CircleLine_ParsesAndRoundTrips()
     {
         // Arrange
-        // Act
         const string line = "256,192,1000,5,2,2:3:4:75:custom.wav";
-        var hitObject = new HitObject(line);
+
+        // Act
+        var hitObject = BeatmapTestData.DecodeHitObject(line);
 
         // Assert
         hitObject.IsCircle.Should().BeTrue();
@@ -26,16 +27,17 @@ public class HitObjectTests
         hitObject.CustomIndex.Should().Be(4);
         hitObject.SampleVolume.Should().Be(75d);
         hitObject.Filename.Should().Be("custom.wav");
-        hitObject.GetLine().Should().Be(line);
+        BeatmapTestData.EncodeHitObject(hitObject).Should().Be(line);
     }
 
     [TestMethod]
-    public void SliderLine_ParsesPathEdgesAndRoundTrips()
+    public void DecodeHitObject_SliderLine_ParsesPathEdgesAndRoundTrips()
     {
         // Arrange
-        // Act
         const string line = "64,96,1200,6,2,B|128:96|192:128,2,240,2|8|0,1:2|2:3|3:1,1:2:3:60:";
-        var hitObject = new HitObject(line);
+
+        // Act
+        var hitObject = BeatmapTestData.DecodeHitObject(line);
 
         // Assert
         hitObject.IsSlider.Should().BeTrue();
@@ -46,7 +48,7 @@ public class HitObjectTests
         hitObject.EdgeHitsounds.Should().Equal(2, 8, 0);
         hitObject.EdgeSampleSets.Should().Equal(SampleSet.Normal, SampleSet.Soft, SampleSet.Drum);
         hitObject.EdgeAdditionSets.Should().Equal(SampleSet.Soft, SampleSet.Drum, SampleSet.Normal);
-        hitObject.GetLine().Should().Be(line);
+        BeatmapTestData.EncodeHitObject(hitObject).Should().Be(line);
     }
 
     [DataTestMethod]
@@ -55,44 +57,44 @@ public class HitObjectTests
     [DataRow("L", PathType.Linear)]
     [DataRow("P", PathType.PerfectCurve)]
     [DataRow("B4", PathType.BSpline)]
-    public void SliderLine_WithEachPathToken_PreservesItsPathTypeAndToken(string token, PathType expectedType)
+    public void DecodeHitObject_WithEachPathToken_PreservesItsPathTypeAndEncodedToken(string token, PathType expectedType)
     {
         // Arrange
         string line = $"64,96,1200,2,0,{token}|128:96|192:96,1,128,0|0,0:0|0:0,0:0:0:0:";
 
         // Act
-        HitObject hitObject = new(line);
+        HitObject hitObject = BeatmapTestData.DecodeHitObject(line);
 
         // Assert
         hitObject.ControlPoints[0].Type.Should().Be(expectedType);
-        hitObject.GetLine().Split(',')[5].Should().Be($"{token}|128:96|192:96");
+        BeatmapTestData.EncodeHitObject(hitObject).Split(',')[5].Should().Be($"{token}|128:96|192:96");
     }
 
     [TestMethod]
-    public void SliderLine_WithMultiplePathMarkers_PreservesTypedRelativeControlPoints()
+    public void DecodeHitObject_WithMultiplePathMarkers_PreservesTypedRelativeControlPoints()
     {
         // Arrange
         const string line = "64,96,1200,2,0,B|128:96|L|192:128|256:96,1,240,0|0,0:0|0:0,0:0:0:0:";
 
         // Act
-        HitObject hitObject = new(line);
+        HitObject hitObject = BeatmapTestData.DecodeHitObject(line);
 
         // Assert
         hitObject.ControlPoints.Select(point => point.Type).Should().Equal(
             PathType.Bezier, null, PathType.Linear, null);
         hitObject.ControlPoints.Select(point => point.Position).Should().Equal(
             Vector2.Zero, new Vector2(64, 0), new Vector2(128, 32), new Vector2(192, 0));
-        hitObject.GetLine().Split(',')[5].Should().Be("B|128:96|L|192:128|256:96");
+        BeatmapTestData.EncodeHitObject(hitObject).Split(',')[5].Should().Be("B|128:96|L|192:128|256:96");
     }
 
     [TestMethod]
-    public void SliderLine_WithLegacyDuplicateBoundary_NormalizesToOneTypedAnchor()
+    public void DecodeHitObject_WithLegacyDuplicateBoundary_NormalizesToOneTypedAnchor()
     {
         // Arrange
         const string line = "0,0,1000,2,0,B|100:0|100:0|200:0,1,200";
 
         // Act
-        HitObject hitObject = new(line, 14);
+        HitObject hitObject = BeatmapTestData.DecodeHitObject(line, 14);
 
         // Assert
         hitObject.ControlPoints.Select(point => (point.Position, point.Type)).Should().Equal(
@@ -100,50 +102,50 @@ public class HitObjectTests
             (new Vector2(100, 0), PathType.Bezier),
             (new Vector2(200, 0), null));
         hitObject.GetSliderPath().SegmentStarts.Should().HaveCount(2);
-        hitObject.GetLine(14).Split(',')[5].Should().Be("B|100:0|100:0|200:0");
-        hitObject.GetLine(128).Split(',')[5].Should().Be("B|B|100:0|200:0");
+        BeatmapTestData.EncodeHitObject(hitObject, 14).Split(',')[5].Should().Be("B|100:0|100:0|200:0");
+        BeatmapTestData.EncodeHitObject(hitObject, 128).Split(',')[5].Should().Be("B|B|100:0|200:0");
     }
 
     [TestMethod]
-    public void SliderLine_WithModernDuplicatePositions_DoesNotInferSegmentBoundary()
+    public void DecodeHitObject_WithModernDuplicatePositions_DoesNotInferSegmentBoundary()
     {
         // Arrange
         const string line = "0,0,1000,2,0,B|100:0|100:0|200:0,1,200";
 
         // Act
-        HitObject hitObject = new(line, 128);
+        HitObject hitObject = BeatmapTestData.DecodeHitObject(line, 128);
 
         // Assert
         hitObject.ControlPoints.Should().HaveCount(4);
         hitObject.ControlPoints.Skip(1).Should().OnlyContain(point => point.Type == null);
         hitObject.GetSliderPath().SegmentStarts.Should().ContainSingle();
-        hitObject.GetLine(128).Split(',')[5].Should().Be("B|100:0|100:0|200:0");
+        BeatmapTestData.EncodeHitObject(hitObject, 128).Split(',')[5].Should().Be("B|100:0|100:0|200:0");
     }
 
     [TestMethod]
-    public void SliderLine_WithThreeLegacyBoundaryPositions_RoundTripsThroughTypedSegments()
+    public void DecodeHitObject_WithThreeLegacyBoundaryPositions_RoundTripsThroughTypedSegments()
     {
         // Arrange
         const string line = "0,0,1000,2,0,B|100:0|100:0|100:0|200:0,1,200";
 
         // Act
-        HitObject hitObject = new(line, 14);
+        HitObject hitObject = BeatmapTestData.DecodeHitObject(line, 14);
 
         // Assert
         hitObject.ControlPoints.Select(point => point.Type).Should().Equal(
             PathType.Bezier, PathType.Bezier, PathType.Bezier, null);
         hitObject.GetSliderPath().SegmentStarts.Should().HaveCount(3);
-        hitObject.GetLine(14).Split(',')[5].Should().Be("B|100:0|100:0|100:0|200:0");
+        BeatmapTestData.EncodeHitObject(hitObject, 14).Split(',')[5].Should().Be("B|100:0|100:0|100:0|200:0");
     }
 
     [TestMethod]
-    public void SliderLine_WithLegacyDuplicateAfterTypeMarker_UsesActiveSegmentType()
+    public void DecodeHitObject_WithLegacyDuplicateAfterTypeMarker_UsesActiveSegmentType()
     {
         // Arrange
         const string line = "0,0,1000,2,0,B|50:0|L|100:0|150:0|150:0|200:0,1,200";
 
         // Act
-        HitObject hitObject = new(line, 14);
+        HitObject hitObject = BeatmapTestData.DecodeHitObject(line, 14);
 
         // Assert
         hitObject.ControlPoints.Select(point => point.Type).Should().Equal(
@@ -151,45 +153,45 @@ public class HitObjectTests
     }
 
     [TestMethod]
-    public void SliderLine_WithLegacyBoundaryAtStart_RoundTripsWithoutAddingAnAnchor()
+    public void DecodeHitObject_WithLegacyBoundaryAtStart_RoundTripsWithoutAddingAnAnchor()
     {
         // Arrange
         const string line = "0,0,1000,2,0,B|0:0|100:0,1,100";
 
         // Act
-        HitObject hitObject = new(line, 14);
+        HitObject hitObject = BeatmapTestData.DecodeHitObject(line, 14);
 
         // Assert
         hitObject.ControlPoints.Should().HaveCount(3);
         hitObject.ControlPoints[1].Type.Should().Be(PathType.Bezier);
-        hitObject.GetLine(14).Split(',')[5].Should().Be("B|0:0|100:0");
+        BeatmapTestData.EncodeHitObject(hitObject, 14).Split(',')[5].Should().Be("B|0:0|100:0");
     }
 
     [TestMethod]
-    public void SliderLine_WithUnknownPathMarkers_UsesCatmullForEachMarker()
+    public void DecodeHitObject_WithUnknownPathMarkers_UsesCatmullForEachMarker()
     {
         // Arrange
         const string line = "0,0,0,2,0,X|100:0|L|200:0|Y|250:0,1,250";
 
         // Act
-        HitObject hitObject = new(line);
+        HitObject hitObject = BeatmapTestData.DecodeHitObject(line);
 
         // Assert
         hitObject.ControlPoints.Select(point => point.Type).Should().Equal(
             PathType.Catmull, null, PathType.Linear, PathType.Catmull);
-        hitObject.GetLine(128).Split(',')[5].Should().Be("C|100:0|L|200:0|C|250:0");
+        BeatmapTestData.EncodeHitObject(hitObject, 128).Split(',')[5].Should().Be("C|100:0|L|200:0|C|250:0");
     }
 
     [TestMethod]
-    public void GetLine_WithMixedPathAndLegacyVersion_ConvertsOnlySerializedOutputToBezier()
+    public void EncodeHitObject_WithMixedPathAndLegacyVersion_ConvertsOnlySerializedOutputToBezier()
     {
         // Arrange
-        HitObject hitObject = new("64,96,1200,2,0,P|128:160|192:96|L|256:96,1,240");
+        HitObject hitObject = BeatmapTestData.DecodeHitObject("64,96,1200,2,0,P|128:160|192:96|L|256:96,1,240");
         var originalPoints = hitObject.ControlPoints.Select(point => (point.Position, point.Type)).ToArray();
 
         // Act
-        string legacyLine = hitObject.GetLine(14);
-        string lazerLine = hitObject.GetLine(128);
+        string legacyLine = BeatmapTestData.EncodeHitObject(hitObject, 14);
+        string lazerLine = BeatmapTestData.EncodeHitObject(hitObject, 128);
 
         // Assert
         legacyLine.Split(',')[5].Should().StartWith("B|");
@@ -199,40 +201,40 @@ public class HitObjectTests
     }
 
     [TestMethod]
-    public void GetLine_WithDuplicatedTypedBoundary_WritesOneBezierSegmentBoundary()
+    public void EncodeHitObject_WithDuplicatedTypedBoundary_WritesOneBezierSegmentBoundary()
     {
         // Arrange
-        HitObject hitObject = new("0,0,1000,2,0,L|100:0|B|100:0|150:100|200:0,1,300");
+        HitObject hitObject = BeatmapTestData.DecodeHitObject("0,0,1000,2,0,L|100:0|B|100:0|150:100|200:0,1,300");
 
         // Act
-        string legacyPath = hitObject.GetLine(14).Split(',')[5];
+        string legacyPath = BeatmapTestData.EncodeHitObject(hitObject, 14).Split(',')[5];
 
         // Assert
         legacyPath.Should().Be("B|100:0|100:0|150:100|200:0");
-        hitObject.GetLine(128).Split(',')[5].Should().Be("L|B|100:0|150:100|200:0");
+        BeatmapTestData.EncodeHitObject(hitObject, 128).Split(',')[5].Should().Be("L|B|100:0|150:100|200:0");
     }
 
     [TestMethod]
-    public void GetLine_WithBSplineAndLegacyVersion_WritesBezierWithoutChangingStoredType()
+    public void EncodeHitObject_WithBSplineAndLegacyVersion_WritesBezierWithoutChangingStoredType()
     {
         // Arrange
-        HitObject hitObject = new("64,96,1200,2,0,B4|128:96|192:128|256:96,1,240");
+        HitObject hitObject = BeatmapTestData.DecodeHitObject("64,96,1200,2,0,B4|128:96|192:128|256:96,1,240");
 
         // Act
-        string legacyLine = hitObject.GetLine(14);
+        string legacyLine = BeatmapTestData.EncodeHitObject(hitObject, 14);
 
         // Assert
         legacyLine.Split(',')[5].Should().StartWith("B|");
         legacyLine.Split(',')[5].Should().NotStartWith("B4|");
         hitObject.ControlPoints[0].Type.Should().Be(PathType.BSpline);
-        hitObject.GetLine(128).Split(',')[5].Should().Be("B4|128:96|192:128|256:96");
+        BeatmapTestData.EncodeHitObject(hitObject, 128).Split(',')[5].Should().Be("B4|128:96|192:128|256:96");
     }
 
     [TestMethod]
     public void GetSliderPath_WithMixedPathTypes_EvaluatesBothSegments()
     {
         // Arrange
-        HitObject hitObject = new("64,96,1200,2,0,L|164:96|B|214:146|264:96,1,250");
+        HitObject hitObject = BeatmapTestData.DecodeHitObject("64,96,1200,2,0,L|164:96|B|214:146|264:96,1,250");
 
         // Act
         SliderPath path = hitObject.GetSliderPath(fullLength: true);
@@ -249,7 +251,7 @@ public class HitObjectTests
     public void GetSliderPath_WithTypedDuplicateAnchor_UsesTheNewSegmentType()
     {
         // Arrange
-        HitObject hitObject = new("0,0,1000,2,0,L|100:0|B|100:0|150:100|200:0,1,300");
+        HitObject hitObject = BeatmapTestData.DecodeHitObject("0,0,1000,2,0,L|100:0|B|100:0|150:100|200:0,1,300");
 
         // Act
         SliderPath path = hitObject.GetSliderPath(fullLength: true);
@@ -264,7 +266,7 @@ public class HitObjectTests
     public void Move_WithSliderControlPoints_KeepsTheirPositionsRelativeToTheStart()
     {
         // Arrange
-        HitObject hitObject = new("64,96,1200,2,0,P|128:160|192:96,1,200");
+        HitObject hitObject = BeatmapTestData.DecodeHitObject("64,96,1200,2,0,P|128:160|192:96,1,200");
         var originalPositions = hitObject.ControlPoints.Select(point => point.Position).ToArray();
 
         // Act
@@ -281,7 +283,7 @@ public class HitObjectTests
     public void SetSliderPath_WithExistingMultiplePathMarkers_ReplacesGeometryAndClearsStaleMarkers()
     {
         // Arrange
-        HitObject hitObject = new(
+        HitObject hitObject = BeatmapTestData.DecodeHitObject(
             "64,96,1200,2,0,B|128:96|L|192:128|256:96,1,240,0|0,0:0|0:0,0:0:0:0:");
         SliderPath replacement = new(PathType.BSpline,
             [new Vector2(10, 10), new Vector2(30, 10), new Vector2(30, 40)], 50);
@@ -295,14 +297,14 @@ public class HitObjectTests
             Vector2.Zero, new Vector2(20, 0), new Vector2(20, 30));
         hitObject.PixelLength.Should().Be(50);
         hitObject.ControlPoints.Skip(1).Should().OnlyContain(point => point.Type == null);
-        hitObject.GetLine().Split(',')[5].Should().Be("B4|30:10|30:40");
+        BeatmapTestData.EncodeHitObject(hitObject).Split(',')[5].Should().Be("B4|30:10|30:40");
     }
 
     [TestMethod]
     public void ControlPoints_WithReplacementControlPoints_ClearsTypedSegmentMarkers()
     {
         // Arrange
-        HitObject hitObject = new(
+        HitObject hitObject = BeatmapTestData.DecodeHitObject(
             "64,96,1200,2,0,B|128:96|L|192:128|256:96,1,240,0|0,0:0|0:0,0:0:0:0:");
 
         // Act
@@ -316,14 +318,14 @@ public class HitObjectTests
 
         // Assert
         hitObject.ControlPoints.Skip(1).Should().OnlyContain(point => point.Type == null);
-        hitObject.GetLine().Split(',')[5].Should().Be("B|30:10|30:40");
+        BeatmapTestData.EncodeHitObject(hitObject).Split(',')[5].Should().Be("B|30:10|30:40");
     }
 
     [TestMethod]
     public void GetSliderPath_WithPixelLengthAndFullLength_PreservesTypeAndSeparatesRequestedFromGeometricLength()
     {
         // Arrange
-        HitObject hitObject = new(
+        HitObject hitObject = BeatmapTestData.DecodeHitObject(
             "64,96,1200,2,0,B4|128:96|192:96,1,50,0|0,0:0|0:0,0:0:0:0:");
 
         // Act
@@ -344,7 +346,7 @@ public class HitObjectTests
     public void DeepCopy_WithMultiplePathMarkers_CopiesTypedControlPoints()
     {
         // Arrange
-        HitObject original = new(
+        HitObject original = BeatmapTestData.DecodeHitObject(
             "64,96,1200,2,0,B|128:96|L|192:128|256:96,1,240,0|0,0:0|0:0,0:0:0:0:");
 
         // Act
@@ -359,30 +361,36 @@ public class HitObjectTests
     }
 
     [TestMethod]
-    public void HoldNoteLine_UsesEndTimeFromObjectParams()
+    public void DecodeHitObject_HoldNoteLine_UsesEndTimeFromObjectParams()
     {
         // Arrange
-        // Act
         const string line = "128,192,2000,128,0,2500:1:2:3:40:hold.wav";
-        var hitObject = new HitObject(line);
+
+        // Act
+        var hitObject = BeatmapTestData.DecodeHitObject(line);
 
         // Assert
         hitObject.IsHoldNote.Should().BeTrue();
         hitObject.EndTime.Should().Be(2500d);
-        hitObject.GetLine().Should().Be(line);
+        BeatmapTestData.EncodeHitObject(hitObject).Should().Be(line);
     }
 
     [TestMethod]
-    public void Comparer_CanIgnorePositionAndTime()
+    public void Equals_WhenPositionAndTimeAreIgnored_TreatsObjectsAsEqual()
     {
         // Arrange
+        var first = BeatmapTestData.DecodeHitObject("64,96,1000,1,0,0:0:0:0:");
+        var second = BeatmapTestData.DecodeHitObject("128,192,2000,1,0,0:0:0:0:");
+        HitObjectComparer comparerIgnoringPositionAndTime = new(false, false);
+        HitObjectComparer comparerIncludingPositionAndTime = new();
+
         // Act
-        var first = new HitObject("64,96,1000,1,0,0:0:0:0:");
-        var second = new HitObject("128,192,2000,1,0,0:0:0:0:");
+        bool ignorePositionAndTime = comparerIgnoringPositionAndTime.Equals(first, second);
+        bool includePositionAndTime = comparerIncludingPositionAndTime.Equals(first, second);
 
         // Assert
-        new HitObjectComparer(false, false).Equals(first, second).Should().BeTrue();
-        new HitObjectComparer().Equals(first, second).Should().BeFalse();
+        ignorePositionAndTime.Should().BeTrue();
+        includePositionAndTime.Should().BeFalse();
     }
 
     [TestMethod]
@@ -455,7 +463,7 @@ public class HitObjectTests
     public void GetAllTloTimes_ForHoldNote_ReturnsStartAndEndEdges()
     {
         // Arrange
-        HitObject hold = new("128,192,2000,128,0,2500:1:2:3:40:hold.wav");
+        HitObject hold = BeatmapTestData.DecodeHitObject("128,192,2000,128,0,2500:1:2:3:40:hold.wav");
         Timing timing = new(1.4);
 
         // Act
@@ -467,13 +475,12 @@ public class HitObjectTests
 
     private static HitObject CreateSlider()
     {
-        return new HitObject("256,192,1000,2,0,L|456:192,2,140,0|0|0,0:0|0:0|0:0,0:0:0:0:")
-        {
-            TemporalLength = 500,
-            SliderVelocity = -100,
-            TimingPoint = CreateTimingPoint(0, -100, SampleSet.Normal, 0, false),
-            UnInheritedTimingPoint = CreateTimingPoint(0, 500, SampleSet.Normal, 0, true),
-        };
+        HitObject slider = BeatmapTestData.DecodeHitObject("256,192,1000,2,0,L|456:192,2,140,0|0|0,0:0|0:0|0:0,0:0:0:0:");
+        slider.TemporalLength = 500;
+        slider.SliderVelocity = -100;
+        slider.TimingPoint = CreateTimingPoint(0, -100, SampleSet.Normal, 0, false);
+        slider.UnInheritedTimingPoint = CreateTimingPoint(0, 500, SampleSet.Normal, 0, true);
+        return slider;
     }
 
     private static TimingPoint CreateTimingPoint(

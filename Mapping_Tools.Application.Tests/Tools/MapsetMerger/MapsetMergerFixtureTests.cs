@@ -3,6 +3,7 @@ using System.Text.Json;
 using Mapping_Tools.Application.Tests.Execution;
 using Mapping_Tools.Application.Tools.MapsetMerger;
 using Mapping_Tools.Application.Tools.MapsetMerger.Models;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Mapping_Tools.Infrastructure.Files;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -19,7 +20,11 @@ public sealed class MapsetMergerFixtureTests : TransformationFixtureTestBase
         using var fixture = CreateFixture("mapset-merger", fixtureName);
         var project = fixture.ReadProject<MapsetMergerServiceOptions>();
         StageMapsetMergerSources(fixture, project);
-        MapsetMergerService service = new(fixture.Gateway, new PhysicalBeatmapsetFileSystem());
+        MapsetMergerService service = new(
+            fixture.Gateway,
+            new PhysicalBeatmapsetFileSystem(),
+            new BeatmapEncoder(),
+            new StoryboardEncoder());
 
         // Act
         await service.MergeAsync(project, cancellationToken: CancellationToken.None);

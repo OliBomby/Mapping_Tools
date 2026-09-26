@@ -7,18 +7,18 @@ namespace Mapping_Tools.Application.Abstractions;
 public interface ITextFileStore
 {
     /// <summary>
-    ///     Reads a text file as an ordered collection of lines.
+    ///     Reads the complete contents of a text file.
     /// </summary>
     /// <param name="path">The file to read.</param>
-    /// <returns>The file contents without line terminators.</returns>
-    IReadOnlyList<string> ReadAllLines(string path);
+    /// <returns>The complete file contents.</returns>
+    string ReadAllText(string path);
 
     /// <summary>
-    ///     Replaces a text file with the supplied lines.
+    ///     Replaces a text file with the supplied text.
     /// </summary>
     /// <param name="path">The destination file.</param>
-    /// <param name="lines">The lines to write in their output order.</param>
-    void WriteAllLines(string path, IEnumerable<string> lines);
+    /// <param name="text">The complete contents to write.</param>
+    void WriteAllText(string path, string text);
 
     /// <summary>
     ///     Deletes a file.

@@ -1,6 +1,7 @@
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Mapping_Tools.Core.Tools.MapCleaner;
 using Mapping_Tools.Core.Tools.MapCleaner.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -35,7 +36,9 @@ public sealed class MapCleanerEngineTests
         beatmap.BeatmapTiming.TimingPoints.Should().HaveCount(815);
         beatmap.HitObjects.Should().HaveCount(924);
         beatmap.GetBookmarks().Should().HaveCount(20);
-        beatmap.GetLines().Should().Equal(
+        string encoded = new BeatmapEncoder().Encode(beatmap);
+        string lineContent = encoded.TrimEnd('\r', '\n');
+        lineContent.Split("\r\n", StringSplitOptions.None).Should().Equal(
             File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "Resources", "expected-map-cleaner.osu")));
     }
 
@@ -43,9 +46,10 @@ public sealed class MapCleanerEngineTests
     public void Clean_WithRemoveHitsounds_ClearsCircleAndSliderEdgeHitsounds()
     {
         // Arrange
-        Beatmap beatmap = CreateBeatmap(
-            new HitObject("256,192,1000,1,2,0:0:0:0:"),
-            new HitObject("256,192,1500,2,0,L|356:192,1,100") { EdgeHitsounds = [2, 8] });
+        HitObject circle = BeatmapTestData.DecodeHitObject("256,192,1000,1,2,0:0:0:0:");
+        HitObject slider = BeatmapTestData.DecodeHitObject("256,192,1500,2,0,L|356:192,1,100");
+        slider.EdgeHitsounds = [2, 8];
+        Beatmap beatmap = CreateBeatmap(circle, slider);
         MapCleanerEngineOptions options = new()
         {
             RemoveHitsounds = true,
@@ -66,7 +70,7 @@ public sealed class MapCleanerEngineTests
     public void Clean_WithWholeBeatResnapping_MovesOffGridObjectAndBookmark()
     {
         // Arrange
-        Beatmap beatmap = CreateBeatmap(new HitObject("256,192,1020,1,0,0:0:0:0:"));
+        Beatmap beatmap = CreateBeatmap(BeatmapTestData.DecodeHitObject("256,192,1020,1,0,0:0:0:0:"));
         beatmap.SetBookmarks([1020]);
         MapCleanerEngineOptions options = new()
         {
@@ -92,7 +96,7 @@ public sealed class MapCleanerEngineTests
 
     private static Beatmap Load(string fileName)
     {
-        return new Beatmap(
-            File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "Resources", fileName)).ToList());
+        return new BeatmapDecoder().Decode(
+            File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Resources", fileName)));
     }
 }

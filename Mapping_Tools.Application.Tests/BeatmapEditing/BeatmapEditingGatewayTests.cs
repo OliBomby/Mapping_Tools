@@ -4,6 +4,7 @@ using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.MathUtil;
@@ -217,7 +218,7 @@ public sealed class BeatmapEditingGatewayTests
         backup.BackupPrecededWrite.Should().BeTrue();
         reload.ReloadCount.Should().Be(1);
         reload.FileHadBeenWritten.Should().BeTrue();
-        store.Files[map_path].Any(line => line == "Version:Edited").Should().BeTrue();
+        store.Files[map_path].Should().Contain("Version:Edited");
     }
 
     [TestMethod]
@@ -244,7 +245,7 @@ public sealed class BeatmapEditingGatewayTests
         backup.LastForce.Should().BeFalse();
         backup.ArtifactCount.Should().Be(0);
         store.WriteCount.Should().Be(1);
-        store.Files[map_path].Any(line => line == "Version:Edited").Should().BeTrue();
+        store.Files[map_path].Should().Contain("Version:Edited");
     }
 
     [TestMethod]
@@ -317,7 +318,11 @@ public sealed class BeatmapEditingGatewayTests
             {
                 FileWrittenResolver = () => store.WriteCount > 0,
             },
-            settings ?? new ApplicationSettings());
+            settings ?? new ApplicationSettings(),
+            new BeatmapDecoder(),
+            new BeatmapEncoder(),
+            new StoryboardDecoder(),
+            new StoryboardEncoder());
     }
 
     private static RecordingTextFileStore CreateStore()
@@ -329,7 +334,7 @@ public sealed class BeatmapEditingGatewayTests
             "standard-feature-rich.osu");
         return new RecordingTextFileStore(
             map_path,
-            File.ReadAllLines(fixture));
+            File.ReadAllText(fixture));
     }
 
     private sealed class RecordingBackupService : IBeatmapBackupService

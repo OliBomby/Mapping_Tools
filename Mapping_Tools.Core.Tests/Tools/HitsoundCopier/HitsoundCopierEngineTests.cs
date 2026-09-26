@@ -2,6 +2,7 @@ using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.BeatmapHelper.Events;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.HitsoundCopier;
@@ -18,7 +19,7 @@ public sealed class HitsoundCopierEngineTests
     {
         // Arrange
         var source = LoadFixture();
-        Beatmap target = new(source.GetLines());
+        Beatmap target = NormalizeThroughText(source);
         HitsoundCopierEngineOptions options = new()
         {
             CopyMode = HitsoundCopierCopyMode.OverwriteEverything,
@@ -60,7 +61,7 @@ public sealed class HitsoundCopierEngineTests
         var source = LoadStoryboardFixture();
         source.StoryboardSoundSamples.Clear();
         source.StoryboardSoundSamples.Add(new StoryboardSoundSample(100, StoryboardLayer.Foreground, "sample.wav", 80));
-        Beatmap target = new(source.GetLines());
+        Beatmap target = NormalizeThroughText(source);
         HitsoundCopierEngineOptions options = new()
         {
             CopyHitsounds = false,
@@ -87,8 +88,8 @@ public sealed class HitsoundCopierEngineTests
         TimingPoint redline = new(0, 1000, 4, SampleSet.Normal, 0, 100, true, false, false);
         Beatmap target = new(
             [
-                new HitObject("256,192,100,2,0,L|396:192,1,140,0|1,0:0|2:0,0:0:0:0:"),
-                new HitObject("256,192,2100,2,0,L|396:192,1,140,0|1,0:0|3:0,0:0:0:0:"),
+                BeatmapTestData.DecodeHitObject("256,192,100,2,0,L|396:192,1,140,0|1,0:0|2:0,0:0:0:0:"),
+                BeatmapTestData.DecodeHitObject("256,192,2100,2,0,L|396:192,1,140,0|1,0:0|3:0,0:0:0:0:"),
             ],
             [redline],
             redline);
@@ -132,7 +133,7 @@ public sealed class HitsoundCopierEngineTests
         var targetTiming = sourceTiming.Copy();
         Beatmap target = new(
             [
-                new HitObject("256,192,0,2,0,L|396:192,1,140,0|0:0,0:0:0:0:"),
+                BeatmapTestData.DecodeHitObject("256,192,0,2,0,L|396:192,1,140,0|0:0,0:0:0:0:"),
             ],
             [targetTiming],
             targetTiming);
@@ -260,9 +261,9 @@ public sealed class HitsoundCopierEngineTests
         TimingPoint redline = new(0, 500, 4, SampleSet.Normal, 0, 100, true, false, false);
         TimingPoint mute = new(500, -100, 4, SampleSet.Normal, 0, 5, false, false, false);
         Beatmap source = CreateCircleBeatmap(1000, 2);
-        Beatmap preserved = new([new HitObject("256,192,1000,1,0,0:0:0:0:")],
+        Beatmap preserved = new([BeatmapTestData.DecodeHitObject("256,192,1000,1,0,0:0:0:0:")],
             [redline.Copy(), mute.Copy()], redline.Copy());
-        Beatmap overwritten = new([new HitObject("256,192,1000,1,0,0:0:0:0:")],
+        Beatmap overwritten = new([BeatmapTestData.DecodeHitObject("256,192,1000,1,0,0:0:0:0:")],
             [redline.Copy(), mute.Copy()], redline.Copy());
         HitsoundCopierEngineOptions options = new()
         {
@@ -286,26 +287,31 @@ public sealed class HitsoundCopierEngineTests
     {
         TimingPoint redline = new(0, 500, 4, SampleSet.Normal, 0, 100, true, false, false);
         return new Beatmap(
-            [new HitObject($"256,192,{time},1,{hitsound},0:0:0:0:")],
+            [BeatmapTestData.DecodeHitObject($"256,192,{time},1,{hitsound},0:0:0:0:")],
             [redline],
             redline);
     }
 
     private static Beatmap LoadFixture()
     {
-        return new Beatmap(
-            File.ReadAllLines(Path.Combine(
+        return new BeatmapDecoder().Decode(
+            File.ReadAllText(Path.Combine(
                 AppContext.BaseDirectory,
                 "Resources",
-                "ComplicatedTestMap.osu")).ToList());
+                "ComplicatedTestMap.osu")));
     }
 
     private static Beatmap LoadStoryboardFixture()
     {
-        return new Beatmap(
-            File.ReadAllLines(Path.Combine(
+        return new BeatmapDecoder().Decode(
+            File.ReadAllText(Path.Combine(
                 AppContext.BaseDirectory,
                 "Resources",
-                "EmptyTestMap.osu")).ToList());
+                "EmptyTestMap.osu")));
+    }
+
+    private static Beatmap NormalizeThroughText(Beatmap beatmap)
+    {
+        return new BeatmapDecoder().Decode(new BeatmapEncoder().Encode(beatmap));
     }
 }

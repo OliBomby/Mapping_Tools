@@ -13,10 +13,8 @@ public sealed class SliderEndGeneratorTests
     public void GetRelevantObjects_WithExpectedSliderLength_ReturnsPlayableEndAtSliderEndTime()
     {
         // Arrange
-        HitObject slider = new("64,96,1000,2,0,L|164:96,1,50,0|0,0:0|0:0,0:0:0:0:")
-        {
-            TemporalLength = 500,
-        };
+        HitObject slider = BeatmapTestData.DecodeHitObject("64,96,1000,2,0,L|164:96,1,50,0|0,0:0|0:0,0:0:0:0:");
+        slider.TemporalLength = 500;
         SliderEndGenerator generator = new();
 
         // Act
@@ -32,7 +30,7 @@ public sealed class SliderEndGeneratorTests
     public void GetRelevantObjects_WithCircle_ReturnsNoSliderEnd()
     {
         // Arrange
-        HitObject circle = new("64,96,1000,1,0,0:0:0:0:");
+        HitObject circle = BeatmapTestData.DecodeHitObject("64,96,1000,1,0,0:0:0:0:");
         SliderEndGenerator generator = new();
 
         // Act

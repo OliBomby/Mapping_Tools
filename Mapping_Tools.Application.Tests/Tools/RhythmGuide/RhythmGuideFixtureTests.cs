@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.Tests.Execution;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.RhythmGuide;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Mapping_Tools.Infrastructure.Files;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -20,7 +21,9 @@ public sealed class RhythmGuideFixtureTests : TransformationFixtureTestBase
             fixture.Gateway,
             new TestBeatmapBackupService(),
             new PhysicalBeatmapsetFileSystem(),
-            new PhysicalBeatmapsetFileSystem());
+            new PhysicalBeatmapsetFileSystem(),
+            new BeatmapDecoder(),
+            new BeatmapEncoder());
 
         // Act
         var result = await service.GenerateAsync(

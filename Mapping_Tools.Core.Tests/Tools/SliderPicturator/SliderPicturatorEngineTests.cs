@@ -224,10 +224,8 @@ public sealed class SliderPicturatorEngineTests
         // Arrange
         RgbaImage image = new(2, 2,
             [255, 255, 255, 255, 0, 0, 0, 255, 0, 0, 0, 255, 255, 255, 255, 255]);
-        HitObject selected = new("256,192,100,2,0,L|270:192,1,14,0|0,0:0|0:0,0:0:0:0:")
-        {
-            TemporalLength = 4,
-        };
+        HitObject selected = BeatmapTestData.DecodeHitObject("256,192,100,2,0,L|270:192,1,14,0|0,0:0|0:0,0:0:0:0:");
+        selected.TemporalLength = 4;
         SliderPicturatorEngineOptions options = new()
         {
             SelectedSlider = selected,
@@ -304,10 +302,8 @@ public sealed class SliderPicturatorEngineTests
         RgbaImage image = new(2, 1, [255, 255, 255, 255, 0, 0, 0, 255]);
         SliderPicturatorEngineOptions options = new() { Quality = 1 };
         long baseSegments = SliderPicturatorEngine.Recolor(image, options).SegmentCount;
-        HitObject selectedSlider = new("256,192,100,2,0,L|270:192,1,14,0|0,0:0|0:0,0:0:0:0:")
-        {
-            TemporalLength = 4,
-        };
+        HitObject selectedSlider = BeatmapTestData.DecodeHitObject("256,192,100,2,0,L|270:192,1,14,0|0,0:0|0:0,0:0:0:0:");
+        selectedSlider.TemporalLength = 4;
         options.SelectedSlider = selectedSlider;
 
         // Act

@@ -1,4 +1,5 @@
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Mapping_Tools.Core.Tools.MetadataManager;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -65,7 +66,7 @@ public sealed class MetadataManagerEngineTests
 
     private static Beatmap Load(string fileName)
     {
-        return new Beatmap(
-            File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "Resources", fileName)).ToList());
+        return new BeatmapDecoder().Decode(
+            File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Resources", fileName)));
     }
 }

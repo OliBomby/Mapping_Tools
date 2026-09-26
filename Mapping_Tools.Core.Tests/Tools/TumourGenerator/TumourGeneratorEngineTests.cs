@@ -20,7 +20,7 @@ public sealed class TumourGeneratorEngineTests
     {
         // Arrange
         const int resolution = 10;
-        HitObject hitObject = new("0,0,384,2,0,B|192:0|192:0|192:192,1,384");
+        HitObject hitObject = BeatmapTestData.DecodeHitObject("0,0,384,2,0,B|192:0|192:0|192:192,1,384");
         var pathWithHints = PathHelper.CreatePathWithHints(hitObject.GetSliderPath());
         TumourGeneratorEngine generator = new() { Resolution = resolution };
         var layer = TumourLayer.GetDefaultLayer();
@@ -88,7 +88,7 @@ public sealed class TumourGeneratorEngineTests
     public void TumourGenerate_SidednessAndWrapping_ChangesGeneratedPathWithoutChangingInput()
     {
         // Arrange
-        HitObject leftInput = new("0,0,0,2,0,L|256:0,1,256");
+        HitObject leftInput = BeatmapTestData.DecodeHitObject("0,0,0,2,0,L|256:0,1,256");
         var rightInput = leftInput.DeepCopy();
         var leftLayer = TumourLayer.GetDefaultLayer();
         leftLayer.TumourCount = 1;
@@ -143,7 +143,7 @@ public sealed class TumourGeneratorEngineTests
         // Act
         var generated = wrappingModes.Select(wrappingMode =>
         {
-            HitObject hitObject = new("0,0,0,2,0,B|128:0|128:128,1,256");
+            HitObject hitObject = BeatmapTestData.DecodeHitObject("0,0,0,2,0,B|128:0|128:128,1,256");
             var layer = TumourLayer.GetDefaultLayer();
             layer.WrappingMode = wrappingMode;
             layer.TumourCount = 1;
@@ -361,10 +361,10 @@ public sealed class TumourGeneratorEngineTests
     public void TumourGenerate_WithCircleOrNoLayers_ReturnsFalseWithoutChangingInput()
     {
         // Arrange
-        HitObject circle = new("64,64,0,1,2");
-        HitObject slider = new("0,0,0,2,0,L|256:0,1,256");
-        string circleLine = circle.GetLine();
-        string sliderLine = slider.GetLine();
+        HitObject circle = BeatmapTestData.DecodeHitObject("64,64,0,1,2");
+        HitObject slider = BeatmapTestData.DecodeHitObject("0,0,0,2,0,L|256:0,1,256");
+        string circleLine = BeatmapTestData.EncodeHitObject(circle);
+        string sliderLine = BeatmapTestData.EncodeHitObject(slider);
 
         // Act
         bool circleGenerated = new TumourGeneratorEngine { TumourLayers = [TumourLayer.GetDefaultLayer()] }
@@ -374,16 +374,16 @@ public sealed class TumourGeneratorEngineTests
         // Assert
         circleGenerated.Should().BeFalse();
         sliderGenerated.Should().BeFalse();
-        circle.GetLine().Should().Be(circleLine);
-        slider.GetLine().Should().Be(sliderLine);
+        BeatmapTestData.EncodeHitObject(circle).Should().Be(circleLine);
+        BeatmapTestData.EncodeHitObject(slider).Should().Be(sliderLine);
     }
 
     [TestMethod]
     public void TumourGenerate_WhenCancelledBeforePlacement_LeavesSliderUnchanged()
     {
         // Arrange
-        HitObject slider = new("0,0,0,2,0,L|256:0,1,256");
-        string originalLine = slider.GetLine();
+        HitObject slider = BeatmapTestData.DecodeHitObject("0,0,0,2,0,L|256:0,1,256");
+        string originalLine = BeatmapTestData.EncodeHitObject(slider);
         TumourGeneratorEngine generator = new() { TumourLayers = [TumourLayer.GetDefaultLayer()] };
         using CancellationTokenSource cancellation = new();
         cancellation.Cancel();
@@ -393,14 +393,14 @@ public sealed class TumourGeneratorEngineTests
 
         // Assert
         act.Should().Throw<OperationCanceledException>();
-        slider.GetLine().Should().Be(originalLine);
+        BeatmapTestData.EncodeHitObject(slider).Should().Be(originalLine);
     }
 
     [TestMethod]
     public void TumourGenerate_WithRelativeRangeAndMiddleAnchors_RecordsLengthAndReconstructsLinearPath()
     {
         // Arrange
-        HitObject slider = new("0,0,0,2,0,L|256:0,1,256");
+        HitObject slider = BeatmapTestData.DecodeHitObject("0,0,0,2,0,L|256:0,1,256");
         var layer = TumourLayer.GetDefaultLayer();
         layer.UseAbsoluteRange = false;
         layer.TumourStart = 0.25;
@@ -426,7 +426,7 @@ public sealed class TumourGeneratorEngineTests
     public void TumourGenerate_WithInactiveLayer_LeavesLayerLengthListEmpty()
     {
         // Arrange
-        HitObject slider = new("0,0,0,2,0,L|256:0,1,256");
+        HitObject slider = BeatmapTestData.DecodeHitObject("0,0,0,2,0,L|256:0,1,256");
         var inactiveLayer = TumourLayer.GetDefaultLayer();
         inactiveLayer.IsActive = false;
         TumourGeneratorEngine generator = new() { TumourLayers = [inactiveLayer] };
@@ -448,7 +448,7 @@ public sealed class TumourGeneratorEngineTests
     public void TumourGenerate_WithEachTemplate_ProducesFiniteSliderPath(TumourTemplate template)
     {
         // Arrange
-        HitObject slider = new("0,0,0,2,0,L|256:0,1,256");
+        HitObject slider = BeatmapTestData.DecodeHitObject("0,0,0,2,0,L|256:0,1,256");
         var layer = TumourLayer.GetDefaultLayer();
         layer.TumourTemplateEnum = template;
         layer.TumourCount = 1;
@@ -467,8 +467,8 @@ public sealed class TumourGeneratorEngineTests
         if (template == TumourTemplate.Circle)
         {
             slider.ControlPoints.Should().Contain(point => point.Type == PathType.PerfectCurve);
-            slider.GetLine(128).Should().Contain("|P|");
-            slider.GetLine(127).Split(',')[5].Should().StartWith("B|").And.NotContain("|P|");
+            BeatmapTestData.EncodeHitObject(slider, 128).Should().Contain("|P|");
+            BeatmapTestData.EncodeHitObject(slider, 127).Split(',')[5].Should().StartWith("B|").And.NotContain("|P|");
         }
     }
 
@@ -478,8 +478,8 @@ public sealed class TumourGeneratorEngineTests
         // Arrange
         const int seed = 712;
         bool randomChoosesRight = new Random(seed).NextDouble() < 0.5;
-        HitObject randomSlider = new("0,0,0,2,0,L|256:0,1,256");
-        HitObject expectedSlider = new("0,0,0,2,0,L|256:0,1,256");
+        HitObject randomSlider = BeatmapTestData.DecodeHitObject("0,0,0,2,0,L|256:0,1,256");
+        HitObject expectedSlider = BeatmapTestData.DecodeHitObject("0,0,0,2,0,L|256:0,1,256");
         var randomLayer = TumourLayer.GetDefaultLayer();
         randomLayer.TumourSidedness = TumourSidedness.Random;
         randomLayer.RandomSeed = seed;

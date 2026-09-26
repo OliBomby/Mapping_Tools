@@ -14,10 +14,8 @@ public sealed class SliderPathGeneratorTests
     public void GetRelevantObjects_WithConfiguredDensitySamplesPositionAndTimeAlongPath()
     {
         // Arrange
-        HitObject slider = new("64,96,1000,2,0,L|164:96,1,100,0|0,0:0|0:0,0:0:0:0:")
-        {
-            TemporalLength = 500,
-        };
+        HitObject slider = BeatmapTestData.DecodeHitObject("64,96,1000,2,0,L|164:96,1,100,0|0,0:0|0:0,0:0:0:0:");
+        slider.TemporalLength = 500;
         SliderPathGenerator generator = new();
         ((SliderPathGeneratorSettings)generator.Settings).PointDensity = 0.05;
 
@@ -39,10 +37,8 @@ public sealed class SliderPathGeneratorTests
     public void GetRelevantObjects_WithOneRequestedSample_UsesSliderStart()
     {
         // Arrange
-        HitObject slider = new("64,96,1000,2,0,L|164:96,1,100,0|0,0:0|0:0,0:0:0:0:")
-        {
-            TemporalLength = 500,
-        };
+        HitObject slider = BeatmapTestData.DecodeHitObject("64,96,1000,2,0,L|164:96,1,100,0|0,0:0|0:0,0:0:0:0:");
+        slider.TemporalLength = 500;
         SliderPathGenerator generator = new();
         ((SliderPathGeneratorSettings)generator.Settings).PointDensity = 0.01;
 
@@ -59,7 +55,7 @@ public sealed class SliderPathGeneratorTests
     public void GetRelevantObjects_WithNonSlider_ReturnsNull()
     {
         // Arrange
-        HitObject circle = new("64,96,1000,1,0,0:0:0:0:");
+        HitObject circle = BeatmapTestData.DecodeHitObject("64,96,1000,1,0,0:0:0:0:");
         SliderPathGenerator generator = new();
 
         // Act
@@ -73,7 +69,7 @@ public sealed class SliderPathGeneratorTests
     public void GetRelevantObjects_WithDensityBelowOneSample_ReturnsEmptyArray()
     {
         // Arrange
-        HitObject slider = new("64,96,1000,2,0,L|164:96,1,100,0|0,0:0|0:0,0:0:0:0:");
+        HitObject slider = BeatmapTestData.DecodeHitObject("64,96,1000,2,0,L|164:96,1,100,0|0,0:0|0:0,0:0:0:0:");
         SliderPathGenerator generator = new();
         ((SliderPathGeneratorSettings)generator.Settings).PointDensity = 0.009;
 

@@ -2,6 +2,7 @@ using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tests.Execution;
 using Mapping_Tools.Application.Tools.PatternGallery;
 using Mapping_Tools.Application.Tools.PatternGallery.Models;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Mapping_Tools.Infrastructure.Tools.PatternGallery;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -23,7 +24,9 @@ public sealed class PatternGalleryFixtureTests : TransformationFixtureTestBase
         PatternGalleryService service = new(
             fixture.Gateway,
             new PatternGalleryFileService(),
-            new ApplicationSettings());
+            new ApplicationSettings(),
+            new BeatmapDecoder(),
+            new BeatmapEncoder());
 
         // Act
         await service.ExportAsync(

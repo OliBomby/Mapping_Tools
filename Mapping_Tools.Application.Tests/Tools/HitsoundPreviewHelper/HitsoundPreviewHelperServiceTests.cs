@@ -89,8 +89,8 @@ public sealed class HitsoundPreviewHelperServiceTests
     {
         Beatmap source = new(
             [
-                new HitObject("64,96,1000,1,0,0:0:0:0:"),
-                new HitObject("400,96,2000,1,0,0:0:0:0:"),
+                BeatmapEditingSessionTestFactory.DecodeHitObject("64,96,1000,1,0,0:0:0:0:"),
+                BeatmapEditingSessionTestFactory.DecodeHitObject("400,96,2000,1,0,0:0:0:0:"),
             ],
             [],
             globalSv: 1.4);
@@ -98,13 +98,13 @@ public sealed class HitsoundPreviewHelperServiceTests
         {
             OpenBeatmapFactory = (path, livePreference) =>
             {
-                Beatmap beatmap = new(source.GetLines());
+                Beatmap beatmap = BeatmapEditingSessionTestFactory.CloneThroughText(source);
                 IReadOnlyList<HitObject> selected =
                 [
                     .. beatmap.HitObjects
                         .Take(selectedObjectCount),
                 ];
-                return new BeatmapEditingSession(
+                return BeatmapEditingSessionTestFactory.FromModel(
                     beatmap,
                     path,
                     new NoOpTextFileStore(),

@@ -24,6 +24,7 @@ using Mapping_Tools.Application.Updates;
 using Mapping_Tools.Application.Updates.Contracts;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Application.Workspace.Contracts;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services;
 using Mapping_Tools.Desktop.Services.Dialogs;
@@ -143,6 +144,10 @@ internal static class DesktopServiceRegistration
             provider.GetRequiredService<PhysicalBeatmapsetFileSystem>());
         services.AddSingleton<ITextFileStore>(provider =>
             provider.GetRequiredService<PhysicalBeatmapsetFileSystem>());
+        services.AddSingleton<IBeatmapDecoder, BeatmapDecoder>();
+        services.AddSingleton<IBeatmapEncoder, BeatmapEncoder>();
+        services.AddSingleton<IStoryboardDecoder, StoryboardDecoder>();
+        services.AddSingleton<IStoryboardEncoder, StoryboardEncoder>();
         services.AddSingleton<IUserNotificationService, UserNotificationService>();
         services.AddSingleton<ToolExecutionService>();
         services.AddSingleton<IToolExecutionService>(provider =>

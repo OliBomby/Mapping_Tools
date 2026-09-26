@@ -175,12 +175,12 @@ public sealed class WindowsGeometryDashboardOverlayServiceTests
 
     private sealed class ConfigStore : ITextFileStore
     {
-        public IReadOnlyList<string> ReadAllLines(string path)
+        public string ReadAllText(string path)
         {
-            return ["Fullscreen = false", "Letterboxing = false", "Width = 320", "Height = 240"];
+            return "Fullscreen = false\r\nLetterboxing = false\r\nWidth = 320\r\nHeight = 240";
         }
 
-        public void WriteAllLines(string path, IEnumerable<string> lines)
+        public void WriteAllText(string path, string text)
         {
             throw new NotSupportedException();
         }

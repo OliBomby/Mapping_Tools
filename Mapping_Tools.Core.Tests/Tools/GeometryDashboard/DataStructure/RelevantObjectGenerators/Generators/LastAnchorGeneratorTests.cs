@@ -14,7 +14,8 @@ public sealed class LastAnchorGeneratorTests
     {
         // Arrange
         LastAnchorGenerator generator = new();
-        HitObject slider = new("0,0,100,2,0,L|10:0|20:0,1,20") { EndTime = 300 };
+        HitObject slider = BeatmapTestData.DecodeHitObject("0,0,100,2,0,L|10:0|20:0,1,20");
+        slider.EndTime = 300;
 
         // Act
         RelevantPoint? point = generator.GetRelevantObjects(new RelevantHitObject(slider));
@@ -30,7 +31,7 @@ public sealed class LastAnchorGeneratorTests
     {
         // Arrange
         LastAnchorGenerator generator = new();
-        HitObject circle = new("0,0,100,1,0,0:0:0:0:");
+        HitObject circle = BeatmapTestData.DecodeHitObject("0,0,100,1,0,0:0:0:0:");
 
         // Act
         RelevantPoint? point = generator.GetRelevantObjects(new RelevantHitObject(circle));

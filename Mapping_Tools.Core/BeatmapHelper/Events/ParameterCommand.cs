@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Mapping_Tools.Core.MathUtil;
 using static Mapping_Tools.Core.BeatmapHelper.FileFormatHelper;
 
@@ -28,51 +28,4 @@ public class ParameterCommand : Command, IHasEndTime
     /// <inheritdoc />
     public double EndTime { get; set; }
 
-    /// <inheritdoc />
-    public override string GetLine()
-    {
-        var builder = new StringBuilder(9);
-
-        builder.Append(EventType.ToString());
-        builder.Append(',');
-        builder.Append(((int)Easing).ToInvariant());
-        builder.Append(',');
-        builder.Append(SaveWithFloatPrecision ? StartTime.ToInvariant() : StartTime.ToRoundInvariant());
-        builder.Append(',');
-        if (!Precision.AlmostEquals(StartTime, EndTime)) builder.Append(SaveWithFloatPrecision ? EndTime.ToInvariant() : EndTime.ToRoundInvariant());
-
-        builder.Append(',');
-        builder.Append(Parameter);
-
-        return builder.ToString();
-    }
-
-    /// <inheritdoc />
-    public override void SetLine(string line)
-    {
-        string subLine = RemoveIndents(line);
-        string[] values = subLine.Split(',');
-
-        if (Enum.TryParse(values[1], out EasingType easingType))
-            Easing = easingType;
-        else throw new BeatmapParsingException("Failed to parse easing of command.", line);
-
-        if (TryParseDouble(values[2], out double startTime))
-            StartTime = startTime;
-        else throw new BeatmapParsingException("Failed to parse start time of param command.", line);
-
-        // Set end time to start time if empty. This accounts for the shorthand
-        if (string.IsNullOrEmpty(values[3]))
-        {
-            EndTime = StartTime;
-        }
-        else
-        {
-            if (TryParseDouble(values[3], out double endTime))
-                EndTime = endTime;
-            else throw new BeatmapParsingException("Failed to parse end time of param command.", line);
-        }
-
-        Parameter = values[4];
-    }
 }

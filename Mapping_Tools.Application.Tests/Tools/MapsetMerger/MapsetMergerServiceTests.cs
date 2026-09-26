@@ -2,8 +2,10 @@ using System.Diagnostics.CodeAnalysis;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.MapsetMerger;
 using Mapping_Tools.Application.Tools.MapsetMerger.Models;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Mapping_Tools.Infrastructure.Files;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -36,9 +38,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
                 new MapsetMergerServiceOptions.MapsetItem { Name = "Pack", Path = second },
             ],
         };
-        MapsetMergerService service = new(
-            new FixtureEditingGateway(),
-            new PhysicalBeatmapsetFileSystem());
+        MapsetMergerService service = CreateService();
 
         // Act
         var result = await service.MergeAsync(project);
@@ -75,9 +75,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
             ExportPath = exportPath,
             Mapsets = [new MapsetMergerServiceOptions.MapsetItem { Name = "Cancelled", Path = source }],
         };
-        MapsetMergerService service = new(
-            new FixtureEditingGateway(),
-            new PhysicalBeatmapsetFileSystem());
+        MapsetMergerService service = CreateService();
         using CancellationTokenSource cancellation = new();
         await cancellation.CancelAsync();
 
@@ -103,9 +101,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
             ExportPath = exportPath,
             Mapsets = [new MapsetMergerServiceOptions.MapsetItem { Name = "Nested", Path = source }],
         };
-        MapsetMergerService service = new(
-            new FixtureEditingGateway(),
-            new PhysicalBeatmapsetFileSystem());
+        MapsetMergerService service = CreateService();
 
         // Act
         await service.MergeAsync(project);
@@ -137,9 +133,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
             ExportPath = exportPath,
             Mapsets = [new MapsetMergerServiceOptions.MapsetItem { Name = "Overlap", Path = source }],
         };
-        MapsetMergerService service = new(
-            new FixtureEditingGateway(),
-            new PhysicalBeatmapsetFileSystem());
+        MapsetMergerService service = CreateService();
 
         // Act
         Func<Task> act = () => service.MergeAsync(project);
@@ -162,9 +156,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
             MoveSbToBeatmap = true,
             Mapsets = [new MapsetMergerServiceOptions.MapsetItem { Name = "Embedded", Path = source }],
         };
-        MapsetMergerService service = new(
-            new FixtureEditingGateway(),
-            new PhysicalBeatmapsetFileSystem());
+        MapsetMergerService service = CreateService();
 
         // Act
         var result = await service.MergeAsync(project);
@@ -188,9 +180,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
             ExportPath = exportPath,
             Mapsets = [new MapsetMergerServiceOptions.MapsetItem { Name = "Storyboard", Path = source }],
         };
-        MapsetMergerService service = new(
-            new FixtureEditingGateway(),
-            new PhysicalBeatmapsetFileSystem());
+        MapsetMergerService service = CreateService();
 
         // Act
         var result = await service.MergeAsync(project);
@@ -211,9 +201,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
         {
             ExportPath = exportPath,
         };
-        MapsetMergerService service = new(
-            new FixtureEditingGateway(),
-            new PhysicalBeatmapsetFileSystem());
+        MapsetMergerService service = CreateService();
 
         // Act
         var result = await service.MergeAsync(project);
@@ -229,6 +217,15 @@ public sealed class MapsetMergerServiceTests : IDisposable
         Dispose();
     }
 
+    private static MapsetMergerService CreateService()
+    {
+        return new MapsetMergerService(
+            new FixtureEditingGateway(),
+            new PhysicalBeatmapsetFileSystem(),
+            new BeatmapEncoder(),
+            new StoryboardEncoder());
+    }
+
     private sealed class FixtureEditingGateway : IBeatmapEditingGateway
     {
         private static readonly PhysicalBeatmapsetFileSystem files = new();
@@ -239,9 +236,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult(new BeatmapEditingSession(
-                path,
-                files));
+            return Task.FromResult(BeatmapEditingSessionTestFactory.FromPath(path, files));
         }
 
         public Task<StoryboardEditingSession> OpenStoryboardAsync(
@@ -249,7 +244,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult(new StoryboardEditingSession(path, files));
+            return Task.FromResult(BeatmapEditingSessionTestFactory.StoryboardFromPath(path, files));
         }
 
         public Task SaveAsync(

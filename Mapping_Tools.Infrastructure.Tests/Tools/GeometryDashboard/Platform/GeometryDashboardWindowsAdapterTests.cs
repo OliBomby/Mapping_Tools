@@ -584,8 +584,8 @@ public sealed class GeometryDashboardWindowsAdapterTests
 
     private sealed class EmptyTextFileStore : Application.Abstractions.ITextFileStore
     {
-        public IReadOnlyList<string> ReadAllLines(string path) => [];
-        public void WriteAllLines(string path, IEnumerable<string> lines) { }
+        public string ReadAllText(string path) => string.Empty;
+        public void WriteAllText(string path, string text) { }
         public void Delete(string path) { }
         public string GetParentFolder(string path) => string.Empty;
         public string CombinePath(string parent, string child) => child;

@@ -307,7 +307,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
             string json = serializer.Serialize(
                 definition.ConfigSchema,
                 dashboardService.GetLockedObjects());
-            files.WriteAllLines(path, json.Split(["\r\n", "\n"], StringSplitOptions.None));
+            files.WriteAllText(path, json);
             await notifications.PublishAsync(new UserNotification(
                 UserNotificationSeverity.Success,
                 "Save virtual objects",
@@ -342,7 +342,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
 
             var objects = serializer.Deserialize<RelevantObjectCollection>(
                 definition.ConfigSchema,
-                string.Join(Environment.NewLine, files.ReadAllLines(paths[0])));
+                files.ReadAllText(paths[0]));
             dashboardService.SetLockedObjects(objects);
             ApplyDashboardState(dashboardService.State);
             await notifications.PublishAsync(new UserNotification(

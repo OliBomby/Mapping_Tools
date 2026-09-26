@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.AutoFail;
 using Mapping_Tools.Core.Tools.AutoFail.Models;
@@ -204,10 +205,10 @@ public sealed class AutoFailDetectorEngineTests
 
     private static Beatmap Load(string fileName)
     {
-        return new Beatmap(
-            File.ReadAllLines(Path.Combine(
+        return new BeatmapDecoder().Decode(
+            File.ReadAllText(Path.Combine(
                 AppContext.BaseDirectory,
                 "Resources",
-                fileName)).ToList());
+                fileName)));
     }
 }

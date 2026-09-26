@@ -1,5 +1,6 @@
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.RhythmGuide.Models;
 
@@ -11,20 +12,26 @@ public static class RhythmGuideGenerator
     /// <summary>Creates a new guide map by retaining the first source's base metadata and redlines.</summary>
     /// <param name="sources">The beatmaps whose expanded rhythm events are copied.</param>
     /// <param name="options">The output mode, name, selection, and snapping choices.</param>
+    /// <param name="beatmapDecoder">Decodes the normalized source copy.</param>
+    /// <param name="beatmapEncoder">Encodes the source before normalization.</param>
     /// <param name="cancellationToken">Cancels timeline expansion or guide generation.</param>
     /// <returns>A new beatmap containing generated guide objects.</returns>
     public static Beatmap CreateNewMap(
         IReadOnlyList<Beatmap> sources,
         RhythmGuideEngineOptions options,
+        IBeatmapDecoder beatmapDecoder,
+        IBeatmapEncoder beatmapEncoder,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(sources);
         ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(beatmapDecoder);
+        ArgumentNullException.ThrowIfNull(beatmapEncoder);
         if (sources.Count == 0) throw new ArgumentException("There must be at least one beatmap.", nameof(sources));
         Validate(options);
 
         // Scuffed beatmap copy
-        Beatmap result = new(sources[0].GetLines());
+        Beatmap result = beatmapDecoder.Decode(beatmapEncoder.Encode(sources[0]));
         // Remove all greenlines
         result.BeatmapTiming.RemoveAll(point => !point.Uninherited);
         // Remove all hitobjects

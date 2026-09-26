@@ -117,6 +117,7 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             ContractResolver = new TumourProjectContractResolver(),
             Converters =
             [
+                new ProjectHitObjectJsonConverter(),
                 new Vector2Converter(),
                 new GeometryGeneratorSettingsDictionaryConverter(),
                 new GeometryRelevantObjectCollectionConverter(),

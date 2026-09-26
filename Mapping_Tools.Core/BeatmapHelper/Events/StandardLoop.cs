@@ -1,4 +1,4 @@
-﻿using static Mapping_Tools.Core.BeatmapHelper.FileFormatHelper;
+using static Mapping_Tools.Core.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Core.BeatmapHelper.Events;
 
@@ -17,24 +17,4 @@ public class StandardLoop : Command
     /// </summary>
     public int LoopCount { get; set; }
 
-    /// <inheritdoc />
-    public override string GetLine()
-    {
-        return $"{EventType},{(SaveWithFloatPrecision ? StartTime.ToInvariant() : StartTime.ToRoundInvariant())},{LoopCount.ToInvariant()}";
-    }
-
-    /// <inheritdoc />
-    public override void SetLine(string line)
-    {
-        string subLine = RemoveIndents(line);
-        string[] values = subLine.Split(',');
-
-        if (TryParseDouble(values[1], out double startTime))
-            StartTime = startTime;
-        else throw new BeatmapParsingException("Failed to parse start time of event param.", line);
-
-        if (TryParseInt(values[2], out int loopCount))
-            LoopCount = loopCount;
-        else throw new BeatmapParsingException("Failed to parse loop count of event param.", line);
-    }
 }
