@@ -1,5 +1,4 @@
 ﻿namespace Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
-#nullable disable
 
 /// <summary>
 ///     Describes a snap interval as a fraction of one beat.

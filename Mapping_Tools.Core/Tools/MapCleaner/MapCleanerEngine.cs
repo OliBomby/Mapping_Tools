@@ -115,7 +115,7 @@ public static class MapCleanerEngine
             cancellationToken.ThrowIfCancellationRequested();
             if (hitObject.IsSlider)
             {
-                var sliderVelocity = hitObject.TimingPoint.Copy();
+                var sliderVelocity = (hitObject.TimingPoint ?? throw new InvalidOperationException("Hit object timing must be resolved before cleaning a map.")).Copy();
                 sliderVelocity.Offset = hitObject.Time;
                 sliderVelocity.MpB = hitObject.SliderVelocity;
                 changes.Add(new TimingPointChange(sliderVelocity, true, fuzziness: 0.4));
@@ -127,6 +127,9 @@ public static class MapCleanerEngine
                 hitObject.ResetHitsounds();
                 continue;
             }
+
+            var hitsoundTimingPoint = hitObject.HitsoundTimingPoint
+                                      ?? throw new InvalidOperationException("Hitsound timing must be resolved before cleaning a map.");
 
             // Body hitsounds
             bool volume = hitObject.IsSlider && options.VolumeSliders || hitObject.IsSpinner && options.VolumeSpinners;
@@ -142,14 +145,14 @@ public static class MapCleanerEngine
                     volume: volume,
                     index: index,
                     sampleSet: sampleSet));
-                if (point.SampleSet != hitObject.HitsoundTimingPoint.SampleSet) sampleSetChanged = options.SampleSetSliders && hitObject.SampleSet == 0;
+                if (point.SampleSet != hitsoundTimingPoint.SampleSet) sampleSetChanged = options.SampleSetSliders && hitObject.SampleSet == 0;
             }
 
-            if (hitObject.IsSlider && !sampleSetChanged && hitObject.SampleSet == 0) hitObject.SampleSet = hitObject.HitsoundTimingPoint.SampleSet;
+            if (hitObject.IsSlider && !sampleSetChanged && hitObject.SampleSet == 0) hitObject.SampleSet = hitsoundTimingPoint.SampleSet;
 
             if (hitObject.IsSlider && sampleSetChanged)
             {
-                var point = hitObject.HitsoundTimingPoint.Copy();
+                var point = hitsoundTimingPoint.Copy();
                 point.Offset = hitObject.Time;
                 changes.Add(new TimingPointChange(point, sampleSet: true));
             }
@@ -169,7 +172,7 @@ public static class MapCleanerEngine
                 if (!timelineObject.HasHitsound) continue;
 
                 // Add greenlines for custom indexes and volumes
-                var point = timelineObject.HitsoundTimingPoint.Copy();
+                var point = (timelineObject.HitsoundTimingPoint ?? throw new InvalidOperationException("Hitsound timing must be resolved before cleaning a map.")).Copy();
                 bool unmute = Precision.AlmostEquals(timelineObject.FenoSampleVolume, 5) && options.RemoveMuting;
                 bool mute = options is { RemoveUnclickableHitsounds: true, RemoveMuting: false }
                             && !(timelineObject.IsCircle || timelineObject.IsSliderHead || timelineObject.IsHoldnoteHead);

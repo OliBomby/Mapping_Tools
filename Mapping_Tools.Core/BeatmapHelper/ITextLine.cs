@@ -1,5 +1,4 @@
 ﻿namespace Mapping_Tools.Core.BeatmapHelper;
-#nullable disable
 
 /// <summary>
 ///     Defines round-trip parsing and serialization for one line of osu! file text.

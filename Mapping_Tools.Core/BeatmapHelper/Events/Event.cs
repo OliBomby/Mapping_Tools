@@ -7,7 +7,6 @@ namespace Mapping_Tools.Core.BeatmapHelper.Events;
 ///     TODO: When actually doing storyboard stuff some of the types should have child and parent events instead of
 ///     indents, so we get a tree structure. BTW this would break ITextLine
 /// </summary>
-#nullable disable
 public abstract class Event : ITextLine
 {
     /// <summary>
@@ -22,7 +21,7 @@ public abstract class Event : ITextLine
     ///     Gets or sets the containing loop or trigger, or <see langword="null" />
     ///     for a top-level event.
     /// </summary>
-    public Event ParentEvent { get; set; }
+    public Event? ParentEvent { get; set; }
 
     /// <summary>
     ///     Gets or sets commands nested directly beneath this event.
@@ -112,8 +111,8 @@ public abstract class Event : ITextLine
     /// <returns></returns>
     public static IEnumerable<Event> ParseEventTree(IEnumerable<string> lines)
     {
-        var parentEvents = new LinkedList<Event>();
-        Event lastEvent = null;
+        var parentEvents = new LinkedList<Event?>();
+        Event? lastEvent = null;
         int lastIndents = -1; // -1 is below the lowest possible indents, so this will always trigger adding null in the parent events
         foreach (string line in lines)
         {

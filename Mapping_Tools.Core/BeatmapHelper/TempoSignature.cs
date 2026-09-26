@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
 namespace Mapping_Tools.Core.BeatmapHelper;
-#nullable disable
 
 /// <summary>
 ///     Describes the metrical numerator and denominator active at a timing point.
@@ -59,7 +58,7 @@ public class TempoSignature : IEquatable<TempoSignature>
     /// </summary>
     /// <param name="other">The signature to compare.</param>
     /// <returns><see langword="true" /> when both metrical components match.</returns>
-    public bool Equals(TempoSignature other)
+    public bool Equals(TempoSignature? other)
     {
         return other != null && TempoDenominator == other.TempoDenominator && TempoNumerator == other.TempoNumerator;
     }
@@ -69,7 +68,7 @@ public class TempoSignature : IEquatable<TempoSignature>
     /// </summary>
     /// <param name="obj">The object to compare.</param>
     /// <returns><see langword="true" /> for an equal <see cref="TempoSignature" />.</returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;
@@ -96,7 +95,7 @@ public class TempoSignature : IEquatable<TempoSignature>
     /// <param name="signature1">The left signature.</param>
     /// <param name="signature2">The right signature.</param>
     /// <returns><see langword="true" /> when both references are null or their metrical components match.</returns>
-    public static bool operator ==(TempoSignature signature1, TempoSignature signature2) => EqualityComparer<TempoSignature>.Default.Equals(signature1, signature2);
+    public static bool operator ==(TempoSignature? signature1, TempoSignature? signature2) => EqualityComparer<TempoSignature>.Default.Equals(signature1, signature2);
 
     /// <summary>
     ///     Applies the != operator.
@@ -104,7 +103,7 @@ public class TempoSignature : IEquatable<TempoSignature>
     /// <param name="signature1">The left signature.</param>
     /// <param name="signature2">The right signature.</param>
     /// <returns><see langword="true" /> when the signatures are not equal.</returns>
-    public static bool operator !=(TempoSignature signature1, TempoSignature signature2) => !(signature1 == signature2);
+    public static bool operator !=(TempoSignature? signature1, TempoSignature? signature2) => !(signature1 == signature2);
 
     // TODO: Metronome pattern.
     // TODO: 2863311530 2863311417 = Start > Beat > Triplet > Skip

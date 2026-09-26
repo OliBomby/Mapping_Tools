@@ -2,7 +2,6 @@
 using static Mapping_Tools.Core.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Core.BeatmapHelper.Events;
-#nullable disable
 
 /// <summary>
 ///     Represents a static storyboard texture and its initial placement.
@@ -22,7 +21,7 @@ public class Sprite : Event
     /// <summary>
     ///     This is a partial path to the image file for this sprite.
     /// </summary>
-    public string FilePath { get; set; }
+    public string FilePath { get; set; } = string.Empty;
 
     /// <summary>
     ///     Gets or sets the sprite's storyboard-space anchor position.

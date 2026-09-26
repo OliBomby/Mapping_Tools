@@ -6,7 +6,6 @@ using Newtonsoft.Json;
 using static Mapping_Tools.Core.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Core.BeatmapHelper;
-#nullable disable
 
 /// <summary>
 ///     Models one redline or greenline from an osu! <c>[TimingPoints]</c> section.
@@ -67,7 +66,7 @@ public class TimingPoint : ITextLine, IComparable<TimingPoint>
     ///     Creates a new Timing Point from the string line of the .osu file.
     /// </summary>
     /// <param name="line"></param>
-    public TimingPoint(string line)
+    public TimingPoint(string line) : this()
     {
         SetLine(line);
     }
@@ -152,7 +151,7 @@ public class TimingPoint : ITextLine, IComparable<TimingPoint>
     /// </summary>
     /// <param name="other">The timing point to compare, or null.</param>
     /// <returns>A standard chronological sort value.</returns>
-    public int CompareTo(TimingPoint other)
+    public int CompareTo(TimingPoint? other)
     {
         if (ReferenceEquals(this, other)) return 0;
         if (ReferenceEquals(null, other)) return 1;
@@ -239,7 +238,7 @@ public class TimingPoint : ITextLine, IComparable<TimingPoint>
     /// <param name="tp">The timing point to consider.</param>
     /// <param name="firstTp">The first timing point in the sequence.</param>
     /// <returns><see langword="true" /> if the timing point was resnapped; otherwise, <see langword="false" />.</returns>
-    public bool ResnapSelf(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint tp = null, TimingPoint firstTp = null)
+    public bool ResnapSelf(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint? tp = null, TimingPoint? firstTp = null)
     {
         double newTime = timing.Resnap(Offset, beatDivisors, floor, tp, firstTp);
         double deltaTime = newTime - Offset;

@@ -131,7 +131,7 @@ public static class MetadataManagerEngine
         string key)
     {
         return values.TryGetValue(key, out var value)
-            ? value.Value ?? string.Empty
+            ? value.Value
             : string.Empty;
     }
 }

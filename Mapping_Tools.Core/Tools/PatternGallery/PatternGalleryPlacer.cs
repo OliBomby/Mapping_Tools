@@ -280,7 +280,7 @@ public class PatternGalleryPlacer
 
     private static TimingPointChange GetSvChange(HitObject ho)
     {
-        var tp = ho.TimingPoint.Copy();
+        var tp = (ho.TimingPoint ?? throw new InvalidOperationException("Hit object timing must be resolved before placing a pattern.")).Copy();
         tp.Offset = ho.Time;
         tp.Uninherited = false;
         tp.MpB = ho.SliderVelocity;
@@ -289,7 +289,7 @@ public class PatternGalleryPlacer
 
     private static TimingPointChange GetHitsoundChange(HitObject ho)
     {
-        var tp = ho.HitsoundTimingPoint.Copy();
+        var tp = (ho.HitsoundTimingPoint ?? throw new InvalidOperationException("Hitsound timing must be resolved before placing a pattern.")).Copy();
         tp.Offset = ho.Time;
         tp.Uninherited = false;
         return new TimingPointChange(tp, sampleSet: true, index: true, volume: true);
@@ -753,7 +753,7 @@ public class PatternGalleryPlacer
         {
             if (ho.IsSlider) // SliderVelocity changes
             {
-                var tp = ho.TimingPoint.Copy();
+                var tp = (ho.TimingPoint ?? throw new InvalidOperationException("Hit object timing must be resolved before placing a pattern.")).Copy();
                 tp.Offset = ho.Time;
                 tp.MpB = ho.SliderVelocity;
                 timingPointsChanges.Add(new TimingPointChange(tp, true, fuzziness: 0.4));
@@ -783,7 +783,7 @@ public class PatternGalleryPlacer
                 if (tlo.HasHitsound)
                 {
                     // Add greenlines for hitsounds
-                    var tp = tlo.HitsoundTimingPoint.Copy();
+                    var tp = (tlo.HitsoundTimingPoint ?? throw new InvalidOperationException("Hitsound timing must be resolved before placing a pattern.")).Copy();
                     tp.Offset = tlo.Time;
                     timingPointsChanges.Add(new TimingPointChange(tp, sampleSet: true, volume: true, index: true));
                 }

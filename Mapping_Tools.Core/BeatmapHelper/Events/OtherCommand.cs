@@ -8,7 +8,6 @@ namespace Mapping_Tools.Core.BeatmapHelper.Events;
 ///     Represents all the commands
 ///     The exceptions being loops and triggers because these have different syntax.
 /// </summary>
-#nullable disable
 public class OtherCommand : Command, IHasEndTime
 {
     /// <summary>
@@ -19,12 +18,12 @@ public class OtherCommand : Command, IHasEndTime
     /// <summary>
     ///     All other parameters
     /// </summary>
-    public double[] Params { get; set; }
+    public double[] Params { get; set; } = [];
 
     /// <summary>
     ///     Used to describe <see cref="EventType" /> in case it is Unknown.
     /// </summary>
-    public string FallbackEventType { get; set; }
+    public string FallbackEventType { get; set; } = string.Empty;
 
     /// <inheritdoc />
     public double EndTime { get; set; }

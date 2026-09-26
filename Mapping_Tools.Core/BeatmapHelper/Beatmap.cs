@@ -1,4 +1,3 @@
-﻿#nullable disable
 using System.Text.RegularExpressions;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.BeatmapHelper.Events;
@@ -18,7 +17,17 @@ public class Beatmap : ITextFile
     /// </summary>
     public Beatmap()
     {
-        Initialize();
+        General = new Dictionary<string, StringValue>();
+        Editor = new Dictionary<string, StringValue>();
+        Metadata = new Dictionary<string, StringValue>();
+        Difficulty = new Dictionary<string, StringValue>();
+        ComboColours = [];
+        SpecialColours = new Dictionary<string, ComboColour>();
+        StoryBoard = new StoryBoard();
+        HitObjects = [];
+        BeatmapTiming = new Timing(1.4);
+
+        FillBasicMetadata();
     }
 
     /// <summary>
@@ -30,10 +39,8 @@ public class Beatmap : ITextFile
     /// <param name="globalSv"></param>
     /// <param name="gameMode"></param>
     public Beatmap(List<HitObject> hitObjects, List<TimingPoint> timingPoints,
-        TimingPoint firstUnInheritedTimingPoint = null, double globalSv = 1.4, GameMode gameMode = GameMode.Standard)
+        TimingPoint? firstUnInheritedTimingPoint = null, double globalSv = 1.4, GameMode gameMode = GameMode.Standard) : this()
     {
-        Initialize();
-
         // Set the hit objects
         HitObjects = hitObjects;
 
@@ -41,7 +48,8 @@ public class Beatmap : ITextFile
         BeatmapTiming.SetTimingPoints(timingPoints);
         BeatmapTiming.SliderMultiplier = globalSv;
 
-        if (!BeatmapTiming.Contains(firstUnInheritedTimingPoint)) BeatmapTiming.Add(firstUnInheritedTimingPoint);
+        if (firstUnInheritedTimingPoint != null && !BeatmapTiming.Contains(firstUnInheritedTimingPoint))
+            BeatmapTiming.Add(firstUnInheritedTimingPoint);
 
         // Set the global SV here too because thats absolutely necessary
         Difficulty["SliderMultiplier"] = new StringValue(globalSv.ToInvariant());
@@ -57,9 +65,8 @@ public class Beatmap : ITextFile
     ///     Initializes the Beatmap file format.
     /// </summary>
     /// <param name="lines">List of strings where each string is another line in the .osu file.</param>
-    public Beatmap(List<string> lines)
+    public Beatmap(List<string> lines) : this()
     {
-        Initialize();
         SetLines(lines);
     }
 
@@ -338,7 +345,7 @@ public class Beatmap : ITextFile
         }));
         lines.Add("");
         lines.Add("[TimingPoints]");
-        lines.AddRange(BeatmapTiming.TimingPoints.Where(tp => tp != null).Select(tp =>
+        lines.AddRange(BeatmapTiming.TimingPoints.Select(tp =>
         {
             tp.SaveWithFloatPrecision = SaveWithFloatPrecision;
             return tp.GetLine();
@@ -363,21 +370,6 @@ public class Beatmap : ITextFile
         lines.Add("");
 
         return lines;
-    }
-
-    private void Initialize()
-    {
-        General = new Dictionary<string, StringValue>();
-        Editor = new Dictionary<string, StringValue>();
-        Metadata = new Dictionary<string, StringValue>();
-        Difficulty = new Dictionary<string, StringValue>();
-        ComboColours = [];
-        SpecialColours = new Dictionary<string, ComboColour>();
-        StoryBoard = new StoryBoard();
-        HitObjects = [];
-        BeatmapTiming = new Timing(1.4);
-
-        FillBasicMetadata();
     }
 
     /// <summary>
@@ -605,7 +597,7 @@ public class Beatmap : ITextFile
     /// </summary>
     public void CalculateHitObjectComboStuff()
     {
-        HitObject previousHitObject = null;
+        HitObject? previousHitObject = null;
         int colourIndex = 0;
         int comboIndex = 0;
 
@@ -641,7 +633,7 @@ public class Beatmap : ITextFile
     /// </summary>
     public void FixComboSkip()
     {
-        HitObject previousHitObject = null;
+        HitObject? previousHitObject = null;
         int colourIndex = 0;
 
         // If there are no combo colours use the default combo colours so the hitobjects still have something
@@ -676,7 +668,7 @@ public class Beatmap : ITextFile
     /// <param name="hitObject">The hit object.</param>
     /// <param name="previousHitObject">The previous hit object.</param>
     /// <returns><see langword="true" /> for explicit new combos, spinners, the first object, or an object after a spinner.</returns>
-    public static bool IsNewCombo(HitObject hitObject, HitObject previousHitObject)
+    public static bool IsNewCombo(HitObject hitObject, HitObject? previousHitObject)
     {
         return hitObject.NewCombo || hitObject.IsSpinner || previousHitObject == null || previousHitObject.IsSpinner;
     }
@@ -820,7 +812,7 @@ public class Beatmap : ITextFile
     public void OffsetTime(double offset)
     {
         BeatmapTiming.Offset(offset);
-        HitObjects?.ForEach(h => h.MoveTime(offset));
+        HitObjects.ForEach(h => h.MoveTime(offset));
     }
 
     private IEnumerable<Event> EnumerateAllEvents()
@@ -969,7 +961,7 @@ public class Beatmap : ITextFile
     public Beatmap DeepCopy()
     {
         var newBeatmap = (Beatmap)MemberwiseClone();
-        newBeatmap.HitObjects = HitObjects?.Select(h => h.DeepCopy()).ToList();
+        newBeatmap.HitObjects = HitObjects.Select(h => h.DeepCopy()).ToList();
         newBeatmap.BeatmapTiming = new Timing([.. BeatmapTiming.TimingPoints.Select(t => t.Copy())], BeatmapTiming.SliderMultiplier);
         newBeatmap.GiveObjectsGreenlines();
         return newBeatmap;

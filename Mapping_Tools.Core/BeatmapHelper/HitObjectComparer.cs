@@ -1,4 +1,3 @@
-#nullable disable
 using System.Diagnostics.CodeAnalysis;
 
 namespace Mapping_Tools.Core.BeatmapHelper;
@@ -32,7 +31,7 @@ public class HitObjectComparer : IEqualityComparer<HitObject>
     /// <param name="y">The second hit object.</param>
     /// <returns><see langword="true" /> when all enabled and type-specific fields match exactly.</returns>
     [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
-    public bool Equals(HitObject x, HitObject y)
+    public bool Equals(HitObject? x, HitObject? y)
     {
         if (x == null && y == null)
             return true;

@@ -138,9 +138,12 @@ public sealed class DesktopProjectPersistenceTests
         // Assert
         project.LoadedHitObjects.Should().ContainSingle();
         project.LoadedHitObjects[0].Line.Should().Be("64,64,1000,2,0,L|164:64,1,100");
-        project.LoadedHitObjects[0].TimingPoint.Meter.TempoDenominator.Should().Be(8);
-        project.LoadedHitObjects[0].TimingPoint.Meter.TempoNumerator.Should().Be(7);
-        project.LoadedHitObjects[0].TimingPoint.Meter.PartialMeasure.Should().BeTrue();
+        var timingPoint = project.LoadedHitObjects[0].TimingPoint;
+        timingPoint.Should().NotBeNull();
+        var meter = timingPoint.Meter;
+        meter.TempoDenominator.Should().Be(8);
+        meter.TempoNumerator.Should().Be(7);
+        meter.PartialMeasure.Should().BeTrue();
         project.DoEditorRead.Should().BeTrue();
     }
 

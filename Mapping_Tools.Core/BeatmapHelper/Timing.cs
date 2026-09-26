@@ -4,7 +4,6 @@ using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.MathUtil;
 
 namespace Mapping_Tools.Core.BeatmapHelper;
-#nullable disable
 
 /// <summary>
 ///     The timing of a beatmap. This objects contains all the timing points (data from the [TimingPoints] section) plus
@@ -15,14 +14,14 @@ namespace Mapping_Tools.Core.BeatmapHelper;
 /// </summary>
 public class Timing : IList<TimingPoint>
 {
-    private List<TimingPoint> greenlines;
-    private List<TimingPoint> redlines;
+    private List<TimingPoint> greenlines = [];
+    private List<TimingPoint> redlines = [];
 
     /// <summary>
     ///     List of all timing points. This included uninherited timing points and inherited timing points.
     ///     This list should be sorted at all times.
     /// </summary>
-    private List<TimingPoint> timingPoints;
+    private List<TimingPoint> timingPoints = [];
 
     /// <summary>
     ///     Creates empty timing data with a global slider multiplier.
@@ -81,7 +80,7 @@ public class Timing : IList<TimingPoint>
     ///     Replaces all the timingpoints and sorts again.
     /// </summary>
     /// <param name="newTimingPoints">The new list of timing points to set.</param>
-    public void SetTimingPoints(List<TimingPoint> newTimingPoints)
+    public void SetTimingPoints(List<TimingPoint>? newTimingPoints)
     {
         timingPoints = newTimingPoints ?? [];
         timingPoints.Sort();
@@ -108,7 +107,7 @@ public class Timing : IList<TimingPoint>
     /// <param name="round">To round the number of beats to a snap divisor.</param>
     /// <param name="divisors">The beat divisors to round to. If null, the default beat divisors will be used.</param>
     /// <returns>The number of beats between the start time and the end time.</returns>
-    public double GetBeatLength(double startTime, double endTime, bool round = false, IBeatDivisor[] divisors = null)
+    public double GetBeatLength(double startTime, double endTime, bool round = false, IBeatDivisor[]? divisors = null)
     {
         bool reverse = false;
         if (startTime > endTime)
@@ -165,8 +164,9 @@ public class Timing : IList<TimingPoint>
     /// <param name="round">Whether to round the result to the nearest beat divisor.</param>
     /// <param name="divisors">The beat divisors to use for rounding.</param>
     /// <returns>The corresponding time in milliseconds.</returns>
-    public double GetMilliseconds(double beatTime, double originTime = 0, bool round = false, IBeatDivisor[] divisors = null)
+    public double GetMilliseconds(double beatTime, double originTime = 0, bool round = false, IBeatDivisor[]? divisors = null)
     {
+        divisors ??= RationalBeatDivisor.GetDefaultBeatDivisors();
         double ms = originTime;
 
         if (beatTime >= 0)
@@ -276,8 +276,9 @@ public class Timing : IList<TimingPoint>
     /// <param name="round">Whether to round the result to the nearest beat divisor.</param>
     /// <param name="divisors">The beat divisors to use for rounding.</param>
     /// <returns>The corresponding time in milliseconds.</returns>
-    public double WalkBeatsInMillisecondTime(double beatTime, double originTime = 0, bool round = false, IBeatDivisor[] divisors = null)
+    public double WalkBeatsInMillisecondTime(double beatTime, double originTime = 0, bool round = false, IBeatDivisor[]? divisors = null)
     {
+        divisors ??= RationalBeatDivisor.GetDefaultBeatDivisors();
         double ms = originTime;
 
         if (beatTime >= 0)
@@ -389,7 +390,7 @@ public class Timing : IList<TimingPoint>
     /// <param name="exactMode">If true, interprets time not as milliseconds and prevents big rounding operations.</param>
     /// <returns>The snapped time.</returns>
     public double Resnap(double time, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true,
-        TimingPoint tp = null, TimingPoint firstTp = null, bool exactMode = false)
+        TimingPoint? tp = null, TimingPoint? firstTp = null, bool exactMode = false)
     {
         var beforeTp = tp ?? GetRedlineAtTime(time, firstTp);
         var afterTp = tp == null ? GetRedlineAfterTime(time) : null;
@@ -426,7 +427,7 @@ public class Timing : IList<TimingPoint>
     /// <param name="exactMode">If true, interprets time not as milliseconds and prevents big rounding operations.</param>
     /// <returns>The snapped time.</returns>
     public double ResnapBeatTime(double time, IEnumerable<IBeatDivisor> beatDivisors,
-        TimingPoint tp = null, TimingPoint firstTp = null, bool exactMode = false)
+        TimingPoint? tp = null, TimingPoint? firstTp = null, bool exactMode = false)
     {
         var beforeTp = tp ?? GetRedlineAtTime(time, firstTp);
         var afterTp = tp == null ? GetRedlineAfterTime(time) : null;
@@ -461,7 +462,7 @@ public class Timing : IList<TimingPoint>
     /// <param name="firstTp"></param>
     /// <returns></returns>
     public double ResnapDuration(double time, double duration, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true,
-        TimingPoint tp = null, TimingPoint firstTp = null)
+        TimingPoint? tp = null, TimingPoint? firstTp = null)
     {
         var beforeTp = tp ?? GetRedlineAtTime(time, firstTp);
 
@@ -498,8 +499,8 @@ public class Timing : IList<TimingPoint>
     ///     You can set this to avoid bad timing when there could be an inherited timing point before the first red line.
     /// </param>
     /// <returns>The snapped time.</returns>
-    public double ResnapInRange(double time, IEnumerable<IBeatDivisor> beatDivisors, double rangeStart, double rangeEnd, bool floor = true, TimingPoint tp = null,
-        TimingPoint firstTp = null)
+    public double ResnapInRange(double time, IEnumerable<IBeatDivisor> beatDivisors, double rangeStart, double rangeEnd, bool floor = true, TimingPoint? tp = null,
+        TimingPoint? firstTp = null)
     {
         var beforeTp = tp ?? GetRedlineAtTime(time, firstTp);
         var afterTp = tp == null ? GetRedlineAfterTime(time) : null;
@@ -625,8 +626,6 @@ public class Timing : IList<TimingPoint>
     /// <param name="tp">The tp.</param>
     public void Add(TimingPoint tp)
     {
-        if (tp == null) return;
-
         int index = timingPoints.BinarySearch(tp);
         if (index < 0)
             index = ~index;
@@ -704,7 +703,7 @@ public class Timing : IList<TimingPoint>
 
     bool ICollection<TimingPoint>.Remove(TimingPoint tp)
     {
-        return tp != null && Remove(tp);
+        return Remove(tp);
     }
 
     /// <summary>
@@ -863,7 +862,7 @@ public class Timing : IList<TimingPoint>
     /// <param name="time"></param>
     /// <param name="timingPoints"></param>
     /// <returns></returns>
-    public static TimingPoint GetTimingPointAfterTime(double time, IReadOnlyList<TimingPoint> timingPoints)
+    public static TimingPoint? GetTimingPointAfterTime(double time, IReadOnlyList<TimingPoint> timingPoints)
     {
         int index = GetTimingPointIndexAfterTime(time, timingPoints);
         return index != -1 ? timingPoints[index] : null;
@@ -991,7 +990,7 @@ public class Timing : IList<TimingPoint>
     /// <param name="time"></param>
     /// <param name="firstTimingPoint"></param>
     /// <returns></returns>
-    public TimingPoint GetRedlineAtTime(double time, TimingPoint firstTimingPoint = null)
+    public TimingPoint GetRedlineAtTime(double time, TimingPoint? firstTimingPoint = null)
     {
         return GetTimingPointAtTime(time, redlines, firstTimingPoint ?? GetFirstTimingPointExtended(true));
     }
@@ -1001,7 +1000,7 @@ public class Timing : IList<TimingPoint>
     /// </summary>
     /// <param name="time"></param>
     /// <returns></returns>
-    public TimingPoint GetRedlineAfterTime(double time)
+    public TimingPoint? GetRedlineAfterTime(double time)
     {
         return GetTimingPointAfterTime(time, redlines);
     }
@@ -1026,7 +1025,8 @@ public class Timing : IList<TimingPoint>
     /// <returns></returns>
     public double GetSvAtTime(double time)
     {
-        var lastTp = GetTimingPointAtTime(time, timingPoints, null);
+        int index = GetTimingPointIndexAtTime(time, timingPoints);
+        var lastTp = index >= 0 ? timingPoints[index] : null;
         if (lastTp == null || lastTp.Uninherited) return -100;
 
         return MathHelper.Clamp(lastTp.MpB, -1000, -10);

@@ -31,9 +31,9 @@ public sealed class AnchorPointGenerator : RelevantObjectsGenerator
     public IEnumerable<RelevantPoint>? GetRelevantObjects(RelevantHitObject relevantHitObject)
     {
         var hitObject = relevantHitObject.HitObject;
-        if (!hitObject.IsSlider || hitObject.CurvePoints is null) return null;
+        if (!hitObject.IsSlider) return null;
         var curvePoints = hitObject.GetAllCurvePoints();
-        if (curvePoints.Count == 0) return Array.Empty<RelevantPoint>();
+        if (curvePoints.Count == 0) return [];
 
         int lastPointIndex = Math.Max(1, curvePoints.Count - 1);
         return curvePoints.Select((point, index) => new RelevantPoint(point)

@@ -46,8 +46,8 @@ public sealed class RelevantHitObject : RelevantObject
     /// <returns>The average squared coordinate difference, or positive infinity for different shapes.</returns>
     public double Difference(RelevantHitObject other)
     {
-        var curvePoints = HitObject.CurvePoints ?? [];
-        var otherCurvePoints = other.HitObject.CurvePoints ?? [];
+        var curvePoints = HitObject.CurvePoints;
+        var otherCurvePoints = other.HitObject.CurvePoints;
         if (HitObject.ObjectType != other.HitObject.ObjectType || HitObject.SliderType != other.HitObject.SliderType || curvePoints.Count != otherCurvePoints.Count)
             return double.PositiveInfinity;
 

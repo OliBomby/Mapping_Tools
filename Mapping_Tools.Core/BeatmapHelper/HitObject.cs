@@ -1,4 +1,3 @@
-#nullable disable
 using System.Collections;
 using System.Text;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
@@ -274,13 +273,13 @@ public class HitObject : ITextLine, IComparable<HitObject>
     /// <summary>
     ///     Gets or sets the optional beatmap-relative custom sample filename.
     /// </summary>
-    public string Filename { get; set; }
+    public string Filename { get; set; } = string.Empty;
 
     /// <summary>
     ///     All path types and their index in the curve points array.
     ///     Used for preserving multiple path types in osu! lazer file format.
     /// </summary>
-    public List<(PathType, int)> AdditionalSliderTypes { get; set; }
+    public List<(PathType, int)> AdditionalSliderTypes { get; set; } = [];
 
     /// <summary>
     ///     Gets or sets the primary curve algorithm used to interpret slider control points.
@@ -290,7 +289,7 @@ public class HitObject : ITextLine, IComparable<HitObject>
     /// <summary>
     ///     Gets or sets slider control points after the object's starting <see cref="Pos" />.
     /// </summary>
-    public List<Vector2> CurvePoints { get; set; }
+    public List<Vector2> CurvePoints { get; set; } = [];
 
     /// <summary>
     ///     Gets or replaces the geometric path assembled from the start position, curve points, type, and pixel length.
@@ -318,17 +317,17 @@ public class HitObject : ITextLine, IComparable<HitObject>
     /// <summary>
     ///     Gets or sets packed hitsound flags for the slider head, repeat points, and tail.
     /// </summary>
-    public List<int> EdgeHitsounds { get; set; }
+    public List<int> EdgeHitsounds { get; set; } = [];
 
     /// <summary>
     ///     Gets or sets normal-layer sample-set overrides for each slider edge.
     /// </summary>
-    public List<SampleSet> EdgeSampleSets { get; set; }
+    public List<SampleSet> EdgeSampleSets { get; set; } = [];
 
     /// <summary>
     ///     Gets or sets addition-layer sample-set overrides for each slider edge.
     /// </summary>
-    public List<SampleSet> EdgeAdditionSets { get; set; }
+    public List<SampleSet> EdgeAdditionSets { get; set; } = [];
 
     /// <summary>
     ///     Indicates whether slider-edge or object-level sample data must be serialized.
@@ -357,7 +356,7 @@ public class HitObject : ITextLine, IComparable<HitObject>
     ///     Gets or sets the combo colour resolved by beatmap processing.
     /// </summary>
     [JsonProperty]
-    public ComboColour Colour { get; set; }
+    public ComboColour? Colour { get; set; }
 
     /// <summary>
     ///     Gets or sets the playable slider length after degenerate-path corrections.
@@ -396,19 +395,19 @@ public class HitObject : ITextLine, IComparable<HitObject>
     ///     Gets or sets the effective timing point used for slider velocity and samples at the object start.
     /// </summary>
     [JsonProperty]
-    public TimingPoint TimingPoint { get; set; }
+    public TimingPoint? TimingPoint { get; set; }
 
     /// <summary>
     ///     Gets or sets the timing point that supplies inherited hitsound settings at the object start.
     /// </summary>
     [JsonProperty]
-    public TimingPoint HitsoundTimingPoint { get; set; }
+    public TimingPoint? HitsoundTimingPoint { get; set; }
 
     /// <summary>
     ///     Gets or sets the active uninherited timing point that supplies beat length.
     /// </summary>
     [JsonProperty]
-    public TimingPoint UnInheritedTimingPoint { get; set; }
+    public TimingPoint? UnInheritedTimingPoint { get; set; }
 
     /// <summary>
     ///     When true, all coordinates and times will be serialized without rounding.
@@ -420,7 +419,7 @@ public class HitObject : ITextLine, IComparable<HitObject>
     /// </summary>
     /// <param name="other">The object to compare, or <see langword="null" />.</param>
     /// <returns>A standard sort value; any instance sorts after <see langword="null" />.</returns>
-    public int CompareTo(HitObject other)
+    public int CompareTo(HitObject? other)
     {
         if (ReferenceEquals(this, other)) return 0;
         if (ReferenceEquals(null, other)) return 1;
@@ -576,7 +575,7 @@ public class HitObject : ITextLine, IComparable<HitObject>
         if (IsSlider)
         {
             var builder = new StringBuilder();
-            if (AdditionalSliderTypes is not null && AdditionalSliderTypes.Count > 1)
+            if (AdditionalSliderTypes.Count > 1)
             {
                 int i = 0;
                 int i2 = 0;
@@ -683,13 +682,15 @@ public class HitObject : ITextLine, IComparable<HitObject>
         var samples = new List<string>();
         if (IsSlider)
         {
+            var timingPoint = TimingPoint ?? throw new InvalidOperationException("Slider timing must be resolved before collecting body samples.");
+
             // Get sliderslide hitsounds for every timingpoint in the slider
-            if (includeDefaults || TimingPoint.SampleIndex != 0)
+            if (includeDefaults || timingPoint.SampleIndex != 0)
             {
-                var firstSampleSet = SampleSet == SampleSet.None ? TimingPoint.SampleSet : SampleSet;
-                samples.Add(GetSliderFilename(firstSampleSet, "slide", TimingPoint.SampleIndex));
+                var firstSampleSet = SampleSet == SampleSet.None ? timingPoint.SampleSet : SampleSet;
+                samples.Add(GetSliderFilename(firstSampleSet, "slide", timingPoint.SampleIndex));
                 if (Whistle)
-                    samples.Add(GetSliderFilename(firstSampleSet, "whistle", TimingPoint.SampleIndex));
+                    samples.Add(GetSliderFilename(firstSampleSet, "whistle", timingPoint.SampleIndex));
             }
 
             foreach (var bodyTp in BodyHitsounds)
@@ -705,7 +706,7 @@ public class HitObject : ITextLine, IComparable<HitObject>
             // 10 ms over tick time is tick
             foreach (double t in GetSliderTickTimes(sliderTickRate))
             {
-                var bodyTp = Timing.GetTimingPointAtTime(t, BodyHitsounds, TimingPoint);
+                var bodyTp = Timing.GetTimingPointAtTime(t, BodyHitsounds, timingPoint);
                 if (includeDefaults || bodyTp.SampleIndex != 0)
                 {
                     var sampleSet = SampleSet == SampleSet.None ? bodyTp.SampleSet : SampleSet;
@@ -727,12 +728,13 @@ public class HitObject : ITextLine, IComparable<HitObject>
         // Sliders with NaN velocity don't have ticks
         if (!IsSlider || double.IsNaN(SliderVelocity)) return [];
 
+        var redline = UnInheritedTimingPoint ?? throw new InvalidOperationException("Slider timing must be resolved before calculating ticks.");
         var ticks = new List<double>();
-        double t = UnInheritedTimingPoint.MpB / sliderTickRate;
+        double t = redline.MpB / sliderTickRate;
         while (t + 10 < TemporalLength)
         {
             ticks.Add(t);
-            t += UnInheritedTimingPoint.MpB / sliderTickRate;
+            t += redline.MpB / sliderTickRate;
         }
 
         // Each repeat does the same tick times but in reverse for reverse passes
@@ -923,11 +925,12 @@ public class HitObject : ITextLine, IComparable<HitObject>
 
         if (IsSlider)
         {
+            var redline = UnInheritedTimingPoint ?? throw new InvalidOperationException("Slider timing must be resolved before changing its duration.");
             double deltaLength =
                 -10000
                 * timing.SliderMultiplier
                 * deltaTemporalTime
-                / (UnInheritedTimingPoint.MpB * (double.IsNaN(SliderVelocity) ? -100 : SliderVelocity)); // Divide by repeats because the endtime is multiplied by repeats
+                / (redline.MpB * (double.IsNaN(SliderVelocity) ? -100 : SliderVelocity)); // Divide by repeats because the endtime is multiplied by repeats
             PixelLength += deltaLength; // Change the pixel length to match the new time
         }
 
@@ -991,8 +994,8 @@ public class HitObject : ITextLine, IComparable<HitObject>
     /// <param name="tp">An optional timing point from which to begin the search.</param>
     /// <param name="firstTp">An optional lower timing boundary.</param>
     /// <returns><see langword="true" /> when the object moved by more than numeric tolerance.</returns>
-    public bool ResnapSelf(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint tp = null,
-        TimingPoint firstTp = null)
+    public bool ResnapSelf(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint? tp = null,
+        TimingPoint? firstTp = null)
     {
         double newTime = GetResnappedTime(timing, beatDivisors, floor, tp, firstTp);
         double deltaTime = newTime - Time;
@@ -1010,8 +1013,8 @@ public class HitObject : ITextLine, IComparable<HitObject>
     /// <param name="tp">An optional timing point from which to begin the search.</param>
     /// <param name="firstTp">An optional lower timing boundary.</param>
     /// <returns><see langword="true" /> when the end changed by more than numeric tolerance.</returns>
-    public bool ResnapEnd(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint tp = null,
-        TimingPoint firstTp = null)
+    public bool ResnapEnd(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint? tp = null,
+        TimingPoint? firstTp = null)
     {
         // If there is a redline in the sliderbody then the sliderend gets snapped to a tick of the latest redline
         if (!IsSlider || timing.TimingPoints.Any(o => o.Uninherited && o.Offset <= EndTime + 20 && o.Offset > Time))
@@ -1029,8 +1032,8 @@ public class HitObject : ITextLine, IComparable<HitObject>
     /// <param name="tp">An optional timing point from which to begin the search.</param>
     /// <param name="firstTp">An optional lower timing boundary.</param>
     /// <returns><see langword="true" /> when the end changed by more than numeric tolerance.</returns>
-    public bool ResnapEndTime(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint tp = null,
-        TimingPoint firstTp = null)
+    public bool ResnapEndTime(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint? tp = null,
+        TimingPoint? firstTp = null)
     {
         double newTime = timing.Resnap(EndTime, beatDivisors, floor, tp, firstTp);
 
@@ -1047,7 +1050,7 @@ public class HitObject : ITextLine, IComparable<HitObject>
     /// <param name="beatDivisors">Permitted fractions of a beat.</param>
     /// <param name="firstTp">An optional lower timing boundary.</param>
     /// <returns><see langword="true" /> when the span duration changed by more than numeric tolerance.</returns>
-    public bool ResnapEndClassic(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, TimingPoint firstTp = null)
+    public bool ResnapEndClassic(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, TimingPoint? firstTp = null)
     {
         double newTemporalLength = timing.ResnapDuration(Time, TemporalLength, beatDivisors, false, firstTp: firstTp);
 
@@ -1086,8 +1089,8 @@ public class HitObject : ITextLine, IComparable<HitObject>
     /// <param name="tp">An optional timing point from which to begin the search.</param>
     /// <param name="firstTp">An optional lower timing boundary.</param>
     /// <returns>The nearest permitted start time in milliseconds.</returns>
-    public double GetResnappedTime(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint tp = null,
-        TimingPoint firstTp = null)
+    public double GetResnappedTime(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint? tp = null,
+        TimingPoint? firstTp = null)
     {
         return timing.Resnap(Time, beatDivisors, floor, tp, firstTp);
     }
@@ -1095,9 +1098,9 @@ public class HitObject : ITextLine, IComparable<HitObject>
     private bool GetSliderExtras()
     {
         int hitsounds = GetHitsounds();
-        return EdgeHitsounds != null && EdgeHitsounds.Any(o => o != hitsounds)
-               || EdgeSampleSets != null && EdgeSampleSets.Any(o => o != SampleSet.None)
-               || EdgeAdditionSets != null && EdgeAdditionSets.Any(o => o != SampleSet.None)
+        return EdgeHitsounds.Any(o => o != hitsounds)
+               || EdgeSampleSets.Any(o => o != SampleSet.None)
+               || EdgeAdditionSets.Any(o => o != SampleSet.None)
                || SampleSet != SampleSet.None
                || AdditionSet != SampleSet.None
                || CustomIndex != 0
@@ -1407,16 +1410,13 @@ public class HitObject : ITextLine, IComparable<HitObject>
     public HitObject DeepCopy()
     {
         var newHitObject = (HitObject)MemberwiseClone();
-        newHitObject.BodyHitsounds = BodyHitsounds?.Select(o => o.Copy()).ToList();
-        newHitObject.TimelineObjects = TimelineObjects?.Select(o => o.Copy()).ToList();
-        newHitObject.CurvePoints = CurvePoints?.Copy();
-        newHitObject.AdditionalSliderTypes = AdditionalSliderTypes?.ToList();
-        if (EdgeHitsounds != null)
-            newHitObject.EdgeHitsounds = [.. EdgeHitsounds];
-        if (EdgeSampleSets != null)
-            newHitObject.EdgeSampleSets = [.. EdgeSampleSets];
-        if (EdgeAdditionSets != null)
-            newHitObject.EdgeAdditionSets = [.. EdgeAdditionSets];
+        newHitObject.BodyHitsounds = BodyHitsounds.Select(o => o.Copy()).ToList();
+        newHitObject.TimelineObjects = TimelineObjects.Select(o => o.Copy()).ToList();
+        newHitObject.CurvePoints = CurvePoints.Copy();
+        newHitObject.AdditionalSliderTypes = AdditionalSliderTypes.ToList();
+        newHitObject.EdgeHitsounds = [.. EdgeHitsounds];
+        newHitObject.EdgeSampleSets = [.. EdgeSampleSets];
+        newHitObject.EdgeAdditionSets = [.. EdgeAdditionSets];
         newHitObject.TimingPoint = TimingPoint?.Copy();
         newHitObject.HitsoundTimingPoint = HitsoundTimingPoint?.Copy();
         newHitObject.UnInheritedTimingPoint = UnInheritedTimingPoint?.Copy();

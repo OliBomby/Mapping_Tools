@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 
 namespace Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
-#nullable disable
 
 /// <summary>
 ///     Stores a snap interval as an unreduced numerator/denominator fraction of one beat.
@@ -52,7 +51,7 @@ public class RationalBeatDivisor : IBeatDivisor
     /// </summary>
     /// <param name="other">The divisor to compare.</param>
     /// <returns><see langword="true" /> only for a rational divisor with identical components.</returns>
-    public bool Equals(IBeatDivisor other)
+    public bool Equals(IBeatDivisor? other)
     {
         if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
@@ -82,7 +81,7 @@ public class RationalBeatDivisor : IBeatDivisor
     /// </summary>
     /// <param name="obj">The object to compare.</param>
     /// <returns><see langword="true" /> when the runtime types, numerator, and denominator match.</returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;

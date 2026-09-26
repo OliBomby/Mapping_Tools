@@ -5,7 +5,6 @@ namespace Mapping_Tools.Core.BeatmapHelper.Events;
 /// <summary>
 ///     Represents trigger loop events. Although called loops, these only ever activate once.
 /// </summary>
-#nullable disable
 public class TriggerLoop : Command, IHasEndTime
 {
     /// <summary>
@@ -16,7 +15,7 @@ public class TriggerLoop : Command, IHasEndTime
     /// <summary>
     ///     Gets or sets the gameplay trigger expression controlling the nested commands.
     /// </summary>
-    public string TriggerName { get; set; }
+    public string TriggerName { get; set; } = string.Empty;
 
     /// <inheritdoc />
     public double EndTime { get; set; }

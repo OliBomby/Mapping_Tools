@@ -1,4 +1,3 @@
-#nullable disable
 using System.Collections;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.MathUtil;
@@ -189,23 +188,23 @@ public class TimelineObject
     /// <summary>
     ///     Gets or sets the explicit beatmap-relative custom filename.
     /// </summary>
-    public string Filename { get; set; }
+    public string Filename { get; set; } = string.Empty;
 
     // Special combined with greenline
     /// <summary>
     ///     Gets or sets the timing point active at the exact edge time.
     /// </summary>
-    public TimingPoint TimingPoint { get; set; }
+    public TimingPoint? TimingPoint { get; set; }
 
     /// <summary>
     ///     Gets or sets the timing point used for hitsound inheritance, including osu!'s five-millisecond lookup offset.
     /// </summary>
-    public TimingPoint HitsoundTimingPoint { get; set; }
+    public TimingPoint? HitsoundTimingPoint { get; set; }
 
     /// <summary>
     ///     Gets or sets the uninherited timing point supplying BPM at this edge.
     /// </summary>
-    public TimingPoint UninheritedTimingPoint { get; set; }
+    public TimingPoint? UninheritedTimingPoint { get; set; }
 
     /// <summary>
     ///     Gets or sets the fully resolved normal-layer sample family.

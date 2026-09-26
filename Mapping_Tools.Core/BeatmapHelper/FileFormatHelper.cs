@@ -7,7 +7,6 @@ namespace Mapping_Tools.Core.BeatmapHelper;
 /// <summary>
 ///     Helper class for File Formats
 /// </summary>
-#nullable disable
 public static class FileFormatHelper
 {
     private static readonly string[] osuDictionaryKeyOrder =
@@ -63,7 +62,7 @@ public static class FileFormatHelper
     /// <returns></returns>
     public static string ToInvariant(this object obj)
     {
-        return Convert.ToString(obj, CultureInfo.InvariantCulture);
+        return Convert.ToString(obj, CultureInfo.InvariantCulture) ?? string.Empty;
     }
 
     /// <summary>
@@ -168,7 +167,7 @@ public static class FileFormatHelper
     /// <param name="category">The exact section header to locate, including brackets.</param>
     /// <param name="categoryIdentifiers">Prefixes that identify the next section; defaults to <c>[</c>.</param>
     /// <returns>The section's non-empty content lines in source order.</returns>
-    public static IEnumerable<string> GetCategoryLines(IEnumerable<string> lines, string category, string[] categoryIdentifiers = null)
+    public static IEnumerable<string> GetCategoryLines(IEnumerable<string> lines, string category, string[]? categoryIdentifiers = null)
     {
         if (categoryIdentifiers == null)
             categoryIdentifiers = ["["];

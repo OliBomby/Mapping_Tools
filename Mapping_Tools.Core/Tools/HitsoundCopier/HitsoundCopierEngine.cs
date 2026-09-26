@@ -241,7 +241,7 @@ public static class HitsoundCopierEngine
                          .Where(item => Precision.AlmostBigger(item.Time, firstTime)))
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var point = item.HitsoundTimingPoint.Copy();
+                var point = (item.HitsoundTimingPoint ?? throw new InvalidOperationException("Hitsound timing must be resolved before copying samples.")).Copy();
                 point.Offset = item.Time;
                 if (FilterMute(item, target, options))
                 {
@@ -365,7 +365,7 @@ public static class HitsoundCopierEngine
                 if (Precision.AlmostBigger(targetItem.Time, firstTime))
                 {
                     // Add timingpointschange to copy timingpoint hitsounds
-                    var point = sourceItem.HitsoundTimingPoint.Copy();
+                    var point = (sourceItem.HitsoundTimingPoint ?? throw new InvalidOperationException("Hitsound timing must be resolved before copying samples.")).Copy();
                     point.Offset = targetItem.Time;
                     changes.Add(new TimingPointChange(
                         point,
@@ -457,7 +457,7 @@ public static class HitsoundCopierEngine
             if (!targetItem.CanCopy || !Precision.AlmostBigger(targetItem.Time, firstTime))
                 continue;
 
-            var point = targetItem.HitsoundTimingPoint.Copy();
+            var point = (targetItem.HitsoundTimingPoint ?? throw new InvalidOperationException("Hitsound timing must be resolved before copying samples.")).Copy();
             bool holdSampleSet = options.CopySampleSets && targetItem.SampleSet == SampleSet.None;
             bool holdIndex = options.CopySampleSets && !(targetItem.CanCustoms && targetItem.CustomIndex != 0);
             // Dont hold indexes or sampleset if the sample it plays currently is the same as the sample it would play without conserving
@@ -551,7 +551,7 @@ public static class HitsoundCopierEngine
         HitsoundCopierEngineOptions options,
         bool addRevert)
     {
-        var point = source.HitsoundTimingPoint.Copy();
+        var point = (source.HitsoundTimingPoint ?? throw new InvalidOperationException("Hitsound timing must be resolved before copying samples.")).Copy();
         point.Offset = targetTime;
         point.SampleIndex = assignment.Index;
         point.SampleSet = assignment.SampleSet;
@@ -649,7 +649,7 @@ public static class HitsoundCopierEngine
                      Math.Abs(item.SampleVolume) < Precision.DOUBLE_EPSILON
                      && Precision.AlmostBigger(item.Time, firstTime)))
         {
-            var point = item.HitsoundTimingPoint.Copy();
+            var point = (item.HitsoundTimingPoint ?? throw new InvalidOperationException("Hitsound timing must be resolved before copying samples.")).Copy();
             point.Offset = item.Time;
             point.Volume = muteTimes.Contains(item.Time) ? 5 : item.FenoSampleVolume;
             changes.Add(new TimingPointChange(point, volume: true));

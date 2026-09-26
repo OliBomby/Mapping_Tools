@@ -1,5 +1,4 @@
 ﻿namespace Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
-#nullable disable
 
 /// <summary>
 ///     Stores a beat fraction that cannot or should not be represented as a numerator and denominator.
@@ -31,7 +30,7 @@ public class IrrationalBeatDivisor : IBeatDivisor
     /// </summary>
     /// <param name="other">The divisor to compare.</param>
     /// <returns><see langword="true" /> only for an irrational divisor with the same stored value.</returns>
-    public bool Equals(IBeatDivisor other)
+    public bool Equals(IBeatDivisor? other)
     {
         if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
@@ -61,7 +60,7 @@ public class IrrationalBeatDivisor : IBeatDivisor
     /// </summary>
     /// <param name="obj">The object to compare.</param>
     /// <returns><see langword="true" /> when the runtime types and stored values match.</returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;

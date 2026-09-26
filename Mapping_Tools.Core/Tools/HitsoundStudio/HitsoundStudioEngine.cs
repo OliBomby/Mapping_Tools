@@ -40,7 +40,7 @@ public sealed class HitsoundStudioEngine
             .ToList();
         foreach (var item in events)
         {
-            var point = timing.GetTimingPointAtTime(item.Time + 5)?.Copy() ?? new TimingPoint();
+            var point = timing.GetTimingPointAtTime(item.Time + 5).Copy();
             point.Offset = item.Time;
             point.SampleIndex = item.CustomIndex;
             point.Volume = Math.Round(point.Volume * item.Volume);

@@ -1,5 +1,4 @@
 ﻿namespace Mapping_Tools.Core.BeatmapHelper.Events;
-#nullable disable
 
 /// <summary>
 ///     Base class for indented storyboard commands that begin at a specific time.

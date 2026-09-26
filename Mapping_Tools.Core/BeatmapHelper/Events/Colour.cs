@@ -1,7 +1,6 @@
 using static Mapping_Tools.Core.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Core.BeatmapHelper.Events;
-#nullable disable
 
 /// <summary>
 ///     Represents a legacy background colour transformation in an osu! events section.
@@ -18,7 +17,7 @@ public class Colour : Event, IHasStartTime
     /// <summary>
     ///     Gets or sets the serialized event token, normally <c>3</c>.
     /// </summary>
-    public string EventType { get; set; }
+    public string EventType { get; set; } = string.Empty;
 
     /// <summary>
     ///     Gets or sets the background colour applied from <see cref="StartTime" /> onward.

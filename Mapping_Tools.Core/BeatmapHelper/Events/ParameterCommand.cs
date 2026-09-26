@@ -7,7 +7,6 @@ namespace Mapping_Tools.Core.BeatmapHelper.Events;
 /// <summary>
 ///     Represents the parameter command. This event has a different syntax so it can't be a <see cref="OtherCommand" />.
 /// </summary>
-#nullable disable
 public class ParameterCommand : Command, IHasEndTime
 {
     /// <summary>
@@ -24,7 +23,7 @@ public class ParameterCommand : Command, IHasEndTime
     ///     Gets or sets the storyboard parameter token, such as additive blending
     ///     or horizontal/vertical flipping.
     /// </summary>
-    public string Parameter { get; set; }
+    public string Parameter { get; set; } = string.Empty;
 
     /// <inheritdoc />
     public double EndTime { get; set; }

@@ -174,8 +174,10 @@ public sealed class PatternGalleryMaker
         beatmap.BeatmapTiming.RemoveAll(point => point.Offset < startTime || point.Offset > endTime);
 
         // Add some earlier timing points if necessary
-        var firstUninherited = beatmap.HitObjects[0].UnInheritedTimingPoint;
-        var firstNormal = beatmap.HitObjects[0].TimingPoint;
+        var firstUninherited = beatmap.HitObjects[0].UnInheritedTimingPoint
+                               ?? throw new InvalidOperationException("Beatmap timing must be resolved before making a pattern.");
+        var firstNormal = beatmap.HitObjects[0].TimingPoint
+                          ?? throw new InvalidOperationException("Beatmap timing must be resolved before making a pattern.");
         if (!beatmap.BeatmapTiming.Contains(firstUninherited)) beatmap.BeatmapTiming.Add(firstUninherited);
         if (!beatmap.BeatmapTiming.Contains(firstNormal)) beatmap.BeatmapTiming.Add(firstNormal);
     }

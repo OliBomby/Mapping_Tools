@@ -4,7 +4,6 @@
 using Mapping_Tools.Core.MathUtil;
 
 namespace Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
-#nullable disable
 
 /// <summary>
 ///     Helper methods to approximate a path by interpolating a sequence of control points.

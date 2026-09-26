@@ -5,7 +5,6 @@ namespace Mapping_Tools.Core.BeatmapHelper.Events;
 /// <summary>
 ///     Represents the standard loop event. This event has a different syntax so it can't be a <see cref="OtherCommand" />.
 /// </summary>
-#nullable disable
 public class StandardLoop : Command
 {
     /// <summary>

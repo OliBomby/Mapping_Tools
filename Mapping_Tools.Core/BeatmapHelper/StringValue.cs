@@ -7,7 +7,6 @@ namespace Mapping_Tools.Core.BeatmapHelper;
 ///     Helper class for a single string that can represent multiple data types.
 ///     Provides methods for converting data to and from string.
 /// </summary>
-#nullable disable
 public class StringValue
 {
     /// <summary>
@@ -27,7 +26,7 @@ public class StringValue
     /// <summary>
     ///     Gets or sets the raw text exactly as stored after an osu! section key.
     /// </summary>
-    public string Value { get; set; }
+    public string Value { get; set; } = string.Empty;
 
     /// <summary>
     ///     Parses or replaces <see cref="Value" /> as an invariant-culture integer.

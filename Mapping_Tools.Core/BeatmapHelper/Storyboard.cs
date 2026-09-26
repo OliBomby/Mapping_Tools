@@ -6,7 +6,6 @@ namespace Mapping_Tools.Core.BeatmapHelper;
 /// <summary>
 ///     Parses and serializes the event collections shared by <c>.osu</c> and <c>.osb</c> files.
 /// </summary>
-#nullable disable
 public class StoryBoard : ITextFile
 {
     /// <summary>
@@ -14,16 +13,22 @@ public class StoryBoard : ITextFile
     /// </summary>
     public StoryBoard()
     {
-        Initialize();
+        BackgroundAndVideoEvents = [];
+        BreakPeriods = [];
+        StoryboardLayerBackground = [];
+        StoryboardLayerPass = [];
+        StoryboardLayerFail = [];
+        StoryboardLayerForeground = [];
+        StoryboardLayerOverlay = [];
+        StoryboardSoundSamples = [];
     }
 
     /// <summary>
     ///     Creates an empty storyboard with separate collections for every osu! event layer and category.
     /// </summary>
     /// <param name="lines">The lines.</param>
-    public StoryBoard(List<string> lines)
+    public StoryBoard(List<string> lines) : this()
     {
-        Initialize();
         SetLines(lines);
     }
 
@@ -163,18 +168,6 @@ public class StoryBoard : ITextFile
         var lines = new List<string>();
         AppendLines(lines);
         return lines;
-    }
-
-    private void Initialize()
-    {
-        BackgroundAndVideoEvents = [];
-        BreakPeriods = [];
-        StoryboardLayerBackground = [];
-        StoryboardLayerPass = [];
-        StoryboardLayerFail = [];
-        StoryboardLayerForeground = [];
-        StoryboardLayerOverlay = [];
-        StoryboardSoundSamples = [];
     }
 
     /// <summary>

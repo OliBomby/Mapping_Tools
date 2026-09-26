@@ -44,6 +44,20 @@ public class BeatmapTests
     }
 
     [TestMethod]
+    public void Beatmap_WithoutFirstTimingPoint_DoesNotAddNullTimingPoint()
+    {
+        // Arrange
+        List<HitObject> hitObjects = [];
+        List<TimingPoint> timingPoints = [];
+
+        // Act
+        Beatmap beatmap = new(hitObjects, timingPoints);
+
+        // Assert
+        beatmap.BeatmapTiming.TimingPoints.Should().BeEmpty();
+    }
+
+    [TestMethod]
     public void QueryTimeCode_SelectsRequestedComboObjects()
     {
         // Arrange

@@ -5,7 +5,6 @@ using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.MathUtil;
 
 namespace Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
-#nullable disable
 
 /// <summary>
 ///     Lazily approximates an osu! slider curve and applies its optional serialized pixel-length constraint.
@@ -43,8 +42,11 @@ public struct SliderPath : IEquatable<SliderPath>
     /// </param>
     public SliderPath(PathType type, Vector2[] controlPoints, double? expectedDistance = null)
     {
-        this = default;
         this.controlPoints = controlPoints;
+        calculatedPath = [];
+        cumulativeLength = [];
+        segmentStarts = [];
+        isInitialised = false;
 
         Type = type;
         ExpectedDistance = expectedDistance;
@@ -360,7 +362,7 @@ public struct SliderPath : IEquatable<SliderPath>
     /// </summary>
     /// <param name="obj">The object to compare.</param>
     /// <returns><see langword="true" /> for an equal <see cref="SliderPath" />.</returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj is null)
             return false;

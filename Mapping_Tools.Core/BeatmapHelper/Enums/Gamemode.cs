@@ -3,7 +3,6 @@
 /// <summary>
 ///     Identifies the osu! ruleset encoded by the beatmap's <c>Mode</c> field.
 /// </summary>
-#nullable disable
 public enum GameMode
 {
     /// <summary>

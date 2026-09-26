@@ -152,7 +152,7 @@ public static class TimingCopierEngine
         foreach (var hitObject in target.HitObjects.Where(hitObject => hitObject.IsSlider))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var timingPoint = hitObject.TimingPoint.Copy();
+            var timingPoint = (hitObject.TimingPoint ?? throw new InvalidOperationException("Hit object timing must be resolved before copying timing.")).Copy();
             timingPoint.Offset = hitObject.Time;
             timingPoint.MpB = hitObject.SliderVelocity;
             timingPointChanges.Add(

@@ -2,7 +2,6 @@
 using static Mapping_Tools.Core.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Core.BeatmapHelper.Events;
-#nullable disable
 
 /// <summary>
 ///     Represents the playfield background declaration in an osu! events section.
@@ -12,12 +11,12 @@ public class Background : Event, IHasStartTime
     /// <summary>
     ///     Gets or sets the original background token, normally <c>0</c>.
     /// </summary>
-    public string EventType { get; set; }
+    public string EventType { get; set; } = string.Empty;
 
     /// <summary>
     ///     Gets or sets the background image path relative to the beatmap folder.
     /// </summary>
-    public string Filename { get; set; }
+    public string Filename { get; set; } = string.Empty;
 
     /// <summary>
     ///     Gets or sets the optional image offset in osu! playfield coordinates.

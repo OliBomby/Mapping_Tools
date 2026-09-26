@@ -55,8 +55,6 @@ internal readonly struct TimingPointChange
 
         foreach (var point in timing)
         {
-            if (point is null) continue;
-
             if (point.Offset < TimingPoint.Offset && (previous is null || point.Offset >= previous.Offset))
                 previous = point;
 

@@ -3,7 +3,6 @@
 /// <summary>
 ///     The hitsound placed into the hitobject.
 /// </summary>
-#nullable disable
 public enum Hitsound
 {
     /// <summary />

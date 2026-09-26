@@ -168,7 +168,7 @@ public sealed class PatternThumbnailControl : Control
         foreach (var hitObject in beatmap.HitObjects.Take(maximum_object_count))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (!hitObject.IsSlider || hitObject.PixelLength >= maximum_pixel_length || hitObject.CurvePoints is null || hitObject.CurvePoints.Count >= maximum_anchor_count)
+            if (!hitObject.IsSlider || hitObject.PixelLength >= maximum_pixel_length || hitObject.CurvePoints.Count >= maximum_anchor_count)
                 continue;
 
             try

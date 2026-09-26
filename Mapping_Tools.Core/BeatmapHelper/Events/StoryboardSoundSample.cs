@@ -10,7 +10,6 @@ namespace Mapping_Tools.Core.BeatmapHelper.Events;
 /// <example>
 ///     Sample,56056,0,"soft-hitnormal.wav",30
 /// </example>
-#nullable disable
 public class StoryboardSoundSample : Event, IEquatable<StoryboardSoundSample>, IHasStartTime, IHasEndTime, IComparable<StoryboardSoundSample>
 {
     /// <summary>
@@ -51,7 +50,7 @@ public class StoryboardSoundSample : Event, IEquatable<StoryboardSoundSample>, I
     ///     The name of the sample file which is the sound of this storyboard sample.
     ///     This is a partial path.
     /// </summary>
-    public string FilePath { get; set; }
+    public string FilePath { get; set; } = string.Empty;
 
     /// <summary>
     ///     The volume of this sound. Ranges from 0 to 100.
@@ -63,7 +62,7 @@ public class StoryboardSoundSample : Event, IEquatable<StoryboardSoundSample>, I
     /// </summary>
     /// <param name="other">The sound event to compare.</param>
     /// <returns>A signed value indicating the relative playback order.</returns>
-    public int CompareTo(StoryboardSoundSample other)
+    public int CompareTo(StoryboardSoundSample? other)
     {
         if (ReferenceEquals(this, other)) return 0;
         if (ReferenceEquals(null, other)) return 1;
@@ -74,7 +73,7 @@ public class StoryboardSoundSample : Event, IEquatable<StoryboardSoundSample>, I
     /// <param name="other">An object to compare with this object.</param>
     /// <returns>true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.</returns>
     [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
-    public bool Equals(StoryboardSoundSample other)
+    public bool Equals(StoryboardSoundSample? other)
     {
         return other != null &&
                StartTime == other.StartTime &&

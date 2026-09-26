@@ -36,7 +36,7 @@ public sealed class SliderPathGenerator : RelevantObjectsGenerator
     public RelevantPoint[]? GetRelevantObjects(RelevantHitObject relevantHitObject)
     {
         var hitObject = relevantHitObject.HitObject;
-        if (!hitObject.IsSlider || hitObject.CurvePoints is null) return null;
+        if (!hitObject.IsSlider) return null;
         int numberOfPoints = (int)(hitObject.PixelLength * MySettings.PointDensity);
         if (numberOfPoints <= 0) return Array.Empty<RelevantPoint>();
 

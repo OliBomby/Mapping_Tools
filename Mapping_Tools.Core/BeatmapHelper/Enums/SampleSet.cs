@@ -3,7 +3,6 @@
 /// <summary>
 ///     The types of samples used for inherited timing points and hitobjects themselves.
 /// </summary>
-#nullable disable
 public enum SampleSet
 {
     /// <summary>

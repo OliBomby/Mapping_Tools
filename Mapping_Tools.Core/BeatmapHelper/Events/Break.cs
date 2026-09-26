@@ -1,7 +1,6 @@
 ﻿using static Mapping_Tools.Core.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Core.BeatmapHelper.Events;
-#nullable disable
 
 /// <summary>
 ///     Represents a gameplay break interval from the beatmap events section.
@@ -25,7 +24,7 @@ public class Break : Event, IHasStartTime, IHasEndTime
     /// <summary>
     ///     Gets or sets the original break token, preserving <c>2</c> or <c>Break</c>.
     /// </summary>
-    public string EventType { get; set; }
+    public string EventType { get; set; } = string.Empty;
 
     /// <inheritdoc />
     public double EndTime { get; set; }

@@ -4,7 +4,6 @@
 ///     Reports malformed osu! beatmap text while retaining the offending source line in the message.
 /// </summary>
 [Serializable]
-#nullable disable
 public class BeatmapParsingException : Exception
 {
     /// <summary>

@@ -3,7 +3,6 @@
 /// <summary>
 ///     The layers according to the osu! Storyboard.
 /// </summary>
-#nullable disable
 public enum StoryboardLayer
 {
     /// <summary>

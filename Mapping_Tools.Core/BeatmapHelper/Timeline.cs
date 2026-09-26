@@ -1,4 +1,3 @@
-#nullable disable
 namespace Mapping_Tools.Core.BeatmapHelper;
 
 /// <summary>
@@ -104,11 +103,11 @@ public class Timeline
     /// <param name="time">The time to find the nearest timeline object to.</param>
     /// <param name="needCopyable">Whether the nearest timeline object must be copyable.</param>
     /// <returns>The nearest timeline object, or null if none are found.</returns>
-    public TimelineObject GetNearestTlo(double time, bool needCopyable = false)
+    public TimelineObject? GetNearestTlo(double time, bool needCopyable = false)
     {
         if (TimelineObjects.Count == 0) return null;
 
-        TimelineObject closest = null;
+        TimelineObject? closest = null;
         double closestDist = double.PositiveInfinity;
         foreach (var tlo in TimelineObjects)
         {

@@ -221,7 +221,7 @@ public sealed class ObjectVisualiserControl : Control
             return;
         }
 
-        if (HitObject.IsSlider && HitObject.PixelLength < MAX_PIXEL_LENGTH && HitObject.CurvePoints is not null && HitObject.CurvePoints.Count < HARD_MAX_ANCHOR_COUNT)
+        if (HitObject.IsSlider && HitObject.PixelLength < MAX_PIXEL_LENGTH && HitObject.CurvePoints.Count < HARD_MAX_ANCHOR_COUNT)
             try
             {
                 double? customLength = CustomPixelLength is { } value && double.IsFinite(value) && value >= 0

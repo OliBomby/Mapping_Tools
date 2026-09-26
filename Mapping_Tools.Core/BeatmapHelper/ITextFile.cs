@@ -3,7 +3,6 @@
 /// <summary>
 ///     Interface for a text file.
 /// </summary>
-#nullable disable
 public interface ITextFile
 {
     /// <summary>
