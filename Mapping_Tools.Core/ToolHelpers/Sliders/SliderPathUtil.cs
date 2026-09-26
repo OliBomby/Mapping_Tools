@@ -9,140 +9,141 @@ namespace Mapping_Tools.Core.ToolHelpers.Sliders;
 /// </summary>
 public static class SliderPathUtil
 {
-    /// <summary>
-    ///     Fits anchors to a target path length after measuring the source curve.
-    /// </summary>
-    /// <param name="anchors">The source slider control points including its start.</param>
-    /// <param name="pathType">The path type.</param>
-    /// <param name="newLength">The new length.</param>
-    /// <param name="newPathType">The new path type.</param>
-    /// <returns>Adjusted anchors and, through <paramref name="newPathType" />, any required type conversion.</returns>
-    public static List<Vector2> MoveAnchorsToLength(List<Vector2> anchors, PathType pathType, double newLength, out PathType newPathType)
+    /// <summary>Moves a typed slider path's end to the requested length.</summary>
+    /// <param name="controlPoints">The ordered path control points.</param>
+    /// <param name="newLength">The requested length.</param>
+    /// <returns>Independent control points preserving all completed segment types.</returns>
+    public static List<PathControlPoint> MoveAnchorsToLength(IReadOnlyList<PathControlPoint> controlPoints, double newLength)
     {
-        var sliderPath = new SliderPath(pathType, [.. anchors], newLength);
-        double fullLength = new SliderPath(pathType, [.. anchors]).Distance;
-
-        return MoveAnchorsToLength(sliderPath, fullLength, newLength, out newPathType);
+        var path = new SliderPath(controlPoints.ToArray());
+        return MoveAnchorsToLength(path, path.Distance, newLength);
     }
 
-    /// <summary>
-    ///     Fits anchors to a target length using a caller-supplied untruncated source length.
-    /// </summary>
-    /// <param name="anchors">The source slider control points including its start.</param>
-    /// <param name="pathType">The path type.</param>
-    /// <param name="fullLength">The full length.</param>
-    /// <param name="newLength">The new length.</param>
-    /// <param name="newPathType">The new path type.</param>
-    /// <returns>Adjusted anchors preserving the original path as far as possible.</returns>
-    public static List<Vector2> MoveAnchorsToLength(List<Vector2> anchors, PathType pathType, double fullLength, double newLength, out PathType newPathType)
+    /// <summary>Moves a typed slider path's end using a caller-supplied full length.</summary>
+    /// <param name="controlPoints">The ordered path control points.</param>
+    /// <param name="fullLength">The length before the move.</param>
+    /// <param name="newLength">The requested length.</param>
+    /// <returns>Independent control points preserving all completed segment types.</returns>
+    public static List<PathControlPoint> MoveAnchorsToLength(IReadOnlyList<PathControlPoint> controlPoints, double fullLength, double newLength)
     {
-        var sliderPath = new SliderPath(pathType, [.. anchors], newLength);
-
-        return MoveAnchorsToLength(sliderPath, fullLength, newLength, out newPathType);
+        return MoveAnchorsToLength(new SliderPath(controlPoints.ToArray()), fullLength, newLength);
     }
 
-    /// <summary>
-    ///     Fits anchors to a fraction of the source curve's full length.
-    /// </summary>
-    /// <param name="anchors">The source slider control points including its start.</param>
-    /// <param name="pathType">The path type.</param>
-    /// <param name="completion">The completion.</param>
-    /// <param name="newPathType">The new path type.</param>
-    /// <returns>Anchors ending at the requested completion.</returns>
-    public static List<Vector2> MoveAnchorsToCompletion(List<Vector2> anchors, PathType pathType, double completion, out PathType newPathType)
+    /// <summary>Moves a typed slider path's end to a fraction of its full length.</summary>
+    /// <param name="controlPoints">The ordered path control points.</param>
+    /// <param name="completion">The fraction of the full path to retain.</param>
+    /// <returns>Independent control points preserving all completed segment types.</returns>
+    public static List<PathControlPoint> MoveAnchorsToCompletion(IReadOnlyList<PathControlPoint> controlPoints, double completion)
     {
-        double fullLength = new SliderPath(pathType, [.. anchors]).Distance;
-        var sliderPath = new SliderPath(pathType, [.. anchors], completion * fullLength);
-
-        return MoveAnchorsToLength(sliderPath, fullLength, sliderPath.Distance, out newPathType);
+        var path = new SliderPath(controlPoints.ToArray());
+        return MoveAnchorsToLength(path, path.Distance, completion * path.Distance);
     }
 
-    /// <summary>
-    ///     Extends or truncates a prepared slider path by moving and reconstructing its anchors.
-    /// </summary>
-    /// <param name="sliderPath">The slider path.</param>
-    /// <param name="fullLength">The full length.</param>
-    /// <param name="newLength">The new length.</param>
-    /// <param name="newPathType">The new path type.</param>
-    /// <returns>The reconstructed anchors and resulting curve type.</returns>
-    public static List<Vector2> MoveAnchorsToLength(SliderPath sliderPath, double fullLength, double newLength, out PathType newPathType)
+    /// <summary>Moves the end of a typed slider path while keeping complete segments unchanged.</summary>
+    /// <param name="sliderPath">The source path.</param>
+    /// <param name="fullLength">The length before the move.</param>
+    /// <param name="newLength">The requested length.</param>
+    /// <returns>Independent control points with segment types.</returns>
+    public static List<PathControlPoint> MoveAnchorsToLength(SliderPath sliderPath, double fullLength, double newLength)
+    {
+        var source = sliderPath.PathControlPoints;
+        var result = source.Select(point => point.Copy()).ToList();
+        if (source.Count < 2 || Precision.AlmostEquals(newLength, fullLength, 0.01)) return result;
+
+        var targetPath = new SliderPath(source.ToArray(), newLength);
+        if (newLength > fullLength)
+        {
+            Vector2 endpoint = targetPath.PositionAt(1);
+            if (source[0].Type == PathType.Linear && source.Skip(1).All(point => !point.Type.HasValue))
+                result[^1].Position = endpoint;
+            else
+            {
+                result[^1].Type = PathType.Linear;
+                result.Add(new PathControlPoint(endpoint));
+            }
+
+            return result;
+        }
+
+        result.Clear();
+        double remainingLength = newLength;
+        foreach (var segment in GetTypedSegments(source))
+        {
+            var positions = segment.Points.Select(point => point.Position).ToArray();
+            double segmentLength = new SliderPath(segment.Type, positions).Distance;
+            if (remainingLength >= segmentLength - 0.01)
+            {
+                AppendSegment(result, segment.Points);
+                remainingLength -= segmentLength;
+                if (remainingLength <= 0.01) break;
+                continue;
+            }
+
+            var cutPath = new SliderPath(segment.Type, positions, Math.Max(0, remainingLength));
+            var cutPoints = MoveSingleSegmentAnchorsToLength(cutPath, segmentLength, remainingLength);
+            AppendSegment(result, cutPoints);
+            break;
+        }
+
+        return result;
+    }
+
+    private static IEnumerable<(List<PathControlPoint> Points, PathType Type)> GetTypedSegments(IReadOnlyList<PathControlPoint> points)
+    {
+        int start = 0;
+        PathType activeType = points[0].Type ?? PathType.Linear;
+        for (int i = 0; i < points.Count; i++)
+        {
+            bool typedBoundary = i > start && points[i].Type.HasValue;
+            if (i != points.Count - 1 && !typedBoundary) continue;
+
+            yield return (points.Skip(start).Take(i - start + 1).ToList(), activeType);
+
+            if (typedBoundary) activeType = points[i].Type!.Value;
+            start = i;
+        }
+    }
+
+    private static void AppendSegment(List<PathControlPoint> result, IReadOnlyList<PathControlPoint> segment)
+    {
+        if (result.Count == 0)
+        {
+            result.AddRange(segment.Select(point => point.Copy()));
+            return;
+        }
+
+        result[^1].Type = segment[0].Type;
+        result.AddRange(segment.Skip(1).Select(point => point.Copy()));
+    }
+
+    private static List<PathControlPoint> MoveSingleSegmentAnchorsToLength(SliderPath sliderPath, double fullLength, double newLength)
     {
         var newAnchors = new List<Vector2>();
         var pathType = sliderPath.Type;
+        PathType newPathType;
         var anchors = sliderPath.ControlPoints;
 
         if (Precision.AlmostEquals(newLength, fullLength, 0.01))
         {
             newAnchors.AddRange(anchors);
             newPathType = pathType;
-            return newAnchors;
+            return newAnchors.Select((position, index) => new PathControlPoint(position, index == 0 ? newPathType : null)).ToList();
         }
 
-        if (newLength > fullLength)
-            // Extend linearly
-            switch (pathType)
-            {
-                case PathType.Bezier:
-                    newPathType = PathType.Bezier;
-                    newAnchors.AddRange(anchors);
-
-                    if (newAnchors.Count > 1 && newAnchors[^2] == newAnchors[^1]) newAnchors[^2] += Vector2.UnitX;
-
-                    newAnchors.Add(anchors[^1]);
-                    newAnchors.Add(sliderPath.PositionAt(1));
-                    break;
-                case PathType.Catmull:
-                case PathType.PerfectCurve:
-                case PathType.BSpline:
-                    // Convert to bezier and then extend
-                    newPathType = PathType.Bezier;
-                    newAnchors = BezierConverter.ConvertToBezier(sliderPath).ControlPoints;
-                    newAnchors.Add(anchors.Last());
-                    newAnchors.Add(sliderPath.PositionAt(1));
-                    break;
-                default:
-                    newPathType = pathType;
-                    newAnchors.AddRange(anchors);
-                    newAnchors[^1] = sliderPath.PositionAt(1);
-                    break;
-            }
-        else
-            switch (sliderPath.Type)
+        switch (sliderPath.Type)
             {
                 case PathType.Catmull:
                 case PathType.Bezier:
-                case PathType.BSpline:
                     newPathType = PathType.Bezier;
 
                     // Convert in case the path type is catmull
-                    var convert = BezierConverter.ConvertToBezier(sliderPath).ControlPoints;
-
-                    // Find the last bezier segment and the pixel length at that part
-                    BezierSubdivision? subdivision = null;
-                    double totalLength = 0;
-
-                    foreach (var bezierSubdivision in ChopAnchors(convert))
-                    {
-                        subdivision = bezierSubdivision;
-                        double length = bezierSubdivision.SubdividedApproximationLength();
-
-                        if (Precision.AlmostBigger(totalLength + length, newLength)) break;
-
-                        totalLength += length;
-                        newAnchors.AddRange(bezierSubdivision.Points);
-                    }
-
-                    if (subdivision == null) break;
-
-                    // Find T for the remaining pixel length
-                    double t = subdivision.LengthToT(newLength - totalLength);
-
-                    // ScaleRight the BezierSubdivision so the anchors end at T
-                    subdivision.ScaleRight(t);
-
-                    // Add the scaled anchors
-                    newAnchors.AddRange(subdivision.Points);
-                    break;
+                    var convert = BezierConverter.ConvertToBezier(sliderPath);
+                    return MoveBezierSegmentsToLength(ChopAnchors(convert), newLength);
+                case PathType.BSpline:
+                    newPathType = PathType.Bezier;
+                    var splineSegments = PathApproximator.GetBSplineBezierSegments(anchors, 4)
+                        .Select(points => new BezierSubdivision(points.ToList()));
+                    return MoveBezierSegmentsToLength(splineSegments, newLength);
                 case PathType.PerfectCurve:
                     newPathType = PathType.PerfectCurve;
                     newAnchors.AddRange(anchors);
@@ -154,7 +155,7 @@ public static class SliderPathUtil
                     if (anchors.Count > 2)
                     {
                         // Find the section of the linear slider which contains the slider end
-                        totalLength = 0;
+                        double totalLength = 0;
                         foreach (var bezierSubdivision in ChopAnchorsLinear(anchors))
                         {
                             newAnchors.Add(bezierSubdivision.Points[0]);
@@ -174,36 +175,65 @@ public static class SliderPathUtil
                     }
 
                     break;
-            }
+        }
 
-        return newAnchors;
+        return newAnchors.Select((position, index) => new PathControlPoint(position, index == 0 ? newPathType : null)).ToList();
+    }
+
+    private static List<PathControlPoint> MoveBezierSegmentsToLength(IEnumerable<BezierSubdivision> subdivisions, double newLength)
+    {
+        var typedAnchors = new List<PathControlPoint>();
+        BezierSubdivision? subdivision = null;
+        double totalLength = 0;
+
+        foreach (var bezierSubdivision in subdivisions)
+        {
+            subdivision = bezierSubdivision;
+            double length = bezierSubdivision.SubdividedApproximationLength();
+
+            if (Precision.AlmostBigger(totalLength + length, newLength)) break;
+
+            totalLength += length;
+            AppendBezierSubdivision(typedAnchors, bezierSubdivision.Points);
+        }
+
+        if (subdivision is null) return typedAnchors;
+
+        double t = subdivision.LengthToT(newLength - totalLength);
+        subdivision.ScaleRight(t);
+        AppendBezierSubdivision(typedAnchors, subdivision.Points);
+        return typedAnchors;
+    }
+
+    private static void AppendBezierSubdivision(List<PathControlPoint> result, IReadOnlyList<Vector2> positions)
+    {
+        if (result.Count == 0)
+        {
+            result.Add(new PathControlPoint(positions[0], PathType.Bezier));
+        }
+        else
+        {
+            result[^1].Type = PathType.Bezier;
+        }
+
+        foreach (var position in positions.Skip(1)) result.Add(new PathControlPoint(position));
     }
 
     /// <summary>
     ///     Calculates the completion values of all the red anchors along the path.
     /// </summary>
-    /// <param name="sliderPath">The path whose repeated-anchor segment boundaries are inspected.</param>
+    /// <param name="sliderPath">The path whose typed segment boundaries are inspected.</param>
     /// <returns>Normalized path completions for red-anchor boundaries.</returns>
     public static IEnumerable<double> GetRedAnchorCompletions(SliderPath sliderPath)
     {
-        int start = 0;
-        int end = 0;
         double totalLength = 0;
-        var anchors = sliderPath.ControlPoints;
-
-        for (int i = 0; i < anchors.Count; i++)
+        var segments = GetTypedSegments(sliderPath.PathControlPoints).ToList();
+        for (int index = 0; index < segments.Count - 1; index++)
         {
-            end++;
-
-            if (i == anchors.Count - 1 || anchors[i] != anchors[i + 1]) continue;
-
-            var cpSpan = anchors.GetRange(start, end - start);
-            var subdivision = new BezierSubdivision(cpSpan);
-            totalLength += subdivision.SubdividedApproximationLength();
-
+            var segment = segments[index];
+            totalLength += new SliderPath(segment.Type,
+                segment.Points.Select(point => point.Position).ToArray()).Distance;
             yield return totalLength / sliderPath.Distance;
-
-            start = end;
         }
     }
 
@@ -214,38 +244,17 @@ public static class SliderPathUtil
     /// <returns>Segments suitable for independent length manipulation.</returns>
     public static IEnumerable<BezierSubdivision> ChopAnchors(SliderPath sliderPath)
     {
-        switch (sliderPath.Type)
+        foreach (var segment in GetTypedSegments(sliderPath.PathControlPoints))
         {
-            case PathType.Catmull:
-            case PathType.Linear:
-                return ChopAnchorsLinear(sliderPath.ControlPoints);
-            default:
-                return ChopAnchors(sliderPath.ControlPoints);
-        }
-    }
-
-    /// <summary>
-    ///     Splits a Bézier anchor list at consecutive duplicate red anchors.
-    /// </summary>
-    /// <param name="anchors">Bézier control points containing duplicate red-anchor separators.</param>
-    /// <returns>One Bézier segment per red-anchor-delimited section.</returns>
-    public static IEnumerable<BezierSubdivision> ChopAnchors(List<Vector2> anchors)
-    {
-        int start = 0;
-        int end = 0;
-
-        for (int i = 0; i < anchors.Count; i++)
-        {
-            end++;
-
-            if (i != anchors.Count - 1 && anchors[i] != anchors[i + 1] || i == anchors.Count - 2) continue;
-
-            var cpSpan = anchors.GetRange(start, end - start);
-            var subdivision = new BezierSubdivision(cpSpan);
-
-            yield return subdivision;
-
-            start = end;
+            var positions = segment.Points.Select(point => point.Position).ToList();
+            if (segment.Type is PathType.Catmull or PathType.Linear)
+            {
+                foreach (var subdivision in ChopAnchorsLinear(positions)) yield return subdivision;
+            }
+            else
+            {
+                yield return new BezierSubdivision(positions);
+            }
         }
     }
 
@@ -300,7 +309,7 @@ public static class SliderPathUtil
         double l2 = Vector2.DistanceSquared(v, w); // i.e. |w-v|^2 -  avoid a sqrt
         if (l2 == 0.0) return Vector2.Distance(p, v); // v == w case
         // Consider the line extending the segment, parameterized as v + t (w - v).
-        // We find projection of point p onto the line. 
+        // We find projection of point p onto the line.
         // It falls where t = [(p-v) . (w-v)] / |w-v|^2
         // We clamp t from [0,1] to handle points outside the segment vw.
         double t = Math.Max(0, Math.Min(1, Vector2.Dot(p - v, w - v) / l2));

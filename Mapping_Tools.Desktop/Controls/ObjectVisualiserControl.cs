@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Core.MathUtil;
 
@@ -13,6 +14,11 @@ namespace Mapping_Tools.Desktop.Controls;
 /// </summary>
 public sealed class ObjectVisualiserControl : Control
 {
+    private static readonly IBrush catmullAnchorBrush = new SolidColorBrush(Color.FromRgb(0x05, 0xff, 0xa2));
+    private static readonly IBrush bSplineAnchorBrush = new SolidColorBrush(Color.FromRgb(0xff, 0x7d, 0xee));
+    private static readonly IBrush perfectCurveAnchorBrush = new SolidColorBrush(Color.FromRgb(0x66, 0x44, 0xcc));
+    private static readonly IBrush bezierAnchorBrush = new SolidColorBrush(Color.FromRgb(0xed, 0x11, 0x21));
+
     /// <summary>Maximum slider pixel length accepted by the legacy visualizer.</summary>
     public const double MAX_PIXEL_LENGTH = 1e6;
 
@@ -71,7 +77,7 @@ public sealed class ObjectVisualiserControl : Control
             nameof(ExtraMarkers), []);
 
     private Rect contentBounds = new(0, 0, 1, 1);
-    private IReadOnlyList<Vector2> controlPoints = [];
+    private IReadOnlyList<PathControlPoint> controlPoints = [];
     private IReadOnlyList<Vector2> pathPoints = [];
     private double scale = 1;
 
@@ -221,7 +227,7 @@ public sealed class ObjectVisualiserControl : Control
             return;
         }
 
-        if (HitObject.IsSlider && HitObject.PixelLength < MAX_PIXEL_LENGTH && HitObject.CurvePoints.Count < HARD_MAX_ANCHOR_COUNT)
+        if (HitObject.IsSlider && HitObject.PixelLength < MAX_PIXEL_LENGTH && HitObject.ControlPoints.Count < HARD_MAX_ANCHOR_COUNT)
             try
             {
                 double? customLength = CustomPixelLength is { } value && double.IsFinite(value) && value >= 0
@@ -229,11 +235,11 @@ public sealed class ObjectVisualiserControl : Control
                     : null;
                 var path = customLength is null
                     ? HitObject.GetSliderPath()
-                    : new SliderPath(HitObject.SliderType, HitObject.GetAllCurvePoints().ToArray(), customLength);
+                    : new SliderPath(HitObject.GetSliderPath().PathControlPoints.Select(point => point.Copy()).ToArray(), customLength);
                 if (path.CalculatedPath.Count <= MAX_SEGMENT_COUNT)
                 {
                     sliderPath = path;
-                    controlPoints = path.ControlPoints.ToArray();
+                    controlPoints = path.PathControlPoints;
                     pathPoints = [HitObject.Pos, .. path.CalculatedPath];
                     sliderPathGeometry = CreatePathGeometry(pathPoints);
                 }
@@ -313,14 +319,21 @@ public sealed class ObjectVisualiserControl : Control
         {
             Pen connectorPen = new(Brushes.White, scale);
             Pen outlinePen = new(Brushes.Black, scale);
-            for (int index = 0; index < controlPoints.Count - 1; index++) context.DrawLine(connectorPen, ToPoint(controlPoints[index]), ToPoint(controlPoints[index + 1]));
+            for (int index = 0; index < controlPoints.Count - 1; index++)
+                context.DrawLine(connectorPen, ToPoint(controlPoints[index].Position), ToPoint(controlPoints[index + 1].Position));
 
             for (int index = 0; index < controlPoints.Count; index++)
             {
-                IBrush brush = index != 0 && controlPoints[index] == controlPoints[index - 1]
-                    ? Brushes.Red
-                    : Brushes.LightGray;
-                DrawSquare(context, brush, outlinePen, controlPoints[index], AnchorSize);
+                var controlPoint = controlPoints[index];
+                IBrush brush = controlPoint.Type switch
+                {
+                    PathType.Catmull => catmullAnchorBrush,
+                    PathType.BSpline => bSplineAnchorBrush,
+                    PathType.PerfectCurve => perfectCurveAnchorBrush,
+                    null => Brushes.LightGray,
+                    _ => bezierAnchorBrush
+                };
+                DrawSquare(context, brush, outlinePen, controlPoint.Position, AnchorSize);
             }
         }
 

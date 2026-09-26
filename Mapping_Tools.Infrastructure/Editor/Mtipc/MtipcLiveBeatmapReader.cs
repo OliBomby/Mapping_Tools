@@ -4,6 +4,7 @@ using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
 
 namespace Mapping_Tools.Infrastructure.Editor.Mtipc;
 
@@ -66,8 +67,7 @@ public sealed class MtipcLiveBeatmapReader : ILiveBeatmapReader
         if (hitObject.IsSlider)
         {
             hitObject.Repeat = source.SegmentCount;
-            hitObject.SliderType = (PathType)source.CurveType;
-            hitObject.CurvePoints = source.CurvePoints.Skip(1).ToList();
+            hitObject.ControlPoints = PathControlPoint.FromLegacyPositions(source.CurvePoints, hitObject.Pos, (PathType)source.CurveType);
             hitObject.EdgeHitsounds = source.SoundTypeList.ToList();
             hitObject.EdgeSampleSets = source.SampleSetList.Select(value => (SampleSet)value).ToList();
             hitObject.EdgeAdditionSets = source.SampleSetAdditionsList.Select(value => (SampleSet)value).ToList();

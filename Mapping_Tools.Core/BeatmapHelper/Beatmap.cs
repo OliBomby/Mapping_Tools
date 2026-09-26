@@ -268,7 +268,7 @@ public class Beatmap : ITextFile
             else
                 SpecialColours[FileFormatHelper.SplitKeyValue(line).Item1] = new ComboColour(line);
 
-        foreach (string line in hitobjectLines) HitObjects.Add(new HitObject(line));
+        foreach (string line in hitobjectLines) HitObjects.Add(new HitObject(line, Version));
 
         // Give the lines to the storyboard
         StoryBoard.SetLines(lines);
@@ -365,7 +365,7 @@ public class Beatmap : ITextFile
         lines.AddRange(HitObjects.Select(ho =>
         {
             ho.SaveWithFloatPrecision = SaveWithFloatPrecision;
-            return ho.GetLine();
+            return ho.GetLine(Version);
         }));
         lines.Add("");
 

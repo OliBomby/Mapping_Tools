@@ -7,6 +7,7 @@ using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Infrastructure.Tools.GeometryDashboard;
 using OsuMemoryDataProvider;
@@ -335,19 +336,18 @@ internal static class EditorReaderSnapshotConverter
         if (hitObject.IsSlider)
         {
             hitObject.Repeat = source.SegmentCount;
-            hitObject.SliderType = (PathType)source.CurveType;
+            var points = new List<Vector2> { hitObject.Pos };
             if (source.sliderCurvePoints is not null)
             {
-                hitObject.CurvePoints =
-                    new List<Vector2>(source.sliderCurvePoints.Length / 2);
                 for (int index = 1;
                      index < source.sliderCurvePoints.Length / 2;
                      index++)
-                    hitObject.CurvePoints.Add(
+                    points.Add(
                         new Vector2(
                             source.sliderCurvePoints[index * 2],
                             source.sliderCurvePoints[index * 2 + 1]));
             }
+            hitObject.ControlPoints = PathControlPoint.FromLegacyPositions(points, hitObject.Pos, (PathType)source.CurveType);
 
             hitObject.EdgeHitsounds =
                 source.SoundTypeList?.ToList() ?? [];

@@ -1,5 +1,7 @@
 ﻿using System.Globalization;
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.ToolHelpers.Sliders.Newgen;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -9,24 +11,48 @@ namespace Mapping_Tools.Core.Tests.ToolHelpers.Sliders.NewGen;
 [TestClass]
 public class PathHelperTests
 {
+    [TestMethod]
+    public void CreatePathWithHints_WithMixedPathTypes_PreservesEachSegmentType()
+    {
+        // Arrange
+        SliderPath sliderPath = new([
+            new PathControlPoint(new Vector2(0, 0), PathType.PerfectCurve),
+            new PathControlPoint(new Vector2(50, 50)),
+            new PathControlPoint(new Vector2(100, 0), PathType.Bezier),
+            new PathControlPoint(new Vector2(150, -50)),
+            new PathControlPoint(new Vector2(200, 0)),
+        ]);
+
+        // Act
+        PathWithHints result = PathHelper.CreatePathWithHints(sliderPath);
+
+        // Assert
+        result.ReconstructionHints.Select(hint => hint.ControlPoints![0].Type)
+            .Should().Equal(PathType.PerfectCurve, PathType.Bezier);
+        result.ReconstructionHints[0].ControlPoints!.Select(point => point.Position).Should().Equal(
+            new Vector2(0, 0), new Vector2(50, 50), new Vector2(100, 0));
+        result.ReconstructionHints[1].ControlPoints!.Select(point => point.Position).Should().Equal(
+            new Vector2(100, 0), new Vector2(150, -50), new Vector2(200, 0));
+    }
+
     [DataTestMethod]
     [DataRow(0)]
     [DataRow(4)]
     public void CreatePathWithHints_WithSplinePathType_PreservesSourceTypeAndAnchors(int pathTypeValue)
     {
         // Arrange
-        Mapping_Tools.Core.BeatmapHelper.Enums.PathType pathType =
-            (Mapping_Tools.Core.BeatmapHelper.Enums.PathType)pathTypeValue;
+        PathType pathType =
+            (PathType)pathTypeValue;
         Vector2[] anchors = [new(0, 0), new(40, 60), new(90, -20), new(140, 30)];
-        Mapping_Tools.Core.BeatmapHelper.SliderPathStuff.SliderPath sliderPath = new(pathType, anchors);
+        SliderPath sliderPath = new(pathType, anchors);
 
         // Act
         PathWithHints result = PathHelper.CreatePathWithHints(sliderPath);
 
         // Assert
         result.ReconstructionHints.Should().ContainSingle();
-        result.ReconstructionHints[0].PathType.Should().Be(pathType);
-        result.ReconstructionHints[0].Anchors.Should().Equal(anchors);
+        result.ReconstructionHints[0].ControlPoints![0].Type.Should().Be(pathType);
+        result.ReconstructionHints[0].ControlPoints!.Select(point => point.Position).Should().Equal(anchors);
         result.Path.First!.Value.Pos.Should().Be(anchors[0]);
         result.Path.Last!.Value.Pos.Should().Be(anchors[^1]);
     }
@@ -36,8 +62,8 @@ public class PathHelperTests
     {
         // Arrange
         Vector2[] anchors = [new(0, 0), new(10, 0), new(10, 10)];
-        Mapping_Tools.Core.BeatmapHelper.SliderPathStuff.SliderPath sliderPath = new(
-            Mapping_Tools.Core.BeatmapHelper.Enums.PathType.Linear,
+        SliderPath sliderPath = new(
+            PathType.Linear,
             anchors);
 
         // Act
@@ -46,12 +72,12 @@ public class PathHelperTests
         // Assert
         result.Path.Should().OnlyContain(point => point.Red);
         result.ReconstructionHints.Should().HaveCount(2);
-        result.ReconstructionHints.Select(hint => hint.PathType)
+        result.ReconstructionHints.Select(hint => hint.ControlPoints![0].Type)
             .Should().Equal(
-                Mapping_Tools.Core.BeatmapHelper.Enums.PathType.Linear,
-                Mapping_Tools.Core.BeatmapHelper.Enums.PathType.Linear);
-        result.ReconstructionHints[0].Anchors.Should().Equal(anchors);
-        result.ReconstructionHints[1].Anchors.Should().Equal(anchors);
+                PathType.Linear,
+                PathType.Linear);
+        result.ReconstructionHints[0].ControlPoints!.Select(point => point.Position).Should().Equal(anchors);
+        result.ReconstructionHints[1].ControlPoints!.Select(point => point.Position).Should().Equal(anchors);
         result.ReconstructionHints[0].Start.Value.Pos.Should().Be(anchors[0]);
         result.ReconstructionHints[0].End.Value.Pos.Should().Be(anchors[1]);
         result.ReconstructionHints[1].Start.Value.Pos.Should().Be(anchors[1]);
@@ -112,8 +138,8 @@ public class PathHelperTests
         foreach (var hint in result.ReconstructionHints)
         {
             i++;
-            hint.Anchors.Should().NotBeNull();
-            (hint.Anchors!.Count > 1).Should().BeTrue($"hint {i} does not have enough anchors");
+            hint.ControlPoints.Should().NotBeNull();
+            (hint.ControlPoints!.Count > 1).Should().BeTrue($"hint {i} does not have enough anchors");
         }
 
         result.Path.Count(o => o.Red).Should().Be(2);

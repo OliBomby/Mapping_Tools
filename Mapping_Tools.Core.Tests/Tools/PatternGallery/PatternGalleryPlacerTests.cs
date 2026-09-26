@@ -128,7 +128,7 @@ public sealed class PatternGalleryPlacerTests
         // Assert
         HitObject placed = target.HitObjects.Single(item => item.IsSlider);
         placed.Pos.X.Should().Be(344);
-        placed.GetAllCurvePoints()[^1].X.Should().Be(384);
+        placed.GetAbsoluteControlPointPositions()[^1].X.Should().Be(384);
         placed.PixelLength.Should().Be(40);
         pattern.HitObjects[0].Pos.X.Should().Be(300);
         pattern.HitObjects[0].PixelLength.Should().Be(20);

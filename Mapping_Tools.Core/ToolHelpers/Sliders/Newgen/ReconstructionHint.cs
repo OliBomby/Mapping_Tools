@@ -1,5 +1,4 @@
-using Mapping_Tools.Core.BeatmapHelper.Enums;
-using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
 
 namespace Mapping_Tools.Core.ToolHelpers.Sliders.Newgen;
 
@@ -25,24 +24,17 @@ public struct ReconstructionHint
     /// </summary>
     public readonly int Layer;
 
-    /// <summary>
-    ///     Should not be used if empty or null.
-    /// </summary>
-    public readonly List<Vector2>? Anchors;
+    /// <summary>Typed source control points, or null for a void interval.</summary>
+    public readonly List<PathControlPoint>? ControlPoints;
 
     /// <summary>
-    ///     The path type path described by the anchors.
-    /// </summary>
-    public readonly PathType PathType;
-
-    /// <summary>
-    ///     Completion at which to start in the path of the anchors.
+    ///     Completion at which to start in the control-point path.
     ///     0 means no margin.
     /// </summary>
     public readonly double StartP;
 
     /// <summary>
-    ///     Completion at which to end in the path of the anchors.
+    ///     Completion at which to end in the control-point path.
     ///     1 means use all available length.
     /// </summary>
     public readonly double EndP;
@@ -54,24 +46,22 @@ public struct ReconstructionHint
     public readonly Func<double, double>? DistFunc;
 
     /// <summary>
-    ///     Associates a path interval with source anchors, precedence, and completion mapping.
+    ///     Associates a path interval with typed control points, precedence, and completion mapping.
     /// </summary>
     /// <param name="start">The first sampled-path node covered by the hint.</param>
     /// <param name="end">The final sampled-path node covered by the hint.</param>
     /// <param name="layer">The layer.</param>
-    /// <param name="anchors">Original control points to reuse, or null for a void interval.</param>
-    /// <param name="pathType">The path type.</param>
+    /// <param name="controlPoints">Typed control points to reuse, or null for a void interval.</param>
     /// <param name="startP">The start p.</param>
     /// <param name="endP">The end p.</param>
     /// <param name="distFunc">The dist func.</param>
-    public ReconstructionHint(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end, int layer, List<Vector2>? anchors,
-        PathType pathType = PathType.Bezier, double startP = 0, double endP = 1, Func<double, double>? distFunc = null)
+    public ReconstructionHint(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end, int layer,
+        List<PathControlPoint>? controlPoints, double startP = 0, double endP = 1, Func<double, double>? distFunc = null)
     {
         Start = start;
         End = end;
-        Anchors = anchors;
+        ControlPoints = controlPoints;
         Layer = layer;
-        PathType = pathType;
         StartP = startP;
         EndP = endP;
         DistFunc = distFunc;
@@ -84,10 +74,10 @@ public struct ReconstructionHint
     /// <param name="end">The new final covered node.</param>
     /// <param name="startP">The start p.</param>
     /// <param name="endP">The end p.</param>
-    /// <returns>The restricted hint with the same anchors, type, layer, and distance mapping.</returns>
+    /// <returns>The restricted hint with the same control points, layer, and distance mapping.</returns>
     public ReconstructionHint Cut(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end, double startP = 0, double endP = 1)
     {
-        return new ReconstructionHint(start, end, Layer, Anchors, PathType, startP, endP, DistFunc);
+        return new ReconstructionHint(start, end, Layer, ControlPoints, startP, endP, DistFunc);
     }
 
     /// <summary>
@@ -97,6 +87,6 @@ public struct ReconstructionHint
     /// <returns>The updated immutable hint value.</returns>
     public ReconstructionHint SetDistFunc(Func<double, double>? distFunc)
     {
-        return new ReconstructionHint(Start, End, Layer, Anchors, PathType, StartP, EndP, distFunc);
+        return new ReconstructionHint(Start, End, Layer, ControlPoints, StartP, EndP, distFunc);
     }
 }

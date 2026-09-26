@@ -39,7 +39,9 @@ public class HitObjectTests
 
         // Assert
         hitObject.IsSlider.Should().BeTrue();
-        hitObject.SliderType.Should().Be(PathType.Bezier);
+        hitObject.ControlPoints[0].Type.Should().Be(PathType.Bezier);
+        hitObject.ControlPoints.Select(point => point.Position).Should().Equal(
+            Vector2.Zero, new Vector2(64, 0), new Vector2(128, 32));
         hitObject.Repeat.Should().Be(2);
         hitObject.EdgeHitsounds.Should().Equal(2, 8, 0);
         hitObject.EdgeSampleSets.Should().Equal(SampleSet.Normal, SampleSet.Soft, SampleSet.Drum);
@@ -62,12 +64,12 @@ public class HitObjectTests
         HitObject hitObject = new(line);
 
         // Assert
-        hitObject.SliderType.Should().Be(expectedType);
+        hitObject.ControlPoints[0].Type.Should().Be(expectedType);
         hitObject.GetLine().Split(',')[5].Should().Be($"{token}|128:96|192:96");
     }
 
     [TestMethod]
-    public void SliderLine_WithMultiplePathMarkers_PreservesMarkerTypesAndControlPointIndexes()
+    public void SliderLine_WithMultiplePathMarkers_PreservesTypedRelativeControlPoints()
     {
         // Arrange
         const string line = "64,96,1200,2,0,B|128:96|L|192:128|256:96,1,240,0|0,0:0|0:0,0:0:0:0:";
@@ -76,9 +78,203 @@ public class HitObjectTests
         HitObject hitObject = new(line);
 
         // Assert
-        hitObject.SliderType.Should().Be(PathType.Linear);
-        hitObject.AdditionalSliderTypes.Should().Equal((PathType.Bezier, 0), (PathType.Linear, 2));
+        hitObject.ControlPoints.Select(point => point.Type).Should().Equal(
+            PathType.Bezier, null, PathType.Linear, null);
+        hitObject.ControlPoints.Select(point => point.Position).Should().Equal(
+            Vector2.Zero, new Vector2(64, 0), new Vector2(128, 32), new Vector2(192, 0));
         hitObject.GetLine().Split(',')[5].Should().Be("B|128:96|L|192:128|256:96");
+    }
+
+    [TestMethod]
+    public void SliderLine_WithLegacyDuplicateBoundary_NormalizesToOneTypedAnchor()
+    {
+        // Arrange
+        const string line = "0,0,1000,2,0,B|100:0|100:0|200:0,1,200";
+
+        // Act
+        HitObject hitObject = new(line, 14);
+
+        // Assert
+        hitObject.ControlPoints.Select(point => (point.Position, point.Type)).Should().Equal(
+            (Vector2.Zero, PathType.Bezier),
+            (new Vector2(100, 0), PathType.Bezier),
+            (new Vector2(200, 0), null));
+        hitObject.GetSliderPath().SegmentStarts.Should().HaveCount(2);
+        hitObject.GetLine(14).Split(',')[5].Should().Be("B|100:0|100:0|200:0");
+        hitObject.GetLine(128).Split(',')[5].Should().Be("B|B|100:0|200:0");
+    }
+
+    [TestMethod]
+    public void SliderLine_WithModernDuplicatePositions_DoesNotInferSegmentBoundary()
+    {
+        // Arrange
+        const string line = "0,0,1000,2,0,B|100:0|100:0|200:0,1,200";
+
+        // Act
+        HitObject hitObject = new(line, 128);
+
+        // Assert
+        hitObject.ControlPoints.Should().HaveCount(4);
+        hitObject.ControlPoints.Skip(1).Should().OnlyContain(point => point.Type == null);
+        hitObject.GetSliderPath().SegmentStarts.Should().ContainSingle();
+        hitObject.GetLine(128).Split(',')[5].Should().Be("B|100:0|100:0|200:0");
+    }
+
+    [TestMethod]
+    public void SliderLine_WithThreeLegacyBoundaryPositions_RoundTripsThroughTypedSegments()
+    {
+        // Arrange
+        const string line = "0,0,1000,2,0,B|100:0|100:0|100:0|200:0,1,200";
+
+        // Act
+        HitObject hitObject = new(line, 14);
+
+        // Assert
+        hitObject.ControlPoints.Select(point => point.Type).Should().Equal(
+            PathType.Bezier, PathType.Bezier, PathType.Bezier, null);
+        hitObject.GetSliderPath().SegmentStarts.Should().HaveCount(3);
+        hitObject.GetLine(14).Split(',')[5].Should().Be("B|100:0|100:0|100:0|200:0");
+    }
+
+    [TestMethod]
+    public void SliderLine_WithLegacyDuplicateAfterTypeMarker_UsesActiveSegmentType()
+    {
+        // Arrange
+        const string line = "0,0,1000,2,0,B|50:0|L|100:0|150:0|150:0|200:0,1,200";
+
+        // Act
+        HitObject hitObject = new(line, 14);
+
+        // Assert
+        hitObject.ControlPoints.Select(point => point.Type).Should().Equal(
+            PathType.Bezier, null, PathType.Linear, PathType.Linear, null);
+    }
+
+    [TestMethod]
+    public void SliderLine_WithLegacyBoundaryAtStart_RoundTripsWithoutAddingAnAnchor()
+    {
+        // Arrange
+        const string line = "0,0,1000,2,0,B|0:0|100:0,1,100";
+
+        // Act
+        HitObject hitObject = new(line, 14);
+
+        // Assert
+        hitObject.ControlPoints.Should().HaveCount(3);
+        hitObject.ControlPoints[1].Type.Should().Be(PathType.Bezier);
+        hitObject.GetLine(14).Split(',')[5].Should().Be("B|0:0|100:0");
+    }
+
+    [TestMethod]
+    public void SliderLine_WithUnknownPathMarkers_UsesCatmullForEachMarker()
+    {
+        // Arrange
+        const string line = "0,0,0,2,0,X|100:0|L|200:0|Y|250:0,1,250";
+
+        // Act
+        HitObject hitObject = new(line);
+
+        // Assert
+        hitObject.ControlPoints.Select(point => point.Type).Should().Equal(
+            PathType.Catmull, null, PathType.Linear, PathType.Catmull);
+        hitObject.GetLine(128).Split(',')[5].Should().Be("C|100:0|L|200:0|C|250:0");
+    }
+
+    [TestMethod]
+    public void GetLine_WithMixedPathAndLegacyVersion_ConvertsOnlySerializedOutputToBezier()
+    {
+        // Arrange
+        HitObject hitObject = new("64,96,1200,2,0,P|128:160|192:96|L|256:96,1,240");
+        var originalPoints = hitObject.ControlPoints.Select(point => (point.Position, point.Type)).ToArray();
+
+        // Act
+        string legacyLine = hitObject.GetLine(14);
+        string lazerLine = hitObject.GetLine(128);
+
+        // Assert
+        legacyLine.Split(',')[5].Should().StartWith("B|");
+        legacyLine.Split(',')[5].Should().NotContain("|P|").And.NotContain("|L|");
+        lazerLine.Split(',')[5].Should().Be("P|128:160|192:96|L|256:96");
+        hitObject.ControlPoints.Select(point => (point.Position, point.Type)).Should().Equal(originalPoints);
+    }
+
+    [TestMethod]
+    public void GetLine_WithDuplicatedTypedBoundary_WritesOneBezierSegmentBoundary()
+    {
+        // Arrange
+        HitObject hitObject = new("0,0,1000,2,0,L|100:0|B|100:0|150:100|200:0,1,300");
+
+        // Act
+        string legacyPath = hitObject.GetLine(14).Split(',')[5];
+
+        // Assert
+        legacyPath.Should().Be("B|100:0|100:0|150:100|200:0");
+        hitObject.GetLine(128).Split(',')[5].Should().Be("L|B|100:0|150:100|200:0");
+    }
+
+    [TestMethod]
+    public void GetLine_WithBSplineAndLegacyVersion_WritesBezierWithoutChangingStoredType()
+    {
+        // Arrange
+        HitObject hitObject = new("64,96,1200,2,0,B4|128:96|192:128|256:96,1,240");
+
+        // Act
+        string legacyLine = hitObject.GetLine(14);
+
+        // Assert
+        legacyLine.Split(',')[5].Should().StartWith("B|");
+        legacyLine.Split(',')[5].Should().NotStartWith("B4|");
+        hitObject.ControlPoints[0].Type.Should().Be(PathType.BSpline);
+        hitObject.GetLine(128).Split(',')[5].Should().Be("B4|128:96|192:128|256:96");
+    }
+
+    [TestMethod]
+    public void GetSliderPath_WithMixedPathTypes_EvaluatesBothSegments()
+    {
+        // Arrange
+        HitObject hitObject = new("64,96,1200,2,0,L|164:96|B|214:146|264:96,1,250");
+
+        // Act
+        SliderPath path = hitObject.GetSliderPath(fullLength: true);
+
+        // Assert
+        path.PathControlPoints.Select(point => point.Type).Should().Equal(
+            PathType.Linear, null, PathType.Bezier, null);
+        path.PositionAt(0).Should().Be(new Vector2(64, 96));
+        path.PositionAt(1).Should().Be(new Vector2(264, 96));
+        path.CalculatedPath.Should().Contain(point => point.Y > 96);
+    }
+
+    [TestMethod]
+    public void GetSliderPath_WithTypedDuplicateAnchor_UsesTheNewSegmentType()
+    {
+        // Arrange
+        HitObject hitObject = new("0,0,1000,2,0,L|100:0|B|100:0|150:100|200:0,1,300");
+
+        // Act
+        SliderPath path = hitObject.GetSliderPath(fullLength: true);
+
+        // Assert
+        path.CalculatedPath.Should().NotContain(new Vector2(150, 100));
+        path.CalculatedPath.Should().Contain(point => point.Y > 0);
+        path.PositionAt(1).Should().Be(new Vector2(200, 0));
+    }
+
+    [TestMethod]
+    public void Move_WithSliderControlPoints_KeepsTheirPositionsRelativeToTheStart()
+    {
+        // Arrange
+        HitObject hitObject = new("64,96,1200,2,0,P|128:160|192:96,1,200");
+        var originalPositions = hitObject.ControlPoints.Select(point => point.Position).ToArray();
+
+        // Act
+        hitObject.Move(new Vector2(20, -10));
+
+        // Assert
+        hitObject.Pos.Should().Be(new Vector2(84, 86));
+        hitObject.ControlPoints.Select(point => point.Position).Should().Equal(originalPositions);
+        hitObject.GetAbsoluteControlPointPositions().Should().Equal(
+            new Vector2(84, 86), new Vector2(148, 150), new Vector2(212, 86));
     }
 
     [TestMethod]
@@ -94,26 +290,33 @@ public class HitObjectTests
         hitObject.SetSliderPath(replacement);
 
         // Assert
-        hitObject.SliderType.Should().Be(PathType.BSpline);
-        hitObject.CurvePoints.Should().Equal(new Vector2(30, 10), new Vector2(30, 40));
+        hitObject.ControlPoints[0].Type.Should().Be(PathType.BSpline);
+        hitObject.ControlPoints.Select(point => point.Position).Should().Equal(
+            Vector2.Zero, new Vector2(20, 0), new Vector2(20, 30));
         hitObject.PixelLength.Should().Be(50);
-        hitObject.AdditionalSliderTypes.Should().BeEmpty();
+        hitObject.ControlPoints.Skip(1).Should().OnlyContain(point => point.Type == null);
         hitObject.GetLine().Split(',')[5].Should().Be("B4|30:10|30:40");
     }
 
     [TestMethod]
-    public void SetAllCurvePoints_WithReplacementControlPoints_ClearsIndexedPathMarkers()
+    public void ControlPoints_WithReplacementControlPoints_ClearsTypedSegmentMarkers()
     {
         // Arrange
         HitObject hitObject = new(
             "64,96,1200,2,0,B|128:96|L|192:128|256:96,1,240,0|0,0:0|0:0,0:0:0:0:");
 
         // Act
-        hitObject.SetAllCurvePoints([new Vector2(10, 10), new Vector2(30, 10), new Vector2(30, 40)]);
+        hitObject.Pos = new Vector2(10, 10);
+        hitObject.ControlPoints =
+        [
+            new PathControlPoint(Vector2.Zero, PathType.Bezier),
+            new PathControlPoint(new Vector2(20, 0)),
+            new PathControlPoint(new Vector2(20, 30)),
+        ];
 
         // Assert
-        hitObject.AdditionalSliderTypes.Should().BeEmpty();
-        hitObject.GetLine().Split(',')[5].Should().Be("L|30:10|30:40");
+        hitObject.ControlPoints.Skip(1).Should().OnlyContain(point => point.Type == null);
+        hitObject.GetLine().Split(',')[5].Should().Be("B|30:10|30:40");
     }
 
     [TestMethod]
@@ -138,7 +341,7 @@ public class HitObjectTests
     }
 
     [TestMethod]
-    public void DeepCopy_WithMultiplePathMarkers_CopiesMutablePathTypeMetadata()
+    public void DeepCopy_WithMultiplePathMarkers_CopiesTypedControlPoints()
     {
         // Arrange
         HitObject original = new(
@@ -146,12 +349,13 @@ public class HitObjectTests
 
         // Act
         HitObject copy = original.DeepCopy();
-        copy.AdditionalSliderTypes[0] = (PathType.Catmull, 0);
+        copy.ControlPoints[0].Type = PathType.Catmull;
 
         // Assert
-        copy.AdditionalSliderTypes.Should().Equal((PathType.Catmull, 0), (PathType.Linear, 2));
-        original.AdditionalSliderTypes.Should().Equal((PathType.Bezier, 0), (PathType.Linear, 2));
-        copy.AdditionalSliderTypes.Should().NotBeSameAs(original.AdditionalSliderTypes);
+        copy.ControlPoints.Select(point => point.Type).Should().Equal(PathType.Catmull, null, PathType.Linear, null);
+        original.ControlPoints.Select(point => point.Type).Should().Equal(PathType.Bezier, null, PathType.Linear, null);
+        copy.ControlPoints.Should().NotBeSameAs(original.ControlPoints);
+        copy.ControlPoints[0].Should().NotBeSameAs(original.ControlPoints[0]);
     }
 
     [TestMethod]

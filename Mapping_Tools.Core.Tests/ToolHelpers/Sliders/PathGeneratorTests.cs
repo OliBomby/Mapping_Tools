@@ -2,6 +2,9 @@ using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.ToolHelpers.Sliders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
+
 namespace Mapping_Tools.Core.Tests.ToolHelpers.Sliders;
 
 [TestClass]
@@ -80,10 +83,10 @@ public sealed class PathGeneratorTests
         PathGenerator generator = new([new Vector2(0, 0), new Vector2(10, 0), new Vector2(20, 0)]);
 
         // Act
-        Vector2[] anchors = generator.GeneratePath().ToArray();
+        PathControlPoint[] anchors = generator.GenerateControlPoints().ToArray();
 
         // Assert
-        anchors.Should().Equal(new Vector2(0, 0), new Vector2(20, 0));
+        anchors.Select(point => point.Position).Should().Equal(new Vector2(0, 0), new Vector2(20, 0));
     }
 
     [DataTestMethod]
@@ -104,24 +107,23 @@ public sealed class PathGeneratorTests
         PathGenerator generator = new(samples);
 
         // Act
-        Vector2[] anchors = generator.GeneratePath(0, samples.Count - 1, Math.PI, mode).ToArray();
+        PathControlPoint[] anchors = generator.GenerateControlPoints(0, samples.Count - 1, Math.PI, mode).ToArray();
 
         // Assert
-        anchors.First().Should().Be(samples.First());
-        anchors.Last().Should().Be(samples.Last());
-        anchors.Should().OnlyContain(point => double.IsFinite(point.X) && double.IsFinite(point.Y));
+        anchors.First().Position.Should().Be(samples.First());
+        anchors.Last().Position.Should().Be(samples.Last());
+        anchors.Should().OnlyContain(point => double.IsFinite(point.Position.X) && double.IsFinite(point.Position.Y));
     }
 
     [TestMethod]
-    public void CalculatePathLength_WithRepeatedRedAnchor_SumsIndependentSegments()
+    public void CalculatePathLength_WithTypedBoundary_SumsIndependentSegments()
     {
         // Arrange
-        List<Vector2> anchors =
+        List<PathControlPoint> anchors =
         [
-            new(0, 0),
-            new(10, 0),
-            new(10, 0),
-            new(10, 10),
+            new(new Vector2(0, 0), PathType.Bezier),
+            new(new Vector2(10, 0), PathType.Bezier),
+            new(new Vector2(10, 10)),
         ];
 
         // Act

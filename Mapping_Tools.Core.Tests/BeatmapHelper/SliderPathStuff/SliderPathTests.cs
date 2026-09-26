@@ -214,11 +214,15 @@ public sealed class SliderPathTests
     }
 
     [TestMethod]
-    public void CalculatedPath_WithRepeatedRedAnchor_TracksEachSubpathStart()
+    public void CalculatedPath_WithTypedRedAnchor_TracksEachSubpathStart()
     {
         // Arrange
-        SliderPath path = new(PathType.Linear,
-            [new Vector2(0, 0), new Vector2(10, 0), new Vector2(10, 0), new Vector2(10, 10)]);
+        SliderPath path = new(
+        [
+            new PathControlPoint(new Vector2(0, 0), PathType.Linear),
+            new PathControlPoint(new Vector2(10, 0), PathType.Linear),
+            new PathControlPoint(new Vector2(10, 10)),
+        ]);
 
         // Act
         IReadOnlyList<Vector2> calculatedPath = path.CalculatedPath;

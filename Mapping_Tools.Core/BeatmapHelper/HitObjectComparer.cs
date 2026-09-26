@@ -52,8 +52,8 @@ public class HitObjectComparer : IEqualityComparer<HitObject>
             return false;
         if (x.IsCircle && y.IsCircle) return true;
         if (x.IsSlider && y.IsSlider)
-            return x.SliderType == y.SliderType
-                   && (!CheckPosition || x.CurvePoints.SequenceEqual(y.CurvePoints))
+            return x.ControlPoints.Select(point => point.Type).SequenceEqual(y.ControlPoints.Select(point => point.Type))
+                   && (!CheckPosition || x.ControlPoints.Select(point => point.Position).SequenceEqual(y.ControlPoints.Select(point => point.Position)))
                    && x.Repeat == y.Repeat
                    && x.PixelLength == y.PixelLength
                    && x.EdgeHitsounds.SequenceEqual(y.EdgeHitsounds)
@@ -69,7 +69,7 @@ public class HitObjectComparer : IEqualityComparer<HitObject>
     ///     Hashes the object's complete serialized line.
     /// </summary>
     /// <param name="obj">The object to hash.</param>
-    /// <returns>The ordinal string hash of <see cref="HitObject.GetLine" />.</returns>
+    /// <returns>The ordinal string hash of <see cref="HitObject.GetLine()" />.</returns>
     public int GetHashCode(HitObject obj)
     {
         return EqualityComparer<string>.Default.GetHashCode(obj.GetLine());

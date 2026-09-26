@@ -5,12 +5,12 @@
   "seedInput": "../../../Beatmaps/ComplicatedTestMap.osu",
   "options": "options.json",
   "expectedOutput": "expected/expected.osu",
-  "expectedOutputSha256": "BE26A9D99683DD8F31713DA20B27E34449F3510CD06AFC2B375D28A37EF8BF55",
+  "expectedOutputSha256": "A423FBDFFF48E819DBCF65D1596C69F5A51CE13605FD481FC29F50FA366F1139",
   "legacyVersion": "1.12.30",
   "reviewer": "Olivier",
   "reviewedOn": "2026-07-19",
   "capturedOn": "2026-07-19",
   "observedMessage": "Successfully generated tumours on 7 sliders!",
   "backupSha256": "9DDBE49058712E1211DCEAA52BCBE3D8FF903562EEF5DD0587945407439AC341",
-  "notes": "The backup exactly matched the target seed. Accepted after the real-world triangle layer was applied to all seven sliders and SV was reconstructed."
+  "notes": "The backup exactly matched the target seed. Accepted after the real-world triangle layer was applied to all seven sliders and SV was reconstructed. Accepted fixture update on 2026-09-26: the slider at time 15 now stores pixel length 234.62789838202227 instead of 234.69080293599185. The typed reconstruction measures its perfect-curve, linear, and perfect-curve segments directly; the legacy reconstruction converted them to separate Bézier segments before measuring. The resulting 0.06290455396958 px length change also changes the inherited timing-point value from -89.47943005023384 to -89.50341979602102 when Fix SV preserves slider duration. All serialized anchor coordinates match."
 }

@@ -1,4 +1,6 @@
 using Editor_Reader;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Infrastructure.Editor;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -30,7 +32,7 @@ public sealed class EditorReaderSnapshotConverterTests
             CustomSampleSet = 3,
             IsSelected = true,
             CurveType = 0,
-            sliderCurvePoints = [100, 200, 150, 225, 200, 250],
+            sliderCurvePoints = [100, 200, 150, 225, 150, 225, 200, 250],
             SoundTypeList = [2],
             SampleSetList = [1],
             SampleSetAdditionsList = [2],
@@ -54,7 +56,11 @@ public sealed class EditorReaderSnapshotConverterTests
         snapshot.CircleSize.Should().Be(4);
         snapshot.SelectedHitObjects.Should().ContainSingle().Which.Should().BeSameAs(converted);
         converted.Repeat.Should().Be(2);
-        converted.CurvePoints.Count.Should().Be(2);
+        converted.ControlPoints.Count.Should().Be(3);
+        converted.ControlPoints.Select(point => point.Position).Should().Equal(
+            Vector2.Zero, new Vector2(50, 25), new Vector2(100, 50));
+        converted.ControlPoints[0].Type.Should().Be(PathType.Catmull);
+        converted.ControlPoints[1].Type.Should().Be(PathType.Catmull);
         converted.EdgeHitsounds.Count.Should().Be(3);
         converted.EdgeHitsounds.ToArray().Should().Equal(2, 0, 0);
         converted.EdgeSampleSets.Count.Should().Be(3);

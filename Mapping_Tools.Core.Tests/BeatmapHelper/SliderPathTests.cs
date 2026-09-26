@@ -9,24 +9,22 @@ namespace Mapping_Tools.Core.Tests.BeatmapHelper;
 public class SliderPathTests
 {
     [TestMethod]
-    public void RepeatedControlPoints_CreateIndependentSegments()
+    public void TypedControlPoints_CreateIndependentSegments()
     {
         // Arrange
         var controlPoints = new[]
         {
-            new Vector2(42, 179),
-            new Vector2(135, 234),
-            new Vector2(219, 171),
-            new Vector2(219, 171),
-            new Vector2(194, 100),
-            new Vector2(194, 100),
-            new Vector2(266, 53),
-            new Vector2(345, 48),
-            new Vector2(405, 117),
+            new PathControlPoint(new Vector2(42, 179), PathType.Bezier),
+            new PathControlPoint(new Vector2(135, 234)),
+            new PathControlPoint(new Vector2(219, 171), PathType.Bezier),
+            new PathControlPoint(new Vector2(194, 100), PathType.Bezier),
+            new PathControlPoint(new Vector2(266, 53)),
+            new PathControlPoint(new Vector2(345, 48)),
+            new PathControlPoint(new Vector2(405, 117)),
         };
 
         // Act
-        var sliderPath = new SliderPath(PathType.Bezier, controlPoints);
+        var sliderPath = new SliderPath(controlPoints);
 
         // Assert
         sliderPath.SegmentStarts.Count.Should().Be(3);

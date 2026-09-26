@@ -1,4 +1,3 @@
-using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Allocation;
@@ -6,7 +5,7 @@ using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGen
 
 namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators;
 
-/// <summary>Generates the center point of a perfect-curve slider's blanket.</summary>
+/// <summary>Generates the center points of perfect-curve slider segments' blankets.</summary>
 public sealed class PerfectCircleBlanketGenerator : RelevantObjectsGenerator
 {
     /// <summary>Creates the active generator with a reduced relevance multiplier.</summary>
@@ -20,18 +19,18 @@ public sealed class PerfectCircleBlanketGenerator : RelevantObjectsGenerator
     public override string Name => "Points on Blanket Centers";
 
     /// <inheritdoc />
-    public override string Description => "Takes a circular arc slider and generates a virtual point on its blanket center.";
+    public override string Description => "Generates a virtual point at the blanket center of each perfect-curve segment.";
 
     /// <inheritdoc />
     public override GeneratorType GeneratorType => GeneratorType.Basic;
 
-    /// <summary>Generates the perfect-curve center when the slider has two control points.</summary>
+    /// <summary>Generates the center of each three-point perfect-curve segment.</summary>
     [RelevantObjectsGeneratorMethod]
-    public RelevantPoint? GetRelevantObjects(RelevantHitObject relevantHitObject)
+    public IEnumerable<RelevantPoint>? GetRelevantObjects(RelevantHitObject relevantHitObject)
     {
         var hitObject = relevantHitObject.HitObject;
-        return hitObject is { IsSlider: true, SliderType: PathType.PerfectCurve, CurvePoints.Count: 2 }
-            ? new RelevantPoint(new Circle(new CircleArc(hitObject.GetAllCurvePoints())).Centre)
+        return hitObject.IsSlider
+            ? PerfectCircleGenerator.GetCircleArcs(hitObject).Select(arc => new RelevantPoint(new Circle(arc).Centre))
             : null;
     }
 }

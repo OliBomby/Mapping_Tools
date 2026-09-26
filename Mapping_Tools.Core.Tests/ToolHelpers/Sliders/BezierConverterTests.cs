@@ -25,7 +25,8 @@ public sealed class BezierConverterTests
         converted.Distance.Should().Be(150);
         Vector2.Distance(converted.PositionAt(0), controlPoints[0]).Should().BeLessThan(0.000001);
         converted.PositionAt(1).Should().Be(source.PositionAt(1));
-        converted.ControlPoints.Should().Equal(new Vector2(0, 0), new Vector2(100, 0), new Vector2(100, 0), new Vector2(100, 100));
+        converted.ControlPoints.Should().Equal(new Vector2(0, 0), new Vector2(100, 0), new Vector2(100, 100));
+        converted.PathControlPoints[1].Type.Should().Be(PathType.Bezier);
     }
 
     [TestMethod]
@@ -98,6 +99,33 @@ public sealed class BezierConverterTests
     }
 
     [TestMethod]
+    public void ConvertToBezierAnchors_WithMixedSegments_PreservesSharedTypedBoundaries()
+    {
+        // Arrange
+        PathControlPoint[] source =
+        [
+            new(new Vector2(0, 0), PathType.PerfectCurve),
+            new(new Vector2(50, 50)),
+            new(new Vector2(100, 0), PathType.Linear),
+            new(new Vector2(120, 0)),
+            new(new Vector2(140, 0), PathType.Catmull),
+            new(new Vector2(150, 10)),
+        ];
+
+        // Act
+        List<PathControlPoint> converted = BezierConverter.ConvertToBezierAnchors(source);
+
+        // Assert
+        converted.Should().OnlyContain(point => point.Type == null || point.Type == PathType.Bezier);
+        converted.Where(point => point.Position == new Vector2(100, 0)).Should().ContainSingle()
+            .Which.Type.Should().Be(PathType.Bezier);
+        converted.Where(point => point.Position == new Vector2(140, 0)).Should().ContainSingle()
+            .Which.Type.Should().Be(PathType.Bezier);
+        source[2].Type.Should().Be(PathType.Linear);
+        source[4].Type.Should().Be(PathType.Catmull);
+    }
+
+    [TestMethod]
     public void ConvertToBezierAnchors_WithBSplinePath_ProducesLengthEquivalentBezierAnchors()
     {
         // Arrange
@@ -105,27 +133,29 @@ public sealed class BezierConverterTests
         SliderPath source = new(PathType.BSpline, [.. anchors]);
 
         // Act
-        List<Vector2> converted = BezierConverter.ConvertToBezierAnchors(anchors, PathType.BSpline);
-        SliderPath convertedPath = new(PathType.Bezier, [.. converted]);
+        List<PathControlPoint> converted = BezierConverter.ConvertToBezierAnchors(anchors, PathType.BSpline);
+        SliderPath convertedPath = new(converted.ToArray());
 
         // Assert
         converted.Count.Should().BeGreaterThan(anchors.Count);
         convertedPath.Distance.Should().BeApproximately(source.Distance, 0.001);
-        Vector2.Distance(converted[0], anchors[0]).Should().BeLessThan(0.001);
-        Vector2.Distance(converted[^1], anchors[^1]).Should().BeLessThan(0.001);
+        Vector2.Distance(converted[0].Position, anchors[0]).Should().BeLessThan(0.001);
+        Vector2.Distance(converted[^1].Position, anchors[^1]).Should().BeLessThan(0.001);
+        converted.Skip(1).SkipLast(1).Should().OnlyContain(point => point.Type == PathType.Bezier);
     }
 
     [TestMethod]
-    public void ConvertCircleToBezierAnchors_WithUnstableCircle_ReturnsOriginalAnchors()
+    public void ConvertCircleToBezierAnchors_WithUnstableCircle_ReturnsTypedOriginalAnchors()
     {
         // Arrange
         List<Vector2> anchors = [new(0, 0), new(50, 0), new(100, 0)];
 
         // Act
-        List<Vector2> converted = BezierConverter.ConvertCircleToBezierAnchors(anchors);
+        List<PathControlPoint> converted = BezierConverter.ConvertCircleToBezierAnchors(anchors);
 
         // Assert
-        converted.Should().BeSameAs(anchors);
+        converted.Select(point => point.Position).Should().Equal(anchors);
+        converted.Select(point => point.Type).Should().Equal(PathType.Bezier, null, null);
     }
 
     [TestMethod]
@@ -135,12 +165,13 @@ public sealed class BezierConverterTests
         List<Vector2> anchors = [new(0, 0), new(50, 50), new(100, 0)];
 
         // Act
-        List<Vector2> converted = BezierConverter.ConvertCircleToBezierAnchors(anchors);
+        List<PathControlPoint> converted = BezierConverter.ConvertCircleToBezierAnchors(anchors);
 
         // Assert
         converted.Should().HaveCountGreaterThan(3);
-        Vector2.Distance(converted[0], anchors[0]).Should().BeLessThan(0.02);
-        Vector2.Distance(converted[^1], anchors[^1]).Should().BeLessThan(0.02);
+        Vector2.Distance(converted[0].Position, anchors[0]).Should().BeLessThan(0.02);
+        Vector2.Distance(converted[^1].Position, anchors[^1]).Should().BeLessThan(0.02);
+        converted[0].Type.Should().Be(PathType.Bezier);
     }
 
     [DataTestMethod]
@@ -158,12 +189,12 @@ public sealed class BezierConverterTests
             new(Math.Cos(sweep), Math.Sin(sweep))];
 
         // Act
-        List<Vector2> converted = BezierConverter.ConvertCircleToBezierAnchors(anchors);
+        List<PathControlPoint> converted = BezierConverter.ConvertCircleToBezierAnchors(anchors);
 
         // Assert
         converted.Should().HaveCountGreaterThan(3);
-        Vector2.Distance(converted[0], anchors[0]).Should().BeLessThan(0.02);
-        Vector2.Distance(converted[^1], anchors[^1]).Should().BeLessThan(0.02);
+        Vector2.Distance(converted[0].Position, anchors[0]).Should().BeLessThan(0.02);
+        Vector2.Distance(converted[^1].Position, anchors[^1]).Should().BeLessThan(0.02);
     }
 
     [TestMethod]
@@ -173,14 +204,14 @@ public sealed class BezierConverterTests
         List<Vector2> anchors = [new(0, 0), new(50, 40), new(100, 0)];
 
         // Act
-        List<Vector2> converted = BezierConverter.ConvertCatmullToBezierAnchors(anchors);
+        List<PathControlPoint> converted = BezierConverter.ConvertCatmullToBezierAnchors(anchors);
 
         // Assert
-        converted.Should().HaveCount(8);
-        converted[0].Should().Be(anchors[0]);
-        converted[^1].Should().Be(anchors[^1]);
-        converted[3].Should().Be(anchors[1]);
-        converted[4].Should().Be(anchors[1]);
+        converted.Should().HaveCount(7);
+        converted[0].Position.Should().Be(anchors[0]);
+        converted[^1].Position.Should().Be(anchors[^1]);
+        converted[3].Position.Should().Be(anchors[1]);
+        converted[3].Type.Should().Be(PathType.Bezier);
     }
 
     [TestMethod]
@@ -190,38 +221,38 @@ public sealed class BezierConverterTests
         List<Vector2> anchors = [new(0, 0), new(6, 0), new(12, 6), new(18, 0)];
 
         // Act
-        List<Vector2> converted = BezierConverter.ConvertCatmullToBezierAnchors(anchors);
+        List<PathControlPoint> converted = BezierConverter.ConvertCatmullToBezierAnchors(anchors);
 
         // Assert
-        converted.Should().Equal(
+        converted.Select(point => point.Position).Should().Equal(
             new Vector2(0, 0),
             new Vector2(1, 0),
             new Vector2(4, -1),
             new Vector2(6, 0),
-            new Vector2(6, 0),
             new Vector2(8, 1),
             new Vector2(10, 6),
-            new Vector2(12, 6),
             new Vector2(12, 6),
             new Vector2(14, 6),
             new Vector2(16, 2),
             new Vector2(18, 0));
+        converted[3].Type.Should().Be(PathType.Bezier);
+        converted[6].Type.Should().Be(PathType.Bezier);
     }
 
     [TestMethod]
-    public void ConvertLinearToBezierAnchors_WithMultipleEdges_DuplicatesRedAnchorBoundaries()
+    public void ConvertLinearToBezierAnchors_WithMultipleEdges_TypesSegmentBoundaries()
     {
         // Arrange
         List<Vector2> anchors = [new(0, 0), new(10, 0), new(10, 20)];
 
         // Act
-        List<Vector2> converted = BezierConverter.ConvertLinearToBezierAnchors(anchors);
+        List<PathControlPoint> converted = BezierConverter.ConvertLinearToBezierAnchors(anchors);
 
         // Assert
-        converted.Should().Equal(
+        converted.Select(point => point.Position).Should().Equal(
             new Vector2(0, 0),
             new Vector2(10, 0),
-            new Vector2(10, 0),
             new Vector2(10, 20));
+        converted.Select(point => point.Type).Should().Equal(PathType.Bezier, PathType.Bezier, null);
     }
 }

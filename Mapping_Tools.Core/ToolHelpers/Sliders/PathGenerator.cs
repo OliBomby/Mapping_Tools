@@ -1,5 +1,8 @@
 ﻿using Mapping_Tools.Core.MathUtil;
 
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
+
 namespace Mapping_Tools.Core.ToolHelpers.Sliders;
 
 /// <summary>
@@ -94,35 +97,33 @@ public class PathGenerator
         diffL.Add(diffL.Last());
     }
 
-    /// <summary>
-    ///     Generates anchors which approximate the entire path
-    /// </summary>
-    /// <param name="maxAngle"></param>
-    /// <returns></returns>
-    public IEnumerable<Vector2> GeneratePath(double maxAngle = Math.PI * 1 / 4)
+    /// <summary>Generates typed Bézier control points for the entire sampled path.</summary>
+    /// <param name="maxAngle">The maximum tangent angle for one segment.</param>
+    /// <returns>Absolute control points with explicit segment types.</returns>
+    public List<PathControlPoint> GenerateControlPoints(double maxAngle = Math.PI * 1 / 4)
     {
-        return GeneratePath(0, path.Count - 1, maxAngle);
+        return GenerateControlPoints(0, path.Count - 1, maxAngle);
     }
 
-    /// <summary>
-    ///     Generates anchors which approximate the path between the given indices
-    /// </summary>
-    /// <param name="startIndex"></param>
-    /// <param name="endIndex"></param>
-    /// <param name="maxAngle"></param>
-    /// <param name="approximationMode"></param>
-    /// <returns></returns>
-    public IEnumerable<Vector2> GeneratePath(double startIndex, double endIndex,
+    /// <summary>Generates Bézier control points with explicit segment boundaries.</summary>
+    /// <param name="startIndex">The first sampled path index.</param>
+    /// <param name="endIndex">The last sampled path index.</param>
+    /// <param name="maxAngle">The maximum tangent angle for one segment.</param>
+    /// <param name="approximationMode">The control-point fitting method.</param>
+    /// <returns>Absolute control points with a type on each segment start.</returns>
+    public List<PathControlPoint> GenerateControlPoints(double startIndex, double endIndex,
         double maxAngle = Math.PI * 1 / 4, ApproximationMode approximationMode = ApproximationMode.Best)
     {
         var segments = GetNonInflectionSegments(startIndex, endIndex, maxAngle);
+        var result = new List<PathControlPoint>();
 
         foreach (var segment in segments)
         {
             var p1 = GetContinuousPosition(segment.Item1);
             var p2 = GetContinuousPosition(segment.Item2);
 
-            yield return p1;
+            if (result.Count == 0) result.Add(new PathControlPoint(p1, PathType.Bezier));
+            else result[^1].Type = PathType.Bezier;
 
             Vector2? middle;
             switch (approximationMode)
@@ -141,10 +142,12 @@ public class PathGenerator
                     break;
             }
 
-            if (middle.HasValue) yield return middle.Value;
+            if (middle.HasValue) result.Add(new PathControlPoint(middle.Value));
 
-            yield return p2;
+            result.Add(new PathControlPoint(p2));
         }
+
+        return result;
     }
 
     private Vector2? BestApproximation(double startIndex, double endIndex)
@@ -443,29 +446,23 @@ public class PathGenerator
     }
 
     /// <summary>
-    ///     Measures a polyline by summing consecutive anchor distances.
+    ///     Measures typed Bézier segments independently.
     /// </summary>
-    /// <param name="anchors">Polyline vertices in traversal order.</param>
-    /// <returns>The total Euclidean length.</returns>
-    public static double CalculatePathLength(List<Vector2> anchors)
+    /// <param name="anchors">Typed control points in traversal order.</param>
+    /// <returns>The total approximated curve length.</returns>
+    public static double CalculatePathLength(IReadOnlyList<PathControlPoint> anchors)
     {
         double length = 0;
-
         int start = 0;
-        int end = 0;
-
-        for (int i = 0; i < anchors.Length(); ++i)
+        for (int index = 0; index < anchors.Count; index++)
         {
-            end++;
+            bool typedBoundary = index > start && anchors[index].Type.HasValue;
+            if (index != anchors.Count - 1 && !typedBoundary) continue;
 
-            if (i == anchors.Length() - 1 || anchors[i] == anchors[i + 1])
-            {
-                var cpSpan = anchors.GetRange(start, end - start);
-
-                length += new BezierSubdivision(cpSpan).SubdividedApproximationLength();
-
-                start = end;
-            }
+            var positions = anchors.Skip(start).Take(index - start + 1)
+                .Select(point => point.Position).ToList();
+            length += new BezierSubdivision(positions).SubdividedApproximationLength();
+            start = index;
         }
 
         return length;

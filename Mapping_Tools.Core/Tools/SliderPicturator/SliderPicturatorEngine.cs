@@ -1,5 +1,6 @@
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Core.Images;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.SliderPicturator.Models;
@@ -438,8 +439,9 @@ public static class SliderPicturatorEngine
         if (foundColourIndex < 0) foundColourIndex = 0;
 
         hitObject.ComboSkip = foundColourIndex - currentColourIndex - 1;
-        hitObject.SetAllCurvePoints(path.ToList());
-        hitObject.SliderType = PathType.Linear;
+        hitObject.Pos = path[0];
+        hitObject.ControlPoints = path.Select((point, i) =>
+            new PathControlPoint(point - hitObject.Pos, i == 0 ? PathType.Linear : null)).ToList();
         hitObject.PixelLength = StableDistance(path);
 
         beatmap.HitObjects.Add(hitObject);

@@ -1,4 +1,5 @@
 using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Core.MathUtil;
 
 namespace Mapping_Tools.Core.Tools.TumourGenerator.Templates;
@@ -70,16 +71,16 @@ internal sealed class CircleTemplate : TumourTemplateBase, IRequireInit
         return [];
     }
 
-    public override List<Vector2>? GetReconstructionHint()
+    public override List<PathControlPoint>? GetReconstructionHint()
     {
         return Precision.AlmostEquals(Length, 0, 1E-3D)
             ? null
-            : [Vector2.Zero, new Vector2(0.5 * Length, -Width), Length * Vector2.UnitX];
-    }
-
-    public override PathType GetReconstructionHintPathType()
-    {
-        return PathType.PerfectCurve;
+            :
+            [
+                new PathControlPoint(Vector2.Zero, PathType.PerfectCurve),
+                new PathControlPoint(new Vector2(0.5 * Length, -Width)),
+                new PathControlPoint(Length * Vector2.UnitX),
+            ];
     }
 
     public override Func<double, double>? GetDistanceRelation()

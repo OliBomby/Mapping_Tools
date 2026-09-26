@@ -20,73 +20,127 @@ public class Reconstructor
     public bool DebugConstruction { get; set; } = false;
 
     /// <summary>
-    ///     Reuses valid hinted segments and generates the gaps to produce one serializable slider path.
+    ///     Reuses valid hinted segments and generates the gaps as independently typed path segments.
     /// </summary>
     /// <param name="pathWithHints">The edited sampled path and its original-segment hints.</param>
-    /// <returns>Reconstructed anchors and the single path type that can serialize them.</returns>
-    public (List<Vector2>, PathType) Reconstruct(PathWithHints pathWithHints)
+    /// <param name="preserveUnmodifiedLastSegment">Keeps an untouched truncated final hint intact so the caller can apply the final pixel-length constraint.</param>
+    /// <returns>Reconstructed path control points in absolute coordinates.</returns>
+    public List<PathControlPoint> Reconstruct(PathWithHints pathWithHints, bool preserveUnmodifiedLastSegment = false)
     {
-        if (DebugConstruction) return (pathWithHints.Path.Select(o => o.Pos).ToList(), PathType.Linear);
+        if (DebugConstruction)
+            return pathWithHints.Path.Select((point, index) => new PathControlPoint(point.Pos, index == 0 ? PathType.Linear : null)).ToList();
 
         var hints = ConstructHints(pathWithHints.Path, pathWithHints.ReconstructionHints);
 
-        var anchors = new List<Vector2>();
-        var pathType = hints.Count == 1 && hints[0].Start == pathWithHints.Path.First && hints[0].End == pathWithHints.Path.Last
-            ? hints[0].PathType
-            : PathType.Bezier;
-
+        var controlPoints = new List<PathControlPoint>();
         foreach (var hint in hints)
-            if (hint.Anchors is null || hint.Anchors.Count == 0)
+        {
+            Vector2[] segmentAnchors;
+            PathType segmentType = hint.ControlPoints?.FirstOrDefault()?.Type ?? PathType.Bezier;
+            List<PathControlPoint> segmentPoints;
+
+            if (hint.ControlPoints is null || hint.ControlPoints.Count == 0)
             {
                 // Null segment, should have been reconstructed from points by ConstructHints...
-                anchors.Add(hint.Start.Value.Pos);
-                anchors.Add(hint.End.Value.Pos);
+                segmentAnchors = [hint.Start.Value.Pos, hint.End.Value.Pos];
+                segmentPoints =
+                [
+                    new PathControlPoint(segmentAnchors[0], segmentType),
+                    new PathControlPoint(segmentAnchors[1]),
+                ];
             }
             else
             {
-                // Cut hint anchors to completion
-                var cutAnchors = CutAnchors(hint.Anchors, hint.PathType, hint.StartP, hint.EndP, out var hintPathType);
+                bool keepFullLastSegment = preserveUnmodifiedLastSegment
+                    && hint.End == pathWithHints.Path.Last
+                    && Precision.AlmostEquals(hint.StartP, 0)
+                    && !Precision.AlmostEquals(hint.EndP, 1)
+                    && IsUnmodified(hint.Start, hint.End);
 
-                // Convert hint path type
-                if (pathType != PathType.Bezier && hintPathType != pathType) throw new Exception("Can not convert hint path to non-bezier path type.");
+                if (keepFullLastSegment)
+                {
+                    segmentPoints = hint.ControlPoints.Select(point => point.Copy()).ToList();
+                    segmentType = segmentPoints[0].Type ?? PathType.Bezier;
+                    segmentAnchors = segmentPoints.Select(point => point.Position).ToArray();
+                }
+                else
+                {
+                    // Cut hint anchors to completion
+                    var cutAnchors = CutAnchors(hint.ControlPoints, hint.StartP, hint.EndP);
+                    segmentType = cutAnchors[0].Type ?? PathType.Bezier;
 
-                var convertedAnchors = pathType == PathType.Bezier ? BezierConverter.ConvertToBezierAnchors(cutAnchors, hintPathType) : cutAnchors;
-
-                // Add hint anchors
-                anchors.AddRange(TransformAnchors(convertedAnchors, hint.Start.Value.Pos, hint.End.Value.Pos,
-                    MathHelper.LerpAngle(hint.Start.Value.PreAngle, hint.End.Value.PostAngle, 0.5)));
+                    // Add hint anchors
+                    segmentAnchors = TransformAnchors(cutAnchors.Select(point => point.Position).ToList(), hint.Start.Value.Pos, hint.End.Value.Pos,
+                        MathHelper.LerpAngle(hint.Start.Value.PreAngle, hint.End.Value.PostAngle, 0.5));
+                    segmentPoints = cutAnchors;
+                }
             }
 
-        return (anchors, pathType);
+            if (controlPoints.Count > 0 && controlPoints[^1].Position == segmentAnchors[0])
+            {
+                controlPoints[^1].Type = segmentType;
+                for (int index = 1; index < segmentAnchors.Length; index++)
+                    controlPoints.Add(new PathControlPoint(segmentAnchors[index], segmentPoints[index].Type));
+            }
+            else
+            {
+                for (int index = 0; index < segmentAnchors.Length; index++)
+                    controlPoints.Add(new PathControlPoint(segmentAnchors[index], index == 0 ? segmentType : segmentPoints[index].Type));
+            }
+        }
+
+        return controlPoints;
     }
 
-    private static List<Vector2> CutAnchors(List<Vector2> anchors, PathType pathType, double startP, double endP, out PathType newPathType)
+    private static bool IsUnmodified(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end)
     {
-        newPathType = pathType;
-        if (Precision.AlmostEquals(startP, 0) && Precision.AlmostEquals(endP, 1)) return anchors;
+        var current = start;
+        while (current is not null)
+        {
+            if (current.Value.Pos != current.Value.OgPos) return false;
+            if (current == end) return true;
+            current = current.Next;
+        }
 
-        double fullLength = new SliderPath(pathType, anchors.ToArray()).Distance;
+        return false;
+    }
+
+    private static List<PathControlPoint> CutAnchors(List<PathControlPoint> source, double startP, double endP)
+    {
+        var controlPoints = source.Select(point => point.Copy()).ToList();
+        PathType pathType = controlPoints[0].Type ?? PathType.Bezier;
+        if (Precision.AlmostEquals(startP, 0) && Precision.AlmostEquals(endP, 1))
+            return controlPoints;
+
+        double fullLength = new SliderPath(controlPoints.ToArray()).Distance;
         double newLengthStart = (1 - startP) * fullLength;
         double newLengthEnd = (endP - startP) * fullLength;
 
         if (!Precision.AlmostEquals(startP, 0))
         {
-            var anchorsReversed = anchors.ToArray();
-            Array.Reverse(anchorsReversed);
-            var sliderPath = new SliderPath(pathType, anchorsReversed, newLengthStart);
-            anchors = SliderPathUtil.MoveAnchorsToLength(sliderPath, fullLength, newLengthStart, out newPathType);
+            var reversed = controlPoints.Select(point => point.Copy()).ToList();
+            reversed.Reverse();
+            reversed[0].Type = pathType;
+            reversed[^1].Type = null;
+            var sliderPath = new SliderPath(reversed.ToArray(), newLengthStart);
+            var moved = SliderPathUtil.MoveAnchorsToLength(sliderPath, fullLength, newLengthStart);
+            PathType newPathType = moved[0].Type ?? pathType;
+            controlPoints = moved;
             pathType = newPathType;
             fullLength = newLengthStart;
-            anchors.Reverse();
+            controlPoints.Reverse();
+            controlPoints[0].Type = pathType;
+            controlPoints[^1].Type = null;
         }
 
         if (!Precision.AlmostEquals(endP, 1))
         {
-            var sliderPath = new SliderPath(pathType, anchors.ToArray(), newLengthEnd);
-            anchors = SliderPathUtil.MoveAnchorsToLength(sliderPath, fullLength, newLengthEnd, out newPathType);
+            var sliderPath = new SliderPath(controlPoints.ToArray(), newLengthEnd);
+            var moved = SliderPathUtil.MoveAnchorsToLength(sliderPath, fullLength, newLengthEnd);
+            controlPoints = moved;
         }
 
-        return anchors;
+        return controlPoints;
     }
 
     private static Vector2[] TransformAnchors(IReadOnlyList<Vector2> anchors, Vector2 start, Vector2 end, double theta)
@@ -132,7 +186,7 @@ public class Reconstructor
     {
         var hints = existingHints is null
             ? new List<ReconstructionHint>()
-            : new List<ReconstructionHint>(existingHints.Where(o => o.Anchors is not null));
+            : new List<ReconstructionHint>(existingHints.Where(o => o.ControlPoints is not null));
 
         int layer = existingHints is null || existingHints.Count == 0 ? 0 : existingHints.Max(hint => hint.Layer) + 1;
         var current = path.First;
@@ -161,9 +215,9 @@ public class Reconstructor
                 if (currentHint is { } activeHint)
                 {
                     // Keep the better hint
-                    if (activeHint.Anchors is not null
-                        && constructedHint.Anchors is not null
-                        && activeHint.Anchors.Count > constructedHint.Anchors.Count)
+                    if (activeHint.ControlPoints is not null
+                        && constructedHint.ControlPoints is not null
+                        && activeHint.ControlPoints.Count > constructedHint.ControlPoints.Count)
                         hints[nextHint - 1] = constructedHint;
                 }
                 else
@@ -191,7 +245,7 @@ public class Reconstructor
 
     private ReconstructionHint ConstructHint(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end, int layer)
     {
-        var anchors = PathGenerator.GeneratePath(start, end).ToList();
-        return new ReconstructionHint(start, end, layer, anchors);
+        var controlPoints = PathGenerator.GeneratePath(start, end);
+        return new ReconstructionHint(start, end, layer, controlPoints);
     }
 }

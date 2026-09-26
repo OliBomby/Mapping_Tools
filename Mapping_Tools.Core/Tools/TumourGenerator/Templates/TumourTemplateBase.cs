@@ -1,4 +1,4 @@
-using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Core.MathUtil;
 using Newtonsoft.Json;
 
@@ -15,7 +15,6 @@ internal abstract class TumourTemplateBase : ITumourTemplate
     public abstract double GetDefaultSpan();
     public abstract int GetDetailLevel();
     public abstract IEnumerable<double> GetCriticalPoints();
-    public abstract List<Vector2>? GetReconstructionHint();
-    public abstract PathType GetReconstructionHintPathType();
+    public abstract List<PathControlPoint>? GetReconstructionHint();
     public abstract Func<double, double>? GetDistanceRelation();
 }

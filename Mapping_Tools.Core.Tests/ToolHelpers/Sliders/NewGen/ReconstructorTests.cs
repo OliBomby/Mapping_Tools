@@ -1,4 +1,5 @@
 using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.ToolHelpers.Sliders.Newgen;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -8,6 +9,29 @@ namespace Mapping_Tools.Core.Tests.ToolHelpers.Sliders.NewGen;
 [TestClass]
 public sealed class ReconstructorTests
 {
+    [TestMethod]
+    public void Reconstruct_WithMixedHints_PreservesPerfectAndBezierSegments()
+    {
+        // Arrange
+        SliderPath sourcePath = new([
+            new PathControlPoint(new Vector2(0, 0), PathType.PerfectCurve),
+            new PathControlPoint(new Vector2(50, 50)),
+            new PathControlPoint(new Vector2(100, 0), PathType.Bezier),
+            new PathControlPoint(new Vector2(150, -50)),
+            new PathControlPoint(new Vector2(200, 0)),
+        ]);
+        PathWithHints path = PathHelper.CreatePathWithHints(sourcePath);
+        Reconstructor reconstructor = new();
+
+        // Act
+        List<PathControlPoint> controlPoints = reconstructor.Reconstruct(path);
+
+        // Assert
+        controlPoints.Where(point => point.Type.HasValue).Select(point => point.Type)
+            .Should().Equal(PathType.PerfectCurve, PathType.Bezier);
+        new SliderPath([.. controlPoints]).Distance.Should().BeApproximately(sourcePath.Distance, 0.01);
+    }
+
     [TestMethod]
     public void Reconstruct_WithFullBSplineHint_PreservesItsTypeAndEndpoints()
     {
@@ -20,11 +44,11 @@ public sealed class ReconstructorTests
         Reconstructor reconstructor = new();
 
         // Act
-        (List<Vector2> anchors, PathType pathType) = reconstructor.Reconstruct(path);
+        List<PathControlPoint> controlPoints = reconstructor.Reconstruct(path);
 
         // Assert
-        pathType.Should().Be(PathType.BSpline);
-        anchors.Should().Equal(new Vector2(0, 0), new Vector2(20, 0));
+        controlPoints[0].Type.Should().Be(PathType.BSpline);
+        controlPoints.Select(point => point.Position).Should().Equal(new Vector2(0, 0), new Vector2(20, 0));
     }
 
     [TestMethod]
@@ -41,13 +65,13 @@ public sealed class ReconstructorTests
         Reconstructor reconstructor = new();
 
         // Act
-        (List<Vector2> anchors, PathType pathType) = reconstructor.Reconstruct(path);
+        List<PathControlPoint> controlPoints = reconstructor.Reconstruct(path);
 
         // Assert
-        pathType.Should().Be(PathType.Bezier);
-        anchors[0].Should().Be(new Vector2(25, 0));
-        anchors[^1].Should().Be(new Vector2(75, 0));
-        new Mapping_Tools.Core.BeatmapHelper.SliderPathStuff.SliderPath(pathType, [.. anchors])
+        controlPoints[0].Type.Should().Be(PathType.Bezier);
+        controlPoints[0].Position.Should().Be(new Vector2(25, 0));
+        controlPoints[^1].Position.Should().Be(new Vector2(75, 0));
+        new SliderPath([.. controlPoints])
             .Distance.Should().BeApproximately(50, 0.001);
     }
 
@@ -62,15 +86,15 @@ public sealed class ReconstructorTests
         Reconstructor reconstructor = new() { DebugConstruction = true };
 
         // Act
-        (List<Vector2> anchors, PathType pathType) = reconstructor.Reconstruct(path);
+        List<PathControlPoint> controlPoints = reconstructor.Reconstruct(path);
 
         // Assert
-        pathType.Should().Be(PathType.Linear);
-        anchors.Should().Equal(new Vector2(0, 0), new Vector2(10, 5), new Vector2(20, 0));
+        controlPoints[0].Type.Should().Be(PathType.Linear);
+        controlPoints.Select(point => point.Position).Should().Equal(new Vector2(0, 0), new Vector2(10, 5), new Vector2(20, 0));
     }
 
     [TestMethod]
-    public void Reconstruct_WithEmptyHintAnchors_UsesHintEndpointsAsFallbackAnchors()
+    public void Reconstruct_WithEmptyHintControlPoints_UsesBezierEndpointsAsFallback()
     {
         // Arrange
         PathWithHints path = CreatePathWithHint(
@@ -81,11 +105,11 @@ public sealed class ReconstructorTests
         Reconstructor reconstructor = new();
 
         // Act
-        (List<Vector2> anchors, PathType pathType) = reconstructor.Reconstruct(path);
+        List<PathControlPoint> controlPoints = reconstructor.Reconstruct(path);
 
         // Assert
-        pathType.Should().Be(PathType.BSpline);
-        anchors.Should().Equal(new Vector2(0, 0), new Vector2(20, 0));
+        controlPoints[0].Type.Should().Be(PathType.Bezier);
+        controlPoints.Select(point => point.Position).Should().Equal(new Vector2(0, 0), new Vector2(20, 0));
     }
 
     [TestMethod]
@@ -100,13 +124,13 @@ public sealed class ReconstructorTests
         Reconstructor reconstructor = new();
 
         // Act
-        (List<Vector2> anchors, PathType pathType) = reconstructor.Reconstruct(path);
+        List<PathControlPoint> controlPoints = reconstructor.Reconstruct(path);
 
         // Assert
-        pathType.Should().Be(PathType.Bezier);
-        anchors[0].Should().Be(new Vector2(0, 0));
-        anchors[^1].Should().Be(new Vector2(20, 0));
-        anchors.Should().OnlyContain(point => double.IsFinite(point.X) && double.IsFinite(point.Y));
+        controlPoints[0].Type.Should().Be(PathType.Bezier);
+        controlPoints[0].Position.Should().Be(new Vector2(0, 0));
+        controlPoints[^1].Position.Should().Be(new Vector2(20, 0));
+        controlPoints.Should().OnlyContain(point => double.IsFinite(point.Position.X) && double.IsFinite(point.Position.Y));
     }
 
     private static PathWithHints CreatePathWithHint(
@@ -125,8 +149,8 @@ public sealed class ReconstructorTests
             start,
             end,
             0,
-            hintAnchors,
-            pathType,
+            hintAnchors.Select((position, index) => new PathControlPoint(position,
+                index == 0 ? pathType : null)).ToList(),
             startP,
             endP));
         return path;

@@ -57,32 +57,29 @@ public sealed class TumourGeneratorEngineTests
 
         pathWithHints.ReconstructionHints[0].Layer.Should().Be(-1);
         pathWithHints.ReconstructionHints[1].Layer.Should().Be(0);
-        pathWithHints.ReconstructionHints[1].Anchors.Should().NotBeNull();
+        pathWithHints.ReconstructionHints[1].ControlPoints.Should().NotBeNull();
         pathWithHints.ReconstructionHints[2].Layer.Should().Be(0);
-        pathWithHints.ReconstructionHints[2].Anchors.Should().BeNull();
+        pathWithHints.ReconstructionHints[2].ControlPoints.Should().BeNull();
         pathWithHints.ReconstructionHints[3].Layer.Should().Be(0);
-        pathWithHints.ReconstructionHints[3].Anchors.Should().NotBeNull();
+        pathWithHints.ReconstructionHints[3].ControlPoints.Should().NotBeNull();
         pathWithHints.ReconstructionHints[4].Layer.Should().Be(-1);
         pathWithHints.ReconstructionHints[5].Layer.Should().Be(-1);
-        var (anchors, pathType) = new Reconstructor().Reconstruct(pathWithHints);
+        var controlPoints = new Reconstructor().Reconstruct(pathWithHints);
 
         // Assert
         pathWithHints.ReconstructionHints.Should().HaveCount(6);
-        pathWithHints.ReconstructionHints[1].Anchors.Should().NotBeNull();
-        pathWithHints.ReconstructionHints[2].Anchors.Should().BeNull();
-        pathWithHints.ReconstructionHints[3].Anchors.Should().NotBeNull();
-        pathType.Should().Be(PathType.Bezier);
-        anchors.Should().Equal(
+        pathWithHints.ReconstructionHints[1].ControlPoints.Should().NotBeNull();
+        pathWithHints.ReconstructionHints[2].ControlPoints.Should().BeNull();
+        pathWithHints.ReconstructionHints[3].ControlPoints.Should().NotBeNull();
+        controlPoints.Select(point => point.Type).Should().Equal(
+            PathType.Bezier, PathType.Bezier, PathType.Bezier, PathType.Bezier,
+            PathType.Bezier, PathType.Bezier, null);
+        controlPoints.Select(point => point.Position).Should().Equal(
             new Vector2(0, 0),
             new Vector2(100, 0),
-            new Vector2(100, 0),
-            new Vector2(105, -5),
             new Vector2(105, -5),
             new Vector2(110, -5),
-            new Vector2(110, -5),
             new Vector2(115, 0),
-            new Vector2(115, 0),
-            new Vector2(192, 0),
             new Vector2(192, 0),
             new Vector2(192, 192));
     }
@@ -421,7 +418,7 @@ public sealed class TumourGeneratorEngineTests
         // Assert
         generated.Should().BeTrue();
         generator.LayerLengths.Should().ContainSingle().Which.Should().BeApproximately(256, 0.01);
-        slider.SliderType.Should().Be(PathType.Linear);
+        slider.ControlPoints[0].Type.Should().Be(PathType.Linear);
         slider.GetSliderPath().Distance.Should().BeGreaterThan(0);
     }
 
@@ -466,7 +463,13 @@ public sealed class TumourGeneratorEngineTests
         // Assert
         generated.Should().BeTrue();
         slider.GetSliderPath().Distance.Should().BeGreaterThan(0);
-        slider.GetAllCurvePoints().Should().OnlyContain(point => double.IsFinite(point.X) && double.IsFinite(point.Y));
+        slider.GetAbsoluteControlPointPositions().Should().OnlyContain(point => double.IsFinite(point.X) && double.IsFinite(point.Y));
+        if (template == TumourTemplate.Circle)
+        {
+            slider.ControlPoints.Should().Contain(point => point.Type == PathType.PerfectCurve);
+            slider.GetLine(128).Should().Contain("|P|");
+            slider.GetLine(127).Split(',')[5].Should().StartWith("B|").And.NotContain("|P|");
+        }
     }
 
     [TestMethod]
@@ -491,6 +494,6 @@ public sealed class TumourGeneratorEngineTests
         new TumourGeneratorEngine { TumourLayers = [expectedLayer] }.TumourGenerate(expectedSlider);
 
         // Assert
-        randomSlider.GetAllCurvePoints().Should().Equal(expectedSlider.GetAllCurvePoints());
+        randomSlider.GetAbsoluteControlPointPositions().Should().Equal(expectedSlider.GetAbsoluteControlPointPositions());
     }
 }

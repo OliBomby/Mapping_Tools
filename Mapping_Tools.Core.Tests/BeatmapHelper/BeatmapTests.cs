@@ -1,4 +1,5 @@
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Core.Tests.BeatmapHelper;
@@ -6,6 +7,24 @@ namespace Mapping_Tools.Core.Tests.BeatmapHelper;
 [TestClass]
 public class BeatmapTests
 {
+    [TestMethod]
+    public void GetLines_WithMixedSlider_UsesBeatmapFormatVersion()
+    {
+        // Arrange
+        HitObject hitObject = new("64,96,1200,2,0,P|128:160|192:96|L|256:96,1,240");
+        Beatmap beatmap = new() { Version = 14, HitObjects = [hitObject] };
+
+        // Act
+        string legacyLine = beatmap.GetLines().Single(line => line.StartsWith("64,96,1200,"));
+        beatmap.Version = 128;
+        string lazerLine = beatmap.GetLines().Single(line => line.StartsWith("64,96,1200,"));
+
+        // Assert
+        legacyLine.Split(',')[5].Should().StartWith("B|");
+        lazerLine.Split(',')[5].Should().Be("P|128:160|192:96|L|256:96");
+        hitObject.ControlPoints[0].Type.Should().Be(PathType.PerfectCurve);
+    }
+
     [DataTestMethod]
     [DataRow("EmptyTestMap.osu")]
     [DataRow("ComplicatedTestMap.osu")]
@@ -130,7 +149,7 @@ public class BeatmapTests
     public void DeepCopy_MutatingCopiedHitObjectsAndTimingLeavesOriginalUnchanged()
     {
         // Arrange
-        TimingPoint redline = new(0, 500, 4, Mapping_Tools.Core.BeatmapHelper.Enums.SampleSet.Normal,
+        TimingPoint redline = new(0, 500, 4, SampleSet.Normal,
             0, 100, true, false, false);
         HitObject originalObject = new("64,96,1000,1,0,0:0:0:0:");
         Beatmap original = new([originalObject], [redline], redline);

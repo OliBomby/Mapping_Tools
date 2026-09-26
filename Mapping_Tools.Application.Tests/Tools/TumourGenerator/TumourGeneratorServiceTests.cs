@@ -83,14 +83,14 @@ public sealed class TumourGeneratorServiceTests
         TumourGeneratorService service = new(gateway, new ApplicationSettings());
         TumourGeneratorServiceOptions project = new();
         project.TumourLayers[0].TumourCount = 1;
-        List<double> progress = [];
+        RecordingProgress<double> progress = new();
 
         // Act
         var result = await service.RunAsync(
             ["map.osu"],
             project,
             true,
-            new Progress<double>(progress.Add));
+            progress);
 
         // Assert
         result.Paths.Should().Equal("map.osu");
@@ -98,7 +98,7 @@ public sealed class TumourGeneratorServiceTests
         result.EditorReloaded.Should().BeTrue();
         gateway.SessionSaveRequests.Select(request => request.ReloadEditor)
             .Should().ContainSingle().Which.Should().BeTrue();
-        progress.Should().Contain(1);
+        progress.Values.Should().Contain(1);
     }
 
     [DataTestMethod]

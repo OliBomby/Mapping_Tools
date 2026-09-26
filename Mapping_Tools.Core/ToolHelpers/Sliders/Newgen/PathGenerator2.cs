@@ -1,5 +1,8 @@
 ﻿using Mapping_Tools.Core.MathUtil;
 
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
+
 namespace Mapping_Tools.Core.ToolHelpers.Sliders.Newgen;
 
 /// <summary>
@@ -47,14 +50,18 @@ public class PathGenerator2
     ///     Generates anchors which approximate the path between the given path nodes.
     ///     Accurate angle and distances must be calculated on the path beforehand.
     /// </summary>
-    /// <returns>Bezier anchors which approximate the given path</returns>
-    public IEnumerable<Vector2> GeneratePath(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end)
+    /// <returns>Typed Bézier control points which approximate the given path.</returns>
+    public List<PathControlPoint> GeneratePath(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end)
     {
         var segments = GetNonInflectionSegments(start, end);
+        var result = new List<PathControlPoint>();
 
         foreach (var (segmentStart, segmentEnd) in segments)
         {
-            yield return segmentStart.Value.Pos;
+            if (result.Count == 0)
+                result.Add(new PathControlPoint(segmentStart.Value.Pos, PathType.Bezier));
+            else
+                result[^1].Type = PathType.Bezier;
 
             var middle = Approximation switch
             {
@@ -64,10 +71,12 @@ public class PathGenerator2
                 _ => null,
             };
 
-            if (middle.HasValue) yield return middle.Value;
+            if (middle.HasValue) result.Add(new PathControlPoint(middle.Value));
 
-            yield return segmentEnd.Value.Pos;
+            result.Add(new PathControlPoint(segmentEnd.Value.Pos));
         }
+
+        return result;
     }
 
     private Vector2? BestApproximation(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end)

@@ -31,9 +31,9 @@ public sealed class LastAnchorGenerator : RelevantObjectsGenerator
     public RelevantPoint? GetRelevantObjects(RelevantHitObject relevantHitObject)
     {
         var hitObject = relevantHitObject.HitObject;
-        if (hitObject.CurvePoints.Count == 0) return null;
-        return hitObject is { IsSlider: true, CurvePoints.Count: > 0 }
-            ? new RelevantPoint(hitObject.CurvePoints.Last()) { CustomTime = hitObject.EndTime }
+        if (hitObject.ControlPoints.Count < 2) return null;
+        return hitObject.IsSlider
+            ? new RelevantPoint(hitObject.Pos + hitObject.ControlPoints[^1].Position) { CustomTime = hitObject.EndTime }
             : null;
     }
 }

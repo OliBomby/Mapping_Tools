@@ -57,12 +57,12 @@ public sealed class SliderCompletionatorEngineTests
     }
 
     [TestMethod]
-    public void Apply_WithTruncatedCatmullSlider_ConvertsAndStoresNewPathType()
+    public void Apply_WithTruncatedCatmullSlider_MovesEndpointAndConvertsCutSegment()
     {
         // Arrange
         var (beatmap, slider) = CreateSliderBeatmap();
-        slider.CurvePoints = [new Vector2(30, 80), new Vector2(100, 0)];
-        slider.SliderType = PathType.Catmull;
+        slider.ControlPoints = [new(Vector2.Zero, PathType.Catmull), new(new Vector2(-70, 80)), new(Vector2.Zero)];
+        Vector2 originalStart = slider.ControlPoints[0].Position;
         SliderCompletionatorEngineOptions options = new()
         {
             Length = 0.5,
@@ -75,9 +75,40 @@ public sealed class SliderCompletionatorEngineTests
 
         // Assert
         completed.Should().Be(1);
-        slider.SliderType.Should().Be(PathType.Bezier);
-        slider.GetSliderPath(fullLength: true).Distance.Should().BeApproximately(slider.PixelLength, 1);
-        slider.GetSliderPath().Type.Should().Be(PathType.Bezier);
+        slider.ControlPoints[0].Type.Should().Be(PathType.Bezier);
+        slider.ControlPoints[0].Position.Should().Be(originalStart);
+        slider.GetSliderPath(true).Distance.Should().BeApproximately(slider.PixelLength, 1);
+        slider.GetSliderPath().Distance.Should().BeApproximately(slider.PixelLength, 1);
+    }
+
+    [TestMethod]
+    public void Apply_WithMixedSlider_KeepsCompletedPerfectSegmentWhenMovingAnchors()
+    {
+        // Arrange
+        var (beatmap, slider) = CreateSliderBeatmap();
+        slider.ControlPoints = [
+            new(Vector2.Zero, PathType.Linear),
+            new(new Vector2(100, 0), PathType.PerfectCurve),
+            new(new Vector2(150, 50)),
+            new(new Vector2(200, 0), PathType.Linear),
+            new(new Vector2(300, 0)),
+        ];
+        double fullLength = slider.GetSliderPath(true).Distance;
+        SliderCompletionatorEngineOptions options = new()
+        {
+            Length = (fullLength - 50) / fullLength,
+            MoveAnchors = true,
+            FreeVariableSetting = SliderCompletionatorFreeVariable.Velocity,
+        };
+
+        // Act
+        SliderCompletionatorEngine.Apply(beatmap, [slider], options);
+
+        // Assert
+        slider.ControlPoints.Select(point => point.Type).Should().Equal(
+            PathType.Linear, PathType.PerfectCurve, null, PathType.Linear, null);
+        Vector2.Distance(slider.ControlPoints[^1].Position, new Vector2(250, 0)).Should().BeLessThan(0.000001);
+        slider.GetSliderPath(true).Distance.Should().BeApproximately(slider.PixelLength, 0.01);
     }
 
     [TestMethod]

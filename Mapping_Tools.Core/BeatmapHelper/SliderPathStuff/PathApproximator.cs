@@ -113,6 +113,17 @@ public static class PathApproximator
         return output;
     }
 
+    internal static List<Vector2[]> GetBSplineBezierSegments(List<Vector2> controlPoints, int degree)
+    {
+        if (degree < 1)
+            throw new ArgumentOutOfRangeException(nameof(degree), @"Degree must be at least 1.");
+        if (controlPoints.Count < 2)
+            return [];
+
+        degree = Math.Min(degree, controlPoints.Count - 1);
+        return BSplineToBezierInternal(controlPoints, ref degree).ToList();
+    }
+
     /// <summary>
     ///     Creates a piecewise-linear approximation of a Catmull-Rom spline.
     /// </summary>

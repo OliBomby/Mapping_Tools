@@ -1,3 +1,5 @@
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.ToolHelpers.Sliders;
 
@@ -72,8 +74,8 @@ public sealed class SlideratorPathGenerator
     }
 
     /// <summary>Generates a variable-velocity slider path.</summary>
-    /// <returns>The generated osu! control points.</returns>
-    public List<Vector2> Sliderate()
+    /// <returns>The generated typed control points in absolute coordinates.</returns>
+    public List<PathControlPoint> Sliderate()
     {
         GetLatticePoints();
         GenerateNeurons();
@@ -292,21 +294,21 @@ public sealed class SlideratorPathGenerator
         {
             var firstPoint = neuron.Nucleus.Pos;
             var lastPoint = neuron.Terminal!.Nucleus.Pos;
-            var generated = pathGenerator.GeneratePath(
+            var generated = pathGenerator.GenerateControlPoints(
                     neuron.Nucleus.SegmentIndex + neuron.Nucleus.SegmentProgress,
                     neuron.Terminal.Nucleus.SegmentIndex + neuron.Terminal.Nucleus.SegmentProgress)
                 .ToList();
             if (generated.Count < 2)
             {
-                generated = [firstPoint, lastPoint];
+                generated = [new PathControlPoint(firstPoint, PathType.Bezier), new PathControlPoint(lastPoint)];
             }
             else
             {
-                generated[0] = firstPoint;
-                generated[^1] = lastPoint;
+                generated[0].Position = firstPoint;
+                generated[^1].Position = lastPoint;
             }
 
-            neuron.Axon = new BezierSubdivision(generated);
+            neuron.Axon = generated;
             // Calculate lengths
             neuron.AxonLength = PathGenerator.CalculatePathLength(generated);
             neuron.DendriteLength = neuron.WantedLength - neuron.AxonLength;
@@ -407,26 +409,26 @@ public sealed class SlideratorPathGenerator
         return length;
     }
 
-    private List<Vector2> AnchorsList()
+    private List<PathControlPoint> AnchorsList()
     {
-        List<Vector2> anchors = [];
+        List<PathControlPoint> anchors = [];
         for (int index = 0; index < slider.Count; index++)
         {
             var neuron = slider[index];
-            anchors.Add(neuron.Nucleus.Pos);
-            if (index != 0) anchors.Add(neuron.Nucleus.Pos);
+            anchors.Add(new PathControlPoint(neuron.Nucleus.Pos, PathType.Bezier));
 
             foreach (var dendrite in neuron.Dendrites)
             {
-                anchors.Add(neuron.Nucleus.Pos + dendrite);
-                anchors.Add(neuron.Nucleus.Pos);
-                anchors.Add(neuron.Nucleus.Pos);
+                anchors.Add(new PathControlPoint(neuron.Nucleus.Pos + dendrite));
+                anchors.Add(new PathControlPoint(neuron.Nucleus.Pos, PathType.Bezier));
             }
 
-            if (index != slider.Count - 1) anchors.AddRange(neuron.Axon.Points.GetRange(1, neuron.Axon.Points.Count - 2));
+            if (index != slider.Count - 1)
+                anchors.AddRange(neuron.Axon.GetRange(1, neuron.Axon.Count - 2)
+                    .Select(point => point.Copy()));
         }
 
-        anchors.RemoveAt(anchors.Count - 1);
+        anchors[^1].Type = null;
         return anchors;
     }
 
@@ -465,13 +467,13 @@ public sealed class SlideratorPathGenerator
         {
             Nucleus = nucleus;
             Dendrites = [];
-            Axon = new BezierSubdivision([nucleus.Pos]);
+            Axon = [new PathControlPoint(nucleus.Pos, PathType.Bezier)];
             Time = time;
         }
 
         internal LatticePoint Nucleus { get; }
         internal List<Vector2> Dendrites { get; }
-        internal BezierSubdivision Axon { get; set; }
+        internal List<PathControlPoint> Axon { get; set; }
         internal Neuron? Terminal { get; set; }
         internal double WantedLength { get; set; }
         internal double DendriteLength { get; set; }

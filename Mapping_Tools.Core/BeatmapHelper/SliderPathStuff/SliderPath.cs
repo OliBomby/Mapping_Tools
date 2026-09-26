@@ -18,11 +18,11 @@ public struct SliderPath : IEquatable<SliderPath>
     public readonly double? ExpectedDistance;
 
     /// <summary>
-    ///     The type of path.
+    ///     The type of the first path segment.
     /// </summary>
     public readonly PathType Type;
 
-    private Vector2[] controlPoints;
+    private PathControlPoint[] controlPoints;
 
     private List<Vector2> calculatedPath;
     private List<double> cumulativeLength;
@@ -41,14 +41,22 @@ public struct SliderPath : IEquatable<SliderPath>
     ///     If null, the path will use the true distance between all <paramref name="controlPoints" />.
     /// </param>
     public SliderPath(PathType type, Vector2[] controlPoints, double? expectedDistance = null)
+        : this(controlPoints.Select((point, index) => new PathControlPoint(point, index == 0 ? type : null)).ToArray(), expectedDistance)
     {
-        this.controlPoints = controlPoints;
+    }
+
+    /// <summary>Creates a path with independently typed segments.</summary>
+    /// <param name="controlPoints">The ordered path control points.</param>
+    /// <param name="expectedDistance">Optional target length.</param>
+    public SliderPath(PathControlPoint[] controlPoints, double? expectedDistance = null)
+    {
+        this.controlPoints = controlPoints.Select(point => point.Copy()).ToArray();
         calculatedPath = [];
         cumulativeLength = [];
         segmentStarts = [];
         isInitialised = false;
 
-        Type = type;
+        Type = controlPoints.FirstOrDefault()?.Type ?? PathType.Linear;
         ExpectedDistance = expectedDistance;
 
         EnsureInitialised();
@@ -62,7 +70,17 @@ public struct SliderPath : IEquatable<SliderPath>
         get
         {
             EnsureInitialised();
-            return controlPoints.ToList();
+            return controlPoints.Select(point => point.Position).ToList();
+        }
+    }
+
+    /// <summary>The typed control points of the path.</summary>
+    public IReadOnlyList<PathControlPoint> PathControlPoints
+    {
+        get
+        {
+            EnsureInitialised();
+            return controlPoints.Select(point => point.Copy()).ToArray();
         }
     }
 
@@ -194,7 +212,7 @@ public struct SliderPath : IEquatable<SliderPath>
             return;
         isInitialised = true;
 
-        controlPoints = controlPoints ?? Array.Empty<Vector2>();
+        controlPoints = controlPoints ?? Array.Empty<PathControlPoint>();
         calculatedPath = new List<Vector2>();
         cumulativeLength = new List<double>();
         segmentStarts = new List<int>();
@@ -203,15 +221,16 @@ public struct SliderPath : IEquatable<SliderPath>
         CalculateCumulativeLength();
     }
 
-    private List<Vector2> CalculateSubpath(List<Vector2> subControlPoints)
+    private List<Vector2> CalculateSubpath(List<Vector2> subControlPoints, PathType type)
     {
-        switch (Type)
+        switch (type)
         {
             case PathType.Linear:
                 return PathApproximator.ApproximateLinear(subControlPoints);
             case PathType.PerfectCurve:
                 //we can only use CircularArc iff we have exactly three control points and no dissection.
-                if (ControlPoints.Length() != 3 || subControlPoints.Length() != 3)
+                if (subControlPoints.Count != 3 ||
+                    controlPoints.Length != 3 && controlPoints.Skip(1).All(point => !point.Type.HasValue))
                     break;
 
                 // Here we have exactly 3 control points. Attempt to fit a circular arc.
@@ -235,29 +254,27 @@ public struct SliderPath : IEquatable<SliderPath>
     {
         calculatedPath.Clear();
 
-        // Sliders may consist of various subpaths separated by two consecutive vertices
-        // with the same position. The following loop parses these subpaths and computes
-        // their shape independently, consecutively appending them to calculatedPath.
+        // Typed control points start independent subpaths at their position.
 
         int start = 0;
-        int end = 0;
+        PathType activeType = Type;
 
-        for (int i = 0; i < ControlPoints.Length(); ++i)
+        for (int i = 0; i < controlPoints.Length; ++i)
         {
-            end++;
-
-            if (i == ControlPoints.Length() - 1 || ControlPoints[i] == ControlPoints[i + 1] && i != ControlPoints.Length() - 2)
+            bool typedBoundary = i > start && controlPoints[i].Type.HasValue;
+            if (i == controlPoints.Length - 1 || typedBoundary)
             {
-                var cpSpan = ControlPoints.GetRange(start, end - start);
+                var cpSpan = controlPoints.Skip(start).Take(i - start + 1).Select(point => point.Position).ToList();
 
                 // Remember the index of the subpath start
                 segmentStarts.Add(calculatedPath.Count);
 
-                foreach (var t in CalculateSubpath(cpSpan))
+                foreach (var t in CalculateSubpath(cpSpan, activeType))
                     if (calculatedPath.Count == 0 || calculatedPath.Last() != t)
                         calculatedPath.Add(t);
 
-                start = end;
+                if (typedBoundary) activeType = controlPoints[i].Type!.Value;
+                start = i;
             }
         }
     }
@@ -353,8 +370,9 @@ public struct SliderPath : IEquatable<SliderPath>
         if (other.ControlPoints == null && ControlPoints != null)
             return false;
 
-        return (ControlPoints == null && other.ControlPoints == null || ControlPoints!.SequenceEqual(other.ControlPoints!)) &&
-               ExpectedDistance.Equals(other.ExpectedDistance) && Type == other.Type;
+        return controlPoints.Select(point => (point.Position, point.Type))
+                   .SequenceEqual(other.controlPoints.Select(point => (point.Position, point.Type))) &&
+               ExpectedDistance.Equals(other.ExpectedDistance);
     }
 
     /// <summary>
@@ -396,7 +414,10 @@ public struct SliderPath : IEquatable<SliderPath>
         hashCode.Add(Type);
         if (controlPoints is not null)
             foreach (var point in controlPoints)
-                hashCode.Add(point);
+            {
+                hashCode.Add(point.Position);
+                hashCode.Add(point.Type);
+            }
 
         return hashCode.ToHashCode();
     }

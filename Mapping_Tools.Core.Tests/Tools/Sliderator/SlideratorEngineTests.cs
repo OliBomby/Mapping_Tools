@@ -32,7 +32,7 @@ public sealed class SlideratorEngineTests
         result.ObjectCount.Should().Be(1);
         beatmap.HitObjects.Count.Should().Be(2);
         beatmap.HitObjects[1].IsSlider.Should().BeTrue();
-        beatmap.HitObjects[1].GetAllCurvePoints().Should().Equal(source.GetAllCurvePoints());
+        beatmap.HitObjects[1].GetAbsoluteControlPointPositions().Should().Equal(source.GetAbsoluteControlPointPositions());
     }
 
     [DataTestMethod]
@@ -43,7 +43,7 @@ public sealed class SlideratorEngineTests
         // Arrange
         var (beatmap, source) = CreateSliderBeatmap();
         PathType pathType = (PathType)pathTypeValue;
-        source.SliderType = pathType;
+        source.ControlPoints[0].Type = pathType;
         var options = CreateOptions();
         options.ExportTime = 1000;
         options.NewVelocity = 1 / 4.2;
@@ -55,8 +55,8 @@ public sealed class SlideratorEngineTests
         // Assert
         result.Simplified.Should().BeTrue();
         HitObject exported = beatmap.HitObjects[1];
-        exported.SliderType.Should().Be(pathType);
-        exported.GetAllCurvePoints().Should().Equal(source.GetAllCurvePoints());
+        exported.ControlPoints[0].Type.Should().Be(pathType);
+        exported.GetAbsoluteControlPointPositions().Should().Equal(source.GetAbsoluteControlPointPositions());
     }
 
     [TestMethod]

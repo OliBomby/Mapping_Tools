@@ -119,7 +119,7 @@ public sealed class GeometryDashboardDomainTests
             Pos = new Vector2(100, 100),
             Time = 500,
             IsCircle = true,
-            CurvePoints = [],
+            ControlPoints = [],
         };
         RelevantHitObject source = new(hitObject);
 
@@ -180,9 +180,8 @@ public sealed class GeometryDashboardDomainTests
         RelevantHitObject hitObject = new(new HitObject
         {
             IsSlider = true,
-            SliderType = PathType.Linear,
             Pos = new Vector2(0, 0),
-            CurvePoints = [new Vector2(100, 0)],
+            ControlPoints = [new(Vector2.Zero, PathType.Linear), new(new Vector2(100, 0))],
             PixelLength = 1,
             Time = 100,
             EndTime = 100,
@@ -203,5 +202,26 @@ public sealed class GeometryDashboardDomainTests
         pathPoints.Should().ContainSingle();
         pathPoints[0].Child.X.Should().NotBe(double.NaN);
         pathPoints[0].Child.Y.Should().NotBe(double.NaN);
+    }
+
+    [TestMethod]
+    public void PerfectCircleGenerators_WithMixedSlider_GenerateForEveryPerfectSegment()
+    {
+        // Arrange
+        HitObject slider = new("10,20,0,2,0,L|110:20|P|110:20|160:70|210:20|L|210:20|310:20|P|310:20|360:70|410:20,1,500");
+        RelevantHitObject relevantSlider = new(slider);
+        PerfectCircleGenerator circles = new();
+        PerfectCircleBlanketGenerator blankets = new();
+
+        // Act
+        var generatedCircles = circles.GetRelevantObjects(relevantSlider)!.ToList();
+        var generatedCenters = blankets.GetRelevantObjects(relevantSlider)!.ToList();
+
+        // Assert
+        generatedCircles.Select(circle => circle.Child.Centre).Should().Equal(
+            new Vector2(160, 20), new Vector2(360, 20));
+        generatedCircles.Select(circle => circle.Child.Radius).Should().Equal(50, 50);
+        generatedCenters.Select(point => point.Child).Should().Equal(
+            new Vector2(160, 20), new Vector2(360, 20));
     }
 }

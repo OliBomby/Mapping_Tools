@@ -1,4 +1,4 @@
-using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Core.MathUtil;
 
 namespace Mapping_Tools.Core.Tools.TumourGenerator.Templates;
@@ -35,11 +35,8 @@ public interface ITumourTemplate
     /// <summary>Gets normalized points that must be retained as path points.</summary>
     IEnumerable<double> GetCriticalPoints();
 
-    /// <summary>Gets reconstruction anchors in the template's local coordinates.</summary>
-    List<Vector2>? GetReconstructionHint();
-
-    /// <summary>Gets the path type for the reconstruction hint.</summary>
-    PathType GetReconstructionHintPathType();
+    /// <summary>Gets typed reconstruction control points in the template's local coordinates.</summary>
+    List<PathControlPoint>? GetReconstructionHint();
 
     /// <summary>Gets the cumulative-distance relation for a reconstruction hint.</summary>
     Func<double, double>? GetDistanceRelation();

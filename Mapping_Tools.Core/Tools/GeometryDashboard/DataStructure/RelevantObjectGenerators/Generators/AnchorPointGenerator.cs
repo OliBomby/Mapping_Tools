@@ -32,7 +32,7 @@ public sealed class AnchorPointGenerator : RelevantObjectsGenerator
     {
         var hitObject = relevantHitObject.HitObject;
         if (!hitObject.IsSlider) return null;
-        var curvePoints = hitObject.GetAllCurvePoints();
+        var curvePoints = hitObject.GetAbsoluteControlPointPositions();
         if (curvePoints.Count == 0) return [];
 
         int lastPointIndex = Math.Max(1, curvePoints.Count - 1);

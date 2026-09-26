@@ -3,6 +3,7 @@ using System.Text;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
+using Mapping_Tools.Core.ToolHelpers.Sliders;
 using Mapping_Tools.Core.MathUtil;
 using Newtonsoft.Json;
 using static Mapping_Tools.Core.BeatmapHelper.FileFormatHelper;
@@ -46,6 +47,14 @@ public class HitObject : ITextLine, IComparable<HitObject>
         // 213,192,78,128,0,378:0:0:0:0:
 
         SetLine(line);
+    }
+
+    /// <summary>Parses a hit-object line according to its beatmap format version.</summary>
+    /// <param name="line">The complete hit-object line.</param>
+    /// <param name="formatVersion">The containing beatmap's file format version.</param>
+    public HitObject(string line, int formatVersion)
+    {
+        SetLine(line, formatVersion);
     }
 
     /// <summary>
@@ -139,7 +148,7 @@ public class HitObject : ITextLine, IComparable<HitObject>
     }
 
     /// <summary>
-    ///     Gets or sets the complete osu! hit-object line through <see cref="GetLine" /> and <see cref="SetLine" />.
+    ///     Gets or sets the complete osu! hit-object line through <see cref="GetLine()" /> and <see cref="SetLine(string)" />.
     /// </summary>
     [JsonProperty]
     public string Line
@@ -276,23 +285,13 @@ public class HitObject : ITextLine, IComparable<HitObject>
     public string Filename { get; set; } = string.Empty;
 
     /// <summary>
-    ///     All path types and their index in the curve points array.
-    ///     Used for preserving multiple path types in osu! lazer file format.
+    ///     Slider anchors relative to <see cref="Pos" />, including the first anchor at (0, 0).
+    ///     A non-null type starts a path segment at that anchor.
     /// </summary>
-    public List<(PathType, int)> AdditionalSliderTypes { get; set; } = [];
+    public List<PathControlPoint> ControlPoints { get; set; } = [];
 
     /// <summary>
-    ///     Gets or sets the primary curve algorithm used to interpret slider control points.
-    /// </summary>
-    public PathType SliderType { get; set; }
-
-    /// <summary>
-    ///     Gets or sets slider control points after the object's starting <see cref="Pos" />.
-    /// </summary>
-    public List<Vector2> CurvePoints { get; set; } = [];
-
-    /// <summary>
-    ///     Gets or replaces the geometric path assembled from the start position, curve points, type, and pixel length.
+    ///     Gets or replaces the geometric path assembled from typed control points and pixel length.
     /// </summary>
     public SliderPath SliderPath
     {
@@ -430,7 +429,12 @@ public class HitObject : ITextLine, IComparable<HitObject>
 
 
     /// <inheritdoc />
-    public void SetLine(string line)
+    public void SetLine(string line) => SetLine(line, 14);
+
+    /// <summary>Parses a hit-object line according to its beatmap format version.</summary>
+    /// <param name="line">The complete hit-object line.</param>
+    /// <param name="formatVersion">The containing beatmap's file format version.</param>
+    public void SetLine(string line, int formatVersion)
     {
         string[] values = line.Split(',');
 
@@ -464,23 +468,54 @@ public class HitObject : ITextLine, IComparable<HitObject>
 
             string[] sliderData = values[5].Split('|');
 
-            SliderType = GetPathType(sliderData);
-            AdditionalSliderTypes = GetAdditionalPathTypes(sliderData);
-
-            var points = new List<Vector2>();
-            foreach (string value in sliderData)
+            var points = new List<PathControlPoint> { new(Vector2.Zero, TryGetPathType(sliderData[0], out PathType firstType) ? firstType : PathType.Catmull) };
+            PathType? pendingType = null;
+            for (int tokenIndex = 0; tokenIndex < sliderData.Length; tokenIndex++)
             {
+                string value = sliderData[tokenIndex];
+                if (TryGetPathType(value, out PathType segmentType))
+                {
+                    if (tokenIndex > 0) pendingType = segmentType;
+                    continue;
+                }
+
                 string[] spl = value.Split(':');
 
                 // It has to have 2 coordinates inside
                 if (spl.Length != 2) continue;
 
                 if (TryParseDouble(spl[0], out double ax) && TryParseDouble(spl[1], out double ay))
-                    points.Add(new Vector2(ax, ay));
+                    points.Add(new PathControlPoint(new Vector2(ax, ay) - Pos, pendingType));
                 else throw new BeatmapParsingException("Failed to parse coordinate of slider anchor.", line);
+
+                pendingType = null;
             }
 
-            CurvePoints = points;
+            if (formatVersion < 128)
+            {
+                var normalized = new List<PathControlPoint>();
+                PathType activeType = points[0].Type ?? firstType;
+                for (int index = 0; index < points.Count; index++)
+                {
+                    var point = points[index];
+                    if (point.Type.HasValue) activeType = point.Type.Value;
+                    if (index > 0 && index < points.Count - 1 && normalized[^1].Position == point.Position &&
+                        !normalized[^1].Type.HasValue)
+                    {
+                        normalized[^1].Type = activeType;
+                        continue;
+                    }
+
+                    if (index < points.Count - 1 && normalized.Count > 0 &&
+                        normalized[^1].Position == point.Position)
+                        point.Type ??= activeType;
+                    normalized.Add(point);
+                }
+
+                points = normalized;
+            }
+
+            ControlPoints = points;
 
             if (TryParseInt(values[6], out int parsedRepeat))
                 Repeat = parsedRepeat;
@@ -561,7 +596,12 @@ public class HitObject : ITextLine, IComparable<HitObject>
     }
 
     /// <inheritdoc />
-    public string GetLine()
+    public string GetLine() => GetLine(128);
+
+    /// <summary>Serializes this object for a specific osu! file format version.</summary>
+    /// <param name="formatVersion">The target osu! file format version.</param>
+    /// <returns>The hit-object line.</returns>
+    public string GetLine(int formatVersion)
     {
         var values = new List<string>
         {
@@ -575,50 +615,36 @@ public class HitObject : ITextLine, IComparable<HitObject>
         if (IsSlider)
         {
             var builder = new StringBuilder();
-            if (AdditionalSliderTypes.Count > 1)
+            bool mixedTypes = ControlPoints.Any(point => point.Type.HasValue && point.Type != ControlPoints[0].Type);
+            if (formatVersion < 128 && (mixedTypes || ControlPoints[0].Type == PathType.BSpline))
             {
-                int i = 0;
-                int i2 = 0;
-                bool first = true;
-                foreach (var p in CurvePoints)
+                var bezier = BezierConverter.ConvertToBezierAnchors(ControlPoints);
+                builder.Append('B');
+                for (int index = 1; index < bezier.Count; index++)
                 {
-                    while (i2 < AdditionalSliderTypes.Count && AdditionalSliderTypes[i2].Item2 <= i)
-                    {
-                        if (!first)
-                            builder.Append('|');
-
-                        builder.Append(GetPathTypeString(AdditionalSliderTypes[i2].Item1));
-                        i++;
-                        i2++;
-                        first = false;
-                    }
-
-                    if (!first)
-                        builder.Append('|');
-
-                    builder.Append(
-                        $"{(SaveWithFloatPrecision ? p.X.ToInvariant() : p.X.ToRoundInvariant())}:{(SaveWithFloatPrecision ? p.Y.ToInvariant() : p.Y.ToRoundInvariant())}");
-                    i++;
-                    first = false;
-                }
-
-                while (i2 < AdditionalSliderTypes.Count && AdditionalSliderTypes[i2].Item2 <= i)
-                {
-                    if (!first)
-                        builder.Append('|');
-
-                    builder.Append(GetPathTypeString(AdditionalSliderTypes[i2].Item1));
-                    i++;
-                    i2++;
-                    first = false;
+                    var point = bezier[index];
+                    var position = point.Position + Pos;
+                    string anchor = $"|{(SaveWithFloatPrecision ? position.X.ToInvariant() : position.X.ToRoundInvariant())}:{(SaveWithFloatPrecision ? position.Y.ToInvariant() : position.Y.ToRoundInvariant())}";
+                    builder.Append(anchor);
+                    if (point.Type.HasValue && index < bezier.Count - 1) builder.Append(anchor);
                 }
             }
             else
             {
-                builder.Append(GetPathTypeString(SliderType));
-                foreach (var p in CurvePoints)
-                    builder.Append(
-                        $"|{(SaveWithFloatPrecision ? p.X.ToInvariant() : p.X.ToRoundInvariant())}:{(SaveWithFloatPrecision ? p.Y.ToInvariant() : p.Y.ToRoundInvariant())}");
+                builder.Append(GetPathTypeString(ControlPoints.FirstOrDefault()?.Type ?? PathType.Linear));
+                for (int index = 1; index < ControlPoints.Count; index++)
+                {
+                    var point = ControlPoints[index];
+                    var p = point.Position + Pos;
+                    if (point.Type.HasValue && formatVersion >= 128)
+                        builder.Append('|').Append(GetPathTypeString(point.Type.Value));
+                    builder.Append($"|{(SaveWithFloatPrecision ? p.X.ToInvariant() : p.X.ToRoundInvariant())}:{(SaveWithFloatPrecision ? p.Y.ToInvariant() : p.Y.ToRoundInvariant())}");
+                    bool previousTypedAtSamePosition = ControlPoints[index - 1].Type.HasValue &&
+                        ControlPoints[index - 1].Position == point.Position;
+                    if (point.Type.HasValue && formatVersion < 128 && index < ControlPoints.Count - 1 &&
+                        !previousTypedAtSamePosition)
+                        builder.Append($"|{(SaveWithFloatPrecision ? p.X.ToInvariant() : p.X.ToRoundInvariant())}:{(SaveWithFloatPrecision ? p.Y.ToInvariant() : p.Y.ToRoundInvariant())}");
+                }
             }
 
             values.Add(builder.ToString());
@@ -880,15 +906,15 @@ public class HitObject : ITextLine, IComparable<HitObject>
     /// </summary>
     public void CalculateSliderTrueLength()
     {
-        if (!IsSlider || double.IsNaN(PixelLength) || PixelLength < 0 || CurvePoints.All(o => o == Pos))
+        if (!IsSlider || double.IsNaN(PixelLength) || PixelLength < 0 || ControlPoints.All(o => o.Position == Vector2.Zero))
         {
             TrueLength = 0;
             return;
         }
 
-        if (SliderType == PathType.Linear && CurvePoints.Count > 1 && CurvePoints[^1] == CurvePoints[^2])
+        if (ControlPoints[0].Type == PathType.Linear && ControlPoints.Count > 2 && ControlPoints[^1].Position == ControlPoints[^2].Position)
         {
-            TrueLength = Math.Min(PixelLength, QuickCalculateLength(GetAllCurvePoints()));
+            TrueLength = Math.Min(PixelLength, QuickCalculateLength(GetAbsoluteControlPointPositions()));
             return;
         }
 
@@ -970,8 +996,6 @@ public class HitObject : ITextLine, IComparable<HitObject>
     public void Move(Vector2 delta)
     {
         Pos += delta;
-        if (!IsSlider) return;
-        for (int i = 0; i < CurvePoints.Count; i++) CurvePoints[i] = CurvePoints[i] + delta;
     }
 
     /// <summary>
@@ -982,7 +1006,7 @@ public class HitObject : ITextLine, IComparable<HitObject>
     {
         Pos = Matrix2.Mult(mat, Pos);
         if (!IsSlider) return;
-        for (int i = 0; i < CurvePoints.Count; i++) CurvePoints[i] = Matrix2.Mult(mat, CurvePoints[i]);
+        foreach (var point in ControlPoints) point.Position = Matrix2.Mult(mat, point.Position);
     }
 
     /// <summary>
@@ -1111,7 +1135,7 @@ public class HitObject : ITextLine, IComparable<HitObject>
     /// <summary>
     ///     Serializes the object as an osu! hit-object line.
     /// </summary>
-    /// <returns>The same representation as <see cref="GetLine" />.</returns>
+    /// <returns>The same representation as <see cref="GetLine()" />.</returns>
     public override string ToString()
     {
         return GetLine();
@@ -1273,106 +1297,44 @@ public class HitObject : ITextLine, IComparable<HitObject>
     /// <returns>A newly constructed slider path.</returns>
     public SliderPath GetSliderPath(bool fullLength = false)
     {
-        return fullLength
-            ? new SliderPath(SliderType, [.. GetAllCurvePoints()])
-            : new SliderPath(SliderType, [.. GetAllCurvePoints()], PixelLength);
+        var points = ControlPoints.Select(point => new PathControlPoint(point.Position + Pos, point.Type)).ToArray();
+        return new SliderPath(points, fullLength ? null : PixelLength);
     }
 
     /// <summary>
-    ///     Replaces slider type, control points, and pixel length from a geometric path.
+    ///     Replaces the typed control points and pixel length from a geometric path.
     /// </summary>
     /// <param name="sliderPath">The path whose values become this object's serialized slider data.</param>
     public void SetSliderPath(SliderPath sliderPath)
     {
-        var controlPoints = sliderPath.ControlPoints;
-        SetAllCurvePoints(controlPoints);
-        SliderType = sliderPath.Type;
+        var points = sliderPath.PathControlPoints;
+        Pos = points[0].Position;
+        ControlPoints = points.Select(point => new PathControlPoint(point.Position - Pos, point.Type)).ToList();
         PixelLength = sliderPath.Distance;
     }
 
     /// <summary>
-    ///     Combines the object start position with its remaining slider control points.
+    ///     Resolves every relative slider control point to an absolute playfield position.
     /// </summary>
     /// <returns>A new list whose first item is <see cref="Pos" />.</returns>
-    public List<Vector2> GetAllCurvePoints()
+    public List<Vector2> GetAbsoluteControlPointPositions()
     {
-        var controlPoints = new List<Vector2> { Pos };
-        controlPoints.AddRange(CurvePoints);
-        return controlPoints;
+        return ControlPoints.Select(point => Pos + point.Position).ToList();
     }
 
-    /// <summary>
-    ///     Splits a complete slider control-point list into start position and trailing curve points.
-    /// </summary>
-    /// <param name="controlPoints">A non-empty list whose first point becomes <see cref="Pos" />.</param>
-    public void SetAllCurvePoints(List<Vector2> controlPoints)
+    private static bool TryGetPathType(string token, out PathType type)
     {
-        Pos = controlPoints.First();
-        CurvePoints = controlPoints.GetRange(1, controlPoints.Count - 1);
-        AdditionalSliderTypes = [];
-    }
-
-    private PathType GetPathType(string[] sliderData)
-    {
-        for (int i = sliderData.Length - 1; i >= 0; i--)
+        type = PathType.Catmull;
+        if (token.Length == 0 || !char.IsLetter(token[0])) return false;
+        switch (token[0])
         {
-            // Iterating in reverse to get the last valid letter
-            if (sliderData[i].Length == 0 || !char.IsLetter(sliderData[i][0])) continue;
-
-            char letter = sliderData[i][0];
-            switch (letter)
-            {
-                case 'L':
-                    return PathType.Linear;
-                case 'B':
-                    if (sliderData[i].Length > 1 && int.TryParse(sliderData[i][1..], out int degree) && degree > 0)
-                        return PathType.BSpline;
-
-                    return PathType.Bezier;
-                case 'P':
-                    return PathType.PerfectCurve;
-                case 'C':
-                    return PathType.Catmull;
-            }
+            case 'L': type = PathType.Linear; return true;
+            case 'B': type = token.Length > 1 && int.TryParse(token[1..], out int degree) && degree > 0
+                ? PathType.BSpline : PathType.Bezier; return true;
+            case 'P': type = PathType.PerfectCurve; return true;
+            case 'C': type = PathType.Catmull; return true;
+            default: return true;
         }
-
-        // If there is no valid letter it will literally default to catmull
-        return PathType.Catmull;
-    }
-
-    private List<(PathType, int)> GetAdditionalPathTypes(string[] sliderData)
-    {
-        var allPathTypes = new List<(PathType, int)>();
-
-        for (int i = 0; i < sliderData.Length; i++)
-        {
-            if (sliderData[i].Length == 0 || !char.IsLetter(sliderData[i][0])) continue;
-
-            char letter = sliderData[i][0];
-            switch (letter)
-            {
-                case 'L':
-                    allPathTypes.Add((PathType.Linear, i));
-                    break;
-                case 'B':
-                    if (sliderData[i].Length > 1 && int.TryParse(sliderData[i][1..], out int degree) && degree > 0)
-                    {
-                        allPathTypes.Add((PathType.BSpline, i));
-                        break;
-                    }
-
-                    allPathTypes.Add((PathType.Bezier, i));
-                    break;
-                case 'P':
-                    allPathTypes.Add((PathType.PerfectCurve, i));
-                    break;
-                case 'C':
-                    allPathTypes.Add((PathType.Catmull, i));
-                    break;
-            }
-        }
-
-        return allPathTypes;
     }
 
     private string GetPathTypeString(PathType pathType)
@@ -1400,7 +1362,7 @@ public class HitObject : ITextLine, IComparable<HitObject>
     /// <returns><see langword="true" /> for zero-area, NaN-length, or effectively zero-length slider geometry.</returns>
     public bool IsInvisible()
     {
-        return PixelLength != 0 && PixelLength <= 0.0001 || double.IsNaN(PixelLength) || CurvePoints.All(o => o == Pos);
+        return PixelLength != 0 && PixelLength <= 0.0001 || double.IsNaN(PixelLength) || ControlPoints.All(o => o.Position == Vector2.Zero);
     }
 
     /// <summary>
@@ -1412,8 +1374,7 @@ public class HitObject : ITextLine, IComparable<HitObject>
         var newHitObject = (HitObject)MemberwiseClone();
         newHitObject.BodyHitsounds = BodyHitsounds.Select(o => o.Copy()).ToList();
         newHitObject.TimelineObjects = TimelineObjects.Select(o => o.Copy()).ToList();
-        newHitObject.CurvePoints = CurvePoints.Copy();
-        newHitObject.AdditionalSliderTypes = AdditionalSliderTypes.ToList();
+        newHitObject.ControlPoints = ControlPoints.Select(point => point.Copy()).ToList();
         newHitObject.EdgeHitsounds = [.. EdgeHitsounds];
         newHitObject.EdgeSampleSets = [.. EdgeSampleSets];
         newHitObject.EdgeAdditionSets = [.. EdgeAdditionSets];

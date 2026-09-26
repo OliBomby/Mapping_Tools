@@ -1,5 +1,6 @@
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.SliderMerger;
 using Mapping_Tools.Core.Tools.SliderMerger.Models;
@@ -29,7 +30,7 @@ public sealed class SliderMergerEngineTests
         beatmap.HitObjects.Should().ContainSingle();
         var slider = beatmap.HitObjects[0];
         slider.IsSlider.Should().BeTrue();
-        slider.SliderType.Should().Be(PathType.Bezier);
+        slider.ControlPoints[0].Type.Should().Be(PathType.Bezier);
         slider.PixelLength.Should().Be(100);
         slider.EdgeHitsounds.Should().Equal(2, 8);
         slider.Repeat.Should().Be(1);
@@ -64,7 +65,7 @@ public sealed class SliderMergerEngineTests
     }
 
     [TestMethod]
-    public void Merge_TwoSliders_WithLinearConnectionAddsGapAndKeepsBezierType()
+    public void Merge_TwoSliders_WithLinearConnectionAddsGapAndKeepsTypedSegments()
     {
         // Arrange
         HitObject first = new("64,64,0,2,0,L|164:64,1,100");
@@ -82,16 +83,17 @@ public sealed class SliderMergerEngineTests
 
         // Assert
         var slider = beatmap.HitObjects.Should().ContainSingle().Subject;
-        slider.SliderType.Should().Be(PathType.Bezier);
+        slider.ControlPoints[0].Type.Should().Be(PathType.Linear);
+        slider.ControlPoints.Skip(1).Should().Contain(point => point.Type == PathType.Linear);
         slider.PixelLength.Should().Be(236);
-        slider.GetAllCurvePoints().Should().Contain(new Vector2(200, 64));
+        slider.GetAbsoluteControlPointPositions().Should().Contain(new Vector2(200, 64));
     }
 
     [DataTestMethod]
     [DataRow(PathType.PerfectCurve)]
     [DataRow(PathType.Catmull)]
     [DataRow(PathType.BSpline)]
-    public void Merge_CurvedSliderWithCircle_ConvertsResultToBezier(PathType pathType)
+    public void Merge_CurvedSliderWithCircle_PreservesOriginalTypeAndAddsLinearSegment(PathType pathType)
     {
         // Arrange
         string pathToken = pathType switch
@@ -113,7 +115,57 @@ public sealed class SliderMergerEngineTests
 
         // Assert
         var slider = beatmap.HitObjects.Should().ContainSingle().Subject;
-        slider.SliderType.Should().Be(PathType.Bezier);
+        slider.ControlPoints[0].Type.Should().Be(pathType);
+        slider.ControlPoints[^2].Type.Should().Be(PathType.Linear);
+    }
+
+    [TestMethod]
+    public void Merge_TruncatedCatmullWithSlider_ConnectsAtVisibleEndAfterCuttingSegment()
+    {
+        // Arrange
+        HitObject first = new("0,0,0,2,0,C|50:100|100:0,1,80");
+        HitObject second = new("120,0,100,2,0,L|170:0,1,50");
+        Beatmap beatmap = CreateBeatmap(first, second);
+        SliderMergerEngineOptions options = new()
+        {
+            Leniency = 200,
+            MergeOnSliderEnd = true,
+            ConnectionModeSetting = SliderMergerConnectionMode.Linear,
+        };
+
+        // Act
+        SliderMergerEngine.Merge(beatmap, beatmap.HitObjects, options);
+
+        // Assert
+        HitObject slider = beatmap.HitObjects.Should().ContainSingle().Subject;
+        slider.ControlPoints[0].Type.Should().Be(PathType.Bezier);
+        slider.GetSliderPath(fullLength: true).Distance.Should().BeApproximately(slider.PixelLength, 1);
+        Vector2.Distance(slider.GetSliderPath().PositionAt(1), new Vector2(170, 0)).Should().BeLessThan(1);
+    }
+
+    [TestMethod]
+    public void Merge_TruncatedMixedSlider_KeepsCompletedPerfectSegment()
+    {
+        // Arrange
+        HitObject first = new("0,0,0,2,0,L|100:0|P|100:0|150:50|200:0|L|200:0|300:0,1,300");
+        first.PixelLength = first.GetSliderPath(true).Distance - 50;
+        HitObject second = new("330,0,100,2,0,L|380:0,1,50");
+        Beatmap beatmap = CreateBeatmap(first, second);
+        SliderMergerEngineOptions options = new()
+        {
+            Leniency = 100,
+            MergeOnSliderEnd = true,
+            ConnectionModeSetting = SliderMergerConnectionMode.Linear,
+        };
+
+        // Act
+        SliderMergerEngine.Merge(beatmap, beatmap.HitObjects, options);
+
+        // Assert
+        HitObject slider = beatmap.HitObjects.Should().ContainSingle().Subject;
+        slider.ControlPoints.Should().Contain(point => point.Type == PathType.PerfectCurve);
+        slider.GetSliderPath(true).Distance.Should().BeApproximately(slider.PixelLength, 0.01);
+        Vector2.Distance(slider.GetSliderPath().PositionAt(1), new Vector2(380, 0)).Should().BeLessThan(1);
     }
 
     [TestMethod]
@@ -264,8 +316,8 @@ public sealed class SliderMergerEngineTests
 
         // Assert
         HitObject slider = beatmap.HitObjects.Should().ContainSingle().Subject;
-        slider.SliderType.Should().Be(PathType.Linear);
-        slider.GetAllCurvePoints().Should().Equal(new Vector2(64, 64), new Vector2(164, 64));
+        slider.ControlPoints[0].Type.Should().Be(PathType.Linear);
+        slider.GetAbsoluteControlPointPositions().Should().Equal(new Vector2(64, 64), new Vector2(164, 64));
         slider.PixelLength.Should().Be(100);
     }
 
@@ -289,7 +341,7 @@ public sealed class SliderMergerEngineTests
         // Assert
         HitObject slider = beatmap.HitObjects.Should().ContainSingle().Subject;
         slider.PixelLength.Should().Be(200);
-        slider.GetAllCurvePoints()[^1].Should().Be(new Vector2(264, 64));
+        slider.GetAbsoluteControlPointPositions()[^1].Should().Be(new Vector2(264, 64));
     }
 
     [TestMethod]
@@ -313,9 +365,9 @@ public sealed class SliderMergerEngineTests
         // Assert
         merged.Should().Be(2);
         HitObject slider = beatmap.HitObjects.Should().ContainSingle().Subject;
-        slider.SliderType.Should().Be(PathType.Linear);
+        slider.ControlPoints[0].Type.Should().Be(PathType.Linear);
         slider.PixelLength.Should().Be(200);
-        slider.GetAllCurvePoints().Should().OnlyHaveUniqueItems();
+        slider.GetAbsoluteControlPointPositions().Should().OnlyHaveUniqueItems();
     }
 
     [TestMethod]
@@ -365,11 +417,21 @@ public sealed class SliderMergerEngineTests
     }
 
     [TestMethod]
-    public void IsLinearBezier_RequiresEveryInteriorPointToRepeatANeighbor()
+    public void IsLinearBezier_RequiresEverySegmentToBeAnEdge()
     {
         // Arrange
-        Vector2[] linear = [new(0, 0), new(10, 0), new(10, 0), new(20, 0)];
-        Vector2[] curved = [new(0, 0), new(10, 5), new(20, 0)];
+        PathControlPoint[] linear =
+        [
+            new(new Vector2(0, 0), PathType.Bezier),
+            new(new Vector2(10, 0), PathType.Bezier),
+            new(new Vector2(20, 0)),
+        ];
+        PathControlPoint[] curved =
+        [
+            new(new Vector2(0, 0), PathType.Bezier),
+            new(new Vector2(10, 5)),
+            new(new Vector2(20, 0)),
+        ];
 
         // Act
         bool isLinear = SliderMergerEngine.IsLinearBezier(linear);

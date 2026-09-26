@@ -1,5 +1,6 @@
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.ToolHelpers.Sliders;
@@ -8,7 +9,7 @@ using Mapping_Tools.Core.Tools.SliderMerger.Models;
 namespace Mapping_Tools.Core.Tools.SliderMerger;
 
 /// <summary>
-///     Merges selected circles and sliders into one Bézier-compatible slider path.
+///     Merges selected circles and sliders while retaining their typed path segments.
 /// </summary>
 public static class SliderMergerEngine
 {
@@ -48,7 +49,7 @@ public static class SliderMergerEngine
             var firstConnection = first.IsSlider
                 ? options.MergeOnSliderEnd
                     ? first.GetSliderPath().PositionAt(1)
-                    : first.CurvePoints.Last()
+                    : first.GetAbsoluteControlPointPositions().Last()
                 : first.Pos;
             double distance = Vector2.Distance(firstConnection, second.Pos);
 
@@ -79,9 +80,11 @@ public static class SliderMergerEngine
             // Preserve the legacy hidden geometry easter egg for existing projects.
             if (Precision.AlmostEquals(options.Leniency, 727))
             {
-                survivor.SetAllCurvePoints(MakePenis(survivor.GetAllCurvePoints(), survivor.PixelLength));
+                var shape = MakePenis(survivor.GetAbsoluteControlPointPositions(), survivor.PixelLength);
+                survivor.Pos = shape[0].Position;
+                survivor.ControlPoints = shape.Select(point =>
+                    new PathControlPoint(point.Position - survivor.Pos, point.Type)).ToList();
                 survivor.PixelLength *= 2;
-                survivor.SliderType = PathType.Bezier;
             }
         }
 
@@ -90,16 +93,19 @@ public static class SliderMergerEngine
     }
 
     /// <summary>
-    ///     Determines whether a Bézier control polygon encodes only straight segments.
+    ///     Determines whether each typed Bézier segment is a straight edge.
     /// </summary>
-    /// <param name="points">The complete Bézier control polygon.</param>
-    /// <returns><see langword="true" /> when every interior point is a duplicated segment endpoint.</returns>
-    public static bool IsLinearBezier(IReadOnlyList<Vector2> points)
+    /// <param name="points">The typed Bézier control points.</param>
+    /// <returns><see langword="true" /> when every segment has exactly two points.</returns>
+    public static bool IsLinearBezier(IReadOnlyList<PathControlPoint> points)
     {
-        // Every point at not the endpoints must have an anchor before or after it at the same position
-        for (int index = 1; index < points.Count - 1; index++)
-            if (points[index] != points[index - 1] && points[index] != points[index + 1])
-                return false;
+        int start = 0;
+        for (int index = 1; index < points.Count; index++)
+        {
+            if (!points[index].Type.HasValue && index != points.Count - 1) continue;
+            if (index - start != 1) return false;
+            start = index;
+        }
 
         return true;
     }
@@ -119,43 +125,34 @@ public static class SliderMergerEngine
     {
         if (options.MergeOnSliderEnd)
         {
-            // In order to merge on the slider end we first move the anchors such that the last anchor is exactly on the slider end
-            // After that merge as usual
-            first.SetAllCurvePoints(SliderPathUtil.MoveAnchorsToLength(
-                first.GetAllCurvePoints(),
-                first.SliderType,
-                first.PixelLength,
-                out var pathType));
-            first.SliderType = pathType;
+            MoveLastAnchorToSliderEnd(first);
         }
 
-        var firstPath = BezierConverter.ConvertToBezierAnchors(
-            first.GetAllCurvePoints(), first.SliderType);
-        var secondPath = BezierConverter.ConvertToBezierAnchors(
-            second.GetAllCurvePoints(), second.SliderType);
+        var firstPath = first.ControlPoints;
+        var secondPath = second.ControlPoints;
         double extraLength = 0;
+        Vector2 join = first.Pos + firstPath[^1].Position;
+        bool linear = options.LinearOnLinear && IsEntirelyLinear(first) && IsEntirelyLinear(second);
 
         switch (options.ConnectionModeSetting)
         {
             case SliderMergerConnectionMode.Move:
-                Move(secondPath, firstPath.Last() - secondPath.First());
+                if (!linear) firstPath[^1].Type = secondPath[0].Type;
                 break;
             case SliderMergerConnectionMode.Linear:
-                firstPath.Add(firstPath.Last());
-                firstPath.Add(secondPath.First());
-                extraLength = (first.CurvePoints.Last() - second.Pos).Length;
+                extraLength = (join - second.Pos).Length;
+                if (!linear) firstPath[^1].Type = PathType.Linear;
+                firstPath.Add(new PathControlPoint(second.Pos - first.Pos, linear ? null : secondPath[0].Type));
                 break;
             default:
                 throw new ArgumentException("Unexpected slider connection mode.", nameof(options));
         }
 
-        var mergedPath = firstPath.Concat(secondPath).ToList();
-        mergedPath.Round();
-        bool linear = options.LinearOnLinear && IsLinearBezier(firstPath) && IsLinearBezier(secondPath);
-        if (linear) RemoveDuplicateAnchors(mergedPath);
+        Vector2 offset = options.ConnectionModeSetting == SliderMergerConnectionMode.Move ? join - second.Pos : Vector2.Zero;
+        foreach (var point in secondPath.Skip(1))
+            firstPath.Add(new PathControlPoint(second.Pos + offset + point.Position - first.Pos, linear ? null : point.Type));
 
-        first.SetAllCurvePoints(mergedPath);
-        first.SliderType = linear ? PathType.Linear : PathType.Bezier;
+        if (linear) RemoveDuplicateAnchors(firstPath);
         first.PixelLength = first.PixelLength + second.PixelLength + extraLength;
         first.Repeat = 1;
         return first;
@@ -166,17 +163,13 @@ public static class SliderMergerEngine
         HitObject second,
         SliderMergerEngineOptions options)
     {
-        var path = BezierConverter.ConvertToBezierAnchors(
-            first.GetAllCurvePoints(), first.SliderType);
-        path.Add(path.Last());
-        path.Add(second.Pos);
-        double extraLength = (first.CurvePoints.Last() - second.Pos).Length;
-        path.Round();
-        bool linear = options.LinearOnLinear && IsLinearBezier(path);
+        var path = first.ControlPoints;
+        bool linear = options.LinearOnLinear && IsEntirelyLinear(first);
+        double extraLength = (first.Pos + path[^1].Position - second.Pos).Length;
+        if (!linear) path[^1].Type = PathType.Linear;
+        path.Add(new PathControlPoint(second.Pos - first.Pos));
         if (linear) RemoveDuplicateAnchors(path);
 
-        first.SetAllCurvePoints(path);
-        first.SliderType = linear ? PathType.Linear : PathType.Bezier;
         first.PixelLength += extraLength;
         first.Repeat = 1;
         return first;
@@ -187,17 +180,17 @@ public static class SliderMergerEngine
         HitObject second,
         SliderMergerEngineOptions options)
     {
-        var path = BezierConverter.ConvertToBezierAnchors(
-            second.GetAllCurvePoints(), second.SliderType);
-        path.Insert(0, path.First());
-        path.Insert(0, first.Pos);
+        var path = second.ControlPoints;
+        bool linear = options.LinearOnLinear && IsEntirelyLinear(second);
+        Vector2 secondStart = second.Pos;
+        var merged = new List<PathControlPoint> { new(Vector2.Zero, PathType.Linear) };
+        merged.Add(new PathControlPoint(secondStart - first.Pos, linear ? null : path[0].Type));
+        merged.AddRange(path.Skip(1).Select(point => new PathControlPoint(secondStart + point.Position - first.Pos, linear ? null : point.Type)));
         double extraLength = (first.Pos - second.Pos).Length;
-        path.Round();
-        bool linear = options.LinearOnLinear && IsLinearBezier(path);
-        if (linear) RemoveDuplicateAnchors(path);
+        if (linear) RemoveDuplicateAnchors(merged);
 
-        second.SetAllCurvePoints(path);
-        second.SliderType = linear ? PathType.Linear : PathType.Bezier;
+        second.Pos = first.Pos;
+        second.ControlPoints = merged;
         second.PixelLength += extraLength;
         second.Repeat = 1;
         return second;
@@ -210,8 +203,11 @@ public static class SliderMergerEngine
     {
         if (Precision.DefinitelyBigger(Vector2.Distance(first.Pos, second.Pos), 0))
         {
-            first.SetAllCurvePoints([first.Pos, second.Pos]);
-            first.SliderType = options.LinearOnLinear ? PathType.Linear : PathType.Bezier;
+            first.ControlPoints =
+            [
+                new PathControlPoint(Vector2.Zero, options.LinearOnLinear ? PathType.Linear : PathType.Bezier),
+                new PathControlPoint(second.Pos - first.Pos),
+            ];
             first.PixelLength = (first.Pos - second.Pos).Length;
             first.IsCircle = false;
             first.IsSlider = true;
@@ -260,10 +256,22 @@ public static class SliderMergerEngine
         return new EdgeData(hitObject.GetHitsounds(), hitObject.SampleSet, hitObject.AdditionSet);
     }
 
-    private static void RemoveDuplicateAnchors(List<Vector2> points)
+    private static bool IsEntirelyLinear(HitObject slider) =>
+        slider.ControlPoints[0].Type == PathType.Linear && slider.ControlPoints.Skip(1).All(point => point.Type is null);
+
+    private static void MoveLastAnchorToSliderEnd(HitObject slider)
+    {
+        double fullLength = slider.GetSliderPath(true).Distance;
+        if (Precision.AlmostEquals(slider.PixelLength, fullLength, 0.01)) return;
+
+        slider.ControlPoints = SliderPathUtil.MoveAnchorsToLength(
+            slider.ControlPoints, fullLength, slider.PixelLength);
+    }
+
+    private static void RemoveDuplicateAnchors(List<PathControlPoint> points)
     {
         for (int index = 0; index < points.Count - 1; index++)
-            if (points[index] == points[index + 1])
+            if (points[index].Position == points[index + 1].Position)
             {
                 points.RemoveAt(index);
                 index--;
@@ -286,14 +294,16 @@ public static class SliderMergerEngine
                 nameof(options));
     }
 
-    private static List<Vector2> MakePenis(List<Vector2> points, double sliderLength)
+    private static List<PathControlPoint> MakePenis(List<Vector2> points, double sliderLength)
     {
-        // Penis shape
-        List<Vector2> newPoints =
+        List<PathControlPoint> newPoints =
         [
-            new(0, 0), new(40, -40), new(0, -70), new(-40, -40), new(0, 0), new(0, 0),
-            new(96, 24), new(168, 0), new(168, 0), new(96, -24), new(0, 0), new(0, 0),
-            new(-40, 40), new(0, 70), new(40, 40), new(0, 0),
+            new(new Vector2(0, 0), PathType.Bezier), new(new Vector2(40, -40)),
+            new(new Vector2(0, -70)), new(new Vector2(-40, -40)),
+            new(new Vector2(0, 0), PathType.Bezier), new(new Vector2(96, 24)),
+            new(new Vector2(168, 0), PathType.Bezier), new(new Vector2(96, -24)),
+            new(new Vector2(0, 0), PathType.Bezier), new(new Vector2(-40, 40)),
+            new(new Vector2(0, 70)), new(new Vector2(40, 40)), new(new Vector2(0, 0)),
         ];
 
         double sizeMultiplier = sliderLength / 591 * 2; // 591 is the size of the dick
@@ -302,7 +312,7 @@ public static class SliderMergerEngine
         matrix *= sizeMultiplier;
         for (int index = 0; index < newPoints.Count; index++)
             // transform to slider
-            newPoints[index] = points.First() + Matrix2.Mult(matrix, newPoints[index]);
+            newPoints[index].Position = points.First() + Matrix2.Mult(matrix, newPoints[index].Position);
 
         return newPoints;
     }

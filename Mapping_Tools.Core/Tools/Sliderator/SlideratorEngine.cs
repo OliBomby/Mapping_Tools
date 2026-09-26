@@ -79,6 +79,7 @@ public static class SlideratorEngine
         cancellationToken.ThrowIfCancellationRequested();
 
         List<Vector2> generated = [];
+        List<PathControlPoint>? generatedControlPoints = null;
         SlideratorPathGenerator sliderator = new()
         {
             PositionFunction = positionFunction,
@@ -90,8 +91,7 @@ public static class SlideratorEngine
         if (!simplifyShape)
         {
             SliderPath sourcePath = new(
-                sourceSlider.SliderType,
-                sourceSlider.GetAllCurvePoints().ToArray(),
+                sourceSlider.GetSliderPath().PathControlPoints.Select(point => point.Copy()).ToArray(),
                 GetMaxCompletion(options) * options.PixelLength);
             List<Vector2> path = [];
             sourcePath.GetPathToProgress(path, 0, 1);
@@ -123,7 +123,8 @@ public static class SlideratorEngine
             }
             else
             {
-                generated = sliderator.Sliderate();
+                generatedControlPoints = sliderator.Sliderate();
+                generated = generatedControlPoints.Select(point => point.Position).ToList();
                 newLength = sliderator.MaxS;
                 if (!double.IsFinite(newLength))
                     throw new ArgumentException(
@@ -141,13 +142,11 @@ public static class SlideratorEngine
         var hitObjectHere = beatmap.HitObjects.FirstOrDefault(hitObject => Math.Abs(options.ExportTime - hitObject.Time) < 5)
                             ?? new HitObject(options.ExportTime, 0, SampleSet.None, SampleSet.None);
         // Clone the hit object to not affect the already existing hit object instance with changes
-        HitObject clone = new(hitObjectHere.GetLine())
-        {
-            IsCircle = options.ExportAsStream,
-            IsSpinner = false,
-            IsHoldNote = false,
-            IsSlider = !options.ExportAsStream,
-        };
+        HitObject clone = hitObjectHere.DeepCopy();
+        clone.IsCircle = options.ExportAsStream;
+        clone.IsSpinner = false;
+        clone.IsHoldNote = false;
+        clone.IsSlider = !options.ExportAsStream;
 
         progress?.Report(0.7);
         cancellationToken.ThrowIfCancellationRequested();
@@ -157,14 +156,18 @@ public static class SlideratorEngine
             // Exporting as a slider
             if (simplifyShape)
             {
-                clone.SetAllCurvePoints(sourceSlider.GetAllCurvePoints());
-                clone.SliderType = sourceSlider.SliderType;
+                clone.Pos = sourceSlider.Pos;
+                clone.ControlPoints = sourceSlider.ControlPoints.Select(point => point.Copy()).ToList();
                 // The velocity is constant, so you can simplify to the original slider shape
             }
             else
             {
-                clone.SetAllCurvePoints(generated);
-                clone.SliderType = newSliderType;
+                clone.Pos = generated[0];
+                clone.ControlPoints = generatedControlPoints is null
+                    ? generated.Select((point, index) => new PathControlPoint(
+                        point - clone.Pos, index == 0 ? newSliderType : null)).ToList()
+                    : generatedControlPoints.Select(point => new PathControlPoint(
+                        point.Position - clone.Pos, point.Type)).ToList();
             }
 
             clone.PixelLength = newLength;
@@ -207,14 +210,12 @@ public static class SlideratorEngine
                 clone.Time = time;
                 beatmap.HitObjects.Add(clone);
                 objectCount++;
-                clone = new HitObject(clone.GetLine())
-                {
-                    IsCircle = true,
-                    IsSpinner = false,
-                    IsHoldNote = false,
-                    IsSlider = false,
-                    NewCombo = false,
-                };
+                clone = clone.DeepCopy();
+                clone.IsCircle = true;
+                clone.IsSpinner = false;
+                clone.IsHoldNote = false;
+                clone.IsSlider = false;
+                clone.NewCombo = false;
                 time += deltaT;
             }
         }

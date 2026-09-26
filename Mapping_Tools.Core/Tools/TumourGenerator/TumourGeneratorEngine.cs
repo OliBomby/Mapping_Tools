@@ -230,13 +230,16 @@ public sealed class TumourGeneratorEngine
         PathHelper.Recalculate(pathWithHints.Path);
         if (pathWithHints.Path.Count == 0 || double.IsNaN(pathWithHints.Path.Last.Value.CumulativeLength)) return false;
 
-        var (anchors, pathType) = JustMiddleAnchors
+        var controlPoints = JustMiddleAnchors
             ? ReconstructOnlyMiddle(pathWithHints)
-            : Reconstructor.Reconstruct(pathWithHints);
-        if (anchors.Count < 2) return false;
+            : Reconstructor.Reconstruct(pathWithHints, preserveUnmodifiedLastSegment: true);
+        if (controlPoints.Count < 2) return false;
 
         // Set the new slider path
-        hitObject.SetSliderPath(new SliderPath(pathType, anchors.ToArray()));
+        SliderPath reconstructedPath = JustMiddleAnchors
+            ? new SliderPath(controlPoints.ToArray())
+            : new SliderPath(controlPoints.ToArray(), pathWithHints.Path.Last.Value.CumulativeLength);
+        hitObject.SetSliderPath(reconstructedPath);
         double newPixelLength = hitObject.PixelLength;
 
         // Update velocity
@@ -453,7 +456,6 @@ public sealed class TumourGeneratorEngine
                 hintEnd,
                 layer,
                 tumourTemplate.GetReconstructionHint(),
-                tumourTemplate.GetReconstructionHintPathType(),
                 startTemplateT,
                 endTemplateT,
                 tumourTemplate.GetDistanceRelation()));
@@ -480,10 +482,10 @@ public sealed class TumourGeneratorEngine
         return point.Pos + actualOffset;
     }
 
-    private static (List<Vector2> Anchors, PathType PathType) ReconstructOnlyMiddle(PathWithHints pathWithHints)
+    private static List<PathControlPoint> ReconstructOnlyMiddle(PathWithHints pathWithHints)
     {
-        if (pathWithHints.Path.Count == 0) return ([], PathType.Linear);
-        List<Vector2> anchors = [];
+        if (pathWithHints.Path.Count == 0) return [];
+        List<PathControlPoint> controlPoints = [];
         var hints = pathWithHints.ReconstructionHints;
         var current = pathWithHints.Path.First;
         ReconstructionHint? currentHint = null;
@@ -497,13 +499,13 @@ public sealed class TumourGeneratorEngine
             }
 
             if (nextHint < hints.Count && current == hints[nextHint].Start) currentHint = hints[nextHint];
-            if (currentHint is { Anchors: not null, Layer: >= 0 } && current.Value.Red && current != currentHint.Value.Start && current != currentHint.Value.End
+            if (currentHint is { ControlPoints: not null, Layer: >= 0 } && current.Value.Red && current != currentHint.Value.Start && current != currentHint.Value.End
                 || current == pathWithHints.Path.First
                 || current == pathWithHints.Path.Last)
-                anchors.Add(current.Value.Pos);
+                controlPoints.Add(new PathControlPoint(current.Value.Pos, controlPoints.Count == 0 ? PathType.Linear : null));
             current = current.Next;
         }
 
-        return (anchors, PathType.Linear);
+        return controlPoints;
     }
 }

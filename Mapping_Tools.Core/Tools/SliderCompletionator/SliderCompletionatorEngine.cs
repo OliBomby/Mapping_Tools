@@ -113,18 +113,12 @@ public static class SliderCompletionatorEngine
                         nameof(options));
 
                 hitObject.SliderVelocity = newVelocity;
+                double fullPathLength = hitObject.GetSliderPath(true).Distance;
                 hitObject.PixelLength = newLength;
 
                 if (options.MoveAnchors)
-                {
-                    // Scale anchors to completion
-                    hitObject.SetAllCurvePoints(SliderPathUtil.MoveAnchorsToLength(
-                        hitObject.GetAllCurvePoints(),
-                        hitObject.SliderType,
-                        hitObject.PixelLength,
-                        out var pathType));
-                    hitObject.SliderType = pathType;
-                }
+                    hitObject.ControlPoints = SliderPathUtil.MoveAnchorsToLength(
+                        hitObject.ControlPoints, fullPathLength, newLength);
 
                 slidersCompleted++;
             }

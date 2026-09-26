@@ -1,4 +1,5 @@
 using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Core.MathUtil;
 
 namespace Mapping_Tools.Core.Tools.TumourGenerator.Templates;
@@ -29,14 +30,14 @@ internal sealed class TriangleTemplate : TumourTemplateBase
 
     public override IEnumerable<double> GetCriticalPoints() { yield return 0.5; }
 
-    public override List<Vector2> GetReconstructionHint()
+    public override List<PathControlPoint> GetReconstructionHint()
     {
-        return [Vector2.Zero, new Vector2(0.5 * Length, -Width), Length * Vector2.UnitX];
-    }
-
-    public override PathType GetReconstructionHintPathType()
-    {
-        return PathType.Linear;
+        return
+        [
+            new PathControlPoint(Vector2.Zero, PathType.Linear),
+            new PathControlPoint(new Vector2(0.5 * Length, -Width)),
+            new PathControlPoint(Length * Vector2.UnitX),
+        ];
     }
 
     public override Func<double, double>? GetDistanceRelation()

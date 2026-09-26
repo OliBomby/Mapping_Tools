@@ -108,15 +108,15 @@ public sealed class SlideratorPathGeneratorTests
         generator.SetPath([new Vector2(0, 0), new Vector2(10, 0)]);
 
         // Act
-        List<Vector2> anchors = generator.Sliderate();
+        var anchors = generator.Sliderate();
 
         // Assert
         generator.MaxS.Should().Be(10);
         anchors.Should().NotBeEmpty();
-        anchors[0].Should().Be(new Vector2(0, 0));
-        anchors[^1].X.Should().BeGreaterThanOrEqualTo(9);
-        anchors[^1].Y.Should().Be(0);
-        anchors.Should().OnlyContain(point => double.IsFinite(point.X) && double.IsFinite(point.Y));
+        anchors[0].Position.Should().Be(new Vector2(0, 0));
+        anchors[^1].Position.X.Should().BeGreaterThanOrEqualTo(9);
+        anchors[^1].Position.Y.Should().Be(0);
+        anchors.Should().OnlyContain(point => double.IsFinite(point.Position.X) && double.IsFinite(point.Position.Y));
     }
 
     [TestMethod]
@@ -132,13 +132,13 @@ public sealed class SlideratorPathGeneratorTests
         generator.SetPath([new Vector2(0, 0), new Vector2(10, 0)]);
 
         // Act
-        List<Vector2> anchors = generator.Sliderate();
+        var anchors = generator.Sliderate();
 
         // Assert
         anchors.Should().HaveCountGreaterThan(2);
-        anchors[0].Should().Be(new Vector2(0, 0));
-        anchors.Should().Contain(point => point.X >= 9);
-        anchors[^1].X.Should().BeLessThanOrEqualTo(1);
-        anchors.Should().OnlyContain(point => double.IsFinite(point.X) && double.IsFinite(point.Y));
+        anchors[0].Position.Should().Be(new Vector2(0, 0));
+        anchors.Should().Contain(point => point.Position.X >= 9);
+        anchors[^1].Position.X.Should().BeLessThanOrEqualTo(1);
+        anchors.Should().OnlyContain(point => double.IsFinite(point.Position.X) && double.IsFinite(point.Position.Y));
     }
 }

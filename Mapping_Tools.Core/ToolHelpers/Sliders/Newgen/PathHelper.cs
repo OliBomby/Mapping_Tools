@@ -20,20 +20,23 @@ public static class PathHelper
         var path = pathWithHints.Path;
 
         // Get all segments of the slider path
-        var controlPoints = sliderPath.ControlPoints;
-        var segments = new List<List<Vector2>>();
+        var controlPoints = sliderPath.PathControlPoints;
+        var segments = new List<List<PathControlPoint>>();
         int start = 0;
-        int end = 0;
-        for (int i = 0; i < controlPoints.Length(); i++)
+        PathType activeType = sliderPath.Type;
+        for (int i = 0; i < controlPoints.Count; i++)
         {
-            end++;
-
-            if (i != controlPoints.Length() - 1 && (controlPoints[i] != controlPoints[i + 1] || i == controlPoints.Length() - 2))
+            bool typedBoundary = i > start && controlPoints[i].Type.HasValue;
+            if (i != controlPoints.Count - 1 && !typedBoundary)
                 continue;
 
-            var cpSpan = controlPoints.GetRange(start, end - start);
-            segments.Add(cpSpan);
-            start = end;
+            var segment = controlPoints.Skip(start).Take(i - start + 1).Select(point => point.Copy()).ToList();
+            segment[0].Type = activeType;
+            if (segment.Count > 1) segment[^1].Type = null;
+            segments.Add(segment);
+
+            if (typedBoundary) activeType = controlPoints[i].Type!.Value;
+            start = i;
         }
 
         var calculatedPath = sliderPath.CalculatedPath;
@@ -48,7 +51,8 @@ public static class PathHelper
             while (segmentIndex < segmentsStarts.Count && i + 1 > segmentsStarts[segmentIndex]) segmentIndex++;
 
             // Check if i+1 is the first point in the next segment so we know i is a red anchor
-            bool isRedAnchor = sliderPath.Type == PathType.Linear || segmentIndex < segmentsStarts.Count && i + 1 == segmentsStarts[segmentIndex] && i != 0;
+            bool isRedAnchor = segments[segmentIndex - 1][0].Type == PathType.Linear ||
+                               segmentIndex < segmentsStarts.Count && i + 1 == segmentsStarts[segmentIndex] && i != 0;
 
             // Update cumulative length
             double dist = 0;
@@ -78,13 +82,13 @@ public static class PathHelper
                 double totalLength = path.Last!.Value.CumulativeLength;
                 double lengthAtStartOfLastHint = segmentStartNode!.Value.CumulativeLength;
                 double remainingLength = totalLength - lengthAtStartOfLastHint;
-                double lastSegmentLength = new SliderPath(sliderPath.Type, [.. segments[segmentIndex - 1]]).Distance;
+                double lastSegmentLength = new SliderPath([.. segments[segmentIndex - 1]]).Distance;
                 endP = remainingLength / lastSegmentLength;
             }
 
             // Add a segment from the previous red anchor to this red anchor
             pathWithHints.AddReconstructionHint(new ReconstructionHint(segmentStartNode!, path.Last!, -1,
-                segments[segmentIndex - 1], sliderPath.Type, endP: endP));
+                segments[segmentIndex - 1], endP: endP));
 
             segmentStartNode = path.Last;
         }

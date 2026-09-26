@@ -24,7 +24,7 @@ public enum PathType
     Linear,
 
     /// <summary>
-    ///     A degree-annotated B-spline encoded with the lazer <c>B4</c> path token.
+    ///     A circular arc through three control points.
     /// </summary>
     PerfectCurve,
 
