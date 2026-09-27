@@ -45,7 +45,7 @@ public class BeatmapTests
         // Act
         var beatmap = new BeatmapDecoder().Decode(File.ReadAllText(path));
         string actual = new BeatmapEncoder().Encode(beatmap);
-        string[] actualLines = actual.TrimEnd('\r', '\n').Split("\r\n", StringSplitOptions.None);
+        string[] actualLines = actual.TrimEnd('\r', '\n').Split("\r\n");
 
         // Assert
         actualLines.Should().Equal(expectedLines);

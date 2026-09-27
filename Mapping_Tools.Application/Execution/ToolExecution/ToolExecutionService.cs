@@ -1,6 +1,8 @@
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Mapping_Tools.Application.Execution.ToolExecution;
 
@@ -12,6 +14,7 @@ public sealed class ToolExecutionService : IToolExecutionService
 {
     private readonly Lock gate = new();
     private readonly IUserNotificationService notifications;
+    private readonly ILogger<ToolExecutionService> logger;
 
     private readonly Dictionary<string, RunningOperation> running =
         new(StringComparer.Ordinal);
@@ -25,14 +28,17 @@ public sealed class ToolExecutionService : IToolExecutionService
     /// </summary>
     /// <param name="notifications">The frontend-neutral outcome stream.</param>
     /// <param name="timeProvider">Supplies deterministic result timestamps.</param>
+    /// <param name="logger">Records operation lifecycle and failures.</param>
     public ToolExecutionService(
         IUserNotificationService notifications,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        ILogger<ToolExecutionService>? logger = null)
     {
         this.notifications = notifications
                              ?? throw new ArgumentNullException(nameof(notifications));
         this.timeProvider = timeProvider
                             ?? throw new ArgumentNullException(nameof(timeProvider));
+        this.logger = logger ?? NullLogger<ToolExecutionService>.Instance;
     }
 
     /// <inheritdoc />
@@ -51,6 +57,7 @@ public sealed class ToolExecutionService : IToolExecutionService
         {
             if (running.ContainsKey(request.OperationId))
             {
+                logger.LogInformation("Tool {OperationId} ({DisplayName}) was already running", request.OperationId, request.DisplayName);
                 linked.Dispose();
                 return Task.FromResult(
                     new ToolExecutionResult<T>(
@@ -63,6 +70,7 @@ public sealed class ToolExecutionService : IToolExecutionService
 
             var operation = new RunningOperation(linked);
             running.Add(request.OperationId, operation);
+            logger.LogInformation("Tool {OperationId} ({DisplayName}) started", request.OperationId, request.DisplayName);
 
             var task = RunAsync(
                 request,
@@ -84,6 +92,7 @@ public sealed class ToolExecutionService : IToolExecutionService
             if (!running.TryGetValue(operationId, out operation!)) return false;
         }
 
+        logger.LogInformation("Cancellation requested for tool {OperationId}", operationId);
         operation.TryCancel();
         return true;
     }
@@ -101,6 +110,7 @@ public sealed class ToolExecutionService : IToolExecutionService
     /// <inheritdoc />
     public async Task StopAsync(CancellationToken cancellationToken = default)
     {
+        logger.LogInformation("Stopping tool execution service");
         await stopping.CancelAsync();
         Task[] tasks;
         RunningOperation[] operations;
@@ -141,6 +151,9 @@ public sealed class ToolExecutionService : IToolExecutionService
                             output.Summary))
                     .ConfigureAwait(false);
 
+            logger.LogInformation("Tool {OperationId} ({DisplayName}) succeeded in {ElapsedMs} ms. Summary: {Summary}",
+                request.OperationId, request.DisplayName, (timeProvider.GetUtcNow() - startedAt).TotalMilliseconds, output.Summary);
+
             return new ToolExecutionResult<T>(
                 ToolExecutionStatus.Succeeded,
                 output.Value,
@@ -150,6 +163,8 @@ public sealed class ToolExecutionService : IToolExecutionService
         }
         catch (OperationCanceledException) when (linked.IsCancellationRequested)
         {
+            logger.LogInformation("Tool {OperationId} ({DisplayName}) cancelled after {ElapsedMs} ms",
+                request.OperationId, request.DisplayName, (timeProvider.GetUtcNow() - startedAt).TotalMilliseconds);
             return new ToolExecutionResult<T>(
                 ToolExecutionStatus.Cancelled,
                 default,
@@ -159,6 +174,8 @@ public sealed class ToolExecutionService : IToolExecutionService
         }
         catch (Exception exception)
         {
+            logger.LogError(exception, "Tool {OperationId} ({DisplayName}) failed after {ElapsedMs} ms",
+                request.OperationId, request.DisplayName, (timeProvider.GetUtcNow() - startedAt).TotalMilliseconds);
             await PublishSafelyAsync(
                     new UserNotification.Models.UserNotification(
                         UserNotificationSeverity.Error,

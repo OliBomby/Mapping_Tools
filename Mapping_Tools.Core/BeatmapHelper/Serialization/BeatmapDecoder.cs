@@ -1,5 +1,3 @@
-using Mapping_Tools.Core.BeatmapHelper.Events;
-using Mapping_Tools.Core.BeatmapHelper.Enums;
 using static Mapping_Tools.Core.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Core.BeatmapHelper.Serialization;

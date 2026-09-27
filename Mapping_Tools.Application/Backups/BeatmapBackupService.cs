@@ -8,6 +8,8 @@ using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.BeatmapHelper.Serialization;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Mapping_Tools.Application.Backups;
 
@@ -23,6 +25,7 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
         new(StringComparer.Ordinal);
 
     private readonly IEditorReloadService reloadService;
+    private readonly ILogger<BeatmapBackupService> logger;
     private readonly ApplicationSettings settings;
     private readonly IBeatmapBackupStore store;
     private readonly ITextFileStore textFileStore;
@@ -39,13 +42,15 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
     /// <param name="settings">The current backup directory, enablement, and retention policy.</param>
     /// <param name="timeProvider">Supplies deterministic local timestamps for filenames and tests.</param>
     /// <param name="beatmapDecoder">Decodes beatmap metadata when validating a restore.</param>
+    /// <param name="logger">Records backup and restore stages.</param>
     public BeatmapBackupService(
         IBeatmapBackupStore store,
         ITextFileStore textFileStore,
         IEditorReloadService reloadService,
         ApplicationSettings settings,
         TimeProvider timeProvider,
-        IBeatmapDecoder beatmapDecoder)
+        IBeatmapDecoder beatmapDecoder,
+        ILogger<BeatmapBackupService>? logger = null)
     {
         this.store = store ?? throw new ArgumentNullException(nameof(store));
         this.textFileStore = textFileStore ?? throw new ArgumentNullException(nameof(textFileStore));
@@ -53,6 +58,7 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         this.timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
         this.beatmapDecoder = beatmapDecoder ?? throw new ArgumentNullException(nameof(beatmapDecoder));
+        this.logger = logger ?? NullLogger<BeatmapBackupService>.Instance;
     }
 
     /// <inheritdoc />
@@ -80,6 +86,8 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
         ArgumentNullException.ThrowIfNull(session);
         cancellationToken.ThrowIfCancellationRequested();
         if (!force && !settings.MakeBackups) return new BeatmapBackupResult([], true);
+
+        logger.LogInformation("Creating {Reason} backup for live session {Path}", reason, session.Path);
 
         await operationLock.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
@@ -110,6 +118,8 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
                     artifacts.Select(artifact => artifact.Path),
                     cancellationToken)
                 .ConfigureAwait(false);
+            logger.LogInformation("Created {Count} {Reason} backup files for {Path}: {Artifacts}",
+                artifacts.Count, reason, session.Path, string.Join(" | ", artifacts.Select(artifact => artifact.Path)));
             return new BeatmapBackupResult(artifacts, false);
         }
         finally
@@ -149,6 +159,7 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
                     false,
                     cancellationToken)
                 .ConfigureAwait(false);
+            logger.LogInformation("Created periodic backup {BackupPath} for {Path}", artifact.Path, session.Path);
             periodicHashes[session.Path] = hash;
             await PruneAsync([artifact.Path], cancellationToken)
                 .ConfigureAwait(false);
@@ -172,6 +183,8 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
         ArgumentException.ThrowIfNullOrWhiteSpace(destinationPath);
         cancellationToken.ThrowIfCancellationRequested();
 
+        logger.LogInformation("Restoring backup {BackupPath} to {DestinationPath}; different filename allowed {AllowDifferent}; reload {Reload}",
+            backupPath, destinationPath, allowDifferentFilename, reloadEditor);
         ValidateRestore(backupPath, destinationPath, allowDifferentFilename);
         cancellationToken.ThrowIfCancellationRequested();
         var safety = await CreateFilesAsync(
@@ -189,6 +202,8 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
                 destinationPath,
                 cancellationToken)
             .ConfigureAwait(false);
+        logger.LogInformation("Restored backup {BackupPath} to {DestinationPath}; safety copy {SafetyPath}",
+            backupPath, destinationPath, safetyArtifact.Path);
 
         if (reloadEditor)
         {
@@ -215,7 +230,13 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
             .ListAsync(settings.BackupsPath, cancellationToken)
             .ConfigureAwait(false);
         var newest = backups.FirstOrDefault(backup => !IsPeriodicBackup(backup.Path));
-        if (newest is null) return null;
+        if (newest is null)
+        {
+            logger.LogInformation("QuickUndo found no eligible backup for {Path}", destinationPath);
+            return null;
+        }
+
+        logger.LogInformation("QuickUndo selected backup {BackupPath} for {Path}", newest.Path, destinationPath);
 
         return await RestoreAsync(
                 newest.Path,
@@ -246,6 +267,8 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
     {
         ArgumentNullException.ThrowIfNull(sourcePaths);
         string[] paths = sourcePaths.ToArray();
+        logger.LogInformation("Creating {Reason} backup for {Count} paths: {Paths}; forced {Force}",
+            reason, paths.Length, string.Join(" | ", paths), force);
         if (paths.Any(string.IsNullOrWhiteSpace))
             throw new ArgumentException(
                 "Backup source paths cannot contain an empty value.",
@@ -279,6 +302,8 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
                         .Concat(additionallyProtectedPaths),
                     cancellationToken)
                 .ConfigureAwait(false);
+            logger.LogInformation("Created {Count} {Reason} backups: {Artifacts}", artifacts.Count, reason,
+                string.Join(" | ", artifacts.Select(artifact => artifact.Path)));
             return new BeatmapBackupResult(artifacts, false);
         }
         finally

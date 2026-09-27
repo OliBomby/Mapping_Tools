@@ -1,6 +1,8 @@
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Updates.Contracts;
 using Mapping_Tools.Application.Updates.Models;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Mapping_Tools.Application.Updates;
 
@@ -12,6 +14,7 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
     private readonly SemaphoreSlim checkGate = new(1, 1);
     private readonly CancellationTokenSource disposeCancellation = new();
     private readonly IUpdateGateway gateway;
+    private readonly ILogger<UpdateService> logger;
     private readonly ApplicationSettings settings;
     private readonly Lock stateLock = new();
     private Task? activeDownloadTask;
@@ -26,10 +29,12 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
     /// <summary>Creates the update use case.</summary>
     /// <param name="gateway">The network, archive, staging, and process adapter.</param>
     /// <param name="settings">The shared settings document containing the skipped version.</param>
-    public UpdateService(IUpdateGateway gateway, ApplicationSettings settings)
+    /// <param name="logger">Records update checks and installation stages.</param>
+    public UpdateService(IUpdateGateway gateway, ApplicationSettings settings, ILogger<UpdateService>? logger = null)
     {
         this.gateway = gateway ?? throw new ArgumentNullException(nameof(gateway));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.logger = logger ?? NullLogger<UpdateService>.Instance;
     }
 
     /// <summary>
@@ -87,6 +92,7 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
         bool allowSkippedVersion,
         CancellationToken cancellationToken = default)
     {
+        logger.LogInformation("Update check started; include skipped version {AllowSkipped}", allowSkippedVersion);
         ThrowIfDisposed();
 
         await checkGate.WaitAsync(cancellationToken).ConfigureAwait(false);
@@ -152,6 +158,8 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
                 activeDownloadTask = null;
             }
 
+            logger.LogInformation("Update check returned {Availability}; current {Current}; latest {Latest}",
+                result.Availability, result.CurrentVersion, result.LatestVersion);
             return result;
         }
         finally
@@ -169,6 +177,7 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
     /// <inheritdoc />
     public Task PrepareUpdateAsync(CancellationToken cancellationToken = default)
     {
+        logger.LogInformation("Update preparation requested");
         ThrowIfDisposed();
 
         UpdateCheckResult check;
@@ -231,6 +240,7 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
         if (!check.CanUpdate || check.LatestVersion is null) throw new InvalidOperationException("Do not skip a version when there are no updates!");
 
         settings.SkipVersion = check.LatestVersion.ToString();
+        logger.LogInformation("User skipped update version {Version}", check.LatestVersion);
     }
 
     /// <inheritdoc />
@@ -249,6 +259,7 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
         }
 
         gateway.LaunchUpdater(check.LatestVersion, restartAfterUpdate);
+        logger.LogInformation("Updater launched for {Version}; restart {Restart}", check.LatestVersion, restartAfterUpdate);
         lock (stateLock)
         {
             operationId++;
@@ -260,6 +271,7 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
     /// <inheritdoc />
     public void AbandonUpdate()
     {
+        logger.LogInformation("Update abandoned");
         ThrowIfDisposed();
         lock (stateLock)
         {
@@ -319,12 +331,19 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
             }
 
             if (isCurrent)
+            {
+                logger.LogInformation("Update package prepared for {Version}", check.LatestVersion);
                 completion.TrySetResult();
+            }
             else
+            {
+                logger.LogInformation("Prepared update package became stale for {Version}", check.LatestVersion);
                 completion.TrySetCanceled();
+            }
         }
         catch (OperationCanceledException exception)
         {
+            logger.LogInformation("Update preparation cancelled for {Version}", check.LatestVersion);
             lock (stateLock)
             {
                 if (operationId == operationId2) prepared = false;
@@ -337,6 +356,7 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
         }
         catch (Exception exception)
         {
+            logger.LogError(exception, "Update preparation failed for {Version}", check.LatestVersion);
             lock (stateLock)
             {
                 if (operationId == operationId2) prepared = false;

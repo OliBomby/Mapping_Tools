@@ -94,7 +94,7 @@ public class HitObjectTests
         const string line = "0,0,1000,2,0,B|100:0|100:0|200:0,1,200";
 
         // Act
-        HitObject hitObject = BeatmapTestData.DecodeHitObject(line, 14);
+        HitObject hitObject = BeatmapTestData.DecodeHitObject(line);
 
         // Assert
         hitObject.ControlPoints.Select(point => (point.Position, point.Type)).Should().Equal(
@@ -103,7 +103,7 @@ public class HitObjectTests
             (new Vector2(200, 0), null));
         hitObject.GetSliderPath().SegmentStarts.Should().HaveCount(2);
         BeatmapTestData.EncodeHitObject(hitObject, 14).Split(',')[5].Should().Be("B|100:0|100:0|200:0");
-        BeatmapTestData.EncodeHitObject(hitObject, 128).Split(',')[5].Should().Be("B|B|100:0|200:0");
+        BeatmapTestData.EncodeHitObject(hitObject).Split(',')[5].Should().Be("B|B|100:0|200:0");
     }
 
     [TestMethod]
@@ -119,7 +119,7 @@ public class HitObjectTests
         hitObject.ControlPoints.Should().HaveCount(4);
         hitObject.ControlPoints.Skip(1).Should().OnlyContain(point => point.Type == null);
         hitObject.GetSliderPath().SegmentStarts.Should().ContainSingle();
-        BeatmapTestData.EncodeHitObject(hitObject, 128).Split(',')[5].Should().Be("B|100:0|100:0|200:0");
+        BeatmapTestData.EncodeHitObject(hitObject).Split(',')[5].Should().Be("B|100:0|100:0|200:0");
     }
 
     [TestMethod]
@@ -129,7 +129,7 @@ public class HitObjectTests
         const string line = "0,0,1000,2,0,B|100:0|100:0|100:0|200:0,1,200";
 
         // Act
-        HitObject hitObject = BeatmapTestData.DecodeHitObject(line, 14);
+        HitObject hitObject = BeatmapTestData.DecodeHitObject(line);
 
         // Assert
         hitObject.ControlPoints.Select(point => point.Type).Should().Equal(
@@ -145,7 +145,7 @@ public class HitObjectTests
         const string line = "0,0,1000,2,0,B|50:0|L|100:0|150:0|150:0|200:0,1,200";
 
         // Act
-        HitObject hitObject = BeatmapTestData.DecodeHitObject(line, 14);
+        HitObject hitObject = BeatmapTestData.DecodeHitObject(line);
 
         // Assert
         hitObject.ControlPoints.Select(point => point.Type).Should().Equal(
@@ -159,7 +159,7 @@ public class HitObjectTests
         const string line = "0,0,1000,2,0,B|0:0|100:0,1,100";
 
         // Act
-        HitObject hitObject = BeatmapTestData.DecodeHitObject(line, 14);
+        HitObject hitObject = BeatmapTestData.DecodeHitObject(line);
 
         // Assert
         hitObject.ControlPoints.Should().HaveCount(3);
@@ -179,7 +179,7 @@ public class HitObjectTests
         // Assert
         hitObject.ControlPoints.Select(point => point.Type).Should().Equal(
             PathType.Catmull, null, PathType.Linear, PathType.Catmull);
-        BeatmapTestData.EncodeHitObject(hitObject, 128).Split(',')[5].Should().Be("C|100:0|L|200:0|C|250:0");
+        BeatmapTestData.EncodeHitObject(hitObject).Split(',')[5].Should().Be("C|100:0|L|200:0|C|250:0");
     }
 
     [TestMethod]
@@ -191,7 +191,7 @@ public class HitObjectTests
 
         // Act
         string legacyLine = BeatmapTestData.EncodeHitObject(hitObject, 14);
-        string lazerLine = BeatmapTestData.EncodeHitObject(hitObject, 128);
+        string lazerLine = BeatmapTestData.EncodeHitObject(hitObject);
 
         // Assert
         legacyLine.Split(',')[5].Should().StartWith("B|");
@@ -211,7 +211,7 @@ public class HitObjectTests
 
         // Assert
         legacyPath.Should().Be("B|100:0|100:0|150:100|200:0");
-        BeatmapTestData.EncodeHitObject(hitObject, 128).Split(',')[5].Should().Be("L|B|100:0|150:100|200:0");
+        BeatmapTestData.EncodeHitObject(hitObject).Split(',')[5].Should().Be("L|B|100:0|150:100|200:0");
     }
 
     [TestMethod]
@@ -227,7 +227,7 @@ public class HitObjectTests
         legacyLine.Split(',')[5].Should().StartWith("B|");
         legacyLine.Split(',')[5].Should().NotStartWith("B4|");
         hitObject.ControlPoints[0].Type.Should().Be(PathType.BSpline);
-        BeatmapTestData.EncodeHitObject(hitObject, 128).Split(',')[5].Should().Be("B4|128:96|192:128|256:96");
+        BeatmapTestData.EncodeHitObject(hitObject).Split(',')[5].Should().Be("B4|128:96|192:128|256:96");
     }
 
     [TestMethod]

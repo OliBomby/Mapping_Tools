@@ -104,9 +104,7 @@ internal sealed class ProjectHitObjectJsonConverter : JsonConverter
     {
         if (serializer.TypeNameHandling == TypeNameHandling.None) return;
 
-        string? assemblyName = null;
-        string? typeName = null;
-        serializer.SerializationBinder?.BindToName(typeof(HitObject), out assemblyName, out typeName);
+        serializer.SerializationBinder.BindToName(typeof(HitObject), out string? assemblyName, out string? typeName);
         typeName ??= typeof(HitObject).FullName;
         assemblyName ??= typeof(HitObject).Assembly.GetName().Name;
 

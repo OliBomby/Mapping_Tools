@@ -46,6 +46,7 @@ using Mapping_Tools.Infrastructure.Projects;
 using Mapping_Tools.Infrastructure.Settings;
 using Mapping_Tools.Infrastructure.Updates;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Mapping_Tools.Desktop.Composition;
 
@@ -102,7 +103,7 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<IFilePicker>(provider =>
         {
             var window = provider.GetRequiredService<MainWindow>();
-            return new AvaloniaFilePicker(() => window.StorageProvider);
+            return new AvaloniaFilePicker(() => window.StorageProvider, provider.GetRequiredService<ILogger<AvaloniaFilePicker>>());
         });
         services.AddSingleton<IClipboardService>(provider =>
         {

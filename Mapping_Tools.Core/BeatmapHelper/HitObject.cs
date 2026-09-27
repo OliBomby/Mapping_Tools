@@ -1,9 +1,7 @@
 using System.Collections;
-using System.Text;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
-using Mapping_Tools.Core.ToolHelpers.Sliders;
 using Mapping_Tools.Core.MathUtil;
 using Newtonsoft.Json;
 using static Mapping_Tools.Core.BeatmapHelper.FileFormatHelper;

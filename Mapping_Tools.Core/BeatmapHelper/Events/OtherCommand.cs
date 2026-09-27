@@ -1,7 +1,3 @@
-using System.Text;
-using Mapping_Tools.Core.MathUtil;
-using static Mapping_Tools.Core.BeatmapHelper.FileFormatHelper;
-
 namespace Mapping_Tools.Core.BeatmapHelper.Events;
 
 /// <summary>

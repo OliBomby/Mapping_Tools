@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Reflection;
+using System.Globalization;
 using System.Text;
 using Avalonia.Controls.Primitives;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -17,6 +18,8 @@ using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Services.Updates;
 using Mapping_Tools.Desktop.Shell;
 using Material.Icons;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Mapping_Tools.Desktop.ViewModels;
 
@@ -31,6 +34,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
     private static readonly Uri issuesUri = new("https://github.com/OliBomby/Mapping_Tools/issues");
     private static readonly Uri donateUri = new("https://ko-fi.com/olibomby");
     private readonly IBetterSaveService betterSave;
+    private readonly ILogger<MainViewModel> logger;
     private readonly IDialogService dialogs;
     private readonly IUiDispatcher dispatcher;
 
@@ -71,6 +75,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
     /// </param>
     /// <param name="migrationService">Copies legacy application data.</param>
     /// <param name="settingsService">Persists the modern settings document after migration.</param>
+    /// <param name="logger">Records shell actions, run settings, and activation failures.</param>
     public MainViewModel(
         IShellFeatureRegistry registry,
         IQuickRunCommandRegistry quickRunRegistry,
@@ -84,7 +89,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
         IUiDispatcher dispatcher,
         IUpdaterInteractionService? updaterInteraction = null,
         IApplicationDataMigrationService? migrationService = null,
-        ISettingsService? settingsService = null)
+        ISettingsService? settingsService = null,
+        ILogger<MainViewModel>? logger = null)
     {
         this.registry = registry ?? throw new ArgumentNullException(nameof(registry));
         this.quickRunRegistry = quickRunRegistry ?? throw new ArgumentNullException(nameof(quickRunRegistry));
@@ -99,6 +105,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
         this.updaterInteraction = updaterInteraction;
         this.migrationService = migrationService;
         this.settingsService = settingsService;
+        this.logger = logger ?? NullLogger<MainViewModel>.Instance;
 
         FeatureItems = registry.Features
             .Select(registration => new ShellFeatureItemViewModel(
@@ -146,7 +153,11 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
         get;
         set
         {
-            if (SetProperty(ref field, value)) RefreshVisibleFeatures();
+            if (SetProperty(ref field, value))
+            {
+                logger.LogInformation("User searched features: {Query}", value);
+                RefreshVisibleFeatures();
+            }
         }
     } = string.Empty;
 
@@ -204,6 +215,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
 
     private async Task DisposeCoreAsync()
     {
+        logger.LogInformation("Shell shutdown started; {FeatureCount} features were instantiated", featureViewModels.Count);
         if (featureActivationCancellation is not null)
             await featureActivationCancellation.CancelAsync();
 
@@ -222,6 +234,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
             if (CurrentFeature is IShellFeatureActivation activation) activation.Deactivate();
             ProjectMenuItems = [];
             OnPropertyChanged(nameof(ProjectMenuItems));
+            logger.LogInformation("Shell shutdown completed");
         }
     }
 
@@ -236,6 +249,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
         if (featureActivationStarted) return;
 
         featureActivationStarted = true;
+        logger.LogInformation("Shell initialization started with {FeatureCount} registered features", FeatureItems.Count);
         await MigrateLegacyDataAsync();
         featureActivationReady = true;
         if (SelectedFeature is not null) await ActivateAsync(SelectedFeature);
@@ -248,6 +262,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
         try
         {
             var result = await migrationService.CopyLegacyDataAsync();
+            logger.LogInformation("Migrated legacy data: {Autosaves} autosaves, {Projects} projects", result.AutosavesCopied, result.ProjectFilesCopied);
             settingsService.Save(settings);
             await notifications.PublishAsync(new UserNotification(
                 UserNotificationSeverity.Success,
@@ -256,6 +271,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
         }
         catch (Exception exception)
         {
+            logger.LogError(exception, "Legacy data migration failed");
             await notifications.PublishAsync(new UserNotification(
                 UserNotificationSeverity.Error,
                 "Legacy data migration failed",
@@ -266,6 +282,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
 
     private async Task ActivateAsync(ShellFeatureItemViewModel item)
     {
+        logger.LogInformation("Feature activation requested: {FeatureId}", item.Id);
         if (featureActivationCancellation is not null)
             await featureActivationCancellation.CancelAsync();
 
@@ -303,6 +320,14 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
 
                 viewModel = registration.CreateViewModel();
                 featureViewModels.Add(item.Id, viewModel);
+                if (viewModel is SingleRunToolViewModel runTool)
+                    runTool.PropertyChanged += (_, args) =>
+                    {
+                        if (args.PropertyName == nameof(SingleRunToolViewModel.IsRunning)
+                            && runTool.IsRunning
+                            && ReferenceEquals(CurrentFeature, runTool))
+                            LogFeatureSettings(item.Id, runTool);
+                    };
             }
 
             if (activationVersion != featureActivationVersion || !ReferenceEquals(SelectedFeature, item)) return;
@@ -314,12 +339,15 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
             if (viewModel is IShellFeatureActivation current) current.Activate();
             if (viewModel is IShellProjectFeature projectFeature) projectCoordinator.Activate(projectFeature);
             if (viewModel is IQuickRun) quickRunRegistry.SelectCurrent(registration.Id);
+            logger.LogInformation("Feature activated: {FeatureId}, view model {ViewModelType}", item.Id, viewModel.GetType().Name);
         }
         catch (OperationCanceledException)
         {
+            logger.LogInformation("Feature activation cancelled: {FeatureId}", item.Id);
         }
         catch (Exception exception)
         {
+            logger.LogError(exception, "Feature activation failed: {FeatureId}", item.Id);
             if (activationVersion == featureActivationVersion && ReferenceEquals(SelectedFeature, item))
             {
                 FeatureLoadError = exception.Message;
@@ -358,7 +386,13 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
 
     partial void OnSelectedFeatureChanged(ShellFeatureItemViewModel? value)
     {
+        if (value is not null) logger.LogInformation("User selected feature {FeatureId}", value.Id);
         if (value is not null && featureActivationReady) _ = ActivateAsync(value);
+    }
+
+    partial void OnIsNavigationOpenChanged(bool value)
+    {
+        logger.LogInformation("Navigation pane open: {IsOpen}", value);
     }
 
     [RelayCommand]
@@ -370,6 +404,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
     [RelayCommand]
     private Task CheckForUpdatesAsync()
     {
+        logger.LogInformation("User requested update check");
         return updaterInteraction?.CheckForUpdatesAsync(
                    false,
                    true)
@@ -405,6 +440,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
     [RelayCommand]
     private async Task OpenAboutAsync()
     {
+        logger.LogInformation("User opened About dialog");
         var version = Assembly.GetEntryAssembly()?.GetName().Version;
         StringBuilder message = new();
         message.AppendLine($"Mapping Tools {version}");
@@ -441,6 +477,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
     [RelayCommand]
     private Task BetterSaveAsync()
     {
+        logger.LogInformation("User requested Better Save");
         return betterSave.ExecuteAsync();
     }
 
@@ -457,6 +494,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
     [RelayCommand(CanExecute = nameof(CanUseProjectActions))]
     private Task SaveProjectAsync()
     {
+        logger.LogInformation("User requested Save project for {FeatureId}", SelectedFeature?.Id);
         return CurrentFeature is IShellProjectFeature feature
             ? projectCoordinator.SaveAsync(feature)
             : Task.CompletedTask;
@@ -465,6 +503,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
     [RelayCommand(CanExecute = nameof(CanUseProjectActions))]
     private Task OpenProjectAsync()
     {
+        logger.LogInformation("User requested Open project for {FeatureId}", SelectedFeature?.Id);
         return CurrentFeature is IShellProjectFeature feature
             ? projectCoordinator.OpenAsync(feature)
             : Task.CompletedTask;
@@ -473,6 +512,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
     [RelayCommand(CanExecute = nameof(CanUseProjectActions))]
     private Task NewProjectAsync()
     {
+        logger.LogInformation("User requested New project for {FeatureId}", SelectedFeature?.Id);
         return CurrentFeature is IShellProjectFeature feature
             ? projectCoordinator.NewAsync(feature)
             : Task.CompletedTask;
@@ -483,6 +523,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
         item.IsFavorite = !item.IsFavorite;
         settings.FavoriteTools.RemoveAll(id => id.Equals(item.Id, StringComparison.OrdinalIgnoreCase));
         if (item.IsFavorite) settings.FavoriteTools.Add(item.Id);
+        logger.LogInformation("User set favorite for {FeatureId} to {IsFavorite}", item.Id, item.IsFavorite);
 
         RefreshVisibleFeatures();
     }
@@ -522,6 +563,32 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
         if (string.IsNullOrWhiteSpace(SearchText)) return true;
 
         return item.SearchableText.Contains(SearchText.Trim(), StringComparison.CurrentCultureIgnoreCase);
+    }
+
+    private void LogFeatureSettings(string featureId, ObservableObject viewModel)
+    {
+        foreach (var property in viewModel.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+        {
+            if (!property.CanRead || property.GetIndexParameters().Length != 0
+                || property.Name.EndsWith("Progress", StringComparison.Ordinal)
+                || property.Name.Contains("Password", StringComparison.OrdinalIgnoreCase)
+                || property.Name.Contains("Secret", StringComparison.OrdinalIgnoreCase)
+                || property.Name.Contains("Token", StringComparison.OrdinalIgnoreCase)) continue;
+
+            Type type = Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType;
+            if (type != typeof(string) && !type.IsPrimitive && !type.IsEnum && type != typeof(decimal)) continue;
+
+            try
+            {
+                string value = Convert.ToString(property.GetValue(viewModel), CultureInfo.InvariantCulture) ?? "<null>";
+                logger.LogInformation("Run setting {FeatureId}.{Property}={Value}", featureId, property.Name,
+                    value.Length <= 500 ? value : value[..500] + "…");
+            }
+            catch (Exception exception)
+            {
+                logger.LogDebug(exception, "Could not inspect run setting {FeatureId}.{Property}", featureId, property.Name);
+            }
+        }
     }
 
     internal void MoveHighlightedFeature(int offset)
@@ -567,7 +634,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
 
     private async Task OpenUriAsync(Uri uri, string destination)
     {
+        logger.LogInformation("User opened {Destination}: {Uri}", destination, uri);
         bool accepted = await launcher.OpenUriAsync(uri).ConfigureAwait(false);
+        logger.LogInformation("Open {Destination} accepted by OS: {Accepted}", destination, accepted);
         if (!accepted)
             await notifications.PublishAsync(new UserNotification(
                 UserNotificationSeverity.Warning,

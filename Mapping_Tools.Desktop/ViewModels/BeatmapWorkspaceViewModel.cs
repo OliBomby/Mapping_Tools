@@ -11,6 +11,8 @@ using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Application.Workspace.Models;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Mapping_Tools.Desktop.ViewModels;
 
@@ -20,6 +22,7 @@ namespace Mapping_Tools.Desktop.ViewModels;
 public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDisposable
 {
     private readonly IApplicationDirectories applicationDirectories;
+    private readonly ILogger<BeatmapWorkspaceViewModel> logger;
     private readonly IBeatmapBackupService backupService;
     private readonly ICurrentBeatmapDialogService currentBeatmapDialogService;
     private readonly IDialogService dialogs;
@@ -46,6 +49,7 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
     /// <param name="notifications">Publishes completion and recoverable failure outcomes.</param>
     /// <param name="dispatcher">Marshals workspace notifications onto the UI thread.</param>
     /// <param name="currentBeatmapDialogService">Fetches the current editor beatmap and presents lookup feedback.</param>
+    /// <param name="logger">Records shell workspace actions and errors.</param>
     public BeatmapWorkspaceViewModel(
         IBeatmapWorkspace workspace,
         IBeatmapBackupService backupService,
@@ -57,7 +61,8 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
         IDialogService dialogs,
         IUserNotificationService notifications,
         IUiDispatcher dispatcher,
-        ICurrentBeatmapDialogService currentBeatmapDialogService)
+        ICurrentBeatmapDialogService currentBeatmapDialogService,
+        ILogger<BeatmapWorkspaceViewModel>? logger = null)
     {
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         this.backupService = backupService ?? throw new ArgumentNullException(nameof(backupService));
@@ -71,6 +76,7 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
         this.dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
         this.currentBeatmapDialogService = currentBeatmapDialogService
                                             ?? throw new ArgumentNullException(nameof(currentBeatmapDialogService));
+        this.logger = logger ?? NullLogger<BeatmapWorkspaceViewModel>.Instance;
 
         this.workspace.SelectionChanged += OnSelectionChanged;
         this.workspace.RestoreMostRecent();
@@ -256,16 +262,20 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
 
     private async Task RunUserOperationAsync(Func<Task> operation, string title)
     {
+        logger.LogInformation("Workspace action started: {Action}", title);
         try
         {
             await operation();
+            logger.LogInformation("Workspace action completed: {Action}", title);
         }
         catch (OperationCanceledException)
         {
+            logger.LogInformation("Workspace action cancelled: {Action}", title);
             // Native picker and dialog cancellation is an ordinary no-op.
         }
         catch (Exception exception)
         {
+            logger.LogError(exception, "Workspace action failed: {Action}", title);
             await PublishAsync(
                 UserNotificationSeverity.Error,
                 title,

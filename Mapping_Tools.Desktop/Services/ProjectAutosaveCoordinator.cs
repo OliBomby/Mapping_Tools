@@ -3,6 +3,8 @@ using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Mapping_Tools.Desktop.Services;
 
@@ -12,6 +14,7 @@ namespace Mapping_Tools.Desktop.Services;
 public sealed class ProjectAutosaveCoordinator
 {
     private readonly IDialogService dialogs;
+    private readonly ILogger<ProjectAutosaveCoordinator> logger;
     private readonly Dictionary<IShellProjectFeature, Task> loadTasks = [];
     private readonly IUserNotificationService notifications;
     private readonly IProjectService projects;
@@ -23,14 +26,17 @@ public sealed class ProjectAutosaveCoordinator
     /// <param name="projects">Loads, saves, and creates typed project data.</param>
     /// <param name="dialogs">Confirms destructive New project operations.</param>
     /// <param name="notifications">Publishes project lifecycle failures.</param>
+    /// <param name="logger">Records project actions and recovery outcomes.</param>
     public ProjectAutosaveCoordinator(
         IProjectService projects,
         IDialogService dialogs,
-        IUserNotificationService notifications)
+        IUserNotificationService notifications,
+        ILogger<ProjectAutosaveCoordinator>? logger = null)
     {
         this.projects = projects ?? throw new ArgumentNullException(nameof(projects));
         this.dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
         this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
+        this.logger = logger ?? NullLogger<ProjectAutosaveCoordinator>.Instance;
     }
 
     /// <summary>
@@ -42,6 +48,7 @@ public sealed class ProjectAutosaveCoordinator
         ArgumentNullException.ThrowIfNull(feature);
         if (loadTasks.ContainsKey(feature)) return;
 
+        logger.LogInformation("Loading recovery project for {Feature}", feature.GetType().Name);
         loadTasks.Add(feature, LoadAutosaveAsync(feature));
     }
 
@@ -56,6 +63,7 @@ public sealed class ProjectAutosaveCoordinator
         ArgumentNullException.ThrowIfNull(feature);
         if (!saveOnShutdown) return Task.CompletedTask;
 
+        logger.LogInformation("Saving recovery project for {Feature} on shutdown", feature.GetType().Name);
         return SaveAutosaveAfterLoadAsync(feature);
     }
 
@@ -63,6 +71,7 @@ public sealed class ProjectAutosaveCoordinator
     public void SuppressSave()
     {
         saveOnShutdown = false;
+        logger.LogInformation("Project autosave suppressed for this shutdown");
     }
 
     /// <summary>
@@ -77,7 +86,7 @@ public sealed class ProjectAutosaveCoordinator
     {
         return RunAsync(
             () => SaveProjectAsync(feature, cancellationToken),
-            "Save project");
+            "Save project", feature);
     }
 
     /// <summary>
@@ -92,7 +101,7 @@ public sealed class ProjectAutosaveCoordinator
     {
         return RunAsync(
             () => OpenProjectAsync(feature, cancellationToken),
-            "Open project");
+            "Open project", feature);
     }
 
     /// <summary>
@@ -107,7 +116,7 @@ public sealed class ProjectAutosaveCoordinator
     {
         return RunAsync(
             () => NewProjectAsync(feature, cancellationToken),
-            "New project");
+            "New project", feature);
     }
 
     private async Task LoadAutosaveAsync(IShellProjectFeature feature)
@@ -117,15 +126,19 @@ public sealed class ProjectAutosaveCoordinator
             await feature.ExecuteProjectOperationAsync(
                 new LoadAutosaveOperation(projects),
                 CancellationToken.None);
+            logger.LogInformation("Recovery project loaded for {Feature}", feature.GetType().Name);
         }
         catch (FileNotFoundException)
         {
+            logger.LogInformation("No recovery project exists for {Feature}", feature.GetType().Name);
         }
         catch (DirectoryNotFoundException)
         {
+            logger.LogInformation("No recovery directory exists for {Feature}", feature.GetType().Name);
         }
         catch (Exception exception)
         {
+            logger.LogError(exception, "Recovery project load failed for {Feature}", feature.GetType().Name);
             await PublishFailureAsync("Project could not be loaded", exception);
         }
     }
@@ -138,9 +151,11 @@ public sealed class ProjectAutosaveCoordinator
             await feature.ExecuteProjectOperationAsync(
                 new AutoSaveOperation(projects),
                 CancellationToken.None);
+            logger.LogInformation("Recovery project saved for {Feature}", feature.GetType().Name);
         }
         catch (Exception exception)
         {
+            logger.LogError(exception, "Recovery project save failed for {Feature}", feature.GetType().Name);
             await PublishFailureAsync("Project could not be saved", exception);
         }
     }
@@ -179,6 +194,7 @@ public sealed class ProjectAutosaveCoordinator
                 ],
                 false),
             cancellationToken);
+        logger.LogInformation("New project confirmation for {Feature}: {Confirmed}", feature.GetType().Name, confirmed);
         if (!confirmed) return;
 
         await AwaitLoadAsync(feature);
@@ -192,17 +208,21 @@ public sealed class ProjectAutosaveCoordinator
         if (loadTasks.TryGetValue(feature, out var loadTask)) await loadTask;
     }
 
-    private async Task RunAsync(Func<Task> operation, string title)
+    private async Task RunAsync(Func<Task> operation, string title, IShellProjectFeature feature)
     {
+        logger.LogInformation("{Action} started for {Feature}", title, feature.GetType().Name);
         try
         {
             await operation();
+            logger.LogInformation("{Action} completed for {Feature}", title, feature.GetType().Name);
         }
         catch (OperationCanceledException)
         {
+            logger.LogInformation("{Action} cancelled for {Feature}", title, feature.GetType().Name);
         }
         catch (Exception exception)
         {
+            logger.LogError(exception, "{Action} failed for {Feature}", title, feature.GetType().Name);
             await PublishFailureAsync(title, exception);
         }
     }

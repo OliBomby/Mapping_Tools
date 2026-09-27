@@ -16,10 +16,6 @@ internal sealed class Program
     [STAThread]
     public static void Main(string[] args)
     {
-        VelopackApp.Build()
-            .SetAutoApplyOnStartup(false)
-            .Run();
-
         AppDomain.CurrentDomain.UnhandledException += (_, eventArgs) =>
         {
             if (eventArgs.ExceptionObject is Exception exception) App.WriteCrashLog(exception);
@@ -32,6 +28,10 @@ internal sealed class Program
 
         try
         {
+            VelopackApp.Build()
+                .SetAutoApplyOnStartup(false)
+                .Run();
+
             BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
         }
         catch (Exception exception)

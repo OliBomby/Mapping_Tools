@@ -174,7 +174,7 @@ public sealed class BeatmapBackupServiceTests
         store.Files[map_path] = new BeatmapEncoder()
             .Encode(session.Beatmap)
             .TrimEnd('\r', '\n')
-            .Split("\r\n", StringSplitOptions.None)
+            .Split("\r\n")
             .ToList();
         var service = CreateService(store, CreateSettings());
 

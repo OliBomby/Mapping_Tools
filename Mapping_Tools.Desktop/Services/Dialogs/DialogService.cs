@@ -5,6 +5,8 @@ using Avalonia.Threading;
 using Mapping_Tools.Desktop.Utilities;
 using Mapping_Tools.Desktop.ViewModels.Dialogs;
 using Mapping_Tools.Desktop.Views.Dialogs;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Mapping_Tools.Desktop.Services.Dialogs;
 
@@ -14,11 +16,15 @@ namespace Mapping_Tools.Desktop.Services.Dialogs;
 /// </summary>
 public sealed class DialogService : IDialogService
 {
+    private readonly ILogger<DialogService> logger;
+
     /// <summary>
     ///     Creates a service that presents dialogs through the desktop application lifetime.
     /// </summary>
-    public DialogService()
+    /// <param name="logger">Records dialog decisions.</param>
+    public DialogService(ILogger<DialogService>? logger = null)
     {
+        this.logger = logger ?? NullLogger<DialogService>.Instance;
     }
 
     /// <inheritdoc />
@@ -28,6 +34,7 @@ public sealed class DialogService : IDialogService
     {
         ArgumentNullException.ThrowIfNull(request);
         cancellationToken.ThrowIfCancellationRequested();
+        logger.LogInformation("Message dialog opened: {Title}", request.Title);
         return InvokeOnUiThreadAsync(() => ShowMessageOnUiThreadAsync(request, cancellationToken));
     }
 
@@ -38,6 +45,7 @@ public sealed class DialogService : IDialogService
     {
         ArgumentNullException.ThrowIfNull(request);
         cancellationToken.ThrowIfCancellationRequested();
+        logger.LogInformation("Value dialog opened: {Title}; prompt {Prompt}", request.Title, request.Prompt);
         return InvokeOnUiThreadAsync(() => ShowValueOnUiThreadAsync(request, cancellationToken));
     }
 
@@ -51,7 +59,11 @@ public sealed class DialogService : IDialogService
                 choice.Label,
                 choice.IsDefault,
                 choice.IsCancel,
-                () => dialog.Close(new ResultBox<TResult>(choice.Result))))
+                () =>
+                {
+                    logger.LogInformation("Message dialog {Title}: user chose {Choice}", request.Title, choice.Label);
+                    dialog.Close(new ResultBox<TResult>(choice.Result));
+                }))
             .ToList();
         dialog.DataContext = new MessageDialogViewModel(
             request.Title,
@@ -67,6 +79,7 @@ public sealed class DialogService : IDialogService
 
         object? result = await dialogTask;
         cancellationToken.ThrowIfCancellationRequested();
+        if (result is not ResultBox<TResult>) logger.LogInformation("Message dialog {Title} dismissed", request.Title);
         return result is ResultBox<TResult> box
             ? box.Value
             : request.DismissResult;
@@ -86,10 +99,18 @@ public sealed class DialogService : IDialogService
             request.AcceptLabel,
             request.CancelLabel,
             value => Validate(value, request),
-            value => DialogHostInteraction.Close(
-                DialogHostInteraction.ROOT_IDENTIFIER,
-                new ResultBox<TValue>((TValue)value!)),
-            () => DialogHostInteraction.Close(DialogHostInteraction.ROOT_IDENTIFIER));
+            value =>
+            {
+                logger.LogInformation("Value dialog {Title} accepted value {Value}", request.Title, value);
+                DialogHostInteraction.Close(
+                    DialogHostInteraction.ROOT_IDENTIFIER,
+                    new ResultBox<TValue>((TValue)value!));
+            },
+            () =>
+            {
+                logger.LogInformation("Value dialog {Title} cancelled", request.Title);
+                DialogHostInteraction.Close(DialogHostInteraction.ROOT_IDENTIFIER);
+            });
         dialog.DataContext = viewModel;
 
         object? result = await DialogHostInteraction.ShowAsync(

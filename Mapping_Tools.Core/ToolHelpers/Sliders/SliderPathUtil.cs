@@ -134,13 +134,10 @@ public static class SliderPathUtil
             {
                 case PathType.Catmull:
                 case PathType.Bezier:
-                    newPathType = PathType.Bezier;
-
                     // Convert in case the path type is catmull
                     var convert = BezierConverter.ConvertToBezier(sliderPath);
                     return MoveBezierSegmentsToLength(ChopAnchors(convert), newLength);
                 case PathType.BSpline:
-                    newPathType = PathType.Bezier;
                     var splineSegments = PathApproximator.GetBSplineBezierSegments(anchors, 4)
                         .Select(points => new BezierSubdivision(points.ToList()));
                     return MoveBezierSegmentsToLength(splineSegments, newLength);

@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using static Mapping_Tools.Core.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Core.BeatmapHelper.Events;
 

@@ -1,5 +1,7 @@
 using Avalonia.Platform.Storage;
 using Mapping_Tools.Application.Platform.FilePicker;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Mapping_Tools.Desktop.Services.Platform;
 
@@ -10,15 +12,18 @@ namespace Mapping_Tools.Desktop.Services.Platform;
 public sealed class AvaloniaFilePicker : IFilePicker
 {
     private readonly Func<IStorageProvider?> storageProviderAccessor;
+    private readonly ILogger<AvaloniaFilePicker> logger;
 
     /// <summary>
     ///     Creates an adapter that resolves the storage provider lazily from a top-level window.
     /// </summary>
     /// <param name="storageProviderAccessor">Returns the current storage provider, if initialized.</param>
-    public AvaloniaFilePicker(Func<IStorageProvider?> storageProviderAccessor)
+    /// <param name="logger">Records picker requests and selected paths.</param>
+    public AvaloniaFilePicker(Func<IStorageProvider?> storageProviderAccessor, ILogger<AvaloniaFilePicker>? logger = null)
     {
         this.storageProviderAccessor = storageProviderAccessor
                                        ?? throw new ArgumentNullException(nameof(storageProviderAccessor));
+        this.logger = logger ?? NullLogger<AvaloniaFilePicker>.Instance;
     }
 
     /// <inheritdoc />
@@ -38,6 +43,7 @@ public sealed class AvaloniaFilePicker : IFilePicker
         ArgumentNullException.ThrowIfNull(request);
         cancellationToken.ThrowIfCancellationRequested();
 
+        logger.LogInformation("Open file picker: {Title}; start {Start}; multiple {Multiple}", request.Title, request.SuggestedStartLocation, request.AllowMultiple);
         var provider = GetProvider(provider => provider.CanOpen, "open files");
         var startLocation = await GetStartLocationAsync(
             provider,
@@ -53,7 +59,9 @@ public sealed class AvaloniaFilePicker : IFilePicker
         });
 
         cancellationToken.ThrowIfCancellationRequested();
-        return GetLocalPaths(files);
+        var paths = GetLocalPaths(files);
+        logger.LogInformation("Open file picker {Title} returned {Count} paths: {Paths}", request.Title, paths.Count, string.Join(" | ", paths));
+        return paths;
     }
 
     /// <inheritdoc />
@@ -64,6 +72,7 @@ public sealed class AvaloniaFilePicker : IFilePicker
         ArgumentNullException.ThrowIfNull(request);
         cancellationToken.ThrowIfCancellationRequested();
 
+        logger.LogInformation("Save file picker: {Title}; start {Start}; suggested {Name}", request.Title, request.SuggestedStartLocation, request.SuggestedFileName);
         var provider = GetProvider(provider => provider.CanSave, "save files");
         var startLocation = await GetStartLocationAsync(
             provider,
@@ -81,7 +90,9 @@ public sealed class AvaloniaFilePicker : IFilePicker
         });
 
         cancellationToken.ThrowIfCancellationRequested();
-        return file is null ? null : GetLocalPath(file);
+        string? path = file is null ? null : GetLocalPath(file);
+        logger.LogInformation("Save file picker {Title} returned {Path}", request.Title, path);
+        return path;
     }
 
     /// <inheritdoc />
@@ -92,6 +103,7 @@ public sealed class AvaloniaFilePicker : IFilePicker
         ArgumentNullException.ThrowIfNull(request);
         cancellationToken.ThrowIfCancellationRequested();
 
+        logger.LogInformation("Folder picker: {Title}; start {Start}; multiple {Multiple}", request.Title, request.SuggestedStartLocation, request.AllowMultiple);
         var provider = GetProvider(provider => provider.CanPickFolder, "pick folders");
         var startLocation = await GetStartLocationAsync(
             provider,
@@ -106,7 +118,9 @@ public sealed class AvaloniaFilePicker : IFilePicker
         });
 
         cancellationToken.ThrowIfCancellationRequested();
-        return GetLocalPaths(folders);
+        var paths = GetLocalPaths(folders);
+        logger.LogInformation("Folder picker {Title} returned {Count} paths: {Paths}", request.Title, paths.Count, string.Join(" | ", paths));
+        return paths;
     }
 
     internal static IReadOnlyList<FilePickerFileType> MapFilters(IReadOnlyList<FilePickerFilter> filters)

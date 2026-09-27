@@ -8,11 +8,14 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mapping_Tools.Desktop.Composition;
 using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Infrastructure.Logging;
+using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Desktop.Services;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Mapping_Tools.Desktop;
 
@@ -23,6 +26,7 @@ namespace Mapping_Tools.Desktop;
 public partial class App : Avalonia.Application
 {
     private IHost? host;
+    private static ILogger<App>? processLogger;
 
     static App()
     {
@@ -46,8 +50,11 @@ public partial class App : Avalonia.Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             host = DesktopHostFactory.Create(desktop.Args ?? []);
+            processLogger = host.Services.GetRequiredService<ILogger<App>>();
             try
             {
+                processLogger.LogInformation("Mapping Tools starting. Version {Version}; OS {OS}; architecture {Architecture}",
+                    typeof(App).Assembly.GetName().Version, Environment.OSVersion, System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture);
                 host.Start();
                 var settings =
                     host.Services.GetRequiredService<DesktopApplicationSettings>();
@@ -59,12 +66,15 @@ public partial class App : Avalonia.Application
                 mainWindow.DataContext =
                     host.Services.GetRequiredService<MainViewModel>();
                 desktop.MainWindow = mainWindow;
+                processLogger.LogInformation("Main window ready");
                 desktop.Exit += (_, _) => StopHost();
             }
-            catch
+            catch (Exception exception)
             {
+                processLogger.LogCritical(exception, "Mapping Tools startup failed");
                 host.Dispose();
                 host = null;
+                processLogger = null;
                 throw;
             }
         }
@@ -81,8 +91,8 @@ public partial class App : Avalonia.Application
     }
 
     /// <summary>
-    ///     Writes an unhandled-exception report to the legacy-compatible application
-    ///     data directory so the Avalonia frontend has the same support handoff as WPF.
+    ///     Writes an unhandled exception to the normal retained log, including failures
+    ///     that occur before the .NET host is available.
     /// </summary>
     /// <param name="exception">The exception that escaped normal application handling.</param>
     internal static void WriteCrashLog(Exception exception)
@@ -91,31 +101,15 @@ public partial class App : Avalonia.Application
 
         try
         {
-            string localApplicationData = Environment.GetFolderPath(
-                Environment.SpecialFolder.LocalApplicationData);
-            if (string.IsNullOrWhiteSpace(localApplicationData)) localApplicationData = AppContext.BaseDirectory;
-
-            string applicationData = Path.Combine(localApplicationData, "Mapping Tools");
-            Directory.CreateDirectory(applicationData);
-
-            List<string> lines =
-            [
-                exception.Message,
-                exception.StackTrace ?? string.Empty,
-                exception.Source ?? string.Empty,
-            ];
-            for (var inner = exception.InnerException;
-                 inner is not null;
-                 inner = inner.InnerException)
+            if (processLogger is not null)
             {
-                lines.Add(string.Empty);
-                lines.Add("Inner exception:");
-                lines.Add(inner.Message);
-                lines.Add(inner.StackTrace ?? string.Empty);
-                lines.Add(inner.Source ?? string.Empty);
+                processLogger.LogCritical(exception, "Unhandled application exception");
+                return;
             }
 
-            File.WriteAllLines(Path.Combine(applicationData, "crash-log.txt"), lines);
+            string logsPath = Path.Combine(new ApplicationDirectories().ApplicationData, "Logs");
+            using SessionFileLoggerProvider provider = new(logsPath);
+            provider.CreateLogger(typeof(App).FullName!).LogCritical(exception, "Unhandled application exception before host startup");
         }
         catch (Exception loggingException)
         {
@@ -131,6 +125,7 @@ public partial class App : Avalonia.Application
 
         try
         {
+            processLogger?.LogInformation("Mapping Tools shutdown started");
             host.Services
                 .GetRequiredService<MainViewModel>()
                 .DisposeAsync()
@@ -140,11 +135,13 @@ public partial class App : Avalonia.Application
             host.StopAsync(TimeSpan.FromSeconds(5))
                 .GetAwaiter()
                 .GetResult();
+            processLogger?.LogInformation("Mapping Tools shutdown completed");
         }
         finally
         {
             host.Dispose();
             host = null;
+            processLogger = null;
         }
     }
 

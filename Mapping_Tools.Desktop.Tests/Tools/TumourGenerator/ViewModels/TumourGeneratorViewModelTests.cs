@@ -6,7 +6,6 @@ using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.TumourGenerator;
 using Mapping_Tools.Application.Tools.TumourGenerator.Models;
-using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.TumourGenerator.Models;
 using Mapping_Tools.Core.Tools.TumourGenerator.Templates;

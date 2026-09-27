@@ -6,6 +6,8 @@ using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Application.Workspace.Models;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Mapping_Tools.Application.Workspace;
 
@@ -22,6 +24,7 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
     private readonly IFilePicker filePicker;
     private readonly IBeatmapsetFileSystem fileSystem;
     private readonly IUserNotificationService notifications;
+    private readonly ILogger<BeatmapWorkspace> logger;
 
     private readonly ApplicationSettings settings;
     private readonly TimeProvider timeProvider;
@@ -41,13 +44,15 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
     /// </param>
     /// <param name="timeProvider">Supplies deterministic timestamps for recent history.</param>
     /// <param name="notifications">Publishes warnings when a selected path is read after its file disappears.</param>
+    /// <param name="logger">Records selection changes and lookup outcomes.</param>
     public BeatmapWorkspace(
         ApplicationSettings settings,
         IFilePicker filePicker,
         IBeatmapsetFileSystem fileSystem,
         ICurrentBeatmapLocator currentBeatmapLocator,
         TimeProvider timeProvider,
-        IUserNotificationService notifications)
+        IUserNotificationService notifications,
+        ILogger<BeatmapWorkspace>? logger = null)
     {
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
@@ -56,6 +61,7 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
                                      ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
         this.timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
         this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
+        this.logger = logger ?? NullLogger<BeatmapWorkspace>.Instance;
         RemoveInvalidRecentEntries();
     }
 
@@ -71,6 +77,7 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
             IReadOnlyList<string> missing = GetMissingSelectedPaths();
             if (missing.Count > 0 && !selectedFromExternalEdit)
             {
+                logger.LogWarning("Selected beatmaps are missing: {Paths}", string.Join(" | ", missing));
                 _ = notifications.PublishAsync(
                     new UserNotification(
                         UserNotificationSeverity.Warning,
@@ -108,6 +115,7 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
             .ToArray();
         selectedPaths = selection;
         selectedFromExternalEdit = source == BeatmapSelectionSource.LazerExternalEdit;
+        logger.LogInformation("Beatmap selection changed from {Source}: {Paths}", source, string.Join(" | ", selection));
 
         string displayDate = timeProvider
             .GetLocalNow()
@@ -131,6 +139,7 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
     {
         selectedPaths = [];
         selectedFromExternalEdit = false;
+        logger.LogInformation("Beatmap selection cleared by {Source}", source);
         PublishSelection(source);
     }
 
@@ -138,7 +147,9 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
     public bool RemoveRecent(string path)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
-        return settings.RecentMaps.RemoveAll(recent => string.Equals(recent.Path, path, StringComparison.Ordinal)) > 0;
+        bool removed = settings.RecentMaps.RemoveAll(recent => string.Equals(recent.Path, path, StringComparison.Ordinal)) > 0;
+        logger.LogInformation("Recent beatmap removed: {Path}, removed={Removed}", path, removed);
+        return removed;
     }
 
     /// <inheritdoc />
@@ -165,7 +176,11 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
             },
             cancellationToken);
 
-        if (paths.Count == 0) return false;
+        if (paths.Count == 0)
+        {
+            logger.LogInformation("Beatmap picker dismissed");
+            return false;
+        }
 
         SetSelection(paths, BeatmapSelectionSource.FilePicker);
         return true;
@@ -206,8 +221,9 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
         {
             throw;
         }
-        catch (Exception)
+        catch (Exception exception)
         {
+            logger.LogWarning(exception, "Current editor beatmap lookup failed; falling back to shell selection");
             // QuickRun intentionally falls back to the shell selection when osu!
             // is closed or the live reader cannot resolve a current map.
         }
@@ -216,12 +232,15 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
 
         if (hasCurrentBeatmap)
         {
+            logger.LogInformation("QuickRun resolved current editor beatmap: {Path}", currentPath);
             if (updateSelection) SetSelection([currentPath!], BeatmapSelectionSource.CurrentEditor);
 
             return currentPath!;
         }
 
-        return SelectedPaths.FirstOrDefault() ?? string.Empty;
+        string fallback = SelectedPaths.FirstOrDefault() ?? string.Empty;
+        logger.LogInformation("QuickRun using selected beatmap fallback: {Path}", fallback);
+        return fallback;
     }
 
     private void RemoveInvalidRecentEntries()

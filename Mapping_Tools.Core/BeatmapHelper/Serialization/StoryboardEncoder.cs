@@ -1,5 +1,3 @@
-using Mapping_Tools.Core.BeatmapHelper.Events;
-
 namespace Mapping_Tools.Core.BeatmapHelper.Serialization;
 
 /// <summary>Encodes storyboard models as complete osu! events sections.</summary>

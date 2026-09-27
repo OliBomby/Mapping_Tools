@@ -1,6 +1,6 @@
 ---
 name: write-unit-tests
-description: "Write and migrate .NET unit tests using the Mapping Tools test conventions: descriptive Method_[Scenario_]Expectation names, explicit Arrange/Act/Assert sections, and Fluent Assertions. Use when adding, editing, reviewing, or migrating C# unit tests in this repository."
+description: "Write and migrate .NET unit tests using the Mapping Tools test conventions: descriptive Method_[Scenario_]Expectation names, explicit Arrange/Act/Assert sections, and AwesomeAssertions. Use when adding, editing, reviewing, or migrating C# unit tests in this repository."
 ---
 
 # Write Unit Tests
@@ -69,7 +69,7 @@ Use the equivalent `Func<Task>` pattern for asynchronous exceptions.
 
 ## Assert Fluently
 
-Use Fluent Assertions for all assertions. Add `using FluentAssertions;` when implicit or global imports do not already provide it.
+Use AwesomeAssertions for all assertions. Add `using AwesomeAssertions;` when implicit or global imports do not already provide it.
 
 Prefer expressions such as:
 
@@ -86,9 +86,9 @@ Do not introduce framework-native assertions such as `Assert.Equal`, `Assert.Thr
 ## Add or Migrate Tests
 
 1. Inspect the test project and nearby tests to identify the existing test framework, setup pattern, and package availability.
-2. Add a compatible Fluent Assertions package reference when the target test project does not already have one.
+2. Add a compatible AwesomeAssertions package reference when the target test project does not already have one.
 3. Rename test methods to the required pattern without changing what they test.
 4. Separate each test into the three required commented sections.
-5. Replace native or alternative assertion APIs with semantically equivalent Fluent Assertions.
+5. Replace native or alternative assertion APIs with semantically equivalent AwesomeAssertions.
 6. Preserve coverage and behavior. Do not weaken assertions merely to make a migration pass.
 7. Build and run the affected test project. Fix compilation errors and unintended test failures before finishing.

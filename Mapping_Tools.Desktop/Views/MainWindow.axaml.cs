@@ -17,6 +17,8 @@ using Mapping_Tools.Desktop.ViewModels;
 using Material.Icons;
 using Material.Styles.Controls;
 using Material.Styles.Models;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Mapping_Tools.Desktop.Views;
 
@@ -30,6 +32,7 @@ public partial class MainWindow : Window, INotificationSurface
     private static readonly WindowBounds defaultBounds = new(80, 60, 1500, 800);
     private static readonly TimeSpan snackbarDuration = TimeSpan.FromSeconds(5);
     private readonly DesktopApplicationSettings settings;
+    private readonly ILogger<MainWindow> logger;
     private readonly SettingsPersistenceHostedService? settingsPersistence;
     private readonly IUpdaterInteractionService? updaterInteraction;
     private bool allowCloseAfterShutdown;
@@ -74,16 +77,20 @@ public partial class MainWindow : Window, INotificationSurface
     /// <param name="settings">The process-lifetime settings document.</param>
     /// <param name="settingsPersistence">The orderly-shutdown boundary used by Exit without saving.</param>
     /// <param name="updaterInteraction">The updater interaction owned by runtime composition.</param>
+    /// <param name="logger">Records window actions and shutdown decisions.</param>
     public MainWindow(
         DesktopApplicationSettings settings,
         SettingsPersistenceHostedService? settingsPersistence,
-        IUpdaterInteractionService? updaterInteraction)
+        IUpdaterInteractionService? updaterInteraction,
+        ILogger<MainWindow>? logger = null)
     {
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         this.settingsPersistence = settingsPersistence;
         this.updaterInteraction = updaterInteraction;
+        this.logger = logger ?? NullLogger<MainWindow>.Instance;
         InitializeComponent();
         AddHandler(KeyDownEvent, HandleWindowKeyDown, RoutingStrategies.Tunnel);
+        AddHandler(Button.ClickEvent, LogButtonClick, RoutingStrategies.Bubble, true);
         PositionChanged += (_, _) => CaptureNormalBounds();
         Resized += (_, _) => CaptureNormalBounds();
         PropertyChanged += (_, eventArgs) =>
@@ -107,6 +114,7 @@ public partial class MainWindow : Window, INotificationSurface
     protected override void OnOpened(EventArgs eventArgs)
     {
         base.OnOpened(eventArgs);
+        logger.LogInformation("Main window opened");
         RestoreWindowPlacement();
         if (DataContext is MainViewModel viewModel) _ = InitializeAndCheckForUpdatesAsync(viewModel);
     }
@@ -120,6 +128,8 @@ public partial class MainWindow : Window, INotificationSurface
     /// <inheritdoc />
     protected override void OnClosing(WindowClosingEventArgs eventArgs)
     {
+        logger.LogInformation("Main window close requested; update={Update}; shutdown={Shutdown}; programmatic={Programmatic}",
+            updaterInteraction?.ShouldUpdateOnClose == true, shutdownCloseInProgress, eventArgs.IsProgrammatic);
         if (!updateCloseInProgress && updaterInteraction?.ShouldUpdateOnClose == true)
         {
             eventArgs.Cancel = true;
@@ -149,6 +159,7 @@ public partial class MainWindow : Window, INotificationSurface
 
         settings.MainWindowRestoreBounds = normalBounds;
         settings.MainWindowMaximized = WindowState == WindowState.Maximized;
+        logger.LogInformation("Main window closing; bounds {Bounds}; maximized {Maximized}", normalBounds, settings.MainWindowMaximized);
         base.OnClosing(eventArgs);
     }
 
@@ -260,11 +271,13 @@ public partial class MainWindow : Window, INotificationSurface
 
     private void MinimizeWindow(object? sender, RoutedEventArgs eventArgs)
     {
+        logger.LogInformation("User minimized main window");
         WindowState = WindowState.Minimized;
     }
 
     private void ToggleMaximizeWindow(object? sender, RoutedEventArgs eventArgs)
     {
+        logger.LogInformation("User toggled maximize; prior state {State}", WindowState);
         WindowState = WindowState == WindowState.Maximized
             ? WindowState.Normal
             : WindowState.Maximized;
@@ -272,11 +285,13 @@ public partial class MainWindow : Window, INotificationSurface
 
     private void CloseWindow(object? sender, RoutedEventArgs eventArgs)
     {
+        logger.LogInformation("User clicked Close window");
         Close();
     }
 
     private void CloseWithoutSaving(object? sender, RoutedEventArgs eventArgs)
     {
+        logger.LogInformation("User chose Exit without saving");
         if (DataContext is MainViewModel viewModel) viewModel.SuppressProjectAutosave();
         settingsPersistence?.SuppressSave();
         Close();
@@ -293,6 +308,7 @@ public partial class MainWindow : Window, INotificationSurface
     {
         if (eventArgs.Key != Key.K || eventArgs.KeyModifiers != KeyModifiers.Control) return;
 
+        logger.LogInformation("User pressed Ctrl+K to focus feature search");
         if (DataContext is MainViewModel viewModel)
         {
             viewModel.IsNavigationOpen = true;
@@ -327,6 +343,7 @@ public partial class MainWindow : Window, INotificationSurface
                                       ?? [];
         if (paths.Count > 0 && DataContext is MainViewModel viewModel)
         {
+            logger.LogInformation("User dropped {Count} beatmap paths: {Paths}", paths.Count, string.Join(" | ", paths));
             viewModel.Workspace.SetDroppedPaths(paths);
             eventArgs.DragEffects = DragDropEffects.Copy;
         }
@@ -336,5 +353,14 @@ public partial class MainWindow : Window, INotificationSurface
         }
 
         eventArgs.Handled = true;
+    }
+
+    private void LogButtonClick(object? sender, RoutedEventArgs eventArgs)
+    {
+        if (eventArgs.Source is not Button button) return;
+
+        string label = button.Content is string text ? text : button.Name ?? button.GetType().Name;
+        logger.LogInformation("User clicked {Control} ({Label}) in {Context}",
+            button.Name ?? button.GetType().Name, label, button.DataContext?.GetType().Name);
     }
 }

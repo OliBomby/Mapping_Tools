@@ -1,6 +1,5 @@
 using System.Text.RegularExpressions;
 using Mapping_Tools.Application.Abstractions;
-using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Tools.MapsetMerger.Contracts;

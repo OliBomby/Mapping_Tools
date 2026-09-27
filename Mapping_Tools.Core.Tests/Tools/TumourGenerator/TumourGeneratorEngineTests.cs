@@ -467,7 +467,7 @@ public sealed class TumourGeneratorEngineTests
         if (template == TumourTemplate.Circle)
         {
             slider.ControlPoints.Should().Contain(point => point.Type == PathType.PerfectCurve);
-            BeatmapTestData.EncodeHitObject(slider, 128).Should().Contain("|P|");
+            BeatmapTestData.EncodeHitObject(slider).Should().Contain("|P|");
             BeatmapTestData.EncodeHitObject(slider, 127).Split(',')[5].Should().StartWith("B|").And.NotContain("|P|");
         }
     }
