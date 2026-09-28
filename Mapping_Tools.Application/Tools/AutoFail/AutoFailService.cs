@@ -5,6 +5,8 @@ using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.AutoFail;
 using Mapping_Tools.Core.Tools.AutoFail.Models;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Mapping_Tools.Application.Tools.AutoFail;
 
@@ -13,16 +15,20 @@ public sealed class AutoFailService : IAutoFailService
 {
     private readonly IBeatmapEditingGateway editingGateway;
     private readonly ApplicationSettings settings;
+    private readonly ILogger<AutoFailService> logger;
 
     /// <summary>Creates a service that opens and saves beatmaps through the shared editing gateway.</summary>
     /// <param name="editingGateway">The live-aware, backup-before-write beatmap gateway.</param>
     /// <param name="settings">Supplies the automatic editor reload preference.</param>
+    /// <param name="logger">Records analysis and fix milestones.</param>
     public AutoFailService(
         IBeatmapEditingGateway editingGateway,
-        ApplicationSettings settings)
+        ApplicationSettings settings,
+        ILogger<AutoFailService>? logger = null)
     {
         this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.logger = logger ?? NullLogger<AutoFailService>.Instance;
     }
 
     /// <inheritdoc />
@@ -31,6 +37,7 @@ public sealed class AutoFailService : IAutoFailService
         CancellationToken cancellationToken = default)
     {
         Validate(options);
+        logger.LogInformation("Analyzing {Path}", options.Path);
         var session = await editingGateway.OpenBeatmapAsync(
             options.Path,
             LiveBeatmapPreference.PreferLive,
@@ -53,6 +60,7 @@ public sealed class AutoFailService : IAutoFailService
             options.PhysicsUpdateLeniency);
         // Detect auto-fail
         var analysis = detector.Analyze(cancellationToken);
+        logger.LogInformation("Analysis completed for {Path}", options.Path);
         return new AutoFailRun(analysis, beatmap.GetMapEndTime(), session, detector);
     }
 
@@ -79,6 +87,7 @@ public sealed class AutoFailService : IAutoFailService
         var detector = run.Detector ?? throw new InvalidOperationException("This analysis has no fix-planning session.");
         var session = run.Session ?? throw new InvalidOperationException("This analysis has no editing session.");
         // Fix auto-fail
+        logger.LogInformation("Applying fix to {Path}", session.Path);
         detector.ApplyFix(plan);
         bool reloadEditor = AutomaticEditorReloadPolicy.ShouldReloadEditor(
             session,

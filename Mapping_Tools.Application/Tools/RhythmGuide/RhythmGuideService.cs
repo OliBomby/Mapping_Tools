@@ -8,6 +8,8 @@ using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Mapping_Tools.Core.Tools.RhythmGuide;
 using Mapping_Tools.Core.Tools.RhythmGuide.Models;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Mapping_Tools.Application.Tools.RhythmGuide;
 
@@ -20,6 +22,7 @@ public sealed class RhythmGuideService : IRhythmGuideService
     private readonly ITextFileStore textFileStore;
     private readonly IBeatmapDecoder beatmapDecoder;
     private readonly IBeatmapEncoder beatmapEncoder;
+    private readonly ILogger<RhythmGuideService> logger;
 
     /// <summary>Creates a service that loads source maps and safely persists guide output.</summary>
     /// <param name="editingGateway">The live-aware, backup-before-write beatmap gateway.</param>
@@ -28,13 +31,15 @@ public sealed class RhythmGuideService : IRhythmGuideService
     /// <param name="textFileStore">Writes newly created beatmap documents.</param>
     /// <param name="beatmapDecoder">Decodes normalized source beatmaps for output generation.</param>
     /// <param name="beatmapEncoder">Encodes normalized source beatmaps and saves output.</param>
+    /// <param name="logger">Records source loading, generation, and output milestones.</param>
     public RhythmGuideService(
         IBeatmapEditingGateway editingGateway,
         IBeatmapBackupService backupService,
         IBeatmapsetFileSystem fileSystem,
         ITextFileStore textFileStore,
         IBeatmapDecoder beatmapDecoder,
-        IBeatmapEncoder beatmapEncoder)
+        IBeatmapEncoder beatmapEncoder,
+        ILogger<RhythmGuideService>? logger = null)
     {
         this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
         this.backupService = backupService ?? throw new ArgumentNullException(nameof(backupService));
@@ -42,6 +47,7 @@ public sealed class RhythmGuideService : IRhythmGuideService
         this.textFileStore = textFileStore ?? throw new ArgumentNullException(nameof(textFileStore));
         this.beatmapDecoder = beatmapDecoder ?? throw new ArgumentNullException(nameof(beatmapDecoder));
         this.beatmapEncoder = beatmapEncoder ?? throw new ArgumentNullException(nameof(beatmapEncoder));
+        this.logger = logger ?? NullLogger<RhythmGuideService>.Instance;
     }
 
     /// <inheritdoc />
@@ -50,10 +56,13 @@ public sealed class RhythmGuideService : IRhythmGuideService
         CancellationToken cancellationToken = default)
     {
         Validate(options);
+        logger.LogInformation("Started with {SourceCount} source beatmaps; mode {Mode}; output {OutputPath}",
+            options.Paths.Length, options.ExportMode, options.ExportPath);
         List<Beatmap> sources = [];
         foreach (string path in options.Paths)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            logger.LogInformation("Loading source {Path}", path);
             var source = await editingGateway.OpenBeatmapAsync(
                 path,
                 LiveBeatmapPreference.PreferLive,
@@ -65,6 +74,7 @@ public sealed class RhythmGuideService : IRhythmGuideService
                 cancellationToken).ConfigureAwait(false);
             sources.Add(source.Beatmap);
         }
+        logger.LogInformation("Loaded and backed up {SourceCount} source beatmaps", sources.Count);
 
         if (options.ExportMode == RhythmGuideExportMode.AddToMap)
         {
@@ -78,6 +88,8 @@ public sealed class RhythmGuideService : IRhythmGuideService
                 sources,
                 options,
                 cancellationToken);
+            logger.LogInformation("Appended {ObjectCount} objects to {Path}; saving",
+                target.Beatmap.HitObjects.Count - originalCount, options.ExportPath);
             await editingGateway.SaveAsync(
                 target,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -93,6 +105,7 @@ public sealed class RhythmGuideService : IRhythmGuideService
             beatmapDecoder,
             beatmapEncoder,
             cancellationToken);
+        logger.LogInformation("Generated {ObjectCount} objects for new map {Path}", generated.HitObjects.Count, options.ExportPath);
         BeatmapEditingSession output = new(
             generated,
             options.ExportPath,
@@ -110,6 +123,7 @@ public sealed class RhythmGuideService : IRhythmGuideService
         {
             cancellationToken.ThrowIfCancellationRequested();
             output.SaveFile();
+            logger.LogInformation("Created new beatmap {Path}", options.ExportPath);
         }
 
         return new RhythmGuideResult(

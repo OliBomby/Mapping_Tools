@@ -5,6 +5,8 @@ using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.HitsoundPreviewHelper;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Mapping_Tools.Application.Tools.HitsoundPreviewHelper;
 
@@ -16,16 +18,20 @@ public sealed class HitsoundPreviewHelperService : IHitsoundPreviewHelperService
 {
     private readonly IBeatmapEditingGateway editingGateway;
     private readonly ApplicationSettings settings;
+    private readonly ILogger<HitsoundPreviewHelperService> logger;
 
     /// <summary>Creates the hitsound-preview application service.</summary>
     /// <param name="editingGateway">Loads live-or-disk maps and saves safe edits.</param>
     /// <param name="settings">Supplies the automatic editor reload preference.</param>
+    /// <param name="logger">Records per-beatmap hitsound update milestones.</param>
     public HitsoundPreviewHelperService(
         IBeatmapEditingGateway editingGateway,
-        ApplicationSettings settings)
+        ApplicationSettings settings,
+        ILogger<HitsoundPreviewHelperService>? logger = null)
     {
         this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.logger = logger ?? NullLogger<HitsoundPreviewHelperService>.Instance;
     }
 
     /// <inheritdoc />
@@ -39,12 +45,14 @@ public sealed class HitsoundPreviewHelperService : IHitsoundPreviewHelperService
         ArgumentNullException.ThrowIfNull(paths);
         Validate(options);
         if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace)) throw new ArgumentException("Select at least one beatmap.", nameof(paths));
+        logger.LogInformation("Started for {Count} beatmaps with {ItemCount} items", paths.Count, options.Items.Count);
 
         List<string> processedPaths = [];
         int updatedEventCount = 0;
         for (int index = 0; index < paths.Count; index++)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            logger.LogInformation("Processing beatmap {Index}/{Count}: {Path}", index + 1, paths.Count, paths[index]);
             var session = await editingGateway
                 .OpenBeatmapAsync(
                     paths[index],
@@ -57,6 +65,7 @@ public sealed class HitsoundPreviewHelperService : IHitsoundPreviewHelperService
                 options.Items,
                 progress?.MapTo(index, paths.Count),
                 cancellationToken);
+            logger.LogInformation("Updated {UpdatedCount} events in {Path}; saving", updated, paths[index]);
 
             // Save the file
             await editingGateway
@@ -73,6 +82,8 @@ public sealed class HitsoundPreviewHelperService : IHitsoundPreviewHelperService
         }
 
         progress?.Report(1);
+        logger.LogInformation("Completed {Count} beatmaps with {UpdatedCount} events updated",
+            processedPaths.Count, updatedEventCount);
         return new HitsoundPreviewHelperResult(processedPaths, updatedEventCount);
     }
 

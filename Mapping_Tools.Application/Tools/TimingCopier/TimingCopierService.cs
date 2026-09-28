@@ -2,6 +2,8 @@ using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.TimingCopier;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Mapping_Tools.Application.Tools.TimingCopier;
 
@@ -11,15 +13,18 @@ namespace Mapping_Tools.Application.Tools.TimingCopier;
 public sealed class TimingCopierService : ITimingCopierService
 {
     private readonly IBeatmapEditingGateway editingGateway;
+    private readonly ILogger<TimingCopierService> logger;
 
     /// <summary>
     ///     Creates the Timing Copier application service.
     /// </summary>
     /// <param name="editingGateway">Loads documents and saves them through the backup boundary.</param>
-    public TimingCopierService(IBeatmapEditingGateway editingGateway)
+    /// <param name="logger">Records source and target copy milestones.</param>
+    public TimingCopierService(IBeatmapEditingGateway editingGateway, ILogger<TimingCopierService>? logger = null)
     {
         this.editingGateway = editingGateway
                               ?? throw new ArgumentNullException(nameof(editingGateway));
+        this.logger = logger ?? NullLogger<TimingCopierService>.Instance;
     }
 
     /// <inheritdoc />
@@ -36,6 +41,7 @@ public sealed class TimingCopierService : ITimingCopierService
             throw new ArgumentException(
                 "Select at least one target beatmap.",
                 nameof(options));
+        logger.LogInformation("Started from {SourcePath} for {TargetCount} targets", options.ImportPath, targetPaths.Length);
 
         var source = await editingGateway
             .OpenBeatmapAsync(
@@ -49,6 +55,7 @@ public sealed class TimingCopierService : ITimingCopierService
         {
             cancellationToken.ThrowIfCancellationRequested();
             string targetPath = targetPaths[index];
+            logger.LogInformation("Processing target {Index}/{Count}: {Path}", index + 1, targetPaths.Length, targetPath);
 
             var target = await editingGateway
                 .OpenBeatmapAsync(
@@ -61,6 +68,7 @@ public sealed class TimingCopierService : ITimingCopierService
                 source.Beatmap,
                 options,
                 cancellationToken);
+            logger.LogInformation("Applied timing to {Path}; saving", targetPath);
             // Save the file
             await editingGateway
                 .SaveAsync(target, cancellationToken: cancellationToken)
@@ -69,6 +77,7 @@ public sealed class TimingCopierService : ITimingCopierService
             progress?.Report(index + 1, targetPaths.Length);
         }
 
+        logger.LogInformation("Completed {Count} targets", processedPaths.Count);
         return new TimingCopierResult(processedPaths);
     }
 

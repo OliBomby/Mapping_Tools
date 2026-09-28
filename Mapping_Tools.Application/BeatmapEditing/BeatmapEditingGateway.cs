@@ -7,6 +7,8 @@ using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Serialization;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Mapping_Tools.Application.BeatmapEditing;
 
@@ -25,6 +27,7 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
     private readonly IBeatmapEncoder beatmapEncoder;
     private readonly IStoryboardDecoder storyboardDecoder;
     private readonly IStoryboardEncoder storyboardEncoder;
+    private readonly ILogger<BeatmapEditingGateway> logger;
 
     /// <summary>
     ///     Creates the application service that arbitrates between durable files
@@ -41,6 +44,7 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
     /// <param name="beatmapEncoder">The beatmap encoder used when saving files.</param>
     /// <param name="storyboardDecoder">The storyboard decoder used when opening files.</param>
     /// <param name="storyboardEncoder">The storyboard encoder used when saving files.</param>
+    /// <param name="logger">Records how beatmaps are opened and saved.</param>
     public BeatmapEditingGateway(
         ITextFileStore fileStore,
         IBeatmapBackupService backupService,
@@ -50,7 +54,8 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
         IBeatmapDecoder beatmapDecoder,
         IBeatmapEncoder beatmapEncoder,
         IStoryboardDecoder storyboardDecoder,
-        IStoryboardEncoder storyboardEncoder)
+        IStoryboardEncoder storyboardEncoder,
+        ILogger<BeatmapEditingGateway>? logger = null)
     {
         this.fileStore = fileStore ?? throw new ArgumentNullException(nameof(fileStore));
         this.backupService = backupService ?? throw new ArgumentNullException(nameof(backupService));
@@ -61,6 +66,7 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
         this.beatmapEncoder = beatmapEncoder ?? throw new ArgumentNullException(nameof(beatmapEncoder));
         this.storyboardDecoder = storyboardDecoder ?? throw new ArgumentNullException(nameof(storyboardDecoder));
         this.storyboardEncoder = storyboardEncoder ?? throw new ArgumentNullException(nameof(storyboardEncoder));
+        this.logger = logger ?? NullLogger<BeatmapEditingGateway>.Instance;
     }
 
     /// <inheritdoc />
@@ -72,14 +78,22 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         cancellationToken.ThrowIfCancellationRequested();
 
+        logger.LogInformation("Opening beatmap {Path}; live preference {Preference}", path, livePreference);
         BeatmapEditingSession diskSession = new(path, fileStore, beatmapDecoder, beatmapEncoder);
-        if (livePreference == LiveBeatmapPreference.DiskOnly) return diskSession;
+        if (livePreference == LiveBeatmapPreference.DiskOnly)
+        {
+            logger.LogInformation("Opened beatmap {Path} from disk because disk-only mode was requested", path);
+            return diskSession;
+        }
 
         if (settings.BeatmapLiveStateReading == BeatmapLiveStateReadingMode.Disabled)
+        {
+            logger.LogInformation("Live state is disabled for beatmap {Path}; using disk when allowed", path);
             return livePreference == LiveBeatmapPreference.RequireLive
                 ? throw new LiveBeatmapUnavailableException(
                     "Live editor state is disabled in Mapping Tools settings.")
                 : diskSession;
+        }
 
         try
         {
@@ -88,20 +102,27 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
                 .ConfigureAwait(false);
 
             if (snapshot is null)
+            {
+                logger.LogInformation("No live editor snapshot for beatmap {Path}; using disk when allowed", path);
                 return livePreference == LiveBeatmapPreference.RequireLive
                     ? throw new LiveBeatmapUnavailableException(
                         "No active osu! beatmap editor could be read.")
                     : diskSession;
+            }
 
             string snapshotPath = Path.GetFullPath(snapshot.Path);
             string requestedPath = Path.GetFullPath(path);
             if (!string.Equals(snapshotPath, requestedPath, StringComparison.Ordinal))
+            {
+                logger.LogInformation("Live editor has {EditorPath} rather than {Path}; using disk when allowed", snapshot.Path, path);
                 return livePreference == LiveBeatmapPreference.RequireLive
                     ? throw new LiveBeatmapUnavailableException(
                         $"osu! is editing '{snapshot.Path}', not the requested beatmap '{path}'.")
                     : diskSession;
+            }
 
             var selected = ApplyLiveState(diskSession.Beatmap, snapshot);
+            logger.LogInformation("Opened beatmap {Path} from live editor with {SelectedCount} selected objects", path, selected.Count);
             return new BeatmapEditingSession(
                 diskSession.Beatmap,
                 path,
@@ -121,6 +142,7 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
         }
         catch (Exception exception) when (livePreference == LiveBeatmapPreference.PreferLive)
         {
+            logger.LogWarning(exception, "Live editor read failed for {Path}; falling back to disk", path);
             return new BeatmapEditingSession(
                 diskSession.Beatmap,
                 path,
@@ -132,6 +154,7 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
         }
         catch (Exception exception)
         {
+            logger.LogWarning(exception, "Required live editor read failed for {Path}", path);
             throw new LiveBeatmapUnavailableException(
                 "osu! editor state could not be read safely.",
                 exception);
@@ -145,6 +168,7 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         cancellationToken.ThrowIfCancellationRequested();
+        logger.LogInformation("Opening storyboard {Path} from disk", path);
         return Task.FromResult(new StoryboardEditingSession(
             path,
             fileStore,
@@ -181,6 +205,8 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        logger.LogInformation("Saving {Path}; source {Source}; reload requested {Reload}",
+            editingSession.Path, beatmapSession?.Source.ToString() ?? "Storyboard", reloadEditor);
         if (beatmapSession is null)
             await backupService.CreateAsync(
                     [editingSession.Path],
@@ -194,13 +220,17 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
                     cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
+        logger.LogInformation("Backup completed for {Path}; writing file", editingSession.Path);
         cancellationToken.ThrowIfCancellationRequested();
         editingSession.SaveFile();
+        logger.LogInformation("Saved {Path}", editingSession.Path);
 
         if (reloadEditor)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            logger.LogInformation("Reloading editor after saving {Path}", editingSession.Path);
             await reloadService.ReloadAsync(cancellationToken).ConfigureAwait(false);
+            logger.LogInformation("Editor reload completed for {Path}", editingSession.Path);
         }
     }
 

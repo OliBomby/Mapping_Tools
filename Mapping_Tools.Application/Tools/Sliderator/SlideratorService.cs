@@ -7,6 +7,8 @@ using Mapping_Tools.Application.Tools.Sliderator.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.Sliderator;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Mapping_Tools.Application.Tools.Sliderator;
 
@@ -18,16 +20,20 @@ public sealed class SlideratorService : ISlideratorService
 {
     private readonly IBeatmapEditingGateway editingGateway;
     private readonly ApplicationSettings settings;
+    private readonly ILogger<SlideratorService> logger;
 
     /// <summary>Creates the Sliderator application service.</summary>
     /// <param name="editingGateway">Opens live-or-disk maps and saves backup-first.</param>
     /// <param name="settings">Supplies the automatic editor reload preference.</param>
+    /// <param name="logger">Records import and generation milestones.</param>
     public SlideratorService(
         IBeatmapEditingGateway editingGateway,
-        ApplicationSettings settings)
+        ApplicationSettings settings,
+        ILogger<SlideratorService>? logger = null)
     {
         this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.logger = logger ?? NullLogger<SlideratorService>.Instance;
     }
 
     /// <inheritdoc />
@@ -47,6 +53,8 @@ public sealed class SlideratorService : ISlideratorService
             .OpenBeatmapAsync(path, preference, cancellationToken)
             .ConfigureAwait(false);
         var selected = BeatmapObjectSelection.Select(session, mode, timeCode);
+        logger.LogInformation("Imported {SliderCount} sliders from {Path} using {Mode}",
+            selected.Count(hitObject => hitObject.IsSlider), path, mode);
         return new SlideratorImportResult(
             selected.Where(hitObject => hitObject.IsSlider).ToArray(),
             session.Beatmap.Difficulty["SliderMultiplier"].DoubleValue,
@@ -68,6 +76,7 @@ public sealed class SlideratorService : ISlideratorService
         ArgumentNullException.ThrowIfNull(project);
         ArgumentNullException.ThrowIfNull(sourceSlider);
         SlideratorEngine.Validate(project, sourceSlider);
+        logger.LogInformation("Generation started for {Path}; quick run {QuickRun}", path, quickRun);
 
         var session = await editingGateway
             .OpenBeatmapAsync(
@@ -82,6 +91,7 @@ public sealed class SlideratorService : ISlideratorService
             project,
             progress,
             cancellationToken);
+        logger.LogInformation("Geometry generated for {Path}; saving result", path);
         bool shouldReload = AutomaticEditorReloadPolicy.ShouldReloadEditor(
             session,
             quickRun,

@@ -6,6 +6,8 @@ using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.MapCleaner;
 using Mapping_Tools.Core.Tools.MapCleaner.Models;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Mapping_Tools.Application.Tools.MapCleaner;
 
@@ -16,22 +18,26 @@ public sealed class MapCleanerService : IMapCleanerService
     private readonly IBeatmapsetFileSystem fileSystem;
     private readonly IMapCleanerSampleService samples;
     private readonly ApplicationSettings settings;
+    private readonly ILogger<MapCleanerService> logger;
 
     /// <summary>Creates a service that cleans beatmaps and their mapset samples.</summary>
     /// <param name="editingGateway">The live-aware, backup-before-write beatmap gateway.</param>
     /// <param name="fileSystem">Resolves beatmap parent directories.</param>
     /// <param name="samples">Analyzes and recoverably removes mapset samples.</param>
     /// <param name="settings">Supplies the automatic editor reload preference.</param>
+    /// <param name="logger">Records per-beatmap cleanup milestones.</param>
     public MapCleanerService(
         IBeatmapEditingGateway editingGateway,
         IBeatmapsetFileSystem fileSystem,
         IMapCleanerSampleService samples,
-        ApplicationSettings settings)
+        ApplicationSettings settings,
+        ILogger<MapCleanerService>? logger = null)
     {
         this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
         this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
         this.samples = samples ?? throw new ArgumentNullException(nameof(samples));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.logger = logger ?? NullLogger<MapCleanerService>.Instance;
     }
 
     /// <inheritdoc />
@@ -46,12 +52,15 @@ public sealed class MapCleanerService : IMapCleanerService
         ArgumentNullException.ThrowIfNull(options);
         if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace)) throw new ArgumentException("Select at least one beatmap.", nameof(paths));
         MapCleanerEngine.Validate(options);
+        logger.LogInformation("Started for {Count} beatmaps; analyze samples {AnalyzeSamples}; remove unused samples {RemoveUnusedSamples}",
+            paths.Count, options.AnalyzeSamples, options.RemoveUnusedSamples);
 
         MapCleanerResult total = new(0, 0, 0, [], [], [], 20);
         for (int index = 0; index < paths.Count; index++)
         {
             cancellationToken.ThrowIfCancellationRequested();
             string path = paths[index];
+            logger.LogInformation("Processing beatmap {Index}/{Count}: {Path}", index + 1, paths.Count, path);
             string directory = fileSystem.GetParentDirectory(path) ?? throw new InvalidOperationException($"Could not resolve the folder for '{path}'.");
 
             var session = await editingGateway.OpenBeatmapAsync(
@@ -63,6 +72,7 @@ public sealed class MapCleanerService : IMapCleanerService
                 directory,
                 options.AnalyzeSamples,
                 cancellationToken).ConfigureAwait(false);
+            logger.LogInformation("Sample analysis completed for {Path}", path);
 
             var mapProgress = progress?.MapTo(index, paths.Count);
 
@@ -73,6 +83,8 @@ public sealed class MapCleanerService : IMapCleanerService
                 firstSamples,
                 mapProgress,
                 cancellationToken);
+            logger.LogInformation("Transformed {Path}: {ObjectsResnapped} objects resnapped, {TimingPointsRemoved} timing points removed",
+                path, result.ObjectsResnapped, result.TimingPointsRemoved);
 
             // Save the file
             await editingGateway.SaveAsync(
@@ -89,11 +101,14 @@ public sealed class MapCleanerService : IMapCleanerService
                     session.Beatmap,
                     cancellationToken).ConfigureAwait(false)
                 : 0;
+            logger.LogInformation("Completed {Path}: {SamplesRemoved} samples moved to recovery", path, removedSamples);
 
             // Update result with removed count
             total = total.Add(result with { SamplesRemoved = removedSamples });
         }
 
+        logger.LogInformation("Completed {Count} beatmaps: {ObjectsResnapped} objects resnapped, {TimingPointsRemoved} timing points removed, {SamplesRemoved} samples moved",
+            paths.Count, total.ObjectsResnapped, total.TimingPointsRemoved, total.SamplesRemoved);
         return total;
     }
 }

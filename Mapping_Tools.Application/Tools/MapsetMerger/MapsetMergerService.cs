@@ -9,6 +9,8 @@ using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.MapsetMerger;
 using Mapping_Tools.Core.Tools.MapsetMerger.Models;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Mapping_Tools.Application.Tools.MapsetMerger;
 
@@ -25,22 +27,26 @@ public sealed class MapsetMergerService : IMapsetMergerService
     private readonly IBeatmapsetFileSystem fileSystem;
     private readonly IBeatmapEncoder beatmapEncoder;
     private readonly IStoryboardEncoder storyboardEncoder;
+    private readonly ILogger<MapsetMergerService> logger;
 
     /// <summary>Creates the export service.</summary>
     /// <param name="editingGateway">Loads disk-only beatmaps and storyboards.</param>
     /// <param name="fileSystem">Reads and writes mapset components and owns staged output mutation.</param>
     /// <param name="beatmapEncoder">Encodes beatmaps for export.</param>
     /// <param name="storyboardEncoder">Encodes storyboards for export.</param>
+    /// <param name="logger">Records mapset staging and commit milestones.</param>
     public MapsetMergerService(
         IBeatmapEditingGateway editingGateway,
         IBeatmapsetFileSystem fileSystem,
         IBeatmapEncoder beatmapEncoder,
-        IStoryboardEncoder storyboardEncoder)
+        IStoryboardEncoder storyboardEncoder,
+        ILogger<MapsetMergerService>? logger = null)
     {
         this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
         this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
         this.beatmapEncoder = beatmapEncoder ?? throw new ArgumentNullException(nameof(beatmapEncoder));
         this.storyboardEncoder = storyboardEncoder ?? throw new ArgumentNullException(nameof(storyboardEncoder));
+        this.logger = logger ?? NullLogger<MapsetMergerService>.Instance;
     }
 
     /// <inheritdoc />
@@ -54,6 +60,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
         Validate(project, inputs);
         MapsetMergerEngine.ResolveDuplicateMapsetNames(inputs);
         ValidateExportPathDoesNotOverlapSources(project.ExportPath, inputs);
+        logger.LogInformation("Staging {Count} mapsets in {OutputPath}", inputs.Count, project.ExportPath);
 
         using var transaction = fileSystem.BeginTransaction(project.ExportPath);
         HashSet<string> usedDifficultyNames = new();
@@ -81,6 +88,8 @@ public sealed class MapsetMergerService : IMapsetMergerService
                 "*.osb",
                 SearchOption.AllDirectories);
             ValidateSourceFileCounts(input, beatmapPaths, storyboardPaths);
+            logger.LogInformation("Processing mapset {Index}/{Count}: {Path}; {BeatmapCount} beatmaps, {StoryboardCount} storyboards",
+                mapsetIndex + 1, inputs.Count, input.Path, beatmapPaths.Count, storyboardPaths.Count);
 
             List<(string Path, Beatmap Beatmap)> beatmaps = [];
             foreach (string path in beatmapPaths)
@@ -160,16 +169,21 @@ public sealed class MapsetMergerService : IMapsetMergerService
                 beatmapsWritten++;
             }
 
-            assetsCopied += CopyReferences(
+            int copied = CopyReferences(
                 transaction,
                 input,
                 references,
                 sampleIndices,
                 cancellationToken);
+            assetsCopied += copied;
+            logger.LogInformation("Staged {Path}: {AssetCount} assets copied", input.Path, copied);
             progress?.Report(mapsetIndex + 1, inputs.Count);
         }
 
+        logger.LogInformation("Committing output {OutputPath}: {BeatmapCount} beatmaps, {StoryboardCount} storyboards, {AssetCount} assets",
+            project.ExportPath, beatmapsWritten, storyboardsWritten, assetsCopied);
         await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+        logger.LogInformation("Committed output {OutputPath}", project.ExportPath);
         return new MapsetMergerResult(
             inputs.Count,
             beatmapsWritten,

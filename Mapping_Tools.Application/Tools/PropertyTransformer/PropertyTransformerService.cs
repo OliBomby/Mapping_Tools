@@ -4,6 +4,8 @@ using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.PropertyTransformer;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Mapping_Tools.Application.Tools.PropertyTransformer;
 
@@ -14,19 +16,23 @@ public sealed class PropertyTransformerService : IPropertyTransformerService
 {
     private readonly IBeatmapEditingGateway editingGateway;
     private readonly ApplicationSettings settings;
+    private readonly ILogger<PropertyTransformerService> logger;
 
     /// <summary>
     ///     Creates the Property Transformer application service.
     /// </summary>
     /// <param name="editingGateway">Loads documents and saves them through the backup boundary.</param>
     /// <param name="settings">Supplies the automatic editor reload preference.</param>
+    /// <param name="logger">Records document transformation milestones.</param>
     public PropertyTransformerService(
         IBeatmapEditingGateway editingGateway,
-        ApplicationSettings settings)
+        ApplicationSettings settings,
+        ILogger<PropertyTransformerService>? logger = null)
     {
         this.editingGateway = editingGateway
                               ?? throw new ArgumentNullException(nameof(editingGateway));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.logger = logger ?? NullLogger<PropertyTransformerService>.Instance;
     }
 
     /// <inheritdoc />
@@ -44,12 +50,14 @@ public sealed class PropertyTransformerService : IPropertyTransformerService
                 "Select at least one beatmap or storyboard.",
                 nameof(paths));
         PropertyTransformerEngine.Validate(options);
+        logger.LogInformation("Started for {Count} documents", paths.Count);
 
         List<string> processedPaths = [];
         for (int index = 0; index < paths.Count; index++)
         {
             cancellationToken.ThrowIfCancellationRequested();
             string path = paths[index];
+            logger.LogInformation("Processing document {Index}/{Count}: {Path}", index + 1, paths.Count, path);
             var documentProgress = progress?.MapTo(index, paths.Count);
 
             if (Path.GetExtension(path).Equals(
@@ -64,6 +72,7 @@ public sealed class PropertyTransformerService : IPropertyTransformerService
                     options,
                     documentProgress,
                     cancellationToken);
+                logger.LogInformation("Transformed storyboard {Path}; saving", path);
                 // Save the file
                 await editingGateway.SaveAsync(
                         editor,
@@ -83,6 +92,7 @@ public sealed class PropertyTransformerService : IPropertyTransformerService
                     options,
                     documentProgress,
                     cancellationToken);
+                logger.LogInformation("Transformed beatmap {Path}; saving", path);
                 // Save the file
                 await editingGateway.SaveAsync(
                         session,
@@ -98,6 +108,7 @@ public sealed class PropertyTransformerService : IPropertyTransformerService
         }
 
         progress?.Report(1);
+        logger.LogInformation("Completed {Count} documents", processedPaths.Count);
         return new PropertyTransformerResult(processedPaths);
     }
 }

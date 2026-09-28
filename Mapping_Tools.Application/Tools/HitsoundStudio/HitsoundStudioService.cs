@@ -17,6 +17,8 @@ using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.HitsoundStudio;
 using Mapping_Tools.Core.Tools.HitsoundStudio.Models;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Mapping_Tools.Application.Tools.HitsoundStudio;
 
@@ -35,6 +37,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
     private readonly IAudioClipMixer mixer;
     private readonly IFileRevealService reveal;
     private readonly IMapCleanerSampleService sampleAnalyzer;
+    private readonly ILogger<HitsoundStudioService> logger;
 
     /// <summary>Creates the Hitsound Studio application service.</summary>
     /// <param name="beatmaps">Loads disk-only beatmaps and writes export copies.</param>
@@ -46,6 +49,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
     /// <param name="files">Performs export-directory mutations.</param>
     /// <param name="reveal">Opens the completed export directory.</param>
     /// <param name="engine">Applies framework-neutral layer and schema rules.</param>
+    /// <param name="logger">Records export stages and output counts.</param>
     public HitsoundStudioService(
         IBeatmapEditingGateway beatmaps,
         IMapCleanerSampleService sampleAnalyzer,
@@ -55,7 +59,8 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         IMidiService midi,
         IBeatmapsetFileSystem files,
         IFileRevealService reveal,
-        HitsoundStudioEngine engine)
+        HitsoundStudioEngine engine,
+        ILogger<HitsoundStudioService>? logger = null)
     {
         this.beatmaps = beatmaps ?? throw new ArgumentNullException(nameof(beatmaps));
         this.sampleAnalyzer = sampleAnalyzer ?? throw new ArgumentNullException(nameof(sampleAnalyzer));
@@ -66,6 +71,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         this.files = files ?? throw new ArgumentNullException(nameof(files));
         this.reveal = reveal ?? throw new ArgumentNullException(nameof(reveal));
         this.engine = engine ?? throw new ArgumentNullException(nameof(engine));
+        this.logger = logger ?? NullLogger<HitsoundStudioService>.Instance;
     }
 
     /// <inheritdoc />
@@ -154,6 +160,8 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
     {
         ArgumentNullException.ThrowIfNull(project);
         Validate(project);
+        logger.LogInformation("Export started: {LayerCount} layers, mode {Mode}, folder {Folder}; export map {ExportMap}, samples {ExportSamples}",
+            project.HitsoundLayers.Count, project.HitsoundExportModeSetting, project.ExportFolder, project.ExportMap, project.ExportSamples);
         files.EnsureDirectoryExists(project.ExportFolder);
         bool validateSampleFile = project.SingleSampleExportFormat != HitsoundStudioSampleExportFormat.MidiChords
                                   && project.MixedSampleExportFormat != HitsoundStudioSampleExportFormat.MidiChords;
@@ -183,6 +191,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         // Convert the multiple layers into packages that have the samples from all the layers at one specific time.
         var packages = engine.ZipLayers(project.HitsoundLayers, project.DefaultSample,
             project.ZipLayersLeniency, validateSampleFile).ToList();
+        logger.LogInformation("Grouped layers into {PackageCount} standard packages", packages.Count);
         Report(progress, 0.1);
 
         // Balance the volume between greenlines and samples.
@@ -201,6 +210,8 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             project.FirstCustomIndex,
             isValid,
             comparer);
+        logger.LogInformation("Built {EventCount} standard events and {SampleCount} sample assignments",
+            standard.Events.Count, standard.Schema.Count);
         Report(progress, 0.6);
 
         string detailedSummary =
@@ -221,6 +232,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
                 cancellationToken).ConfigureAwait(false);
             ApplyExport(session.Beatmap, standard.Events, project);
             mapPath = Path.Combine(project.ExportFolder, session.Beatmap.GetFileName());
+            logger.LogInformation("Writing beatmap {Path}", mapPath);
             session.SaveFile(mapPath);
         }
 
@@ -230,6 +242,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             ? await ExportStandardSamplesAsync(standard.Schema, project, comparer, cancellationToken)
                 .ConfigureAwait(false)
             : 0;
+        logger.LogInformation("Exported {SampleCount} standard samples", sampleCount);
         Report(progress, 0.99);
 
         return await ShowResultsAsync(
@@ -291,6 +304,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             !validateSampleFile || IsValidSource(sample);
 
         var packages = engine.ZipLayers(project.HitsoundLayers, project.DefaultSample, 0, false).ToList();
+        logger.LogInformation("Grouped layers into {PackageCount} named packages", packages.Count);
 
         // Balance the volume between greenlines and samples.
         engine.BalanceVolumes(packages, 0, false, true);
@@ -304,6 +318,8 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             project.AllowGrowthPreviousSampleSchema,
             isValid,
             comparer);
+        logger.LogInformation("Built {EventCount} named events and {SampleCount} sample assignments",
+            named.Events.Count, named.Schema.Count);
         Report(progress, 0.5);
 
         string detailedSummary =
@@ -324,6 +340,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
                 cancellationToken).ConfigureAwait(false);
             ApplyExport(session.Beatmap, named.Events, project);
             mapPath = Path.Combine(project.ExportFolder, session.Beatmap.GetFileName());
+            logger.LogInformation("Writing beatmap {Path}", mapPath);
             session.SaveFile(mapPath);
         }
 
@@ -332,6 +349,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         int sampleCount = project.ExportSamples
             ? await ExportNamedSamplesAsync(named, project, comparer, cancellationToken).ConfigureAwait(false)
             : 0;
+        logger.LogInformation("Exported {SampleCount} named samples", sampleCount);
 
         return await ShowResultsAsync(
             project,
@@ -352,6 +370,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
     {
         // Don't add the default sample when exporting MIDI files because that is not a final export.
         var packages = engine.ZipLayers(project.HitsoundLayers, project.DefaultSample, 0, false).ToList();
+        logger.LogInformation("Grouped layers into {PackageCount} MIDI packages", packages.Count);
         var session = await beatmaps.OpenBeatmapAsync(
             project.BaseBeatmap,
             LiveBeatmapPreference.DiskOnly,
@@ -371,6 +390,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         if (project.ExportMap)
         {
             mapPath = Path.Combine(project.ExportFolder, project.HitsoundDiffName + ".mid");
+            logger.LogInformation("Writing MIDI file {Path}", mapPath);
             await ExportMidiAsync(
                 packages,
                 beatmap,
@@ -406,6 +426,8 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             await reveal.RevealAsync(project.ExportFolder, cancellationToken).ConfigureAwait(false);
 
         Report(progress, 1);
+        logger.LogInformation("Export completed: map {MapPath}, {SampleCount} samples, {EventCount} events; {Summary}",
+            mapPath, sampleCount, eventCount, detailedSummary);
         return new HitsoundStudioExportResult(
             mapPath,
             sampleCount,

@@ -4,6 +4,8 @@ using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.SliderPicturator;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Mapping_Tools.Application.Tools.SliderPicturator;
 
@@ -13,19 +15,23 @@ public sealed class SliderPicturatorService : ISliderPicturatorService
     private readonly IBeatmapEditingGateway editingGateway;
     private readonly IImageFileService images;
     private readonly ApplicationSettings settings;
+    private readonly ILogger<SliderPicturatorService> logger;
 
     /// <summary>Creates the Slider Picturator application service.</summary>
     /// <param name="editingGateway">Loads and backup-saves beatmaps.</param>
     /// <param name="images">Decodes local image files into Core pixel buffers.</param>
     /// <param name="settings">Supplies the automatic editor reload preference.</param>
+    /// <param name="logger">Records image generation and save milestones.</param>
     public SliderPicturatorService(
         IBeatmapEditingGateway editingGateway,
         IImageFileService images,
-        ApplicationSettings settings)
+        ApplicationSettings settings,
+        ILogger<SliderPicturatorService>? logger = null)
     {
         this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
         this.images = images ?? throw new ArgumentNullException(nameof(images));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.logger = logger ?? NullLogger<SliderPicturatorService>.Instance;
     }
 
     /// <inheritdoc />
@@ -40,6 +46,7 @@ public sealed class SliderPicturatorService : ISliderPicturatorService
         Validate(options);
         cancellationToken.ThrowIfCancellationRequested();
 
+        logger.LogInformation("Loading image {ImagePath} for beatmap {Path}", options.PictureFile, path);
         var image = await images.LoadAsync(options.PictureFile, cancellationToken).ConfigureAwait(false);
         progress?.Report(0.1);
 
@@ -53,10 +60,12 @@ public sealed class SliderPicturatorService : ISliderPicturatorService
             image,
             circleSize,
             options);
+        logger.LogInformation("Generated path for {Path}; applying to beatmap", path);
         cancellationToken.ThrowIfCancellationRequested();
 
         SliderPicturatorEngine.ApplyToBeatmap(beatmap, pathPoints, frameDistance, options);
         long segmentCount = SliderPicturatorEngine.Recolor(image, options).SegmentCount;
+        logger.LogInformation("Applied image to {Path} with {SegmentCount} segments; saving", path, segmentCount);
 
         await editingGateway
             .SaveAsync(
@@ -68,6 +77,7 @@ public sealed class SliderPicturatorService : ISliderPicturatorService
                 cancellationToken)
             .ConfigureAwait(false);
         progress?.Report(1);
+        logger.LogInformation("Completed {Path}", path);
         return new SliderPicturatorResult(path, segmentCount);
     }
 

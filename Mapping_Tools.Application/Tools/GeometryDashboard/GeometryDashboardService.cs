@@ -9,6 +9,8 @@ using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Mapping_Tools.Application.Tools.GeometryDashboard;
 
@@ -38,6 +40,7 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
     private readonly IGeometryDashboardRuntime runtime;
     private readonly List<IRelevantDrawable> selectedDrawables = [];
     private readonly Lock stateGate = new();
+    private readonly ILogger<GeometryDashboardService> logger;
     private bool disposed;
     private HitObject[] heldHitObjects = [];
     private Vector2 heldMouseOffset;
@@ -66,18 +69,21 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
     /// <param name="runtime">Reads semantic osu! editor snapshots.</param>
     /// <param name="input">Reads and updates osu!-space global input.</param>
     /// <param name="overlayService">Displays neutral osu!-space overlay scenes.</param>
+    /// <param name="logger">Records dashboard lifecycle and loop failures.</param>
     public GeometryDashboardService(
         ApplicationSettings applicationSettings,
         GeometryDashboardServiceOptions project,
         IGeometryDashboardRuntime runtime,
         IGeometryDashboardInputService input,
-        IGeometryDashboardOverlayService overlayService)
+        IGeometryDashboardOverlayService overlayService,
+        ILogger<GeometryDashboardService>? logger = null)
     {
         this.applicationSettings = applicationSettings ?? throw new ArgumentNullException(nameof(applicationSettings));
         this.project = project ?? throw new ArgumentNullException(nameof(project));
         this.runtime = runtime ?? throw new ArgumentNullException(nameof(runtime));
         this.input = input ?? throw new ArgumentNullException(nameof(input));
         this.overlayService = overlayService ?? throw new ArgumentNullException(nameof(overlayService));
+        this.logger = logger ?? NullLogger<GeometryDashboardService>.Instance;
 
         Generators = DiscoverGenerators();
         project.SetGenerators(Generators);
@@ -126,6 +132,7 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
             ThrowIfDisposed();
             if (runLoop is { IsCompleted: false }) return;
 
+            logger.LogInformation("Starting");
             PublishState("Starting...");
             runCancellation?.Dispose();
             runCancellation = new CancellationTokenSource();
@@ -138,6 +145,7 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
     /// <inheritdoc />
     public void Stop()
     {
+        logger.LogInformation("Stopping");
         Task? worker;
         Task? snappingWorker;
         CancellationTokenSource? cancellation;
@@ -168,6 +176,7 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
         }
 
         PublishUnavailableState("Stopped");
+        logger.LogInformation("Stopped");
     }
 
     /// <inheritdoc />
@@ -298,6 +307,8 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
 
     private async Task RunLoopAsync(CancellationToken cancellationToken)
     {
+        string? lastFailure = null;
+        DateTime lastFailureLoggedAt = DateTime.MinValue;
         while (!cancellationToken.IsCancellationRequested)
         {
             try
@@ -310,6 +321,13 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
             }
             catch (Exception exception)
             {
+                string failure = $"{exception.GetType().FullName}: {exception.Message}";
+                if (failure != lastFailure || DateTime.UtcNow - lastFailureLoggedAt >= TimeSpan.FromMinutes(1))
+                {
+                    logger.LogWarning(exception, "Refresh failed; retrying");
+                    lastFailureLoggedAt = DateTime.UtcNow;
+                }
+                lastFailure = failure;
                 PublishUnavailableState($"Error: {exception.Message} Retrying...");
             }
 
@@ -327,6 +345,8 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
 
     private async Task SnappingLoopAsync(CancellationToken cancellationToken)
     {
+        string? lastFailure = null;
+        DateTime lastFailureLoggedAt = DateTime.MinValue;
         while (!cancellationToken.IsCancellationRequested)
         {
             try
@@ -339,6 +359,13 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
             }
             catch (Exception exception)
             {
+                string failure = $"{exception.GetType().FullName}: {exception.Message}";
+                if (failure != lastFailure || DateTime.UtcNow - lastFailureLoggedAt >= TimeSpan.FromMinutes(1))
+                {
+                    logger.LogWarning(exception, "Snapping failed; retrying");
+                    lastFailureLoggedAt = DateTime.UtcNow;
+                }
+                lastFailure = failure;
                 PublishUnavailableState($"Error: {exception.Message} Retrying...");
             }
 

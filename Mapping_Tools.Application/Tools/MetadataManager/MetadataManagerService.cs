@@ -4,6 +4,8 @@ using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.MetadataManager;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Mapping_Tools.Application.Tools.MetadataManager;
 
@@ -15,18 +17,22 @@ public sealed class MetadataManagerService : IMetadataManagerService
 {
     private readonly IBeatmapBackupService backupService;
     private readonly IBeatmapEditingGateway editingGateway;
+    private readonly ILogger<MetadataManagerService> logger;
 
     /// <summary>
     ///     Creates a Metadata Manager application service.
     /// </summary>
     /// <param name="editingGateway">Loads beatmaps with the configured live-editor preference.</param>
     /// <param name="backupService">Creates the pre-write backup for each target.</param>
+    /// <param name="logger">Records per-target metadata changes and saves.</param>
     public MetadataManagerService(
         IBeatmapEditingGateway editingGateway,
-        IBeatmapBackupService backupService)
+        IBeatmapBackupService backupService,
+        ILogger<MetadataManagerService>? logger = null)
     {
         this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
         this.backupService = backupService ?? throw new ArgumentNullException(nameof(backupService));
+        this.logger = logger ?? NullLogger<MetadataManagerService>.Instance;
     }
 
     /// <inheritdoc />
@@ -54,11 +60,13 @@ public sealed class MetadataManagerService : IMetadataManagerService
             throw new ArgumentException(
                 "Select at least one target beatmap.",
                 nameof(options));
+        logger.LogInformation("Export started for {Count} beatmaps", paths.Length);
 
         List<string> processedPaths = [];
         for (int index = 0; index < paths.Length; index++)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            logger.LogInformation("Processing beatmap {Index}/{Count}: {Path}", index + 1, paths.Length, paths[index]);
             var session = await editingGateway
                 .OpenBeatmapAsync(
                     paths[index],
@@ -73,13 +81,16 @@ public sealed class MetadataManagerService : IMetadataManagerService
                 .ConfigureAwait(false);
 
             MetadataManagerEngine.Apply(session.Beatmap, options);
+            logger.LogInformation("Applied metadata to {Path}; saving with updated filename", paths[index]);
             cancellationToken.ThrowIfCancellationRequested();
             // Save the file with name update because we updated the metadata
             session.SaveFileWithNameUpdate();
+            logger.LogInformation("Saved {OriginalPath} as {SavedPath}", paths[index], session.Path);
             processedPaths.Add(session.Path);
             progress?.Report(index + 1, paths.Length);
         }
 
+        logger.LogInformation("Exported {Count} beatmaps", processedPaths.Count);
         return new MetadataManagerResult(processedPaths);
     }
 

@@ -8,6 +8,8 @@ using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.HitsoundCopier;
 using Mapping_Tools.Core.Tools.HitsoundCopier.Models;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Mapping_Tools.Application.Tools.HitsoundCopier;
 
@@ -21,6 +23,7 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
     private readonly IFileRevealService reveal;
     private readonly IHitsoundSampleService samples;
     private readonly ApplicationSettings settings;
+    private readonly ILogger<HitsoundCopierService> logger;
 
     /// <summary>Creates the Hitsound Copier application service.</summary>
     /// <param name="editingGateway">Loads live-aware maps and saves through the backup boundary.</param>
@@ -28,18 +31,21 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
     /// <param name="directories">Provides the default sample export directory.</param>
     /// <param name="reveal">Reveals the completed sample export directory.</param>
     /// <param name="settings">Supplies the automatic editor reload preference.</param>
+    /// <param name="logger">Records target processing and sample export milestones.</param>
     public HitsoundCopierService(
         IBeatmapEditingGateway editingGateway,
         IHitsoundSampleService samples,
         IApplicationDirectories directories,
         IFileRevealService reveal,
-        ApplicationSettings settings)
+        ApplicationSettings settings,
+        ILogger<HitsoundCopierService>? logger = null)
     {
         this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
         this.samples = samples ?? throw new ArgumentNullException(nameof(samples));
         this.directories = directories ?? throw new ArgumentNullException(nameof(directories));
         this.reveal = reveal ?? throw new ArgumentNullException(nameof(reveal));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.logger = logger ?? NullLogger<HitsoundCopierService>.Instance;
     }
 
     /// <inheritdoc />
@@ -52,6 +58,8 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
         Validate(options);
         string[] targetPaths = options.PathTo
             .Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        logger.LogInformation("Started for {Count} targets; source {SourcePath}; mode {Mode}",
+            targetPaths.Length, options.PathFrom, options.CopyMode);
         BeatmapEditingSession? sourceSession = null;
         if (!string.IsNullOrWhiteSpace(options.PathFrom))
             sourceSession = await editingGateway.OpenBeatmapAsync(
@@ -67,6 +75,7 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
         for (int index = 0; index < targetPaths.Length; index++)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            logger.LogInformation("Processing target {Index}/{Count}: {Path}", index + 1, targetPaths.Length, targetPaths[index]);
             var targetSession = await editingGateway.OpenBeatmapAsync(
                 targetPaths[index],
                 LiveBeatmapPreference.PreferLive,
@@ -108,6 +117,8 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
                     schema),
                 schema,
                 cancellationToken);
+            logger.LogInformation("Transformed {Path}: {MatchedCount} matched, {GeneratedCount} samples generated, {MutedCount} edges muted; saving",
+                targetPaths[index], result.MatchedHitsoundCount, result.GeneratedSampleCount, result.MutedEdgeCount);
             await editingGateway.SaveAsync(
                 targetSession,
                 AutomaticEditorReloadPolicy.ShouldReloadEditor(
@@ -125,11 +136,15 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
 
         if (schema.Count > 0)
         {
+            logger.LogInformation("Exporting {SchemaCount} sample assignments", schema.Count);
             int exportedSampleCount = await samples.ExportAsync(schema, cancellationToken).ConfigureAwait(false);
+            logger.LogInformation("Exported {ExportedCount} samples to {Directory}", exportedSampleCount, directories.Exports);
             if (exportedSampleCount > 0)
                 await reveal.RevealAsync(directories.Exports, cancellationToken).ConfigureAwait(false);
         }
 
+        logger.LogInformation("Completed {Count} targets: {MatchedCount} matched, {GeneratedCount} samples generated, {MutedCount} edges muted",
+            processed.Count, matched, generated, muted);
         return new HitsoundCopierResult(processed, matched, generated, muted, schema);
     }
 

@@ -9,6 +9,8 @@ using Mapping_Tools.Core.ToolHelpers.Sliders;
 using Mapping_Tools.Core.ToolHelpers.Sliders.Newgen;
 using Mapping_Tools.Core.Tools.TumourGenerator;
 using Mapping_Tools.Core.Tools.TumourGenerator.Models;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Mapping_Tools.Application.Tools.TumourGenerator;
 
@@ -20,16 +22,20 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
 {
     private readonly IBeatmapEditingGateway editingGateway;
     private readonly ApplicationSettings settings;
+    private readonly ILogger<TumourGeneratorService> logger;
 
     /// <summary>Creates the service over the shared editing gateway.</summary>
     /// <param name="editingGateway">Loads live or disk maps and saves backup-first.</param>
     /// <param name="settings">Supplies the automatic editor reload preference.</param>
+    /// <param name="logger">Records import and per-beatmap generation milestones.</param>
     public TumourGeneratorService(
         IBeatmapEditingGateway editingGateway,
-        ApplicationSettings settings)
+        ApplicationSettings settings,
+        ILogger<TumourGeneratorService>? logger = null)
     {
         this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.logger = logger ?? NullLogger<TumourGeneratorService>.Instance;
     }
 
     /// <inheritdoc />
@@ -48,6 +54,8 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
                 cancellationToken)
             .ConfigureAwait(false);
         var markedObjects = BeatmapObjectSelection.Select(session, mode, timeCode);
+        logger.LogInformation("Imported {SliderCount} sliders from {Path} using {Mode}",
+            markedObjects.Count(hitObject => hitObject.IsSlider), path, mode);
         double circleSize = session.Beatmap.Difficulty["CircleSize"].DoubleValue;
         return new TumourImportResult(
             markedObjects.Where(hitObject => hitObject.IsSlider).ToArray(),
@@ -67,6 +75,7 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
         ArgumentNullException.ThrowIfNull(project);
         if (paths.Count == 0) throw new ArgumentException("At least one beatmap path is required.", nameof(paths));
         Validate(project);
+        logger.LogInformation("Started for {Count} beatmaps; selection {Mode}", paths.Count, project.ImportModeSetting);
 
         int generatedCount = 0;
         bool editorReloaded = false;
@@ -78,6 +87,7 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
             cancellationToken.ThrowIfCancellationRequested();
             string path = paths[pathIndex];
             ArgumentException.ThrowIfNullOrWhiteSpace(path);
+            logger.LogInformation("Processing beatmap {Index}/{Count}: {Path}", pathIndex + 1, paths.Count, path);
             var session = await editingGateway.OpenBeatmapAsync(
                     path,
                     project.ImportModeSetting == HitObjectSelectionMode.Selected
@@ -90,6 +100,8 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
                 session,
                 project.ImportModeSetting,
                 project.TimeCode);
+            logger.LogInformation("Selected {SelectedCount} objects in {Path}", markedObjects.Count, path);
+            int generatedBeforeMap = generatedCount;
             for (int objectIndex = 0; objectIndex < markedObjects.Count; objectIndex++)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -99,12 +111,18 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
             }
 
             if (project.FixSv)
+            {
+                logger.LogInformation("Fixing slider velocity in {Path}", path);
                 SliderVelocityFixer.Fix(
                     session.Beatmap,
                     markedObjects,
                     project.DelegateToBpm,
                     project.RemoveSliderTicks,
                     cancellationToken);
+            }
+
+            logger.LogInformation("Generated {GeneratedCount} sliders in {Path}; saving",
+                generatedCount - generatedBeforeMap, path);
 
             bool shouldReload = AutomaticEditorReloadPolicy.ShouldReloadEditor(
                 session,
@@ -118,6 +136,8 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
         }
 
         progress?.Report(1);
+        logger.LogInformation("Completed {Count} beatmaps with {GeneratedCount} sliders generated",
+            completedPaths.Count, generatedCount);
         return new TumourRunResult(completedPaths, generatedCount, editorReloaded);
     }
 

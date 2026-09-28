@@ -13,6 +13,8 @@ using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.PatternGallery;
 using Mapping_Tools.Core.Tools.PatternGallery.Models;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Mapping_Tools.Application.Tools.PatternGallery;
 
@@ -27,6 +29,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
     private readonly ApplicationSettings settings;
     private readonly IBeatmapDecoder beatmapDecoder;
     private readonly IBeatmapEncoder beatmapEncoder;
+    private readonly ILogger<PatternGalleryService> logger;
 
     /// <summary>Creates the Pattern Gallery application use case.</summary>
     /// <param name="editing">Loads live or disk beatmaps and saves with backups.</param>
@@ -34,18 +37,21 @@ public sealed class PatternGalleryService : IPatternGalleryService
     /// <param name="settings">Supplies the automatic editor reload preference.</param>
     /// <param name="beatmapDecoder">Parses imported object and timing point text.</param>
     /// <param name="beatmapEncoder">Encodes saved patterns.</param>
+    /// <param name="logger">Records pattern export milestones.</param>
     public PatternGalleryService(
         IBeatmapEditingGateway editing,
         IPatternGalleryFileService files,
         ApplicationSettings settings,
         IBeatmapDecoder beatmapDecoder,
-        IBeatmapEncoder beatmapEncoder)
+        IBeatmapEncoder beatmapEncoder,
+        ILogger<PatternGalleryService>? logger = null)
     {
         this.editing = editing ?? throw new ArgumentNullException(nameof(editing));
         this.files = files ?? throw new ArgumentNullException(nameof(files));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         this.beatmapDecoder = beatmapDecoder ?? throw new ArgumentNullException(nameof(beatmapDecoder));
         this.beatmapEncoder = beatmapEncoder ?? throw new ArgumentNullException(nameof(beatmapEncoder));
+        this.logger = logger ?? NullLogger<PatternGalleryService>.Instance;
     }
 
     /// <inheritdoc />
@@ -189,6 +195,8 @@ public sealed class PatternGalleryService : IPatternGalleryService
 
         Validate(project);
         if (patterns.Count == 0) throw new InvalidOperationException("No pattern has been selected to export.");
+        logger.LogInformation("Exporting {Count} patterns to {Path}; time mode {Mode}",
+            patterns.Count, targetPath, project.ExportTimeMode);
 
         var preference = project.ExportTimeMode == ExportTimeMode.Current
             ? LiveBeatmapPreference.RequireLive
@@ -210,12 +218,15 @@ public sealed class PatternGalleryService : IPatternGalleryService
         };
 
         var placer = project.CreatePlacer();
+        logger.LogInformation("Placing patterns at time {ExportTime} in {Path}", exportTime, targetPath);
 
         for (int index = 0; index < patterns.Count; index++)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             var pattern = patterns[index];
+            logger.LogInformation("Placing pattern {Index}/{Count}: {Pattern} in {Path}",
+                index + 1, patterns.Count, pattern.FileName, targetPath);
             var source = await editing.OpenBeatmapAsync(
                     files.GetPatternPath(paths, pattern.FileName),
                     LiveBeatmapPreference.DiskOnly,
@@ -237,6 +248,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
             progress?.Report(index + 1, patterns.Count);
         }
 
+        logger.LogInformation("Placed {Count} patterns in {Path}; saving", patterns.Count, targetPath);
         await editing.SaveAsync(
                 target,
                 AutomaticEditorReloadPolicy.ShouldReloadEditor(
@@ -246,6 +258,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
                 cancellationToken)
             .ConfigureAwait(false);
 
+        logger.LogInformation("Exported {Count} patterns to {Path}", patterns.Count, targetPath);
         return new PatternGalleryRunResult(patterns.Count, "Successfully exported pattern!");
     }
 
