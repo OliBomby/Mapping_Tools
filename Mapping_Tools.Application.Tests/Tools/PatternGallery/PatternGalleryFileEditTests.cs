@@ -1,5 +1,4 @@
 using System.IO.Compression;
-using AwesomeAssertions;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.PatternGallery;

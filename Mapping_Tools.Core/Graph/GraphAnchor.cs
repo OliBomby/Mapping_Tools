@@ -39,7 +39,7 @@ public sealed class GraphAnchor
             field = value ?? throw new ArgumentNullException(nameof(value));
             field.P = tension;
         }
-    } = new SingleCurveInterpolator();
+    }
 
     /// <summary>Gets or sets the interpolation parameter, normally in the range -1 to 1.</summary>
     public double Tension
@@ -59,4 +59,3 @@ public sealed class GraphAnchor
         return new GraphAnchor(Pos, GraphInterpolatorCatalog.Clone(Interpolator), Tension);
     }
 }
-

@@ -37,9 +37,9 @@ public sealed class MapCleanerEngineTests
         beatmap.HitObjects.Should().HaveCount(924);
         beatmap.GetBookmarks().Should().HaveCount(20);
         string encoded = new BeatmapEncoder().Encode(beatmap);
-        string lineContent = encoded.TrimEnd('\r', '\n');
-        lineContent.Split("\r\n").Should().Equal(
-            File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "Resources", "expected-map-cleaner.osu")));
+        string expected = string.Join("\r\n",
+            File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "Resources", "expected-map-cleaner.osu"))) + "\r\n";
+        encoded.Should().Be(expected);
     }
 
     [TestMethod]

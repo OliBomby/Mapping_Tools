@@ -44,7 +44,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     IQuickRun
 {
     /// <inheritdoc />
-    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+    public IProjectUndoHistory? UndoHistory { get; set; }
 
     private static readonly TimeSpan searchDebounceInterval = TimeSpan.FromMilliseconds(150);
     private readonly IPatternGalleryArchiveService archives;

@@ -30,7 +30,7 @@ public sealed partial class ObservableSampleGeneratingArgs : ObservableObject
     /// <summary>Gets or sets the source audio or SoundFont path.</summary>
     [ObservableProperty]
     [Undoable]
-    public partial string Path { get; set; } = string.Empty;
+    public partial string Path { get; set; }
 
     /// <summary>Gets or sets the linear sample gain.</summary>
     [ObservableProperty]

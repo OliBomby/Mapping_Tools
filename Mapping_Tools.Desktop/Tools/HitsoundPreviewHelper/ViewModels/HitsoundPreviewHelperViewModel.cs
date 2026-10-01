@@ -32,7 +32,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     IShellProjectFeature<HitsoundPreviewHelperProject>
 {
     /// <inheritdoc />
-    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+    public IProjectUndoHistory? UndoHistory { get; set; }
 
     private readonly ICurrentBeatmapDialogService currentBeatmapService;
     private readonly ProjectDefinition<HitsoundPreviewHelperProject> definition;

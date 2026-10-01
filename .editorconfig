@@ -12,10 +12,17 @@ resharper_partial_type_with_single_part_highlighting = none
 resharper_property_can_be_made_init_only_global_highlighting = hint
 resharper_unused_auto_property_accessor_local_highlighting = none
 resharper_unused_member_global_highlighting = hint
+resharper_unused_auto_property_accessor_global_highlighting = hint
+resharper_not_accessed_positional_property_global_highlighting = hint
 resharper_unused_member_local_highlighting = suggestion
 resharper_virtual_member_call_in_constructor_highlighting = none
 resharper_xaml_static_resource_not_resolved_highlighting = none
 resharper_xaml_style_class_not_found_highlighting = none
+
+[Mapping_Tools.*.Tests/**/*.cs]
+# Recording test doubles intentionally expose observations and configurable behavior.
+resharper_collection_never_queried_global_highlighting = hint
+resharper_collection_never_updated_global_highlighting = hint
 
 [*.{csproj,props,targets}]
 charset = utf-8-bom

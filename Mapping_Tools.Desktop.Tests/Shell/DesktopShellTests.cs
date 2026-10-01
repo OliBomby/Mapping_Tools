@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
@@ -34,6 +35,7 @@ namespace Mapping_Tools.Desktop.Tests.Shell;
 public sealed class DesktopShellTests
 {
     [TestMethod]
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure", Justification = "Command events are observed only during the view model's lifetime.")]
     public async Task InitializeAsync_WithDelayedRecovery_SubscribesToInitializedHistory()
     {
         // Arrange
@@ -73,6 +75,7 @@ public sealed class DesktopShellTests
     }
 
     [TestMethod]
+    [SuppressMessage("ReSharper", "AccessToModifiedClosure", Justification = "The event counter is intentionally reset between synchronous edits.")]
     public async Task OnCurrentFeatureChanged_AfterSwitch_ObservesOnlyActiveHistory()
     {
         // Arrange
@@ -1011,7 +1014,7 @@ public sealed class DesktopShellTests
 
     private sealed class StubProjectFeatureViewModel : ObservableObject, IShellProjectFeature<StubProject>
     {
-        public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+        public IProjectUndoHistory? UndoHistory { get; set; }
 
         private static readonly ProjectDefinition<StubProject> definition = new(
             "stubproject.json",

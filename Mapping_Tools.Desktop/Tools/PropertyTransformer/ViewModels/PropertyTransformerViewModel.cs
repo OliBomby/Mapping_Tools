@@ -21,7 +21,7 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
     IShellProjectFeature<PropertyTransformerProject>
 {
     /// <inheritdoc />
-    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+    public IProjectUndoHistory? UndoHistory { get; set; }
 
     private readonly IPropertyTransformerService propertyTransformer;
     private readonly DesktopApplicationSettings settings;

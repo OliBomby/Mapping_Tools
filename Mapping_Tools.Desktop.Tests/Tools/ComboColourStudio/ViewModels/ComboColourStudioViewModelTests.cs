@@ -28,7 +28,7 @@ public sealed class ComboColourStudioViewModelTests
         var original = viewModel.ComboColours[0].Color;
         ProjectUndoHistory<ComboColourProject> history = new(viewModel, new VersionedProjectJsonSerializer());
         viewModel.UndoHistory = history;
-        var changed = Mapping_Tools.Core.BeatmapHelper.RgbaColour.FromRgb(12, 34, 56);
+        var changed = Core.BeatmapHelper.RgbaColour.FromRgb(12, 34, 56);
 
         // Act
         viewModel.ComboColours[0].Color = changed;

@@ -440,6 +440,27 @@ public sealed class TumourGeneratorEngineTests
         slider.GetSliderPath().Distance.Should().BeGreaterThan(0);
     }
 
+    [TestMethod]
+    public void TumourGenerate_WithInactiveLayerAndTruncatedCurvedTail_PreservesControlPointsAndPixelLength()
+    {
+        // Arrange
+        HitObject slider = BeatmapTestData.DecodeHitObject("0,0,0,2,0,B|100:100|200:0,1,50");
+        var original = slider.DeepCopy();
+        var layer = TumourLayer.GetDefaultLayer();
+        layer.IsActive = false;
+        TumourGeneratorEngine generator = new() { TumourLayers = [layer] };
+
+        // Act
+        bool generated = generator.TumourGenerate(slider);
+
+        // Assert
+        generated.Should().BeTrue();
+        slider.ControlPoints.Select(point => (point.Position, point.Type)).Should().Equal(
+            original.ControlPoints.Select(point => (point.Position, point.Type)));
+        slider.PixelLength.Should().BeApproximately(original.PixelLength, 0.000001);
+        slider.GetSliderPath().CalculatedPath.Should().Equal(original.GetSliderPath().CalculatedPath);
+    }
+
     [DataTestMethod]
     [DataRow(TumourTemplate.Triangle)]
     [DataRow(TumourTemplate.Square)]

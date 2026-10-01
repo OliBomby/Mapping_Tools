@@ -1,4 +1,3 @@
-using AwesomeAssertions;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mapping_Tools.Application.Projects.Models;

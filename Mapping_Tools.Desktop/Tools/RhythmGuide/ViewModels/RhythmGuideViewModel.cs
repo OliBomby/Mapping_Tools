@@ -24,7 +24,7 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
     IShellProjectFeature<RhythmGuideProject>
 {
     /// <inheritdoc />
-    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+    public IProjectUndoHistory? UndoHistory { get; set; }
 
     private readonly ICurrentBeatmapDialogService currentBeatmapService;
     private readonly ProjectDefinition<RhythmGuideProject> definition;

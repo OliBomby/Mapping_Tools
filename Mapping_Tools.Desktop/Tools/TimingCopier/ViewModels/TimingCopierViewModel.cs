@@ -25,7 +25,7 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
     IShellProjectFeature<TimingCopierProject>
 {
     /// <inheritdoc />
-    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+    public IProjectUndoHistory? UndoHistory { get; set; }
 
     private readonly ICurrentBeatmapDialogService currentBeatmapService;
 

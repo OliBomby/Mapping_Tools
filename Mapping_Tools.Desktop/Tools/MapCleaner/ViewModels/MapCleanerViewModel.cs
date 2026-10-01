@@ -25,7 +25,7 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
     IShellProjectFeature<MapCleanerProject>
 {
     /// <inheritdoc />
-    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+    public IProjectUndoHistory? UndoHistory { get; set; }
 
     private readonly IMapCleanerService cleaner;
 

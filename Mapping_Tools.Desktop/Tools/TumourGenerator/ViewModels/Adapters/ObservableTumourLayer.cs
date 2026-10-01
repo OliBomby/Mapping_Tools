@@ -174,7 +174,7 @@ public sealed partial class ObservableTumourLayer : ObservableObject
     /// <summary>Gets or sets the user-facing layer name.</summary>
     [ObservableProperty]
     [Undoable]
-    public partial string Name { get; set; } = string.Empty;
+    public partial string Name { get; set; }
 
     /// <summary>Creates a plain snapshot for an Application service.</summary>
     /// <returns>An independently mutable copy of this layer.</returns>

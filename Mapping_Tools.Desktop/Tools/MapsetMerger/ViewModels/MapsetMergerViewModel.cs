@@ -31,7 +31,7 @@ namespace Mapping_Tools.Desktop.Tools.MapsetMerger.ViewModels;
 public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShellProjectFeature<MapsetMergerProject>
 {
     /// <inheritdoc />
-    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+    public IProjectUndoHistory? UndoHistory { get; set; }
 
     private readonly ICurrentBeatmapDialogService currentBeatmapService;
 

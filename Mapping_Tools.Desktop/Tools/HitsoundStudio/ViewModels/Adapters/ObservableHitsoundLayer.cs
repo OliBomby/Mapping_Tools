@@ -27,7 +27,7 @@ public sealed partial class ObservableHitsoundLayer : ObservableObject
     /// <summary>Gets or sets the display name.</summary>
     [ObservableProperty]
     [Undoable]
-    public partial string Name { get; set; } = string.Empty;
+    public partial string Name { get; set; }
 
     /// <summary>Gets or sets the sample family.</summary>
     [ObservableProperty]
@@ -54,7 +54,7 @@ public sealed partial class ObservableHitsoundLayer : ObservableObject
     /// <summary>Gets or sets the sorted timestamps assigned to this layer.</summary>
     [ObservableProperty]
     [Undoable]
-    public partial List<double> Times { get; set; } = [];
+    public partial List<double> Times { get; set; }
 
     /// <summary>Creates a detached plain snapshot of this layer.</summary>
     /// <returns>A layer containing independent import, sample, and timing data.</returns>

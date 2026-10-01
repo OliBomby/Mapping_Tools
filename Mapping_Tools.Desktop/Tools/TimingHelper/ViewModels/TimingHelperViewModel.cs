@@ -22,7 +22,7 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
     IShellProjectFeature<TimingHelperProject>
 {
     /// <inheritdoc />
-    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+    public IProjectUndoHistory? UndoHistory { get; set; }
 
     private readonly DesktopApplicationSettings settings;
 

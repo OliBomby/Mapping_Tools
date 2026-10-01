@@ -46,7 +46,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     IDisposable
 {
     /// <inheritdoc />
-    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+    public IProjectUndoHistory? UndoHistory { get; set; }
 
     private readonly IAudioGenerator audioGenerator;
     private readonly ICurrentBeatmapDialogService currentBeatmapService;

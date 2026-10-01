@@ -42,12 +42,12 @@ public sealed partial class ObservableHitsoundZone : ObservableObject
     /// <summary>Gets or sets the user-facing zone name.</summary>
     [ObservableProperty]
     [Undoable]
-    public partial string Name { get; set; } = string.Empty;
+    public partial string Name { get; set; }
 
     /// <summary>Gets or sets the optional explicit sample filename.</summary>
     [ObservableProperty]
     [Undoable]
-    public partial string Filename { get; set; } = string.Empty;
+    public partial string Filename { get; set; }
 
     /// <summary>Gets or sets the target playfield X coordinate, or -1 for wildcard.</summary>
     [ObservableProperty]

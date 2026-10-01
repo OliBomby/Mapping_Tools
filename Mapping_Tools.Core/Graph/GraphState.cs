@@ -41,10 +41,10 @@ public sealed class GraphState
     public double MinY { get; set; }
 
     /// <summary>Gets or sets the maximum graph X value.</summary>
-    public double MaxX { get; set; } = 1;
+    public double MaxX { get; set; }
 
     /// <summary>Gets or sets the maximum graph Y value.</summary>
-    public double MaxY { get; set; } = 1;
+    public double MaxY { get; set; }
 
     /// <summary>Creates the unit-bounded default curve used by an empty value editor.</summary>
     /// <returns>A graph with two zero-valued edge anchors.</returns>

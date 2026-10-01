@@ -12,7 +12,7 @@ namespace Mapping_Tools.Desktop.Services.Undo;
 /// <summary>Stores the editable state of a dialog independently from its owning project.</summary>
 public sealed class DialogUndoHistory : IProjectUndoHistory, IDisposable
 {
-    private const int maxStates = 51;
+    private const int max_states = 51;
     private readonly object model;
     private readonly Action refreshBindings;
     private readonly List<DialogState> states = [];
@@ -89,7 +89,7 @@ public sealed class DialogUndoHistory : IProjectUndoHistory, IDisposable
         if (CanRedo) states.RemoveRange(cursor + 1, states.Count - cursor - 1);
         states.Add(next);
         cursor++;
-        if (states.Count > maxStates)
+        if (states.Count > max_states)
         {
             states.RemoveAt(0);
             cursor--;
@@ -146,7 +146,7 @@ public sealed class DialogUndoHistory : IProjectUndoHistory, IDisposable
             foreach (var collection in state.Collections)
             {
                 collection.Target.Clear();
-                foreach (var item in collection.Items) collection.Target.Add(item);
+                foreach (object? item in collection.Items) collection.Target.Add(item);
             }
 
             foreach (var value in state.Values) value.Property.SetValue(value.Target, value.Value);
@@ -185,19 +185,19 @@ public sealed class DialogUndoHistory : IProjectUndoHistory, IDisposable
         {
             if (!list.IsReadOnly && !list.IsFixedSize)
                 collections.Add(new CollectionEntry(list, list.Cast<object?>().ToArray()));
-            foreach (var item in list) Visit(item, values, collections, visited);
+            foreach (object? item in list) Visit(item, values, collections, visited);
             return;
         }
 
         if (value is IDictionary dictionary)
         {
-            foreach (var item in dictionary.Values) Visit(item, values, collections, visited);
+            foreach (object? item in dictionary.Values) Visit(item, values, collections, visited);
             return;
         }
 
         if (value is IEnumerable enumerable)
         {
-            foreach (var item in enumerable) Visit(item, values, collections, visited);
+            foreach (object? item in enumerable) Visit(item, values, collections, visited);
             return;
         }
 
@@ -258,13 +258,13 @@ public sealed class DialogUndoHistory : IProjectUndoHistory, IDisposable
 
         if (value is IDictionary dictionary)
         {
-            foreach (var item in dictionary.Values) Observe(item, visited);
+            foreach (object? item in dictionary.Values) Observe(item, visited);
             return;
         }
 
         if (value is IEnumerable enumerable)
         {
-            foreach (var item in enumerable) Observe(item, visited);
+            foreach (object? item in enumerable) Observe(item, visited);
             return;
         }
 

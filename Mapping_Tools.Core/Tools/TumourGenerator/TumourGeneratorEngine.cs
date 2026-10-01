@@ -236,9 +236,11 @@ public sealed class TumourGeneratorEngine
         if (controlPoints.Count < 2) return false;
 
         // Set the new slider path
-        SliderPath reconstructedPath = JustMiddleAnchors
-            ? new SliderPath(controlPoints.ToArray())
-            : new SliderPath(controlPoints.ToArray(), pathWithHints.Path.Last.Value.CumulativeLength);
+        SliderPath reconstructedPath = new(controlPoints.ToArray());
+        // A preserved truncated tail retains its full anchors and needs a length constraint.
+        // Otherwise measure the reconstructed curves directly.
+        if (!JustMiddleAnchors && Vector2.DistanceSquared(reconstructedPath.PositionAt(1), pathWithHints.Path.Last.Value.Pos) > Precision.DOUBLE_EPSILON)
+            reconstructedPath = new SliderPath(controlPoints.ToArray(), pathWithHints.Path.Last.Value.CumulativeLength);
         hitObject.SetSliderPath(reconstructedPath);
         double newPixelLength = hitObject.PixelLength;
 

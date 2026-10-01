@@ -24,7 +24,7 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
     IShellProjectFeature<SliderCompletionatorProject>
 {
     /// <inheritdoc />
-    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+    public IProjectUndoHistory? UndoHistory { get; set; }
 
     private readonly ISliderCompletionatorService completionator;
 

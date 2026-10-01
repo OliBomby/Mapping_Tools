@@ -30,7 +30,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     IShellFeatureActivation
 {
     /// <inheritdoc />
-    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+    public IProjectUndoHistory? UndoHistory { get; set; }
 
     private static readonly RgbaColour[] defaultComboColors =
         [.. ComboColour.GetDefaultComboColours().Select(colour => colour.Color)];

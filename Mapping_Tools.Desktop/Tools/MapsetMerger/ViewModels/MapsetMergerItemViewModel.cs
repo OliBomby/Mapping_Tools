@@ -22,11 +22,11 @@ public sealed partial class MapsetMergerItemViewModel : ObservableObject
 
     /// <summary>Gets or sets the output folder and reference prefix.</summary>
     [ObservableProperty]
-    public partial string Name { get; set; } = string.Empty;
+    public partial string Name { get; set; }
 
     /// <summary>Gets or sets the source mapset directory.</summary>
     [ObservableProperty]
-    public partial string Path { get; set; } = string.Empty;
+    public partial string Path { get; set; }
 
     /// <summary>Gets or sets whether this row is selected for removal.</summary>
     [ObservableProperty]

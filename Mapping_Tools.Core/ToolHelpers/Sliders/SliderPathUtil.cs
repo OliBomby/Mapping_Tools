@@ -140,7 +140,10 @@ public static class SliderPathUtil
                 case PathType.BSpline:
                     var splineSegments = PathApproximator.GetBSplineBezierSegments(anchors, 4)
                         .Select(points => new BezierSubdivision(points.ToList()));
-                    return MoveBezierSegmentsToLength(splineSegments, newLength);
+                    var splineAnchors = MoveBezierSegmentsToLength(splineSegments, newLength);
+                    // Match osu!'s sampled endpoint rather than the exact Bézier evaluation.
+                    if (splineAnchors.Count > 0) splineAnchors[^1].Position = sliderPath.PositionAt(1);
+                    return splineAnchors;
                 case PathType.PerfectCurve:
                     newPathType = PathType.PerfectCurve;
                     newAnchors.AddRange(anchors);

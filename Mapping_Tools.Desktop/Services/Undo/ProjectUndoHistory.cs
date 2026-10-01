@@ -14,8 +14,8 @@ namespace Mapping_Tools.Desktop.Services.Undo;
 /// <typeparam name="TProject">The feature's persisted project type.</typeparam>
 public sealed class ProjectUndoHistory<TProject> : IProjectUndoHistory
 {
-    private const int maxStates = 51;
-    private const int maxCompressedBytes = 8 * 1024 * 1024;
+    private const int max_states = 51;
+    private const int max_compressed_bytes = 8 * 1024 * 1024;
     private readonly IShellProjectFeature<TProject> feature;
     private readonly IProjectSerializer serializer;
     private readonly List<HistoryState> states;
@@ -119,7 +119,7 @@ public sealed class ProjectUndoHistory<TProject> : IProjectUndoHistory
         currentProject = next;
         cursor++;
 
-        while (states.Count > maxStates || states.Count > 1 && StoredBytes() > maxCompressedBytes)
+        while (states.Count > max_states || states.Count > 1 && StoredBytes() > max_compressed_bytes)
         {
             states.RemoveAt(0);
             cursor--;
@@ -329,7 +329,7 @@ public sealed class ProjectUndoHistory<TProject> : IProjectUndoHistory
 
         if (value is IEnumerable enumerable)
         {
-            foreach (var item in enumerable) Visit(item, visited);
+            foreach (object? item in enumerable) Visit(item, visited);
             return;
         }
 
@@ -343,7 +343,7 @@ public sealed class ProjectUndoHistory<TProject> : IProjectUndoHistory
 
     private long StoredBytes()
     {
-        return states.Sum(state => (long)state.Project.Length
+        return states.Sum(state => state.Project.Length
                                    + state.ExternalFromPrevious.Sum(change => change.EstimatedBytes));
     }
 

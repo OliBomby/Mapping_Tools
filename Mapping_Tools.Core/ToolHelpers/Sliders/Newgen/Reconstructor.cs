@@ -17,13 +17,13 @@ public class Reconstructor
     /// <summary>
     ///     Controls whether reconstruction returns the sampled points as a linear path for inspection.
     /// </summary>
-    public bool DebugConstruction { get; set; } = false;
+    public bool DebugConstruction { get; set; }
 
     /// <summary>
     ///     Reuses valid hinted segments and generates the gaps as independently typed path segments.
     /// </summary>
     /// <param name="pathWithHints">The edited sampled path and its original-segment hints.</param>
-    /// <param name="preserveUnmodifiedLastSegment">Keeps an untouched truncated final hint intact so the caller can apply the final pixel-length constraint.</param>
+    /// <param name="preserveUnmodifiedLastSegment">Keeps an untouched truncated curved final hint intact so the caller can apply the final pixel-length constraint.</param>
     /// <returns>Reconstructed path control points in absolute coordinates.</returns>
     public List<PathControlPoint> Reconstruct(PathWithHints pathWithHints, bool preserveUnmodifiedLastSegment = false)
     {
@@ -52,6 +52,8 @@ public class Reconstructor
             else
             {
                 bool keepFullLastSegment = preserveUnmodifiedLastSegment
+                    && hint.ControlPoints.Count > 2
+                    && segmentType != PathType.Linear
                     && hint.End == pathWithHints.Path.Last
                     && Precision.AlmostEquals(hint.StartP, 0)
                     && !Precision.AlmostEquals(hint.EndP, 1)

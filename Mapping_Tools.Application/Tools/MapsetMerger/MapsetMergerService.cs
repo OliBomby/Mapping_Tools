@@ -361,6 +361,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
     }
 
     private static void Validate(
+        // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
         MapsetMergerServiceOptions project,
         IReadOnlyList<MapsetMergerInput> inputs)
     {

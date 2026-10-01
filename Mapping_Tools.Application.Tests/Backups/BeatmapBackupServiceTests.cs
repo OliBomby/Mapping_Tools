@@ -171,11 +171,7 @@ public sealed class BeatmapBackupServiceTests
             map_path,
             store,
             BeatmapEditingSource.LiveEditor);
-        store.Files[map_path] = new BeatmapEncoder()
-            .Encode(session.Beatmap)
-            .TrimEnd('\r', '\n')
-            .Split("\r\n")
-            .ToList();
+        store.WriteAllText(map_path, new BeatmapEncoder().Encode(session.Beatmap));
         var service = CreateService(store, CreateSettings());
 
         // Act
@@ -571,7 +567,7 @@ public sealed class BeatmapBackupServiceTests
 
         public string ReadAllText(string path)
         {
-            return string.Join("\r\n", Files[path]);
+            return string.Join("\r\n", Files[path]) + "\r\n";
         }
 
         public void WriteAllText(string path, string text)

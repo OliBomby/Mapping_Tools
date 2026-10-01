@@ -35,7 +35,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     IShellProjectFeature<SlideratorProject>
 {
     /// <inheritdoc />
-    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+    public IProjectUndoHistory? UndoHistory { get; set; }
 
     private readonly ICurrentBeatmapDialogService currentBeatmapService;
 

@@ -668,6 +668,7 @@ public static class SliderPicturatorEngine
     }
 
     private static void ValidateImageAndQuality(
+        // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
         RgbaImage image,
         SliderPicturatorEngineOptions options)
     {

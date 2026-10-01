@@ -116,8 +116,8 @@ public sealed class RhythmGuideServiceTests
         await service.GenerateAsync(options);
 
         // Assert
-        gateway.EditingSessionSaveRequests.Should().ContainSingle();
-        gateway.EditingSessionSaveRequests.Single().Session.Path.Should().Be("existing.osu");
+        gateway.SessionSaveRequests.Should().ContainSingle();
+        gateway.SessionSaveRequests.Single().Session.Path.Should().Be("existing.osu");
     }
 
     private static BeatmapEditingSession CreateSession(

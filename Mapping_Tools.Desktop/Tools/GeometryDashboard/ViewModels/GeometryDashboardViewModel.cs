@@ -34,7 +34,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     IShellProjectFeature<GeometryDashboardProject>, IShellExtraProjectMenuFeature, IShellFeatureActivation, IDisposable
 {
     /// <inheritdoc />
-    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+    public IProjectUndoHistory? UndoHistory { get; set; }
 
     private const string save_slot_binding_prefix = "geometry-dashboard-save-slot";
     private readonly IGeometryDashboardService dashboardService;

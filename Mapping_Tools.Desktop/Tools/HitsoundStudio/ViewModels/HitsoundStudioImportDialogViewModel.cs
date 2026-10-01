@@ -72,7 +72,7 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
     /// <summary>Gets or sets the beatmap path used by beatmap-based imports.</summary>
     [ObservableProperty]
     [Undoable]
-    public partial string BeatmapPath { get; set; } = string.Empty;
+    public partial string BeatmapPath { get; set; }
 
     /// <summary>Gets or sets the MIDI source path.</summary>
     [ObservableProperty]

@@ -30,7 +30,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     IShellProjectFeature<MetadataManagerProject>
 {
     /// <inheritdoc />
-    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+    public IProjectUndoHistory? UndoHistory { get; set; }
 
     private readonly ICurrentBeatmapDialogService currentBeatmapService;
     private readonly ProjectDefinition<MetadataManagerProject> definition;

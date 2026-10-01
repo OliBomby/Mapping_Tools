@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
@@ -11,6 +12,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Mapping_Tools.Desktop.Tests.Services.Undo;
 
 [TestClass]
+[SuppressMessage("ReSharper", "AccessToDisposedClosure", Justification = "Windows are closed before the test's history is disposed.")]
 public sealed class ProjectUndoWindowInputTests
 {
     [TestMethod]
