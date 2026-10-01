@@ -9,6 +9,10 @@
     "dotnet-reportgenerator-globaltool": {
       "version": "5.5.11",
       "commands": ["reportgenerator"]
+    },
+    "jetbrains.resharper.globaltools": {
+      "version": "2026.2.3.1",
+      "commands": ["jb"]
     }
   }
 }
