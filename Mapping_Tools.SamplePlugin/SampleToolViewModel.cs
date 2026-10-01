@@ -5,6 +5,7 @@ using Mapping_Tools.Application.Execution.ToolExecution.Models;
 using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.ViewModels;
 
 namespace Mapping_Tools.SamplePlugin;
@@ -16,6 +17,9 @@ public sealed partial class SampleToolViewModel : SingleRunToolViewModel,
     IQuickRun,
     IShellProjectFeature<SampleToolProject>
 {
+    /// <inheritdoc />
+    public IProjectUndoHistory? UndoHistory { get; set; }
+
     private readonly SampleToolService sampleTool;
     private readonly IBeatmapWorkspace workspace;
 
@@ -39,6 +43,7 @@ public sealed partial class SampleToolViewModel : SingleRunToolViewModel,
     ///     Gets or sets the one tag appended to selected beatmaps' metadata.
     /// </summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyDataErrorInfo]
     [Required(ErrorMessage = "Enter a tag.")]
     [RegularExpression(@"^\S+$", ErrorMessage = "The tag must not contain spaces.")]

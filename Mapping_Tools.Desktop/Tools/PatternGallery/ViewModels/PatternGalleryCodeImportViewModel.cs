@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Services.Undo;
 using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -22,22 +23,27 @@ public sealed partial class PatternGalleryCodeImportViewModel : ObservableValida
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [Required(ErrorMessage = "A pattern name is required.")]
+    [Undoable]
     public partial string Name { get; set; }
 
     /// <summary>Gets or sets raw hit-object lines.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string HitObjects { get; set; } = string.Empty;
 
     /// <summary>Gets or sets raw timing-point lines.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string TimingPoints { get; set; } = string.Empty;
 
     /// <summary>Gets or sets the global slider multiplier.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double GlobalSv { get; set; } = 1.4;
 
     /// <summary>Gets or sets the selected game mode.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial GameMode GameMode { get; set; } = GameMode.Standard;
 
     /// <summary>Gets the game modes shown in the form.</summary>

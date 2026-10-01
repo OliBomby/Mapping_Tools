@@ -3,8 +3,12 @@ using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Tools.MetadataManager;
 using Mapping_Tools.Core.Tools.MetadataManager;
+using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
+using Mapping_Tools.Desktop.Tools.MetadataManager.Models;
 using Mapping_Tools.Desktop.Tools.MetadataManager.ViewModels;
+using Mapping_Tools.Infrastructure.Projects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Tools.MetadataManager.ViewModels;
@@ -12,6 +16,28 @@ namespace Mapping_Tools.Desktop.Tests.Tools.MetadataManager.ViewModels;
 [TestClass]
 public sealed class MetadataManagerViewModelTests
 {
+    [TestMethod]
+    public void ComboColorPickerChange_Undo_RestoresPreviousColor()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+        viewModel.AddComboColourCommand.Execute(null);
+        var original = viewModel.ComboColours[0].Color;
+        ProjectUndoHistory<MetadataManagerProject> history = new(viewModel, new VersionedProjectJsonSerializer());
+        viewModel.UndoHistory = history;
+
+        // Act
+        viewModel.ComboColours[0].Color = RgbaColour.FromRgb(12, 34, 56);
+        history.Capture();
+        history.Undo();
+
+        // Assert
+        viewModel.ComboColours[0].Color.Should().Be(original);
+        history.CanUndo.Should().BeFalse();
+        history.Redo();
+        viewModel.ComboColours[0].Color.Should().Be(RgbaColour.FromRgb(12, 34, 56));
+    }
+
     [TestMethod]
     public async Task BrowseExportCommand_WithMultipleFiles_JoinsPathsAndRequestsMultiSelect()
     {

@@ -1,3 +1,9 @@
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Data;
+using Avalonia.Headless;
+using Avalonia.Input;
+using Avalonia.Interactivity;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Tools.Sliderator.Contracts;
@@ -5,14 +11,19 @@ using Mapping_Tools.Application.Tools.Sliderator.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Graph;
+using Mapping_Tools.Core.Graph.Interpolation.Interpolators;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.Sliderator.Models;
+using Mapping_Tools.Desktop.Controls.Graph;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services.Dialogs;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.Sliderator.Models;
 using Mapping_Tools.Desktop.Tools.Sliderator.ViewModels;
+using Mapping_Tools.Desktop.Tools.Sliderator.Views;
+using Mapping_Tools.Infrastructure.Projects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Tools.Sliderator.ViewModels;
@@ -20,6 +31,186 @@ namespace Mapping_Tools.Desktop.Tests.Tools.Sliderator.ViewModels;
 [TestClass]
 public sealed class SlideratorViewModelTests
 {
+    [TestMethod]
+    public void Undo_AfterChangingBeatLengthAndBpm_RestoresGraphAndTiming()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        ProjectUndoHistory<SlideratorProject> history = new(viewModel, new VersionedProjectJsonSerializer());
+        viewModel.UndoHistory = history;
+        var original = viewModel.GraphState.Clone();
+
+        // Act
+        using (history.BeginEdit())
+        {
+            viewModel.GraphBeats = 5;
+            viewModel.BeatsPerMinute = 240;
+            viewModel.ExportTime = 1234;
+        }
+        history.Undo();
+
+        // Assert
+        viewModel.GraphBeats.Should().Be(3);
+        viewModel.BeatsPerMinute.Should().Be(180);
+        viewModel.ExportTime.Should().Be(0);
+        viewModel.GraphState.MaxX.Should().Be(original.MaxX);
+        history.CanUndo.Should().BeFalse();
+        history.Redo();
+        viewModel.GraphBeats.Should().Be(5);
+        viewModel.BeatsPerMinute.Should().Be(240);
+        viewModel.ExportTime.Should().Be(1234);
+        viewModel.GraphState.MaxX.Should().Be(5);
+    }
+
+    [TestMethod]
+    public void Undo_ExportRadioGesture_RestoresOriginalChoiceInOneStep()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        ProjectUndoHistory<SlideratorProject> history = new(viewModel, new VersionedProjectJsonSerializer());
+        viewModel.UndoHistory = history;
+
+        // Act
+        using (history.BeginGesture())
+        {
+            viewModel.ExportAsNormal = false;
+            viewModel.ExportAsStream = true;
+        }
+        history.Undo();
+
+        // Assert
+        viewModel.ExportAsNormal.Should().BeTrue();
+        viewModel.ExportAsStream.Should().BeFalse();
+        history.CanUndo.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void Undo_GraphDragGesture_RestoresStartingGraphInOneStep()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        ProjectUndoHistory<SlideratorProject> history = new(viewModel, new VersionedProjectJsonSerializer());
+        viewModel.UndoHistory = history;
+        var startingPoint = viewModel.GraphState.Anchors[1].Pos;
+
+        // Act
+        using (history.BeginGesture())
+        {
+            for (int index = 1; index <= 5; index++)
+            {
+                var state = viewModel.GraphState.Clone();
+                state.Anchors[1].Pos = new Vector2(3, 1 + index * 0.1f);
+                viewModel.GraphState = state;
+            }
+        }
+        history.Undo();
+
+        // Assert
+        viewModel.GraphState.Anchors[1].Pos.Should().Be(startingPoint);
+        history.CanUndo.Should().BeFalse();
+    }
+
+    [DataTestMethod]
+    [DataRow(typeof(HalfSineInterpolator))]
+    [DataRow(typeof(SingleCurveInterpolator3))]
+    [DataRow(typeof(DoubleCurveInterpolator3))]
+    [DataRow(typeof(WaveInterpolator))]
+    public void SetInterpolator_FromGraphControl_RecordsUndoHistory(Type interpolatorType)
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        viewModel.VelocityLimit = 1_000_000;
+        var startingGraph = viewModel.GraphState.Clone();
+        startingGraph.Anchors[1].Tension = 0.5;
+        viewModel.GraphState = startingGraph;
+        ProjectUndoHistory<SlideratorProject> history = new(viewModel, new VersionedProjectJsonSerializer());
+        viewModel.UndoHistory = history;
+        SlideratorView view = new() { DataContext = viewModel };
+        GraphControl graph = view.FindControl<GraphControl>("GraphControlElement")!;
+        Window window = new() { Content = view };
+        ProjectUndoWindowInput.Attach(window, () => history);
+        window.Show();
+        Type original = viewModel.GraphState.Anchors[1].Interpolator.GetType();
+
+        // Act
+        graph.SetInterpolator(1, interpolatorType);
+        bool recorded = history.CanUndo;
+        Type edited = viewModel.GraphState.Anchors[1].Interpolator.GetType();
+        history.Undo();
+        window.Close();
+
+        // Assert
+        edited.Should().Be(interpolatorType);
+        recorded.Should().BeTrue();
+        viewModel.GraphState.Anchors[1].Interpolator.GetType().Should().Be(original);
+        graph.GraphState!.Anchors[1].Interpolator.GetType().Should().Be(original);
+        history.CanUndo.Should().BeFalse();
+    }
+
+    [DataTestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public void EditCompleted_GraphDrag_RecordsOneUndoStep(bool loseCapture)
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        ProjectUndoHistory<SlideratorProject> history = new(viewModel, new VersionedProjectJsonSerializer());
+        viewModel.UndoHistory = history;
+        GraphControl graph = new();
+        graph.Bind(GraphControl.GraphStateProperty, new Binding(nameof(SlideratorViewModel.GraphState))
+        {
+            Mode = BindingMode.TwoWay,
+            Source = viewModel,
+        });
+        GraphState original = viewModel.GraphState.Clone();
+        IPointer? pointer = null;
+        graph.AddHandler(InputElement.PointerPressedEvent, (_, args) => pointer = args.Pointer,
+            RoutingStrategies.Tunnel, true);
+        Window window = new() { Width = 600, Height = 400, Content = graph };
+        ProjectUndoWindowInput.Attach(window, () => history);
+        window.Show();
+        Point graphPoint = graph.GetControlPosition(new Vector2(1.5f, 0.3f));
+        Point press = graph.TranslatePoint(graphPoint, window)
+                      ?? throw new InvalidOperationException("Graph has no pointer position.");
+
+        // Act
+        window.MouseDown(press, MouseButton.Right);
+        for (int index = 1; index <= 5; index++)
+            window.MouseMove(press + new Vector(index * 8, -index * 4));
+        if (loseCapture) pointer!.Capture(null);
+        window.MouseUp(press + new Vector(40, -20), MouseButton.Right);
+        bool recorded = history.CanUndo;
+        int editedAnchorCount = viewModel.GraphState.Anchors.Count;
+        history.Undo();
+        window.Close();
+
+        // Assert
+        recorded.Should().BeTrue();
+        editedAnchorCount.Should().Be(original.Anchors.Count + 1);
+        viewModel.GraphState.Anchors.Should().HaveCount(original.Anchors.Count);
+        graph.GraphState!.Anchors.Should().HaveCount(original.Anchors.Count);
+        history.CanUndo.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public async Task ImportCommand_Undo_RestoresWholePreviousStateInOneStep()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        ProjectUndoHistory<SlideratorProject> history = new(viewModel, new VersionedProjectJsonSerializer());
+        viewModel.UndoHistory = history;
+
+        // Act
+        await viewModel.ImportCommand.ExecuteAsync(null);
+        history.Undo();
+
+        // Assert
+        viewModel.LoadedHitObjects.Should().BeEmpty();
+        viewModel.BeatsPerMinute.Should().Be(180);
+        viewModel.GraphBeats.Should().Be(3);
+        history.CanUndo.Should().BeFalse();
+    }
+
     [TestMethod]
     public async Task RunQuickAsync_WithImportedSlider_PreservesEditorReadPreferenceAndPassesPersistedGraphSettings()
     {

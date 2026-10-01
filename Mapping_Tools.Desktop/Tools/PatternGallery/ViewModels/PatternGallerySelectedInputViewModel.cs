@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Services.Undo;
 using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -20,6 +21,7 @@ public sealed partial class PatternGallerySelectedInputViewModel : ObservableVal
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [Required(ErrorMessage = "A pattern name is required.")]
+    [Undoable]
     public partial string Name { get; set; }
 
     /// <summary>Gets the command that validates and accepts the form.</summary>

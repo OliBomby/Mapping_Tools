@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Services.Undo;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Core.Graph;
@@ -19,6 +20,7 @@ public sealed class GraphEditorViewModel : ObservableObject
     }
 
     /// <summary>Gets or sets the graph snapshot edited by the window.</summary>
+    [Undoable]
     public GraphState GraphState
     {
         get => graphState;

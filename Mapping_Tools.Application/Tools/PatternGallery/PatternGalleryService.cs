@@ -82,7 +82,8 @@ public sealed class PatternGalleryService : IPatternGalleryService
         GameMode gameMode,
         PatternGalleryServiceOptions project,
         PatternGalleryCollectionPaths paths,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        PatternGalleryFileEdit? fileEdit = null)
     {
         ArgumentNullException.ThrowIfNull(project);
 
@@ -106,7 +107,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
             gameMode,
             out var patternBeatmap);
 
-        SavePattern(pattern, patternBeatmap, paths, cancellationToken);
+        SavePattern(pattern, patternBeatmap, paths, cancellationToken, fileEdit);
 
         return Task.FromResult(pattern);
     }
@@ -119,7 +120,8 @@ public sealed class PatternGalleryService : IPatternGalleryService
         double startTime,
         double endTime,
         PatternGalleryCollectionPaths paths,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        PatternGalleryFileEdit? fileEdit = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(sourcePath);
 
@@ -141,13 +143,15 @@ public sealed class PatternGalleryService : IPatternGalleryService
                 startTime,
                 endTime,
                 out var filtered);
-            SavePattern(pattern, filtered, paths, cancellationToken);
+            SavePattern(pattern, filtered, paths, cancellationToken, fileEdit);
         }
         else
         {
             pattern = maker.FromBeatmap(source.Beatmap, name);
             // Save the pattern in the collection folder by copying
-            files.CopyPattern(sourcePath, files.GetPatternPath(paths, pattern.FileName));
+            string destination = files.GetPatternPath(paths, pattern.FileName);
+            fileEdit?.CaptureFile(destination);
+            files.CopyPattern(sourcePath, destination);
         }
 
         return pattern;
@@ -158,7 +162,8 @@ public sealed class PatternGalleryService : IPatternGalleryService
         string sourcePath,
         string name,
         PatternGalleryCollectionPaths paths,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        PatternGalleryFileEdit? fileEdit = null)
     {
         var source = await editing.OpenBeatmapAsync(
                 sourcePath,
@@ -174,7 +179,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
             source.SelectedHitObjects,
             out var filtered);
 
-        SavePattern(pattern, filtered, paths, cancellationToken);
+        SavePattern(pattern, filtered, paths, cancellationToken, fileEdit);
 
         return pattern;
     }
@@ -266,17 +271,40 @@ public sealed class PatternGalleryService : IPatternGalleryService
     public Task DeleteAsync(
         IReadOnlyList<PatternGalleryPattern> patterns,
         PatternGalleryCollectionPaths paths,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        PatternGalleryFileEdit? fileEdit = null)
     {
         ArgumentNullException.ThrowIfNull(patterns);
 
         foreach (var pattern in patterns)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            files.DeletePattern(files.GetPatternPath(paths, pattern.FileName));
+            string path = files.GetPatternPath(paths, pattern.FileName);
+            fileEdit?.CaptureFile(path);
+            files.DeletePattern(path);
         }
 
         return Task.CompletedTask;
+    }
+
+    /// <inheritdoc />
+    public void MergeCollection(
+        PatternGalleryServiceOptions project,
+        PatternGalleryServiceOptions imported,
+        IReadOnlyList<PatternGalleryArchiveFile> patternFiles,
+        PatternGalleryCollectionPaths paths,
+        PatternGalleryFileEdit? fileEdit = null)
+    {
+        files.EnsureCollection(paths);
+        var contents = patternFiles.ToDictionary(file => file.FileName, StringComparer.OrdinalIgnoreCase);
+        foreach (var pattern in imported.Patterns)
+            if (contents.TryGetValue(pattern.FileName, out var file))
+            {
+                string path = files.GetPatternPath(paths, pattern.FileName);
+                fileEdit?.CaptureFile(path);
+                files.WritePatternBytes(path, file.Content);
+                project.Patterns.Add(pattern);
+            }
     }
 
     /// <inheritdoc />
@@ -332,15 +360,17 @@ public sealed class PatternGalleryService : IPatternGalleryService
         PatternGalleryPattern pattern,
         Beatmap patternBeatmap,
         PatternGalleryCollectionPaths paths,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        PatternGalleryFileEdit? fileEdit)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        string destination = files.GetPatternPath(paths, pattern.FileName);
+        fileEdit?.CaptureFile(destination);
 
         // Make sure the file handler always uses the right pattern files folder
         files.EnsureCollection(paths);
 
         patternBeatmap.Version = 128;
-        string destination = files.GetPatternPath(paths, pattern.FileName);
 
         // Save the modified pattern beatmap in the colleciton folder
         files.WritePatternBytes(

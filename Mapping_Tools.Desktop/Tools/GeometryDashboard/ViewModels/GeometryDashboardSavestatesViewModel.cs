@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.Models;
+using Mapping_Tools.Desktop.Services.Undo;
 
 namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 
@@ -11,17 +12,21 @@ public sealed partial class GeometryDashboardSavestatesViewModel : ObservableObj
 {
     private readonly Action<GeometryDashboardSaveSlot> loadSlot;
     private readonly Action refreshHotkeys;
+    private readonly IProjectUndoHistory? undoHistory;
 
     /// <summary>Creates the save-slot editor over the live project.</summary>
     public GeometryDashboardSavestatesViewModel(
         GeometryDashboardProject project,
         Action<GeometryDashboardSaveSlot> loadSlot,
-        Action refreshHotkeys)
+        Action refreshHotkeys,
+        IProjectUndoHistory? undoHistory = null)
     {
         Project = project ?? throw new ArgumentNullException(nameof(project));
         this.loadSlot = loadSlot ?? throw new ArgumentNullException(nameof(loadSlot));
         this.refreshHotkeys = refreshHotkeys ?? throw new ArgumentNullException(nameof(refreshHotkeys));
+        this.undoHistory = undoHistory;
         SaveSlots = new ObservableCollection<GeometryDashboardSaveSlot>(Project.SaveSlots);
+        if (undoHistory is not null) undoHistory.Changed += OnHistoryChanged;
     }
 
     /// <summary>Gets the live project slots.</summary>
@@ -40,6 +45,21 @@ public sealed partial class GeometryDashboardSavestatesViewModel : ObservableObj
     /// <summary>Receives the window close action.</summary>
     public Action? Close { get; set; }
 
+    /// <summary>Releases the history subscription when the editor closes.</summary>
+    public void Detach()
+    {
+        if (undoHistory is not null) undoHistory.Changed -= OnHistoryChanged;
+    }
+
+    private void OnHistoryChanged(object? sender, EventArgs args)
+    {
+        if (Project.SaveSlots.SequenceEqual(SaveSlots)) return;
+        SaveSlots.Clear();
+        foreach (var slot in Project.SaveSlots) SaveSlots.Add(slot);
+        SelectedSlots.Clear();
+        SelectedSlot = null;
+    }
+
     /// <summary>Replaces the extended list selection supplied by the Avalonia list control.</summary>
     /// <param name="slots">The selected live save slots.</param>
     public void SetSelectedSlots(IEnumerable<GeometryDashboardSaveSlot> slots)
@@ -53,6 +73,7 @@ public sealed partial class GeometryDashboardSavestatesViewModel : ObservableObj
     [RelayCommand]
     private void Add()
     {
+        using var edit = undoHistory?.BeginEdit();
         GeometryDashboardSaveSlot slot;
         lock (Project)
         {
@@ -70,6 +91,7 @@ public sealed partial class GeometryDashboardSavestatesViewModel : ObservableObj
     [RelayCommand]
     private void Remove()
     {
+        using var edit = undoHistory?.BeginEdit();
         var slots = SelectedSlots.Count > 0
             ? SelectedSlots.ToArray()
             : SelectedSlot is not null
@@ -98,6 +120,7 @@ public sealed partial class GeometryDashboardSavestatesViewModel : ObservableObj
     [RelayCommand]
     private void Duplicate()
     {
+        using var edit = undoHistory?.BeginEdit();
         var slots = SelectedSlots.Count > 0
             ? SelectedSlots.ToArray()
             : SelectedSlot is not null
@@ -130,6 +153,7 @@ public sealed partial class GeometryDashboardSavestatesViewModel : ObservableObj
     [RelayCommand]
     private void Load(GeometryDashboardSaveSlot? slot = null)
     {
+        using var edit = undoHistory?.BeginEdit();
         if (slot is not null) loadSlot(slot);
         else if (SelectedSlot is not null) loadSlot(SelectedSlot);
     }
@@ -138,6 +162,7 @@ public sealed partial class GeometryDashboardSavestatesViewModel : ObservableObj
     [RelayCommand]
     private void Save(GeometryDashboardSaveSlot? slot = null)
     {
+        using var edit = undoHistory?.BeginEdit();
         lock (Project)
         {
             if (slot is not null) Project.SaveToSlot(slot);

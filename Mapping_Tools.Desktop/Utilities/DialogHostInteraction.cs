@@ -1,11 +1,21 @@
 using Avalonia.Threading;
+using Avalonia.Controls;
 using DialogHostAvalonia;
+using Mapping_Tools.Desktop.Services.Undo;
 
 namespace Mapping_Tools.Desktop.Utilities;
 
 /// <summary>Provides the shared root and nested DialogHost interaction boundary.</summary>
 internal static class DialogHostInteraction
 {
+    private static readonly List<DialogUndoHistory?> histories = [];
+
+    /// <summary>Gets the draft history for the currently displayed dialog.</summary>
+    internal static IProjectUndoHistory? CurrentUndoHistory => histories.LastOrDefault();
+
+    /// <summary>Gets whether a modal dialog currently owns keyboard input.</summary>
+    internal static bool IsDialogOpen => histories.Count > 0;
+
     /// <summary>Identifies the DialogHost covering the main shell.</summary>
     internal const string ROOT_IDENTIFIER = "RootDialog";
 
@@ -44,6 +54,14 @@ internal static class DialogHostInteraction
         CancellationToken cancellationToken)
     {
         CancellationTokenRegistration registration = default;
+        DialogUndoHistory? history = null;
+        if (content is Control { DataContext: { } model } control)
+            history = new DialogUndoHistory(model, () =>
+            {
+                control.DataContext = null;
+                control.DataContext = model;
+            });
+        histories.Add(history);
         try
         {
             DialogOpenedEventHandler openedHandler = (_, eventArgs) =>
@@ -65,6 +83,8 @@ internal static class DialogHostInteraction
         }
         finally
         {
+            histories.RemoveAt(histories.Count - 1);
+            history?.Dispose();
             await registration.DisposeAsync();
         }
     }

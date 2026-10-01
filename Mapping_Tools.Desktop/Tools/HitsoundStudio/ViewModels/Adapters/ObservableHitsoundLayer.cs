@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
 
@@ -25,28 +26,34 @@ public sealed partial class ObservableHitsoundLayer : ObservableObject
 
     /// <summary>Gets or sets the display name.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string Name { get; set; } = string.Empty;
 
     /// <summary>Gets or sets the sample family.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial SampleSet SampleSet { get; set; }
 
     /// <summary>Gets or sets the hitsound layer.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial Hitsound Hitsound { get; set; }
 
     /// <summary>Gets or sets the export priority.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial int Priority { get; set; }
 
     /// <summary>Gets the persisted import settings.</summary>
     public LayerImportArgs ImportArgs => Model.ImportArgs;
 
     /// <summary>Gets the observable sample-generation settings.</summary>
+    [Undoable]
     public ObservableSampleGeneratingArgs SampleArgs { get; }
 
     /// <summary>Gets or sets the sorted timestamps assigned to this layer.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial List<double> Times { get; set; } = [];
 
     /// <summary>Creates a detached plain snapshot of this layer.</summary>

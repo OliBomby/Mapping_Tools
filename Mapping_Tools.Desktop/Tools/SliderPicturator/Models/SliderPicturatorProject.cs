@@ -6,9 +6,6 @@ namespace Mapping_Tools.Desktop.Tools.SliderPicturator.Models;
 /// <summary>Stores Slider Picturator preview state alongside the service inputs.</summary>
 public sealed class SliderPicturatorProject : SliderPicturatorServiceOptions
 {
-    /// <summary>Gets or sets the approximate preview segment count.</summary>
-    public long SegmentCount { get; set; }
-
     /// <summary>Gets or sets whether the map palette supplies the track colour.</summary>
     public bool UseMapComboColors
     {

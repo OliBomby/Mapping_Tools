@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Services.Undo;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Platform.FilePicker;
@@ -37,6 +38,7 @@ public sealed partial class ComboColourStudioImportDialogViewModel : ObservableO
 
     /// <summary>Gets or sets the beatmap path being imported.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string Path { get; set; }
 
     /// <summary>Gets the command that validates and accepts the path.</summary>

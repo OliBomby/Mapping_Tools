@@ -17,6 +17,7 @@ using Mapping_Tools.Core.Images;
 using Mapping_Tools.Core.Tools.SliderPicturator;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tools.SliderPicturator.Models;
 using Mapping_Tools.Desktop.Utilities;
 using Mapping_Tools.Desktop.ViewModels;
@@ -28,6 +29,9 @@ namespace Mapping_Tools.Desktop.Tools.SliderPicturator.ViewModels;
 public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, IQuickRun, IShellProjectFeature<SliderPicturatorProject>,
     IShellFeatureActivation
 {
+    /// <inheritdoc />
+    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+
     private static readonly RgbaColour[] defaultComboColors =
         [.. ComboColour.GetDefaultComboColours().Select(colour => colour.Color)];
 
@@ -97,10 +101,12 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
 
     /// <summary>Gets or sets the GPU viewport-size choice.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial long ViewportSize { get; set; } = 32768;
 
     /// <summary>Gets or sets the image quality.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial int Quality { get; set; } = 1;
 
     /// <summary>Gets or sets the estimated segment count.</summary>
@@ -109,86 +115,107 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
 
     /// <summary>Gets or sets the image vertical resolution.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double YResolution { get; set; } = 1080;
 
     /// <summary>Gets or sets the slider start X coordinate.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double SliderStartX { get; set; } = 256;
 
     /// <summary>Gets or sets the slider start Y coordinate.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double SliderStartY { get; set; } = 192;
 
     /// <summary>Gets or sets the image start X coordinate.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double ImageStartX { get; set; }
 
     /// <summary>Gets or sets the image start Y coordinate.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double ImageStartY { get; set; }
 
     /// <summary>Gets or sets whether map combo colours supply the track colour.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool UseMapComboColors { get; set; }
 
     /// <summary>Gets or sets the selected combo colour.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial RgbaColour ComboColor { get; set; } = defaultComboColors[0];
 
     /// <summary>Gets or sets the effective track colour.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial RgbaColour CurrentTrackColor { get; set; } = RgbaColour.White;
 
     /// <summary>Gets or sets the manually selected track colour.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial RgbaColour TrackColorPickerColor { get; set; } = RgbaColour.White;
 
     /// <summary>Gets or sets the border colour.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial RgbaColour BorderColor { get; set; } = RgbaColour.White;
 
     /// <summary>Gets or sets the generated start time.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double TimeCode { get; set; }
 
     /// <summary>Gets or sets the generated duration.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double Duration { get; set; } = 1;
 
     /// <summary>Gets or sets the selected image path.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string PictureFile { get; set; } = string.Empty;
 
     /// <summary>Gets or sets whether transparent black can represent black pixels.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool BlackOn { get; set; } = true;
 
     /// <summary>Gets or sets whether the border colour can represent pixels.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool BorderOn { get; set; } = true;
 
     /// <summary>Gets or sets whether red participates in matching.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool RedOn { get; set; } = true;
 
     /// <summary>Gets or sets whether green participates in matching.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool GreenOn { get; set; } = true;
 
     /// <summary>Gets or sets whether blue participates in matching.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool BlueOn { get; set; } = true;
 
     /// <summary>Gets or sets whether alpha participates in matching.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool AlphaOn { get; set; } = true;
 
     /// <summary>Gets or sets whether generated map colours are persisted.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool SetBeatmapColors { get; set; } = true;
 
     /// <summary>Gets the transient slider whose sliderball path should be preserved.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial HitObject? SelectedSlider { get; set; }
 
     /// <inheritdoc />
@@ -281,6 +308,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     [RelayCommand]
     private async Task ImportAsync()
     {
+        using var edit = UndoHistory?.BeginEdit();
         try
         {
             string path = await workspace.ResolveQuickRunBeatmapAsync(false);
@@ -293,6 +321,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     [RelayCommand]
     private void Remove()
     {
+        using var edit = UndoHistory?.BeginEdit();
         SelectedSlider = null;
     }
 
@@ -571,7 +600,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     {
         return new SliderPicturatorProject
         {
-            ViewportSize = ViewportSize, Quality = Quality, SegmentCount = SegmentCount, YResolution = YResolution,
+            ViewportSize = ViewportSize, Quality = Quality, YResolution = YResolution,
             SliderStartX = SliderStartX, SliderStartY = SliderStartY, ImageStartX = ImageStartX, ImageStartY = ImageStartY,
             UseMapComboColors = UseMapComboColors, ComboColor = ComboColor, CurrentTrackColor = CurrentTrackColor,
             TrackColorPickerColor = TrackColorPickerColor, BorderColor = BorderColor, TimeCode = TimeCode, Duration = Duration,
@@ -585,7 +614,6 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
         ArgumentNullException.ThrowIfNull(project);
         ViewportSize = project.ViewportSize;
         Quality = project.Quality;
-        SegmentCount = project.SegmentCount;
         YResolution = project.YResolution;
         SliderStartX = project.SliderStartX;
         SliderStartY = project.SliderStartY;

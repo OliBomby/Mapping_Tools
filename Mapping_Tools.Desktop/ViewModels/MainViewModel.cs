@@ -16,6 +16,7 @@ using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Services.Updates;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Shell;
 using Material.Icons;
 using Microsoft.Extensions.Logging;
@@ -163,7 +164,13 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
 
     /// <summary>Gets the currently activated feature presentation model.</summary>
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(UndoCommand))]
+    [NotifyCanExecuteChangedFor(nameof(RedoCommand))]
+    [NotifyPropertyChangedFor(nameof(ProjectHistory))]
     public partial ObservableObject? CurrentFeature { get; private set; }
+
+    /// <summary>Gets the active feature's project edit history, or null when the feature has no history.</summary>
+    public IProjectUndoHistory? ProjectHistory => (CurrentFeature as IShellProjectFeature)?.UndoHistory;
 
     /// <summary>Gets whether the selected feature is currently being prepared.</summary>
     [ObservableProperty]
@@ -230,6 +237,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
         }
         finally
         {
+            if (ProjectHistory is { } history)
+                history.Changed -= OnUndoHistoryChanged;
             if (CurrentFeature is IQuickRun) DeactivateQuickRun();
             if (CurrentFeature is IShellFeatureActivation activation) activation.Deactivate();
             ProjectMenuItems = [];
@@ -332,12 +341,17 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
 
             if (activationVersion != featureActivationVersion || !ReferenceEquals(SelectedFeature, item)) return;
 
+            if (viewModel is IShellProjectFeature projectFeature)
+                await projectCoordinator.ActivateAsync(projectFeature);
+
+            cancellation.Token.ThrowIfCancellationRequested();
+            if (activationVersion != featureActivationVersion || !ReferenceEquals(SelectedFeature, item)) return;
+
             CurrentFeature = viewModel;
             HasProjectMenu = viewModel is IShellProjectFeature;
             ProjectMenuItems = CreateProjectMenuItems(viewModel);
             OnPropertyChanged(nameof(ProjectMenuItems));
             if (viewModel is IShellFeatureActivation current) current.Activate();
-            if (viewModel is IShellProjectFeature projectFeature) projectCoordinator.Activate(projectFeature);
             if (viewModel is IQuickRun) quickRunRegistry.SelectCurrent(registration.Id);
             logger.LogInformation("Feature activated: {FeatureId}, view model {ViewModelType}", item.Id, viewModel.GetType().Name);
         }
@@ -368,6 +382,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
 
         List<ShellProjectMenuItem> items =
         [
+            new("_Undo", "Undo the last project edit (Ctrl+Z).", UndoCommand, MaterialIconKind.Undo),
+            new("_Redo", "Redo the last undone project edit (Ctrl+Y).", RedoCommand, MaterialIconKind.Redo),
             new("_Save project", "Save tool settings to file.", SaveProjectCommand, MaterialIconKind.ContentSave),
             new("_Open project", "Load tool settings from file.", OpenProjectCommand, MaterialIconKind.Folder),
             new("_New project", "Load the default tool settings.", NewProjectCommand, MaterialIconKind.RocketLaunch),
@@ -484,6 +500,61 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
     private bool CanUseProjectActions()
     {
         return CurrentFeature is IShellProjectFeature;
+    }
+
+    private bool CanUndo()
+    {
+        return ProjectHistory?.CanUndo == true;
+    }
+
+    [RelayCommand(CanExecute = nameof(CanUndo))]
+    private async Task UndoAsync()
+    {
+        logger.LogInformation("User requested Undo for {FeatureId}", SelectedFeature?.Id);
+        try
+        {
+            ProjectHistory?.Undo();
+        }
+        catch (Exception exception)
+        {
+            await notifications.PublishAsync(new UserNotification(
+                UserNotificationSeverity.Error, "Could not undo", exception.Message, exception));
+        }
+    }
+
+    private bool CanRedo()
+    {
+        return ProjectHistory?.CanRedo == true;
+    }
+
+    [RelayCommand(CanExecute = nameof(CanRedo))]
+    private async Task RedoAsync()
+    {
+        logger.LogInformation("User requested Redo for {FeatureId}", SelectedFeature?.Id);
+        try
+        {
+            ProjectHistory?.Redo();
+        }
+        catch (Exception exception)
+        {
+            await notifications.PublishAsync(new UserNotification(
+                UserNotificationSeverity.Error, "Could not redo", exception.Message, exception));
+        }
+    }
+
+    partial void OnCurrentFeatureChanged(ObservableObject? oldValue, ObservableObject? newValue)
+    {
+        if (oldValue is IShellProjectFeature { UndoHistory: { } previous })
+            previous.Changed -= OnUndoHistoryChanged;
+
+        if (newValue is IShellProjectFeature { UndoHistory: { } current })
+            current.Changed += OnUndoHistoryChanged;
+    }
+
+    private void OnUndoHistoryChanged(object? sender, EventArgs eventArgs)
+    {
+        UndoCommand.NotifyCanExecuteChanged();
+        RedoCommand.NotifyCanExecuteChanged();
     }
 
     private void DeactivateQuickRun()

@@ -11,6 +11,7 @@ using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.RhythmGuide.Models;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.Services;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.Models;
@@ -22,6 +23,9 @@ namespace Mapping_Tools.Desktop.Tools.RhythmGuide.ViewModels;
 public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
     IShellProjectFeature<RhythmGuideProject>
 {
+    /// <inheritdoc />
+    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+
     private readonly ICurrentBeatmapDialogService currentBeatmapService;
     private readonly ProjectDefinition<RhythmGuideProject> definition;
     private readonly IFilePicker filePicker;
@@ -72,31 +76,38 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets the source beatmap paths in selection order.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyPropertyChangedFor(nameof(SourceCount))]
     public partial string[] SourcePaths { get; set; } = [];
 
     /// <summary>Gets or sets the destination beatmap path.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string ExportPath { get; set; }
 
     /// <summary>Gets or sets whether the guide creates or extends a beatmap.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial RhythmGuideExportMode ExportMode { get; set; }
 
     /// <summary>Gets or sets the game mode assigned to a new guide beatmap.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial GameMode OutputGameMode { get; set; }
 
     /// <summary>Gets or sets the difficulty name assigned to a new guide beatmap.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string OutputName { get; set; } = "Hitsounds";
 
     /// <summary>Gets or sets whether every generated object uses night-core timing.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool NcEverything { get; set; }
 
     /// <summary>Gets or sets which expanded source events become guide objects.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial RhythmGuideSelectionMode SelectionMode { get; set; } =
         RhythmGuideSelectionMode.HitsoundEvents;
 

@@ -1,4 +1,6 @@
 using Avalonia.Controls;
+using Mapping_Tools.Desktop.Services.Undo;
+using Mapping_Tools.Desktop.Tools.RhythmGuide.ViewModels;
 
 namespace Mapping_Tools.Desktop.Tools.RhythmGuide.Views;
 
@@ -9,5 +11,7 @@ public sealed partial class RhythmGuideWindow : Window
     public RhythmGuideWindow()
     {
         InitializeComponent();
+        ProjectUndoWindowInput.Attach(this,
+            () => (DataContext as RhythmGuideViewModel)?.UndoHistory);
     }
 }

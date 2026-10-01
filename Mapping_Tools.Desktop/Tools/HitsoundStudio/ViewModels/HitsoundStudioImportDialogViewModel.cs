@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Services.Undo;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Platform.FilePicker;
@@ -40,88 +41,109 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
 
     /// <summary>Gets or sets the layer name.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string Name { get; set; }
 
     /// <summary>Gets or sets the import kind.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial ImportType ImportType { get; set; } = ImportType.None;
 
     /// <summary>Gets or sets the selected legacy import tab.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial int SelectedTabIndex { get; set; }
 
     /// <summary>Gets or sets the sample family.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial SampleSet SampleSet { get; set; } = SampleSet.Normal;
 
     /// <summary>Gets or sets the hitsound.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial Hitsound Hitsound { get; set; } = Hitsound.Normal;
 
     /// <summary>Gets or sets the audio/SoundFont path for a simple layer.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string SamplePath { get; set; } = string.Empty;
 
     /// <summary>Gets or sets the beatmap path used by beatmap-based imports.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string BeatmapPath { get; set; } = string.Empty;
 
     /// <summary>Gets or sets the MIDI source path.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string MidiPath { get; set; } = string.Empty;
 
     /// <summary>Gets or sets the stack X filter.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double X { get; set; } = -1;
 
     /// <summary>Gets or sets the stack Y filter.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double Y { get; set; } = -1;
 
     /// <summary>Gets or sets the MIDI offset.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double Offset { get; set; }
 
     /// <summary>Gets or sets whether source volumes create separate layers.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool DiscriminateVolumes { get; set; }
 
     /// <summary>Gets or sets whether identical sample data is canonicalized.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool DetectDuplicateSamples { get; set; }
 
     /// <summary>Gets or sets whether duplicate event times are removed.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool RemoveDuplicates { get; set; }
 
     /// <summary>Gets or sets whether hitsound import includes storyboard sounds.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool IncludeStoryboard { get; set; }
 
     /// <summary>Gets or sets whether MIDI instruments are part of layer identity.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool DiscriminateInstruments { get; set; } = true;
 
     /// <summary>Gets or sets whether MIDI keys are part of layer identity.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool DiscriminateKeys { get; set; } = true;
 
     /// <summary>Gets or sets whether MIDI lengths are part of layer identity.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsLengthSettingsVisible))]
+    [Undoable]
     public partial bool DiscriminateLengths { get; set; }
 
     /// <summary>Gets or sets whether MIDI velocities are part of layer identity.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsVelocitySettingsVisible))]
+    [Undoable]
     public partial bool DiscriminateVelocities { get; set; }
 
     /// <summary>Gets or sets the MIDI length roughness.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double LengthRoughness { get; set; } = 2;
 
     /// <summary>Gets or sets the MIDI velocity roughness.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double VelocityRoughness { get; set; } = 10;
 
     /// <summary>Gets all import modes.</summary>

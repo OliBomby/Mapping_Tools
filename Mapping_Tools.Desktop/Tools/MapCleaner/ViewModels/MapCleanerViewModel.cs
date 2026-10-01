@@ -13,6 +13,7 @@ using Mapping_Tools.Core.Tools.MapCleaner.Models;
 using Mapping_Tools.Desktop.Controls.Timeline;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tools.MapCleaner.Models;
 using Mapping_Tools.Desktop.ViewModels;
 
@@ -23,6 +24,9 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
     IQuickRun,
     IShellProjectFeature<MapCleanerProject>
 {
+    /// <inheritdoc />
+    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+
     private readonly IMapCleanerService cleaner;
 
     private readonly IPlatformLauncher launcher;
@@ -55,46 +59,57 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets whether slider volume changes are preserved.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool VolumeSliders { get; set; } = true;
 
     /// <summary>Gets or sets whether slider sample-set changes are preserved.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool SampleSetSliders { get; set; } = true;
 
     /// <summary>Gets or sets whether spinner volume changes are preserved.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool VolumeSpinners { get; set; } = true;
 
     /// <summary>Gets or sets whether hit objects and slider ends are resnapped.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool ResnapObjects { get; set; } = true;
 
     /// <summary>Gets or sets whether editor bookmarks are resnapped.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool ResnapBookmarks { get; set; }
 
     /// <summary>Gets or sets whether mapset samples are inspected.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool AnalyzeSamples { get; set; } = true;
 
     /// <summary>Gets or sets whether unused samples are moved to recovery.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool RemoveUnusedSamples { get; set; }
 
     /// <summary>Gets or sets whether object hitsounds are removed.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool RemoveHitsounds { get; set; }
 
     /// <summary>Gets or sets whether muting values are removed from object ends.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool RemoveMuting { get; set; }
 
     /// <summary>Gets or sets whether unclickable slider and spinner ends are muted.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool RemoveUnclickableHitsounds { get; set; }
 
     /// <summary>Gets or sets the typed beat divisors used for resnapping.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial IBeatDivisor[] BeatDivisors { get; set; } =
         RationalBeatDivisor.GetDefaultBeatDivisors();
 

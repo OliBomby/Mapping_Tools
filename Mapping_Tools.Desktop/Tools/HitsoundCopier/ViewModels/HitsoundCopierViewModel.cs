@@ -14,6 +14,7 @@ using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.HitsoundCopier.Models;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tools.HitsoundCopier.Models;
 using Mapping_Tools.Desktop.ViewModels;
 
@@ -24,6 +25,9 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     IShellProjectFeature<HitsoundCopierProject>,
     IQuickRun
 {
+    /// <inheritdoc />
+    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+
     private readonly IHitsoundCopierService copier;
     private readonly ICurrentBeatmapDialogService currentBeatmapService;
 
@@ -57,15 +61,18 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets the optional source beatmap path.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string PathFrom { get; set; } = string.Empty;
 
     /// <summary>Gets or sets vertical-bar-separated target beatmap paths.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyPropertyChangedFor(nameof(ExportMapCountText))]
     public partial string PathTo { get; set; } = string.Empty;
 
     /// <summary>Gets or sets zero for overwrite-all or one for defined-only mode.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyPropertyChangedFor(nameof(SmartCopyModeSelected))]
     public partial HitsoundCopierCopyMode CopyMode { get; set; }
 
@@ -74,49 +81,60 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets the rounded millisecond matching leniency.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyDataErrorInfo]
     [Range(0, double.MaxValue)]
     public partial double TemporalLeniency { get; set; } = 5;
 
     /// <summary>Gets or sets whether object and edge hitsounds are copied.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool CopyHitsounds { get; set; } = true;
 
     /// <summary>Gets or sets whether slider-body hitsounds are copied.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool CopyBodyHitsounds { get; set; } = true;
 
     /// <summary>Gets or sets whether sample sets and custom indices are copied.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool CopySampleSets { get; set; } = true;
 
     /// <summary>Gets or sets whether timing-point volumes are copied.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool CopyVolumes { get; set; } = true;
 
     /// <summary>Gets or sets whether target five-percent volumes are protected.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool AlwaysPreserve5Volume { get; set; } = true;
 
     /// <summary>Gets or sets whether storyboard samples are copied.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool CopyStoryboardedSamples { get; set; }
 
     /// <summary>Gets or sets whether hitsound-satisfied storyboard samples are skipped.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool IgnoreHitsoundSatisfiedSamples { get; set; } = true;
 
     /// <summary>Gets or sets whether any target hitsound suppresses a storyboard sample.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool IgnoreWheneverHitsound { get; set; }
 
     /// <summary>Gets or sets whether unmatched hitsounds target slider ticks.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyPropertyChangedFor(nameof(StartIndexBoxVisible))]
     public partial bool CopyToSliderTicks { get; set; }
 
     /// <summary>Gets or sets whether unmatched hitsounds target slider slides.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyPropertyChangedFor(nameof(StartIndexBoxVisible))]
     public partial bool CopyToSliderSlides { get; set; }
 
@@ -125,34 +143,41 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets the first custom sample index.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial int StartIndex { get; set; } = 100;
 
     /// <summary>Gets or sets whether eligible slider ends are muted.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool MuteSliderends { get; set; }
 
     /// <summary>Gets or sets all accepted beat divisors for the muting filter.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial IBeatDivisor[] BeatDivisors { get; set; } =
         RationalBeatDivisor.GetDefaultBeatDivisors();
 
     /// <summary>Gets or sets muted beat divisors for the muting filter.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial IBeatDivisor[] MutedDivisors { get; set; } =
         RationalBeatDivisor.GetDefaultBeatDivisors().Skip(1).ToArray();
 
     /// <summary>Gets or sets the minimum eligible slider duration in beats.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyDataErrorInfo]
     [Range(0, double.MaxValue)]
     public partial double MinLength { get; set; } = 0.5;
 
     /// <summary>Gets or sets the optional muted custom index.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial int MutedIndex { get; set; } = -1;
 
     /// <summary>Gets or sets the muted sample family.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial SampleSet MutedSampleSet { get; set; } = SampleSet.None;
 
     /// <summary>Gets the copy modes in display order.</summary>

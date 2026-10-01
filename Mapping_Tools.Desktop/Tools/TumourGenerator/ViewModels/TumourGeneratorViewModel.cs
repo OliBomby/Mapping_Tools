@@ -19,6 +19,7 @@ using Mapping_Tools.Core.Tools.TumourGenerator.Templates;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tools.TumourGenerator.Models;
 using Mapping_Tools.Desktop.Tools.TumourGenerator.ViewModels.Adapters;
 using Mapping_Tools.Desktop.ViewModels;
@@ -36,6 +37,9 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     IShellFeatureActivation,
     IDisposable
 {
+    /// <inheritdoc />
+    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+
     private readonly IDialogService dialogs;
 
     private readonly ITumourGeneratorService generator;
@@ -89,41 +93,50 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         Enum.GetValues<TumourSidedness>();
 
     /// <summary>Gets the editable layers in generation order.</summary>
+    [Undoable]
     public ObservableCollection<ObservableTumourLayer> TumourLayers { get; } = [];
 
     /// <summary>Gets or sets the source used when importing or running.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyPropertyChangedFor(nameof(TimeCodeVisible))]
     public partial HitObjectSelectionMode ImportModeSetting { get; set; } = HitObjectSelectionMode.Selected;
 
     /// <summary>Gets or sets the time query used by time-based selection.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string TimeCode { get; set; } = string.Empty;
 
     /// <summary>Gets or sets whether only middle anchors are retained.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool JustMiddleAnchors { get; set; }
 
     /// <summary>Gets or sets the global tumour size scalar.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double Scale { get; set; } = 1;
 
     /// <summary>Gets or sets the Circle Size used by the preview visualizer.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double CircleSize { get; set; } = 4;
 
     /// <summary>Gets or sets whether slider velocity is corrected after generation.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyPropertyChangedFor(nameof(RemoveSliderTicksEnabled))]
     public partial bool FixSv { get; set; } = true;
 
     /// <summary>Gets or sets whether corrected velocity is delegated to BPM redlines.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyPropertyChangedFor(nameof(RemoveSliderTicksEnabled))]
     public partial bool DelegateToBpm { get; set; }
 
     /// <summary>Gets or sets whether delegated velocity removes slider ticks.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool RemoveSliderTicks { get; set; }
 
     /// <summary>Gets whether delegated slider-tick removal is currently applicable.</summary>
@@ -131,6 +144,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets whether advanced layer controls are visible.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyPropertyChangedFor(nameof(TumourStartSliderMin))]
     [NotifyPropertyChangedFor(nameof(TumourRangeSliderMax))]
     [NotifyPropertyChangedFor(nameof(TumourParameterGraphVisible))]
@@ -138,6 +152,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets whether reconstruction diagnostics are enabled.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool DebugConstruction { get; set; }
 
     /// <summary>Gets whether the time-code field applies to the current import mode.</summary>
@@ -332,6 +347,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task ImportAsync()
     {
+        using var edit = UndoHistory?.BeginEdit();
         string? path;
         try
         {
@@ -388,6 +404,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private void Add()
     {
+        using var edit = UndoHistory?.BeginEdit();
         ObservableTumourLayer layer = new(TumourLayer.GetDefaultLayer());
         layer.Name = $"Layer {TumourLayers.Count + 1}";
         layer.TumourEnd = LayerRangeSliderMaxes.LastOrDefault(PreviewHitObject.PixelLength);
@@ -398,6 +415,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private void Copy()
     {
+        using var edit = UndoHistory?.BeginEdit();
         if (CurrentLayer is null) return;
 
         ObservableTumourLayer copy = new(CurrentLayer.Snapshot());
@@ -409,6 +427,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private void Remove()
     {
+        using var edit = UndoHistory?.BeginEdit();
         if (TumourLayers.Count <= 1 || CurrentLayer is null) return;
 
         int index = CurrentLayerIndex;
@@ -420,6 +439,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private void Raise()
     {
+        using var edit = UndoHistory?.BeginEdit();
         if (CurrentLayerIndex >= 0 && CurrentLayerIndex < TumourLayers.Count - 1)
         {
             TumourLayers.Move(CurrentLayerIndex, CurrentLayerIndex + 1);
@@ -431,6 +451,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private void Lower()
     {
+        using var edit = UndoHistory?.BeginEdit();
         if (CurrentLayerIndex > 0)
         {
             TumourLayers.Move(CurrentLayerIndex, CurrentLayerIndex - 1);
@@ -442,6 +463,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private void Randomize()
     {
+        using var edit = UndoHistory?.BeginEdit();
         if (CurrentLayer is not null) CurrentLayer.RandomSeed = Random.Shared.Next();
     }
 

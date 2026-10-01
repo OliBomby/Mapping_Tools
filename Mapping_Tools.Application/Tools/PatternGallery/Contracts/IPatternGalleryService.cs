@@ -27,6 +27,7 @@ public interface IPatternGalleryService
     /// <param name="project">The collection receiving the pattern.</param>
     /// <param name="paths">The resolved collection paths.</param>
     /// <param name="cancellationToken">Cancels parsing or writing.</param>
+    /// <param name="fileEdit">Optionally records the files changed by this operation.</param>
     /// <returns>The new indexed pattern.</returns>
     Task<PatternGalleryPattern> ImportCodeAsync(
         string name,
@@ -36,7 +37,8 @@ public interface IPatternGalleryService
         GameMode gameMode,
         PatternGalleryServiceOptions project,
         PatternGalleryCollectionPaths paths,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default,
+        PatternGalleryFileEdit? fileEdit = null);
 
     /// <summary>Imports a beatmap file, retaining only the requested objects when configured.</summary>
     /// <param name="sourcePath">The source `.osu` file.</param>
@@ -46,6 +48,7 @@ public interface IPatternGalleryService
     /// <param name="endTime">An optional upper time bound.</param>
     /// <param name="paths">The resolved collection paths.</param>
     /// <param name="cancellationToken">Cancels reading or writing.</param>
+    /// <param name="fileEdit">Optionally records the files changed by this operation.</param>
     /// <returns>The new indexed pattern.</returns>
     Task<PatternGalleryPattern> ImportFileAsync(
         string sourcePath,
@@ -54,19 +57,22 @@ public interface IPatternGalleryService
         double startTime,
         double endTime,
         PatternGalleryCollectionPaths paths,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default,
+        PatternGalleryFileEdit? fileEdit = null);
 
     /// <summary>Imports the hit objects selected in the current live editor state.</summary>
     /// <param name="sourcePath">The beatmap expected to be open in osu!.</param>
     /// <param name="name">The display name.</param>
     /// <param name="paths">The resolved collection paths.</param>
     /// <param name="cancellationToken">Cancels live reading or writing.</param>
+    /// <param name="fileEdit">Optionally records the files changed by this operation.</param>
     /// <returns>The new indexed pattern.</returns>
     Task<PatternGalleryPattern> ImportSelectedAsync(
         string sourcePath,
         string name,
         PatternGalleryCollectionPaths paths,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default,
+        PatternGalleryFileEdit? fileEdit = null);
 
     /// <summary>Places selected patterns into one target beatmap and saves it safely.</summary>
     /// <param name="targetPath">The beatmap to edit.</param>
@@ -90,10 +96,25 @@ public interface IPatternGalleryService
     /// <param name="patterns">Patterns to remove.</param>
     /// <param name="paths">The resolved collection paths.</param>
     /// <param name="cancellationToken">Cancels before deletion.</param>
+    /// <param name="fileEdit">Optionally records the files changed by this operation.</param>
     Task DeleteAsync(
         IReadOnlyList<PatternGalleryPattern> patterns,
         PatternGalleryCollectionPaths paths,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default,
+        PatternGalleryFileEdit? fileEdit = null);
+
+    /// <summary>Writes archived patterns into the current collection and adds their metadata.</summary>
+    /// <param name="project">The collection receiving the patterns.</param>
+    /// <param name="imported">The imported pattern metadata.</param>
+    /// <param name="patternFiles">The archived pattern bytes.</param>
+    /// <param name="paths">The destination collection paths.</param>
+    /// <param name="fileEdit">Optionally records the files changed by the merge.</param>
+    void MergeCollection(
+        PatternGalleryServiceOptions project,
+        PatternGalleryServiceOptions imported,
+        IReadOnlyList<PatternGalleryArchiveFile> patternFiles,
+        PatternGalleryCollectionPaths paths,
+        PatternGalleryFileEdit? fileEdit = null);
 
     /// <summary>Reconciles indexed metadata with the physical Pattern Files directory.</summary>
     /// <param name="project">The collection to modify.</param>

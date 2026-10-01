@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Services.Undo;
 using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -44,24 +45,29 @@ public sealed partial class PatternGalleryFileImportViewModel : ObservableValida
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [Required(ErrorMessage = "A pattern name is required.")]
+    [Undoable]
     public partial string Name { get; set; }
 
     /// <summary>Gets or sets the source pattern file path.</summary>
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [Required(ErrorMessage = "A pattern file path is required.")]
+    [Undoable]
     public partial string FilePath { get; set; }
 
     /// <summary>Gets or sets the optional time-code filter.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string Filter { get; set; } = string.Empty;
 
     /// <summary>Gets or sets the optional lower time bound in milliseconds.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double StartTime { get; set; } = -1;
 
     /// <summary>Gets or sets the optional upper time bound in milliseconds.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double EndTime { get; set; } = -1;
 
     /// <summary>Gets the command that validates and accepts the form.</summary>

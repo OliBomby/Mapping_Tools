@@ -19,6 +19,7 @@ using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGen
 using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.Views;
 using Material.Icons;
@@ -32,6 +33,9 @@ namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 public sealed partial class GeometryDashboardViewModel : ObservableObject,
     IShellProjectFeature<GeometryDashboardProject>, IShellExtraProjectMenuFeature, IShellFeatureActivation, IDisposable
 {
+    /// <inheritdoc />
+    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+
     private const string save_slot_binding_prefix = "geometry-dashboard-save-slot";
     private readonly IGeometryDashboardService dashboardService;
 
@@ -196,6 +200,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         }
 
         dashboardService.ApplyPreferences();
+        foreach (var generator in Generators) generator.NotifySettingsChanged();
         lifecycle.KeepRunningChanged();
         OnPropertyChanged(nameof(KeepRunning));
         SynchronizeSaveSlotHotkeys();
@@ -251,6 +256,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         var result = await window.ShowDialog<GeometryDashboardPreferencesDialogResult?>(owner());
         if (result is null) return;
 
+        using var edit = UndoHistory?.BeginEdit();
         lock (Project)
         {
             Project.SetCurrentPreferences(result.Preferences);
@@ -266,8 +272,9 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     /// <summary>Shows the modeless save-slot dialog for the current project.</summary>
     public Task ShowProjectSlotsAsync()
     {
-        GeometryDashboardSavestatesViewModel viewModel = new(Project, LoadSaveSlot, RefreshSaveSlotHotkeys);
+        GeometryDashboardSavestatesViewModel viewModel = new(Project, LoadSaveSlot, RefreshSaveSlotHotkeys, UndoHistory);
         GeometryDashboardSavestatesWindow window = new() { DataContext = viewModel };
+        window.AttachUndoHistory(UndoHistory);
         viewModel.Close = window.Close;
         window.Show(owner());
         return Task.CompletedTask;
@@ -284,6 +291,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         object? result = await window.ShowDialog<object?>(owner());
         if (result is true)
         {
+            UndoHistory?.Capture();
             generator.NotifySettingsChanged();
             dashboardService.Regenerate();
         }
@@ -330,6 +338,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     [RelayCommand]
     private async Task LoadLockedObjectsAsync()
     {
+        using var edit = UndoHistory?.BeginEdit();
         try
         {
             var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
@@ -401,6 +410,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         dispatcher.Post(() =>
         {
             if (disposed) return;
+            using var edit = UndoHistory?.BeginEdit();
             lock (Project)
             {
                 Project.LoadFromSlot(slot);

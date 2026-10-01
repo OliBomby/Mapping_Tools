@@ -37,13 +37,13 @@
                     </DataGrid.Styles>
                     <DataGrid.Columns>
                         <controls:CompactDataGridTextColumn Header="Name"
-                                                            Binding="{ReflectionBinding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                            Binding="{ReflectionBinding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
                         <controls:CompactDataGridTextColumn Header="Filename"
-                                                            Binding="{ReflectionBinding Filename, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                            Binding="{ReflectionBinding Filename, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
                         <controls:CompactDataGridTextColumn Header="X position"
-                                                            Binding="{ReflectionBinding XPos, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}" />
+                                                            Binding="{ReflectionBinding XPos, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}" />
                         <controls:CompactDataGridTextColumn Header="Y position"
-                                                            Binding="{ReflectionBinding YPos, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}" />
+                                                            Binding="{ReflectionBinding YPos, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}" />
                         <controls:CompactDataGridComboBoxColumn Header="Hitsound"
                                                                 ItemsSource="{Binding Hitsounds}"
                                                                 SelectedItemBinding="{ReflectionBinding Hitsound, Mode=TwoWay}"
@@ -60,7 +60,7 @@
                                                                 SortMemberPath="AdditionsSet"
                                                                 IsReadOnly="False" />
                         <controls:CompactDataGridTextColumn Header="Custom index"
-                                                            Binding="{ReflectionBinding CustomIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvariantInt32Converter}, ConverterParameter=0}" />
+                                                            Binding="{ReflectionBinding CustomIndex, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantInt32Converter}, ConverterParameter=0}" />
                     </DataGrid.Columns>
                 </DataGrid>
 

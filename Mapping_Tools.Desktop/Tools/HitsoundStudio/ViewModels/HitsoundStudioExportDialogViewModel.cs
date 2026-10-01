@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Services.Undo;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Platform.FilePicker;
@@ -42,42 +43,52 @@ public sealed partial class HitsoundStudioExportDialogViewModel : ObservableObje
 
     /// <summary>Gets or sets the output folder.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string ExportFolder { get; set; }
 
     /// <summary>Gets or sets the map version name.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string HitsoundDiffName { get; set; }
 
     /// <summary>Gets or sets whether the map is exported.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool ExportMap { get; set; }
 
     /// <summary>Gets or sets whether samples are exported.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool ExportSamples { get; set; }
 
     /// <summary>Gets or sets whether the detailed completion summary is shown.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool ShowResults { get; set; }
 
     /// <summary>Gets or sets whether the output is cleared.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool DeleteAllInExportFirst { get; set; }
 
     /// <summary>Gets or sets whether the prior schema is used.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool UsePreviousSampleSchema { get; set; }
 
     /// <summary>Gets or sets whether the prior schema may grow.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool AllowGrowthPreviousSampleSchema { get; set; }
 
     /// <summary>Gets or sets whether coinciding modes retain regular hitsounds.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool AddCoincidingRegularHitsounds { get; set; }
 
     /// <summary>Gets or sets whether MIDI includes greenline volume.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool AddGreenLineVolumeToMidi { get; set; }
 
     /// <summary>Gets or sets export mode.</summary>
@@ -87,6 +98,7 @@ public sealed partial class HitsoundStudioExportDialogViewModel : ObservableObje
     [NotifyPropertyChangedFor(nameof(CoincidingExtraSettingsVisible))]
     [NotifyPropertyChangedFor(nameof(MidiExtraSettingsVisible))]
     [NotifyPropertyChangedFor(nameof(GameModeVisible))]
+    [Undoable]
     public partial HitsoundStudioExportMode HitsoundExportModeSetting { get; set; }
 
     /// <summary>Gets whether sample-specific options apply to the selected mode.</summary>
@@ -106,22 +118,27 @@ public sealed partial class HitsoundStudioExportDialogViewModel : ObservableObje
 
     /// <summary>Gets or sets the output game mode.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial GameMode HitsoundExportGameMode { get; set; }
 
     /// <summary>Gets or sets time grouping leniency.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double ZipLayersLeniency { get; set; }
 
     /// <summary>Gets or sets the first custom index.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial int FirstCustomIndex { get; set; }
 
     /// <summary>Gets or sets single-source format.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial HitsoundStudioSampleExportFormat SingleSampleExportFormat { get; set; }
 
     /// <summary>Gets or sets mixed-source format.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial HitsoundStudioSampleExportFormat MixedSampleExportFormat { get; set; }
 
     /// <summary>Gets the export modes.</summary>

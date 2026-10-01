@@ -41,7 +41,7 @@
                             <TextBox HorizontalAlignment="Stretch"
                                      Margin="5, 0"
                                      Classes="compact"
-                                     Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                     Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
                         </DataTemplate>
                     </TableViewColumn.CellTemplate>
                 </TableViewColumn>

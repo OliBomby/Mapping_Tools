@@ -4,6 +4,7 @@ using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Desktop.Services;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
+using Mapping_Tools.Infrastructure.Projects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Services;
@@ -12,7 +13,7 @@ namespace Mapping_Tools.Desktop.Tests.Services;
 public sealed class ProjectAutosaveCoordinatorTests
 {
     [TestMethod]
-    public async Task Activate_WithExistingAutosave_InstallsLoadedProject()
+    public async Task ActivateAsync_WithExistingAutosave_InstallsLoadedProject()
     {
         // Arrange
         RecordingProjectService projects = new()
@@ -23,8 +24,7 @@ public sealed class ProjectAutosaveCoordinatorTests
         var coordinator = CreateCoordinator(projects);
 
         // Act
-        coordinator.Activate(feature);
-        await feature.Installed.Task;
+        await coordinator.ActivateAsync(feature);
 
         // Assert
         feature.Value.Should().Be(42);
@@ -38,7 +38,7 @@ public sealed class ProjectAutosaveCoordinatorTests
         RecordingProjectService projects = new();
         TestProjectFeature feature = new() { Value = 7 };
         var coordinator = CreateCoordinator(projects);
-        coordinator.Activate(feature);
+        await coordinator.ActivateAsync(feature);
 
         // Act
         await coordinator.SaveOnShutdown(feature);
@@ -91,17 +91,17 @@ public sealed class ProjectAutosaveCoordinatorTests
     }
 
     [TestMethod]
-    public void SaveOnShutdown_AfterSuppressSave_DoesNotPersistProject()
+    public async Task SaveOnShutdown_AfterSuppressSave_DoesNotPersistProject()
     {
         // Arrange
         RecordingProjectService projects = new();
         TestProjectFeature feature = new() { Value = 7 };
         var coordinator = CreateCoordinator(projects);
-        coordinator.Activate(feature);
+        await coordinator.ActivateAsync(feature);
         coordinator.SuppressSave();
 
         // Act
-        coordinator.SaveOnShutdown(feature);
+        await coordinator.SaveOnShutdown(feature);
 
         // Assert
         projects.AutoSavedProjects.Should().BeEmpty();
@@ -162,6 +162,28 @@ public sealed class ProjectAutosaveCoordinatorTests
         feature.InstallCount.Should().Be(1);
     }
 
+    [TestMethod]
+    public async Task NewAsync_AfterRecoveryLoad_CanUndoToPreviousProject()
+    {
+        // Arrange
+        RecordingProjectService projects = new() { LoadedProject = new TestProject(42) };
+        TestProjectFeature feature = new();
+        ProjectAutosaveCoordinator coordinator = new(
+            projects,
+            new TestDialogService { BooleanResult = true },
+            new UserNotificationService(),
+            serializer: new VersionedProjectJsonSerializer());
+        await coordinator.ActivateAsync(feature);
+
+        // Act
+        await coordinator.NewAsync(feature);
+        feature.UndoHistory!.Undo();
+
+        // Assert
+        feature.Value.Should().Be(42);
+        feature.UndoHistory.CanRedo.Should().BeTrue();
+    }
+
     private static ProjectAutosaveCoordinator CreateCoordinator(
         RecordingProjectService projects,
         TestDialogService? dialogs = null)
@@ -174,14 +196,13 @@ public sealed class ProjectAutosaveCoordinatorTests
 
     private sealed class TestProjectFeature : IShellProjectFeature<TestProject>
     {
+        public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+
         private static readonly ProjectDefinition<TestProject> definition = new(
             "testproject.json",
             "Test Projects",
             static () => new TestProject(3),
             "test-project.json");
-
-        public TaskCompletionSource<TestProject> Installed { get; } =
-            new(TaskCreationOptions.RunContinuationsAsynchronously);
 
         public int Value { get; set; }
 
@@ -200,7 +221,6 @@ public sealed class ProjectAutosaveCoordinatorTests
         {
             Value = project.Value;
             InstallCount++;
-            Installed.TrySetResult(project);
         }
     }
 

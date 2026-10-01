@@ -5,10 +5,12 @@ using Mapping_Tools.Application.Tools.SliderPicturator;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Images;
 using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.SliderPicturator.Models;
 using Mapping_Tools.Desktop.Tools.SliderPicturator.ViewModels;
+using Mapping_Tools.Infrastructure.Projects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Tools.SliderPicturator.ViewModels;
@@ -16,6 +18,26 @@ namespace Mapping_Tools.Desktop.Tests.Tools.SliderPicturator.ViewModels;
 [TestClass]
 public sealed class SliderPicturatorViewModelTests
 {
+    [TestMethod]
+    public void Undo_AfterPreviewCountChanges_RestoresInputsWithoutRestoringDerivedCount()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingPicturator());
+        ProjectUndoHistory<SliderPicturatorProject> history = new(viewModel, new VersionedProjectJsonSerializer());
+        viewModel.UndoHistory = history;
+
+        // Act
+        viewModel.Quality = 2;
+        viewModel.SegmentCount = 42;
+        history.Capture();
+        history.Undo();
+
+        // Assert
+        viewModel.Quality.Should().Be(1);
+        viewModel.SegmentCount.Should().Be(42);
+        history.CanUndo.Should().BeFalse();
+    }
+
     [TestMethod]
     public async Task RunQuickAsync_WhenServiceReturnsSegmentCount_UpdatesSegmentCountFromResult()
     {

@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Projects.Contracts;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
 using Microsoft.Extensions.Logging;
@@ -18,6 +19,7 @@ public sealed class ProjectAutosaveCoordinator
     private readonly Dictionary<IShellProjectFeature, Task> loadTasks = [];
     private readonly IUserNotificationService notifications;
     private readonly IProjectService projects;
+    private readonly IProjectSerializer? serializer;
     private bool saveOnShutdown = true;
 
     /// <summary>
@@ -27,29 +29,35 @@ public sealed class ProjectAutosaveCoordinator
     /// <param name="dialogs">Confirms destructive New project operations.</param>
     /// <param name="notifications">Publishes project lifecycle failures.</param>
     /// <param name="logger">Records project actions and recovery outcomes.</param>
+    /// <param name="serializer">Freezes project states for the in-memory undo history.</param>
     public ProjectAutosaveCoordinator(
         IProjectService projects,
         IDialogService dialogs,
         IUserNotificationService notifications,
-        ILogger<ProjectAutosaveCoordinator>? logger = null)
+        ILogger<ProjectAutosaveCoordinator>? logger = null,
+        IProjectSerializer? serializer = null)
     {
         this.projects = projects ?? throw new ArgumentNullException(nameof(projects));
         this.dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
         this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
         this.logger = logger ?? NullLogger<ProjectAutosaveCoordinator>.Instance;
+        this.serializer = serializer;
     }
 
     /// <summary>
-    ///     Starts restoring a feature's automatic recovery project once.
+    ///     Restores a feature's automatic recovery project and initializes its history once.
     /// </summary>
     /// <param name="feature">The feature whose state is being activated.</param>
-    public void Activate(IShellProjectFeature feature)
+    /// <returns>The shared task that completes after recovery and history initialization.</returns>
+    public Task ActivateAsync(IShellProjectFeature feature)
     {
         ArgumentNullException.ThrowIfNull(feature);
-        if (loadTasks.ContainsKey(feature)) return;
+        if (loadTasks.TryGetValue(feature, out var loadTask)) return loadTask;
 
         logger.LogInformation("Loading recovery project for {Feature}", feature.GetType().Name);
-        loadTasks.Add(feature, LoadAutosaveAsync(feature));
+        loadTask = LoadAutosaveAsync(feature);
+        loadTasks.Add(feature, loadTask);
+        return loadTask;
     }
 
     /// <summary>
@@ -141,6 +149,11 @@ public sealed class ProjectAutosaveCoordinator
             logger.LogError(exception, "Recovery project load failed for {Feature}", feature.GetType().Name);
             await PublishFailureAsync("Project could not be loaded", exception);
         }
+
+        if (serializer is not null)
+            await feature.ExecuteProjectOperationAsync(
+                new InitializeUndoOperation(serializer),
+                CancellationToken.None);
     }
 
     private async Task SaveAutosaveAfterLoadAsync(IShellProjectFeature feature)
@@ -286,7 +299,10 @@ public sealed class ProjectAutosaveCoordinator
             var opened = await projects.OpenAsync(
                 feature.ProjectDefinition,
                 cancellationToken);
-            if (opened is not null) feature.Install(opened.Project);
+            if (opened is not null)
+            {
+                using (feature.UndoHistory?.BeginEdit()) feature.Install(opened.Project);
+            }
         }
     }
 
@@ -297,7 +313,20 @@ public sealed class ProjectAutosaveCoordinator
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            feature.Install(projects.CreateNew(feature.ProjectDefinition));
+            using (feature.UndoHistory?.BeginEdit())
+                feature.Install(projects.CreateNew(feature.ProjectDefinition));
+            return Task.CompletedTask;
+        }
+    }
+
+    private sealed class InitializeUndoOperation(IProjectSerializer serializer) : IProjectFeatureOperation
+    {
+        public Task ExecuteAsync<TProject>(
+            IShellProjectFeature<TProject> feature,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            feature.UndoHistory = new ProjectUndoHistory<TProject>(feature, serializer);
             return Task.CompletedTask;
         }
     }

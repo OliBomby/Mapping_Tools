@@ -23,6 +23,8 @@ using Mapping_Tools.Desktop.Converters;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Tools.PatternGallery.Services;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tools.PatternGallery.Models;
 using Mapping_Tools.Desktop.Tools.PatternGallery.Views;
 using Mapping_Tools.Desktop.Utilities;
@@ -41,6 +43,9 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     IShellFeatureActivation,
     IQuickRun
 {
+    /// <inheritdoc />
+    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+
     private static readonly TimeSpan searchDebounceInterval = TimeSpan.FromMilliseconds(150);
     private readonly IPatternGalleryArchiveService archives;
     private readonly ICurrentBeatmapDialogService currentBeatmapService;
@@ -136,10 +141,12 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets the editable project model.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial PatternGalleryProject Project { get; set; } = new();
 
     /// <summary>Gets or sets the user-visible collection name.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string CollectionName { get; set; } = "My Pattern Collection";
 
     /// <summary>Gets the visible pattern groups after filtering and sorting.</summary>
@@ -173,11 +180,13 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets the export-time mode.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyPropertyChangedFor(nameof(CustomExportTimeVisible))]
     public partial ExportTimeMode ExportTimeMode { get; set; } = ExportTimeMode.Current;
 
     /// <summary>Gets or sets the custom export time in milliseconds.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double CustomExportTime { get; set; }
 
     /// <summary>Gets whether the custom-time field should be shown.</summary>
@@ -185,74 +194,91 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets the extraction and overwrite padding in milliseconds.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyDataErrorInfo]
     [Range(0, double.MaxValue, ErrorMessage = "Padding must be zero or greater.")]
     public partial double Padding { get; set; } = 5;
 
     /// <summary>Gets or sets the minimum partition gap in beats.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyDataErrorInfo]
     [Range(0, double.MaxValue, ErrorMessage = "Parting distance must be zero or greater.")]
     public partial double PartingDistance { get; set; } = 4;
 
     /// <summary>Gets or sets the target-object overwrite mode.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial PatternOverwriteMode PatternOverwriteMode { get; set; } = PatternOverwriteMode.PartitionedOverwrite;
 
     /// <summary>Gets or sets the timing overwrite mode.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial TimingOverwriteMode TimingOverwriteMode { get; set; } = TimingOverwriteMode.OriginalTimingOnly;
 
     /// <summary>Gets or sets whether pattern hitsounds are copied.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool IncludeHitsounds { get; set; }
 
     /// <summary>Gets or sets whether pattern kiai state is copied.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool IncludeKiai { get; set; }
 
     /// <summary>Gets or sets whether positions are scaled to target Circle Size.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool ScaleToNewCircleSize { get; set; }
 
     /// <summary>Gets or sets whether pattern timing is scaled to the target.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool ScaleToNewTiming { get; set; } = true;
 
     /// <summary>Gets or sets whether objects are snapped to target timing.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool SnapToNewTiming { get; set; } = true;
 
     /// <summary>Gets or sets the beat divisors used for resnapping.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial IBeatDivisor[] BeatDivisors { get; set; } = RationalBeatDivisor.GetDefaultBeatDivisors();
 
     /// <summary>Gets or sets whether global slider velocity is compensated.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool FixGlobalSv { get; set; } = true;
 
     /// <summary>Gets or sets whether BPM-dependent slider velocity is compensated.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool FixBpmSv { get; set; }
 
     /// <summary>Gets or sets whether combo-colour skips are repaired.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool FixColourHax { get; set; } = true;
 
     /// <summary>Gets or sets whether stack offsets are made explicit.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool FixStackLeniency { get; set; }
 
     /// <summary>Gets or sets whether slider tick rate is compensated.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool FixTickRate { get; set; }
 
     /// <summary>Gets or sets the optional spatial scale multiplier.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double CustomScale { get; set; } = 1;
 
     /// <summary>Gets or sets clockwise spatial rotation in degrees.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double CustomRotate { get; set; }
 
     /// <summary>Gets the current physical collection paths for view commands.</summary>
@@ -321,7 +347,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         CancelThumbnailRefresh();
         Project = project;
         items.Clear();
-        ConfigureProject();
+        ConfigureProject(UndoHistory?.IsRestoring != true);
         RebuildGroups();
         StartThumbnailRefresh();
     }
@@ -349,11 +375,13 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task AddCodeAsync()
     {
+        using var edit = UndoHistory?.BeginEdit();
         var input = await ShowCodeDialogAsync($"Pattern {Project.Patterns.Count + 1}");
         if (input is null) return;
 
         try
         {
+            using var fileEdit = CreateFileEdit(Paths);
             var pattern = await gallery.ImportCodeAsync(
                 input.Name,
                 input.HitObjects,
@@ -362,7 +390,8 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
                 input.GameMode,
                 Project,
                 Paths,
-                CancellationToken.None);
+                CancellationToken.None,
+                fileEdit);
             Project.Patterns.Add(pattern);
             await PublishSuccessAsync($"Imported {pattern.Name}.");
             RebuildGroups();
@@ -378,12 +407,14 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task AddFileAsync()
     {
+        using var edit = UndoHistory?.BeginEdit();
         var input = await ShowFileDialogAsync(
             $"Pattern {Project.Patterns.Count + 1}", string.Empty);
         if (input is null) return;
 
         try
         {
+            using var fileEdit = CreateFileEdit(Paths);
             var pattern = await gallery.ImportFileAsync(
                 input.FilePath,
                 input.Name,
@@ -391,7 +422,8 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
                 input.StartTime,
                 input.EndTime,
                 Paths,
-                CancellationToken.None);
+                CancellationToken.None,
+                fileEdit);
             Project.Patterns.Add(pattern);
             await PublishSuccessAsync($"Imported {pattern.Name}.");
             RebuildGroups();
@@ -407,6 +439,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task AddSelectedAsync()
     {
+        using var edit = UndoHistory?.BeginEdit();
         string? name = await ShowSelectedDialogAsync($"Pattern {Project.Patterns.Count + 1}");
         if (string.IsNullOrWhiteSpace(name)) return;
 
@@ -415,11 +448,13 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
 
         try
         {
+            using var fileEdit = CreateFileEdit(Paths);
             var pattern = await gallery.ImportSelectedAsync(
                 sourcePath,
                 name,
                 Paths,
-                CancellationToken.None);
+                CancellationToken.None,
+                fileEdit);
             Project.Patterns.Add(pattern);
             await PublishSuccessAsync($"Imported {pattern.Name}.");
             RebuildGroups();
@@ -465,10 +500,12 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             if (!confirmed) return;
         }
 
+        using var edit = UndoHistory?.BeginEdit();
         try
         {
+            using var fileEdit = CreateFileEdit(Paths);
             CancelThumbnailRefresh();
-            await gallery.DeleteAsync(selected, Paths);
+            await gallery.DeleteAsync(selected, Paths, fileEdit: fileEdit);
             foreach (var pattern in selected) Project.Patterns.Remove(pattern);
 
             string deletionMessage =
@@ -493,6 +530,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task ShowDetailsAsync()
     {
+        using var edit = UndoHistory?.BeginEdit();
         var pattern = SelectedPatterns.FirstOrDefault();
         if (pattern is null) return;
 
@@ -570,6 +608,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     [RelayCommand]
     public void AssignGroup(string? group)
     {
+        using var edit = UndoHistory?.BeginEdit();
         foreach (var pattern in SelectedPatterns) pattern.Group = group ?? string.Empty;
 
         RebuildGroups();
@@ -579,6 +618,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task NewGroupAsync()
     {
+        using var edit = UndoHistory?.BeginEdit();
         var result = await dialogs.ShowValueAsync(new ValueDialogRequest<string>(
             "New pattern group",
             "Group name",
@@ -591,6 +631,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task RenameGroupAsync()
     {
+        using var edit = UndoHistory?.BeginEdit();
         var selected = SelectedPatterns.FirstOrDefault();
         if (selected is null) return;
 
@@ -611,6 +652,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task RenameCollectionAsync()
     {
+        using var edit = UndoHistory?.BeginEdit();
         var rename = await ShowCollectionRenameDialogAsync(
             CollectionName,
             Project.FileHandler.CollectionFolderName);
@@ -621,7 +663,9 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             if (!string.Equals(rename.NewFolderName, Project.FileHandler.CollectionFolderName, StringComparison.Ordinal))
             {
                 CancelThumbnailRefresh();
+                var before = Paths;
                 paths = files.RenameCollection(Paths, rename.NewFolderName);
+                UndoHistory?.AddExternalChange(new PatternGalleryCollectionMove(files, before, paths));
                 Project.FileHandler.CollectionFolderName = rename.NewFolderName;
             }
 
@@ -633,6 +677,14 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         {
             await PublishErrorAsync(exception.Message, exception);
         }
+    }
+
+    private PatternGalleryFileEdit? CreateFileEdit(params PatternGalleryCollectionPaths[] collections)
+    {
+        return UndoHistory is { } history
+            ? new PatternGalleryFileEdit(files,
+                change => history.AddExternalChange(new PatternGalleryFileUndoChange(change)), collections)
+            : null;
     }
 
     private static async Task<PatternGalleryCollectionRenameInput?> ShowCollectionRenameDialogAsync(
@@ -683,6 +735,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task ImportCollectionAsync()
     {
+        using var edit = UndoHistory?.BeginEdit();
         var selected = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
             Title = "Import Pattern Gallery collection",
@@ -710,16 +763,9 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             imported.FileHandler.CollectionFolderName = archive.CollectionFolderName;
             if (merge)
             {
+                using var fileEdit = CreateFileEdit(Paths);
                 CancelThumbnailRefresh();
-                files.EnsureCollection(Paths);
-                var contents = archive.PatternFiles
-                    .ToDictionary(file => file.FileName, StringComparer.OrdinalIgnoreCase);
-                foreach (var pattern in imported.Patterns)
-                    if (contents.TryGetValue(pattern.FileName, out var file))
-                    {
-                        files.WritePatternBytes(files.GetPatternPath(Paths, pattern.FileName), file.Content);
-                        Project.Patterns.Add(pattern);
-                    }
+                gallery.MergeCollection(Project, imported, archive.PatternFiles, Paths, fileEdit);
 
                 RebuildGroups();
                 StartThumbnailRefresh();
@@ -728,10 +774,11 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             }
 
             var importedPaths = files.Resolve(CollectionBasePath, imported.FileHandler);
-            if (Directory.Exists(importedPaths.Collection)) throw new IOException($"Collection folder '{imported.FileHandler.CollectionFolderName}' already exists.");
+            if (files.CollectionExists(importedPaths)) throw new IOException($"Collection folder '{imported.FileHandler.CollectionFolderName}' already exists.");
 
+            using var importedFileEdit = CreateFileEdit(importedPaths, Paths);
             CancelThumbnailRefresh();
-            await archives.ExtractAsync(archivePath, CollectionBasePath);
+            await archives.ExtractAsync(archivePath, CollectionBasePath, fileEdit: importedFileEdit);
             bool load = await dialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
                 "Load imported collection",
                 $"Load '{imported.CollectionName}' as the active Pattern Gallery collection?",
@@ -743,10 +790,13 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             if (load)
             {
                 if (Project.Patterns.Count > 0)
+                {
+                    importedFileEdit?.CaptureFile(Paths.ProjectFile);
                     await projects.SaveAsync(
                         definition.ConfigSchema,
                         Paths.ProjectFile,
                         Snapshot(false));
+                }
 
                 ((IShellProjectFeature<PatternGalleryProject>)this).Install(imported);
             }
@@ -763,6 +813,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task RestoreCollectionAsync()
     {
+        using var edit = UndoHistory?.BeginEdit();
         bool confirmed = await dialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
             "Restore Pattern Gallery collection",
             "Remove missing patterns and add pattern files that are not indexed?",
@@ -863,6 +914,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             return;
         }
 
+        UndoHistory?.Capture();
         var project = Snapshot(false);
         var patterns = patternsOverride ?? SelectedPatterns.ToArray();
         var execution = await Execution.ExecuteAsync(
@@ -893,6 +945,25 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             {
                 pattern.UseCount++;
                 pattern.LastUsedTime = usedAt;
+            }
+
+            if (UndoHistory is ProjectUndoHistory<PatternGalleryProject> history)
+            {
+                string collectionFolder = Project.FileHandler.CollectionFolderName;
+                var usage = patterns.ToDictionary(
+                    pattern => pattern.FileName,
+                    pattern => (pattern.UseCount, pattern.LastUsedTime),
+                    StringComparer.Ordinal);
+                history.RebaseUntracked(state =>
+                {
+                    if (state.FileHandler.CollectionFolderName != collectionFolder) return;
+                    foreach (var pattern in state.Patterns)
+                        if (usage.TryGetValue(pattern.FileName, out var values))
+                        {
+                            pattern.UseCount = values.UseCount;
+                            pattern.LastUsedTime = values.LastUsedTime;
+                        }
+                });
             }
         }
     }
@@ -971,7 +1042,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         return snapshot;
     }
 
-    private void ConfigureProject()
+    private void ConfigureProject(bool ensureCollection = true)
     {
         CollectionName = string.IsNullOrWhiteSpace(Project.CollectionName)
             ? "My Pattern Collection"
@@ -996,7 +1067,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         CustomScale = Project.CustomScale;
         CustomRotate = Project.CustomRotate;
         paths = files.Resolve(CollectionBasePath, Project.FileHandler);
-        files.EnsureCollection(paths);
+        if (ensureCollection) files.EnsureCollection(paths);
         OnPropertyChanged(nameof(CustomExportTimeVisible));
     }
 

@@ -9,6 +9,7 @@ using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.SliderCompletionator.Models;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tools.SliderCompletionator.Models;
 using Mapping_Tools.Desktop.ViewModels;
 
@@ -22,6 +23,9 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
     IQuickRun,
     IShellProjectFeature<SliderCompletionatorProject>
 {
+    /// <inheritdoc />
+    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+
     private readonly ISliderCompletionatorService completionator;
 
     private readonly DesktopApplicationSettings settings;
@@ -56,12 +60,14 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
 
     /// <summary>Gets or sets the source-object import mode.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyPropertyChangedFor(nameof(TimeCodeVisible))]
     public partial HitObjectSelectionMode ImportModeSetting { get; set; } =
         HitObjectSelectionMode.Selected;
 
     /// <summary>Gets or sets the value calculated from the other slider inputs.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyPropertyChangedFor(nameof(DurationVisible))]
     [NotifyPropertyChangedFor(nameof(EndTimeVisible))]
     [NotifyPropertyChangedFor(nameof(LengthVisible))]
@@ -71,53 +77,63 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
 
     /// <summary>Gets or sets the legacy time-code query.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string TimeCode { get; set; } = string.Empty;
 
     /// <summary>Gets or sets the requested duration in beats, or <c>-1</c> to preserve it.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyDataErrorInfo]
     [Range(double.MinValue, double.MaxValue, ErrorMessage = "Enter a finite duration.")]
     public partial double Duration { get; set; } = -1;
 
     /// <summary>Gets or sets the requested end time in milliseconds, or <c>-1</c> to preserve it.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyDataErrorInfo]
     [Range(double.MinValue, double.MaxValue, ErrorMessage = "Enter a finite end time.")]
     public partial double EndTime { get; set; } = -1;
 
     /// <summary>Gets or sets the requested complete-path fraction, or <c>-1</c> to preserve it.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyDataErrorInfo]
     [Range(double.MinValue, double.MaxValue, ErrorMessage = "Enter a finite length.")]
     public partial double Length { get; set; } = 1;
 
     /// <summary>Gets or sets the requested slider velocity multiplier, or <c>-1</c> to preserve it.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyDataErrorInfo]
     [Range(double.MinValue, double.MaxValue, ErrorMessage = "Enter a finite velocity.")]
     public partial double SliderVelocity { get; set; } = -1;
 
     /// <summary>Gets or sets whether anchors are moved to the new slider length.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool MoveAnchors { get; set; }
 
     /// <summary>Gets or sets whether end time replaces duration input.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyPropertyChangedFor(nameof(DurationVisible))]
     [NotifyPropertyChangedFor(nameof(EndTimeVisible))]
     public partial bool UseEndTime { get; set; }
 
     /// <summary>Gets or sets whether the live editor playhead supplies the end time.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyPropertyChangedFor(nameof(EndTimeVisible))]
     public partial bool UseCurrentEditorTime { get; set; }
 
     /// <summary>Gets or sets whether slider velocity is delegated to BPM timing points.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool DelegateToBpm { get; set; }
 
     /// <summary>Gets or sets whether delegated sliders remove slider ticks.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool RemoveSliderTicks { get; set; }
 
     /// <summary>Gets whether the time-code field is visible for the selected import mode.</summary>

@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.TumourGenerator.Models;
@@ -38,6 +39,7 @@ public sealed partial class ObservableTumourLayer : ObservableObject
 
     /// <summary>Gets or sets the selected geometric template.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyPropertyChangedFor(nameof(TumourTemplate))]
     public partial TumourTemplate TumourTemplateEnum { get; set; }
 
@@ -46,30 +48,37 @@ public sealed partial class ObservableTumourLayer : ObservableObject
 
     /// <summary>Gets or sets how the tumour follows the slider path.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial WrappingMode WrappingMode { get; set; }
 
     /// <summary>Gets or sets the side-selection policy.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial TumourSidedness TumourSidedness { get; set; }
 
     /// <summary>Gets or sets the graph controlling tumour length.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial GraphState TumourLength { get; set; }
 
     /// <summary>Gets or sets the graph controlling tumour scale.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial GraphState TumourScale { get; set; }
 
     /// <summary>Gets or sets the graph controlling tumour rotation.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial GraphState TumourRotation { get; set; }
 
     /// <summary>Gets or sets the graph controlling the template parameter.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial GraphState TumourParameter { get; set; }
 
     /// <summary>Gets or sets the graph controlling tumour spacing.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial GraphState TumourDistance { get; set; }
 
     /// <summary>Gets or sets the scalar projection used by the compact scale slider.</summary>
@@ -129,34 +138,42 @@ public sealed partial class ObservableTumourLayer : ObservableObject
 
     /// <summary>Gets or sets the explicit tumour count.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial int TumourCount { get; set; }
 
     /// <summary>Gets or sets the sequence start.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double TumourStart { get; set; }
 
     /// <summary>Gets or sets the sequence end.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double TumourEnd { get; set; }
 
     /// <summary>Gets or sets the deterministic random-side seed.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial int RandomSeed { get; set; }
 
     /// <summary>Gets or sets whether the path is recalculated before placement.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool Recalculate { get; set; }
 
     /// <summary>Gets or sets whether range and shape values are absolute pixels.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool UseAbsoluteRange { get; set; }
 
     /// <summary>Gets or sets whether this layer participates in generation.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool IsActive { get; set; }
 
     /// <summary>Gets or sets the user-facing layer name.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string Name { get; set; } = string.Empty;
 
     /// <summary>Creates a plain snapshot for an Application service.</summary>

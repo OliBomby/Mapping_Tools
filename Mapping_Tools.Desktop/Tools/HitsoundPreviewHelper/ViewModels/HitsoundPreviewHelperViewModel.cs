@@ -14,6 +14,7 @@ using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.Models;
 using Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.ViewModels.Adapters;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.Services;
@@ -30,6 +31,9 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     IQuickRun,
     IShellProjectFeature<HitsoundPreviewHelperProject>
 {
+    /// <inheritdoc />
+    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+
     private readonly ICurrentBeatmapDialogService currentBeatmapService;
     private readonly ProjectDefinition<HitsoundPreviewHelperProject> definition;
     private readonly IUserNotificationService notifications;
@@ -84,6 +88,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
 
     /// <summary>Gets or sets the zones edited by the tool.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial ObservableCollection<ObservableHitsoundZone> Items { get; set; } = [];
 
     /// <summary>Gets every supported hitsound layer.</summary>
@@ -155,6 +160,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     [RelayCommand]
     private void Add()
     {
+        using var edit = UndoHistory?.BeginEdit();
         Items.Add(new ObservableHitsoundZone());
     }
 
@@ -162,6 +168,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     [RelayCommand]
     private async Task AddFromSelectionAsync()
     {
+        using var edit = UndoHistory?.BeginEdit();
         try
         {
             string? path = await currentBeatmapService.FetchAsync();
@@ -195,6 +202,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     [RelayCommand]
     private void Copy()
     {
+        using var edit = UndoHistory?.BeginEdit();
         int initialCount = Items.Count;
         for (int index = 0; index < initialCount; index++)
             if (Items[index].IsSelected)
@@ -205,6 +213,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     [RelayCommand]
     private void Remove()
     {
+        using var edit = UndoHistory?.BeginEdit();
         Items = new ObservableCollection<ObservableHitsoundZone>(Items.Where(item => !item.IsSelected));
     }
 

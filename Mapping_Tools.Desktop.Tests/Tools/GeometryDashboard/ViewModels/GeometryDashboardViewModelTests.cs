@@ -16,9 +16,11 @@ using Mapping_Tools.Core.Settings.Models;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
+using Mapping_Tools.Infrastructure.Projects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Tools.GeometryDashboard.ViewModels;
@@ -26,6 +28,29 @@ namespace Mapping_Tools.Desktop.Tests.Tools.GeometryDashboard.ViewModels;
 [TestClass]
 public sealed class GeometryDashboardViewModelTests
 {
+    [TestMethod]
+    public void Undo_GeneratorRowChange_RefreshesTableBindings()
+    {
+        // Arrange
+        using var viewModel = CreateViewModel();
+        var row = viewModel.Generators.First();
+        bool original = row.IsSequential;
+        ProjectUndoHistory<GeometryDashboardProject> history = new(viewModel, new VersionedProjectJsonSerializer());
+        viewModel.UndoHistory = history;
+        List<string?> notifications = [];
+        row.PropertyChanged += (_, args) => notifications.Add(args.PropertyName);
+
+        // Act
+        row.IsSequential = !original;
+        history.Capture();
+        notifications.Clear();
+        history.Undo();
+
+        // Assert
+        row.IsSequential.Should().Be(original);
+        notifications.Should().Contain(nameof(row.IsSequential));
+    }
+
     [TestMethod]
     public void Constructor_WithCoreGenerators_GroupsAndFiltersRows()
     {

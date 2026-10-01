@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Services.Undo;
 using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -23,12 +24,14 @@ public sealed partial class PatternGalleryCollectionRenameViewModel : Observable
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [Required(ErrorMessage = "A collection name is required.")]
+    [Undoable]
     public partial string NewName { get; set; }
 
     /// <summary>Gets or sets the collection's new directory name.</summary>
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [Required(ErrorMessage = "A collection directory name is required.")]
+    [Undoable]
     public partial string NewFolderName { get; set; }
 
     /// <summary>Gets the command that validates and accepts both names.</summary>

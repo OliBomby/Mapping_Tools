@@ -42,6 +42,34 @@ public interface IPatternGalleryFileService
     /// <returns>The exact source bytes.</returns>
     byte[] ReadPatternBytes(string path);
 
+    /// <summary>Reads a collection file's bytes without treating a missing file as an error.</summary>
+    /// <param name="path">The absolute file path.</param>
+    /// <returns>The exact bytes, or null when the file does not exist.</returns>
+    byte[]? ReadFileBytes(string path);
+
+    /// <summary>Lists relative file paths inside a collection without reading their contents.</summary>
+    /// <param name="paths">The collection to inspect.</param>
+    /// <returns>Relative file paths.</returns>
+    IReadOnlyList<string> EnumerateCollectionFiles(PatternGalleryCollectionPaths paths);
+
+    /// <summary>Gets whether a collection directory currently exists.</summary>
+    /// <param name="paths">The collection to inspect.</param>
+    /// <returns>True when the collection directory exists.</returns>
+    bool CollectionExists(PatternGalleryCollectionPaths paths);
+
+    /// <summary>Removes a collection directory only when it contains no files.</summary>
+    /// <param name="paths">The collection to remove.</param>
+    void RemoveEmptyCollection(PatternGalleryCollectionPaths paths);
+
+    /// <summary>Applies checked file changes without overwriting unexpected edits.</summary>
+    /// <param name="paths">The collection containing the files.</param>
+    /// <param name="changes">Changes recorded by one user edit.</param>
+    /// <param name="undo">Whether to restore the original bytes.</param>
+    void ApplyCollectionFileChanges(
+        PatternGalleryCollectionPaths paths,
+        IReadOnlyList<PatternGalleryFileChange> changes,
+        bool undo);
+
     /// <summary>Writes raw pattern bytes for ZIP merge import.</summary>
     /// <param name="path">The destination pattern file.</param>
     /// <param name="bytes">The complete pattern file bytes.</param>

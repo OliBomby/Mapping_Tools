@@ -14,6 +14,7 @@ using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.ComboColourStudio.Models;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.Models;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels.Adapters;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.Views;
@@ -30,6 +31,9 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     IShellProjectFeature<ComboColourProject>,
     IQuickRun
 {
+    /// <inheritdoc />
+    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+
     private readonly ICurrentBeatmapDialogService currentBeatmapService;
 
     private readonly IFilePicker filePicker;
@@ -69,15 +73,18 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets the editable project.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial ComboColourProject Project { get; set; } = new();
 
     /// <summary>Gets the Desktop-adapted colour points shown by the editing grid.</summary>
+    [Undoable]
     public ObservableCollection<ObservableColourPoint> ColourPoints { get; } = [];
 
     /// <summary>Gets the colour points currently selected in the editing grid.</summary>
     public ObservableCollection<ObservableColourPoint> SelectedColourPoints { get; } = [];
 
     /// <summary>Gets the palette entries shown by the sequence editor.</summary>
+    [Undoable]
     public ObservableCollection<ObservableSpecialColour> ComboColours { get; } = [];
 
     /// <summary>Gets the modes available in the colour-point combo column.</summary>
@@ -175,6 +182,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private void AddColourPoint()
     {
+        using var edit = UndoHistory?.BeginEdit();
         double time = ColourPoints.Count > 1
             ? SelectedColourPoint?.Time ?? ColourPoints[^1].Time
             : 0;
@@ -185,6 +193,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task AddColourPointAtEditorTimeAsync()
     {
+        using var edit = UndoHistory?.BeginEdit();
         try
         {
             var snapshot = await liveReader.ReadAsync();
@@ -219,6 +228,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private void RemoveColourPoint()
     {
+        using var edit = UndoHistory?.BeginEdit();
         var selected = (SelectedColourPoints.Count > 0
                 ? SelectedColourPoints.ToArray()
                 : SelectedColourPoint is not null
@@ -242,6 +252,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private void AddComboColour()
     {
+        using var edit = UndoHistory?.BeginEdit();
         Project.AddComboColour();
         RebuildPalette();
         SelectedSequenceColour ??= ComboColours.LastOrDefault();
@@ -251,6 +262,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private void RemoveComboColour()
     {
+        using var edit = UndoHistory?.BeginEdit();
         Project.RemoveLastComboColour();
         RebuildPalette();
         SelectedSequenceColour = ComboColours.LastOrDefault();
@@ -261,6 +273,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private void AddSequenceColour(ObservableColourPoint? point)
     {
+        using var edit = UndoHistory?.BeginEdit();
         point ??= SelectedColourPoint;
         if (point is null || SelectedSequenceColour is null) return;
 
@@ -287,6 +300,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private void RemoveSequenceColour(ObservableSpecialColour? colour)
     {
+        using var edit = UndoHistory?.BeginEdit();
         if (SelectedColourPoint is null || SelectedColourPoint.ColourSequence.Count == 0) return;
 
         if (colour is null)
@@ -324,6 +338,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task ImportColoursAsync()
     {
+        using var edit = UndoHistory?.BeginEdit();
         await ImportAsync(false);
     }
 
@@ -331,6 +346,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task ImportColourHaxAsync()
     {
+        using var edit = UndoHistory?.BeginEdit();
         await ImportAsync(true);
     }
 
@@ -455,7 +471,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
 
     private ObservableColourPoint AddPresentationPoint(ColourPoint point)
     {
-        ObservableColourPoint adapter = new(point);
+        ObservableColourPoint adapter = new(point, FindPaletteAdapter);
         ColourPoints.Add(adapter);
         SyncProjectFromPresentation();
         return adapter;
@@ -465,9 +481,8 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     {
         ColourPoints.Clear();
         SelectedColourPoints.Clear();
-        foreach (var point in Project.ColourPoints) ColourPoints.Add(new ObservableColourPoint(point));
-
         RebuildPalette();
+        foreach (var point in Project.ColourPoints) ColourPoints.Add(new ObservableColourPoint(point, FindPaletteAdapter));
     }
 
     private void RebuildPalette()
@@ -483,6 +498,12 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     private void SyncProjectFromPresentation()
     {
         Project.ColourPoints = ColourPoints.Select(point => point.Snapshot()).ToList();
+    }
+
+    private ObservableSpecialColour FindPaletteAdapter(SpecialColour colour)
+    {
+        return ComboColours.FirstOrDefault(adapter => ReferenceEquals(adapter.Model, colour))
+               ?? new ObservableSpecialColour(colour);
     }
 
     private ComboColourProject SnapshotProject()

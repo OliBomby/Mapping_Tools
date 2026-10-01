@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Services.Undo;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -22,9 +23,11 @@ public sealed partial class GeometryDashboardPredicateCollectionViewModel : Obse
     public string Name { get; }
 
     /// <summary>Gets the settings collection kept in sync with the visible rows.</summary>
+    [Undoable]
     public SelectionPredicateCollection Model { get; }
 
     /// <summary>Gets the observable predicate rows displayed by the Avalonia list.</summary>
+    [Undoable]
     public ObservableCollection<SelectionPredicate> Predicates { get; }
 
     /// <summary>Gets the predicate rows currently selected in the list.</summary>

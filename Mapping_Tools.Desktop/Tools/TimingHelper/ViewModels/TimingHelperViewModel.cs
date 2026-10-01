@@ -7,6 +7,7 @@ using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tools.TimingHelper.Models;
 using Mapping_Tools.Desktop.Validation;
 using Mapping_Tools.Desktop.ViewModels;
@@ -20,6 +21,9 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
     IQuickRun,
     IShellProjectFeature<TimingHelperProject>
 {
+    /// <inheritdoc />
+    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+
     private readonly DesktopApplicationSettings settings;
 
     private readonly ITimingHelperService timingHelper;
@@ -46,26 +50,32 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets whether hit objects are counted as timing markers.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool Objects { get; set; } = true;
 
     /// <summary>Gets or sets whether bookmarks are counted as timing markers.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool Bookmarks { get; set; } = true;
 
     /// <summary>Gets or sets whether greenlines are counted as timing markers.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool Greenlines { get; set; } = true;
 
     /// <summary>Gets or sets whether redlines are counted as timing markers and retained.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool Redlines { get; set; } = true;
 
     /// <summary>Gets or sets whether inserted redlines omit their first barline.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool OmitBarline { get; set; }
 
     /// <summary>Gets or sets the tolerated marker error in milliseconds.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyDataErrorInfo]
     [InclusiveRange<double>(0, double.MaxValue, ErrorMessage = "Leniency must be non-negative and finite.")]
     public partial double Leniency { get; set; } = 3;
@@ -75,10 +85,12 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
     ///     to infer the spacing.
     /// </summary>
     [ObservableProperty]
+    [Undoable]
     public partial double BeatsBetween { get; set; } = -1;
 
     /// <summary>Gets or sets the beat divisors used to resnap marker times.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial IBeatDivisor[] BeatDivisors { get; set; } =
         RationalBeatDivisor.GetDefaultBeatDivisors();
 

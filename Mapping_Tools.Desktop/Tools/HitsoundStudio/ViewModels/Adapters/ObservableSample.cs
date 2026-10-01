@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
 
@@ -21,14 +22,17 @@ public sealed partial class ObservableSample : ObservableObject
     public Sample Model { get; }
 
     /// <summary>Gets the observable source and transformation arguments.</summary>
+    [Undoable]
     public ObservableSampleGeneratingArgs SampleArgs { get; }
 
     /// <summary>Gets or sets the sample family.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial SampleSet SampleSet { get; set; }
 
     /// <summary>Gets or sets the hitsound layer.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial Hitsound Hitsound { get; set; }
 
     /// <summary>Creates an independent plain snapshot for Application services.</summary>

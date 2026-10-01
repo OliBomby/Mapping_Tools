@@ -20,6 +20,7 @@ using Mapping_Tools.Desktop.Converters;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tools.Sliderator.Models;
 using Mapping_Tools.Desktop.ViewModels;
 
@@ -33,6 +34,9 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     IQuickRun,
     IShellProjectFeature<SlideratorProject>
 {
+    /// <inheritdoc />
+    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+
     private readonly ICurrentBeatmapDialogService currentBeatmapService;
 
     private readonly IDialogService dialogs;
@@ -43,6 +47,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     private GraphState? acceptedGraphState;
     private bool settingGraphState;
     private bool synchronizingGraphBounds;
+    private bool installingProject;
 
     /// <summary>
     ///     Creates a Sliderator presentation model.
@@ -95,15 +100,18 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets the selection source used by Import.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyPropertyChangedFor(nameof(TimeCodeVisible))]
     public partial HitObjectSelectionMode ImportModeSetting { get; set; } = HitObjectSelectionMode.Selected;
 
     /// <summary>Gets or sets the time-code selection expression.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string TimeCode { get; set; } = string.Empty;
 
     /// <summary>Gets or sets the displayed source slider index.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyPropertyChangedFor(nameof(VisibleHitObject))]
     public partial int VisibleHitObjectIndex { get; set; }
 
@@ -118,43 +126,51 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets the map's global slider multiplier.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyDataErrorInfo]
     [Range(0.4, 3.6, ErrorMessage = "Global SV must be between 0.4 and 3.6.")]
     public partial double GlobalSv { get; set; } = 1.4;
 
     /// <summary>Gets or sets the graph duration in beats.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyDataErrorInfo]
     [Range(0, 10000, ErrorMessage = "Beat length must be between 0 and 10000.")]
     public partial double GraphBeats { get; set; } = 3;
 
     /// <summary>Gets or sets the graph playback BPM.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyDataErrorInfo]
     [Range(double.Epsilon, double.MaxValue, ErrorMessage = "BPM must be greater than zero.")]
     public partial double BeatsPerMinute { get; set; } = 180;
 
     /// <summary>Gets or sets the graph-to-preview slider pixel length.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyPropertyChangedFor(nameof(SvGraphMultiplier))]
     [NotifyPropertyChangedFor(nameof(ExpectedSegments))]
     public partial double PixelLength { get; private set; } = 100;
 
     /// <summary>Gets or sets the timestamp to which the generated object is exported.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double ExportTime { get; set; }
 
     /// <summary>Gets or sets whether export adds or replaces the object at the timestamp.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial SlideratorExportMode ExportModeSetting { get; set; } = SlideratorExportMode.Add;
 
     /// <summary>Gets or sets whether the graph is interpreted as position or velocity.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyPropertyChangedFor(nameof(ExpectedSegments))]
     public partial SlideratorGraphMode GraphModeSetting { get; set; } = SlideratorGraphMode.Position;
 
     /// <summary>Gets or sets the stream beat subdivision.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyDataErrorInfo]
     [Range(1, 16, ErrorMessage = "Beat snap divisor must be between 1 and 16.")]
     [NotifyPropertyChangedFor(nameof(ExpectedSegments))]
@@ -162,25 +178,30 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets the self-imposed normal-slider SV limit.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyDataErrorInfo]
-    [Range(0, 100000, ErrorMessage = "SV limit must be between 0 and 100000.")]
+    [Range(0, double.MaxValue, ErrorMessage = "SV limit must be at least 0.")]
     public partial double VelocityLimit { get; set; } = 10;
 
     /// <summary>Gets or sets whether red source anchors are drawn in the preview.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool ShowRedAnchors { get; set; }
 
     /// <summary>Gets or sets whether graph anchors are drawn in the preview.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool ShowGraphAnchors { get; set; }
 
     /// <summary>Gets or sets whether the new SV is manually controlled.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyPropertyChangedFor(nameof(ExpectedSegments))]
     public partial bool ManualVelocity { get; set; }
 
     /// <summary>Gets or sets the selected SV used by Sliderator's optimizer.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyDataErrorInfo]
     [Range(0, double.MaxValue, ErrorMessage = "New SV must be non-negative.")]
     [NotifyPropertyChangedFor(nameof(ExpectedSegments))]
@@ -188,6 +209,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets the minimum normal-slider dendrite length.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyDataErrorInfo]
     [Range(1, 12, ErrorMessage = "Minimum tumour length must be between 1 and 12.")]
     [NotifyPropertyChangedFor(nameof(ExpectedSegments))]
@@ -195,42 +217,48 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets whether output velocity is delegated to BPM redlines.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool DelegateToBpm { get; set; }
 
     /// <summary>Gets or sets whether delegated output suppresses slider ticks.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool RemoveSliderTicks { get; set; }
 
     /// <summary>Gets or sets the normal-slider format radio state.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyPropertyChangedFor(nameof(ExpectedSegments))]
     public partial bool ExportAsNormal { get; set; } = true;
 
     /// <summary>Gets or sets the stream format radio state.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyPropertyChangedFor(nameof(ExpectedSegments))]
     public partial bool ExportAsStream { get; set; }
 
     /// <summary>Gets or sets the invisible-slider format radio state.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyPropertyChangedFor(nameof(ExpectedSegments))]
     public partial bool ExportAsInvisibleSlider { get; set; }
 
     /// <summary>Gets or sets the shared Core graph state.</summary>
+    [Undoable]
     public GraphState GraphState
     {
         get;
         set
         {
             ArgumentNullException.ThrowIfNull(value);
-            if (!settingGraphState) ClipGraphAnchorToVelocityLimit(value);
+            if (!settingGraphState && !installingProject) ClipGraphAnchorToVelocityLimit(value);
 
             if (ReferenceEquals(field, value)) return;
 
             field = value;
             acceptedGraphState = value.Clone();
             double graphWidth = value.MaxX - value.MinX;
-            if (double.IsFinite(graphWidth) && !Precision.AlmostEquals(GraphBeats, graphWidth))
+            if (!installingProject && double.IsFinite(graphWidth) && !Precision.AlmostEquals(GraphBeats, graphWidth))
             {
                 synchronizingGraphBounds = true;
                 try
@@ -520,6 +548,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
                 return false;
             }
 
+            using var edit = UndoHistory?.BeginEdit();
             LoadedHitObjects.Clear();
             foreach (var hitObject in result.Sliders) LoadedHitObjects.Add(hitObject);
 
@@ -609,36 +638,44 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
     private void Install(SlideratorProject project)
     {
-        ImportModeSetting = project.ImportModeSetting;
-        TimeCode = project.TimeCode;
-        LoadedHitObjects.Clear();
-        foreach (var hitObject in project.LoadedHitObjects) LoadedHitObjects.Add(hitObject);
-        VisibleHitObjectIndex = project.VisibleHitObjectIndex;
-        GlobalSv = project.GlobalSv;
-        GraphBeats = project.GraphBeats;
-        BeatsPerMinute = project.BeatsPerMinute;
-        ExportTime = project.ExportTime;
-        ExportModeSetting = project.ExportModeSetting;
-        GraphModeSetting = project.GraphModeSetting;
-        BeatSnapDivisor = project.BeatSnapDivisor;
-        VelocityLimit = project.VelocityLimit;
-        ShowRedAnchors = project.ShowRedAnchors;
-        ShowGraphAnchors = project.ShowGraphAnchors;
-        ManualVelocity = project.ManualVelocity;
-        NewVelocity = project.NewVelocity;
-        MinDendrite = project.MinDendrite;
-        DelegateToBpm = project.DelegateToBpm;
-        RemoveSliderTicks = project.RemoveSliderTicks;
-        ExportAsNormal = project.ExportAsNormal;
-        ExportAsStream = project.ExportAsStream;
-        ExportAsInvisibleSlider = project.ExportAsInvisibleSlider;
-        DoEditorRead = project.DoEditorRead;
-        var state = project.GraphState.Clone();
-        state.MinY = GraphMinY;
-        state.MaxY = GraphMaxY;
-        SetGraphState(state);
-        UpdateVisibleHitObject();
-        ExportTime = project.ExportTime;
+        installingProject = true;
+        try
+        {
+            ImportModeSetting = project.ImportModeSetting;
+            TimeCode = project.TimeCode;
+            LoadedHitObjects.Clear();
+            foreach (var hitObject in project.LoadedHitObjects) LoadedHitObjects.Add(hitObject);
+            VisibleHitObjectIndex = project.VisibleHitObjectIndex;
+            GlobalSv = project.GlobalSv;
+            GraphBeats = project.GraphBeats;
+            BeatsPerMinute = project.BeatsPerMinute;
+            PixelLength = project.PixelLength;
+            ExportTime = project.ExportTime;
+            ExportModeSetting = project.ExportModeSetting;
+            GraphModeSetting = project.GraphModeSetting;
+            BeatSnapDivisor = project.BeatSnapDivisor;
+            VelocityLimit = project.VelocityLimit;
+            ShowRedAnchors = project.ShowRedAnchors;
+            ShowGraphAnchors = project.ShowGraphAnchors;
+            ManualVelocity = project.ManualVelocity;
+            NewVelocity = project.NewVelocity;
+            MinDendrite = project.MinDendrite;
+            DelegateToBpm = project.DelegateToBpm;
+            RemoveSliderTicks = project.RemoveSliderTicks;
+            ExportAsNormal = project.ExportAsNormal;
+            ExportAsStream = project.ExportAsStream;
+            ExportAsInvisibleSlider = project.ExportAsInvisibleSlider;
+            DoEditorRead = project.DoEditorRead;
+            SetGraphState(project.GraphState.Clone());
+        }
+        finally
+        {
+            installingProject = false;
+        }
+
+        OnPropertyChanged(nameof(VisibleHitObject));
+        OnPropertyChanged(nameof(GraphDuration));
+        UpdateGraphDerivedValues();
     }
 
     private void UpdateVisibleHitObject()
@@ -662,11 +699,12 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     // ReSharper disable once UnusedParameterInPartialMethod
     partial void OnVisibleHitObjectIndexChanged(int value)
     {
-        UpdateVisibleHitObject();
+        if (!installingProject) UpdateVisibleHitObject();
     }
 
     partial void OnGraphBeatsChanged(double value)
     {
+        if (installingProject) return;
         if (!synchronizingGraphBounds && double.IsFinite(value) && value >= 0)
         {
             var state = GraphState.Clone();
@@ -692,6 +730,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
     partial void OnBeatsPerMinuteChanged(double value)
     {
+        if (installingProject) return;
         if (VisibleHitObject?.UnInheritedTimingPoint is not null && double.IsFinite(value) && value > 0)
         {
             VisibleHitObject.UnInheritedTimingPoint.MpB = 60000 / value;
@@ -986,6 +1025,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
     private void UpdateGraphDerivedValues()
     {
+        if (installingProject) return;
         SlideratorEngineOptions options = new()
         {
             GlobalSv = GlobalSv,
@@ -1066,6 +1106,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
     private void ToggleGraphMode()
     {
+        using var edit = UndoHistory?.BeginEdit();
         var mode = GraphModeSetting == SlideratorGraphMode.Position
             ? SlideratorGraphMode.Velocity
             : SlideratorGraphMode.Position;
@@ -1109,6 +1150,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
                 false));
         if (!confirmed) return;
 
+        using var edit = UndoHistory?.BeginEdit();
         SetGraphState(CreateResetGraphState());
     }
 
@@ -1133,6 +1175,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
         double target = result.Value;
 
+        using var edit = UndoHistory?.BeginEdit();
         var state = GraphState.Clone();
         foreach (var anchor in state.Anchors) anchor.Pos = new Vector2(anchor.Pos.X, (float)(anchor.Pos.Y * target / maximum));
 

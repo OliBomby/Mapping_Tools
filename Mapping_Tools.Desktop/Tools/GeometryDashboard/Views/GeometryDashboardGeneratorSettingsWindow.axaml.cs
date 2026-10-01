@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 
@@ -11,6 +12,7 @@ public sealed partial class GeometryDashboardGeneratorSettingsWindow : Window
     public GeometryDashboardGeneratorSettingsWindow()
     {
         InitializeComponent();
+        ProjectUndoWindowInput.AttachDialog(this);
     }
 
     private void PredicatesSelectionChanged(object? sender, SelectionChangedEventArgs eventArgs)

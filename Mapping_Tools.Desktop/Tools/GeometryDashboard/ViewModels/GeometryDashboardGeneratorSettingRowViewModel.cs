@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Services.Undo;
 using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
@@ -27,6 +28,7 @@ public sealed class GeometryDashboardGeneratorSettingRowViewModel : ObservableOb
     public string? Description => property.GetCustomAttribute<DescriptionAttribute>()?.Description;
 
     /// <summary>Gets the underlying property value.</summary>
+    [Undoable]
     public object? Value
     {
         get => property.GetValue(settings);

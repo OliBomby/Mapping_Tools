@@ -12,6 +12,7 @@ using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Tools.TimingCopier.Models;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tools.TimingCopier.Models;
 using Mapping_Tools.Desktop.ViewModels;
 
@@ -23,6 +24,9 @@ namespace Mapping_Tools.Desktop.Tools.TimingCopier.ViewModels;
 public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
     IShellProjectFeature<TimingCopierProject>
 {
+    /// <inheritdoc />
+    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+
     private readonly ICurrentBeatmapDialogService currentBeatmapService;
 
     private readonly IFilePicker filePicker;
@@ -63,19 +67,23 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets the source beatmap path.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string ImportPath { get; set; } = string.Empty;
 
     /// <summary>Gets or sets vertical-bar-separated target beatmap paths.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyPropertyChangedFor(nameof(ExportMapCountText))]
     public partial string ExportPath { get; set; } = string.Empty;
 
     /// <summary>Gets or sets how target markers are positioned after timing is copied.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial TimingCopierResnapMode ResnapMode { get; set; } = TimingCopierResnapMode.PreserveBeatSpacing;
 
     /// <summary>Gets or sets the positive beat snap divisors used during resnapping.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial IBeatDivisor[] BeatDivisors { get; set; } =
         RationalBeatDivisor.GetDefaultBeatDivisors();
 
@@ -112,6 +120,7 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task ImportLoadAsync()
     {
+        using var edit = UndoHistory?.BeginEdit();
         string? path = await currentBeatmapService.FetchAsync();
         if (path is not null) ImportPath = path;
     }
@@ -120,6 +129,7 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task ImportBrowseAsync()
     {
+        using var edit = UndoHistory?.BeginEdit();
         await PickBeatmapsAsync(
             "Copy timing from",
             workspace.GetBeatmapPickerStartLocation(Path.GetDirectoryName(ImportPath)),
@@ -131,6 +141,7 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task ExportLoadAsync()
     {
+        using var edit = UndoHistory?.BeginEdit();
         string? path = await currentBeatmapService.FetchAsync();
         if (path is not null) ExportPath = path;
     }
@@ -139,6 +150,7 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task ExportBrowseAsync()
     {
+        using var edit = UndoHistory?.BeginEdit();
         string? suggestedStartLocation = Path.GetDirectoryName(ImportPath);
         if (string.IsNullOrWhiteSpace(suggestedStartLocation))
         {

@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Mapping_Tools.Desktop.Services.Undo;
 
 namespace Mapping_Tools.Desktop.Tools.HitsoundStudio.Views;
 
@@ -9,5 +10,6 @@ public sealed partial class HitsoundStudioImportDialog : Window
     public HitsoundStudioImportDialog()
     {
         InitializeComponent();
+        ProjectUndoWindowInput.AttachDialog(this);
     }
 }

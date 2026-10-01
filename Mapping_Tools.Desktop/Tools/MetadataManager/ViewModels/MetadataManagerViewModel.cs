@@ -15,6 +15,7 @@ using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.MetadataManager;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels.Adapters;
 using Mapping_Tools.Desktop.Tools.MetadataManager.Models;
 using Mapping_Tools.Desktop.Validation;
@@ -28,6 +29,9 @@ namespace Mapping_Tools.Desktop.Tools.MetadataManager.ViewModels;
 public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     IShellProjectFeature<MetadataManagerProject>
 {
+    /// <inheritdoc />
+    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+
     private readonly ICurrentBeatmapDialogService currentBeatmapService;
     private readonly ProjectDefinition<MetadataManagerProject> definition;
     private readonly IFilePicker filePicker;
@@ -74,15 +78,18 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets the beatmap whose metadata should be imported.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string ImportPath { get; set; } = string.Empty;
 
     /// <summary>Gets or sets vertical-bar-separated target beatmap paths.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyPropertyChangedFor(nameof(ExportMapCountText))]
     public partial string ExportPath { get; set; }
 
     /// <summary>Gets or sets the Unicode artist name.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyDataErrorInfo]
     [StringLength(81, ErrorMessage = "Artist names must be 81 characters or fewer.")]
     [NotifyPropertyChangedFor(nameof(IsBeatmapFileNameOverflowVisible))]
@@ -90,6 +97,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets the ASCII artist name used in generated filenames.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyDataErrorInfo]
     [StringLength(81, ErrorMessage = "Artist names must be 81 characters or fewer.")]
     [AsciiOnly]
@@ -98,6 +106,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets the Unicode title.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyDataErrorInfo]
     [StringLength(81, ErrorMessage = "Titles must be 81 characters or fewer.")]
     [NotifyPropertyChangedFor(nameof(IsBeatmapFileNameOverflowVisible))]
@@ -105,6 +114,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets the ASCII title used in generated filenames.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyDataErrorInfo]
     [StringLength(81, ErrorMessage = "Titles must be 81 characters or fewer.")]
     [AsciiOnly]
@@ -113,6 +123,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets the mapper name.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyDataErrorInfo]
     [StringLength(81, ErrorMessage = "Mapper names must be 81 characters or fewer.")]
     [NotifyPropertyChangedFor(nameof(IsBeatmapFileNameOverflowVisible))]
@@ -120,12 +131,14 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets the source text recorded in the beatmap.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyDataErrorInfo]
     [StringLength(81, ErrorMessage = "Source text must be 81 characters or fewer.")]
     public partial string Source { get; set; } = string.Empty;
 
     /// <summary>Gets or sets the space-separated beatmap tags.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyDataErrorInfo]
     [StringLength(1000, ErrorMessage = "Tags must be 1000 characters or fewer.")]
     [NotifyPropertyChangedFor(nameof(IsTagsOverflowVisible))]
@@ -133,24 +146,30 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets whether repeated tags are removed before export.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool DoRemoveDuplicateTags { get; set; } = true;
 
     /// <summary>Gets or sets whether online beatmap and mapset IDs are reset.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool ResetIds { get; set; }
 
     /// <summary>Gets or sets the preview timestamp in milliseconds.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double PreviewTime { get; set; }
 
     /// <summary>Gets or sets whether combo and special colours are exported.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool UseComboColours { get; set; } = true;
 
     /// <summary>Gets the ordered combo-colour palette edited by the form.</summary>
+    [Undoable]
     public ObservableCollection<ObservableComboColour> ComboColours { get; } = [];
 
     /// <summary>Gets the named special colours edited by the form.</summary>
+    [Undoable]
     public ObservableCollection<ObservableSpecialColour> SpecialColours { get; } = [];
 
     /// <summary>Gets the number of non-empty target beatmap paths.</summary>
@@ -205,6 +224,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task ImportAsync()
     {
+        using var edit = UndoHistory?.BeginEdit();
         try
         {
             string exportPath = ExportPath;
@@ -260,6 +280,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private void AddComboColour()
     {
+        using var edit = UndoHistory?.BeginEdit();
         if (ComboColours.Count >= 8) return;
 
         var colour = ComboColours.Count == 0
@@ -271,12 +292,14 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private void RemoveComboColour()
     {
+        using var edit = UndoHistory?.BeginEdit();
         if (ComboColours.Count > 0) ComboColours.RemoveAt(ComboColours.Count - 1);
     }
 
     [RelayCommand]
     private void AddSpecialColour()
     {
+        using var edit = UndoHistory?.BeginEdit();
         var colour = SpecialColours.Count == 0
             ? RgbaColour.FromRgb(255, 255, 255)
             : SpecialColours[^1].Color;
@@ -286,6 +309,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private void RemoveSpecialColour()
     {
+        using var edit = UndoHistory?.BeginEdit();
         if (SpecialColours.Count > 0) SpecialColours.RemoveAt(SpecialColours.Count - 1);
     }
 

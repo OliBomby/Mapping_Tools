@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.ComboColourStudio.Models;
+using Mapping_Tools.Desktop.Services.Undo;
 
 namespace Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels.Adapters;
 
@@ -9,13 +11,14 @@ public sealed partial class ObservableColourPoint : ObservableObject
 {
     /// <summary>Creates an adapter around the supplied point.</summary>
     /// <param name="model">The persisted point edited by this adapter.</param>
-    public ObservableColourPoint(ColourPoint model)
+    /// <param name="getPaletteAdapter">Optionally reuses the palette adapter for each sequence colour.</param>
+    public ObservableColourPoint(ColourPoint model, Func<SpecialColour, ObservableSpecialColour>? getPaletteAdapter = null)
     {
         Model = model ?? throw new ArgumentNullException(nameof(model));
         Time = model.Time;
         Mode = model.Mode;
         ColourSequence = new ObservableCollection<ObservableSpecialColour>(
-            model.ColourSequence.Select(colour => new ObservableSpecialColour(colour)));
+            model.ColourSequence.Select(colour => getPaletteAdapter?.Invoke(colour) ?? new ObservableSpecialColour(colour)));
     }
 
     /// <summary>Gets the plain point represented by this adapter.</summary>
@@ -23,10 +26,12 @@ public sealed partial class ObservableColourPoint : ObservableObject
 
     /// <summary>Gets or sets the point offset in milliseconds.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double Time { get; set; }
 
     /// <summary>Gets or sets whether this point is normal or burst mode.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial ColourPointMode Mode { get; set; }
 
     /// <summary>Gets the available point application modes.</summary>
@@ -34,6 +39,7 @@ public sealed partial class ObservableColourPoint : ObservableObject
         Enum.GetValues<ColourPointMode>();
 
     /// <summary>Gets the editable ordered combo-colour sequence.</summary>
+    [Undoable]
     public ObservableCollection<ObservableSpecialColour> ColourSequence { get; }
 
     /// <summary>Creates a plain snapshot including sequence edits.</summary>

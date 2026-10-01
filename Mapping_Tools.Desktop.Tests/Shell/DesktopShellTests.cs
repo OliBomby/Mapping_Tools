@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
@@ -19,9 +20,12 @@ using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services;
 using Mapping_Tools.Desktop.Services.Dialogs;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.ViewModels;
+using Mapping_Tools.Desktop.Views;
+using Mapping_Tools.Infrastructure.Projects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Shell;
@@ -29,6 +33,186 @@ namespace Mapping_Tools.Desktop.Tests.Shell;
 [TestClass]
 public sealed class DesktopShellTests
 {
+    [TestMethod]
+    public async Task InitializeAsync_WithDelayedRecovery_SubscribesToInitializedHistory()
+    {
+        // Arrange
+        StubProjectFeatureViewModel project = new();
+        TaskCompletionSource<StubProject> recovery = new();
+        await using var viewModel = CreateMainViewModel(
+            [Registration("project", "Project", () => project)],
+            projectService: new RecordingProjectService { RecoveryProject = recovery.Task },
+            projectSerializer: new VersionedProjectJsonSerializer(),
+            initialize: false);
+        List<bool> undoAvailability = [];
+        List<bool> redoAvailability = [];
+        viewModel.UndoCommand.CanExecuteChanged += (_, _) =>
+            undoAvailability.Add(viewModel.UndoCommand.CanExecute(null));
+        viewModel.RedoCommand.CanExecuteChanged += (_, _) =>
+            redoAvailability.Add(viewModel.RedoCommand.CanExecute(null));
+
+        // Act
+        Task initialization = viewModel.InitializeAsync();
+        bool loadingDuringRecovery = viewModel.IsFeatureLoading;
+        recovery.SetResult(new StubProject { Value = 42 });
+        await initialization;
+        bool recoveryWasRecorded = project.UndoHistory!.CanUndo;
+        undoAvailability.Clear();
+        redoAvailability.Clear();
+        project.Value = 43;
+        project.UndoHistory.Undo();
+
+        // Assert
+        loadingDuringRecovery.Should().BeTrue();
+        recoveryWasRecorded.Should().BeFalse();
+        viewModel.IsFeatureLoading.Should().BeFalse();
+        viewModel.CurrentFeature.Should().BeSameAs(project);
+        project.Value.Should().Be(42);
+        undoAvailability.Should().Equal(true, false);
+        redoAvailability.Should().Equal(false, true);
+    }
+
+    [TestMethod]
+    public async Task OnCurrentFeatureChanged_AfterSwitch_ObservesOnlyActiveHistory()
+    {
+        // Arrange
+        StubProjectFeatureViewModel first = new();
+        StubProjectFeatureViewModel second = new();
+        await using var viewModel = CreateMainViewModel(
+            [
+                Registration("first", "First", () => first),
+                Registration("second", "Second", () => second),
+            ],
+            projectSerializer: new VersionedProjectJsonSerializer());
+        int notifications = 0;
+        viewModel.UndoCommand.CanExecuteChanged += (_, _) => notifications++;
+
+        // Act
+        viewModel.SelectedFeature = viewModel.FeatureItems[1];
+        notifications = 0;
+        first.Value = 1;
+        int inactiveNotifications = notifications;
+        second.Value = 2;
+        int activeNotifications = notifications;
+        viewModel.SelectedFeature = viewModel.FeatureItems[0];
+        notifications = 0;
+        second.Value = 3;
+        int switchedBackInactiveNotifications = notifications;
+        first.Value = 4;
+
+        // Assert
+        inactiveNotifications.Should().Be(0);
+        activeNotifications.Should().Be(1);
+        switchedBackInactiveNotifications.Should().Be(0);
+        notifications.Should().Be(1);
+        viewModel.CurrentFeature.Should().BeSameAs(first);
+    }
+
+    [TestMethod]
+    public async Task InitializeAsync_WhenRecoveryCompletesAfterSwitch_DoesNotSubscribeInactiveHistory()
+    {
+        // Arrange
+        StubProjectFeatureViewModel project = new();
+        StubFeatureViewModel home = new();
+        TaskCompletionSource<StubProject> recovery = new();
+        await using var viewModel = CreateMainViewModel(
+            [
+                Registration("project", "Project", () => project),
+                Registration("home", "Home", () => home),
+            ],
+            projectService: new RecordingProjectService { RecoveryProject = recovery.Task },
+            projectSerializer: new VersionedProjectJsonSerializer(),
+            initialize: false);
+        Task initialization = viewModel.InitializeAsync();
+        viewModel.SelectedFeature = viewModel.FeatureItems[1];
+        int notifications = 0;
+        viewModel.UndoCommand.CanExecuteChanged += (_, _) => notifications++;
+
+        // Act
+        recovery.SetResult(new StubProject { Value = 42 });
+        await initialization;
+        project.Value = 43;
+
+        // Assert
+        viewModel.CurrentFeature.Should().BeSameAs(home);
+        viewModel.IsFeatureLoading.Should().BeFalse();
+        project.UndoHistory!.CanUndo.Should().BeTrue();
+        notifications.Should().Be(0);
+    }
+
+    [TestMethod]
+    public async Task DisposeAsync_WithActiveUndoHistory_UnsubscribesCommandNotifications()
+    {
+        // Arrange
+        StubProjectFeatureViewModel project = new();
+        var viewModel = CreateMainViewModel(
+            [Registration("project", "Project", () => project)],
+            projectSerializer: new VersionedProjectJsonSerializer());
+        int notifications = 0;
+        viewModel.UndoCommand.CanExecuteChanged += (_, _) => notifications++;
+        viewModel.RedoCommand.CanExecuteChanged += (_, _) => notifications++;
+
+        // Act
+        await viewModel.DisposeAsync();
+        project.Value = 1;
+
+        // Assert
+        project.UndoHistory!.CanUndo.Should().BeTrue();
+        notifications.Should().Be(0);
+    }
+
+    [TestMethod]
+    public async Task UndoCommand_WhileMenuGestureIsOpen_UndoesCurrentProject()
+    {
+        // Arrange
+        StubProjectFeatureViewModel project = new();
+        await using var viewModel = CreateMainViewModel(
+            [Registration("project", "Project", () => project)]);
+        ProjectUndoHistory<StubProject> history = new(project, new VersionedProjectJsonSerializer());
+        project.UndoHistory = history;
+        project.Value = 1;
+        viewModel.UndoCommand.CanExecute(null).Should().BeTrue();
+
+        // Act
+        using (history.BeginGesture()) await viewModel.UndoCommand.ExecuteAsync(null);
+
+        // Assert
+        project.Value.Should().Be(0);
+        history.CanRedo.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task MainWindow_ControlZ_UndoesCurrentProject()
+    {
+        // Arrange
+        StubProjectFeatureViewModel project = new();
+        await using var viewModel = CreateMainViewModel(
+            [Registration("project", "Project", () => project)]);
+        ProjectUndoHistory<StubProject> history = new(project, new VersionedProjectJsonSerializer());
+        project.UndoHistory = history;
+        project.Value = 1;
+        MainWindow window = new() { DataContext = viewModel };
+
+        // Act
+        window.RaiseEvent(new KeyEventArgs
+        {
+            RoutedEvent = InputElement.KeyDownEvent,
+            Source = window,
+            Key = Key.LeftCtrl,
+            KeyModifiers = KeyModifiers.Control,
+        });
+        window.RaiseEvent(new KeyEventArgs
+        {
+            RoutedEvent = InputElement.KeyDownEvent,
+            Source = window,
+            Key = Key.Z,
+            KeyModifiers = KeyModifiers.Control,
+        });
+
+        // Assert
+        project.Value.Should().Be(0);
+    }
+
     [TestMethod]
     public void ShellFeatureRegistry_DuplicateIdentifier_Throws()
     {
@@ -710,6 +894,7 @@ public sealed class DesktopShellTests
         TestDialogService? dialogs = null,
         IQuickRunCommandRegistry? quickRunRegistry = null,
         RecordingProjectService? projectService = null,
+        IProjectSerializer? projectSerializer = null,
         IUiDispatcher? dispatcher = null,
         IApplicationDataMigrationService? migrationService = null,
         ISettingsService? settingsService = null,
@@ -745,7 +930,8 @@ public sealed class DesktopShellTests
             new ProjectAutosaveCoordinator(
                 projectService,
                 resolvedDialogs,
-                resolvedNotifications),
+                resolvedNotifications,
+                serializer: projectSerializer),
             dispatcher ?? workspaceDispatcher,
             null,
             migrationService,
@@ -825,6 +1011,8 @@ public sealed class DesktopShellTests
 
     private sealed class StubProjectFeatureViewModel : ObservableObject, IShellProjectFeature<StubProject>
     {
+        public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+
         private static readonly ProjectDefinition<StubProject> definition = new(
             "stubproject.json",
             "Stub Projects",
@@ -832,23 +1020,36 @@ public sealed class DesktopShellTests
 
         public int InstallCount { get; private set; }
 
+        [Undoable]
+        public int Value
+        {
+            get;
+            set => SetProperty(ref field, value);
+        }
+
         public ProjectDefinition<StubProject> ProjectDefinition => definition;
 
         public StubProject Snapshot()
         {
-            return new StubProject();
+            return new StubProject { Value = Value };
         }
 
         public void Install(StubProject project)
         {
             InstallCount++;
+            Value = project.Value;
         }
     }
 
-    private sealed record StubProject;
+    private sealed record StubProject
+    {
+        public int Value { get; init; }
+    }
 
     private sealed class RecordingProjectService : IProjectService
     {
+        public Task<StubProject>? RecoveryProject { get; init; }
+
         public int SaveAsCount { get; private set; }
 
         public int AutoSaveCount { get; private set; }
@@ -888,11 +1089,12 @@ public sealed class DesktopShellTests
             return Task.FromException<TProject>(new FileNotFoundException());
         }
 
-        public Task<TProject> LoadAutoSaveAsync<TProject>(
+        public async Task<TProject> LoadAutoSaveAsync<TProject>(
             ProjectDefinition<TProject> definition,
             CancellationToken cancellationToken = default)
         {
-            return Task.FromException<TProject>(new FileNotFoundException());
+            if (RecoveryProject is null) throw new FileNotFoundException();
+            return (TProject)(object)await RecoveryProject;
         }
 
         public Task AutoSaveAsync<TProject>(

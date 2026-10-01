@@ -9,6 +9,7 @@ using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.SliderMerger.Models;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tools.SliderMerger.Models;
 using Mapping_Tools.Desktop.ViewModels;
 
@@ -22,6 +23,9 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
     IQuickRun,
     IShellProjectFeature<SliderMergerProject>
 {
+    /// <inheritdoc />
+    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+
     private readonly ISliderMergerService merger;
     private readonly DesktopApplicationSettings settings;
     private readonly IBeatmapWorkspace workspace;
@@ -55,30 +59,36 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets the source-object import mode.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyPropertyChangedFor(nameof(TimeCodeVisible))]
     public partial HitObjectSelectionMode ImportModeSetting { get; set; } = HitObjectSelectionMode.Selected;
 
     /// <summary>Gets or sets the legacy time-code query.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string TimeCode { get; set; } = string.Empty;
 
     /// <summary>Gets or sets how adjacent paths are joined.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial SliderMergerConnectionMode ConnectionModeSetting { get; set; } =
         SliderMergerConnectionMode.Move;
 
     /// <summary>Gets or sets the non-negative object connection tolerance in osu! pixels.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyDataErrorInfo]
     [Range(0, double.MaxValue, ErrorMessage = "Enter a finite non-negative leniency.")]
     public partial double Leniency { get; set; } = 256;
 
     /// <summary>Gets or sets whether a fully linear merge uses the linear path type.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool LinearOnLinear { get; set; }
 
     /// <summary>Gets or sets whether matching uses a slider's playable end.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool MergeOnSliderEnd { get; set; } = true;
 
     /// <summary>Gets whether the time-code field is visible for Time import mode.</summary>

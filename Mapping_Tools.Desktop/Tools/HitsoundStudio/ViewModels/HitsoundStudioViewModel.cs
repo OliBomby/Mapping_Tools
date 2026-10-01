@@ -24,6 +24,7 @@ using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tools.HitsoundStudio.Models;
 using Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels.Adapters;
 using Mapping_Tools.Desktop.Tools.HitsoundStudio.Views;
@@ -44,6 +45,9 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     IAsyncDisposable,
     IDisposable
 {
+    /// <inheritdoc />
+    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+
     private readonly IAudioGenerator audioGenerator;
     private readonly ICurrentBeatmapDialogService currentBeatmapService;
     private readonly ProjectDefinition<HitsoundStudioProject> definition;
@@ -124,10 +128,12 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets the beatmap used as the export baseline.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string BaseBeatmap { get; set; } = string.Empty;
 
     /// <summary>Gets or sets the default sample.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial ObservableSample DefaultSample { get; set; } =
         new(new Sample
         {
@@ -138,134 +144,167 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets the export directory.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string ExportFolder { get; set; }
 
     /// <summary>Gets or sets the editable layer collection.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial ObservableCollection<ObservableHitsoundLayer> Layers { get; set; } = [];
 
     /// <summary>Gets or sets the timestamps common to the selected layers in milliseconds.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double[] EditTimes { get; set; } = [];
 
     /// <summary>Gets or sets whether the potentially long timestamp list is shown.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool ShowTimes { get; set; }
 
     /// <summary>Gets or sets the selected layers' shared display name.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string EditName { get; set; } = string.Empty;
 
     /// <summary>Gets or sets the selected layers' shared sample family.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial SampleSet? EditSampleSet { get; set; } = SampleSet.Normal;
 
     /// <summary>Gets or sets the selected layers' shared hitsound.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial Hitsound? EditHitsound { get; set; } = Hitsound.Normal;
 
     /// <summary>Gets or sets the selected layers' shared source path.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string EditSamplePath { get; set; } = string.Empty;
 
     /// <summary>Gets or sets the selected source volume as a linear gain.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double EditSampleVolume { get; set; } = 1;
 
     /// <summary>Gets or sets the selected source panning.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double EditSamplePanning { get; set; }
 
     /// <summary>Gets or sets the selected source pitch shift.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double EditSamplePitchShift { get; set; }
 
     /// <summary>Gets or sets the selected SoundFont bank.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string EditSampleBank { get; set; } = "-1";
 
     /// <summary>Gets or sets the selected SoundFont patch.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string EditSamplePatch { get; set; } = "-1";
 
     /// <summary>Gets or sets the selected SoundFont instrument.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string EditSampleInstrument { get; set; } = "-1";
 
     /// <summary>Gets or sets the selected MIDI key.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string EditSampleKey { get; set; } = "-1";
 
     /// <summary>Gets or sets the selected SoundFont note length.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double EditSampleLength { get; set; } = -1;
 
     /// <summary>Gets or sets the selected MIDI velocity.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string EditSampleVelocity { get; set; } = "127";
 
     /// <summary>Gets or sets the selected import kind.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial ImportType? EditImportType { get; set; } = ImportType.None;
 
     /// <summary>Gets or sets the selected import source path.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string EditImportPath { get; set; } = string.Empty;
 
     /// <summary>Gets or sets the selected stack X coordinate.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double EditImportX { get; set; } = -1;
 
     /// <summary>Gets or sets the selected stack Y coordinate.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double EditImportY { get; set; } = -1;
 
     /// <summary>Gets or sets the selected imported sample path.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string EditImportSamplePath { get; set; } = string.Empty;
 
     /// <summary>Gets or sets whether imported volume creates distinct layers.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool EditImportDiscriminateVolumes { get; set; }
 
     /// <summary>Gets or sets whether duplicate sample files are canonicalized.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool EditImportDetectDuplicates { get; set; }
 
     /// <summary>Gets or sets whether duplicate import times are removed.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool EditImportRemoveDuplicates { get; set; }
 
     /// <summary>Gets or sets the selected SoundFont import bank filter.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string EditImportBank { get; set; } = "-1";
 
     /// <summary>Gets or sets the selected SoundFont import patch filter.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string EditImportPatch { get; set; } = "-1";
 
     /// <summary>Gets or sets the selected SoundFont import key filter.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string EditImportKey { get; set; } = "-1";
 
     /// <summary>Gets or sets the selected MIDI length filter.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double EditImportLength { get; set; } = -1;
 
     /// <summary>Gets or sets the selected MIDI length rounding roughness.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double EditImportLengthRoughness { get; set; } = 1;
 
     /// <summary>Gets or sets the selected MIDI velocity filter.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string EditImportVelocity { get; set; } = "-1";
 
     /// <summary>Gets or sets the selected MIDI velocity rounding roughness.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double EditImportVelocityRoughness { get; set; } = 1;
 
     /// <summary>Gets or sets the selected MIDI start offset.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double EditImportOffset { get; set; }
 
     /// <summary>Gets the layer selection supplied by the Avalonia list.</summary>
@@ -317,68 +356,84 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets whether the next export uses the previous schema.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool UsePreviousSampleSchema { get; set; }
 
     /// <summary>Gets or sets the currently loaded schema.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial SampleSchema? PreviousSampleSchema { get; set; }
 
     /// <summary>Gets or sets whether a previous schema may grow.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool AllowGrowthPreviousSampleSchema { get; set; }
 
     /// <summary>Gets or sets the export mode used by the dialog.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial HitsoundStudioExportMode HitsoundExportModeSetting { get; set; }
         = HitsoundStudioExportMode.Standard;
 
     /// <summary>Gets or sets the output osu! game mode.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial GameMode HitsoundExportGameMode { get; set; } = GameMode.Standard;
 
     /// <summary>Gets or sets the map version name.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string HitsoundDiffName { get; set; } = "Hitsounds";
 
     /// <summary>Gets or sets layer timestamp grouping leniency.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double ZipLayersLeniency { get; set; } = 15;
 
     /// <summary>Gets or sets the first new custom index.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial int FirstCustomIndex { get; set; } = 1;
 
     /// <summary>Gets or sets whether maps and samples are written.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool ExportMap { get; set; } = true;
 
     /// <summary>Gets or sets whether generated samples are written.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool ExportSamples { get; set; } = true;
 
     /// <summary>Gets or sets whether the detailed result summary is shown.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool ShowResults { get; set; }
 
     /// <summary>Gets or sets whether the output directory is cleared.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool DeleteAllInExportFirst { get; set; }
 
     /// <summary>Gets or sets whether named modes retain regular hitsounds.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool AddCoincidingRegularHitsounds { get; set; } = true;
 
     /// <summary>Gets or sets whether MIDI receives greenline volume events.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool AddGreenLineVolumeToMidi { get; set; } = true;
 
     /// <summary>Gets or sets the single-source format.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial HitsoundStudioSampleExportFormat SingleSampleExportFormat { get; set; }
         = HitsoundStudioSampleExportFormat.Default;
 
     /// <summary>Gets or sets the mixed-source format.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial HitsoundStudioSampleExportFormat MixedSampleExportFormat { get; set; }
         = HitsoundStudioSampleExportFormat.Default;
 
@@ -452,6 +507,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task AddAsync()
     {
+        using var edit = UndoHistory?.BeginEdit();
         try
         {
             var request = await ShowImportDialogAsync(
@@ -492,6 +548,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task RemoveAsync()
     {
+        using var edit = UndoHistory?.BeginEdit();
         if (SelectedLayers.Count == 0) return;
         bool confirmed = await messageDialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
             "Confirm deletion",
@@ -520,6 +577,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task ReloadAsync()
     {
+        using var edit = UndoHistory?.BeginEdit();
         if (SelectedLayers.Count == 0)
         {
             await PublishNotificationAsync(
@@ -770,6 +828,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task PickDefaultSampleAsync()
     {
+        using var edit = UndoHistory?.BeginEdit();
         var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
             Title = "Choose default sample",
@@ -842,6 +901,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task LoadSampleSchemaAsync()
     {
+        using var edit = UndoHistory?.BeginEdit();
         var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
             Title = "Load sample schema",
@@ -864,6 +924,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task BulkAssignSamplesAsync()
     {
+        using var edit = UndoHistory?.BeginEdit();
         var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
             Title = "Bulk assign samples",
@@ -947,6 +1008,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
 
     private void RefreshEditorFromSelection()
     {
+        using var ignored = UndoHistory?.SuspendRecording();
         var selected = SelectedLayers.ToList();
         syncingEditor = true;
         EditTimes = CommonTimes(selected);

@@ -7,6 +7,7 @@ using Mapping_Tools.Application.Tools.PropertyTransformer;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tools.PropertyTransformer.Models;
 using Mapping_Tools.Desktop.ViewModels;
 
@@ -19,6 +20,9 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
     IQuickRun,
     IShellProjectFeature<PropertyTransformerProject>
 {
+    /// <inheritdoc />
+    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+
     private readonly IPropertyTransformerService propertyTransformer;
     private readonly DesktopApplicationSettings settings;
     private readonly IBeatmapWorkspace workspace;
@@ -45,142 +49,177 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
 
     /// <summary>Gets or sets the timing-point offset multiplier.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double TimingpointOffsetMultiplier { get; set; } = 1;
 
     /// <summary>Gets or sets the timing-point offset addition in milliseconds.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double TimingpointOffsetOffset { get; set; }
 
     /// <summary>Gets or sets the uninherited timing-point BPM multiplier.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double TimingpointBpmMultiplier { get; set; } = 1;
 
     /// <summary>Gets or sets the uninherited timing-point BPM addition.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double TimingpointBpmOffset { get; set; }
 
     /// <summary>Gets or sets the inherited timing-point slider-velocity multiplier.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double TimingpointSvMultiplier { get; set; } = 1;
 
     /// <summary>Gets or sets the inherited timing-point slider-velocity addition.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double TimingpointSvOffset { get; set; }
 
     /// <summary>Gets or sets the timing-point custom-index multiplier.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double TimingpointIndexMultiplier { get; set; } = 1;
 
     /// <summary>Gets or sets the timing-point custom-index addition.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double TimingpointIndexOffset { get; set; }
 
     /// <summary>Gets or sets the timing-point volume multiplier.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double TimingpointVolumeMultiplier { get; set; } = 1;
 
     /// <summary>Gets or sets the timing-point volume addition.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double TimingpointVolumeOffset { get; set; }
 
     /// <summary>Gets or sets the hit-object time multiplier.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double HitObjectTimeMultiplier { get; set; } = 1;
 
     /// <summary>Gets or sets the hit-object time addition in milliseconds.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double HitObjectTimeOffset { get; set; }
 
     /// <summary>Gets or sets the hit-object volume multiplier.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double HitObjectVolumeMultiplier { get; set; } = 1;
 
     /// <summary>Gets or sets the hit-object volume addition.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double HitObjectVolumeOffset { get; set; }
 
     /// <summary>Gets or sets the bookmark time multiplier.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double BookmarkTimeMultiplier { get; set; } = 1;
 
     /// <summary>Gets or sets the bookmark time addition in milliseconds.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double BookmarkTimeOffset { get; set; }
 
     /// <summary>Gets or sets the storyboard event time multiplier.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double SbEventTimeMultiplier { get; set; } = 1;
 
     /// <summary>Gets or sets the storyboard event time addition in milliseconds.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double SbEventTimeOffset { get; set; }
 
     /// <summary>Gets or sets the storyboard sample time multiplier.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double SbSampleTimeMultiplier { get; set; } = 1;
 
     /// <summary>Gets or sets the storyboard sample time addition in milliseconds.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double SbSampleTimeOffset { get; set; }
 
     /// <summary>Gets or sets the storyboard sample volume multiplier.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double SbSampleVolumeMultiplier { get; set; } = 1;
 
     /// <summary>Gets or sets the storyboard sample volume addition.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double SbSampleVolumeOffset { get; set; }
 
     /// <summary>Gets or sets the break time multiplier.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double BreakTimeMultiplier { get; set; } = 1;
 
     /// <summary>Gets or sets the break time addition in milliseconds.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double BreakTimeOffset { get; set; }
 
     /// <summary>Gets or sets the video start-time multiplier.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double VideoTimeMultiplier { get; set; } = 1;
 
     /// <summary>Gets or sets the video start-time addition in milliseconds.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double VideoTimeOffset { get; set; }
 
     /// <summary>Gets or sets the preview-point time multiplier.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double PreviewTimeMultiplier { get; set; } = 1;
 
     /// <summary>Gets or sets the preview-point time addition.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double PreviewTimeOffset { get; set; }
 
     /// <summary>Gets or sets whether transformed values are clipped to their legacy bounds.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool ClipProperties { get; set; }
 
     /// <summary>Gets or sets whether value and time filters are active.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool EnableFilters { get; set; }
 
     /// <summary>Gets or sets the values allowed by the match filter.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double[] MatchFilter { get; set; } = [];
 
     /// <summary>Gets or sets the values rejected by the mismatch filter.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double[] UnmatchFilter { get; set; } = [];
 
     /// <summary>Gets or sets the inclusive lower time filter, or <c>-1</c> for none.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double MinTimeFilter { get; set; } = -1;
 
     /// <summary>Gets or sets the inclusive upper time filter, or <c>-1</c> for none.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double MaxTimeFilter { get; set; } = -1;
 
     /// <summary>Gets or sets whether all time-related fields are synchronized.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool SyncTimeFields { get; set; }
 
     /// <summary>Runs Property Transformer against the current editor beatmap.</summary>
@@ -335,6 +374,7 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
     [RelayCommand]
     private void Reset()
     {
+        using var edit = UndoHistory?.BeginEdit();
         ResetMultipliersAndOffsets();
     }
 

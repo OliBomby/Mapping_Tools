@@ -1,3 +1,5 @@
+using Mapping_Tools.Desktop.Services.Undo;
+
 namespace Mapping_Tools.Desktop.Shell;
 
 /// <summary>
@@ -6,6 +8,9 @@ namespace Mapping_Tools.Desktop.Shell;
 /// </summary>
 public interface IShellProjectFeature
 {
+    /// <summary>Gets or sets this feature's in-memory project edit history after recovery loads.</summary>
+    IProjectUndoHistory? UndoHistory { get; set; }
+
     /// <summary>
     ///     Gets optional feature-owned recovery files that receive the same
     ///     snapshot as the primary shell autosave.

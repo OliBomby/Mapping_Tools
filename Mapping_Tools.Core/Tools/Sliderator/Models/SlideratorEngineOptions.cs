@@ -1,6 +1,5 @@
 using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.MathUtil;
-using Newtonsoft.Json;
 
 namespace Mapping_Tools.Core.Tools.Sliderator.Models;
 
@@ -14,15 +13,12 @@ public class SlideratorEngineOptions
     public double GlobalSv { get; set; } = 1.4;
 
     /// <summary>Gets or sets the requested graph duration in beats.</summary>
-    [JsonIgnore]
     public double GraphBeats { get; set; } = 3;
 
     /// <summary>Gets or sets the redline BPM applied to the graph duration.</summary>
-    [JsonIgnore]
     public double BeatsPerMinute { get; set; } = 180;
 
     /// <summary>Gets or sets the source slider's effective pixel length.</summary>
-    [JsonIgnore]
     public double PixelLength { get; set; } = 100;
 
     /// <summary>Gets or sets the timeline divisor used for stream output.</summary>

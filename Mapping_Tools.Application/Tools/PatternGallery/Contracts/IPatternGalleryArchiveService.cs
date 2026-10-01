@@ -32,8 +32,10 @@ public interface IPatternGalleryArchiveService
     /// <param name="archivePath">The existing ZIP path.</param>
     /// <param name="basePath">The directory below which the archive root is created.</param>
     /// <param name="cancellationToken">Cancels before the next entry is written.</param>
+    /// <param name="fileEdit">Optionally records each file before extraction changes it.</param>
     Task ExtractAsync(
         string archivePath,
         string basePath,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default,
+        PatternGalleryFileEdit? fileEdit = null);
 }

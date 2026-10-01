@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Services.Undo;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using Avalonia.Data;
@@ -68,6 +69,7 @@ public sealed partial class ValueDialogViewModel : ObservableValidator
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [DialogValue]
+    [Undoable]
     public partial string ValueText { get; set; }
 
     /// <summary>Gets the native window title.</summary>

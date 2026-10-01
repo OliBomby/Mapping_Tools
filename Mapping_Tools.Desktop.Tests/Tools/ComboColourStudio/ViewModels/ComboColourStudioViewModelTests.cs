@@ -6,7 +6,10 @@ using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Tools.ComboColourStudio;
 using Mapping_Tools.Core.Tools.ComboColourStudio.Models;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
+using Mapping_Tools.Desktop.Services.Undo;
+using Mapping_Tools.Desktop.Tools.ComboColourStudio.Models;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels;
+using Mapping_Tools.Infrastructure.Projects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Tools.ComboColourStudio.ViewModels;
@@ -14,6 +17,33 @@ namespace Mapping_Tools.Desktop.Tests.Tools.ComboColourStudio.ViewModels;
 [TestClass]
 public sealed class ComboColourStudioViewModelTests
 {
+    [TestMethod]
+    public void PaletteColorChange_UpdatesSequenceAndUndoesTogether()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+        viewModel.AddComboColourCommand.Execute(null);
+        viewModel.AddColourPointCommand.Execute(null);
+        viewModel.AddSequenceColour(viewModel.SelectedColourPoint!, viewModel.ComboColours[0]);
+        var original = viewModel.ComboColours[0].Color;
+        ProjectUndoHistory<ComboColourProject> history = new(viewModel, new VersionedProjectJsonSerializer());
+        viewModel.UndoHistory = history;
+        var changed = Mapping_Tools.Core.BeatmapHelper.RgbaColour.FromRgb(12, 34, 56);
+
+        // Act
+        viewModel.ComboColours[0].Color = changed;
+        history.Capture();
+
+        // Assert
+        viewModel.SelectedColourPoint!.ColourSequence[0].Should().BeSameAs(viewModel.ComboColours[0]);
+        viewModel.SelectedColourPoint.ColourSequence[0].Color.Should().Be(changed);
+        history.Undo();
+        viewModel.ComboColours[0].Color.Should().Be(original);
+        viewModel.SelectedColourPoint!.ColourSequence[0].Color.Should().Be(original);
+        history.Redo();
+        viewModel.SelectedColourPoint!.ColourSequence[0].Color.Should().Be(changed);
+    }
+
     [TestMethod]
     public void AddColourPointCommand_AfterAddingPaletteColour_SelectsPointAndAddsSequence()
     {

@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Services.Undo;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -29,9 +30,11 @@ public sealed partial class GeometryDashboardPreferencesDialogViewModel : Observ
     }
 
     /// <summary>Gets the independent document being edited.</summary>
+    [Undoable]
     public GeometryDashboardPreferences Preferences { get; }
 
     /// <summary>Gets or sets whether Desktop keeps the service running when this view is hidden.</summary>
+    [Undoable]
     public bool KeepRunning
     {
         get => keepRunning;
@@ -48,6 +51,7 @@ public sealed partial class GeometryDashboardPreferencesDialogViewModel : Observ
     public IReadOnlyList<UpdateMode> UpdateModes { get; } = Enum.GetValues<UpdateMode>();
 
     /// <summary>Gets the editable appearance groups retained by the project.</summary>
+    [Undoable]
     public ObservableCollection<GeometryDashboardPreferenceRowViewModel> Appearance { get; }
 
     /// <summary>Gets or sets the complete graph while the snap key is down.</summary>

@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Services.Undo;
 using System.Globalization;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -30,6 +31,7 @@ public sealed class GeometryDashboardPreferenceRowViewModel : ObservableObject
     public string Name { get; }
 
     /// <summary>Gets the Core appearance settings.</summary>
+    [Undoable]
     public RelevantObjectPreferences Preference { get; }
 
     /// <summary>Gets or sets the color using Avalonia's color-picker type.</summary>

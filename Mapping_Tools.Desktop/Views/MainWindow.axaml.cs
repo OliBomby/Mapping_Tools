@@ -11,8 +11,10 @@ using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services.Hosted;
 using Mapping_Tools.Desktop.Services.Notifications;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Services.Updates;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Utilities;
 using Mapping_Tools.Desktop.ViewModels;
 using Material.Icons;
 using Material.Styles.Controls;
@@ -90,6 +92,11 @@ public partial class MainWindow : Window, INotificationSurface
         this.logger = logger ?? NullLogger<MainWindow>.Instance;
         InitializeComponent();
         AddHandler(KeyDownEvent, HandleWindowKeyDown, RoutingStrategies.Tunnel);
+        ProjectUndoWindowInput.Attach(
+            this,
+            ActiveHistory,
+            ReplayHistory,
+            textBox => DialogHostInteraction.IsDialogOpen || textBox.DataContext is not MainViewModel);
         AddHandler(Button.ClickEvent, LogButtonClick, RoutingStrategies.Bubble, true);
         PositionChanged += (_, _) => CaptureNormalBounds();
         Resized += (_, _) => CaptureNormalBounds();
@@ -318,6 +325,27 @@ public partial class MainWindow : Window, INotificationSurface
         }
 
         eventArgs.Handled = true;
+    }
+
+    private void ReplayHistory(bool undo)
+    {
+        if (DialogHostInteraction.IsDialogOpen)
+        {
+            var history = DialogHostInteraction.CurrentUndoHistory;
+            if (undo) history?.Undo();
+            else history?.Redo();
+            return;
+        }
+
+        if (DataContext is not MainViewModel viewModel) return;
+        var command = undo ? viewModel.UndoCommand : viewModel.RedoCommand;
+        if (command.CanExecute(null)) command.Execute(null);
+    }
+
+    private IProjectUndoHistory? ActiveHistory()
+    {
+        if (DialogHostInteraction.IsDialogOpen) return DialogHostInteraction.CurrentUndoHistory;
+        return (DataContext as MainViewModel)?.ProjectHistory;
     }
 
     private void DragCurrentMaps(object? sender, PointerPressedEventArgs eventArgs)

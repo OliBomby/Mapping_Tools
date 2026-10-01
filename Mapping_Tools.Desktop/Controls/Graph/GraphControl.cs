@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
 using DialogHostAvalonia;
@@ -27,6 +28,14 @@ namespace Mapping_Tools.Desktop.Controls.Graph;
 /// </summary>
 public sealed class GraphControl : Decorator
 {
+    /// <summary>Identifies the start of a graph edit or editing gesture.</summary>
+    public static readonly RoutedEvent<RoutedEventArgs> EditStartedEvent =
+        RoutedEvent.Register<GraphControl, RoutedEventArgs>(nameof(EditStarted), RoutingStrategies.Bubble);
+
+    /// <summary>Identifies the completion of a graph edit, including a cancelled pointer gesture.</summary>
+    public static readonly RoutedEvent<RoutedEventArgs> EditCompletedEvent =
+        RoutedEvent.Register<GraphControl, RoutedEventArgs>(nameof(EditCompleted), RoutingStrategies.Bubble);
+
     private const double minimum_view_size = 1e-9;
     private const double anchor_hit_radius = 10;
     private const double tension_hit_radius = 9;
@@ -631,6 +640,20 @@ public sealed class GraphControl : Decorator
     /// <summary>Raised after an edit produces a new cloned graph state.</summary>
     public event EventHandler<GraphStateChangedEventArgs>? StateChanged;
 
+    /// <summary>Raised before an edit or pointer gesture changes the graph state.</summary>
+    public event EventHandler<RoutedEventArgs> EditStarted
+    {
+        add => AddHandler(EditStartedEvent, value);
+        remove => RemoveHandler(EditStartedEvent, value);
+    }
+
+    /// <summary>Raised after an edit finishes or its pointer capture is lost.</summary>
+    public event EventHandler<RoutedEventArgs> EditCompleted
+    {
+        add => AddHandler(EditCompletedEvent, value);
+        remove => RemoveHandler(EditCompletedEvent, value);
+    }
+
     /// <summary>Applies one brush to the curve, edges, anchors, and tension handles.</summary>
     /// <param name="brush">The brush to apply.</param>
     public void SetBrush(IBrush brush)
@@ -972,8 +995,8 @@ public sealed class GraphControl : Decorator
                 return;
             }
 
-            int newIndex = AddAnchor(GetGraphPosition(point));
-            BeginGesture(eventArgs.Pointer, GraphPointerGesture.Anchor, newIndex, point);
+            BeginGesture(eventArgs.Pointer, GraphPointerGesture.Anchor, -1, point);
+            gestureAnchorIndex = AddAnchor(GetGraphPosition(point));
             eventArgs.Handled = true;
             return;
         }
@@ -1141,6 +1164,8 @@ public sealed class GraphControl : Decorator
         capturedPointer?.Capture(null);
         capturedPointer = pointer;
         ActiveGesture = nextGesture;
+        if (nextGesture is GraphPointerGesture.Anchor or GraphPointerGesture.Tension)
+            RaiseEvent(new RoutedEventArgs(EditStartedEvent));
         gestureAnchorIndex = anchorIndex;
         gestureStartPosition = point;
         lastPointerPosition = point;
@@ -1152,14 +1177,16 @@ public sealed class GraphControl : Decorator
 
     private void EndGesture(IPointer pointer)
     {
-        pointer.Capture(null);
+        bool editing = ActiveGesture is GraphPointerGesture.Anchor or GraphPointerGesture.Tension;
         capturedPointer = null;
+        pointer.Capture(null);
         ActiveGesture = GraphPointerGesture.None;
         gestureAnchorIndex = -1;
         if (!IsPointerOver) drawAnchors = false;
         if (IsPointerOver) UpdateCursor(lastPointerPosition);
         else Cursor = null;
 
+        if (editing) RaiseEvent(new RoutedEventArgs(EditCompletedEvent));
         InvalidateVisual();
     }
 
@@ -1213,18 +1240,27 @@ public sealed class GraphControl : Decorator
 
     private void CommitState(GraphState state)
     {
-        committingState = true;
+        bool standaloneEdit = ActiveGesture is not (GraphPointerGesture.Anchor or GraphPointerGesture.Tension);
+        if (standaloneEdit) RaiseEvent(new RoutedEventArgs(EditStartedEvent));
         try
         {
-            SetCurrentValue(GraphStateProperty, state);
+            committingState = true;
+            try
+            {
+                SetCurrentValue(GraphStateProperty, state);
+            }
+            finally
+            {
+                committingState = false;
+            }
+
+            StateChanged?.Invoke(this, new GraphStateChangedEventArgs(state.Clone()));
+            InvalidateVisual();
         }
         finally
         {
-            committingState = false;
+            if (standaloneEdit) RaiseEvent(new RoutedEventArgs(EditCompletedEvent));
         }
-
-        StateChanged?.Invoke(this, new GraphStateChangedEventArgs(state.Clone()));
-        InvalidateVisual();
     }
 
     private double Snap(double value, GraphMarkerOrientation orientation)

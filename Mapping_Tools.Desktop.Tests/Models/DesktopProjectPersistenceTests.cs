@@ -171,7 +171,6 @@ public sealed class DesktopProjectPersistenceTests
         var project = serializer.Deserialize<SliderPicturatorProject>(json);
 
         // Assert
-        project.SegmentCount.Should().Be(42);
         project.UseMapComboColors.Should().BeTrue();
         project.ComboColor.Should().Be(new RgbaColour(255, 0, 128, 255));
         project.TrackColorPickerColor.Should().Be(new RgbaColour(255, 255, 255, 255));
@@ -184,7 +183,7 @@ public sealed class DesktopProjectPersistenceTests
     public void SerializeAndDeserialize_SliderPicturatorProject_PreservesDesktopTrackColorState()
     {
         // Arrange
-        SliderPicturatorProject project = new() { UseMapComboColors = true, SegmentCount = 42 };
+        SliderPicturatorProject project = new() { UseMapComboColors = true };
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
@@ -195,7 +194,7 @@ public sealed class DesktopProjectPersistenceTests
         json.Should().Contain("Mapping_Tools.Viewmodels.SliderPicturatorVm, Mapping Tools");
         restored.UseMapComboColors.Should().BeTrue();
         restored.SetTrackColorOverride.Should().BeFalse();
-        restored.SegmentCount.Should().Be(42);
+        json.Should().NotContain("SegmentCount");
     }
 
     [TestMethod]

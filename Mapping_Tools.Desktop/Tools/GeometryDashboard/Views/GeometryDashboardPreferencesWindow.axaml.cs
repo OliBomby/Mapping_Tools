@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Mapping_Tools.Desktop.Services.Undo;
 
 namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.Views;
 
@@ -9,5 +10,6 @@ public sealed partial class GeometryDashboardPreferencesWindow : Window
     public GeometryDashboardPreferencesWindow()
     {
         InitializeComponent();
+        ProjectUndoWindowInput.AttachDialog(this);
     }
 }

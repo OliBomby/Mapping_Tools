@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Core.HitsoundStuff;
 
 namespace Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels.Adapters;
@@ -28,43 +29,53 @@ public sealed partial class ObservableSampleGeneratingArgs : ObservableObject
 
     /// <summary>Gets or sets the source audio or SoundFont path.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial string Path { get; set; } = string.Empty;
 
     /// <summary>Gets or sets the linear sample gain.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyPropertyChangedFor(nameof(Velocity))]
     public partial double Volume { get; set; }
 
     /// <summary>Gets or sets the stereo pan.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double Panning { get; set; }
 
     /// <summary>Gets or sets the pitch adjustment.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double PitchShift { get; set; }
 
     /// <summary>Gets or sets the SoundFont bank, or -1 when unused.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial int Bank { get; set; }
 
     /// <summary>Gets or sets the SoundFont patch, or -1 when unused.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial int Patch { get; set; }
 
     /// <summary>Gets or sets the SoundFont instrument, or -1 when unused.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial int Instrument { get; set; }
 
     /// <summary>Gets or sets the MIDI key, or -1 when unused.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial int Key { get; set; }
 
     /// <summary>Gets or sets the generated SoundFont note length.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double Length { get; set; }
 
     /// <summary>Gets or sets the MIDI velocity and updates the corresponding gain.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyPropertyChangedFor(nameof(Volume))]
     public partial int Velocity { get; set; }
 

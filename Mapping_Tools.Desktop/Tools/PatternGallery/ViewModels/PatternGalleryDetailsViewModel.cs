@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Services.Undo;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -30,6 +31,7 @@ public sealed partial class PatternGalleryDetailsViewModel : ObservableValidator
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [Required(ErrorMessage = "A pattern name is required.")]
+    [Undoable]
     public partial string Name { get; set; }
 
     /// <summary>Gets the formatted creation timestamp.</summary>

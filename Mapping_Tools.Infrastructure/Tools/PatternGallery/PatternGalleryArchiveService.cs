@@ -1,3 +1,4 @@
+using Mapping_Tools.Application.Tools.PatternGallery;
 using System.IO.Compression;
 using System.Text;
 using Mapping_Tools.Application.Tools.PatternGallery.Contracts;
@@ -99,7 +100,8 @@ public sealed class PatternGalleryArchiveService : IPatternGalleryArchiveService
     public Task ExtractAsync(
         string archivePath,
         string basePath,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        PatternGalleryFileEdit? fileEdit = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(archivePath);
         ArgumentException.ThrowIfNullOrWhiteSpace(basePath);
@@ -111,6 +113,7 @@ public sealed class PatternGalleryArchiveService : IPatternGalleryArchiveService
             cancellationToken.ThrowIfCancellationRequested();
             string[] parts = ValidateEntry(entry.FullName);
             string destination = parts.Aggregate(destinationRoot, Path.Combine);
+            if (!string.IsNullOrEmpty(entry.Name)) fileEdit?.CaptureFile(destination);
             string? directory = Path.GetDirectoryName(destination);
             if (directory is not null) Directory.CreateDirectory(directory);
 

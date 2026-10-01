@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Core.BeatmapHelper;
 
 namespace Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels.Adapters;
@@ -19,6 +20,7 @@ public sealed partial class ObservableComboColour : ObservableObject
 
     /// <summary>Gets or sets the ARGB colour value.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial RgbaColour Color { get; set; }
 
     /// <summary>Creates a plain colour snapshot.</summary>

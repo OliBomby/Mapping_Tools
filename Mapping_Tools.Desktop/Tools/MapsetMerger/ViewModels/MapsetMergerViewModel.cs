@@ -17,6 +17,7 @@ using Mapping_Tools.Core.Tools.MapsetMerger;
 using Mapping_Tools.Core.Tools.MapsetMerger.Models;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tools.MapsetMerger.Models;
 using Mapping_Tools.Desktop.ViewModels;
 
@@ -29,6 +30,9 @@ namespace Mapping_Tools.Desktop.Tools.MapsetMerger.ViewModels;
 /// </summary>
 public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShellProjectFeature<MapsetMergerProject>
 {
+    /// <inheritdoc />
+    public Mapping_Tools.Desktop.Services.Undo.IProjectUndoHistory? UndoHistory { get; set; }
+
     private readonly ICurrentBeatmapDialogService currentBeatmapService;
 
     private readonly IFilePicker filePicker;
@@ -70,12 +74,14 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
 
     /// <summary>Gets or sets the export directory.</summary>
     [ObservableProperty]
+    [Undoable]
     [NotifyDataErrorInfo]
     [Required(ErrorMessage = "Select an export directory.")]
     public partial string ExportPath { get; set; }
 
     /// <summary>Gets or sets whether the first storyboard is embedded in beatmaps.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool MoveSbToBeatmap { get; set; }
 
     ProjectDefinition<MapsetMergerProject> IShellProjectFeature<MapsetMergerProject>.ProjectDefinition { get; } = new(
@@ -115,6 +121,7 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
     [RelayCommand]
     private async Task AddMapsetFromCurrentAsync()
     {
+        using var edit = UndoHistory?.BeginEdit();
         string? path = await currentBeatmapService.FetchAsync();
         if (path is not null)
             await AddMapsetFromPathAsync(
@@ -143,6 +150,7 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
     [RelayCommand]
     private void RemoveMapset()
     {
+        using var edit = UndoHistory?.BeginEdit();
         var selected = Mapsets.Where(item => item.IsSelected).ToList();
         if (selected.Count > 0)
         {
@@ -158,6 +166,7 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
     [RelayCommand]
     private async Task BrowseExportPathAsync()
     {
+        using var edit = UndoHistory?.BeginEdit();
         try
         {
             var paths = await filePicker.PickFoldersAsync(new OpenFolderPickerRequest

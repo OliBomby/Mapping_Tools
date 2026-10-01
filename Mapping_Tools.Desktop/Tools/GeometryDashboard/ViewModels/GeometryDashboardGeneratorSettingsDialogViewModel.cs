@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Services.Undo;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
@@ -40,6 +41,7 @@ public sealed partial class GeometryDashboardGeneratorSettingsDialogViewModel : 
     public GeneratorSettings Settings { get; }
 
     /// <summary>Gets reflected editable properties.</summary>
+    [Undoable]
     public ObservableCollection<GeometryDashboardGeneratorSettingRowViewModel> Rows { get; }
 
     /// <summary>Gets the shared generator settings shown in the first legacy card.</summary>
@@ -49,6 +51,7 @@ public sealed partial class GeometryDashboardGeneratorSettingsDialogViewModel : 
     public ObservableCollection<GeometryDashboardGeneratorSettingRowViewModel> SpecificRows { get; }
 
     /// <summary>Gets all editable selection-predicate collections exposed by the generator settings.</summary>
+    [Undoable]
     public ObservableCollection<GeometryDashboardPredicateCollectionViewModel> PredicateGroups { get; }
 
     /// <summary>Gets the shared selection-predicate collections shown in the first legacy card.</summary>
