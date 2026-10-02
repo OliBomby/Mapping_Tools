@@ -157,6 +157,52 @@ public sealed class SlideratorEngineTests
     }
 
     [TestMethod]
+    [DataRow("64,64,0,2,0,L|164:64,1,100", 1)]
+    [DataRow("64,64,0,2,0,L|164:64,1,100", 2)]
+    [DataRow("64,64,0,2,0,L|164:64,1,100", 100)]
+    [DataRow("64,64,0,2,0,L|64:164,1,100", 100)]
+    [DataRow("64,64,0,2,0,L|114:64|114:114,1,100", 100)]
+    [DataRow("64,64,0,2,0,L|164:164,1,141.4213562373095", 100)]
+    [DataRow("64,64,0,2,0,L|164:64,1,100", 1000)]
+    public void GetLegacySliderBallPositionAtTime_WithInvisiblatorOutput_PreservesOriginalPositionsAfterStart(
+        string encodedSource, int duration)
+    {
+        // Arrange
+        var (beatmap, _) = CreateSliderBeatmap();
+        var source = BeatmapTestData.DecodeHitObject(encodedSource);
+        beatmap.HitObjects[0] = source;
+        var options = CreateOptions();
+        options.ExportTime = 1000;
+        options.GraphBeats = 1;
+        options.BeatsPerMinute = 60000.0 / duration;
+        options.PixelLength = source.PixelLength;
+        beatmap.BeatmapTiming.GetRedlineAtTime(0).MpB = duration;
+        options.ExportAsNormal = false;
+        options.ExportAsInvisibleSlider = true;
+        options.GraphState = SlideratorEngineOptions.CreatePositionGraph(options.GraphBeats);
+        Vector2[] expected = source.GetSliderPath().SliderballPositions(duration)
+            .Select(position => position.Rounded()).ToArray();
+        SlideratorEngine.Apply(beatmap, source, options);
+        var invisible = beatmap.HitObjects.Skip(1).Single();
+        invisible.CalculateSliderTemporalLength(beatmap.BeatmapTiming, false);
+        int startTime = (int)invisible.Time;
+
+        // Act
+        Vector2[] actual = Enumerable.Range(0, duration + 1)
+            .Select(milliseconds => invisible.GetLegacySliderBallPositionAtTime(startTime + milliseconds))
+            .ToArray();
+
+        // Assert
+        for (int milliseconds = 1; milliseconds <= duration; milliseconds++)
+        {
+            actual[milliseconds].Should().Be(expected[milliseconds],
+                "every legacy tracking sample after the start must remain on the intended rounded path at millisecond {0}", milliseconds);
+        }
+
+        actual[0].Should().NotBe(expected[0], "tracking uses the zero-duration endpoint, while rendering uses its start");
+    }
+
+    [TestMethod]
     public void Apply_WhenCancellationIsRequestedBeforeGeneration_LeavesBeatmapUnchanged()
     {
         // Arrange

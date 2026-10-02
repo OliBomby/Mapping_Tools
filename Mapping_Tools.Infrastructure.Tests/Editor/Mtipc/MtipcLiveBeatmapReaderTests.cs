@@ -10,7 +10,7 @@ namespace Mapping_Tools.Infrastructure.Tests.Editor.Mtipc;
 public sealed class MtipcLiveBeatmapReaderTests
 {
     [TestMethod]
-    [DataRow(1, 1500, 500.0, 156.8, 1464.0)]
+    [DataRow(1, 1500, 500.0, 156.79998779296875, 1464.0)]
     [DataRow(2, 2000, 500.0, 71.2, 1964.0)]
     [DataRow(1, 1060, 60.0, 114.0, 1030.0)]
     public void ConvertHitObject_WithSliderEndTime_PreservesDurationAndTrueSliderEnd(
@@ -30,7 +30,7 @@ public sealed class MtipcLiveBeatmapReaderTests
         converted.TemporalLength.Should().Be(spanDuration);
         converted.EndTime.Should().Be(endTime);
         point.Should().NotBeNull();
-        point.Child.X.Should().BeApproximately(expectedX, 0.000001);
+        point.Child.X.Should().BeApproximately(expectedX, 0.00001);
         point.Child.Y.Should().Be(96);
         point.CustomTime.Should().Be(expectedTime);
     }

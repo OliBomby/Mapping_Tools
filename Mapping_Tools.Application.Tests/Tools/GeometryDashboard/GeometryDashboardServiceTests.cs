@@ -6,6 +6,7 @@ using Mapping_Tools.Application.Tools.GeometryDashboard;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Settings.Models;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators;
@@ -36,8 +37,77 @@ public sealed class GeometryDashboardServiceTests
         // Assert
         overlay.LastScene.Shapes.Should().Contain(shape =>
             shape.Kind == GeometryDashboardOverlayShapeKind.Point
-            && Math.Abs(shape.Start.X - 156.8) < 0.000001
+            && Math.Abs(shape.Start.X - 156.79998779296875) < 0.000001
             && Math.Abs(shape.Start.Y - 96) < 0.000001);
+    }
+
+    [TestMethod]
+    public async Task RefreshOnceAsync_WithInvisibleSliderAndIntegerLiveEndTime_DrawsTailOnOriginalPath()
+    {
+        // Arrange
+        string encodedSlider = File.ReadAllText(Path.Combine(AppContext.BaseDirectory,
+            "Fixtures", "Sliders", "InvisibleCurvedSlider.txt"));
+        HitObject slider = BeatmapEditingSessionTestFactory.DecodeHitObject(encodedSlider.Trim());
+        slider.EndTime = 1624;
+        slider.TrueLength = 0;
+        var timingPoints = new[]
+        {
+            new TimingPoint(697, 8.438424136537212E-07, 4, SampleSet.Soft, 1, 70, true, false, true),
+            new TimingPoint(697, double.NaN, 4, SampleSet.Soft, 1, 70, false, false, true),
+        };
+        var editor = new LiveBeatmapSnapshot("C:/Songs/map/map.osu", [], timingPoints, [slider],
+            0, 1.7, 1, 9.3, 4, 1000, [slider]);
+        var runtime = new RuntimeStub(new GeometryDashboardRuntimeSnapshot(editor, true));
+        var overlay = new OverlayStub();
+        using var service = CreateService(new InputStub(true), runtime, overlay);
+        service.Generators.OfType<TrueSliderEndGenerator>().Single().Settings.IsActive = true;
+
+        // Act
+        await service.RefreshOnceAsync();
+
+        // Assert
+        overlay.LastScene.Shapes.Should().Contain(shape =>
+            shape.Kind == GeometryDashboardOverlayShapeKind.Point && shape.Start == new Vector2(345, 198));
+        overlay.LastScene.Shapes.Should().NotContain(shape =>
+            shape.Kind == GeometryDashboardOverlayShapeKind.Point && shape.Start == new Vector2(273, 120));
+        slider.TemporalLength.Should().BeGreaterThan(927).And.BeLessThan(928);
+        slider.GetLegacyTrueSliderEndTime().Should().Be(1588);
+        HitObject original = BeatmapEditingSessionTestFactory.DecodeHitObject(
+            "86,237,698,6,0,B|221:166|221:166|258:144|304:150|336:179|355:214,1,305.999990661621,6|2,1:2|0:0,0:0:0:0:");
+        original.GetSliderPath().SliderballPositions(10000).Should().Contain(position =>
+            Vector2.Distance(position, new Vector2(345, 198)) < 1);
+    }
+
+    [TestMethod]
+    public async Task RefreshOnceAsync_WithOnlySliderTimingChanged_UpdatesTailJudgementPoint()
+    {
+        // Arrange
+        const string encoded_slider = "64,96,1000,2,0,L|164:96,1,100";
+        HitObject first = BeatmapEditingSessionTestFactory.DecodeHitObject(encoded_slider);
+        HitObject second = BeatmapEditingSessionTestFactory.DecodeHitObject(encoded_slider);
+        first.EndTime = second.EndTime = 1500;
+        var firstEditor = new LiveBeatmapSnapshot("C:/Songs/map/map.osu", [],
+            [new TimingPoint(0, 700, 4, SampleSet.Normal, 0, 100, true, false, false)],
+            [first], 0, 1.4, 1, 5, 4, 1000, [first]);
+        var secondEditor = new LiveBeatmapSnapshot("C:/Songs/map/map.osu", [],
+            [new TimingPoint(0, 840, 4, SampleSet.Normal, 0, 100, true, false, false)],
+            [second], 0, 1.4, 1, 5, 4, 1001, [second]);
+        var runtime = new RuntimeStub(new GeometryDashboardRuntimeSnapshot(firstEditor, true),
+            new GeometryDashboardRuntimeSnapshot(secondEditor, true));
+        var overlay = new OverlayStub();
+        using var service = CreateService(new InputStub(true), runtime, overlay);
+        service.Generators.OfType<TrueSliderEndGenerator>().Single().Settings.IsActive = true;
+        await service.RefreshOnceAsync();
+
+        // Act
+        await service.RefreshOnceAsync();
+
+        // Assert
+        overlay.LastScene.Shapes.Should().Contain(shape =>
+            shape.Kind == GeometryDashboardOverlayShapeKind.Point && shape.Start == new Vector2(158, 96));
+        overlay.LastScene.Shapes.Should().NotContain(shape =>
+            shape.Kind == GeometryDashboardOverlayShapeKind.Point
+            && shape.Start == new Vector2(156.79998779296875, 96));
     }
 
     [TestMethod]

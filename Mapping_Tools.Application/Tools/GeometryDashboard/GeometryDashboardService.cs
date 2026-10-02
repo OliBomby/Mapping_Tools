@@ -464,6 +464,15 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
                     && editorTime < objectModel.EndTime + approachTime),
             };
             var objects = candidates.ToArray();
+            if (editor.TimingPoints.Count > 0)
+            {
+                var timing = new Timing(editor.TimingPoints.ToList(), editor.SliderMultiplier);
+                // Live readers supply truncated end times and unresolved playable lengths.
+                // Resolve velocity from timing before sampling legacy movement segments.
+                foreach (var hitObject in objects.Where(hitObject => hitObject.IsSlider))
+                    hitObject.CalculateSliderTemporalLength(timing, false);
+            }
+
             var existing = layers.GetRootRelevantHitObjects().ToArray();
             var removed = existing
                 .Where(old => !objects.Any(candidate => SameHitObject(old.HitObject, candidate)))
@@ -898,7 +907,8 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
 
     private static bool SameHitObject(HitObject first, HitObject second)
     {
-        return hitObjectComparer.Equals(first, second);
+        return hitObjectComparer.Equals(first, second)
+               && (!first.IsSlider || first.TemporalLength.Equals(second.TemporalLength));
     }
 
     private static RgbaColour AdjustColour(RgbaColour colour, double saturationMultiplier, double brightnessMultiplier)

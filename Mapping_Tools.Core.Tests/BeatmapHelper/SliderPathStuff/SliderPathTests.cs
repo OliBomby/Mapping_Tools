@@ -9,6 +9,103 @@ namespace Mapping_Tools.Core.Tests.BeatmapHelper.SliderPathStuff;
 public sealed class SliderPathTests
 {
     [TestMethod]
+    public void GetLegacySliderBallPositionAtTime_WithInflatedLengthAndDuplicateTail_DoesNotExtendInvisiblePath()
+    {
+        // Arrange
+        SliderPath path = new(PathType.Linear,
+            [new Vector2(0, 0), new Vector2(100, 0), new Vector2(100, 0)], 200);
+
+        // Act
+        var position = path.GetLegacySliderBallPositionAtTime(2500, 1000, 100, 1);
+
+        // Assert
+        position.Should().Be(new Vector2(100, 0));
+        path.PositionAt(1).Should().Be(new Vector2(200, 0), "the general geometric path keeps its existing extension behavior");
+    }
+
+    [TestMethod]
+    [DataRow(1000, 1000.0, 1, 1064)]
+    [DataRow(1000, 100000.0 / 61, 1, 1030)]
+    [DataRow(1000, 100000.0 / 60.5, 1, 1030)]
+    [DataRow(1000, 100000.0 / 500.5, 2, 1965)]
+    [DataRow(-1000, 100000.0 / 61.5, 1, -969)]
+    public void GetLegacyTrueSliderEndTime_WithFractionalOrRepeatedTiming_TruncatesAbsoluteTimestampsAndMidpoint(
+        int startTime, double velocity, int spans, int expected)
+    {
+        // Arrange
+        SliderPath path = new(PathType.Linear, [new Vector2(0, 0), new Vector2(100, 0)]);
+
+        // Act
+        int time = path.GetLegacyTrueSliderEndTime(startTime, velocity, spans);
+
+        // Assert
+        time.Should().Be(expected);
+    }
+
+    [TestMethod]
+    [DataRow(1000, 1, 2.0)]
+    [DataRow(1001, 1, 26.5)]
+    [DataRow(1002, 1, 51.0)]
+    [DataRow(1004, 2, 100.0)]
+    [DataRow(1005, 2, 100.0 - 98.0 / 3)]
+    [DataRow(1007, 2, 2.0)]
+    public void GetLegacySliderBallPositionAtTime_WithSubMillisecondSegments_UsesTruncatedSegmentBoundaries(
+        int time, int spans, double expectedX)
+    {
+        // Arrange
+        SliderPath path = new(PathType.Linear, [new Vector2(0, 0), new Vector2(2, 0), new Vector2(100, 0)]);
+
+        // Act
+        var position = path.GetLegacySliderBallPositionAtTime(time, 1000, 25000, spans);
+
+        // Assert
+        position.X.Should().BeApproximately(expectedX, 0.00001);
+        position.Y.Should().Be(0);
+    }
+
+    [TestMethod]
+    public void GetLegacySliderBallPositionAtTime_WithSharedBoundary_UsesFirstMatchingSegment()
+    {
+        // Arrange
+        SliderPath path = new(PathType.Linear,
+            [new Vector2(0, 0), new Vector2(100, 0), new Vector2(102, 0), new Vector2(200, 0)]);
+
+        // Act
+        var position = path.GetLegacySliderBallPositionAtTime(1001, 1000, 100000, 1);
+
+        // Assert
+        position.Should().Be(new Vector2(100, 0));
+    }
+
+    [TestMethod]
+    [DataRow(999, 0.0)]
+    [DataRow(1005, 125.0)]
+    public void GetLegacySliderBallPositionAtTime_OutsideSlider_UsesStartOrExtrapolatesFinalMovement(int time, double expectedX)
+    {
+        // Arrange
+        SliderPath path = new(PathType.Linear, [new Vector2(0, 0), new Vector2(100, 0)]);
+
+        // Act
+        var position = path.GetLegacySliderBallPositionAtTime(time, 1000, 25000, 1);
+
+        // Assert
+        position.Should().Be(new Vector2(expectedX, 0));
+    }
+
+    [TestMethod]
+    public void GetLegacyTrueSliderEndTime_WithEmptyPath_ReturnsStartTime()
+    {
+        // Arrange
+        SliderPath path = new(PathType.Linear, []);
+
+        // Act
+        int time = path.GetLegacyTrueSliderEndTime(1000, 25000, 1);
+
+        // Assert
+        time.Should().Be(1000);
+    }
+
+    [TestMethod]
     public void PositionAt_ClampsProgressToThePathEndpoints()
     {
         // Arrange

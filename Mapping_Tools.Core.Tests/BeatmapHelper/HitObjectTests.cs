@@ -10,6 +10,47 @@ namespace Mapping_Tools.Core.Tests.BeatmapHelper;
 public class HitObjectTests
 {
     [TestMethod]
+    public void GetLegacyTrueSliderEndTime_WithOddDuration_UsesIntegerMidpoint()
+    {
+        // Arrange
+        var slider = BeatmapTestData.DecodeHitObject("64,96,1000,2,0,L|164:96,1,100,0|0,0:0|0:0,0:0:0:0:");
+        slider.TemporalLength = 61;
+
+        // Act
+        int time = slider.GetLegacyTrueSliderEndTime();
+
+        // Assert
+        time.Should().Be(1030);
+    }
+
+    [TestMethod]
+    public void GetLegacySliderBallPositionAtTime_WithFastSegments_UsesAbsoluteLegacyPosition()
+    {
+        // Arrange
+        var slider = BeatmapTestData.DecodeHitObject("64,96,1000,2,0,L|66:96|164:96,1,100,0|0,0:0|0:0,0:0:0:0:");
+        slider.TemporalLength = 4;
+
+        // Act
+        var position = slider.GetLegacySliderBallPositionAtTime(1002);
+
+        // Assert
+        position.Should().Be(new Vector2(115, 96));
+    }
+
+    [TestMethod]
+    public void GetLegacySliderBallPositionAtTime_WithNonSlider_ReturnsObjectPosition()
+    {
+        // Arrange
+        var circle = BeatmapTestData.DecodeHitObject("64,96,1000,1,0,0:0:0:0:");
+
+        // Act
+        var position = circle.GetLegacySliderBallPositionAtTime(1000);
+
+        // Assert
+        position.Should().Be(new Vector2(64, 96));
+    }
+
+    [TestMethod]
     public void DecodeHitObject_CircleLine_ParsesAndRoundTrips()
     {
         // Arrange

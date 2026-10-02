@@ -188,6 +188,157 @@ public struct SliderPath : IEquatable<SliderPath>
         return PositionAt(timeLength <= 0 ? 0 : (double)ms / timeLength);
     }
 
+    /// <summary>Calculates osu!stable's nominal tail judgement timestamp.</summary>
+    /// <param name="startTime">The integer slider start timestamp in milliseconds.</param>
+    /// <param name="velocity">Slider velocity in pixels per second.</param>
+    /// <param name="spanCount">The number of traversals of the path.</param>
+    /// <returns>The truncated final scoring time minus 36 ms, bounded by the integer midpoint.</returns>
+    /// <remarks>
+    /// Uses the calculated polyline, float segment lengths, and accumulated segment durations.
+    /// This is stable's fixed tail tick, not lazer's continuous tracking and tail leniency.
+    /// Actual gameplay evaluates tracking on the update which reaches this timestamp.
+    /// </remarks>
+    public int GetLegacyTrueSliderEndTime(int startTime, double velocity, int spanCount)
+    {
+        double endTime = startTime;
+        double distance = 0;
+        foreach (var segment in GetLegacySliderSegments(startTime, velocity, spanCount))
+        {
+            endTime = segment.EndTime;
+            distance += segment.Distance;
+        }
+
+        if (distance <= 0) return startTime;
+
+        // Stable calculates EndTime and the last scoring timestamp separately.
+        int duration = (int)endTime - startTime;
+        int scoringTime = (int)(startTime + (float)distance / velocity * 1000.0);
+        return Math.Max(startTime + duration / 2, scoringTime - 36);
+    }
+
+    /// <summary>Calculates the slider ball position used by osu!stable's cursor tracking check.</summary>
+    /// <param name="time">The integer timestamp to sample, in milliseconds.</param>
+    /// <param name="startTime">The integer slider start timestamp in milliseconds.</param>
+    /// <param name="velocity">Slider velocity in pixels per second.</param>
+    /// <param name="spanCount">The number of traversals of the path.</param>
+    /// <returns>The absolute position on the calculated path.</returns>
+    /// <remarks>
+    /// Truncates each polyline segment's start and end timestamps, then interpolates using floats.
+    /// At shared boundaries the first matching segment wins; zero-duration segments use their endpoint.
+    /// At the exact start of an invisible slider this can differ from the rendered ball, which uses the start.
+    /// Before the slider starts, returns its start; after it ends, extrapolates its final movement as stable does.
+    /// Lazer uses continuous path progress instead. This also differs from stable's PositionAtTime helper.
+    /// </remarks>
+    public Vector2 GetLegacySliderBallPositionAtTime(int time, int startTime, double velocity, int spanCount)
+    {
+        Vector2 position = PositionAt(0);
+        if (time < startTime) return position;
+
+        (Vector2 Start, Vector2 End, double StartTime, double EndTime, float Distance)? lastSegment = null;
+        foreach (var segment in GetLegacySliderSegments(startTime, velocity, spanCount))
+        {
+            int segmentStart = (int)segment.StartTime;
+            int segmentEnd = (int)segment.EndTime;
+            if (segmentStart <= time && segmentEnd >= time)
+                return InterpolateLegacySliderSegment(segment.Start, segment.End, segmentStart, segmentEnd, time);
+
+            lastSegment = segment;
+        }
+
+        // Stable keeps using the final movement when a judgement update arrives after it ends.
+        return lastSegment is { } last
+            ? InterpolateLegacySliderSegment(last.Start, last.End, (int)last.StartTime, (int)last.EndTime, time)
+            : position;
+    }
+
+    private static Vector2 InterpolateLegacySliderSegment(Vector2 start, Vector2 end, int startTime, int endTime, int time)
+    {
+        if (startTime == endTime) return end;
+
+        float progress = (float)(1.0 - (double)(float)(endTime - time) / (float)(endTime - startTime));
+        return new Vector2(
+            (float)start.X + ((float)end.X - (float)start.X) * progress,
+            (float)start.Y + ((float)end.Y - (float)start.Y) * progress);
+    }
+
+    private IEnumerable<(Vector2 Start, Vector2 End, double StartTime, double EndTime, float Distance)>
+        GetLegacySliderSegments(int startTime, double velocity, int spanCount)
+    {
+        EnsureInitialised();
+        if (!double.IsFinite(velocity) || velocity <= 0 || spanCount <= 0 || calculatedPath.Count < 2) yield break;
+
+        var lines = GetLegacyPathSegments();
+        double[] lengths = new double[lines.Length + 1];
+        for (int i = 0; i < lines.Length; i++)
+            lengths[i + 1] = lengths[i] + lines[i].Distance;
+
+        double currentTime = startTime;
+        for (int span = 0; span < spanCount; span++)
+        {
+            bool reversed = span % 2 == 1;
+            for (int step = 0; step < lines.Length; step++)
+            {
+                int index = reversed ? lines.Length - step - 1 : step;
+                var start = reversed ? lines[index].End : lines[index].Start;
+                var end = reversed ? lines[index].Start : lines[index].End;
+                float distance = (float)(lengths[index + 1] - lengths[index]);
+                // Stable's 32-bit runtime keeps this multiplication at extended precision.
+                // Do not round the product to float before dividing by velocity.
+                double endTime = currentTime + 1000.0 * distance / velocity;
+
+                yield return (start, end, currentTime, endTime, distance);
+                currentTime = endTime;
+            }
+        }
+    }
+
+    private (Vector2 Start, Vector2 End, float Distance)[] GetLegacyPathSegments()
+    {
+        // Stable keeps duplicate linear anchors. A duplicate tail prevents extension and is
+        // essential to Invisiblator's end snapping; the general path approximation removes it.
+        bool linear = Type == PathType.Linear && controlPoints.All(point => point.Type is null or PathType.Linear);
+        var points = linear
+            ? controlPoints.Select(point => new System.Numerics.Vector2(
+                (float)Math.Round(point.Position.X), (float)Math.Round(point.Position.Y))).ToArray()
+            : calculatedPath.Select(point => new System.Numerics.Vector2((float)point.X, (float)point.Y)).ToArray();
+        List<(System.Numerics.Vector2 Start, System.Numerics.Vector2 End)> lines = [];
+        for (int i = 1; i < points.Length; i++)
+        {
+            // Stable's linear subdivision computes the endpoint even with just one subdivision.
+            // At Invisiblator coordinates, subtracting then adding floats can change that endpoint.
+            var end = linear ? points[i - 1] + (points[i] - points[i - 1]) : points[i];
+            lines.Add((points[i - 1], end));
+        }
+
+        double total = 0;
+        foreach (var line in lines)
+            total += LegacyLineLength(line.End - line.Start);
+
+        double excess = total - (linear ? ExpectedDistance ?? total : total);
+        while (linear && ExpectedDistance.HasValue && lines.Count > 0)
+        {
+            var last = lines[^1];
+            var delta = last.End - last.Start;
+            if (delta.Length() > excess + 0.0001)
+            {
+                if (delta != System.Numerics.Vector2.Zero)
+                    lines[^1] = (last.Start, last.Start + System.Numerics.Vector2.Normalize(delta) * (LegacyLineLength(delta) - (float)excess));
+                break;
+            }
+
+            excess -= delta.Length();
+            lines.RemoveAt(lines.Count - 1);
+        }
+
+        return lines.Select(line => (new Vector2(line.Start.X, line.Start.Y), new Vector2(line.End.X, line.End.Y),
+            LegacyLineLength(line.End - line.Start))).ToArray();
+    }
+
+    private static float LegacyLineLength(System.Numerics.Vector2 delta)
+    {
+        return (float)Math.Sqrt((double)delta.X * delta.X + (double)delta.Y * delta.Y);
+    }
+
     /// <summary>
     ///     Computes the position of the sliderball on the slider at all ms from 0 to timeLength.
     /// </summary>

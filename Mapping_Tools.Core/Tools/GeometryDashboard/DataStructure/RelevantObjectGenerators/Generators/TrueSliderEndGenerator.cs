@@ -4,7 +4,7 @@ using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGen
 
 namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators;
 
-/// <summary>Generates the cursor position at a slider's legacy tail judgement time.</summary>
+/// <summary>Generates the osu!stable cursor-tracking position at the nominal legacy tail judgement time.</summary>
 public sealed class TrueSliderEndGenerator : RelevantObjectsGenerator
 {
     /// <inheritdoc />
@@ -17,7 +17,7 @@ public sealed class TrueSliderEndGenerator : RelevantObjectsGenerator
     public override string Name => "Points on True Slider Ends";
 
     /// <inheritdoc />
-    public override string Description => "Generates virtual points at the slider ball's position 36 ms before the slider ends, or halfway through sliders shorter than 72 ms.";
+    public override string Description => "Generates osu!stable true slider ends using legacy integer timing and segment interpolation. Lazer uses different tracking and tail leniency.";
 
     /// <inheritdoc />
     public override GeneratorType GeneratorType => GeneratorType.Basic;
@@ -34,15 +34,11 @@ public sealed class TrueSliderEndGenerator : RelevantObjectsGenerator
         var hitObject = relevantHitObject.HitObject;
         if (hitObject is not { IsSlider: true, ControlPoints.Count: > 0 }) return null;
 
-        double duration = hitObject.TemporalLength * hitObject.Repeat;
-        // Legacy tail judgement cannot occur before the midpoint of the entire slider.
-        double elapsed = Math.Max(duration / 2, duration - 36);
-        double progress = hitObject.TemporalLength > 0 ? elapsed / hitObject.TemporalLength % 2 : 0;
-        if (progress > 1) progress = 2 - progress;
+        int time = hitObject.GetLegacyTrueSliderEndTime();
 
-        return new RelevantPoint(hitObject.GetSliderPath().PositionAt(progress))
+        return new RelevantPoint(hitObject.GetLegacySliderBallPositionAtTime(time))
         {
-            CustomTime = hitObject.Time + elapsed,
+            CustomTime = time,
         };
     }
 }

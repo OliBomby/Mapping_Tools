@@ -407,6 +407,42 @@ public class HitObject : IComparable<HitObject>
         TemporalLength = Repeat == 0 ? 0 : (value - Time) / Repeat;
     }
 
+    /// <summary>Calculates the nominal osu!stable tail judgement time with legacy integer truncation.</summary>
+    /// <returns>The absolute integer timestamp, or the truncated start time for an object without slider timing.</returns>
+    /// <remarks>
+    /// Requires resolved <see cref="TemporalLength" />. Velocity is reconstructed from the resolved length
+    /// and span duration. Uses the calculated slider polyline, not a separate stable curve approximator.
+    /// Lazer's continuous tracking and tail leniency do not use these segment timing quirks.
+    /// </remarks>
+    public int GetLegacyTrueSliderEndTime()
+    {
+        var path = GetSliderPath();
+        return path.GetLegacyTrueSliderEndTime((int)Time, GetLegacySliderVelocity(path), Repeat);
+    }
+
+    /// <summary>Calculates the osu!stable slider ball position used for cursor tracking at an integer timestamp.</summary>
+    /// <param name="time">The absolute timestamp in milliseconds.</param>
+    /// <returns>The ball position, or the object's position if it has no usable slider timing.</returns>
+    /// <remarks>
+    /// Uses float interpolation within individually truncated polyline segment timestamps, including repeats.
+    /// Requires resolved <see cref="TemporalLength" /> and uses the existing calculated path geometry.
+    /// This models osu!stable gameplay rather than lazer tracking or the editor's PositionAtTime helper.
+    /// </remarks>
+    public Vector2 GetLegacySliderBallPositionAtTime(int time)
+    {
+        if (!IsSlider || TemporalLength <= 0 || ControlPoints.Count == 0) return Pos;
+
+        var path = GetSliderPath();
+        return path.GetLegacySliderBallPositionAtTime(time, (int)Time, GetLegacySliderVelocity(path), Repeat);
+    }
+
+    private double GetLegacySliderVelocity(SliderPath path)
+    {
+        return IsSlider && TemporalLength > 0
+            ? (TrueLength > 0 ? TrueLength : path.Distance) / TemporalLength * 1000.0
+            : 0;
+    }
+
     /// <summary>
     ///     Enumerates slider-body slide, whistle, and tick filenames that can play.
     /// </summary>
