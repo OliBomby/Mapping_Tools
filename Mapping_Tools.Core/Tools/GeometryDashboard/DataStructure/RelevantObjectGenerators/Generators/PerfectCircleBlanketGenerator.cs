@@ -8,6 +8,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Generates the center points of perfect-curve slider segments' blankets.</summary>
 public sealed class PerfectCircleBlanketGenerator : RelevantObjectsGenerator
 {
+    /// <inheritdoc />
+    public override string Id => "perfect-circle-blanket";
+
     /// <summary>Creates the active generator with a reduced relevance multiplier.</summary>
     public PerfectCircleBlanketGenerator()
     {

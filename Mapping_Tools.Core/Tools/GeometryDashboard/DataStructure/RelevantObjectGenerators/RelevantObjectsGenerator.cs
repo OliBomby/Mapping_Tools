@@ -25,6 +25,9 @@ public abstract class RelevantObjectsGenerator
     /// <summary>Gets the mutable settings used by this generator.</summary>
     public GeneratorSettings Settings { get; }
 
+    /// <summary>Gets the stable identity of this generator.</summary>
+    public abstract string Id { get; }
+
     /// <summary>Gets the stable display name retained for project compatibility.</summary>
     public abstract string Name { get; }
 

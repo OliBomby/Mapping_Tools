@@ -6,6 +6,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Settings for slider-path point sampling.</summary>
 public sealed class SliderPathGeneratorSettings : GeneratorSettings
 {
+    /// <inheritdoc />
+    public override string Id => "slider-path";
+
     /// <summary>Gets or sets the number of generated points per path pixel.</summary>
     [DisplayName("Point Density")]
     public double PointDensity { get; set; }

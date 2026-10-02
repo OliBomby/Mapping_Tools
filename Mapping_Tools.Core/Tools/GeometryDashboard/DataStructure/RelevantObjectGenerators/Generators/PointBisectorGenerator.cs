@@ -9,6 +9,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Generates the perpendicular bisector of two points.</summary>
 public sealed class PointBisectorGenerator : RelevantObjectsGenerator
 {
+    /// <inheritdoc />
+    public override string Id => "point-bisector";
+
     /// <summary>Creates an active sequential deep generator.</summary>
     public PointBisectorGenerator()
     {

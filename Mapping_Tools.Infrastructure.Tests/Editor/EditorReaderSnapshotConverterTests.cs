@@ -20,6 +20,7 @@ public sealed class EditorReaderSnapshotConverterTests
         {
             SpatialLength = 160,
             StartTime = 1000,
+            EndTime = 2000,
             Type = 2,
             SoundType = 2,
             SegmentCount = 2,
@@ -56,6 +57,8 @@ public sealed class EditorReaderSnapshotConverterTests
         snapshot.CircleSize.Should().Be(4);
         snapshot.SelectedHitObjects.Should().ContainSingle().Which.Should().BeSameAs(converted);
         converted.Repeat.Should().Be(2);
+        converted.TemporalLength.Should().Be(500);
+        converted.EndTime.Should().Be(2000);
         converted.ControlPoints.Count.Should().Be(3);
         converted.ControlPoints.Select(point => point.Position).Should().Equal(
             Vector2.Zero, new Vector2(50, 25), new Vector2(100, 50));

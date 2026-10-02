@@ -9,6 +9,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Generates a line parallel to a source line through a point.</summary>
 public sealed class ParallelismGenerator : RelevantObjectsGenerator
 {
+    /// <inheritdoc />
+    public override string Id => "parallelism";
+
     /// <summary>Creates an active deep generator requiring selected inputs.</summary>
     public ParallelismGenerator()
     {

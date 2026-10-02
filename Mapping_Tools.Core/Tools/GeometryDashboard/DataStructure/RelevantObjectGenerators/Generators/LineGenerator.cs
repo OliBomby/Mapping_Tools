@@ -9,6 +9,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Generates the infinite line through two points.</summary>
 public sealed class LineGenerator : RelevantObjectsGenerator
 {
+    /// <inheritdoc />
+    public override string Id => "line";
+
     /// <summary>Creates an active sequential deep generator.</summary>
     public LineGenerator()
     {

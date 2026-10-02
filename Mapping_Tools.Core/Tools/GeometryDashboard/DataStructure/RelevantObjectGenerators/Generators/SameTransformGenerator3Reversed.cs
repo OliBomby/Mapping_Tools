@@ -9,6 +9,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Generates the next point using the reversed angle transform.</summary>
 public sealed class SameTransformGenerator3Reversed : RelevantObjectsGenerator
 {
+    /// <inheritdoc />
+    public override string Id => "same-transform-3-reversed";
+
     /// <summary>Creates an ordered deep successor generator.</summary>
     public SameTransformGenerator3Reversed()
     {

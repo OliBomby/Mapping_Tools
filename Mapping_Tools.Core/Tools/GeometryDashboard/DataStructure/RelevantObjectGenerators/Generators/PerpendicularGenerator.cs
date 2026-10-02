@@ -9,6 +9,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Generates a line perpendicular to a source line through a point.</summary>
 public sealed class PerpendicularGenerator : RelevantObjectsGenerator
 {
+    /// <inheritdoc />
+    public override string Id => "perpendicular";
+
     /// <summary>Creates an active deep generator requiring selected inputs.</summary>
     public PerpendicularGenerator()
     {

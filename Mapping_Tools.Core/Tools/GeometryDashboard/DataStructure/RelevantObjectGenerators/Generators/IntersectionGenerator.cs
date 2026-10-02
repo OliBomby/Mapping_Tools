@@ -9,6 +9,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Generates points where pairs of lines or circles intersect.</summary>
 public sealed class IntersectionGenerator : RelevantObjectsGenerator
 {
+    /// <inheritdoc />
+    public override string Id => "intersection";
+
     /// <summary>Creates an active deep generator accepting sufficiently relevant inputs.</summary>
     public IntersectionGenerator()
     {

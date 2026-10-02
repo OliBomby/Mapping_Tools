@@ -7,6 +7,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Generates a point on the last anchor of a slider.</summary>
 public sealed class LastAnchorGenerator : RelevantObjectsGenerator
 {
+    /// <inheritdoc />
+    public override string Id => "last-anchor";
+
     /// <summary>Creates the active generator with unit relevance.</summary>
     public LastAnchorGenerator()
     {

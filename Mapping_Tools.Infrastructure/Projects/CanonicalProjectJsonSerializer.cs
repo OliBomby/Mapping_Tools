@@ -7,8 +7,6 @@ using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators;
-using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators;
-using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettingses;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -135,55 +133,23 @@ internal static class CanonicalProjectJsonSerializer
     private sealed class CanonicalGeneratorSettingsDictionaryConverter : JsonConverter
     {
         private static readonly IReadOnlyDictionary<Type, string> generatorIds =
-            new Dictionary<Type, string>
-            {
-                [typeof(AnchorPointGenerator)] = "anchor-point",
-                [typeof(AngleBisectorGenerator)] = "angle-bisector",
-                [typeof(AveragePointGenerator2)] = "average-point-2",
-                [typeof(AveragePointGenerator3)] = "average-point-3",
-                [typeof(CircleTangentGenerator)] = "circle-tangent",
-                [typeof(EqualSpacingGenerator)] = "equal-spacing",
-                [typeof(IntersectionGenerator)] = "intersection",
-                [typeof(LastAnchorGenerator)] = "last-anchor",
-                [typeof(LinearLineGenerator)] = "linear-line",
-                [typeof(LineGenerator)] = "line",
-                [typeof(ParallelismGenerator)] = "parallelism",
-                [typeof(PerfectCircleBlanketGenerator)] = "perfect-circle-blanket",
-                [typeof(PerfectCircleGenerator)] = "perfect-circle",
-                [typeof(PerpendicularGenerator)] = "perpendicular",
-                [typeof(PointBisectorGenerator)] = "point-bisector",
-                [typeof(SameTransformGenerator2)] = "same-transform-2",
-                [typeof(SameTransformGenerator3)] = "same-transform-3",
-                [typeof(SameTransformGenerator3Reversed)] = "same-transform-3-reversed",
-                [typeof(SameTransformGenerator4)] = "same-transform-4",
-                [typeof(ScaleRotateGenerator)] = "scale-rotate",
-                [typeof(SinglePointCircleGenerator)] = "single-point-circle",
-                [typeof(SliderEndGenerator)] = "slider-end",
-                [typeof(SliderPathGenerator)] = "slider-path",
-                [typeof(SquareGenerator)] = "square",
-                [typeof(SquareGenerator2)] = "square-2",
-                [typeof(StartPointGenerator)] = "start-point",
-                [typeof(SymmetryGenerator)] = "symmetry",
-                [typeof(TangentCircleGenerator)] = "tangent-circle",
-                [typeof(TriangleGenerator)] = "triangle",
-                [typeof(TriangleGenerator2)] = "triangle-2",
-            };
+            CreateTypeIds<RelevantObjectsGenerator>(generator => generator.Id);
 
         private static readonly IReadOnlyDictionary<string, Type> generatorTypes = generatorIds
             .ToDictionary(pair => pair.Value, pair => pair.Key, StringComparer.Ordinal);
 
         private static readonly IReadOnlyDictionary<Type, string> settingsIds =
-            new Dictionary<Type, string>
-            {
-                [typeof(GeneratorSettings)] = "default",
-                [typeof(ScaleRotateGeneratorSettings)] = "scale-rotate",
-                [typeof(SinglePointCircleGeneratorSettings)] = "single-point-circle",
-                [typeof(SliderPathGeneratorSettings)] = "slider-path",
-                [typeof(SymmetryGeneratorSettings)] = "symmetry",
-            };
+            CreateTypeIds<GeneratorSettings>(settings => settings.Id);
 
         private static readonly IReadOnlyDictionary<string, Type> settingsTypes = settingsIds
             .ToDictionary(pair => pair.Value, pair => pair.Key, StringComparer.Ordinal);
+
+        private static IReadOnlyDictionary<Type, string> CreateTypeIds<TBase>(Func<TBase, string> getId)
+        {
+            return typeof(TBase).Assembly.GetTypes()
+                .Where(type => !type.IsAbstract && typeof(TBase).IsAssignableFrom(type))
+                .ToDictionary(type => type, type => getId((TBase)Activator.CreateInstance(type)!));
+        }
 
         public override bool CanConvert(Type objectType)
         {

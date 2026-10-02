@@ -10,6 +10,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Generates a transformed point, line, or circle around a selected origin.</summary>
 public sealed class ScaleRotateGenerator : RelevantObjectsGenerator
 {
+    /// <inheritdoc />
+    public override string Id => "scale-rotate";
+
     /// <summary>Creates the active deep transform generator with legacy defaults.</summary>
     public ScaleRotateGenerator() : base(new ScaleRotateGeneratorSettings())
     {

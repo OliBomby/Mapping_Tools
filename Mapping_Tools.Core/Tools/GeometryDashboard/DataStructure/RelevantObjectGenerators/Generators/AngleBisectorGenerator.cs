@@ -9,6 +9,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Generates the two angle bisectors of two intersecting lines.</summary>
 public sealed class AngleBisectorGenerator : RelevantObjectsGenerator
 {
+    /// <inheritdoc />
+    public override string Id => "angle-bisector";
+
     /// <summary>Creates an active deep generator requiring selected inputs.</summary>
     public AngleBisectorGenerator()
     {

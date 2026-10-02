@@ -9,6 +9,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Generates two equal-radius circles centered on two points.</summary>
 public sealed class EqualSpacingGenerator : RelevantObjectsGenerator
 {
+    /// <inheritdoc />
+    public override string Id => "equal-spacing";
+
     /// <summary>Creates an active sequential deep generator.</summary>
     public EqualSpacingGenerator()
     {

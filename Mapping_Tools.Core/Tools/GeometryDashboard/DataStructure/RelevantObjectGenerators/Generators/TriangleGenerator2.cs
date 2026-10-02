@@ -9,6 +9,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Generates the second equilateral-triangle orientation.</summary>
 public sealed class TriangleGenerator2 : RelevantObjectsGenerator
 {
+    /// <inheritdoc />
+    public override string Id => "triangle-2";
+
     /// <summary>Creates an active deep triangle generator.</summary>
     public TriangleGenerator2()
     {

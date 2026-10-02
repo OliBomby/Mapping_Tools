@@ -8,6 +8,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Generates the average of three points.</summary>
 public sealed class AveragePointGenerator3 : RelevantObjectsGenerator
 {
+    /// <inheritdoc />
+    public override string Id => "average-point-3";
+
     /// <summary>Creates an active sequential deep generator.</summary>
     public AveragePointGenerator3()
     {

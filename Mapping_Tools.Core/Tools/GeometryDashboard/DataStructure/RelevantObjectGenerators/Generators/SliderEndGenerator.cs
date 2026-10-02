@@ -7,6 +7,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Generates a point at a slider's playable end.</summary>
 public sealed class SliderEndGenerator : RelevantObjectsGenerator
 {
+    /// <inheritdoc />
+    public override string Id => "slider-end";
+
     /// <summary>Creates the inactive-by-default endpoint generator.</summary>
     public SliderEndGenerator() { Settings.RelevancyRatio = 0.8; }
 

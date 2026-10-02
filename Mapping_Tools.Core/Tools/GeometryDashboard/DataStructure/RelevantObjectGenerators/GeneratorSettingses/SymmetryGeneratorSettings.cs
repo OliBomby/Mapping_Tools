@@ -6,6 +6,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Settings for reflection across a selected axis.</summary>
 public sealed class SymmetryGeneratorSettings : GeneratorSettings
 {
+    /// <inheritdoc />
+    public override string Id => "symmetry";
+
     /// <summary>Gets or sets the predicate for axis lines.</summary>
     [DisplayName("Axis Input Selection")]
     public SelectionPredicateCollection AxisInputPredicate { get; set; } = new();

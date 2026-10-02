@@ -8,6 +8,7 @@ using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Settings.Models;
+using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators;
 using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -17,6 +18,28 @@ namespace Mapping_Tools.Application.Tests.Tools.GeometryDashboard;
 [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
 public sealed class GeometryDashboardServiceTests
 {
+    [TestMethod]
+    public async Task RefreshOnceAsync_WithTrueSliderEndGeneratorActive_DrawsTailJudgementPoint()
+    {
+        // Arrange
+        HitObject slider = BeatmapEditingSessionTestFactory.DecodeHitObject("64,96,1000,2,0,L|164:96,1,100,0|0,0:0|0:0,0:0:0:0:");
+        slider.TemporalLength = 500;
+        var runtime = new RuntimeStub(CreateRuntimeSnapshot(slider, 1000, [slider]));
+        var overlay = new OverlayStub();
+        using var service = CreateService(new InputStub(true), runtime, overlay);
+        var generator = service.Generators.OfType<TrueSliderEndGenerator>().Should().ContainSingle().Which;
+        generator.Settings.IsActive = true;
+
+        // Act
+        await service.RefreshOnceAsync();
+
+        // Assert
+        overlay.LastScene.Shapes.Should().Contain(shape =>
+            shape.Kind == GeometryDashboardOverlayShapeKind.Point
+            && Math.Abs(shape.Start.X - 156.8) < 0.000001
+            && Math.Abs(shape.Start.Y - 96) < 0.000001);
+    }
+
     [TestMethod]
     public async Task RefreshOnceAsync_WhenInputPlatformIsUnavailable_ReportsGracefulStatus()
     {

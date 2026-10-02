@@ -9,6 +9,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Generates all four points completing the two square orientations.</summary>
 public sealed class SquareGenerator2 : RelevantObjectsGenerator
 {
+    /// <inheritdoc />
+    public override string Id => "square-2";
+
     /// <summary>Creates an active deep generator.</summary>
     public SquareGenerator2()
     {

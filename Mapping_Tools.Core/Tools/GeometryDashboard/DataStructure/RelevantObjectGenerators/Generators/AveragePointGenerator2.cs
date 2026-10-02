@@ -8,6 +8,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Generates the midpoint of two points.</summary>
 public sealed class AveragePointGenerator2 : RelevantObjectsGenerator
 {
+    /// <inheritdoc />
+    public override string Id => "average-point-2";
+
     /// <summary>Creates an active sequential deep generator.</summary>
     public AveragePointGenerator2()
     {

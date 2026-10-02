@@ -6,6 +6,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Settings for the scale-and-rotate generator.</summary>
 public sealed class ScaleRotateGeneratorSettings : GeneratorSettings
 {
+    /// <inheritdoc />
+    public override string Id => "scale-rotate";
+
     /// <summary>Gets or sets the rotation angle in degrees.</summary>
     [DisplayName("Angle")]
     public double Angle { get; set; }

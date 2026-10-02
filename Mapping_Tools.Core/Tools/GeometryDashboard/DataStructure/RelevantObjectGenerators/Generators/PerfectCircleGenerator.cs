@@ -10,6 +10,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Generates the complete circles represented by perfect-curve slider segments.</summary>
 public sealed class PerfectCircleGenerator : RelevantObjectsGenerator
 {
+    /// <inheritdoc />
+    public override string Id => "perfect-circle";
+
     /// <summary>Creates the active generator with unit relevance.</summary>
     public PerfectCircleGenerator()
     {

@@ -13,6 +13,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// </remarks>
 public sealed class TriangleGenerator : RelevantObjectsGenerator
 {
+    /// <inheritdoc />
+    public override string Id => "triangle";
+
     /// <summary>Creates an active deep triangle generator.</summary>
     public TriangleGenerator()
     {

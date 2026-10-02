@@ -9,6 +9,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Generates the next point using a four-point transform.</summary>
 public sealed class SameTransformGenerator4 : RelevantObjectsGenerator
 {
+    /// <inheritdoc />
+    public override string Id => "same-transform-4";
+
     /// <summary>Creates an ordered deep successor generator.</summary>
     public SameTransformGenerator4()
     {

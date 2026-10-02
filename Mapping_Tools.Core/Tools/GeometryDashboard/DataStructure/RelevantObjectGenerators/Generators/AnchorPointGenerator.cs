@@ -7,6 +7,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Generates points at every anchor of a slider.</summary>
 public sealed class AnchorPointGenerator : RelevantObjectsGenerator
 {
+    /// <inheritdoc />
+    public override string Id => "anchor-point";
+
     /// <summary>Creates the active anchor generator with its legacy relevance multiplier.</summary>
     public AnchorPointGenerator()
     {

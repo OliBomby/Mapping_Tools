@@ -6,6 +6,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Settings for a circle generated from one point.</summary>
 public sealed class SinglePointCircleGeneratorSettings : GeneratorSettings
 {
+    /// <inheritdoc />
+    public override string Id => "single-point-circle";
+
     /// <summary>Gets or sets the circle radius in editor pixels.</summary>
     [DisplayName("Radius")]
     public double Radius { get; set; }

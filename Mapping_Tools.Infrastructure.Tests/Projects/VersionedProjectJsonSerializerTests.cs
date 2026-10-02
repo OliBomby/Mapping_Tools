@@ -180,6 +180,39 @@ public sealed class VersionedProjectJsonSerializerTests
     }
 
     [TestMethod]
+    public void SerializeAndDeserialize_WithAllDashboardGenerators_PreservesTrueSliderEndSettings()
+    {
+        // Arrange
+        VersionedProjectJsonSerializer serializer = new();
+        GeometryDashboardEngineOptions project = new();
+        var generators = typeof(RelevantObjectsGenerator).Assembly.GetTypes()
+            .Where(type => !type.IsAbstract
+                           && typeof(RelevantObjectsGenerator).IsAssignableFrom(type)
+                           && type.GetConstructor(Type.EmptyTypes) is not null)
+            .Select(type => (RelevantObjectsGenerator)Activator.CreateInstance(type)!)
+            .ToArray();
+        project.SetGenerators(generators);
+        var trueSliderEnd = generators.OfType<TrueSliderEndGenerator>().Single();
+        trueSliderEnd.Settings.IsActive = true;
+        trueSliderEnd.Settings.RelevancyRatio = 0.37;
+        project.GetThis();
+
+        // Act
+        string json = serializer.Serialize(project);
+        var reloaded = serializer.Deserialize<GeometryDashboardEngineOptions>(json);
+
+        // Assert
+        json.Should().Contain("\"true-slider-end\"");
+        json.Should().NotContain("TrueSliderEndGenerator");
+        json.Should().NotContain("Id");
+        reloaded.CurrentPreferences.GeneratorSettings.Keys.Should().BeEquivalentTo(
+            generators.Select(generator => generator.GetType()));
+        var settings = reloaded.CurrentPreferences.GeneratorSettings[typeof(TrueSliderEndGenerator)];
+        settings.IsActive.Should().BeTrue();
+        settings.RelevancyRatio.Should().Be(0.37);
+    }
+
+    [TestMethod]
     public void DeserializeAndSerialize_WithLegacySlideratorProject_PreservesGraphInCanonicalFormat()
     {
         // Arrange

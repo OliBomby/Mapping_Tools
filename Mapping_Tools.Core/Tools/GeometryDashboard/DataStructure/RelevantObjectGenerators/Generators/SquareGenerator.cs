@@ -9,6 +9,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Generates the perpendicular points completing a square.</summary>
 public sealed class SquareGenerator : RelevantObjectsGenerator
 {
+    /// <inheritdoc />
+    public override string Id => "square";
+
     /// <summary>Creates an active deep generator.</summary>
     public SquareGenerator()
     {

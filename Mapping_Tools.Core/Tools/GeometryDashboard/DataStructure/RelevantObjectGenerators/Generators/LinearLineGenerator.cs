@@ -9,6 +9,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Generates a line matching a linear slider.</summary>
 public sealed class LinearLineGenerator : RelevantObjectsGenerator
 {
+    /// <inheritdoc />
+    public override string Id => "linear-line";
+
     /// <summary>Creates the active generator with unit relevance.</summary>
     public LinearLineGenerator()
     {

@@ -8,6 +8,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Generates sampled points along slider paths.</summary>
 public sealed class SliderPathGenerator : RelevantObjectsGenerator
 {
+    /// <inheritdoc />
+    public override string Id => "slider-path";
+
     /// <summary>Creates the non-inheritable path sampler with legacy density.</summary>
     public SliderPathGenerator() : base(new SliderPathGeneratorSettings())
     {

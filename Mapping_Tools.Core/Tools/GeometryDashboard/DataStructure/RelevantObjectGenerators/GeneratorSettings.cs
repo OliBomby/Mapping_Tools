@@ -8,6 +8,10 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Serializable, frontend-neutral settings shared by all geometry generators.</summary>
 public class GeneratorSettings : ICloneable
 {
+    /// <summary>Gets the stable identity of this settings type.</summary>
+    [JsonIgnore]
+    public virtual string Id => "default";
+
     /// <summary>Creates settings with the legacy inactive/default selection behavior.</summary>
     public GeneratorSettings()
     {

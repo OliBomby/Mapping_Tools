@@ -10,6 +10,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Generates reflected points, lines, and circles across a selected axis.</summary>
 public sealed class SymmetryGenerator : RelevantObjectsGenerator
 {
+    /// <inheritdoc />
+    public override string Id => "symmetry";
+
     /// <summary>Creates the active deep reflection generator with legacy defaults.</summary>
     public SymmetryGenerator() : base(new SymmetryGeneratorSettings())
     {

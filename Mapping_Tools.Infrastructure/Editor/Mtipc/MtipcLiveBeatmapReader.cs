@@ -53,12 +53,12 @@ public sealed class MtipcLiveBeatmapReader : ILiveBeatmapReader
         source.TimeSignature, (SampleSet)source.SampleSet, source.CustomSamples, source.Volume,
         source.TimingChange, (source.EffectFlags & 1) != 0, (source.EffectFlags & 8) != 0);
 
-    private static HitObject ConvertHitObject(MtipcHitObjectData source)
+    internal static HitObject ConvertHitObject(MtipcHitObjectData source)
     {
         var hitObject = new HitObject
         {
             PixelLength = source.SpatialLength, Time = source.StartTime, ObjectType = source.Type,
-            EndTime = source.EndTime, Hitsounds = source.SoundType, Pos = source.Position, EndPos = source.EndPosition,
+            Hitsounds = source.SoundType, Pos = source.Position, EndPos = source.EndPosition,
             Filename = source.SampleFile ?? string.Empty, SampleVolume = source.SampleVolume,
             SampleSet = (SampleSet)source.SampleSet, AdditionSet = (SampleSet)source.SampleSetAdditions,
             CustomIndex = source.CustomSampleSet,
@@ -76,6 +76,8 @@ public sealed class MtipcLiveBeatmapReader : ILiveBeatmapReader
             Pad(hitObject.EdgeAdditionSets, hitObject.Repeat + 1, SampleSet.None);
         }
         else hitObject.Repeat = hitObject.IsSpinner || hitObject.IsHoldNote ? 1 : 0;
+        // EndTime derives the span duration, so Repeat must already be assigned.
+        hitObject.EndTime = source.EndTime;
         return hitObject;
     }
 

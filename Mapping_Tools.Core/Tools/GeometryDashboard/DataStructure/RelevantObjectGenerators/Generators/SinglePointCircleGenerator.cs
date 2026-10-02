@@ -10,6 +10,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Generates a configurable circle centered on each point.</summary>
 public sealed class SinglePointCircleGenerator : RelevantObjectsGenerator
 {
+    /// <inheritdoc />
+    public override string Id => "single-point-circle";
+
     /// <summary>Creates the inactive generator with a 100-pixel radius.</summary>
     public SinglePointCircleGenerator() : base(new SinglePointCircleGeneratorSettings())
     {

@@ -322,7 +322,6 @@ internal static class EditorReaderSnapshotConverter
             PixelLength = source.SpatialLength,
             Time = source.StartTime,
             ObjectType = source.Type,
-            EndTime = source.EndTime,
             Hitsounds = source.SoundType,
             Pos = new Vector2(source.X, source.Y),
             EndPos = new Vector2(source.X, source.Y),
@@ -379,6 +378,8 @@ internal static class EditorReaderSnapshotConverter
                 hitObject.IsSpinner || hitObject.IsHoldNote ? 1 : 0;
         }
 
+        // EndTime derives the span duration, so Repeat must already be assigned.
+        hitObject.EndTime = source.EndTime;
         return hitObject;
     }
 

@@ -9,6 +9,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Generates the next point using the same angle and velocity change.</summary>
 public sealed class SameTransformGenerator3 : RelevantObjectsGenerator
 {
+    /// <inheritdoc />
+    public override string Id => "same-transform-3";
+
     /// <summary>Creates an ordered deep successor generator.</summary>
     public SameTransformGenerator3()
     {

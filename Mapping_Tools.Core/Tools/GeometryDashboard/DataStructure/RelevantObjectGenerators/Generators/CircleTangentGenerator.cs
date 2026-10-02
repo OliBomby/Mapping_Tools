@@ -9,6 +9,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Generates tangent lines from a point to a circle.</summary>
 public sealed class CircleTangentGenerator : RelevantObjectsGenerator
 {
+    /// <inheritdoc />
+    public override string Id => "circle-tangent";
+
     /// <summary>Creates an active deep generator requiring selected inputs.</summary>
     public CircleTangentGenerator()
     {

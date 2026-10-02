@@ -7,6 +7,9 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Generates the start position of every hit object.</summary>
 public sealed class StartPointGenerator : RelevantObjectsGenerator
 {
+    /// <inheritdoc />
+    public override string Id => "start-point";
+
     /// <summary>Creates the active generator with unit relevance.</summary>
     public StartPointGenerator()
     {
