@@ -102,12 +102,12 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
     /// <summary>Gets or sets whether identical sample data is canonicalized.</summary>
     [ObservableProperty]
     [Undoable]
-    public partial bool DetectDuplicateSamples { get; set; }
+    public partial bool DetectDuplicateSamples { get; set; } = true;
 
     /// <summary>Gets or sets whether duplicate event times are removed.</summary>
     [ObservableProperty]
     [Undoable]
-    public partial bool RemoveDuplicates { get; set; }
+    public partial bool RemoveDuplicates { get; set; } = true;
 
     /// <summary>Gets or sets whether hitsound import includes storyboard sounds.</summary>
     [ObservableProperty]
