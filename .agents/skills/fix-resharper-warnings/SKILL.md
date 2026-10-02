@@ -10,12 +10,12 @@ Fix warnings and errors in edited source files and findings introduced elsewhere
 Rerun after fixes and report any remaining applicable findings or blocked analysis. 
 You may suppress warnings if you deem the warning to not be a risk or fixing it reduces the code readability more than it's worth, most often in test projects.
 
+Use the version pinned in `.config/dotnet-tools.json`. If `dotnet jb` is unavailable, check the local NuGet cache for that version's `inspectcode.exe` before attempting `dotnet tool restore` once. Invoke the cached executable directly when available.
+
 Run from the repository root:
 
 ```powershell
-dotnet tool restore
-dotnet jb inspectcode Mapping_Tools.slnx --output=artifacts/resharper/<run-id>/warnings.sarif --severity=WARNING --swea --settings=Mapping_Tools.sln.DotSettings '--disable-settings-layers=GlobalAll;GlobalPerProduct;SolutionPersonal;ProjectPersonal' --caches-home=artifacts/resharper/<run-id>/cache --properties=BaseOutputPath=bin/agent/ --no-updates --verbosity=WARN
+dotnet jb inspectcode Mapping_Tools.slnx --output=artifacts/resharper/<run-id>/warnings.sarif --severity=WARNING --swea --settings=Mapping_Tools.sln.DotSettings '--disable-settings-layers=GlobalAll;GlobalPerProduct;SolutionPersonal;ProjectPersonal' --caches-home=artifacts/resharper/cache --properties=BaseOutputPath=bin/agent/ --no-updates --verbosity=WARN
 ```
 
-Use a new timestamp or UUID for `<run-id>` on every run: reused caches have returned stale inspection settings here. The explicit `.DotSettings` path is required for this `.slnx` solution.
-
+Use a new timestamp or UUID for `<run-id>` but reuse the cache. Reset it when the tool version, inspection settings, or build options change, or results appear stale. The explicit `.DotSettings` path is required for this `.slnx` solution.

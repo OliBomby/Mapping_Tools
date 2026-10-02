@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Avalonia.Controls;
+using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
@@ -20,6 +21,7 @@ using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.QuickRun.Models;
 using Mapping_Tools.Application.Settings.Contracts;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Core.Settings.Models;
 using Mapping_Tools.Application.Workspace.Models;
 using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Models;
@@ -48,6 +50,187 @@ namespace Mapping_Tools.Desktop.Tests.Shell;
 [TestClass]
 public sealed class DesktopShellTests
 {
+    [DataTestMethod]
+    [DataRow(0)]
+    [DataRow(1)]
+    [DataRow(2)]
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure", Justification = "The feature factory is used only before the Preferences view model is disposed.")]
+    public async Task MainWindow_WithFocusedPreferencesHotkey_UndoesEachGestureAndUpdatesInput(int inputIndex)
+    {
+        // Arrange
+        DesktopApplicationSettings settings = new();
+        TestHotkeyBindingCoordinator bindings = new();
+        using PreferencesViewModel preferences = new(settings, new TestFilePicker(),
+            new StubThemeService(), new UserNotificationService(), new QuickRunCommandRegistry(),
+            bindings, new TestBetterSaveOverrideService());
+        await using var viewModel = CreateMainViewModel(
+            [Registration("preferences", "Preferences", () => preferences)], settings: settings);
+        MainWindow window = new() { DataContext = viewModel };
+        using HeadlessViewHost host = HeadlessViewHost.ShowWindow(window);
+        HotkeyEditor input = window.GetVisualDescendants().OfType<HotkeyEditor>().ElementAt(inputIndex);
+        input.Focus();
+
+        // Act
+        host.PressKey(Key.B, RawInputModifiers.Alt, PhysicalKey.B, "b");
+        window.KeyRelease(Key.B, RawInputModifiers.Alt, PhysicalKey.B, "b");
+        host.PressKey(Key.C, RawInputModifiers.Alt, PhysicalKey.C, "c");
+        window.KeyRelease(Key.C, RawInputModifiers.Alt, PhysicalKey.C, "c");
+        host.PressKey(Key.Z, RawInputModifiers.Control, PhysicalKey.Z, "z");
+        HotkeySettings? undone = input.Hotkey;
+        string? undoneText = input.Text;
+        host.PressKey(Key.Z, RawInputModifiers.Control, PhysicalKey.Z, "z");
+        HotkeySettings? original = input.Hotkey;
+        host.PressKey(Key.Y, RawInputModifiers.Control, PhysicalKey.Y, "y");
+
+        // Assert
+        HotkeySettings expected = new((int)Key.B, (int)KeyModifiers.Alt);
+        undone.Should().Be(expected);
+        undoneText.Should().Be(HotkeyEditor.Format(expected));
+        original.Should().BeNull();
+        input.Hotkey.Should().Be(expected);
+        input.Text.Should().Be(HotkeyEditor.Format(expected));
+        HotkeySettings?[] stored = [settings.QuickRunHotkey, settings.QuickUndoHotkey, settings.BetterSaveHotkey];
+        HotkeySettings?[] live = [bindings.QuickRun, bindings.QuickUndo, bindings.BetterSave];
+        stored[inputIndex].Should().Be(expected);
+        live[inputIndex].Should().Be(expected);
+    }
+
+    [DataTestMethod]
+    [DataRow(0, false)]
+    [DataRow(1, false)]
+    [DataRow(2, false)]
+    [DataRow(0, true)]
+    [DataRow(1, true)]
+    [DataRow(2, true)]
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure", Justification = "The feature factory is used only before the Preferences view model is disposed.")]
+    public async Task MainWindow_AfterSmartQuickRunSelection_UndoesAndRedoesFocusedInput(int inputIndex, bool useMouse)
+    {
+        // Arrange
+        DesktopApplicationSettings settings = new() { SmartQuickRunEnabled = true };
+        QuickRunCommandRegistry registry = new();
+        registry.Register(new QuickRunCommand("first", "First", QuickRunTargets.Always, _ => Task.CompletedTask));
+        using PreferencesViewModel preferences = new(settings, new TestFilePicker(),
+            new StubThemeService(), new UserNotificationService(), registry,
+            new TestHotkeyBindingCoordinator(), new TestBetterSaveOverrideService());
+        await using var viewModel = CreateMainViewModel(
+            [Registration("preferences", "Preferences", () => preferences)], settings: settings);
+        MainWindow window = new() { DataContext = viewModel };
+        using HeadlessViewHost host = HeadlessViewHost.ShowWindow(window);
+        ComboBox input = window.GetVisualDescendants().OfType<PreferencesView>().Single()
+            .GetVisualDescendants().OfType<ComboBox>()
+            .Where(comboBox => comboBox.ItemsSource is IReadOnlyList<string>).ElementAt(inputIndex);
+        input.Focus();
+
+        // Act
+        if (useMouse)
+        {
+            host.Click(input);
+            Popup popup = input.GetVisualDescendants().OfType<Popup>().Single();
+            TopLevel dropdown = TopLevel.GetTopLevel(popup.Child!)!;
+            ComboBoxItem option = dropdown.GetVisualDescendants().OfType<ComboBoxItem>()
+                .Single(item => Equals(item.DataContext, "First"));
+            Point point = option.TranslatePoint(new Point(option.Bounds.Width / 2, option.Bounds.Height / 2), dropdown)!.Value;
+            dropdown.MouseMove(point);
+            dropdown.MouseDown(point, MouseButton.Left, RawInputModifiers.LeftMouseButton);
+            dropdown.MouseUp(point, MouseButton.Left);
+            HeadlessViewHost.RunDispatcherJobs();
+        }
+        else
+        {
+            host.PressKey(Key.Down, RawInputModifiers.None, PhysicalKey.ArrowDown, "");
+            window.KeyRelease(Key.Down, RawInputModifiers.None, PhysicalKey.ArrowDown, "");
+        }
+        object? selected = input.SelectedItem;
+        host.PressKey(Key.Z, RawInputModifiers.Control, PhysicalKey.Z, "z");
+        object? undone = input.SelectedItem;
+        string[] storedAfterUndo = [settings.NoneQuickRunTool, settings.SingleQuickRunTool, settings.MultipleQuickRunTool];
+        host.PressKey(Key.Y, RawInputModifiers.Control, PhysicalKey.Y, "y");
+
+        // Assert
+        selected.Should().Be("First");
+        undone.Should().Be("<Current Tool>");
+        storedAfterUndo[inputIndex].Should().Be("<Current Tool>");
+        input.SelectedItem.Should().Be("First");
+        string[] storedAfterRedo = [settings.NoneQuickRunTool, settings.SingleQuickRunTool, settings.MultipleQuickRunTool];
+        storedAfterRedo[inputIndex].Should().Be("First");
+    }
+
+    [TestMethod]
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure", Justification = "The feature factory is used only before the Preferences view model is disposed.")]
+    public async Task MainWindow_WithPreferences_UndoesAndRedoesThroughShortcutsWithoutProjectMenu()
+    {
+        // Arrange
+        DesktopApplicationSettings settings = new() { MaxBackupFiles = 25 };
+        using PreferencesViewModel preferences = new(settings, new TestFilePicker(),
+            new StubThemeService(), new UserNotificationService(), new QuickRunCommandRegistry(),
+            new TestHotkeyBindingCoordinator(), new TestBetterSaveOverrideService());
+        await using var viewModel = CreateMainViewModel(
+            [Registration("preferences", "Preferences", () => preferences)], settings: settings);
+        MainWindow window = new() { DataContext = viewModel };
+        using HeadlessViewHost host = HeadlessViewHost.ShowWindow(window);
+        preferences.MaxBackupFiles = 42;
+        preferences.UndoHistory.Capture();
+
+        // Act
+        window.KeyPress(Key.Z, RawInputModifiers.Control, PhysicalKey.Z, "z");
+        int undone = settings.MaxBackupFiles;
+        window.KeyPress(Key.Y, RawInputModifiers.Control, PhysicalKey.Y, "y");
+        int redone = settings.MaxBackupFiles;
+        window.KeyPress(Key.Z, RawInputModifiers.Control, PhysicalKey.Z, "z");
+
+        // Assert
+        undone.Should().Be(25);
+        redone.Should().Be(42);
+        settings.MaxBackupFiles.Should().Be(25);
+        viewModel.ProjectHistory.Should().BeSameAs(preferences.UndoHistory);
+        viewModel.HasProjectMenu.Should().BeFalse();
+        viewModel.ProjectMenuItems.Should().BeEmpty();
+        viewModel.SaveProjectCommand.CanExecute(null).Should().BeFalse();
+        viewModel.OpenProjectCommand.CanExecute(null).Should().BeFalse();
+        viewModel.NewProjectCommand.CanExecute(null).Should().BeFalse();
+        window.GetVisualDescendants().OfType<MenuItem>()
+            .Should().NotContain(item => Equals(item.Header, "_Edit"));
+    }
+
+    [TestMethod]
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure", Justification = "The feature factory is used only before the Preferences view model is disposed.")]
+    public async Task MainWindow_AfterPreferencesPathLosesFocus_UndoesAndRedoesTheWholeTextEdit()
+    {
+        // Arrange
+        DesktopApplicationSettings settings = new() { OsuPath = @"C:\osu!" };
+        using PreferencesViewModel preferences = new(settings, new TestFilePicker(),
+            new StubThemeService(), new UserNotificationService(), new QuickRunCommandRegistry(),
+            new TestHotkeyBindingCoordinator(), new TestBetterSaveOverrideService());
+        await using var viewModel = CreateMainViewModel(
+            [Registration("preferences", "Preferences", () => preferences)], settings: settings);
+        MainWindow window = new() { DataContext = viewModel };
+        using HeadlessViewHost host = HeadlessViewHost.ShowWindow(window);
+        TextBox path = window.GetVisualDescendants().OfType<PreferencesView>().Single()
+            .GetVisualDescendants().OfType<TextBox>().Single(textBox => textBox.Text == @"C:\osu!");
+
+        // Act
+        path.Focus();
+        host.PressKey(Key.A, RawInputModifiers.Control, PhysicalKey.A, "a");
+        host.TypeText(@"D:\Games\");
+        host.TypeText("osu!");
+        host.Find<TextBox>("ToolSearchBox").Focus();
+        HeadlessViewHost.RunDispatcherJobs();
+        string edited = settings.OsuPath;
+        host.PressKey(Key.Z, RawInputModifiers.Control, PhysicalKey.Z, "z");
+        string undone = settings.OsuPath;
+        string undoneText = path.Text!;
+        bool canUndoAgain = preferences.UndoHistory.CanUndo;
+        host.PressKey(Key.Y, RawInputModifiers.Control, PhysicalKey.Y, "y");
+
+        // Assert
+        edited.Should().Be(@"D:\Games\osu!");
+        undone.Should().Be(@"C:\osu!");
+        undoneText.Should().Be(@"C:\osu!");
+        canUndoAgain.Should().BeFalse();
+        settings.OsuPath.Should().Be(@"D:\Games\osu!");
+        path.Text.Should().Be(@"D:\Games\osu!");
+    }
+
     [TestMethod]
     [SuppressMessage("ReSharper", "AccessToDisposedClosure", Justification = "Command events are observed only during the view model's lifetime.")]
     public async Task InitializeAsync_WithDelayedRecovery_SubscribesToInitializedHistory()
@@ -1406,6 +1589,13 @@ public sealed class DesktopShellTests
         public void RunAll()
         {
             while (backgroundActions.Count > 0) backgroundActions.Dequeue()();
+        }
+    }
+
+    private sealed class StubThemeService : IApplicationThemeService
+    {
+        public void Apply(ApplicationTheme theme)
+        {
         }
     }
 

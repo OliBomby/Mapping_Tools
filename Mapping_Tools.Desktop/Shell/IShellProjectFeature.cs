@@ -6,10 +6,10 @@ namespace Mapping_Tools.Desktop.Shell;
 ///     Exposes a project-bearing feature to the heterogeneous desktop shell
 ///     without erasing the feature's project type.
 /// </summary>
-public interface IShellProjectFeature
+public interface IShellProjectFeature : IShellUndoFeature
 {
     /// <summary>Gets or sets this feature's in-memory project edit history after recovery loads.</summary>
-    IProjectUndoHistory? UndoHistory { get; set; }
+    new IProjectUndoHistory? UndoHistory { get; set; }
 
     /// <summary>
     ///     Gets optional feature-owned recovery files that receive the same

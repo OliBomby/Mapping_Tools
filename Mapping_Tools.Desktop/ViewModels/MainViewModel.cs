@@ -169,8 +169,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
     [NotifyPropertyChangedFor(nameof(ProjectHistory))]
     public partial ObservableObject? CurrentFeature { get; private set; }
 
-    /// <summary>Gets the active feature's project edit history, or null when the feature has no history.</summary>
-    public IProjectUndoHistory? ProjectHistory => (CurrentFeature as IShellProjectFeature)?.UndoHistory;
+    /// <summary>Gets the active feature's edit history, or null when the feature has no history.</summary>
+    public IProjectUndoHistory? ProjectHistory => (CurrentFeature as IShellUndoFeature)?.UndoHistory;
 
     /// <summary>Gets whether the selected feature is currently being prepared.</summary>
     [ObservableProperty]
@@ -382,8 +382,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
 
         List<ShellProjectMenuItem> items =
         [
-            new("_Undo", "Undo the last project edit (Ctrl+Z).", UndoCommand, MaterialIconKind.Undo),
-            new("_Redo", "Redo the last undone project edit (Ctrl+Y).", RedoCommand, MaterialIconKind.Redo),
+            new("_Undo", "Undo the last edit (Ctrl+Z).", UndoCommand, MaterialIconKind.Undo),
+            new("_Redo", "Redo the last undone edit (Ctrl+Y).", RedoCommand, MaterialIconKind.Redo),
             new("_Save project", "Save tool settings to file.", SaveProjectCommand, MaterialIconKind.ContentSave),
             new("_Open project", "Load tool settings from file.", OpenProjectCommand, MaterialIconKind.Folder),
             new("_New project", "Load the default tool settings.", NewProjectCommand, MaterialIconKind.RocketLaunch),
@@ -544,10 +544,10 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
 
     partial void OnCurrentFeatureChanged(ObservableObject? oldValue, ObservableObject? newValue)
     {
-        if (oldValue is IShellProjectFeature { UndoHistory: { } previous })
+        if (oldValue is IShellUndoFeature { UndoHistory: { } previous })
             previous.Changed -= OnUndoHistoryChanged;
 
-        if (newValue is IShellProjectFeature { UndoHistory: { } current })
+        if (newValue is IShellUndoFeature { UndoHistory: { } current })
             current.Changed += OnUndoHistoryChanged;
     }
 

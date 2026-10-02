@@ -109,7 +109,7 @@ public static class ProjectUndoWindowInput
         private void BeginKeyGesture(Key key)
         {
             // Hold one scope across key repeats. Text input is grouped by focus instead.
-            if (window.FocusManager.GetFocusedElement() is TextBox || keyGesture is not null
+            if (window.FocusManager.GetFocusedElement() is TextBox { IsReadOnly: false } || keyGesture is not null
                 || key is Key.LeftCtrl or Key.RightCtrl or Key.LeftShift or Key.RightShift
                     or Key.LeftAlt or Key.RightAlt or Key.LWin or Key.RWin) return;
 
@@ -145,7 +145,7 @@ public static class ProjectUndoWindowInput
 
         private void OnGotFocus(object? sender, RoutedEventArgs args)
         {
-            if (args.Source is not TextBox textBox || includeTextEdit?.Invoke(textBox) == false
+            if (args.Source is not TextBox { IsReadOnly: false } textBox || includeTextEdit?.Invoke(textBox) == false
                 || textEdits.ContainsKey(textBox) || getHistory() is not { } history) return;
 
             textEdits.Add(textBox, (history, history.BeginGesture()));

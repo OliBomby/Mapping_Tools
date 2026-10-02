@@ -207,7 +207,8 @@ public sealed class DialogUndoHistory : IProjectUndoHistory, IDisposable
         foreach (var property in GetStateProperties(value))
         {
             object? child = property.GetValue(value);
-            if (property.SetMethod?.IsPublic == true
+            if (property.SetMethod is { } setter
+                && (setter.IsPublic || property.IsDefined(typeof(UndoableAttribute)))
                 && (IsScalar(property.PropertyType) || child is not null && IsScalar(child.GetType())
                     || IsRestorableReference(property.PropertyType)))
                 values.Add(new ValueEntry(value, property, child));
@@ -286,11 +287,12 @@ public sealed class DialogUndoHistory : IProjectUndoHistory, IDisposable
 
     private static IEnumerable<PropertyInfo> GetStateProperties(object owner)
     {
-        return owner.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
+        return owner.GetType().GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
             .Where(property => property.CanRead && property.GetIndexParameters().Length == 0
                                && (owner is INotifyPropertyChanged
                                    ? property.IsDefined(typeof(UndoableAttribute))
-                                   : !property.IsDefined(typeof(JsonIgnoreAttribute))));
+                                   : property.GetMethod?.IsPublic == true
+                                     && !property.IsDefined(typeof(JsonIgnoreAttribute))));
     }
 
     private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs args)

@@ -16,6 +16,24 @@ namespace Mapping_Tools.Desktop.Tests.Services.Undo;
 [TestClass]
 public sealed class DialogUndoHistoryTests
 {
+    [TestMethod]
+    public void Undo_WithPrivateMarkedState_RestoresOnlyTheMarkedValue()
+    {
+        // Arrange
+        TestDialog dialog = new();
+        using DialogUndoHistory history = new(dialog, () => { });
+        dialog.SetPrivateState(1, 2);
+        history.Capture();
+
+        // Act
+        history.Undo();
+
+        // Assert
+        dialog.PrivateState.Should().Be((0, 2));
+        history.CanUndo.Should().BeFalse();
+        history.CanRedo.Should().BeTrue();
+    }
+
     [DataTestMethod]
     [DataRow(false)]
     [DataRow(true)]
@@ -187,6 +205,23 @@ public sealed class DialogUndoHistoryTests
 
     private sealed class TestDialog : ObservableObject
     {
+        [Undoable]
+        private int PrivateValue
+        {
+            get;
+            set => SetProperty(ref field, value);
+        }
+
+        private int PrivateUntracked { get; set; }
+
+        public (int Tracked, int Untracked) PrivateState => (PrivateValue, PrivateUntracked);
+
+        public void SetPrivateState(int tracked, int untracked)
+        {
+            PrivateValue = tracked;
+            PrivateUntracked = untracked;
+        }
+
         [Undoable]
         public int Value
         {

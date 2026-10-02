@@ -20,6 +20,168 @@ namespace Mapping_Tools.Desktop.Tests.ViewModels;
 [TestClass]
 public sealed class PreferencesViewModelTests
 {
+    [DataTestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public void Constructor_WithPersistedSongsPath_DoesNotReconfigureWatcherOrRecordAnEdit(bool overrideOsuSave)
+    {
+        // Arrange
+        var settings = CreateSettings();
+        settings.OverrideOsuSave = overrideOsuSave;
+        TestBetterSaveOverrideService watcher = new();
+
+        // Act
+        using var viewModel = CreateViewModel(settings, betterSaveOverride: watcher);
+
+        // Assert
+        viewModel.SongsPath.Should().Be(@"C:\osu!\Songs");
+        settings.SongsPath.Should().Be(@"C:\osu!\Songs");
+        watcher.Configurations.Should().BeEmpty();
+        viewModel.UndoHistory.CanUndo.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void SongsPath_AfterInvalidDraftReturnsToAcceptedValue_DoesNotReconfigureWatcher()
+    {
+        // Arrange
+        var settings = CreateSettings();
+        TestBetterSaveOverrideService watcher = new();
+        using var viewModel = CreateViewModel(settings, betterSaveOverride: watcher);
+        viewModel.SongsPath = string.Empty;
+
+        // Act
+        viewModel.SongsPath = @"C:\osu!\Songs";
+
+        // Assert
+        viewModel.HasErrors.Should().BeFalse();
+        settings.SongsPath.Should().Be(@"C:\osu!\Songs");
+        watcher.Configurations.Should().BeEmpty();
+    }
+
+    [TestMethod]
+    public void Undo_AfterGroupedPreferenceChanges_RestoresSettingsAndLiveServices()
+    {
+        // Arrange
+        var settings = CreateSettings();
+        RecordingThemeService themes = new();
+        TestHotkeyBindingCoordinator bindings = new();
+        TestBetterSaveOverrideService watcher = new();
+        using var viewModel = CreateViewModel(settings, themeService: themes,
+            hotkeyBindings: bindings, betterSaveOverride: watcher);
+        using (viewModel.UndoHistory.BeginEdit())
+        {
+            viewModel.Theme = ApplicationTheme.Light;
+            viewModel.QuickRunHotkey = new HotkeySettings(90, 6);
+            viewModel.QuickUndoHotkey = new HotkeySettings(89, 6);
+            viewModel.BetterSaveHotkey = new HotkeySettings(88, 6);
+            viewModel.SongsPath = @"D:\Songs";
+            viewModel.OverrideOsuSave = true;
+            viewModel.MaxBackupFiles = 42;
+            viewModel.MakePeriodicBackups = false;
+        }
+
+        // Act
+        viewModel.UndoHistory.Undo();
+
+        // Assert
+        settings.Theme.Should().Be(ApplicationTheme.Dark);
+        themes.AppliedThemes.Should().Equal(ApplicationTheme.Light, ApplicationTheme.Dark);
+        settings.QuickRunHotkey.Should().BeNull();
+        settings.QuickUndoHotkey.Should().BeNull();
+        settings.BetterSaveHotkey.Should().BeNull();
+        bindings.QuickRun.Should().BeNull();
+        bindings.QuickUndo.Should().BeNull();
+        bindings.BetterSave.Should().BeNull();
+        settings.SongsPath.Should().Be(@"C:\osu!\Songs");
+        settings.OverrideOsuSave.Should().BeFalse();
+        watcher.Configurations.Last().Should().Be((@"C:\osu!\Songs", false));
+        settings.MaxBackupFiles.Should().Be(25);
+        settings.MakePeriodicBackups.Should().BeTrue();
+        viewModel.UndoHistory.CanUndo.Should().BeFalse();
+        viewModel.UndoHistory.CanRedo.Should().BeTrue();
+    }
+
+    [DataTestMethod]
+    [DataRow(nameof(PreferencesViewModel.OsuPath))]
+    [DataRow(nameof(PreferencesViewModel.SongsPath))]
+    [DataRow(nameof(PreferencesViewModel.OsuConfigPath))]
+    [DataRow(nameof(PreferencesViewModel.BackupsPath))]
+    public void Undo_IntoInvalidPathDraft_RestoresAcceptedPathAndValidation(string propertyName)
+    {
+        // Arrange
+        var settings = CreateSettings();
+        TestBetterSaveOverrideService watcher = new();
+        using var viewModel = CreateViewModel(settings, betterSaveOverride: watcher);
+        var property = typeof(PreferencesViewModel).GetProperty(propertyName)!;
+        var setting = typeof(DesktopApplicationSettings).GetProperty(propertyName)!;
+        string original = (string)setting.GetValue(settings)!;
+        property.SetValue(viewModel, string.Empty);
+        viewModel.UndoHistory.Capture();
+        property.SetValue(viewModel, @"D:\NewPath");
+        viewModel.UndoHistory.Capture();
+
+        // Act
+        viewModel.UndoHistory.Undo();
+
+        // Assert
+        property.GetValue(viewModel).Should().Be(string.Empty);
+        setting.GetValue(settings).Should().Be(original);
+        viewModel.HasErrors.Should().BeTrue();
+        if (propertyName == nameof(PreferencesViewModel.SongsPath))
+            watcher.Configurations.Last().Should().Be((original, false));
+    }
+
+    [TestMethod]
+    public void Redo_AfterUndo_ReappliesLivePreferencesWithoutRecordingReplay()
+    {
+        // Arrange
+        var settings = CreateSettings();
+        RecordingThemeService themes = new();
+        TestHotkeyBindingCoordinator bindings = new();
+        using var viewModel = CreateViewModel(settings, themeService: themes, hotkeyBindings: bindings);
+        HotkeySettings hotkey = new(90, 6);
+        using (viewModel.UndoHistory.BeginEdit())
+        {
+            viewModel.Theme = ApplicationTheme.Light;
+            viewModel.QuickRunHotkey = hotkey;
+        }
+        viewModel.UndoHistory.Undo();
+
+        // Act
+        viewModel.UndoHistory.Redo();
+
+        // Assert
+        settings.Theme.Should().Be(ApplicationTheme.Light);
+        themes.AppliedThemes.Should().Equal(ApplicationTheme.Light, ApplicationTheme.Dark, ApplicationTheme.Light);
+        settings.QuickRunHotkey.Should().Be(hotkey);
+        bindings.QuickRun.Should().Be(hotkey);
+        viewModel.UndoHistory.CanRedo.Should().BeFalse();
+        viewModel.UndoHistory.CanUndo.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public void Activate_AfterLeavingPreferences_PreservesHistoryAndDiscardsRedoAfterNewEdit()
+    {
+        // Arrange
+        using var viewModel = CreateViewModel(CreateSettings());
+        viewModel.MaxBackupFiles = 30;
+        viewModel.UndoHistory.Capture();
+        viewModel.Deactivate();
+
+        // Act
+        viewModel.Activate();
+        viewModel.UndoHistory.Undo();
+        int undone = viewModel.MaxBackupFiles;
+        viewModel.MaxBackupFiles = 40;
+        viewModel.UndoHistory.Capture();
+
+        // Assert
+        undone.Should().Be(25);
+        viewModel.MaxBackupFiles.Should().Be(40);
+        viewModel.UndoHistory.CanRedo.Should().BeFalse();
+        viewModel.UndoHistory.CanUndo.Should().BeTrue();
+    }
+
     [TestMethod]
     public void Constructor_WithPersistedSettings_ExposesValuesWithoutSaving()
     {

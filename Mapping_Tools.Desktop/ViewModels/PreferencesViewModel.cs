@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.CompilerServices;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
@@ -11,6 +12,7 @@ using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.Settings.Models;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Shell;
 
 namespace Mapping_Tools.Desktop.ViewModels;
@@ -19,7 +21,7 @@ namespace Mapping_Tools.Desktop.ViewModels;
 ///     Edits the process-lifetime settings document and applies live-only side
 ///     effects without exposing Avalonia controls or storage-provider objects.
 /// </summary>
-public sealed partial class PreferencesViewModel : ObservableValidator, IShellFeatureActivation
+public sealed partial class PreferencesViewModel : ObservableValidator, IShellFeatureActivation, IShellUndoFeature, IDisposable
 {
     private const string current_tool = "<Current Tool>";
     private readonly IBetterSaveOverrideService betterSaveOverride;
@@ -30,28 +32,6 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
 
     private readonly DesktopApplicationSettings settings;
     private readonly IApplicationThemeService themeService;
-
-    /// <summary>Gets or edits the directory that receives beatmap backups.</summary>
-    [ObservableProperty] [NotifyDataErrorInfo] [Required(ErrorMessage = "Select a path.")]
-    private string backupsPath;
-
-    /// <summary>Gets or edits the retained-backup limit as a typed count.</summary>
-    [ObservableProperty] private int maxBackupFiles;
-
-    /// <summary>Gets or edits the current user's osu! configuration file.</summary>
-    [ObservableProperty] [NotifyDataErrorInfo] [Required(ErrorMessage = "Select a path.")]
-    private string osuConfigPath;
-
-    /// <summary>Gets or edits the directory containing the osu! executable.</summary>
-    [ObservableProperty] [NotifyDataErrorInfo] [Required(ErrorMessage = "Select a path.")]
-    private string osuPath;
-
-    /// <summary>Gets or edits the periodic-backup interval as a typed duration.</summary>
-    [ObservableProperty] private TimeSpan periodicBackupInterval;
-
-    /// <summary>Gets or edits osu!'s beatmap-library directory.</summary>
-    [ObservableProperty] [NotifyDataErrorInfo] [Required(ErrorMessage = "Select a path.")]
-    private string songsPath;
 
     /// <summary>
     ///     Creates an editor over the process-lifetime settings document.
@@ -79,15 +59,64 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
         this.quickRunRegistry = quickRunRegistry ?? throw new ArgumentNullException(nameof(quickRunRegistry));
         this.hotkeyBindings = hotkeyBindings ?? throw new ArgumentNullException(nameof(hotkeyBindings));
         this.betterSaveOverride = betterSaveOverride ?? throw new ArgumentNullException(nameof(betterSaveOverride));
-
-        osuPath = settings.OsuPath;
-        songsPath = settings.SongsPath;
-        osuConfigPath = settings.OsuConfigPath;
-        backupsPath = settings.BackupsPath;
-        maxBackupFiles = settings.MaxBackupFiles;
-        periodicBackupInterval = settings.PeriodicBackupInterval;
+        OsuPath = settings.OsuPath;
+        SongsPath = settings.SongsPath;
+        OsuConfigPath = settings.OsuConfigPath;
+        BackupsPath = settings.BackupsPath;
+        MaxBackupFiles = settings.MaxBackupFiles;
+        PeriodicBackupInterval = settings.PeriodicBackupInterval;
         RefreshQuickRunTools();
+        UndoHistory = new DialogUndoHistory(this, () => { });
     }
+
+    /// <summary>Gets the Preferences edit history retained for this app session.</summary>
+    public DialogUndoHistory UndoHistory { get; }
+
+    IProjectUndoHistory IShellUndoFeature.UndoHistory => UndoHistory;
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        UndoHistory.Dispose();
+    }
+
+    /// <summary>Gets or edits the directory that receives beatmap backups.</summary>
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Required(ErrorMessage = "Select a path.")]
+    [Undoable]
+    public partial string BackupsPath { get; set; }
+
+    /// <summary>Gets or edits the retained-backup limit as a typed count.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial int MaxBackupFiles { get; set; }
+
+    /// <summary>Gets or edits the current user's osu! configuration file.</summary>
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Required(ErrorMessage = "Select a path.")]
+    [Undoable]
+    public partial string OsuConfigPath { get; set; }
+
+    /// <summary>Gets or edits the directory containing the osu! executable.</summary>
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Required(ErrorMessage = "Select a path.")]
+    [Undoable]
+    public partial string OsuPath { get; set; }
+
+    /// <summary>Gets or edits the periodic-backup interval as a typed duration.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial TimeSpan PeriodicBackupInterval { get; set; }
+
+    /// <summary>Gets or edits osu!'s beatmap-library directory.</summary>
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Required(ErrorMessage = "Select a path.")]
+    [Undoable]
+    public partial string SongsPath { get; set; }
 
     /// <summary>Gets QuickRun targets that accept no selected hit objects.</summary>
     public IReadOnlyList<string> NoneQuickRunTools
@@ -111,6 +140,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
     } = [current_tool];
 
     /// <summary>Gets or sets whether tool runs create automatic safety backups.</summary>
+    [Undoable]
     public bool MakeBackups
     {
         get => settings.MakeBackups;
@@ -123,6 +153,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
     }
 
     /// <summary>Gets or sets whether the background backup timer is enabled.</summary>
+    [Undoable]
     public bool MakePeriodicBackups
     {
         get => settings.MakePeriodicBackups;
@@ -137,6 +168,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
     /// <summary>
     ///     Gets or sets whether general file pickers begin beside the current beatmap.
     /// </summary>
+    [Undoable]
     public bool CurrentBeatmapDefaultFolder
     {
         get => settings.CurrentBeatmapDefaultFolder;
@@ -153,6 +185,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
         Enum.GetValues<CurrentBeatmapFetchingMode>();
 
     /// <summary>Gets or sets how the current beatmap path is fetched.</summary>
+    [Undoable]
     public CurrentBeatmapFetchingMode CurrentBeatmapFetching
     {
         get => settings.CurrentBeatmapFetching;
@@ -165,6 +198,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
     }
 
     /// <summary>Gets or sets whether active osu!lazer external edits are detected automatically.</summary>
+    [Undoable]
     public bool AutoDetectLazerExternalEdit
     {
         get => settings.AutoDetectLazerExternalEdit;
@@ -181,6 +215,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
         Enum.GetValues<BeatmapLiveStateReadingMode>();
 
     /// <summary>Gets or sets how unsaved beatmap editor state is read.</summary>
+    [Undoable]
     public BeatmapLiveStateReadingMode BeatmapLiveStateReading
     {
         get => settings.BeatmapLiveStateReading;
@@ -197,6 +232,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
         Enum.GetValues<EditorReloadMode>();
 
     /// <summary>Gets or sets how the osu! editor is reloaded after a save.</summary>
+    [Undoable]
     public EditorReloadMode EditorReload
     {
         get => settings.EditorReload;
@@ -209,6 +245,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
     }
 
     /// <summary>Gets or sets whether Mapping Tools overwrites osu!'s own save with BetterSave.</summary>
+    [Undoable]
     public bool OverrideOsuSave
     {
         get => settings.OverrideOsuSave;
@@ -225,6 +262,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
     }
 
     /// <summary>Gets or sets whether ordinary Run actions use each feature's QuickRun path.</summary>
+    [Undoable]
     public bool AlwaysQuickRun
     {
         get => settings.AlwaysQuickRun;
@@ -237,6 +275,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
     }
 
     /// <summary>Gets or sets whether QuickRun routes by the live selected-object count.</summary>
+    [Undoable]
     public bool SmartQuickRunEnabled
     {
         get => settings.SmartQuickRunEnabled;
@@ -249,6 +288,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
     }
 
     /// <summary>Gets or sets the target used when no hit objects are selected.</summary>
+    [Undoable]
     public string NoneQuickRunTool
     {
         get => settings.NoneQuickRunTool;
@@ -259,6 +299,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
     }
 
     /// <summary>Gets or sets the target used when exactly one hit object is selected.</summary>
+    [Undoable]
     public string SingleQuickRunTool
     {
         get => settings.SingleQuickRunTool;
@@ -269,6 +310,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
     }
 
     /// <summary>Gets or sets the target used when multiple hit objects are selected.</summary>
+    [Undoable]
     public string MultipleQuickRunTool
     {
         get => settings.MultipleQuickRunTool;
@@ -279,6 +321,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
     }
 
     /// <summary>Gets or sets the live global QuickRun shortcut.</summary>
+    [Undoable]
     public HotkeySettings? QuickRunHotkey
     {
         get => settings.QuickRunHotkey;
@@ -290,6 +333,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
     }
 
     /// <summary>Gets or sets the live global QuickUndo shortcut.</summary>
+    [Undoable]
     public HotkeySettings? QuickUndoHotkey
     {
         get => settings.QuickUndoHotkey;
@@ -301,6 +345,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
     }
 
     /// <summary>Gets or sets the live global BetterSave shortcut.</summary>
+    [Undoable]
     public HotkeySettings? BetterSaveHotkey
     {
         get => settings.BetterSaveHotkey;
@@ -312,6 +357,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
     }
 
     /// <summary>Gets or sets the palette applied immediately to the live application.</summary>
+    [Undoable]
     public ApplicationTheme Theme
     {
         get => settings.Theme;
@@ -345,8 +391,10 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
 
     partial void OnSongsPathChanged(string value)
     {
+        string previousPath = settings.SongsPath;
         ApplyValidatedValue(value, static (settings, path) => settings.SongsPath = path, nameof(SongsPath));
-        if (!GetErrors(nameof(SongsPath)).Cast<object>().Any()) betterSaveOverride.Configure(value, settings.OverrideOsuSave);
+        if (settings.SongsPath != previousPath)
+            betterSaveOverride.Configure(settings.SongsPath, settings.OverrideOsuSave);
     }
 
     partial void OnOsuConfigPathChanged(string value)
@@ -484,19 +532,56 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
     private void SetQuickRunTarget(
         string current,
         string value,
-        Action<DesktopApplicationSettings, string> apply)
+        Action<DesktopApplicationSettings, string> apply,
+        [CallerMemberName] string propertyName = "")
     {
         if (string.IsNullOrWhiteSpace(value)) return;
 
-        SetProperty(current, value, settings, apply, false);
+        SetProperty(current, value, settings, apply, false, propertyName);
     }
 
     private void SetHotkey(
         HotkeySettings? current,
         HotkeySettings? value,
         Action<DesktopApplicationSettings, HotkeySettings?> apply,
-        Action<HotkeySettings?> applyBinding)
+        Action<HotkeySettings?> applyBinding,
+        [CallerMemberName] string propertyName = "")
     {
-        if (SetProperty(current, value, settings, apply, false)) applyBinding(value);
+        if (SetProperty(current, value, settings, apply, false, propertyName)) applyBinding(value);
+    }
+
+    // Invalid path text is editable state, but services must retain the last accepted path.
+    // Record that separately so undoing into an invalid draft also restores its accepted value.
+    [Undoable]
+    private string AcceptedOsuPath
+    {
+        get => settings.OsuPath;
+        set => settings.OsuPath = value;
+    }
+
+    [Undoable]
+    private string AcceptedSongsPath
+    {
+        get => settings.SongsPath;
+        set
+        {
+            if (settings.SongsPath == value) return;
+            settings.SongsPath = value;
+            betterSaveOverride.Configure(value, settings.OverrideOsuSave);
+        }
+    }
+
+    [Undoable]
+    private string AcceptedOsuConfigPath
+    {
+        get => settings.OsuConfigPath;
+        set => settings.OsuConfigPath = value;
+    }
+
+    [Undoable]
+    private string AcceptedBackupsPath
+    {
+        get => settings.BackupsPath;
+        set => settings.BackupsPath = value;
     }
 }
