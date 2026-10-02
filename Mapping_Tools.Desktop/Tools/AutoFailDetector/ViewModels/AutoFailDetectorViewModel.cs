@@ -5,20 +5,27 @@ using Mapping_Tools.Application.Execution.ToolExecution.Models;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Platform;
+using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Application.Tools.AutoFail;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.Tools.AutoFail.Models;
 using Mapping_Tools.Desktop.Controls.Timeline;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services.Dialogs;
+using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Tools.AutoFailDetector.Models;
 using Mapping_Tools.Desktop.ViewModels;
 
 namespace Mapping_Tools.Desktop.Tools.AutoFailDetector.ViewModels;
 
 /// <summary>Coordinates Auto-fail Detector options, execution, fixes, and timeline output.</summary>
-public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, IQuickRun
+public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, IQuickRun,
+    IShellProjectFeature<AutoFailDetectorProject>
 {
+    /// <inheritdoc />
+    public IProjectUndoHistory? UndoHistory { get; set; }
+
     private readonly IAutoFailService autoFail;
     private readonly IDialogService dialogs;
     private readonly IPlatformLauncher launcher;
@@ -54,34 +61,42 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
 
     /// <summary>Gets or sets whether confirmed unloading objects appear on the timeline.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool ShowUnloadingObjects { get; set; } = true;
 
     /// <summary>Gets or sets whether possible unloading objects appear on the timeline.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool ShowPotentialUnloadingObjects { get; set; }
 
     /// <summary>Gets or sets whether disrupting objects appear on the timeline.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool ShowPotentialDisruptors { get; set; }
 
     /// <summary>Gets or sets the simulated approach rate, or -1 to use the map value.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double ApproachRateOverride { get; set; } = -1;
 
     /// <summary>Gets or sets the simulated overall difficulty, or -1 to use the map value.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial double OverallDifficultyOverride { get; set; } = -1;
 
     /// <summary>Gets or sets the tolerated physics-update delay in milliseconds.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial int PhysicsUpdateLeniency { get; set; } = 9;
 
     /// <summary>Gets or sets whether analysis offers repair guidance.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool GetAutoFailFix { get; set; }
 
     /// <summary>Gets or sets whether an accepted repair may insert spinners automatically.</summary>
     [ObservableProperty]
+    [Undoable]
     public partial bool AutoPlaceFix { get; set; }
 
     /// <summary>Gets the final timestamp displayed by the result timeline.</summary>
@@ -95,6 +110,41 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
     /// <summary>Gets the filtered result markers displayed on the timeline.</summary>
     [ObservableProperty]
     public partial IReadOnlyList<TimelineMarker> Markers { get; private set; } = [];
+
+    ProjectDefinition<AutoFailDetectorProject> IShellProjectFeature<AutoFailDetectorProject>.ProjectDefinition { get; } = new(
+        "autofaildetectorproject.json",
+        "Auto-fail Detector Projects",
+        () => new AutoFailDetectorProject(),
+        "auto-fail-detector-project.json",
+        ToolConfigSchema.ForTool(AutoFailDetectorToolDefinition.Definition.Id));
+
+    AutoFailDetectorProject IShellProjectFeature<AutoFailDetectorProject>.Snapshot()
+    {
+        return new AutoFailDetectorProject
+        {
+            ShowUnloadingObjects = ShowUnloadingObjects,
+            ShowPotentialUnloadingObjects = ShowPotentialUnloadingObjects,
+            ShowPotentialDisruptors = ShowPotentialDisruptors,
+            ApproachRateOverride = ApproachRateOverride,
+            OverallDifficultyOverride = OverallDifficultyOverride,
+            PhysicsUpdateLeniency = PhysicsUpdateLeniency,
+            GetAutoFailFix = GetAutoFailFix,
+            AutoPlaceFix = AutoPlaceFix,
+        };
+    }
+
+    void IShellProjectFeature<AutoFailDetectorProject>.Install(AutoFailDetectorProject project)
+    {
+        ArgumentNullException.ThrowIfNull(project);
+        ShowUnloadingObjects = project.ShowUnloadingObjects;
+        ShowPotentialUnloadingObjects = project.ShowPotentialUnloadingObjects;
+        ShowPotentialDisruptors = project.ShowPotentialDisruptors;
+        ApproachRateOverride = project.ApproachRateOverride;
+        OverallDifficultyOverride = project.OverallDifficultyOverride;
+        PhysicsUpdateLeniency = project.PhysicsUpdateLeniency;
+        GetAutoFailFix = project.GetAutoFailFix;
+        AutoPlaceFix = project.AutoPlaceFix;
+    }
 
     /// <summary>Analyzes the current editor beatmap, falling back to the shell selection.</summary>
     /// <param name="cancellationToken">Cancels beatmap discovery or analysis.</param>

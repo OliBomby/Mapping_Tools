@@ -10,8 +10,12 @@ using Mapping_Tools.Desktop.Controls.Timeline;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services.Hosted;
 using Mapping_Tools.Desktop.Services.Dialogs;
+using Mapping_Tools.Desktop.Services.Undo;
+using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.AutoFailDetector.ViewModels;
+using Mapping_Tools.Desktop.Tools.AutoFailDetector.Models;
+using Mapping_Tools.Infrastructure.Projects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Tools.AutoFailDetector.ViewModels;
@@ -19,6 +23,107 @@ namespace Mapping_Tools.Desktop.Tests.Tools.AutoFailDetector.ViewModels;
 [TestClass]
 public sealed class AutoFailDetectorViewModelTests
 {
+    [TestMethod]
+    public void Install_WithSerializedSnapshot_RestoresEveryOption()
+    {
+        // Arrange
+        IShellProjectFeature<AutoFailDetectorProject> source = CreateViewModel(new RecordingAutoFailService());
+        AutoFailDetectorProject options = new()
+        {
+            ShowUnloadingObjects = false,
+            ShowPotentialUnloadingObjects = true,
+            ShowPotentialDisruptors = true,
+            ApproachRateOverride = 12.5,
+            OverallDifficultyOverride = 8.5,
+            PhysicsUpdateLeniency = 17,
+            GetAutoFailFix = true,
+            AutoPlaceFix = true,
+        };
+        source.Install(options);
+        VersionedProjectJsonSerializer serializer = new();
+        string json = serializer.Serialize(source.ProjectDefinition.ConfigSchema, source.Snapshot());
+        IShellProjectFeature<AutoFailDetectorProject> target = CreateViewModel(new RecordingAutoFailService());
+
+        // Act
+        target.Install(serializer.Deserialize<AutoFailDetectorProject>(target.ProjectDefinition.ConfigSchema, json));
+
+        // Assert
+        target.Snapshot().Should().BeEquivalentTo(options);
+        json.Should().NotContain("Markers").And.NotContain("HasRun").And.NotContain("EndTime");
+    }
+
+    [TestMethod]
+    public void Install_WithNewProject_RestoresFormDefaults()
+    {
+        // Arrange
+        var viewModel = CreateViewModel(new RecordingAutoFailService());
+        IShellProjectFeature<AutoFailDetectorProject> feature = viewModel;
+        var defaults = feature.Snapshot();
+        viewModel.ShowUnloadingObjects = false;
+        viewModel.ShowPotentialUnloadingObjects = true;
+        viewModel.ShowPotentialDisruptors = true;
+        viewModel.ApproachRateOverride = 12;
+        viewModel.OverallDifficultyOverride = 8;
+        viewModel.PhysicsUpdateLeniency = 20;
+        viewModel.GetAutoFailFix = true;
+        viewModel.AutoPlaceFix = true;
+
+        // Act
+        feature.Install(feature.ProjectDefinition.CreateProject());
+
+        // Assert
+        feature.Snapshot().Should().BeEquivalentTo(defaults);
+    }
+
+    [TestMethod]
+    [DataRow(nameof(AutoFailDetectorViewModel.ShowUnloadingObjects), false)]
+    [DataRow(nameof(AutoFailDetectorViewModel.ShowPotentialUnloadingObjects), true)]
+    [DataRow(nameof(AutoFailDetectorViewModel.ShowPotentialDisruptors), true)]
+    [DataRow(nameof(AutoFailDetectorViewModel.ApproachRateOverride), 12.5)]
+    [DataRow(nameof(AutoFailDetectorViewModel.OverallDifficultyOverride), 8.5)]
+    [DataRow(nameof(AutoFailDetectorViewModel.PhysicsUpdateLeniency), 17)]
+    [DataRow(nameof(AutoFailDetectorViewModel.GetAutoFailFix), true)]
+    [DataRow(nameof(AutoFailDetectorViewModel.AutoPlaceFix), true)]
+    public void Undo_WithChangedOption_RestoresOriginalAndAllowsRedo(string propertyName, object value)
+    {
+        // Arrange
+        var viewModel = CreateViewModel(new RecordingAutoFailService());
+        var property = typeof(AutoFailDetectorViewModel).GetProperty(propertyName)!;
+        object? original = property.GetValue(viewModel);
+        ProjectUndoHistory<AutoFailDetectorProject> history = new(viewModel, new VersionedProjectJsonSerializer());
+        viewModel.UndoHistory = history;
+        property.SetValue(viewModel, value);
+
+        // Act
+        history.Undo();
+
+        // Assert
+        property.GetValue(viewModel).Should().Be(original);
+        history.CanUndo.Should().BeFalse();
+        history.CanRedo.Should().BeTrue();
+        history.Redo();
+        property.GetValue(viewModel).Should().Be(value);
+    }
+
+    [TestMethod]
+    public async Task RunCommand_WithUndoHistory_DoesNotRecordAnalysisResults()
+    {
+        // Arrange
+        TestBeatmapWorkspace workspace = new();
+        workspace.SetSelection(["selected.osu"]);
+        var viewModel = CreateViewModel(new RecordingAutoFailService(), workspace);
+        ProjectUndoHistory<AutoFailDetectorProject> history = new(viewModel, new VersionedProjectJsonSerializer());
+        viewModel.UndoHistory = history;
+
+        // Act
+        await viewModel.RunCommand.ExecuteAsync(null);
+        history.Capture();
+
+        // Assert
+        viewModel.HasRun.Should().BeTrue();
+        history.CanUndo.Should().BeFalse();
+    }
+
     [TestMethod]
     public async Task RunCommand_WithWorkspaceMap_PublishesSuccessAndInstallsFilteredMarkers()
     {
