@@ -1,13 +1,12 @@
+using System.Diagnostics.CodeAnalysis;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.VisualTree;
-using System.Collections.ObjectModel;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
-using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Desktop.Tools.HitsoundStudio.Models;
 using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Shell;
@@ -16,7 +15,6 @@ using Mapping_Tools.Desktop.Tests.TestHelpers;
 using Mapping_Tools.Desktop.Tests.Tools.HitsoundStudio.ViewModels;
 using Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels.Adapters;
 using Mapping_Tools.Desktop.Tools.HitsoundStudio.Views;
-using Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Tools.HitsoundStudio.Views;
@@ -179,6 +177,7 @@ public sealed class HitsoundStudioViewTests
     }
 
     [TestMethod]
+    [SuppressMessage("ReSharper", "AccessToModifiedClosure")]
     public async Task AddButton_AcceptingImport_ShowsImportedLayerEditor()
     {
         // Arrange
