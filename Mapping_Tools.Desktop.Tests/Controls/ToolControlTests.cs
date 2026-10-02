@@ -7,6 +7,7 @@ using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Tools.ComboColourStudio;
 using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Converters;
+using Mapping_Tools.Desktop.Tests.TestHelpers;
 using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -149,6 +150,25 @@ public sealed class ToolControlTests
         blockedRunCount.Should().Be(0);
         DataValidationErrors.GetHasErrors(input).Should().BeFalse();
         correctedCanExecute.Should().BeTrue();
+        viewModel.RunCount.Should().Be(1);
+    }
+
+    [TestMethod]
+    public async Task RunButton_RealClick_ExecutesBoundCommandOnce()
+    {
+        // Arrange
+        var viewModel = new ValidationProbeViewModel(CreateExecutionService());
+        ToolRunButton runButton = new() { RunCommand = viewModel.RunCommand };
+        StackPanel view = new();
+        view.Children.Add(runButton);
+        using HeadlessViewHost host = HeadlessViewHost.Show(view);
+        Button button = runButton.GetVisualDescendants().OfType<Button>().Single();
+
+        // Act
+        host.Click(button);
+        await viewModel.RunCommand.ExecutionTask!;
+
+        // Assert
         viewModel.RunCount.Should().Be(1);
     }
 

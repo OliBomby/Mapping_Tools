@@ -440,11 +440,15 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     private void Raise()
     {
         using var edit = UndoHistory?.BeginEdit();
-        if (CurrentLayerIndex >= 0 && CurrentLayerIndex < TumourLayers.Count - 1)
-        {
-            TumourLayers.Move(CurrentLayerIndex, CurrentLayerIndex + 1);
-            CurrentLayerIndex++;
-        }
+        int sourceIndex = CurrentLayerIndex;
+        if (sourceIndex < 0 || sourceIndex >= TumourLayers.Count - 1) return;
+
+        ObservableTumourLayer selectedLayer = TumourLayers[sourceIndex];
+        int destinationIndex = sourceIndex + 1;
+        TumourLayers.Move(sourceIndex, destinationIndex);
+        CurrentLayerIndex = destinationIndex;
+        if (ReferenceEquals(TumourLayers[destinationIndex], selectedLayer))
+            OnPropertyChanged(nameof(CurrentLayer));
     }
 
     /// <summary>Moves the current layer one position toward the beginning.</summary>
@@ -452,11 +456,15 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     private void Lower()
     {
         using var edit = UndoHistory?.BeginEdit();
-        if (CurrentLayerIndex > 0)
-        {
-            TumourLayers.Move(CurrentLayerIndex, CurrentLayerIndex - 1);
-            CurrentLayerIndex--;
-        }
+        int sourceIndex = CurrentLayerIndex;
+        if (sourceIndex <= 0 || sourceIndex >= TumourLayers.Count) return;
+
+        ObservableTumourLayer selectedLayer = TumourLayers[sourceIndex];
+        int destinationIndex = sourceIndex - 1;
+        TumourLayers.Move(sourceIndex, destinationIndex);
+        CurrentLayerIndex = destinationIndex;
+        if (ReferenceEquals(TumourLayers[destinationIndex], selectedLayer))
+            OnPropertyChanged(nameof(CurrentLayer));
     }
 
     /// <summary>Replaces the current layer's random seed with a new seed.</summary>

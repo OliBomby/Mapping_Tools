@@ -1,13 +1,8 @@
 using CommunityToolkit.Mvvm.Input;
-using Mapping_Tools.Application.Execution.ToolExecution;
-using Mapping_Tools.Application.Execution.UserNotification;
-using Mapping_Tools.Application.Tools.MetadataManager;
-using Mapping_Tools.Core.Tools.MetadataManager;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.MetadataManager.Models;
-using Mapping_Tools.Desktop.Tools.MetadataManager.ViewModels;
 using Mapping_Tools.Infrastructure.Projects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -20,7 +15,7 @@ public sealed class MetadataManagerViewModelTests
     public void ComboColorPickerChange_Undo_RestoresPreviousColor()
     {
         // Arrange
-        var viewModel = CreateViewModel();
+        var viewModel = MetadataManagerViewModelTestFactory.Create();
         viewModel.AddComboColourCommand.Execute(null);
         var original = viewModel.ComboColours[0].Color;
         ProjectUndoHistory<MetadataManagerProject> history = new(viewModel, new VersionedProjectJsonSerializer());
@@ -47,7 +42,7 @@ public sealed class MetadataManagerViewModelTests
         {
             BeatmapPickerStartLocation = @"C:\Maps",
         };
-        var viewModel = CreateViewModel(filePicker: picker, workspace: workspace);
+        var viewModel = MetadataManagerViewModelTestFactory.Create(filePicker: picker, workspace: workspace);
         viewModel.ImportPath = @"E:\Source\source.osu";
 
         // Act
@@ -65,7 +60,7 @@ public sealed class MetadataManagerViewModelTests
     public async Task ImportCommand_WithExistingExportPath_PreservesExportPath()
     {
         // Arrange
-        var viewModel = CreateViewModel();
+        var viewModel = MetadataManagerViewModelTestFactory.Create();
         viewModel.ImportPath = "source.osu";
         viewModel.ExportPath = "existing-target.osu";
 
@@ -86,7 +81,7 @@ public sealed class MetadataManagerViewModelTests
         {
             BeatmapPickerStartLocation = @"C:\Maps",
         };
-        var viewModel = CreateViewModel(filePicker: picker, workspace: workspace);
+        var viewModel = MetadataManagerViewModelTestFactory.Create(filePicker: picker, workspace: workspace);
 
         // Act
         await ExecuteAsync(viewModel.BrowseImportCommand);
@@ -100,7 +95,7 @@ public sealed class MetadataManagerViewModelTests
     {
         // Arrange
         RecordingMetadataManagerService metadataManager = new();
-        var viewModel = CreateViewModel(metadataManager);
+        var viewModel = MetadataManagerViewModelTestFactory.Create(metadataManager);
         viewModel.ExportPath = "first.osu|second.osu";
         viewModel.Artist = "Wave Artist";
         viewModel.RomanisedArtist = "Wave Artist";
@@ -119,50 +114,9 @@ public sealed class MetadataManagerViewModelTests
         viewModel.IsRunning.Should().BeFalse();
     }
 
-    private static MetadataManagerViewModel CreateViewModel(
-        RecordingMetadataManagerService? metadataManager = null,
-        TestFilePicker? filePicker = null,
-        TestBeatmapWorkspace? workspace = null)
-    {
-        UserNotificationService notifications = new();
-        ToolExecutionService execution = new(
-            notifications,
-            TimeProvider.System);
-        return new MetadataManagerViewModel(
-            metadataManager ?? new RecordingMetadataManagerService(),
-            execution,
-            filePicker ?? new TestFilePicker(),
-            new TestCurrentBeatmapDialogService(),
-            workspace ?? new TestBeatmapWorkspace(),
-            notifications,
-            new TestApplicationDirectories());
-    }
-
     private static Task ExecuteAsync(IAsyncRelayCommand command)
     {
         return command.ExecuteAsync(null);
     }
 
-    private sealed class RecordingMetadataManagerService : IMetadataManagerService
-    {
-        public MetadataManagerServiceOptions? Options { get; private set; }
-
-        public Task<MetadataManagerEngineOptions> ImportAsync(
-            string path,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(new MetadataManagerEngineOptions());
-        }
-
-        public Task<MetadataManagerResult> ExportAsync(
-            MetadataManagerServiceOptions options,
-            IProgress<double>? progress = null,
-            CancellationToken cancellationToken = default)
-        {
-            Options = options;
-            progress?.Report(1);
-            string[] paths = options.ExportPath.Split('|', StringSplitOptions.RemoveEmptyEntries);
-            return Task.FromResult(new MetadataManagerResult(paths));
-        }
-    }
 }

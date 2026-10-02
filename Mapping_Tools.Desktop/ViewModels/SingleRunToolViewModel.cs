@@ -13,6 +13,7 @@ namespace Mapping_Tools.Desktop.ViewModels;
 /// </summary>
 public abstract class SingleRunToolViewModel : ObservableValidator
 {
+    private readonly object progressGate = new();
     private long runGeneration;
 
     /// <summary>
@@ -93,8 +94,12 @@ public abstract class SingleRunToolViewModel : ObservableValidator
         }
         finally
         {
-            Interlocked.Increment(ref runGeneration);
-            Progress = 0;
+            lock (progressGate)
+            {
+                Interlocked.Increment(ref runGeneration);
+                Progress = 0;
+            }
+
             IsRunning = false;
         }
     }
@@ -106,7 +111,11 @@ public abstract class SingleRunToolViewModel : ObservableValidator
         long runGeneration2 = Volatile.Read(ref runGeneration);
         return new Progress<ToolExecutionProgress>(value =>
         {
-            if (IsRunning && Volatile.Read(ref runGeneration) == runGeneration2) Progress = value.Progress * 100;
+            lock (progressGate)
+            {
+                if (IsRunning && Volatile.Read(ref runGeneration) == runGeneration2)
+                    Progress = value.Progress * 100;
+            }
         });
     }
 

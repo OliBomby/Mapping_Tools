@@ -1,10 +1,13 @@
 using System.Diagnostics.CodeAnalysis;
+using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Primitives;
+using Avalonia.Headless;
 using Avalonia.Input;
+using Avalonia.VisualTree;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Migration.Contracts;
@@ -17,15 +20,26 @@ using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.QuickRun.Models;
 using Mapping_Tools.Application.Settings.Contracts;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Application.Workspace.Models;
 using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services;
 using Mapping_Tools.Desktop.Services.Dialogs;
+using Mapping_Tools.Desktop.Services.Notifications;
 using Mapping_Tools.Desktop.Services.Undo;
+using Mapping_Tools.Desktop.Tests.Controls.FeatureLoading;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
+using Mapping_Tools.Desktop.Tests.TestHelpers;
+using Mapping_Tools.Desktop.Tests.Tools.HitsoundPreviewHelper.Views;
+using Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.ViewModels;
+using Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.ViewModels.Adapters;
+using Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.Models;
+using Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.Views;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Views;
+using Mapping_Tools.Desktop.Views.Dialogs;
+using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Infrastructure.Projects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -185,7 +199,7 @@ public sealed class DesktopShellTests
     }
 
     [TestMethod]
-    public async Task MainWindow_ControlZ_UndoesCurrentProject()
+    public async Task MainWindow_ControlZAndY_UndoAndRedoCurrentProject()
     {
         // Arrange
         StubProjectFeatureViewModel project = new();
@@ -195,25 +209,406 @@ public sealed class DesktopShellTests
         project.UndoHistory = history;
         project.Value = 1;
         MainWindow window = new() { DataContext = viewModel };
+        using HeadlessViewHost host = HeadlessViewHost.ShowWindow(window);
 
         // Act
-        window.RaiseEvent(new KeyEventArgs
-        {
-            RoutedEvent = InputElement.KeyDownEvent,
-            Source = window,
-            Key = Key.LeftCtrl,
-            KeyModifiers = KeyModifiers.Control,
-        });
-        window.RaiseEvent(new KeyEventArgs
-        {
-            RoutedEvent = InputElement.KeyDownEvent,
-            Source = window,
-            Key = Key.Z,
-            KeyModifiers = KeyModifiers.Control,
-        });
+        window.KeyPress(Key.Z, RawInputModifiers.Control, PhysicalKey.Z, "z");
+        int undone = project.Value;
+        window.KeyPress(Key.Y, RawInputModifiers.Control, PhysicalKey.Y, "y");
 
         // Assert
-        project.Value.Should().Be(0);
+        undone.Should().Be(0);
+        project.Value.Should().Be(1);
+    }
+
+    [TestMethod]
+    public async Task MainWindow_SearchTypingAndEnter_ActivatesHighlightedFeature()
+    {
+        // Arrange
+        StubFeatureViewModel first = new();
+        StubFeatureViewModel timing = new();
+        await using var viewModel = CreateMainViewModel(
+        [
+            Registration("first", "First", () => first),
+            Registration("timing", "Timing copier", () => timing),
+        ]);
+        MainWindow window = new() { DataContext = viewModel };
+        using HeadlessViewHost host = HeadlessViewHost.ShowWindow(window);
+        TextBox search = host.Find<TextBox>("ToolSearchBox");
+        host.Click(search);
+
+        // Act
+        host.TypeText("Timing");
+        host.PressKey(Key.Enter, RawInputModifiers.None, PhysicalKey.Enter, "\r");
+
+        // Assert
+        viewModel.SearchText.Should().Be("Timing");
+        viewModel.SelectedFeature.Should().BeSameAs(viewModel.FeatureItems.Single(item => item.Id == "timing"));
+        timing.ActivationCount.Should().Be(1);
+        first.ActivationCount.Should().Be(1);
+    }
+
+    [TestMethod]
+    public async Task MainWindow_FavoriteNavigationItems_AppearAlphabeticallyAndActivateOnClick()
+    {
+        // Arrange
+        var zulu = new StubFeatureViewModel();
+        var bravo = new StubFeatureViewModel();
+        DesktopApplicationSettings settings = new() { FavoriteTools = ["zulu", "bravo"] };
+        await using var viewModel = CreateMainViewModel(
+        [
+            Registration("zulu", "Zulu", () => zulu),
+            Registration("bravo", "Bravo", () => bravo),
+        ], settings);
+        MainWindow window = new() { DataContext = viewModel };
+        using HeadlessViewHost host = HeadlessViewHost.ShowWindow(window);
+        NavigationListBox navigation = host.Find<NavigationListBox>("ToolList");
+        ListBoxItem[] favoriteItems = navigation.GetVisualDescendants().OfType<ListBoxItem>()
+            .Where(item => item.DataContext is ShellFeatureItemViewModel feature && feature.IsFavorite)
+            .ToArray();
+        ListBoxItem zuluItem = favoriteItems.Single(item => ((ShellFeatureItemViewModel)item.DataContext!).Id == "zulu");
+
+        // Act
+        host.Click(zuluItem);
+        await HeadlessViewHost.DrainAsync(() => ReferenceEquals(viewModel.CurrentFeature, zulu)
+                                               && !viewModel.IsFeatureLoading);
+
+        // Assert
+        favoriteItems.Select(item => ((ShellFeatureItemViewModel)item.DataContext!).DisplayName)
+            .Should().Equal("Bravo", "Zulu");
+        viewModel.SelectedFeature.Should().BeSameAs(viewModel.FeatureItems.Single(item => item.Id == "zulu"));
+        zulu.ActivationCount.Should().Be(1);
+    }
+
+    [TestMethod]
+    public async Task MainWindow_ClosedNavigationDrawer_AllowsClickingActiveFeature()
+    {
+        // Arrange
+        var feature = new FirstFeatureViewModel();
+        await using var viewModel = CreateMainViewModel(
+        [Registration("feature", "Feature", () => feature)]);
+        MainWindow window = new() { DataContext = viewModel };
+        using HeadlessViewHost host = HeadlessViewHost.ShowWindow(window);
+        await HeadlessViewHost.DrainAsync(() => window.GetVisualDescendants()
+            .OfType<FirstFeatureView>().Any());
+        ToggleButton navigationToggle = window.GetVisualDescendants().OfType<ToggleButton>()
+            .Single(toggle => toggle.Classes.Contains("navigation-toggle"));
+        Button featureAction = window.GetVisualDescendants().OfType<Button>()
+            .Single(button => button.Name == "FeatureAction");
+
+        // Act
+        host.Click(navigationToggle);
+        bool drawerClosed = !viewModel.IsNavigationOpen;
+        host.Click(featureAction);
+
+        // Assert
+        drawerClosed.Should().BeTrue();
+        featureAction.Bounds.Width.Should().BeGreaterThan(0);
+        feature.ActionCount.Should().Be(1);
+    }
+
+    [TestMethod]
+    public async Task MainWindow_ProjectMenuUndoAndRedo_UseTheActiveProjectHistory()
+    {
+        // Arrange
+        StubProjectFeatureViewModel project = new();
+        ProjectUndoHistory<StubProject> history = new(project, new VersionedProjectJsonSerializer());
+        project.UndoHistory = history;
+        project.Value = 1;
+        await using var viewModel = CreateMainViewModel(
+            [Registration("project", "Project", () => project)]);
+        MainWindow window = new() { DataContext = viewModel };
+        using HeadlessViewHost host = HeadlessViewHost.ShowWindow(window);
+        MenuItem projectMenu = window.GetVisualDescendants().OfType<MenuItem>()
+            .Single(item => Equals(item.Header, "_Project"));
+
+        // Act
+        host.Click(projectMenu);
+        MenuItem undoItem = window.GetVisualDescendants().OfType<MenuItem>()
+            .Single(item => Equals(item.Header, "_Undo"));
+        host.Click(undoItem);
+        int undone = project.Value;
+        host.Click(projectMenu);
+        MenuItem redoItem = window.GetVisualDescendants().OfType<MenuItem>()
+            .Single(item => Equals(item.Header, "_Redo"));
+        host.Click(redoItem);
+
+        // Assert
+        undone.Should().Be(0);
+        project.Value.Should().Be(1);
+        history.CanUndo.Should().BeTrue();
+        history.CanRedo.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public async Task MainWindow_HitsoundPreviewGridNameEdit_UsesActiveProjectHistory()
+    {
+        // Arrange
+        HitsoundPreviewHelperViewModel feature = HitsoundPreviewHelperViewModelTestFactory.CreateForShell();
+        IShellProjectFeature<HitsoundPreviewHelperProject> projectFeature = feature;
+        typeof(ObservableHitsoundZone).GetProperty(nameof(ObservableHitsoundZone.Name))!
+            .IsDefined(typeof(UndoableAttribute), true).Should().BeTrue();
+        await using var viewModel = CreateMainViewModelForFeature(
+            Registration("hitsound-preview", "Hitsound Preview", () => feature),
+            new VersionedProjectJsonSerializer());
+        MainWindow window = new() { DataContext = viewModel };
+        using HeadlessViewHost host = HeadlessViewHost.ShowWindow(window);
+        await HeadlessViewHost.DrainAsync(() => window.GetVisualDescendants().OfType<HitsoundPreviewHelperView>().Any());
+        viewModel.ProjectHistory.Should().BeSameAs(feature.UndoHistory);
+
+        // Act
+        host.Click(host.Find<Control>("AddButton"));
+        await HeadlessViewHost.DrainAsync(() => feature.UndoHistory?.CanUndo == true);
+        ObservableHitsoundZone zone = feature.Items.Single();
+        int itemCountAfterAdd = feature.Items.Count;
+        string originalName = zone.Name;
+        VersionedProjectJsonSerializer serializer = new();
+        string serializedBeforeNameEdit = serializer.Serialize(projectFeature.ProjectDefinition.ConfigSchema, projectFeature.Snapshot());
+        int zoneNameChanges = 0;
+        zone.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName == nameof(ObservableHitsoundZone.Name)) zoneNameChanges++;
+        };
+        DataGrid grid = window.GetVisualDescendants().OfType<DataGrid>().Single();
+        DataGridCell nameCell = grid.GetVisualDescendants().OfType<DataGridCell>()
+            .Where(cell => ReferenceEquals(cell.DataContext, zone) && cell.IsVisible && cell.Bounds.Width > 0)
+            .OrderBy(cell => cell.Bounds.X)
+            .First();
+        host.Click(nameCell.GetVisualDescendants().OfType<TextBlock>().Single());
+        TextBox editor = nameCell.GetVisualDescendants().OfType<TextBox>()
+            .Single(textBox => textBox.IsVisible && textBox.Bounds.Width > 0);
+        bool editorFocused = editor.Focus();
+        host.PressKey(Key.A, RawInputModifiers.Control, PhysicalKey.A, "a");
+        host.TypeText("edited from the shell grid");
+        host.Click(grid.GetVisualDescendants().OfType<DataGridCell>()
+            .Where(cell => ReferenceEquals(cell.DataContext, zone) && cell.IsVisible && cell.Bounds.Width > 0)
+            .OrderBy(cell => cell.Bounds.X)
+            .ElementAt(1));
+        int zoneNameChangesAfterEdit = zoneNameChanges;
+        string editedZoneName = projectFeature.Snapshot().Items.Single().Name;
+        string serializedAfterNameEdit = serializer.Serialize(projectFeature.ProjectDefinition.ConfigSchema, projectFeature.Snapshot());
+        bool serializedProjectChangedAfterEdit = serializedAfterNameEdit != serializedBeforeNameEdit;
+        host.Click(window.GetVisualDescendants().OfType<MenuItem>()
+            .Single(item => Equals(item.Header, "_Project")));
+        host.Click(window.GetVisualDescendants().OfType<MenuItem>()
+            .Single(item => Equals(item.Header, "_Undo")));
+        string undoneName = feature.Items.Single().Name;
+        await HeadlessViewHost.DrainAsync(() => grid.GetVisualDescendants().OfType<DataGridCell>()
+            .Any(cell => cell.DataContext is ObservableHitsoundZone current
+                         && current.Name == originalName
+                         && cell.GetVisualDescendants().OfType<TextBlock>().Any(textBlock =>
+                             textBlock.IsEffectivelyVisible && textBlock.Text == originalName)));
+        host.Click(window.GetVisualDescendants().OfType<MenuItem>()
+            .Single(item => Equals(item.Header, "_Project")));
+        host.Click(window.GetVisualDescendants().OfType<MenuItem>()
+            .Single(item => Equals(item.Header, "_Redo")));
+        await HeadlessViewHost.DrainAsync(() => grid.GetVisualDescendants().OfType<DataGridCell>()
+            .Any(cell => cell.DataContext is ObservableHitsoundZone current
+                         && current.Name == "edited from the shell grid"
+                         && cell.GetVisualDescendants().OfType<TextBlock>()
+                             .Any(textBlock => textBlock.IsEffectivelyVisible
+                                               && textBlock.Text == "edited from the shell grid")));
+
+        // Assert
+        itemCountAfterAdd.Should().Be(1);
+        editorFocused.Should().BeTrue();
+        zoneNameChangesAfterEdit.Should().BeGreaterThan(0);
+        editedZoneName.Should().Be("edited from the shell grid");
+        serializedProjectChangedAfterEdit.Should().BeTrue();
+        undoneName.Should().Be(originalName);
+        feature.Items.Single().Name.Should().Be("edited from the shell grid");
+    }
+
+    [TestMethod]
+    [SuppressMessage(
+        "ReSharper",
+        "AccessToDisposedClosure",
+        Justification = "The observer is used only while this test's view model is alive.")]
+    public async Task MainWindow_SwitchingBetweenProjectFeatures_KeepsProjectMenuAvailable()
+    {
+        // Arrange
+        var firstProject = new StubProjectFeatureViewModel();
+        var secondProject = new StubProjectFeatureViewModel();
+        await using var viewModel = CreateMainViewModel(
+        [
+            Registration("first-project", "First project", () => firstProject),
+            Registration("second-project", "Second project", () => secondProject),
+        ]);
+        List<bool> menuAvailability = [];
+        viewModel.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName == nameof(MainViewModel.HasProjectMenu))
+                menuAvailability.Add(viewModel.HasProjectMenu);
+        };
+        MainWindow window = new() { DataContext = viewModel };
+        using HeadlessViewHost host = HeadlessViewHost.ShowWindow(window);
+        NavigationListBox navigation = host.Find<NavigationListBox>("ToolList");
+        ListBoxItem secondProjectItem = navigation.GetVisualDescendants().OfType<ListBoxItem>()
+            .Single(item => item.DataContext is ShellFeatureItemViewModel feature
+                            && feature.Id == "second-project");
+
+        // Act
+        host.Click(secondProjectItem);
+        await HeadlessViewHost.DrainAsync(() => ReferenceEquals(viewModel.CurrentFeature, secondProject)
+                                               && !viewModel.IsFeatureLoading);
+        MenuItem projectMenu = window.GetVisualDescendants().OfType<MenuItem>()
+            .Single(item => Equals(item.Header, "_Project"));
+
+        // Assert
+        menuAvailability.Should().NotContain(false);
+        viewModel.HasProjectMenu.Should().BeTrue();
+        projectMenu.IsVisible.Should().BeTrue();
+        projectMenu.IsEnabled.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task MainWindow_FileMenuOpenCurrentBeatmap_FetchesAndSelectsEditorPath()
+    {
+        // Arrange
+        TestCurrentBeatmapDialogService currentBeatmap = new() { Path = "C:\\maps\\current.osu" };
+        TestBeatmapWorkspace workspace = new();
+        await using var viewModel = CreateMainViewModel(
+            currentBeatmapDialog: currentBeatmap,
+            beatmapWorkspace: workspace);
+        MainWindow window = new() { DataContext = viewModel };
+        using HeadlessViewHost host = HeadlessViewHost.ShowWindow(window);
+        MenuItem fileMenu = window.GetVisualDescendants().OfType<MenuItem>()
+            .Single(item => Equals(item.Header, "_File"));
+
+        // Act
+        host.Click(fileMenu);
+        MenuItem openCurrentBeatmap = window.GetVisualDescendants().OfType<MenuItem>()
+            .Single(item => Equals(item.Header, "_Open current beatmap"));
+        host.Click(openCurrentBeatmap);
+        await HeadlessViewHost.DrainAsync(() => currentBeatmap.FetchCount == 1);
+
+        // Assert
+        currentBeatmap.FetchCount.Should().Be(1);
+        workspace.SelectedPaths.Should().Equal("C:\\maps\\current.osu");
+        workspace.LastSelectionSource.Should().Be(BeatmapSelectionSource.CurrentEditor);
+    }
+
+    [TestMethod]
+    public async Task MainWindow_FileMenuOpenCurrentBeatmap_WhenLookupFails_ShowsOriginalProductionDialog()
+    {
+        // Arrange
+        RecordingCurrentBeatmapLocator locator = new()
+        {
+            Failure = new InvalidOperationException("The editor state is unavailable."),
+        };
+        UserNotificationService notifications = new();
+        CurrentBeatmapDialogService currentBeatmap = new(
+            locator,
+            new DialogService(),
+            new PhysicalBeatmapsetFileSystem(),
+            notifications);
+        TestBeatmapWorkspace workspace = new();
+        await using var viewModel = CreateMainViewModel(
+            currentBeatmapDialog: currentBeatmap,
+            beatmapWorkspace: workspace);
+        MainWindow window = new() { DataContext = viewModel };
+        IClassicDesktopStyleApplicationLifetime lifetime =
+            Avalonia.Application.Current!.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime
+            ?? throw new InvalidOperationException("The headless test application has no classic desktop lifetime.");
+        Window? previousMainWindow = lifetime.MainWindow;
+        lifetime.MainWindow = window;
+        HeadlessViewHost host = HeadlessViewHost.ShowWindow(window);
+
+        try
+        {
+            // Act
+            OpenCurrentBeatmapFromFileMenu(host, window);
+            Task openTask = viewModel.Workspace.OpenCurrentBeatmapCommand.ExecutionTask!;
+            HeadlessViewHost.PumpDispatcherUntil(() => lifetime.Windows.OfType<MessageDialog>()
+                .Any(dialog => dialog.IsVisible));
+            MessageDialog dialog = lifetime.Windows.OfType<MessageDialog>().Single(candidate => candidate.IsVisible);
+            using HeadlessViewHost dialogHost = HeadlessViewHost.Attach(dialog);
+            string displayedError = dialog.GetVisualDescendants().OfType<TextBlock>()
+                .Single(textBlock => textBlock.Text == "The editor state is unavailable.").Text!;
+            dialogHost.Click(dialog.GetVisualDescendants().OfType<Button>()
+                .Single(button => button.Content?.ToString() == "OK"));
+            HeadlessViewHost.PumpDispatcherUntil(() => openTask.IsCompleted);
+            await openTask;
+
+            // Assert
+            displayedError.Should().Be("The editor state is unavailable.");
+            dialog.Title.Should().Be("Current beatmap unavailable");
+            locator.FindCount.Should().Be(1);
+            workspace.SelectedPaths.Should().BeEmpty();
+        }
+        finally
+        {
+            host.Dispose();
+            lifetime.MainWindow = previousMainWindow;
+        }
+    }
+
+    [TestMethod]
+    public async Task MainWindow_FileMenuOpenCurrentBeatmap_WhenSelectedFileIsMissing_ShowsWarningSnackbar()
+    {
+        // Arrange
+        string missingPath = Path.Combine(Path.GetTempPath(), $"mapping-tools-missing-{Guid.NewGuid():N}.osu");
+        RecordingCurrentBeatmapLocator locator = new(missingPath);
+        UserNotificationService notifications = new();
+        CurrentBeatmapDialogService currentBeatmap = new(
+            locator,
+            new DialogService(),
+            new PhysicalBeatmapsetFileSystem(),
+            notifications);
+        TestBeatmapWorkspace workspace = new();
+        await using var viewModel = CreateMainViewModel(
+            currentBeatmapDialog: currentBeatmap,
+            notifications: notifications,
+            beatmapWorkspace: workspace);
+        MainWindow window = new() { DataContext = viewModel };
+        IClassicDesktopStyleApplicationLifetime lifetime =
+            Avalonia.Application.Current!.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime
+            ?? throw new InvalidOperationException("The headless test application has no classic desktop lifetime.");
+        Window? previousMainWindow = lifetime.MainWindow;
+        lifetime.MainWindow = window;
+        HeadlessViewHost host = HeadlessViewHost.ShowWindow(window);
+        NotificationPresenter presenter = new(notifications, new TestDialogService(), window);
+
+        try
+        {
+            await presenter.StartAsync(CancellationToken.None);
+
+            // Act
+            OpenCurrentBeatmapFromFileMenu(host, window);
+            Task openTask = viewModel.Workspace.OpenCurrentBeatmapCommand.ExecutionTask!;
+            HeadlessViewHost.PumpDispatcherUntil(() => openTask.IsCompleted);
+            await openTask;
+            await HeadlessViewHost.DrainAsync(() => window.GetVisualDescendants().OfType<TextBlock>()
+                .Any(textBlock => textBlock.IsEffectivelyVisible
+                                  && textBlock.Text is { } text
+                                  && text.Contains(missingPath, StringComparison.Ordinal)));
+
+            // Assert
+            locator.FindCount.Should().Be(1);
+            workspace.SelectedPaths.Should().BeEmpty();
+            window.GetVisualDescendants().OfType<TextBlock>()
+                .Should().Contain(textBlock => textBlock.IsEffectivelyVisible
+                                               && textBlock.Text != null
+                                               && textBlock.Text.Contains(missingPath, StringComparison.Ordinal));
+        }
+        finally
+        {
+            try
+            {
+                await presenter.StopAsync(CancellationToken.None);
+            }
+            finally
+            {
+                try
+                {
+                    host.Dispose();
+                }
+                finally
+                {
+                    lifetime.MainWindow = previousMainWindow;
+                }
+            }
+        }
     }
 
     [TestMethod]
@@ -231,30 +626,37 @@ public sealed class DesktopShellTests
             .WithMessage("*same*registered more than once*");
     }
 
-    [TestMethod]
-    public void MainViewModel_SearchPartialExactAndClear_FiltersRegisteredFeatures()
+    [DataTestMethod]
+    [DataRow("cop", "timing")]
+    [DataRow("Get started", "get-started")]
+    public void MainViewModel_SearchText_FiltersRegisteredFeatures(string searchText, string expectedFeatureId)
     {
         // Arrange
         using var viewModel = CreateMainViewModel(
             [Registration("get-started", "Get started"), Registration("timing", "Timing copier")]);
 
         // Act
+        viewModel.SearchText = searchText;
+        string[] visibleFeatureIds = viewModel.VisibleFeatures.Select(item => item.Id).ToArray();
+
+        // Assert
+        visibleFeatureIds.Should().Equal(expectedFeatureId);
+    }
+
+    [TestMethod]
+    public void MainViewModel_ClearSearchText_ShowsAllRegisteredFeatures()
+    {
+        // Arrange
+        using var viewModel = CreateMainViewModel(
+            [Registration("get-started", "Get started"), Registration("timing", "Timing copier")]);
         viewModel.SearchText = "cop";
-
-        // Assert
-        viewModel.VisibleFeatures.Select(item => item.Id).Should().Equal("timing");
-
-        // Act
-        viewModel.SearchText = "Get started";
-
-        // Assert
-        viewModel.VisibleFeatures.Select(item => item.Id).Should().Equal("get-started");
 
         // Act
         viewModel.SearchText = string.Empty;
+        string[] visibleFeatureIds = viewModel.VisibleFeatures.Select(item => item.Id).ToArray();
 
         // Assert
-        viewModel.VisibleFeatures.Select(item => item.Id).Should().Equal("get-started", "timing");
+        visibleFeatureIds.Should().Equal("get-started", "timing");
     }
 
     [TestMethod]
@@ -516,15 +918,14 @@ public sealed class DesktopShellTests
 
         // Act
         quickItem.ActivateCommand.Execute(null);
+        string? commandIdAfterQuickToolActivation = quickRunRegistry.CurrentCommandId;
 
-        // Assert
-        quickRunRegistry.CurrentCommandId.Should().Be("quick");
-
-        // Act
         ordinaryItem.ActivateCommand.Execute(null);
+        string? commandIdAfterOrdinaryToolActivation = quickRunRegistry.CurrentCommandId;
 
         // Assert
-        quickRunRegistry.CurrentCommandId.Should().BeNull();
+        commandIdAfterQuickToolActivation.Should().Be("quick");
+        commandIdAfterOrdinaryToolActivation.Should().BeNull();
     }
 
     [TestMethod]
@@ -636,18 +1037,19 @@ public sealed class DesktopShellTests
 
         // Act
         second.ActivateCommand.Execute(null);
+        bool isLoadingWhileSecondFeatureIsQueued = viewModel.IsFeatureLoading;
+        bool hasProjectMenuWhileSecondFeatureIsQueued = viewModel.HasProjectMenu;
 
-        // Assert
-        viewModel.IsFeatureLoading.Should().BeTrue();
-        viewModel.HasProjectMenu.Should().BeTrue();
-
-        // Act
         dispatcher.RunAll();
+        bool isLoadingAfterSecondFeatureActivation = viewModel.IsFeatureLoading;
+        bool hasProjectMenuAfterSecondFeatureActivation = viewModel.HasProjectMenu;
 
         // Assert
-        viewModel.IsFeatureLoading.Should().BeFalse();
+        isLoadingWhileSecondFeatureIsQueued.Should().BeTrue();
+        hasProjectMenuWhileSecondFeatureIsQueued.Should().BeTrue();
+        isLoadingAfterSecondFeatureActivation.Should().BeFalse();
         viewModel.CurrentFeature.Should().BeOfType<StubProjectFeatureViewModel>();
-        viewModel.HasProjectMenu.Should().BeTrue();
+        hasProjectMenuAfterSecondFeatureActivation.Should().BeTrue();
     }
 
     [TestMethod]
@@ -901,6 +1303,8 @@ public sealed class DesktopShellTests
         IUiDispatcher? dispatcher = null,
         IApplicationDataMigrationService? migrationService = null,
         ISettingsService? settingsService = null,
+        ICurrentBeatmapDialogService? currentBeatmapDialog = null,
+        TestBeatmapWorkspace? beatmapWorkspace = null,
         bool initialize = true)
     {
         var resolvedSettings = settings ?? new DesktopApplicationSettings();
@@ -909,8 +1313,9 @@ public sealed class DesktopShellTests
         var resolvedQuickRunRegistry = quickRunRegistry ?? new QuickRunCommandRegistry();
         projectService ??= new RecordingProjectService();
         ImmediateTestDispatcher workspaceDispatcher = new();
+        var resolvedWorkspace = beatmapWorkspace ?? new TestBeatmapWorkspace();
         BeatmapWorkspaceViewModel workspace = new(
-            new TestBeatmapWorkspace(),
+            resolvedWorkspace,
             new TestBeatmapBackupService(),
             new TestQuickUndoCommandService(),
             new TestFilePicker(),
@@ -920,7 +1325,7 @@ public sealed class DesktopShellTests
             new TestDialogService(),
             resolvedNotifications,
             workspaceDispatcher,
-            new TestCurrentBeatmapDialogService());
+            currentBeatmapDialog ?? new TestCurrentBeatmapDialogService());
         MainViewModel viewModel = new(
             new ShellFeatureRegistry(registrations ?? [Registration("get-started", "Get started")]),
             resolvedQuickRunRegistry,
@@ -960,6 +1365,23 @@ public sealed class DesktopShellTests
             factory ?? (() => new StubFeatureViewModel()),
             horizontalScrollBarVisibility,
             verticalScrollBarVisibility);
+    }
+
+    private static MainViewModel CreateMainViewModelForFeature(
+        ShellFeatureRegistration registration,
+        IProjectSerializer projectSerializer)
+    {
+        return CreateMainViewModel([registration], projectSerializer: projectSerializer);
+    }
+
+    private static void OpenCurrentBeatmapFromFileMenu(HeadlessViewHost host, MainWindow window)
+    {
+        MenuItem fileMenu = window.GetVisualDescendants().OfType<MenuItem>()
+            .Single(item => Equals(item.Header, "_File"));
+        host.Click(fileMenu);
+        MenuItem openCurrentBeatmap = window.GetVisualDescendants().OfType<MenuItem>()
+            .Single(item => Equals(item.Header, "_Open current beatmap"));
+        host.Click(openCurrentBeatmap);
     }
 
     private static Task ExecuteAsync(IAsyncRelayCommand command)

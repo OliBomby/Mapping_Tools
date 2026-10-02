@@ -5,6 +5,7 @@ using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Tools.RhythmGuide;
 using Mapping_Tools.Core.Tools.RhythmGuide.Models;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
+using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.Services;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -120,7 +121,7 @@ public sealed class RhythmGuideViewModelTests
         UserNotificationService? notifications = null,
         TestBeatmapWorkspace? workspace = null,
         TestFileRevealService? fileReveal = null,
-        TestCurrentBeatmapDialogService? currentBeatmap = null)
+        ICurrentBeatmapDialogService? currentBeatmap = null)
     {
         notifications ??= new UserNotificationService();
         ToolExecutionService execution = new(

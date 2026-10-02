@@ -9,6 +9,7 @@ using Mapping_Tools.Core.Tools.AutoFail.Models;
 using Mapping_Tools.Desktop.Controls.Timeline;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services.Hosted;
+using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.AutoFailDetector.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -207,7 +208,7 @@ public sealed class AutoFailDetectorViewModelTests
         RecordingAutoFailService service,
         TestBeatmapWorkspace? workspace = null,
         string? currentPath = null,
-        TestDialogService? dialogs = null,
+        IDialogService? dialogs = null,
         IUserNotificationService? notifications = null)
     {
         var notificationService = notifications ?? new UserNotificationService();

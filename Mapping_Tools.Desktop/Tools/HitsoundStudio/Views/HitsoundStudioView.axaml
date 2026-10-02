@@ -31,22 +31,26 @@
             <Grid Grid.Column="0"
                   Margin="0,0,10,0"
                   RowDefinitions="*,Auto">
-                <ScrollViewer Grid.Row="0"
+                    <ScrollViewer x:Name="LayerEditorScrollViewer"
+                                  Grid.Row="0"
                               HorizontalAlignment="Stretch"
                               VerticalAlignment="Stretch"
                               HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Hidden">
-                    <StackPanel IsVisible="{Binding HasLayers}"
+                    <StackPanel x:Name="LayerEditor"
+                                IsVisible="{Binding HasLayers}"
                                 IsEnabled="{Binding HasLayers}"
                                 Margin="0,0,0,20">
                         <TextBlock FontSize="14"
                                    FontWeight="Bold"
                                    Text="General" />
-                        <TextBox Margin="0,5,0,0"
+                        <TextBox x:Name="NameEditor"
+                                 Margin="0,5,0,0"
                                  Text="{Binding EditName, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                  materialAssists:TextFieldAssist.Label="Name"
                                  ToolTip.Tip="The name of this hitsound layer." />
-                        <ComboBox Margin="0,5,0,0"
+                        <ComboBox x:Name="SampleSetEditor"
+                                  Margin="0,5,0,0"
                                   Cursor="Hand"
                                   ItemsSource="{Binding SampleSets}"
                                   SelectedItem="{Binding EditSampleSet, Mode=TwoWay}"
@@ -248,7 +252,8 @@
                                          materialAssists:TextFieldAssist.Label="Offset"
                                          ToolTip.Tip="Millisecond offset applied to imported events." />
                             </StackPanel>
-                            <Button Margin="0,20,0,0"
+                            <Button x:Name="ReloadButton"
+                                    Margin="0,20,0,0"
                                     FontSize="16"
                                     FontWeight="Bold"
                                     Content="Reload from source"
@@ -259,7 +264,7 @@
                 </ScrollViewer>
             </Grid>
 
-            <GridSplitter
+            <GridSplitter x:Name="LayerEditorSplitter"
                 Grid.Column="1"
                 Width="1"
                 Margin="0,10,0,10"
@@ -270,7 +275,8 @@
                 ResizeDirection="Columns"
                 ResizeBehavior="PreviousAndNext" />
 
-            <controls:MaterialGridListView Grid.Column="2"
+            <controls:MaterialGridListView x:Name="LayersList"
+                                           Grid.Column="2"
                                            Margin="10,0,0,0"
                                            ItemsSource="{Binding Layers}"
                                            SelectedItems="{Binding SelectedLayers, Mode=TwoWay}"
@@ -352,6 +358,7 @@
                 </materialDesign:FloatingButton>
                 <materialDesign:FloatingButton Classes="mini light no-transitions"
                                                Margin="5"
+                                               x:Name="RemoveButton"
                                                Command="{Binding RemoveCommand}"
                                                ToolTip.Tip="Remove selected layers.">
                     <materialIcons:MaterialIcon Width="24"
@@ -401,7 +408,8 @@
                                        Margin="0, 0, 0, 5"
                                        Text="Base beatmap:"
                                        ToolTip.Tip="Beatmap used as the export baseline and MIDI timing source." />
-                            <TextBox Grid.Column="1"
+                            <TextBox x:Name="BaseBeatmapEditor"
+                                     Grid.Column="1"
                                      Classes="compact"
                                      Margin="5,14,5,0"
                                      Text="{Binding BaseBeatmap, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"

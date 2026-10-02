@@ -1,20 +1,10 @@
 using Avalonia.Controls;
-using Mapping_Tools.Application.Abstractions;
-using Mapping_Tools.Application.Audio.Contracts;
-using Mapping_Tools.Application.Audio.Models;
-using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
-using Mapping_Tools.Application.Projects.Contracts;
-using Mapping_Tools.Application.Tools.HitsoundStudio.Contracts;
-using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
-using Mapping_Tools.Core.Audio;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
-using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
-using Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels;
 using Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels.Adapters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -27,10 +17,10 @@ public sealed class HitsoundStudioViewModelTests
     public void Constructor_DefaultSample_UsesAutomaticSampleSetAndInvariantVolume()
     {
         // Arrange
-        var viewModel = CreateViewModel(
-            new RecordingHitsoundStudioService(),
-            new RecordingAudioGenerator(),
-            new RecordingPlaybackService());
+        var viewModel = HitsoundStudioViewModelTestFactory.CreateViewModel(
+            new HitsoundStudioViewModelTestFactory.RecordingHitsoundStudioService(),
+            new HitsoundStudioViewModelTestFactory.RecordingAudioGenerator(),
+            new HitsoundStudioViewModelTestFactory.RecordingPlaybackService());
 
         // Act
         var defaultSample = viewModel.DefaultSample;
@@ -44,10 +34,10 @@ public sealed class HitsoundStudioViewModelTests
     public async Task PreviewCommand_WhenSupersededDuringGeneration_StopsStaleSessionAndKeepsLatestPlaying()
     {
         // Arrange
-        RecordingHitsoundStudioService service = new();
-        RecordingAudioGenerator audioGenerator = new();
-        RecordingPlaybackService playback = new();
-        var viewModel = CreateViewModel(service, audioGenerator, playback);
+        HitsoundStudioViewModelTestFactory.RecordingHitsoundStudioService service = new();
+        HitsoundStudioViewModelTestFactory.RecordingAudioGenerator audioGenerator = new();
+        HitsoundStudioViewModelTestFactory.RecordingPlaybackService playback = new();
+        var viewModel = HitsoundStudioViewModelTestFactory.CreateViewModel(service, audioGenerator, playback);
         ObservableHitsoundLayer layer = new(
             new HitsoundLayer(
                 "layer",
@@ -65,13 +55,13 @@ public sealed class HitsoundStudioViewModelTests
         audioGenerator.ReleaseFirstGeneration();
         await firstPreview;
         await secondPreview;
+        int[] stopCountsAfterPreviews = playback.Sessions.Select(session => session.StopCount).ToArray();
+
+        await viewModel.DisposeAsync();
 
         // Assert
         playback.Sessions.Should().HaveCount(2);
-        playback.Sessions[0].StopCount.Should().Be(1);
-        playback.Sessions[1].StopCount.Should().Be(0);
-
-        await viewModel.DisposeAsync();
+        stopCountsAfterPreviews.Should().Equal(1, 0);
         playback.Sessions[1].StopCount.Should().Be(1);
     }
 
@@ -79,7 +69,7 @@ public sealed class HitsoundStudioViewModelTests
     public void SetSelection_WithMixedLayerValues_ShowsNeutralEditorValues()
     {
         // Arrange
-        var (viewModel, _, _) = CreateMixedSelection();
+        var (viewModel, _, _) = HitsoundStudioViewModelTestFactory.CreateMixedSelection();
 
         // Act
         viewModel.SetSelection(viewModel.Layers);
@@ -99,7 +89,7 @@ public sealed class HitsoundStudioViewModelTests
     public void SetSelection_WithEquivalentTimeLists_ShowsCommonTimes()
     {
         // Arrange
-        var (viewModel, first, second) = CreateMixedSelection();
+        var (viewModel, first, second) = HitsoundStudioViewModelTestFactory.CreateMixedSelection();
         second.Times = first.Times.ToList();
 
         // Act
@@ -113,7 +103,7 @@ public sealed class HitsoundStudioViewModelTests
     public void SetSelection_WhenSelectionGrowsWithoutChangingFirstSelectedLayer_RefreshesEditorValues()
     {
         // Arrange
-        var (viewModel, first, second) = CreateMixedSelection();
+        var (viewModel, first, second) = HitsoundStudioViewModelTestFactory.CreateMixedSelection();
         viewModel.SetSelection([first]);
 
         // Act
@@ -128,7 +118,7 @@ public sealed class HitsoundStudioViewModelTests
     public void SelectedLayers_WhenCollectionChangesDirectly_RefreshesEditorState()
     {
         // Arrange
-        var (viewModel, first, _) = CreateMixedSelection();
+        var (viewModel, first, _) = HitsoundStudioViewModelTestFactory.CreateMixedSelection();
 
         // Act
         viewModel.SelectedLayers.Add(first);
@@ -143,7 +133,7 @@ public sealed class HitsoundStudioViewModelTests
     public void MoveSelectedLayers_WhenSelectedLayerMovesDown_PreservesSelection()
     {
         // Arrange
-        var (viewModel, first, second) = CreateMixedSelection();
+        var (viewModel, first, second) = HitsoundStudioViewModelTestFactory.CreateMixedSelection();
         viewModel.SetSelection([first]);
 
         // Act
@@ -158,10 +148,10 @@ public sealed class HitsoundStudioViewModelTests
     public void EditorColumnWidth_WhenLayersAreAbsentOrPresent_UsesCollapsedOrStarSizing()
     {
         // Arrange
-        var viewModel = CreateViewModel(
-            new RecordingHitsoundStudioService(),
-            new RecordingAudioGenerator(),
-            new RecordingPlaybackService());
+        var viewModel = HitsoundStudioViewModelTestFactory.CreateViewModel(
+            new HitsoundStudioViewModelTestFactory.RecordingHitsoundStudioService(),
+            new HitsoundStudioViewModelTestFactory.RecordingAudioGenerator(),
+            new HitsoundStudioViewModelTestFactory.RecordingPlaybackService());
         ObservableHitsoundLayer layer = new(new HitsoundLayer(
             "layer",
             SampleSet.Normal,
@@ -183,7 +173,7 @@ public sealed class HitsoundStudioViewModelTests
     public void EditSharedValues_WithMultipleSelectedLayers_UpdatesEveryLayer()
     {
         // Arrange
-        var (viewModel, first, second) = CreateMixedSelection();
+        var (viewModel, first, second) = HitsoundStudioViewModelTestFactory.CreateMixedSelection();
         viewModel.SetSelection(viewModel.Layers);
 
         // Act
@@ -216,11 +206,11 @@ public sealed class HitsoundStudioViewModelTests
     public async Task ReloadCommand_WhenSourceChangesTimes_RefreshesLayerAndEditorState()
     {
         // Arrange
-        RecordingHitsoundStudioService service = new();
-        var viewModel = CreateViewModel(
+        HitsoundStudioViewModelTestFactory.RecordingHitsoundStudioService service = new();
+        var viewModel = HitsoundStudioViewModelTestFactory.CreateViewModel(
             service,
-            new RecordingAudioGenerator(),
-            new RecordingPlaybackService());
+            new HitsoundStudioViewModelTestFactory.RecordingAudioGenerator(),
+            new HitsoundStudioViewModelTestFactory.RecordingPlaybackService());
         ObservableHitsoundLayer layer = new(new HitsoundLayer(
             "layer",
             SampleSet.Normal,
@@ -248,10 +238,10 @@ public sealed class HitsoundStudioViewModelTests
     {
         // Arrange
         TestCurrentBeatmapDialogService currentBeatmap = new() { Path = "current.osu" };
-        var viewModel = CreateViewModel(
-            new RecordingHitsoundStudioService(),
-            new RecordingAudioGenerator(),
-            new RecordingPlaybackService(),
+        var viewModel = HitsoundStudioViewModelTestFactory.CreateViewModel(
+            new HitsoundStudioViewModelTestFactory.RecordingHitsoundStudioService(),
+            new HitsoundStudioViewModelTestFactory.RecordingAudioGenerator(),
+            new HitsoundStudioViewModelTestFactory.RecordingPlaybackService(),
             currentBeatmap);
 
         // Act
@@ -270,10 +260,10 @@ public sealed class HitsoundStudioViewModelTests
         UserNotificationService notifications = new();
         List<UserNotification> published = [];
         notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
-        var viewModel = CreateViewModel(
-            new RecordingHitsoundStudioService(),
-            new RecordingAudioGenerator(),
-            new RecordingPlaybackService(),
+        var viewModel = HitsoundStudioViewModelTestFactory.CreateViewModel(
+            new HitsoundStudioViewModelTestFactory.RecordingHitsoundStudioService(),
+            new HitsoundStudioViewModelTestFactory.RecordingAudioGenerator(),
+            new HitsoundStudioViewModelTestFactory.RecordingPlaybackService(),
             currentBeatmap,
             notifications);
         viewModel.BaseBeatmap = "existing.osu";
@@ -296,10 +286,10 @@ public sealed class HitsoundStudioViewModelTests
         {
             BeatmapPickerStartLocation = @"C:\Maps",
         };
-        var viewModel = CreateViewModel(
-            new RecordingHitsoundStudioService(),
-            new RecordingAudioGenerator(),
-            new RecordingPlaybackService(),
+        var viewModel = HitsoundStudioViewModelTestFactory.CreateViewModel(
+            new HitsoundStudioViewModelTestFactory.RecordingHitsoundStudioService(),
+            new HitsoundStudioViewModelTestFactory.RecordingAudioGenerator(),
+            new HitsoundStudioViewModelTestFactory.RecordingPlaybackService(),
             workspace: workspace,
             filePicker: filePicker);
 
@@ -315,12 +305,12 @@ public sealed class HitsoundStudioViewModelTests
     public async Task ValidateSamplesCommand_WithInvalidLayers_ShowsAffectedLayerNames()
     {
         // Arrange
-        RecordingHitsoundStudioService service = new();
+        HitsoundStudioViewModelTestFactory.RecordingHitsoundStudioService service = new();
         TestDialogService dialogs = new();
-        var viewModel = CreateViewModel(
+        var viewModel = HitsoundStudioViewModelTestFactory.CreateViewModel(
             service,
-            new RecordingAudioGenerator(),
-            new RecordingPlaybackService(),
+            new HitsoundStudioViewModelTestFactory.RecordingAudioGenerator(),
+            new HitsoundStudioViewModelTestFactory.RecordingPlaybackService(),
             dialogs: dialogs);
         ObservableHitsoundLayer invalidLayer = new(new HitsoundLayer(
             "missing layer",
@@ -360,10 +350,10 @@ public sealed class HitsoundStudioViewModelTests
     {
         // Arrange
         TestDialogService dialogs = new();
-        var viewModel = CreateViewModel(
-            new RecordingHitsoundStudioService(),
-            new RecordingAudioGenerator(),
-            new RecordingPlaybackService(),
+        var viewModel = HitsoundStudioViewModelTestFactory.CreateViewModel(
+            new HitsoundStudioViewModelTestFactory.RecordingHitsoundStudioService(),
+            new HitsoundStudioViewModelTestFactory.RecordingAudioGenerator(),
+            new HitsoundStudioViewModelTestFactory.RecordingPlaybackService(),
             dialogs: dialogs);
 
         // Act
@@ -382,12 +372,12 @@ public sealed class HitsoundStudioViewModelTests
     public async Task ValidateSamplesCommand_WithSingleDecoderFailure_ShowsExceptionDetails()
     {
         // Arrange
-        RecordingHitsoundStudioService service = new();
+        HitsoundStudioViewModelTestFactory.RecordingHitsoundStudioService service = new();
         TestDialogService dialogs = new();
-        var viewModel = CreateViewModel(
+        var viewModel = HitsoundStudioViewModelTestFactory.CreateViewModel(
             service,
-            new RecordingAudioGenerator(),
-            new RecordingPlaybackService(),
+            new HitsoundStudioViewModelTestFactory.RecordingAudioGenerator(),
+            new HitsoundStudioViewModelTestFactory.RecordingPlaybackService(),
             dialogs: dialogs);
         ObservableHitsoundLayer layer = new(new HitsoundLayer(
             "broken layer",
@@ -418,12 +408,12 @@ public sealed class HitsoundStudioViewModelTests
     public async Task ValidateSamplesCommand_WithMultipleDecoderFailures_ShowsFirstExceptionDetails()
     {
         // Arrange
-        RecordingHitsoundStudioService service = new();
+        HitsoundStudioViewModelTestFactory.RecordingHitsoundStudioService service = new();
         TestDialogService dialogs = new();
-        var viewModel = CreateViewModel(
+        var viewModel = HitsoundStudioViewModelTestFactory.CreateViewModel(
             service,
-            new RecordingAudioGenerator(),
-            new RecordingPlaybackService(),
+            new HitsoundStudioViewModelTestFactory.RecordingAudioGenerator(),
+            new HitsoundStudioViewModelTestFactory.RecordingPlaybackService(),
             dialogs: dialogs);
         ObservableHitsoundLayer firstLayer = new(new HitsoundLayer(
             "first broken layer",
@@ -458,274 +448,5 @@ public sealed class HitsoundStudioViewModelTests
             .And.NotContain("second decoder failure");
     }
 
-    private static (HitsoundStudioViewModel ViewModel, ObservableHitsoundLayer First, ObservableHitsoundLayer Second)
-        CreateMixedSelection()
-    {
-        var viewModel = CreateViewModel(
-            new RecordingHitsoundStudioService(),
-            new RecordingAudioGenerator(),
-            new RecordingPlaybackService());
-        ObservableHitsoundLayer first = new(new HitsoundLayer(
-            "first",
-            SampleSet.Normal,
-            Hitsound.Normal,
-            new SampleGeneratingArgs("first.wav", 0.5, 0, 0, -1, -1, -1, -1, -1),
-            new LayerImportArgs()));
-        first.Times = [100];
-        ObservableHitsoundLayer second = new(new HitsoundLayer(
-            "second",
-            SampleSet.Drum,
-            Hitsound.Whistle,
-            new SampleGeneratingArgs("second.wav", 0.75, 0, 0, -1, -1, -1, -1, -1),
-            new LayerImportArgs(ImportType.Hitsounds)
-            {
-                DiscriminateVolumes = true,
-            }));
-        second.Times = [200];
-        viewModel.Layers.Add(first);
-        viewModel.Layers.Add(second);
 
-        return (viewModel, first, second);
-    }
-
-    private static HitsoundStudioViewModel CreateViewModel(
-        RecordingHitsoundStudioService service,
-        RecordingAudioGenerator audioGenerator,
-        RecordingPlaybackService playback,
-        TestCurrentBeatmapDialogService? currentBeatmap = null,
-        UserNotificationService? notifications = null,
-        TestDialogService? dialogs = null,
-        TestBeatmapWorkspace? workspace = null,
-        TestFilePicker? filePicker = null)
-    {
-        notifications ??= new UserNotificationService();
-        ToolExecutionService execution = new(
-            notifications,
-            TimeProvider.System);
-        return new HitsoundStudioViewModel(
-            service,
-            audioGenerator,
-            playback,
-            dialogs ?? new TestDialogService(),
-            notifications,
-            execution,
-            currentBeatmap ?? new TestCurrentBeatmapDialogService(),
-            workspace ?? new TestBeatmapWorkspace(),
-            filePicker ?? new TestFilePicker(),
-            new StubHitsoundStudioFileSystem(),
-            new StubProjectStore(),
-            new DesktopApplicationSettings(),
-            new TestApplicationDirectories(),
-            static () => null!);
-    }
-
-    private sealed class RecordingHitsoundStudioService : IHitsoundStudioService
-    {
-        public Action<IReadOnlyList<HitsoundLayer>>? ReloadAction { get; set; }
-
-        public IReadOnlyDictionary<SampleGeneratingArgs, Exception> ValidationFailures { get; set; } =
-            new Dictionary<SampleGeneratingArgs, Exception>(new SampleGeneratingArgsComparer());
-
-        public Task<IReadOnlyList<HitsoundLayer>> ImportAsync(
-            HitsoundStudioImportRequest request,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult<IReadOnlyList<HitsoundLayer>>([]);
-        }
-
-        public Task<IReadOnlyList<HitsoundLayer>> ReloadAsync(
-            IReadOnlyList<HitsoundLayer> layers,
-            CancellationToken cancellationToken = default)
-        {
-            ReloadAction?.Invoke(layers);
-            return Task.FromResult(layers);
-        }
-
-        public Task<IReadOnlyDictionary<SampleGeneratingArgs, Exception>> ValidateSamplesAsync(
-            IReadOnlyList<SampleGeneratingArgs> samples,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(ValidationFailures);
-        }
-
-        public Task<HitsoundStudioExportResult> ExportAsync(
-            HitsoundStudioServiceOptions project,
-            IProgress<double>? progress = null,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult<HitsoundStudioExportResult>(null!);
-        }
-    }
-
-    private sealed class RecordingAudioGenerator : IAudioGenerator
-    {
-        private readonly TaskCompletionSource<bool> releaseFirstGeneration =
-            new(TaskCreationOptions.RunContinuationsAsynchronously);
-
-        private int generationCount;
-
-        public TaskCompletionSource<bool> FirstGenerationStarted { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
-
-        public TaskCompletionSource<bool> FirstGenerationCanceled { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
-
-        public async Task<AudioClip> GenerateAsync(
-            AudioGenerationRequest request,
-            CancellationToken cancellationToken = default)
-        {
-            if (Interlocked.Increment(ref generationCount) == 1)
-            {
-                FirstGenerationStarted.TrySetResult(true);
-                await using var registration = cancellationToken.Register(() => FirstGenerationCanceled.TrySetResult(true));
-                await releaseFirstGeneration.Task;
-            }
-
-            return new AudioClip(new AudioFormat(8000, 1), [0.1f]);
-        }
-
-        public void ReleaseFirstGeneration()
-        {
-            releaseFirstGeneration.TrySetResult(true);
-        }
-    }
-
-    private sealed class RecordingPlaybackService : IAudioPlaybackService
-    {
-        public List<RecordingPlaybackSession> Sessions { get; } = [];
-
-        public Task<IAudioPlaybackSession> PlayAsync(
-            AudioClip clip,
-            AudioPlaybackOptions? options = null,
-            CancellationToken cancellationToken = default)
-        {
-            var session = new RecordingPlaybackSession();
-            Sessions.Add(session);
-            return Task.FromResult<IAudioPlaybackSession>(session);
-        }
-    }
-
-    private sealed class RecordingPlaybackSession : IAudioPlaybackSession
-    {
-        public int StopCount { get; private set; }
-        public AudioPlaybackState State => AudioPlaybackState.Playing;
-
-        public TimeSpan Position => TimeSpan.Zero;
-
-        public Task Completion => Task.CompletedTask;
-
-        public void Pause()
-        {
-        }
-
-        public void Resume()
-        {
-        }
-
-        public ValueTask StopAsync()
-        {
-            StopCount++;
-            return ValueTask.CompletedTask;
-        }
-
-        public ValueTask DisposeAsync()
-        {
-            return StopAsync();
-        }
-    }
-
-    private sealed class StubHitsoundStudioFileSystem : IBeatmapsetFileSystem
-    {
-        public bool FileExists(string path)
-        {
-            return false;
-        }
-
-        public bool DirectoryExists(string path)
-        {
-            return false;
-        }
-
-        public string ReadAllText(string path)
-        {
-            return string.Empty;
-        }
-
-        public void WriteAllText(string path, string text)
-        {
-        }
-
-        public void Delete(string path)
-        {
-        }
-
-        public string GetParentFolder(string path)
-        {
-            return Path.GetDirectoryName(path) ?? string.Empty;
-        }
-
-        public string CombinePath(string parent, string child)
-        {
-            return Path.Combine(parent, child);
-        }
-
-        public string? GetParentDirectory(string filePath)
-        {
-            return Path.GetDirectoryName(filePath);
-        }
-
-        public IReadOnlyList<string> EnumerateFiles(
-            string directory,
-            string searchPattern,
-            SearchOption searchOption = SearchOption.TopDirectoryOnly)
-        {
-            return [];
-        }
-
-        public void EnsureDirectoryExists(string path)
-        {
-        }
-
-        public byte[] ReadAllBytes(string path)
-        {
-            return [];
-        }
-
-        public void WriteAllBytes(string path, ReadOnlySpan<byte> bytes, bool overwrite = false)
-        {
-        }
-
-        public void CopyFile(string sourcePath, string destinationPath, bool overwrite = false)
-        {
-        }
-
-        public void MoveFile(string sourcePath, string destinationPath, bool overwrite = false)
-        {
-        }
-
-        public IBeatmapsetFileTransaction BeginTransaction(string targetDirectory)
-        {
-            throw new NotSupportedException();
-        }
-    }
-
-    private sealed class StubProjectStore : IProjectStore
-    {
-        public void EnsureDirectoryExists(string path)
-        {
-        }
-
-        public Task SaveAsync<TProject>(
-            string path,
-            TProject project,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task<TProject> LoadAsync<TProject>(
-            string path,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.FromException<TProject>(new NotSupportedException());
-        }
-    }
 }

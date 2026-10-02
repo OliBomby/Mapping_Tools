@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.VisualTree;
 using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.ViewModels;
 
@@ -19,6 +20,15 @@ public sealed partial class HitsoundPreviewHelperView : UserControl
     {
         InitializeComponent();
         addButtonModifiers = new ButtonModifierCapture(AddButton);
+    }
+
+    private void DataGridPointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        if (sender is not DataGrid grid || e.InitialPressMouseButton != MouseButton.Left
+            || grid.DataContext is not HitsoundPreviewHelperViewModel) return;
+        if (e.Source is not Control source || source.FindAncestorOfType<DataGridCell>() is null) return;
+
+        grid.BeginEdit();
     }
 
     private void AddButtonClick(object? sender, RoutedEventArgs e)

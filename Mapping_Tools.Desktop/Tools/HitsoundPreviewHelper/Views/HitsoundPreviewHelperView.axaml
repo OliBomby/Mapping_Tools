@@ -25,6 +25,7 @@
                           CanUserResizeColumns="True"
                           CanUserSortColumns="True"
                           SelectionMode="Extended"
+                          PointerReleased="DataGridPointerReleased"
                           UseLogicalScrollable="True"
                           GridLinesVisibility="Horizontal"
                           ScrollViewer.HorizontalScrollBarVisibility="Auto"

@@ -20,6 +20,7 @@ using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
+using Mapping_Tools.Desktop.Tests.TestHelpers;
 using Mapping_Tools.Desktop.Tools.Sliderator.Models;
 using Mapping_Tools.Desktop.Tools.Sliderator.ViewModels;
 using Mapping_Tools.Desktop.Tools.Sliderator.Views;
@@ -129,7 +130,7 @@ public sealed class SlideratorViewModelTests
         GraphControl graph = view.FindControl<GraphControl>("GraphControlElement")!;
         Window window = new() { Content = view };
         ProjectUndoWindowInput.Attach(window, () => history);
-        window.Show();
+        using HeadlessViewHost host = HeadlessViewHost.ShowWindow(window);
         Type original = viewModel.GraphState.Anchors[1].Interpolator.GetType();
 
         // Act
@@ -137,7 +138,6 @@ public sealed class SlideratorViewModelTests
         bool recorded = history.CanUndo;
         Type edited = viewModel.GraphState.Anchors[1].Interpolator.GetType();
         history.Undo();
-        window.Close();
 
         // Assert
         edited.Should().Be(interpolatorType);
@@ -168,7 +168,7 @@ public sealed class SlideratorViewModelTests
             RoutingStrategies.Tunnel, true);
         Window window = new() { Width = 600, Height = 400, Content = graph };
         ProjectUndoWindowInput.Attach(window, () => history);
-        window.Show();
+        using HeadlessViewHost host = HeadlessViewHost.ShowWindow(window);
         Point graphPoint = graph.GetControlPosition(new Vector2(1.5f, 0.3f));
         Point press = graph.TranslatePoint(graphPoint, window)
                       ?? throw new InvalidOperationException("Graph has no pointer position.");
@@ -182,7 +182,6 @@ public sealed class SlideratorViewModelTests
         bool recorded = history.CanUndo;
         int editedAnchorCount = viewModel.GraphState.Anchors.Count;
         history.Undo();
-        window.Close();
 
         // Assert
         recorded.Should().BeTrue();

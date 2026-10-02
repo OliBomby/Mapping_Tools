@@ -1,23 +1,11 @@
 using System.ComponentModel;
 using Avalonia.Input;
-using Mapping_Tools.Application.Abstractions;
-using Mapping_Tools.Application.BeatmapEditing.Models;
-using Mapping_Tools.Application.Execution.UserNotification;
-using Mapping_Tools.Application.Execution.UserNotification.Models;
-using Mapping_Tools.Application.Projects.Contracts;
-using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Application.Settings.Models;
-using Mapping_Tools.Application.Tools.GeometryDashboard;
-using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Core.BeatmapHelper;
-using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Settings.Models;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
-using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Services.Undo;
-using Mapping_Tools.Desktop.Tools.GeometryDashboard;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 using Mapping_Tools.Infrastructure.Projects;
@@ -32,7 +20,7 @@ public sealed class GeometryDashboardViewModelTests
     public void Undo_GeneratorRowChange_RefreshesTableBindings()
     {
         // Arrange
-        using var viewModel = CreateViewModel();
+        using var viewModel = GeometryDashboardViewModelTestFactory.CreateViewModel();
         var row = viewModel.Generators.First();
         bool original = row.IsSequential;
         ProjectUndoHistory<GeometryDashboardProject> history = new(viewModel, new VersionedProjectJsonSerializer());
@@ -55,7 +43,7 @@ public sealed class GeometryDashboardViewModelTests
     public void Constructor_WithCoreGenerators_GroupsAndFiltersRows()
     {
         // Arrange
-        using var viewModel = CreateViewModel();
+        using var viewModel = GeometryDashboardViewModelTestFactory.CreateViewModel();
 
         // Act
         viewModel.Generators.Should().NotBeEmpty();
@@ -72,7 +60,7 @@ public sealed class GeometryDashboardViewModelTests
     public void NotifySettingsChanged_AfterGeneratorSettingsChange_NotifiesGeneratorRowBindings()
     {
         // Arrange
-        using var viewModel = CreateViewModel();
+        using var viewModel = GeometryDashboardViewModelTestFactory.CreateViewModel();
         var generator = viewModel.Generators.First();
         var changedProperties = new List<string?>();
         generator.PropertyChanged += (_, eventArgs) => changedProperties.Add(eventArgs.PropertyName);
@@ -131,21 +119,22 @@ public sealed class GeometryDashboardViewModelTests
     public async Task RefreshOnceAsync_WhenInputPlatformIsUnavailable_ShowsGracefulStatus()
     {
         // Arrange
-        using var viewModel = CreateViewModel(false);
+        using var viewModel = GeometryDashboardViewModelTestFactory.CreateViewModel(false);
 
         // Act
         await viewModel.RefreshOnceAsync();
 
         // Assert
         viewModel.Status.Should().Be("Unable to run: Geometry Dashboard requires Windows.");
+        viewModel.StatusIndicatorState.Should().Be(GeometryDashboardStatusIndicatorState.Error);
     }
 
     [TestMethod]
     public async Task RefreshOnceAsync_WhenEditorIsUnfocused_ShowsGreenUnfocusedStatus()
     {
         // Arrange
-        var editor = CreateRuntimeSnapshot(DecodeHitObject("64,96,1000,1,0,0:0:0:0:"), 0, []).Editor;
-        using var viewModel = CreateViewModel(
+        var editor = GeometryDashboardViewModelTestFactory.CreateRuntimeSnapshot(DecodeHitObject("64,96,1000,1,0,0:0:0:0:"), 0, []).Editor;
+        using var viewModel = GeometryDashboardViewModelTestFactory.CreateViewModel(
             snapshots: new GeometryDashboardRuntimeSnapshot(editor, false));
 
         // Act
@@ -160,7 +149,7 @@ public sealed class GeometryDashboardViewModelTests
     public async Task Deactivate_AfterRuntimeRefresh_UpdatesStatusThroughServiceEvent()
     {
         // Arrange
-        using var viewModel = CreateViewModel();
+        using var viewModel = GeometryDashboardViewModelTestFactory.CreateViewModel();
         await viewModel.RefreshOnceAsync();
         var changedProperties = new List<string?>();
         viewModel.PropertyChanged += (_, args) => changedProperties.Add(args.PropertyName);
@@ -178,7 +167,7 @@ public sealed class GeometryDashboardViewModelTests
     {
         // Arrange
         var globalHotkeys = new RecordingGlobalHotkeyService();
-        using var viewModel = CreateViewModel(globalHotkeys: globalHotkeys);
+        using var viewModel = GeometryDashboardViewModelTestFactory.CreateViewModel(globalHotkeys: globalHotkeys);
         var slot = new GeometryDashboardSaveSlot
         {
             ProjectHotkey = new HotkeySettings(56, 2),
@@ -202,7 +191,7 @@ public sealed class GeometryDashboardViewModelTests
     {
         // Arrange
         var globalHotkeys = new RecordingGlobalHotkeyService();
-        using var viewModel = CreateViewModel(globalHotkeys: globalHotkeys);
+        using var viewModel = GeometryDashboardViewModelTestFactory.CreateViewModel(globalHotkeys: globalHotkeys);
         viewModel.Project.SaveSlots.Add(new GeometryDashboardSaveSlot
         {
             ProjectHotkey = new HotkeySettings(56, 0),
@@ -221,7 +210,7 @@ public sealed class GeometryDashboardViewModelTests
     public void ToggleSelected_WithShiftModifierAndEmptyGraph_DoesNotCreateObjects()
     {
         // Arrange
-        using var viewModel = CreateViewModel();
+        using var viewModel = GeometryDashboardViewModelTestFactory.CreateViewModel();
 
         // Act
         viewModel.ToggleSelected(KeyModifiers.Shift);
@@ -238,12 +227,12 @@ public sealed class GeometryDashboardViewModelTests
         HitObject initialHitObject = DecodeHitObject("64,96,1000,1,0,0:0:0:0:");
         HitObject selectedHitObject = DecodeHitObject("64,96,1000,1,0,0:0:0:0:");
         HitObject finalHitObject = DecodeHitObject("64,96,1000,1,0,0:0:0:0:");
-        using var viewModel = CreateViewModel(
+        using var viewModel = GeometryDashboardViewModelTestFactory.CreateViewModel(
             snapshots:
             [
-                CreateRuntimeSnapshot(initialHitObject, 0, []),
-                CreateRuntimeSnapshot(selectedHitObject, 1, [selectedHitObject]),
-                CreateRuntimeSnapshot(finalHitObject, 2, []),
+                GeometryDashboardViewModelTestFactory.CreateRuntimeSnapshot(initialHitObject, 0, []),
+                GeometryDashboardViewModelTestFactory.CreateRuntimeSnapshot(selectedHitObject, 1, [selectedHitObject]),
+                GeometryDashboardViewModelTestFactory.CreateRuntimeSnapshot(finalHitObject, 2, []),
             ]);
 
         // Act
@@ -257,180 +246,6 @@ public sealed class GeometryDashboardViewModelTests
         unselectedCount.Should().Be(0);
         selectedCount.Should().BeGreaterThan(0);
         viewModel.SelectedCount.Should().Be(0);
-    }
-
-    private static GeometryDashboardViewModel CreateViewModel(
-        bool inputSupported = true,
-        IGlobalHotkeyService? globalHotkeys = null,
-        params GeometryDashboardRuntimeSnapshot?[] snapshots)
-    {
-        var project = new GeometryDashboardProject();
-        var runtime = new RuntimeStub(snapshots);
-        var input = new InputStub(inputSupported);
-        var overlay = new OverlayStub();
-        var service = new GeometryDashboardService(
-            new ApplicationSettings(),
-            project,
-            runtime,
-            input,
-            overlay);
-        var lifecycle = new GeometryDashboardLifecycleCoordinator(project, service);
-
-        return new GeometryDashboardViewModel(
-            project,
-            service,
-            lifecycle,
-            globalHotkeys ?? new RecordingGlobalHotkeyService(),
-            new SerializerStub(),
-            new TestFilePicker
-            {
-                CanOpenFiles = false,
-                CanSaveFiles = false,
-                CanPickFolders = false,
-            },
-            new TextFileStoreStub(),
-            new NotificationStub(),
-            static () => null!,
-            new ImmediateTestDispatcher());
-    }
-
-    private static GeometryDashboardRuntimeSnapshot CreateRuntimeSnapshot(
-        HitObject hitObject,
-        int editorTime,
-        IReadOnlyList<HitObject> selectedHitObjects)
-    {
-        return new GeometryDashboardRuntimeSnapshot(
-            new LiveBeatmapSnapshot(
-                "C:/Songs/map/map.osu",
-                [],
-                [],
-                [hitObject],
-                0,
-                1.4,
-                1,
-                5,
-                4,
-                editorTime,
-                selectedHitObjects),
-            true);
-    }
-
-    private sealed class RuntimeStub(IEnumerable<GeometryDashboardRuntimeSnapshot?> snapshots) : IGeometryDashboardRuntime
-    {
-        private readonly Queue<GeometryDashboardRuntimeSnapshot?> snapshots = new(snapshots);
-        public bool IsProcessRunning => true;
-
-        public Task<GeometryDashboardRuntimeSnapshot?> ReadAsync(CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(snapshots.Count == 0 ? null : snapshots.Dequeue());
-        }
-    }
-
-    private sealed class InputStub(bool isSupported) : IGeometryDashboardInputService
-    {
-        public bool IsSupported => isSupported;
-
-        public bool IsHotkeyDown(HotkeySettings? hotkey)
-        {
-            return false;
-        }
-
-        public bool IsMouseButtonDown(GeometryDashboardMouseButton button)
-        {
-            return false;
-        }
-
-        public bool TryGetCursorPosition(out Vector2 position)
-        {
-            position = Vector2.Zero;
-            return false;
-        }
-
-        public bool TrySetCursorPosition(Vector2 position)
-        {
-            return false;
-        }
-    }
-
-    private sealed class RecordingGlobalHotkeyService : IGlobalHotkeyService
-    {
-        public Dictionary<string, HotkeySettings?> Bindings { get; } =
-            new(StringComparer.Ordinal);
-
-        public Dictionary<string, Func<CancellationToken, Task>> Callbacks { get; } =
-            new(StringComparer.Ordinal);
-
-        public void SetBinding(
-            string id,
-            HotkeySettings? hotkey,
-            Func<CancellationToken, Task> callback)
-        {
-            Bindings[id] = hotkey;
-            Callbacks[id] = callback;
-        }
-
-        public void Start()
-        {
-        }
-
-        public void Stop()
-        {
-        }
-    }
-
-    private sealed class OverlayStub : IGeometryDashboardOverlayService
-    {
-        public bool IsSupported => false;
-        public bool IsVisible => false;
-        public string? ConfigurationStatus => null;
-        public void Update(GeometryDashboardOverlayScene scene, GeometryDashboardOverlayOptions options) { }
-        public void Hide() { }
-        public void Dispose() { }
-    }
-
-    private sealed class SerializerStub : IProjectSerializer
-    {
-        public string Serialize<TProject>(TProject project)
-        {
-            return "{}";
-        }
-
-        public TProject Deserialize<TProject>(string json)
-        {
-            return Activator.CreateInstance<TProject>();
-        }
-    }
-
-    private sealed class TextFileStoreStub : ITextFileStore
-    {
-        public string ReadAllText(string path)
-        {
-            return string.Empty;
-        }
-
-        public void WriteAllText(string path, string text) { }
-        public void Delete(string path) { }
-
-        public string GetParentFolder(string path)
-        {
-            return string.Empty;
-        }
-
-        public string CombinePath(string parent, string child)
-        {
-            return child;
-        }
-    }
-
-    private sealed class NotificationStub : IUserNotificationService
-    {
-        public event EventHandler<UserNotificationPublishedEventArgs>? Published;
-
-        public Task PublishAsync(UserNotification notification, CancellationToken cancellationToken = default)
-        {
-            Published?.Invoke(this, new UserNotificationPublishedEventArgs(notification));
-            return Task.CompletedTask;
-        }
     }
 
     private sealed class GeneratorSettingsWithUnmappedProperty : GeneratorSettings

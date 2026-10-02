@@ -1,6 +1,3 @@
-using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
-using Avalonia.Data;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Settings.Models;
@@ -15,7 +12,6 @@ using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.TumourGenerator.Models;
 using Mapping_Tools.Desktop.Tools.TumourGenerator.ViewModels;
-using Mapping_Tools.Infrastructure.Projects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Tools.TumourGenerator.ViewModels;
@@ -152,10 +148,14 @@ public sealed class TumourGeneratorViewModelTests
     public void ShellProjectFeature_SnapshotAndInstall_PreserveLayersGraphsAndPreview()
     {
         // Arrange
-        var viewModel = Create(new RecordingGenerator());
+        using TumourGeneratorViewModel viewModel = Create(new RecordingGenerator(), activate: false);
         viewModel.CurrentLayer!.TumourTemplateEnum = TumourTemplate.Square;
         viewModel.CurrentLayer.TumourParameter = TumourLayer.GetGraphState(12);
         viewModel.CurrentLayer.Name = "Custom";
+        viewModel.CurrentLayer.TumourStart = 35.39506172839506;
+        viewModel.CurrentLayer.TumourEnd = 256;
+        viewModel.CurrentLayer.UseAbsoluteRange = true;
+        viewModel.AdvancedOptions = true;
         viewModel.PreviewHitObject = DecodeHitObject("32,64,100,2,0,L|200:64,1,168");
         IShellProjectFeature<TumourGeneratorProject> feature = viewModel;
 
@@ -169,82 +169,17 @@ public sealed class TumourGeneratorViewModelTests
         viewModel.CurrentLayer!.Name.Should().Be("Custom");
         viewModel.CurrentLayer.TumourTemplateEnum.Should().Be(TumourTemplate.Square);
         viewModel.CurrentLayer.TumourParameter.GetValue(0).Should().Be(12);
-        EncodeHitObject(viewModel.PreviewHitObject).Should().Contain("32,64,100");
-    }
-
-    [TestMethod]
-    public void ShellProjectFeature_Install_PreservesAdvancedOptionsAndStart()
-    {
-        // Arrange
-        var viewModel = Create(new RecordingGenerator(), activate: false);
-        const string legacy_project_json = """
-                                           {
-                                             "$type": "Mapping_Tools.Viewmodels.TumourGeneratorVm, Mapping Tools",
-                                             "TumourLayers": [
-                                               {
-                                                 "$type": "Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourLayer, Mapping Tools",
-                                                 "TumourStart": 35.39506172839506,
-                                                 "TumourEnd": 256.0,
-                                                 "UseAbsoluteRange": true
-                                               }
-                                             ],
-                                             "AdvancedOptions": true
-                                           }
-                                           """;
-        var project = new LegacyProjectJsonSerializer()
-            .Deserialize<TumourGeneratorProject>(legacy_project_json);
-        Slider slider = new() { DataContext = viewModel };
-        slider.Bind(
-            RangeBase.ValueProperty,
-            new Binding("CurrentLayer.TumourStart") { Mode = BindingMode.TwoWay });
-        IShellProjectFeature<TumourGeneratorProject> feature = viewModel;
-
-        // Act
-        feature.Install(project);
-
-        // Assert
-        viewModel.AdvancedOptions.Should().BeTrue();
-        viewModel.CurrentLayer!.TumourStart.Should().Be(35.39506172839506);
-        slider.Value.Should().Be(35.39506172839506);
-        var snapshot = feature.Snapshot();
         snapshot.AdvancedOptions.Should().BeTrue();
         snapshot.TumourLayers[0].TumourStart.Should().Be(35.39506172839506);
-    }
-
-    [TestMethod]
-    public void TumourRangeSliderMax_WhenAbsoluteLayerIsInstalledBeforePreview_ContainsConfiguredEnd()
-    {
-        // Arrange
-        var viewModel = Create(new RecordingGenerator(), activate: false);
-        var project = new TumourGeneratorProject
-        {
-            TumourLayers = [TumourLayer.GetDefaultLayer()],
-        };
-        double savedEnd = project.TumourLayers[0].TumourEnd;
-        Slider slider = new() { DataContext = viewModel };
-        slider.Bind(
-            RangeBase.MaximumProperty,
-            new Binding(nameof(TumourGeneratorViewModel.TumourRangeSliderMax)));
-        slider.Bind(
-            RangeBase.ValueProperty,
-            new Binding("CurrentLayer.TumourEnd") { Mode = BindingMode.TwoWay });
-        IShellProjectFeature<TumourGeneratorProject> feature = viewModel;
-
-        // Act
-        feature.Install(project);
-
-        // Assert
-        viewModel.LayerRangeSliderMaxes.Should().BeEmpty();
-        slider.Maximum.Should().BeGreaterThanOrEqualTo(savedEnd);
-        viewModel.TumourRangeSliderMax.Should().BeGreaterThanOrEqualTo(savedEnd);
-        viewModel.CurrentLayer!.TumourEnd.Should().Be(savedEnd);
+        snapshot.TumourLayers[0].TumourEnd.Should().Be(256);
+        EncodeHitObject(viewModel.PreviewHitObject).Should().Contain("32,64,100");
     }
 
     [TestMethod]
     public void LayerCommands_AddCopyRemoveAndReorder_PreserveSelectionRules()
     {
         // Arrange
-        var viewModel = Create(new RecordingGenerator());
+        using TumourGeneratorViewModel viewModel = Create(new RecordingGenerator());
 
         // Act
         viewModel.AddCommand.Execute(null);

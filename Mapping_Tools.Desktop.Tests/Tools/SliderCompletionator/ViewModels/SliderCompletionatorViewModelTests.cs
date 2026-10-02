@@ -1,14 +1,11 @@
 using Avalonia.Controls;
 using Avalonia.VisualTree;
-using Mapping_Tools.Application.Execution.ToolExecution;
-using Mapping_Tools.Application.Execution.UserNotification;
-using Mapping_Tools.Application.Tools.SliderCompletionator;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.SliderCompletionator.Models;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
-using Mapping_Tools.Desktop.Tools.SliderCompletionator.ViewModels;
+using Mapping_Tools.Desktop.Tests.TestHelpers;
 using Mapping_Tools.Desktop.Tools.SliderCompletionator.Views;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -24,7 +21,7 @@ public sealed class SliderCompletionatorViewModelTests
         RecordingCompletionator service = new();
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["one.osu", "two.osu"]);
-        var viewModel = Create(service, workspace);
+        var viewModel = SliderCompletionatorViewModelTestFactory.Create(service, workspace);
         viewModel.ImportModeSetting = HitObjectSelectionMode.Everything;
         viewModel.FreeVariableSetting = SliderCompletionatorFreeVariable.Length;
         viewModel.Duration = 1.5;
@@ -50,7 +47,7 @@ public sealed class SliderCompletionatorViewModelTests
         // Arrange
         RecordingCompletionator service = new();
         TestBeatmapWorkspace workspace = new() { QuickRunPath = "current.osu" };
-        var viewModel = Create(service, workspace);
+        var viewModel = SliderCompletionatorViewModelTestFactory.Create(service, workspace);
 
         // Act
         await viewModel.RunQuickAsync(CancellationToken.None);
@@ -67,7 +64,7 @@ public sealed class SliderCompletionatorViewModelTests
         RecordingCompletionator service = new();
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["selected.osu"]);
-        var viewModel = Create(service, workspace);
+        var viewModel = SliderCompletionatorViewModelTestFactory.Create(service, workspace);
 
         // Act
         await viewModel.RunCommand.ExecuteAsync(null);
@@ -90,7 +87,7 @@ public sealed class SliderCompletionatorViewModelTests
             AsynchronousCurrentBeatmapLocator currentBeatmap = new("current.osu");
             TestBeatmapWorkspace workspace = new();
             workspace.QuickRunResolver = currentBeatmap.FindCurrentBeatmapAsync;
-            var viewModel = Create(service, workspace);
+            var viewModel = SliderCompletionatorViewModelTestFactory.Create(service, workspace);
             viewModel.UseEndTime = true;
             viewModel.UseCurrentEditorTime = true;
             List<int> stateChangeThreads = [];
@@ -125,7 +122,7 @@ public sealed class SliderCompletionatorViewModelTests
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["one.osu", "two.osu"]);
         DesktopApplicationSettings settings = new() { AlwaysQuickRun = true };
-        var viewModel = Create(
+        var viewModel = SliderCompletionatorViewModelTestFactory.Create(
             service,
             workspace,
             settings);
@@ -145,7 +142,7 @@ public sealed class SliderCompletionatorViewModelTests
         RecordingCompletionator service = new();
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["selected.osu"]);
-        var viewModel = Create(service, workspace);
+        var viewModel = SliderCompletionatorViewModelTestFactory.Create(service, workspace);
         viewModel.Duration = double.PositiveInfinity;
 
         // Act
@@ -161,7 +158,7 @@ public sealed class SliderCompletionatorViewModelTests
     public void Visibility_WhenEndTimeIsEnabled_HidesDurationAndShowsEndTime()
     {
         // Arrange
-        var viewModel = Create(new RecordingCompletionator());
+        var viewModel = SliderCompletionatorViewModelTestFactory.Create(new RecordingCompletionator());
 
         // Act
         viewModel.UseEndTime = true;
@@ -175,10 +172,10 @@ public sealed class SliderCompletionatorViewModelTests
     public void View_WhenEndTimeIsEnabled_SwapsDurationInputForEndTimeInput()
     {
         // Arrange
-        var viewModel = Create(new RecordingCompletionator());
+        var viewModel = SliderCompletionatorViewModelTestFactory.Create(new RecordingCompletionator());
         SliderCompletionatorView view = new() { DataContext = viewModel };
         Window window = new() { Content = view };
-        window.Show();
+        using HeadlessViewHost host = HeadlessViewHost.ShowWindow(window);
         var endTimeOption = view.GetVisualDescendants()
             .OfType<CheckBox>()
             .Single(option => HasToolTip(option, "Lets you input the slider end time"));
@@ -197,14 +194,13 @@ public sealed class SliderCompletionatorViewModelTests
             .Should().ContainSingle(input => input.IsVisible);
         viewModel.UseEndTime.Should().BeTrue();
 
-        window.Close();
     }
 
     [TestMethod]
     public void Visibility_WhenCurrentEditorTimeAndLengthAreSelected_HidesEndTimeAndLength()
     {
         // Arrange
-        var viewModel = Create(new RecordingCompletionator());
+        var viewModel = SliderCompletionatorViewModelTestFactory.Create(new RecordingCompletionator());
         viewModel.UseEndTime = true;
 
         // Act
@@ -215,20 +211,6 @@ public sealed class SliderCompletionatorViewModelTests
         viewModel.EndTimeVisible.Should().BeFalse();
         viewModel.LengthVisible.Should().BeFalse();
         viewModel.VelocityVisible.Should().BeTrue();
-    }
-
-    private static SliderCompletionatorViewModel Create(
-        RecordingCompletionator service,
-        TestBeatmapWorkspace? workspace = null,
-        DesktopApplicationSettings? settings = null)
-    {
-        return new SliderCompletionatorViewModel(
-            service,
-            new ToolExecutionService(
-                new UserNotificationService(),
-                TimeProvider.System),
-            workspace ?? new TestBeatmapWorkspace(),
-            settings ?? new DesktopApplicationSettings());
     }
 
     private static bool HasToolTip(Control control, string prefix)
@@ -287,23 +269,4 @@ public sealed class SliderCompletionatorViewModelTests
         }
     }
 
-    private sealed class RecordingCompletionator : ISliderCompletionatorService
-    {
-        public IReadOnlyList<string>? Paths { get; private set; }
-
-        public SliderCompletionatorServiceOptions? Options { get; private set; }
-
-        public Task<SliderCompletionatorResult> CompleteAsync(
-            IReadOnlyList<string> paths,
-            SliderCompletionatorServiceOptions options,
-            bool quickRun = false,
-            IProgress<double>? progress = null,
-            CancellationToken cancellationToken = default)
-        {
-            Paths = paths.ToArray();
-            Options = options;
-            progress?.Report(1);
-            return Task.FromResult(new SliderCompletionatorResult(paths, 2));
-        }
-    }
 }

@@ -1,4 +1,6 @@
 using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Headless;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -13,9 +15,12 @@ public sealed class AvaloniaTestSetup
         SynchronizationContext? synchronizationContext = SynchronizationContext.Current;
         try
         {
-            AppBuilder.Configure<App>()
+            AppBuilder.Configure<HeadlessTestApplication>()
                 .UseHeadless(new AvaloniaHeadlessPlatformOptions { UseHeadlessDrawing = true })
-                .SetupWithoutStarting();
+                .SetupWithClassicDesktopLifetime([]);
+            IClassicDesktopStyleApplicationLifetime lifetime =
+                (IClassicDesktopStyleApplicationLifetime)global::Avalonia.Application.Current!.ApplicationLifetime!;
+            lifetime.ShutdownMode = ShutdownMode.OnExplicitShutdown;
         }
         finally
         {
