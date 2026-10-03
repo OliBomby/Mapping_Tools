@@ -28,8 +28,12 @@ internal sealed class RecordingBeatmapFileSystem : IBeatmapsetFileSystem
 
     public string? GetParentDirectory(string filePath)
     {
-        return ParentDirectoryResolver?.Invoke(filePath)
-               ?? Path.GetDirectoryName(filePath);
+        if (ParentDirectoryResolver is not null) return ParentDirectoryResolver(filePath);
+
+        string? parent = Path.GetDirectoryName(filePath.Replace('\\', '/'));
+        return parent is null || !filePath.Contains('\\')
+            ? parent
+            : parent.Replace('/', '\\');
     }
 
     public string ReadAllText(string path)

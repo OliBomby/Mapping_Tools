@@ -504,7 +504,7 @@ public sealed class BeatmapBackupServiceTests
 
         public string GetFileName(string path)
         {
-            return Path.GetFileName(path);
+            return Path.GetFileName(path.Replace('\\', '/'));
         }
 
         public string Combine(string directory, string fileName)

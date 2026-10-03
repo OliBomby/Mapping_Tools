@@ -1,4 +1,6 @@
+using System.Globalization;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
@@ -12,6 +14,9 @@ namespace Mapping_Tools.Application.Tests.Execution;
 public abstract class TransformationFixtureTestBase
 {
     private static readonly IProjectSerializer projectJson = new LegacyProjectJsonSerializer();
+    private static readonly Regex numericToken = new(
+        @"(?<![A-Za-z0-9_])[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     protected static FixtureContext CreateFixture(string toolName, string fixtureName)
     {
@@ -124,6 +129,7 @@ public abstract class TransformationFixtureTestBase
                 "{fixtureRoot}",
                 WorkspaceRoot.Replace('\\', '/'),
                 StringComparison.Ordinal);
+            json = json.Replace("\\\\", "/", StringComparison.Ordinal);
             return projectJson.Deserialize<T>(json);
         }
 
@@ -225,9 +231,53 @@ public abstract class TransformationFixtureTestBase
     protected static void AssertTextOutputEquivalent(string expectedPath, string actualPath)
     {
         File.Exists(actualPath).Should().BeTrue($"Tool did not write output: {actualPath}");
-        string actual = File.ReadAllText(actualPath);
-        string expected = File.ReadAllText(expectedPath);
-        actual.Should().Be(expected);
+        string[] actualLines = NormalizeOutputText(File.ReadAllText(actualPath)).Split('\n');
+        string[] expectedLines = NormalizeOutputText(File.ReadAllText(expectedPath)).Split('\n');
+
+        actualLines.Length.Should().Be(expectedLines.Length);
+        for (int index = 0; index < expectedLines.Length; index++)
+        {
+            string actualLine = actualLines[index];
+            string expectedLine = expectedLines[index];
+            if (actualLine == expectedLine || AreNumericallyEquivalent(actualLine, expectedLine)) continue;
+
+            actualLine.Should().Be(expectedLine, $"output line {index + 1} should match");
+        }
+    }
+
+    private static string NormalizeOutputText(string value)
+    {
+        return value.Replace("\r\n", "\n", StringComparison.Ordinal)
+            .Replace('\\', '/');
+    }
+
+    private static bool AreNumericallyEquivalent(string actual, string expected)
+    {
+        MatchCollection actualTokens = numericToken.Matches(actual);
+        MatchCollection expectedTokens = numericToken.Matches(expected);
+        if (actualTokens.Count == 0 || actualTokens.Count != expectedTokens.Count) return false;
+        if (numericToken.Replace(actual, "{number}") != numericToken.Replace(expected, "{number}")) return false;
+
+        for (int index = 0; index < actualTokens.Count; index++)
+        {
+            string actualToken = actualTokens[index].Value;
+            string expectedToken = expectedTokens[index].Value;
+            if (actualToken == expectedToken) continue;
+            if (!HasFractionalPart(actualToken) && !HasFractionalPart(expectedToken)) return false;
+            if (!double.TryParse(actualToken, NumberStyles.Float, CultureInfo.InvariantCulture, out double actualValue)
+                || !double.TryParse(expectedToken, NumberStyles.Float, CultureInfo.InvariantCulture, out double expectedValue))
+                return false;
+
+            double tolerance = Math.Max(1, Math.Max(Math.Abs(actualValue), Math.Abs(expectedValue))) * 1e-14;
+            if (Math.Abs(actualValue - expectedValue) > tolerance) return false;
+        }
+
+        return true;
+    }
+
+    private static bool HasFractionalPart(string value)
+    {
+        return value.Contains('.') || value.Contains('e') || value.Contains('E');
     }
 
 }

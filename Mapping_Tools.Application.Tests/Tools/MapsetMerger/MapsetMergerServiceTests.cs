@@ -48,9 +48,10 @@ public sealed class MapsetMergerServiceTests : IDisposable
         result.BeatmapsWritten.Should().Be(2);
         Directory.GetFiles(exportPath, "*.osu").Should().HaveCount(2);
         Directory.GetFiles(exportPath, "*.osb").Should().HaveCount(2);
+        string audioReference = Path.Combine("Pack", "audio.mp3");
         (await File.ReadAllTextAsync(Directory.GetFiles(exportPath, "*.osu").Single(path =>
-                File.ReadAllText(path).Contains("Pack\\audio.mp3", StringComparison.Ordinal))))
-            .Should().Contain("Pack\\audio.mp3");
+                File.ReadAllText(path).Contains(audioReference, StringComparison.Ordinal))))
+            .Should().Contain(audioReference);
         Directory.GetFiles(exportPath, "soft-hitfinish*.wav").Should().HaveCount(2);
         Directory.GetFiles(exportPath, "background.jpg", SearchOption.AllDirectories).Should().HaveCount(2);
         Directory.GetFiles(exportPath, "sb.wav", SearchOption.AllDirectories).Should().HaveCount(2);
@@ -165,7 +166,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
         result.StoryboardsWritten.Should().Be(0);
         Directory.GetFiles(exportPath, "*.osb").Should().BeEmpty();
         (await File.ReadAllTextAsync(Directory.GetFiles(exportPath, "*.osu").Single()))
-            .Should().Contain("Embedded\\nested/story.png");
+            .Should().Contain(Path.Combine("Embedded", "nested/story.png"));
     }
 
     [TestMethod]
