@@ -99,7 +99,8 @@ public sealed class LayerBoundaryTests
                 .Descendants("ProjectReference")
                 .Select(element => element.Attribute("Include")?.Value)
                 .Where(value => value is not null)
-                .Select(value => Path.GetFileNameWithoutExtension(value!))
+                .Select(value => Path.GetFileNameWithoutExtension(
+                    value!.Replace('\\', Path.DirectorySeparatorChar)))
                 .Order(StringComparer.Ordinal)
                 .ToArray();
 

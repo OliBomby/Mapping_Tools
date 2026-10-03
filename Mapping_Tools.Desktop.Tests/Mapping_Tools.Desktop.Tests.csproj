@@ -8,7 +8,7 @@
     <UsedAvaloniaProducts></UsedAvaloniaProducts>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-    <MappingToolsRepositoryRoot>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..'))</MappingToolsRepositoryRoot>
+    <MappingToolsRepositoryRoot>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/..'))</MappingToolsRepositoryRoot>
   </PropertyGroup>
 
   <ItemGroup>
