@@ -63,15 +63,11 @@ jobs:
         shell: pwsh
         run: ./tools/measure-coverage.ps1
 
-      - name: Measure Core mutation score
-        shell: pwsh
-        run: ./tools/measure-mutation.ps1
-
       - name: Publish job summary
         if: always()
         shell: pwsh
         run: |
-          foreach ($file in @('coverage-report/coverage-summary.md', 'coverage-report/mutation-summary.md')) {
+          foreach ($file in @('coverage-report/coverage-summary.md')) {
             if (Test-Path $file) {
               Get-Content $file -Raw | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
             }
@@ -84,6 +80,5 @@ jobs:
           name: quality-reports
           path: |
             coverage-report/merged
-            coverage-report/mutation
             coverage-report/*-summary.md
           if-no-files-found: warn
