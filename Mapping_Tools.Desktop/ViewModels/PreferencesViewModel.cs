@@ -90,6 +90,16 @@ public sealed partial class PreferencesViewModel : LocalizedObservableValidator,
         new(null, string.Empty),
         new("en", "English"),
         new("nl", "Nederlands"),
+        new("ru", "Русский"),
+        new("zh-Hans", "简体中文"),
+        new("ja", "日本語"),
+        new("es", "Español"),
+        new("zh-Hant", "繁體中文"),
+        new("id", "Bahasa Indonesia"),
+        new("pl", "Polski"),
+        new("de", "Deutsch"),
+        new("fr", "Français"),
+        new("ko", "한국어"),
     ];
 
     /// <summary>Gets or sets the live interface language without changing date, number or expression syntax.</summary>
@@ -97,7 +107,7 @@ public sealed partial class PreferencesViewModel : LocalizedObservableValidator,
     {
         get => settings.Language is null
             ? Languages[0]
-            : Languages.FirstOrDefault(option => string.Equals(option.Code, settings.Language.Split('-')[0], StringComparison.OrdinalIgnoreCase)) ?? Languages[1];
+            : Languages.FirstOrDefault(option => string.Equals(option.Code, settings.Language, StringComparison.OrdinalIgnoreCase)) ?? Languages[1];
         set
         {
             if (SetProperty(settings.Language, value.Code, settings, static (document, code) => document.Language = code, false))

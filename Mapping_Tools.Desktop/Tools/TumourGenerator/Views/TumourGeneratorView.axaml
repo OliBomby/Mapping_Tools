@@ -27,7 +27,14 @@
                                      IsQuickRunSupported="True"
                     HelpText="{loc:Tr TumourGenerator_Help}" />
 
-            <Grid x:Name="TumourMainColumns" Grid.Row="1" ColumnDefinitions="200,Auto,200,Auto,*">
+            <Grid x:Name="TumourMainColumns" Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" MinWidth="100" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="240" MinWidth="100"/>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
                 <Grid x:Name="TumourLayersColumn" Grid.Column="0" RowDefinitions="*,Auto,Auto" Margin="0,0,10,0">
                     <ListBox x:Name="TumourLayerList" Grid.Row="0" ItemsSource="{Binding TumourLayers}"
                              VerticalAlignment="Top"

@@ -15,7 +15,7 @@
         <Grid Grid.Row="0">
             <Grid RowDefinitions="Auto,*">
                 <Grid ColumnDefinitions="*,Auto">
-        <controls:ToolViewHeader Title="{loc:Tr PatternGallery_Title}"
+                    <controls:ToolViewHeader Title="{loc:Tr PatternGallery_Title}"
                                              IsQuickRunSupported="True"
                                  HelpText="{loc:Tr PatternGallery_Help}" />
                     <TextBlock Grid.Column="1"
@@ -28,7 +28,7 @@
                                PointerPressed="CollectionNamePointerPressed" />
                 </Grid>
 
-                <Grid Grid.Row="1" Margin="0,18,0,0" ColumnDefinitions="*,20,240">
+                <Grid Grid.Row="1" Margin="0,18,0,0" ColumnDefinitions="*,20,320">
                     <Grid Grid.Column="0" RowDefinitions="*,Auto">
                         <ScrollViewer Grid.Row="0"
                                       HorizontalScrollBarVisibility="Disabled"
@@ -158,13 +158,13 @@
                                                             Height="24"
                                                             Margin="5" />
                                 <TextBox Classes="compact"
-                    PlaceholderText="{loc:Tr PatternGallery_Search}"
-                                         Width="120"
+                                         PlaceholderText="{loc:Tr PatternGallery_Search}"
+                                         MinWidth="120"
                                          Height="24"
                                          Margin="5"
                                          Text="{Binding SearchFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTip.Tip="{loc:Tr PatternGallery_SearchTip}" />
-                                <ComboBox Width="120"
+                                         ToolTip.Tip="{loc:Tr PatternGallery_SearchTip}" />
+                                <ComboBox MinWidth="120"
                                           Height="24"
                                           Margin="5"
                                           Classes="compact"
@@ -176,13 +176,13 @@
                                         </DataTemplate>
                                     </ComboBox.ItemTemplate>
                                 </ComboBox>
-                                <ComboBox Width="100"
+                                <ComboBox MinWidth="120"
                                           Height="24"
                                           Margin="5"
                                           Classes="compact"
                                           SelectedIndex="{Binding SortDirection, Mode=TwoWay}">
-                    <ComboBoxItem Content="{loc:Tr Common_Ascending}" />
-                    <ComboBoxItem Content="{loc:Tr Common_Descending}" />
+                                    <ComboBoxItem Content="{loc:Tr Common_Ascending}" />
+                                    <ComboBoxItem Content="{loc:Tr Common_Descending}" />
                                 </ComboBox>
                             </StackPanel>
                         </Grid>

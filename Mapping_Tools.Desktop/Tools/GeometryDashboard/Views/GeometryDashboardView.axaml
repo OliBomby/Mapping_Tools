@@ -92,7 +92,7 @@
                     <TextBlock Text="{loc:Tr GeometryDashboard_Active}" />
                     <TextBlock Grid.Column="1" Text="{loc:Tr GeometryDashboard_Settings}" />
                     <TextBlock Grid.Column="2" Text="{loc:Tr GeometryDashboard_Name}" />
-                    <TextBlock Grid.Column="3" Text="{loc:Tr GeometryDashboard_Sequential}" />
+                    <TextBlock Grid.Column="3" Text="{loc:Tr GeometryDashboard_Sequential}" Margin="0,0,5,0" />
                     <TextBlock Grid.Column="4" Text="{loc:Tr GeometryDashboard_Relevancy}" TextWrapping="Wrap" />
                 </Grid>
                 <ScrollViewer Grid.Row="1" x:Name="GeneratorsScrollViewer"

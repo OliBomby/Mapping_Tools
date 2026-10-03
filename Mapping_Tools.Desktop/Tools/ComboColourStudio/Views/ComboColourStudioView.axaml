@@ -181,7 +181,7 @@
                             <Button Content="{loc:Tr ComboColourStudio_ImportHax}" Margin="5"
                                     Command="{Binding ImportColourHaxCommand}"
                                     ToolTip.Tip="{loc:Tr ComboColourStudio_ImportHaxTip}" />
-                            <TextBox Width="130" Margin="25,0,10,5"
+                            <TextBox Width="190" Margin="25,0,10,5"
                                      materialAssists:TextFieldAssist.Label="{loc:Tr ComboColourStudio_MaxBurstLength}"
                                      Text="{Binding Project.MaxBurstLength, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantInt32Converter}}"
                                      ToolTip.Tip="{loc:Tr ComboColourStudio_MaxBurstLengthTip}" />

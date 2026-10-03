@@ -34,13 +34,13 @@
                                     <ColumnDefinition Width="Auto" MinWidth="100" SharedSizeGroup="PreferenceSecondaryLabel" />
                                     <ColumnDefinition Width="150" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="{loc:Tr GeometryDashboard_SnapKey}" VerticalAlignment="Bottom" Margin="0,0,0,6"
+                                <TextBlock Text="{loc:Tr GeometryDashboard_SnapKey}" VerticalAlignment="Bottom" Margin="0,0,5,6"
                                            ToolTip.Tip="{loc:Tr GeometryDashboard_SnapKeyTip}" />
                                 <controls:HotkeyEditor Grid.Column="1" Width="150" VerticalAlignment="Bottom"
                                                        Classes="compact"
                                                        Hotkey="{Binding Preferences.SnapHotkey, Mode=TwoWay}"
                                                        ToolTip.Tip="{loc:Tr GeometryDashboard_SnapKeyTip}" />
-                                <TextBlock Grid.Column="2" Text="{loc:Tr GeometryDashboard_SelectKey}" VerticalAlignment="Bottom" Margin="10,0,0,6"
+                                <TextBlock Grid.Column="2" Text="{loc:Tr GeometryDashboard_SelectKey}" VerticalAlignment="Bottom" Margin="10,0,5,6"
                                            ToolTip.Tip="{loc:Tr GeometryDashboard_SelectKeyTip}" />
                                 <controls:HotkeyEditor Grid.Column="3" Width="150" VerticalAlignment="Bottom"
                                                        Classes="compact"
@@ -55,14 +55,14 @@
                                     <ColumnDefinition Width="Auto" MinWidth="100" SharedSizeGroup="PreferenceSecondaryLabel" />
                                     <ColumnDefinition Width="150" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="{loc:Tr GeometryDashboard_LockKey}" VerticalAlignment="Bottom" Margin="0,0,0,6"
+                                <TextBlock Text="{loc:Tr GeometryDashboard_LockKey}" VerticalAlignment="Bottom" Margin="0,0,5,6"
                                            ToolTip.Tip="{loc:Tr GeometryDashboard_LockKeyTip}" />
                                 <controls:HotkeyEditor Grid.Column="1" Width="150" VerticalAlignment="Bottom"
                                                        Classes="compact"
                                                        Hotkey="{Binding Preferences.LockHotkey, Mode=TwoWay}"
                                                        ToolTip.Tip="{loc:Tr GeometryDashboard_LockKeyTip}" />
                                 <TextBlock Grid.Column="2" Text="{loc:Tr GeometryDashboard_UsabilityKey}" VerticalAlignment="Bottom"
-                                           Margin="10,0,0,6"
+                                           Margin="10,0,5,6"
                                            ToolTip.Tip="{loc:Tr GeometryDashboard_UsabilityKeyTip}" />
                                 <controls:HotkeyEditor Grid.Column="3" Width="150" VerticalAlignment="Bottom"
                                                        Classes="compact"
@@ -75,7 +75,7 @@
                                     <ColumnDefinition Width="Auto" MinWidth="100" SharedSizeGroup="PreferenceLabel" />
                                     <ColumnDefinition Width="150" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="{loc:Tr GeometryDashboard_RefreshKey}" VerticalAlignment="Bottom" Margin="0,0,0,6"
+                                <TextBlock Text="{loc:Tr GeometryDashboard_RefreshKey}" VerticalAlignment="Bottom" Margin="0,0,5,6"
                                            ToolTip.Tip="{loc:Tr GeometryDashboard_RefreshKeyTip}" />
                                 <controls:HotkeyEditor Grid.Column="1" Width="150" VerticalAlignment="Bottom"
                                                        Classes="compact"
@@ -91,24 +91,26 @@
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="{loc:Tr GeometryDashboard_Offset}" VerticalAlignment="Bottom" Margin="0,0,0,6"
+                                <TextBlock Text="{loc:Tr GeometryDashboard_Offset}" VerticalAlignment="Center" Margin="0,0,5,6"
                                            ToolTip.Tip="{loc:Tr GeometryDashboard_OffsetTip}" />
-                                <TextBox Grid.Column="1" Width="95" VerticalAlignment="Bottom" Margin="0,0,10,0"
+                                <TextBox Grid.Column="1" Width="155" VerticalAlignment="Center" Margin="0,0,10,0"
                                          materialAssists:TextFieldAssist.Label="{loc:Tr GeometryDashboard_LeftOffset}"
                                          Text="{Binding Preferences.OffsetLeft, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
                                          ToolTip.Tip="{loc:Tr GeometryDashboard_OffsetLeftTip}" />
-                                <TextBox Grid.Column="2" Width="95" VerticalAlignment="Bottom" Margin="0,0,10,0"
-                                         materialAssists:TextFieldAssist.Label="{loc:Tr GeometryDashboard_TopOffset}"
-                                         Text="{Binding Preferences.OffsetTop, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
-                                         ToolTip.Tip="{loc:Tr GeometryDashboard_OffsetTopTip}" />
-                                <TextBox Grid.Column="3" Width="95" VerticalAlignment="Bottom" Margin="0,0,10,0"
+                                <StackPanel Grid.Column="2" Margin="0,0,10,0" Spacing="10">
+                                    <TextBox Width="155" VerticalAlignment="Bottom"
+                                             materialAssists:TextFieldAssist.Label="{loc:Tr GeometryDashboard_TopOffset}"
+                                             Text="{Binding Preferences.OffsetTop, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
+                                             ToolTip.Tip="{loc:Tr GeometryDashboard_OffsetTopTip}" />
+                                    <TextBox Width="155" VerticalAlignment="Bottom"
+                                             materialAssists:TextFieldAssist.Label="{loc:Tr GeometryDashboard_BottomOffset}"
+                                             Text="{Binding Preferences.OffsetBottom, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
+                                             ToolTip.Tip="{loc:Tr GeometryDashboard_OffsetBottomTip}" />
+                                </StackPanel>
+                                <TextBox Grid.Column="3" Width="155" VerticalAlignment="Center" Margin="0,0,10,0"
                                          materialAssists:TextFieldAssist.Label="{loc:Tr GeometryDashboard_RightOffset}"
                                          Text="{Binding Preferences.OffsetRight, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
                                          ToolTip.Tip="{loc:Tr GeometryDashboard_OffsetRightTip}" />
-                                <TextBox Grid.Column="4" Width="95" VerticalAlignment="Bottom"
-                                         materialAssists:TextFieldAssist.Label="{loc:Tr GeometryDashboard_BottomOffset}"
-                                         Text="{Binding Preferences.OffsetBottom, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
-                                         ToolTip.Tip="{loc:Tr GeometryDashboard_OffsetBottomTip}" />
                             </Grid>
 
                             <Grid Margin="10">
@@ -116,7 +118,7 @@
                                     <ColumnDefinition Width="Auto" MinWidth="100" SharedSizeGroup="PreferenceLabel" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="{loc:Tr GeometryDashboard_Complexity}" VerticalAlignment="Bottom" Margin="0,0,0,6"
+                                <TextBlock Text="{loc:Tr GeometryDashboard_Complexity}" VerticalAlignment="Bottom" Margin="0,0,5,6"
                                            ToolTip.Tip="{loc:Tr GeometryDashboard_ComplexityTip}" />
                                 <TextBox Grid.Column="1" Width="120" VerticalAlignment="Bottom"
                                          materialAssists:TextFieldAssist.Label="{loc:Tr GeometryDashboard_InceptionLevel}"
@@ -129,7 +131,7 @@
                                     <ColumnDefinition Width="Auto" MinWidth="100" SharedSizeGroup="PreferenceLabel" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="{loc:Tr GeometryDashboard_Downkey}" VerticalAlignment="Center" Margin="0,0,0,6"
+                                <TextBlock Text="{loc:Tr GeometryDashboard_Downkey}" VerticalAlignment="Center" Margin="0,0,5,6"
                                            ToolTip.Tip="{loc:Tr GeometryDashboard_SnapOptionTip}" />
                                 <ListBox Grid.Column="1" Classes="material-tool-toggle-list" SelectionMode="Multiple,Toggle"
                                          HorizontalAlignment="Left" VerticalAlignment="Center"
@@ -160,7 +162,7 @@
                                     <ColumnDefinition Width="Auto" MinWidth="100" SharedSizeGroup="PreferenceLabel" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="{loc:Tr GeometryDashboard_Upkey}" VerticalAlignment="Center" Margin="0,0,0,6"
+                                <TextBlock Text="{loc:Tr GeometryDashboard_Upkey}" VerticalAlignment="Center" Margin="0,0,5,6"
                                            ToolTip.Tip="{loc:Tr GeometryDashboard_UpkeyTip}" />
                                 <StackPanel Grid.Column="1">
                                     <RadioButton Content="{loc:Tr GeometryDashboard_Everything}" GroupName="KeyUpView"
@@ -177,7 +179,7 @@
                                     <ColumnDefinition Width="Auto" MinWidth="100" SharedSizeGroup="PreferenceLabel" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="{loc:Tr GeometryDashboard_Selection}" VerticalAlignment="Center" Margin="0,0,0,6"
+                                <TextBlock Text="{loc:Tr GeometryDashboard_Selection}" VerticalAlignment="Center" Margin="0,0,5,6"
                                            ToolTip.Tip="{loc:Tr GeometryDashboard_SelectionTip}" />
                                 <StackPanel Grid.Column="1">
                                     <RadioButton Content="{loc:Tr GeometryDashboard_AllVisible}" GroupName="SelectedObjects"
@@ -197,7 +199,7 @@
                                     <ColumnDefinition Width="Auto" MinWidth="100" SharedSizeGroup="PreferenceLabel" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="{loc:Tr GeometryDashboard_Updating}" VerticalAlignment="Center" Margin="0,0,0,6"
+                                <TextBlock Text="{loc:Tr GeometryDashboard_Updating}" VerticalAlignment="Center" Margin="0,0,5,6"
                                            ToolTip.Tip="{loc:Tr GeometryDashboard_UpdatingTip}" />
                                 <StackPanel Grid.Column="1">
                                     <RadioButton Content="{loc:Tr GeometryDashboard_AnyChange}" GroupName="Updating"
@@ -216,7 +218,7 @@
                                     <ColumnDefinition Width="Auto" MinWidth="100" SharedSizeGroup="PreferenceLabel" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="{loc:Tr GeometryDashboard_MinimalDiff}" VerticalAlignment="Bottom" Margin="0,0,0,6"
+                                <TextBlock Text="{loc:Tr GeometryDashboard_MinimalDiff}" VerticalAlignment="Bottom" Margin="0,0,5,6"
                                            ToolTip.Tip="{loc:Tr GeometryDashboard_MinimalDiffTip}" />
                                 <TextBox Grid.Column="1" Width="150" VerticalAlignment="Bottom"
                                          materialAssists:TextFieldAssist.Label="{loc:Tr GeometryDashboard_MinimalDifference}"
@@ -229,7 +231,7 @@
                                     <ColumnDefinition Width="Auto" MinWidth="100" SharedSizeGroup="PreferenceLabel" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="{loc:Tr GeometryDashboard_KeepRunning}" VerticalAlignment="Center" Margin="0,0,0,6"
+                                <TextBlock Text="{loc:Tr GeometryDashboard_KeepRunning}" VerticalAlignment="Center" Margin="0,0,5,6"
                                            ToolTip.Tip="{loc:Tr GeometryDashboard_KeepRunningTip}" />
                                 <ToggleSwitch Grid.Column="1" HorizontalAlignment="Left" OnContent="" OffContent=""
                                               IsChecked="{Binding KeepRunning, Mode=TwoWay}"
@@ -241,7 +243,7 @@
                                     <ColumnDefinition Width="Auto" MinWidth="100" SharedSizeGroup="PreferenceLabel" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="{loc:Tr GeometryDashboard_SeePlayfield}" VerticalAlignment="Center" Margin="0,0,0,6"
+                                <TextBlock Text="{loc:Tr GeometryDashboard_SeePlayfield}" VerticalAlignment="Center" Margin="0,0,5,6"
                                            ToolTip.Tip="{loc:Tr GeometryDashboard_SeePlayfieldTip}" />
                                 <ToggleSwitch Grid.Column="1" HorizontalAlignment="Left" OnContent="" OffContent=""
                                               IsChecked="{Binding Preferences.VisiblePlayfieldBoundary, Mode=TwoWay}"
@@ -253,7 +255,7 @@
                                     <ColumnDefinition Width="Auto" MinWidth="100" SharedSizeGroup="PreferenceLabel" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="{loc:Tr GeometryDashboard_Debug}" VerticalAlignment="Center" Margin="0,0,0,6"
+                                <TextBlock Text="{loc:Tr GeometryDashboard_Debug}" VerticalAlignment="Center" Margin="0,0,5,6"
                                            ToolTip.Tip="{loc:Tr GeometryDashboard_DebugTip}" />
                                 <ToggleSwitch Grid.Column="1" HorizontalAlignment="Left" OnContent="" OffContent=""
                                               IsChecked="{Binding Preferences.DebugEnabled, Mode=TwoWay}"
@@ -265,7 +267,7 @@
                     <ItemsControl ItemsSource="{Binding Appearance}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Expander Header="{Binding Name}" IsExpanded="False" Margin="0,0,0,5"
+                                <Expander Header="{Binding Name}" IsExpanded="False" Margin="0,0,5,5"
                                           HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
                                     <StackPanel Margin="20, 10">
                                         <Grid ColumnDefinitions="130,*,70" MinHeight="35">
@@ -326,8 +328,11 @@
 
         <Border Grid.Row="2" Padding="10">
             <Grid ColumnDefinitions="*,*">
-                <Button MinWidth="200" Content="{loc:Tr GeometryDashboard_Apply}" CornerRadius="10" Command="{Binding ApplyCommand}" />
+                <Button MinWidth="200" Content="{loc:Tr GeometryDashboard_Apply}" CornerRadius="10"
+                        HorizontalAlignment="Center"
+                        Command="{Binding ApplyCommand}" />
                 <Button Grid.Column="1" MinWidth="200" Content="{loc:Tr GeometryDashboard_Cancel}" CornerRadius="10"
+                        HorizontalAlignment="Center"
                         Command="{Binding CancelCommand}" />
             </Grid>
         </Border>

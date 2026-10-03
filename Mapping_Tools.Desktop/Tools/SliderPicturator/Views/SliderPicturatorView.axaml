@@ -25,53 +25,58 @@
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal">
-                    <StackPanel Width="350" HorizontalAlignment="Left">
+                    <StackPanel MinWidth="350" HorizontalAlignment="Left">
                         <StackPanel Margin="15,0,0,0" HorizontalAlignment="Left">
-                            <ComboBox Width="258" HorizontalAlignment="Left" Cursor="Hand"
+                            <ComboBox MinWidth="100" HorizontalAlignment="Left" Cursor="Hand"
                                       ItemsSource="{Binding ViewportSizes}" SelectedItem="{Binding ViewportSize}"
                                       materialAssists:ComboBoxAssist.Label="{loc:Tr SliderPicturator_ViewportSize}"
                                       ToolTip.Tip="{loc:Tr SliderPicturator_ViewportSizeTip}" />
 
-                            <Grid ColumnDefinitions="*,*,*" Margin="5,10,0,0">
-                                <TextBox Grid.Column="0" Width="75"
+                            <Grid ColumnDefinitions="Auto,Auto,Auto" Margin="0,10,0,0">
+                                <TextBox Grid.Column="0" MinWidth="75"
+                                         Margin="0, 0, 5, 0"
                                          Text="{Binding TimeCode, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}"
                                          materialAssists:TextFieldAssist.Label="{loc:Tr SliderPicturator_Time}"
                                          ToolTip.Tip="{loc:Tr SliderPicturator_TimeTip}" />
 
-                                <TextBox Grid.Column="1" Width="75"
+                                <TextBox Grid.Column="1" MinWidth="75"
+                                         Margin="5, 0"
                                          Text="{Binding Duration, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}"
                                          materialAssists:TextFieldAssist.Label="{loc:Tr SliderPicturator_Duration}"
                                          ToolTip.Tip="{loc:Tr SliderPicturator_DurationTip}" />
 
-                                <TextBox Grid.Column="2" Width="75"
+                                <TextBox Grid.Column="2" MinWidth="75"
+                                         Margin="5, 0"
                                          Text="{Binding YResolution, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}"
                                          materialAssists:TextFieldAssist.Label="{loc:Tr SliderPicturator_YResolution}"
                                          ToolTip.Tip="{loc:Tr SliderPicturator_YResolutionTip}" />
                             </Grid>
 
-                            <Grid ColumnDefinitions="Auto,*,*" Margin="5,10,0,0">
-                                <TextBlock Grid.Column="0" Margin="5,15,0,0" VerticalAlignment="Center"
+                            <Grid Margin="0,10,0,0" ColumnDefinitions="Auto,Auto,Auto" RowDefinitions="Auto, Auto">
+                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,15,5,0" VerticalAlignment="Center"
                                            Text="{loc:Tr SliderPicturator_SliderPosition}" />
-                                <TextBox Grid.Column="1" Width="75"
+                                <TextBox Grid.Row="0" Grid.Column="1" MinWidth="75"
+                                         Margin="5, 0"
                                          Text="{Binding SliderStartX, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}"
                                          materialAssists:TextFieldAssist.Label="{loc:Tr SliderPicturator_XPosition}"
                                          ToolTip.Tip="{loc:Tr SliderPicturator_SliderHeadXTip}" />
 
-                                <TextBox Grid.Column="2" Width="75"
+                                <TextBox Grid.Row="0" Grid.Column="2" MinWidth="75"
+                                         Margin="5, 0"
                                          Text="{Binding SliderStartY, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}"
                                          materialAssists:TextFieldAssist.Label="{loc:Tr SliderPicturator_YPosition}"
                                          ToolTip.Tip="{loc:Tr SliderPicturator_SliderHeadYTip}" />
-                            </Grid>
 
-                            <Grid ColumnDefinitions="Auto,*,*" Margin="5,10,0,0">
-                                <TextBlock Grid.Column="0" Margin="5,15,0,0" VerticalAlignment="Center"
+                                <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,15,5,0" VerticalAlignment="Center"
                                            Text="{loc:Tr SliderPicturator_ImagePosition}" />
-                                <TextBox Grid.Column="1" Width="75"
+                                <TextBox Grid.Row="1" Grid.Column="1" MinWidth="75"
+                                         Margin="5, 0"
                                          Text="{Binding ImageStartX, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}"
                                          materialAssists:TextFieldAssist.Label="{loc:Tr SliderPicturator_XPosition}"
                                          ToolTip.Tip="{loc:Tr SliderPicturator_ImageTopLeftXTip}" />
 
-                                <TextBox Grid.Column="2" Width="75"
+                                <TextBox Grid.Row="1" Grid.Column="2" MinWidth="75"
+                                         Margin="5, 0"
                                          Text="{Binding ImageStartY, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}"
                                          materialAssists:TextFieldAssist.Label="{loc:Tr SliderPicturator_YPosition}"
                                          ToolTip.Tip="{loc:Tr SliderPicturator_ImageTopLeftYTip}" />
@@ -79,13 +84,14 @@
 
                             <Grid Margin="0,20,0,0" RowDefinitions="Auto,40,40" ColumnDefinitions="Auto,*">
                                 <CheckBox Grid.Row="0" Grid.ColumnSpan="2" Content="{loc:Tr SliderPicturator_UseMapComboColors}"
+                                          Margin="0, 0, 0, 5"
                                           IsChecked="{Binding UseMapComboColors}"
                                           ToolTip.Tip="{loc:Tr SliderPicturator_UseMapComboColorsTip}" />
 
                                 <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Text="{loc:Tr SliderPicturator_TrackColor}" />
                                 <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal"
-                                            HorizontalAlignment="Center">
-                                    <ComboBox Width="106" Margin="10,0,25,0" Cursor="Hand"
+                                            HorizontalAlignment="Left">
+                                    <ComboBox Width="106" Margin="10,0,15,0" Cursor="Hand"
                                               IsVisible="{Binding ShouldShowCcPicker}"
                                               ItemsSource="{Binding AvailableColors}"
                                               SelectedItem="{Binding ComboColor}"
@@ -122,7 +128,7 @@
                         <CheckBox Content="{loc:Tr SliderPicturator_SetBeatmapColors}" IsChecked="{Binding SetBeatmapColors}"
                                   ToolTip.Tip="{loc:Tr SliderPicturator_SetBeatmapColorsTip}" />
                         <Slider Value="{Binding Quality}"
-                                Margin="5,10,15,10" Minimum="1" Maximum="101"
+                                Margin="5,15,15,15" Minimum="1" Maximum="101"
                                 Classes="Discrete"
                                 TickPlacement="BottomRight"
                                 TickFrequency="10" IsSnapToTickEnabled="True" ToolTip.Tip="{loc:Tr SliderPicturator_ImageQuality}" />
@@ -137,7 +143,9 @@
                     </StackPanel>
 
                     <StackPanel>
-                        <Image Width="440" Source="{Binding PreviewImage}" Stretch="Uniform"
+                        <Image Width="440"
+                               Margin="10"
+                               Source="{Binding PreviewImage}" Stretch="Uniform"
                                HorizontalAlignment="Left" VerticalAlignment="Top"
                                RenderOptions.BitmapInterpolationMode="None" />
                     </StackPanel>

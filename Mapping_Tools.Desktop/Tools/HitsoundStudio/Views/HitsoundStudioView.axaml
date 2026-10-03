@@ -15,7 +15,7 @@
         <converters:DoubleArrayToStringConverter x:Key="DoubleArrayToStringConverter" />
         <hsConverters:HitsoundStudioSampleVolumeConverter x:Key="HitsoundStudioSampleVolumeConverter" />
     </UserControl.Resources>
-    <Grid ColumnDefinitions="*,260"
+    <Grid ColumnDefinitions="*,300"
           RowDefinitions="Auto,*,Auto">
         <controls:ToolViewHeader Grid.ColumnSpan="2"
                                  Title="Hitsound Studio"

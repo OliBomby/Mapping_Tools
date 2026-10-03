@@ -34,7 +34,7 @@ public static class TranslationManager
     }
 
     /// <summary>Selects a text language. Unsupported or invalid codes use English; null follows the system.</summary>
-    /// <param name="code">A persisted language code such as en or nl, or null for the system default.</param>
+    /// <param name="code">A supported language code such as en, nl, ru, zh-Hans, zh-Hant, or ja, or null for the system default.</param>
     public static void SetLanguage(string? code)
     {
         string? normalized = string.IsNullOrWhiteSpace(code) ? null : Normalize(code);
@@ -53,7 +53,18 @@ public static class TranslationManager
         try
         {
             var culture = CultureInfo.GetCultureInfo(code);
-            return culture.TwoLetterISOLanguageName == "nl" ? "nl" : "en";
+            string languageCode = culture.TwoLetterISOLanguageName;
+            if (languageCode == "zh")
+            {
+                return culture.Name.Contains("Hant", StringComparison.OrdinalIgnoreCase)
+                    || culture.Name is "zh-TW" or "zh-HK" or "zh-MO"
+                    ? "zh-Hant"
+                    : "zh-Hans";
+            }
+
+            return languageCode is "en" or "nl" or "ru" or "ja" or "es" or "id" or "pl" or "de" or "fr" or "ko"
+                ? languageCode
+                : "en";
         }
         catch (CultureNotFoundException)
         {

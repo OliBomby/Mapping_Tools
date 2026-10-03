@@ -1,0 +1,303 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms</value>
+  </resheader>
+  <data name="AutoFailDetector_Description" xml:space="preserve">
+    <value>Deteksi pemuatan objek yang keliru pada pola yang saling tumpang tindih.</value>
+    <comment>Tool catalog description for Auto-fail Detector. Explain that it detects overlapping hit-object patterns which can cause incorrect object loading. Keep the tool name and hit-object mapping terminology unchanged.</comment>
+  </data>
+  <data name="AutoFailDetector_SearchTerms" xml:space="preserve">
+    <value>overlap|overlapping|hit object|object loading|auto fail|unloading|tumpang tindih|pola bertumpuk|objek hit|pemuatan objek|gagal otomatis|pembongkaran</value>
+    <comment>Additional search terms for Auto-fail Detector. Separate terms with |. Keep canonical English terms and add likely mapper search words; do not translate tool or product names.</comment>
+  </data>
+  <data name="ComboColourStudio_Description" xml:space="preserve">
+    <value>Sesuaikan urutan warna kombo, burst, dan colour haxing.</value>
+    <comment>Tool catalog description for Combo Colour Studio. Combo colours are beatmap object-group colours; bursts are groups of objects; colour haxing is community terminology for unusual combo-colour use. Keep the tool name and technical terms unchanged.</comment>
+  </data>
+  <data name="ComboColourStudio_SearchTerms" xml:space="preserve">
+    <value>combo colour|combo color|colour sequence|color sequence|burst|colour hax|color hax|warna kombo|urutan warna kombo|ledakan objek|penggunaan warna tidak biasa</value>
+    <comment>Additional search terms for Combo Colour Studio. Separate terms with |. Include common spelling variants and mapper vocabulary; retain all canonical English terms.</comment>
+  </data>
+  <data name="GeometryDashboard_Description" xml:space="preserve">
+    <value>Buat, tampilkan, snap, dan simpan geometri yang berguna di sekitar hit object osu!.</value>
+    <comment>Tool catalog description for Geometry Dashboard. Geometry can be generated around osu! hit objects, shown as an overlay, used for snapping, and saved. Preserve the product name osu! and mapping term hit object.</comment>
+  </data>
+  <data name="GeometryDashboard_SearchTerms" xml:space="preserve">
+    <value>geometry|snap|snapping|virtual objects|overlay|generators|shape|geometri|snap objek|penyelarasan|objek virtual|lapisan tindih|generator|bentuk</value>
+    <comment>Additional search terms for Geometry Dashboard. Separate terms with |. Terms describe generated geometry, snapping and overlays; preserve the canonical English terms already present.</comment>
+  </data>
+  <data name="HitsoundCopier_Description" xml:space="preserve">
+    <value>Salin hitsound, sample, dan suara storyboard antar-beatmap.</value>
+    <comment>Tool catalog description for Hitsound Copier. It copies hitsounds and their samples, including storyboard audio, from one or more beatmaps to others. Preserve the established osu! terms hitsound, storyboard, and beatmap.</comment>
+  </data>
+  <data name="HitsoundCopier_SearchTerms" xml:space="preserve">
+    <value>hitsound|sample|storyboard sound|audio|mute|multi-map|suara hit|sampel|suara storyboard|audio|bisu|banyak map|salin suara</value>
+    <comment>Additional search terms for Hitsound Copier. Separate terms with |. Include hitsound, sample, storyboard sound, audio, mute, and multi-map concepts; do not translate canonical product or tool names.</comment>
+  </data>
+  <data name="HitsoundPreviewHelper_Description" xml:space="preserve">
+    <value>Tempatkan hitsound sementara berdasarkan zona posisi.</value>
+    <comment>Tool catalog description for Hitsound Preview Helper. It assigns temporary hitsounds according to positional zones on the playfield. Preserve the established mapping term hitsound; provisional means preview/draft assignment, not permanent playback.</comment>
+  </data>
+  <data name="HitsoundPreviewHelper_SearchTerms" xml:space="preserve">
+    <value>hitsound|preview|temporary|provisional|zone|sample|position|suara hit|pratinjau|sementara|zona|sampel|posisi</value>
+    <comment>Additional search terms for Hitsound Preview Helper. Separate terms with |. Include temporary preview, positional zone, and sample concepts while retaining canonical English terms.</comment>
+  </data>
+  <data name="HitsoundStudio_Description" xml:space="preserve">
+    <value>Impor, edit, pratinjau, buat, dan ekspor lapisan hitsound.</value>
+    <comment>Tool catalog description for Hitsound Studio. It manages layered hitsound data through import, editing, preview, generation, and export. Preserve the tool name and established osu! term hitsound.</comment>
+  </data>
+  <data name="HitsoundStudio_SearchTerms" xml:space="preserve">
+    <value>hitsound|sample|MIDI|SoundFont|export|layer|audio|suara hit|sampel|ekspor|lapisan|audio</value>
+    <comment>Additional search terms for Hitsound Studio. Separate terms with |. MIDI and SoundFont are technical proper names and must remain unchanged; include the canonical English concepts.</comment>
+  </data>
+  <data name="MapCleaner_Description" xml:space="preserve">
+    <value>Bangun ulang greenline yang berguna dan, jika perlu, resnap isi map.</value>
+    <comment>Tool catalog description for Map Cleaner. Greenlines are inherited timing points that change slider velocity; resnapping realigns map content to timing or distance snap. Preserve osu! community terms greenline and resnap.</comment>
+  </data>
+  <data name="MapCleaner_SearchTerms" xml:space="preserve">
+    <value>clean|greenline|green line|inherited timing point|resnap|resnap objects|samples|bersihkan|garis hijau|titik timing turunan|atur ulang snap objek|sampel</value>
+    <comment>Additional search terms for Map Cleaner. Separate terms with |. Greenline means an inherited timing point; resnap means realign objects to a snap grid. Keep canonical English search terms.</comment>
+  </data>
+  <data name="MapsetMerger_Description" xml:space="preserve">
+    <value>Gabungkan beberapa mapset dan atasi konflik beatmap, audio, gambar, storyboard, serta sample.</value>
+    <comment>Tool catalog description for Mapset Merger. A mapset is a collection of related beatmaps and assets; the tool combines mapsets and resolves conflicting files. Preserve beatmap, storyboard, and mapset as established mapping terms.</comment>
+  </data>
+  <data name="MapsetMerger_SearchTerms" xml:space="preserve">
+    <value>mapset|beatmapset|merge|combine|audio|image|storyboard|sample|conflict|set map|gabungkan|satukan|gambar|suara|konflik aset</value>
+    <comment>Additional search terms for Mapset Merger. Separate terms with |. Include mapset and beatmapset synonyms plus asset conflict concepts; keep canonical English terms searchable.</comment>
+  </data>
+  <data name="MetadataManager_Description" xml:space="preserve">
+    <value>Edit metadata sekali, lalu terapkan ke beberapa beatmap.</value>
+    <comment>Tool catalog description for Metadata Manager. Metadata means artist, title, tags, colours, and related beatmap fields; edits can be applied to multiple beatmaps. Preserve beatmap as established terminology.</comment>
+  </data>
+  <data name="MetadataManager_SearchTerms" xml:space="preserve">
+    <value>metadata|artist|title|tags|colours|colors|beatmap information|artis|judul|tag|warna|informasi beatmap</value>
+    <comment>Additional search terms for Metadata Manager. Separate terms with |. Include metadata field names and both colour/color spellings; preserve canonical English terms.</comment>
+  </data>
+  <data name="PatternGallery_Description" xml:space="preserve">
+    <value>Kumpulkan, pratinjau, atur, dan tempatkan pola hit object yang dapat digunakan kembali.</value>
+    <comment>Tool catalog description for Pattern Gallery. It stores reusable arrangements of hit objects, lets users preview and organize them, and places them into a beatmap. Preserve the established term hit object.</comment>
+  </data>
+  <data name="PatternGallery_SearchTerms" xml:space="preserve">
+    <value>pattern|gallery|collection|osu|snippet|hit object|object pattern|template|pola|galeri|kumpulan|cuplikan|objek hit|pola objek|templat</value>
+    <comment>Additional search terms for Pattern Gallery. Separate terms with |. Include reusable hit-object arrangement and template concepts; preserve canonical English keywords.</comment>
+  </data>
+  <data name="PropertyTransformer_Description" xml:space="preserve">
+    <value>Kalikan dan tambahkan nilai properti timing, objek, bookmark, dan storyboard.</value>
+    <comment>Tool catalog description for Property Transformer. It applies multiplication and addition to numeric properties in timing points, hit objects, bookmarks, and storyboard data. Preserve storyboard and other file-format terminology.</comment>
+  </data>
+  <data name="PropertyTransformer_SearchTerms" xml:space="preserve">
+    <value>properties|transform|timing|offset|multiplier|hit object|bookmark|storyboard|properti|ubah|waktu|selisih|pengali|objek hit|markah|papan cerita</value>
+    <comment>Additional search terms for Property Transformer. Separate terms with |. Include affected beatmap data categories and arithmetic concepts; retain all English canonical terms.</comment>
+  </data>
+  <data name="RhythmGuide_Description" xml:space="preserve">
+    <value>Buat beatmap berisi circle dari ritme beberapa map.</value>
+    <comment>Tool catalog description for Rhythm Guide. It creates hit circles in a new beatmap using rhythmic information from multiple source beatmaps. Preserve beatmap and map as established mapper terms.</comment>
+  </data>
+  <data name="RhythmGuide_SearchTerms" xml:space="preserve">
+    <value>rhythm|hitsound|guide|reference|circles|beatmap|timing|ritme|suara hit|panduan|referensi|circle|beatmap|timing</value>
+    <comment>Additional search terms for Rhythm Guide. Separate terms with |. Include rhythm reference, hit circles, beatmap, and timing concepts while keeping English canonical terms.</comment>
+  </data>
+  <data name="Sliderator_Description" xml:space="preserve">
+    <value>Buat slider dan stream dengan velocity bervariasi dari grafik yang dapat diedit.</value>
+    <comment>Tool catalog description for Sliderator. It creates sliders with changing slider velocity (SV) and streams by drawing an editable graph. Keep Sliderator, slider, stream, and SV unchanged as established names or mapper terms.</comment>
+  </data>
+  <data name="Sliderator_SearchTerms" xml:space="preserve">
+    <value>slider|sliderator|variable velocity|SV|stream|graph|velocity|kecepatan bervariasi|alur slider|grafik|kecepatan</value>
+    <comment>Additional search terms for Sliderator. Separate terms with |. SV means slider velocity. Keep the proper tool name and canonical English mapper terms.</comment>
+  </data>
+  <data name="SliderCompletionator_Description" xml:space="preserve">
+    <value>Ubah panjang dan durasi slider sambil menghitung slider velocity.</value>
+    <comment>Tool catalog description for Slider Completionator. It adjusts a slider's path length and time duration while calculating the required slider velocity (SV). Preserve the proper tool name and slider/SV terminology.</comment>
+  </data>
+  <data name="SliderCompletionator_SearchTerms" xml:space="preserve">
+    <value>slider|completion|duration|length|velocity|SV|slider velocity|penyelesaian|durasi|panjang|kecepatan|kecepatan slider</value>
+    <comment>Additional search terms for Slider Completionator. Separate terms with |. SV means slider velocity; include duration and path-length concepts while preserving canonical English terms.</comment>
+  </data>
+  <data name="SliderMerger_Description" xml:space="preserve">
+    <value>Gabungkan slider dan circle yang dipilih menjadi satu slider tersambung.</value>
+    <comment>Tool catalog description for Slider Merger. It joins selected sliders and hit circles into one continuous slider path. Preserve the proper tool name and established object terms slider and hit circle.</comment>
+  </data>
+  <data name="SliderMerger_SearchTerms" xml:space="preserve">
+    <value>slider|merge|bezier|connection|circle|hit circle|join|combine|gabungkan|kurva bezier|sambungan|circle|hit circle|satukan</value>
+    <comment>Additional search terms for Slider Merger. Separate terms with |. Include slider, hit-circle, joining, and Bezier concepts; keep canonical English terms.</comment>
+  </data>
+  <data name="SliderPicturator_Description" xml:space="preserve">
+    <value>Buat jalur slider yang mereproduksi gambar yang diimpor.</value>
+    <comment>Tool catalog description for Slider Picturator. It converts an imported image into a slider path in the beatmap. Preserve the proper tool name and established term slider.</comment>
+  </data>
+  <data name="SliderPicturator_SearchTerms" xml:space="preserve">
+    <value>slider|picture|image|picturator|render|trace|path|gambar|pikturator|render|telusuri|jalur</value>
+    <comment>Additional search terms for Slider Picturator. Separate terms with |. Include image tracing and slider-path concepts while retaining canonical English terms.</comment>
+  </data>
+  <data name="TimingCopier_Description" xml:space="preserve">
+    <value>Salin timing antar-beatmap dengan opsi resnap objek.</value>
+    <comment>Tool catalog description for Timing Copier. It copies timing points from one beatmap to another and can optionally resnap objects to the copied timing. Preserve timing point, beatmap, and resnap terminology.</comment>
+  </data>
+  <data name="TimingCopier_SearchTerms" xml:space="preserve">
+    <value>timing|copy|resnap|beat divisor|multi-map|timing point|BPM|salin|atur ulang snap|pembagi ketukan|banyak map|titik timing</value>
+    <comment>Additional search terms for Timing Copier. Separate terms with |. BPM means beats per minute; include timing points, beat divisors, and resnapping while retaining English canonical terms.</comment>
+  </data>
+  <data name="TimingHelper_Description" xml:space="preserve">
+    <value>Sesuaikan BPM dan tambahkan redline agar marker yang dipilih tersnap.</value>
+    <comment>Tool catalog description for Timing Helper. BPM is beats per minute. Redlines are uninherited timing points; the tool adjusts timing so selected markers align to the beat snap grid. Preserve BPM and redline mapping terminology.</comment>
+  </data>
+  <data name="TimingHelper_SearchTerms" xml:space="preserve">
+    <value>timing|redline|BPM|marker|beat divisor|snap|timing point|waktu|garis merah|penanda|pembagi ketukan|selaraskan|titik timing</value>
+    <comment>Additional search terms for Timing Helper. Separate terms with |. BPM means beats per minute and redline means uninherited timing point; keep the existing canonical English terms searchable.</comment>
+  </data>
+  <data name="TumourGenerator_Description" xml:space="preserve">
+    <value>Hasilkan banyak tumour pada slider.</value>
+    <comment>Tool catalog description for Tumour Generator 2. Tumours is the tool's playful name for dense layers of repeated slider shapes; retain this wording and the proper tool name exactly.</comment>
+  </data>
+  <data name="TumourGenerator_SearchTerms" xml:space="preserve">
+    <value>tumour|tumor|slider|layers|graph|templates|lapisan slider|grafik|templat</value>
+    <comment>Additional search terms for Tumour Generator 2. Separate terms with |. Include British and American spelling of tumour/tumor and slider-layer concepts; do not translate the tool name.</comment>
+  </data>
+  <data name="HitsoundStudio_ExportSummary" xml:space="preserve">
+    <value>Indeks sampel: {0}, sampel: {1}, greenline: {2}</value>
+    <comment>Detailed Hitsound Studio export result. {0} is the count of custom sample indices, {1} is the count of sample entries containing a valid sample, and {2} is the count of greenline changes. Preserve each numbered placeholder exactly once; these are counts, not formatted dates or decimal values.</comment>
+  </data>
+  <data name="HitsoundStudio_ImportSummary" xml:space="preserve">
+    <value>Indeks sampel: 0, sampel: {0}, greenline: 0</value>
+    <comment>Detailed Hitsound Studio import result. {0} is the count of distinct sample arguments found across imported samples; the import creates no sample indices or greenlines. Preserve {0} exactly once; this is an integer count.</comment>
+  </data>
+  <data name="HitsoundStudio_MidiSummary" xml:space="preserve">
+    <value>Not: {0}, perubahan volume: {1}</value>
+    <comment>Detailed Hitsound Studio MIDI export result. {0} is the number of exported notes and {1} is the number of timing points receiving a volume change (zero when that option is disabled). Preserve both numbered placeholders exactly once; they are integer counts.</comment>
+  </data>
+  <data name="QuickUndo_NoCurrentBeatmap" xml:space="preserve">
+    <value>QuickUndo tidak dapat menentukan beatmap aktif. Buka beatmap di osu! dan periksa pengaturan beatmap aktif di Preferences.</value>
+    <comment>Warning shown when QuickUndo cannot identify the beatmap currently open in the osu! editor. The user can open a beatmap and verify current-beatmap discovery in Preferences. Keep QuickUndo and osu! unchanged; beatmap is established mapper vocabulary.</comment>
+  </data>
+  <data name="QuickUndo_NoBackup" xml:space="preserve">
+    <value>Tidak ada cadangan tersimpan nonperiodik yang dapat dipulihkan.</value>
+    <comment>Warning shown when QuickUndo finds no retained non-periodic backup for the current beatmap. Non-periodic distinguishes user-triggered backups from automatic periodic snapshots.</comment>
+  </data>
+  <data name="QuickUndo_Restored" xml:space="preserve">
+    <value>Cadangan nonperiodik terbaru berhasil dipulihkan.</value>
+    <comment>Success notification after QuickUndo restores the newest retained non-periodic backup. No placeholders. Keep backup terminology concise.</comment>
+  </data>
+  <data name="QuickRun_EditorUnavailable" xml:space="preserve">
+    <value>QuickRun tidak dapat menentukan pilihan di editor osu! saat ini.</value>
+    <comment>Warning shown when QuickRun cannot read the selected hit objects in the currently open osu! editor. Keep QuickRun and osu! unchanged.</comment>
+  </data>
+  <data name="QuickRun_CommandUnavailable" xml:space="preserve">
+    <value>Perintah QuickRun yang dikonfigurasi tidak tersedia.</value>
+    <comment>Warning shown when the command configured for the current selection size cannot be found. QuickRun is a proper feature name and must remain unchanged.</comment>
+  </data>
+  <data name="QuickRun_NoObjectsSelected" xml:space="preserve">
+    <value>Tidak ada hit object yang dipilih, dan belum ada perintah QuickRun untuk pilihan kosong. Pilih hit object atau atur perintah untuk tanpa pilihan di Preferences.</value>
+    <comment>Warning shown when QuickRun has read the editor successfully, found zero selected hit objects, and no command is configured for that selection size. Tell the user to select objects or configure the empty-selection command. Keep QuickRun unchanged.</comment>
+  </data>
+  <data name="QuickRun_NamedCommandUnavailable" xml:space="preserve">
+    <value>Tool QuickRun '{0}' yang dikonfigurasi tidak tersedia.</value>
+    <comment>Warning shown when the tool named in QuickRun settings is not in the command catalog. {0} is the canonical untranslated tool name; preserve this placeholder exactly once.</comment>
+  </data>
+  <data name="QuickRun_Failed" xml:space="preserve">
+    <value>QuickRun tidak dapat menyelesaikan perintah. Lihat detail kesalahan untuk informasi teknis.</value>
+    <comment>Error notification after a QuickRun command throws. Preserve technical exception information separately in the exception details; do not insert raw exception text here.</comment>
+  </data>
+  <data name="BetterSave_EditorUnavailable" xml:space="preserve">
+    <value>BetterSave tidak dapat menentukan beatmap aktif. Buka beatmap di osu! dan periksa pengaturan beatmap aktif di Preferences.</value>
+    <comment>Warning shown when BetterSave cannot identify the beatmap currently open in the osu! editor. The user can open a beatmap and verify current-beatmap discovery in Preferences. Keep BetterSave and osu! unchanged.</comment>
+  </data>
+  <data name="BetterSave_Saved" xml:space="preserve">
+    <value>Beatmap aktif berhasil disimpan.</value>
+    <comment>Success notification after BetterSave writes the currently open beatmap. Keep beatmap as established mapper vocabulary.</comment>
+  </data>
+  <data name="BetterSave_Failed" xml:space="preserve">
+    <value>BetterSave tidak dapat menyimpan beatmap aktif. Lihat detail kesalahan untuk informasi teknis.</value>
+    <comment>Error notification after BetterSave fails. Preserve the original exception in technical details; do not expose raw exception text as localized UI.</comment>
+  </data>
+  <data name="ToolExecution_Failed" xml:space="preserve">
+    <value>Operasi tidak dapat diselesaikan. Lihat detail kesalahan untuk informasi teknis.</value>
+    <comment>Generic error summary shown when an application tool throws an exception not mapped to a specific expected user-facing message. Technical exception details are available separately; do not include exception text in this string.</comment>
+  </data>
+  <data name="Workspace_MissingBeatmapTitle" xml:space="preserve">
+    <value>Beatmap yang dipilih tidak ditemukan</value>
+    <comment>Notification title shown when a previously selected beatmap file no longer exists. Keep beatmap as established mapper vocabulary.</comment>
+  </data>
+  <data name="Workspace_MissingBeatmapMessage" xml:space="preserve">
+    <value>Salah satu beatmap yang dipilih tidak dapat ditemukan. Pilih lagi melalui Berkas &gt; Buka beatmap.</value>
+    <comment>Notification shown when a selected beatmap file has disappeared. The menu command File &gt; Open beatmap is a UI label and will be localized by the Desktop resource owner; this message names the action in plain text.</comment>
+  </data>
+  <data name="Workspace_OpenBeatmapPicker" xml:space="preserve">
+    <value>Buka beatmap</value>
+    <comment>Title passed to the native beatmap file picker. This is user-visible dialog text and should use the natural imperative for opening one or more beatmap files.</comment>
+  </data>
+  <data name="Exception_OperationFailed" xml:space="preserve">
+    <value>Operasi tidak dapat diselesaikan dengan masukan atau status aplikasi saat ini.</value>
+    <comment>Fallback user-facing message for recognized expected application exceptions when no more specific localized message exists. This describes invalid input or a prerequisite/state mismatch without exposing exception internals.</comment>
+  </data>
+  <data name="Exception_FileMissing" xml:space="preserve">
+    <value>File atau folder yang diperlukan tidak ditemukan. Periksa jalur yang dipilih, lalu coba lagi.</value>
+    <comment>User-facing summary for FileNotFoundException or DirectoryNotFoundException. Do not include a path placeholder; the original path remains available in technical details.</comment>
+  </data>
+  <data name="Exception_LiveEditorUnavailable" xml:space="preserve">
+    <value>Mapping Tools tidak dapat membaca status langsung untuk beatmap aktif. Buka beatmap yang dimaksud di osu! dan periksa opsi status langsung di Preferences.</value>
+    <comment>Actionable summary for LiveBeatmapUnavailableException, which covers disabled live reading, no readable active editor, a different beatmap being open, or unsafe live data. Keep Mapping Tools and osu! unchanged; do not expose the technical exception message.</comment>
+  </data>
+  <data name="Exception_BackupBeatmapMismatch" xml:space="preserve">
+    <value>Cadangan ini milik beatmap lain. Pilih cadangan untuk beatmap aktif sebelum memulihkannya.</value>
+    <comment>Summary for BeatmapBackupIncompatibleException, raised when backup metadata does not match the destination difficulty or mapset. Do not include filenames; they remain in technical details.</comment>
+  </data>
+  <data name="Exception_AccessDenied" xml:space="preserve">
+    <value>Aplikasi tidak dapat mengakses file atau folder yang dipilih. Periksa izinnya, lalu coba lagi.</value>
+    <comment>User-facing summary for UnauthorizedAccessException. Do not include a path placeholder; the original path and diagnostic message remain in technical details.</comment>
+  </data>
+  <data name="Exception_InvalidInput" xml:space="preserve">
+    <value>Satu atau beberapa nilai tidak valid. Tinjau masukan, lalu coba lagi.</value>
+    <comment>User-facing summary for ArgumentException from an operation boundary. This is broad because exception text may be programmer-facing; preserve specific form validation in the owning UI.</comment>
+  </data>
+  <data name="Exception_Prerequisite" xml:space="preserve">
+    <value>Operasi tidak dapat dilanjutkan dalam status saat ini. Periksa prasyaratnya, lalu coba lagi.</value>
+    <comment>User-facing summary for InvalidOperationException from an operation boundary. This covers unavailable editor state or unmet prerequisites without exposing diagnostic exception text.</comment>
+  </data>
+  <data name="Exception_UnexpectedFailure" xml:space="preserve">
+    <value>Kesalahan tak terduga menghentikan operasi. Lihat detail kesalahan untuk informasi teknis.</value>
+    <comment>Generic user-facing message for unexpected exceptions. Keep technical diagnostic detail in the separate exception field; never interpolate raw exception text here.</comment>
+  </data>
+  <data xml:space="preserve" name="Picker_Beatmaps">
+    <value>beatmap osu!</value>
+    <comment>Native file-picker filter label for .osu beatmaps. Preserve osu!; filenames/extensions/MIME types stay unchanged.</comment>
+  </data>
+  <data xml:space="preserve" name="Picker_BeatmapsAndStoryboards">
+    <value>beatmap dan storyboard osu!</value>
+    <comment>Native file-picker filter label for .osu maps and .osb storyboards. Preserve osu! and established storyboard term.</comment>
+  </data>
+  <data xml:space="preserve" name="Picker_BeatmapBackups">
+    <value>cadangan beatmap osu!</value>
+    <comment>Native restore-picker filter label for backup copies of .osu or .osb files. Preserve osu!.</comment>
+  </data>
+  <data xml:space="preserve" name="Picker_MappingToolsProjects">
+    <value>proyek Mapping Tools</value>
+    <comment>Native file-picker filter label for JSON tool-configuration projects, distinct from .osu beatmaps. Preserve Mapping Tools.</comment>
+  </data>
+  <data xml:space="preserve" name="Picker_OsuConfiguration">
+    <value>konfigurasi pengguna osu!</value>
+    <comment>Native file-picker filter label for osu!.&lt;user&gt;.cfg files. Preserve osu!; matching glob remains invariant.</comment>
+  </data>
+  <data xml:space="preserve" name="Picker_SampleFiles">
+    <value>file sampel</value>
+    <comment>Native audio picker filter label for WAV/OGG audio samples and SF2 SoundFonts; sample means audio asset.</comment>
+  </data>
+  <data xml:space="preserve" name="Picker_SaveProject">
+    <value>Simpan proyek</value>
+    <comment>Native Save As dialog title for saved tool configuration, not beatmap data.</comment>
+  </data>
+  <data xml:space="preserve" name="Picker_OpenProject">
+    <value>Buka proyek</value>
+    <comment>Native Open dialog title for loading a saved tool configuration project.</comment>
+  </data>
+</root>

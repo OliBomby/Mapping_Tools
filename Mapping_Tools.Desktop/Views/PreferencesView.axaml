@@ -101,7 +101,7 @@
             </Grid>
 
             <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                <ComboBox Width="200"
+                <ComboBox Width="220"
                           HorizontalAlignment="Left"
                           ItemsSource="{Binding CurrentBeatmapFetchingModes}"
                           SelectedItem="{Binding CurrentBeatmapFetching, Mode=TwoWay}"
@@ -113,7 +113,7 @@
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
-                <ComboBox Width="200"
+                <ComboBox Width="220"
                           Margin="15 0 0 0"
                           HorizontalAlignment="Left"
                           ItemsSource="{Binding BeatmapLiveStateReadingModes}"
@@ -126,7 +126,7 @@
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
-                <ComboBox Width="200"
+                <ComboBox Width="220"
                           Margin="15 0 0 0"
                           HorizontalAlignment="Left"
                           ItemsSource="{Binding EditorReloadModes}"
@@ -141,7 +141,7 @@
                 </ComboBox>
             </StackPanel>
 
-            <TextBox MaxWidth="150"
+            <TextBox MaxWidth="240"
                      Margin="0,10,0,0"
                      HorizontalAlignment="Left"
                      materialAssists:TextFieldAssist.Label="{loc:Tr Shell_MaxBackupFiles}"
@@ -161,7 +161,7 @@
                               Content="{loc:Tr Shell_MakePeriodicBackups}"
                               IsChecked="{Binding MakePeriodicBackups, Mode=TwoWay}"
                               ToolTip.Tip="{loc:Tr Shell_PeriodicallyMakeAutomaticBackupsWhenTheEditorIsOpenThisIsUsefulIfYouForgetToSaveOftenOrAccidentallyD}" />
-                    <TextBox MaxWidth="150"
+                    <TextBox MaxWidth="220"
                              Margin="20,0,0,0"
                              HorizontalAlignment="Left"
                              IsVisible="{Binding MakePeriodicBackups}"
@@ -192,7 +192,7 @@
 
             <StackPanel Margin="5,10,0,0">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Width="150"
+                    <TextBlock Width="220"
                                VerticalAlignment="Center"
                                Text="{loc:Tr Shell_QuickrunHotkey}"
                                ToolTip.Tip="{loc:Tr Shell_QuickrunLetsYouQuicklyRunAToolOnTheBeatmapYouHaveOpenInTheEditor}" />
@@ -259,7 +259,7 @@
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Width="150"
+                    <TextBlock Width="220"
                                VerticalAlignment="Center"
                                Text="{loc:Tr Shell_QuickundoHotkey}"
                                ToolTip.Tip="{loc:Tr Shell_QuicklyLoadsTheLatestBackupIntoTheBeatmapCurrentlyOpenInTheEditor}" />
@@ -269,7 +269,7 @@
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Width="150"
+                    <TextBlock Width="220"
                                VerticalAlignment="Center"
                                Text="{loc:Tr Shell_BettersaveHotkey}"
                                ToolTip.Tip="{loc:Tr Shell_BettersaveSavesTheCurrentMapWithProperRoundingInsteadOfTruncatingValues}" />
