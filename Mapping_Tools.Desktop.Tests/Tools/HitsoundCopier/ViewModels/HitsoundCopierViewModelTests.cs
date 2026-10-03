@@ -36,17 +36,18 @@ public sealed class HitsoundCopierViewModelTests
         // Arrange
         TestFilePicker picker = new() { OpenFiles = ["target.osu"] };
         TestBeatmapWorkspace workspace = new();
-        workspace.SetSelection([@"C:\Maps\selected.osu"], BeatmapSelectionSource.FilePicker);
-        workspace.BeatmapPickerStartLocation = @"C:\Maps";
+        workspace.SetSelection([Path.Combine("Maps", "selected.osu")], BeatmapSelectionSource.FilePicker);
+        workspace.BeatmapPickerStartLocation = "Maps";
         var viewModel = Create(picker, workspace);
-        viewModel.PathFrom = @"E:\Other\source.osu";
+        string sourcePath = Path.Combine("Other", "source.osu");
+        viewModel.PathFrom = sourcePath;
 
         // Act
         await viewModel.ExportBrowseCommand.ExecuteAsync(null);
 
         // Assert
         picker.LastOpenRequest.Should().NotBeNull();
-        picker.LastOpenRequest!.SuggestedStartLocation.Should().Be(@"E:\Other");
+        picker.LastOpenRequest!.SuggestedStartLocation.Should().Be(Path.GetDirectoryName(sourcePath));
     }
 
     [TestMethod]

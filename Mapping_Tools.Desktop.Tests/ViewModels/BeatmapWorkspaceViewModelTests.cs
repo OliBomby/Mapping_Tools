@@ -17,8 +17,9 @@ public sealed class BeatmapWorkspaceViewModelTests
     {
         // Arrange
         TestBeatmapWorkspace workspace = new();
+        string mapPath = Path.Combine("Songs", "Mapset", "Artist - Title [Hard].osu");
         workspace.SetRecentMaps(new RecentBeatmap(
-            @"C:\Songs\Mapset\Artist - Title [Hard].osu",
+            mapPath,
             "today"));
 
         // Act
@@ -27,7 +28,7 @@ public sealed class BeatmapWorkspaceViewModelTests
         // Assert
         workspace.LastSelectionSource.Should().Be(BeatmapSelectionSource.Startup);
         viewModel.SelectedMapNames.Should().Be("Artist - Title [Hard].osu");
-        viewModel.SelectedMapToolTip.Should().Be(@"C:\Songs\Mapset\Artist - Title [Hard].osu");
+        viewModel.SelectedMapToolTip.Should().Be(mapPath);
         viewModel.SelectedMapCountText.Should().Be("(1) map total");
         viewModel.HasSingleSelection.Should().BeTrue();
     }
@@ -38,12 +39,14 @@ public sealed class BeatmapWorkspaceViewModelTests
         // Arrange
         TestBeatmapWorkspace workspace = new();
         using var viewModel = CreateViewModel(workspace);
+        string firstPath = Path.Combine("Songs", "one.osu");
+        string secondPath = Path.Combine("Songs", "two.osu");
 
         // Act
-        viewModel.SetDroppedPaths([@"C:\one.osu", @"C:\two.osu"]);
+        viewModel.SetDroppedPaths([firstPath, secondPath]);
 
         // Assert
-        workspace.SelectedPaths.Should().Equal(@"C:\one.osu", @"C:\two.osu");
+        workspace.SelectedPaths.Should().Equal(firstPath, secondPath);
         workspace.LastSelectionSource.Should().Be(BeatmapSelectionSource.DragAndDrop);
         viewModel.SelectedMapNames.Should().Be("one.osu|two.osu");
         viewModel.SelectedMapCountText.Should().Be("(2) maps total");

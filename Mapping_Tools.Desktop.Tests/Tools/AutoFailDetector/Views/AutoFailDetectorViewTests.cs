@@ -56,7 +56,8 @@ public sealed class AutoFailDetectorViewTests
             await runTask;
 
             // Assert
-            guide.Should().Be("Live auto-fail fix guide.\r\n\r\nDo you want to use this solution?");
+            guide.ReplaceLineEndings("\n")
+                .Should().Be("Live auto-fail fix guide.\n\nDo you want to use this solution?");
             service.ApplyFixRequestCount.Should().Be(1);
         }
         finally

@@ -98,7 +98,8 @@ public sealed class TimingCopierViewModelTests
         // Arrange
         TestFilePicker picker = new() { OpenFiles = ["first.osu", "second.osu"] };
         var viewModel = Create(filePicker: picker);
-        viewModel.ImportPath = @"C:\maps\source.osu";
+        string importPath = Path.Combine("maps", "source.osu");
+        viewModel.ImportPath = importPath;
 
         // Act
         await viewModel.ExportBrowseCommand.ExecuteAsync(null);
@@ -107,7 +108,7 @@ public sealed class TimingCopierViewModelTests
         viewModel.ExportPath.Should().Be("first.osu|second.osu");
         picker.LastOpenRequest.Should().NotBeNull();
         picker.LastOpenRequest!.AllowMultiple.Should().BeTrue();
-        picker.LastOpenRequest.SuggestedStartLocation.Should().Be(@"C:\maps");
+        picker.LastOpenRequest.SuggestedStartLocation.Should().Be(Path.GetDirectoryName(importPath));
     }
 
     [TestMethod]

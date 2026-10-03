@@ -40,10 +40,11 @@ public sealed class MetadataManagerViewModelTests
         TestFilePicker picker = new() { OpenFiles = ["first.osu", "second.osu"] };
         TestBeatmapWorkspace workspace = new()
         {
-            BeatmapPickerStartLocation = @"C:\Maps",
+            BeatmapPickerStartLocation = "Maps",
         };
         var viewModel = MetadataManagerViewModelTestFactory.Create(filePicker: picker, workspace: workspace);
-        viewModel.ImportPath = @"E:\Source\source.osu";
+        string importPath = Path.Combine("Source", "source.osu");
+        viewModel.ImportPath = importPath;
 
         // Act
         await ExecuteAsync(viewModel.BrowseExportCommand);
@@ -53,7 +54,7 @@ public sealed class MetadataManagerViewModelTests
         viewModel.ExportMapCountText.Should().Be("(2) maps total");
         picker.LastOpenRequest.Should().NotBeNull();
         picker.LastOpenRequest!.AllowMultiple.Should().BeTrue();
-        picker.LastOpenRequest.SuggestedStartLocation.Should().Be(@"E:\Source");
+        picker.LastOpenRequest.SuggestedStartLocation.Should().Be(Path.GetDirectoryName(importPath));
     }
 
     [TestMethod]
