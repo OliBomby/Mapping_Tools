@@ -144,11 +144,32 @@ public sealed class TranslationTests
         try
         {
             // Act
-            TranslationManager.SetLanguage("fr-FR");
+            TranslationManager.SetLanguage("sv-SE");
             string text = DesktopStrings.Shell_Preferences;
 
             // Assert
             text.Should().Be("Preferences");
+        }
+        finally
+        {
+            TranslationManager.SetLanguage(previous);
+        }
+    }
+
+    [TestMethod]
+    public void SetLanguage_FrenchRegion_UsesFrenchResources()
+    {
+        // Arrange
+        string? previous = TranslationManager.Language;
+
+        try
+        {
+            // Act
+            TranslationManager.SetLanguage("fr-FR");
+
+            // Assert
+            TranslationManager.Language.Should().Be("fr");
+            DesktopStrings.Shell_Preferences.Should().Be("Préférences");
         }
         finally
         {

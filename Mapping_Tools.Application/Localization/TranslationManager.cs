@@ -62,9 +62,15 @@ public static class TranslationManager
                     : "zh-Hans";
             }
 
-            return languageCode is "en" or "nl" or "ru" or "ja" or "es" or "id" or "pl" or "de" or "fr" or "ko"
-                ? languageCode
-                : "en";
+            for (CultureInfo candidate = culture;
+                 !candidate.Equals(CultureInfo.InvariantCulture);
+                 candidate = candidate.Parent)
+            {
+                if (ApplicationStrings.ResourceManager.GetResourceSet(candidate, true, false) is not null)
+                    return candidate.Name;
+            }
+
+            return "en";
         }
         catch (CultureNotFoundException)
         {

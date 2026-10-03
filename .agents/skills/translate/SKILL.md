@@ -46,5 +46,6 @@ For other languages search for the relevant language tag.
 - MSBuild generates public `[ProjectName]Strings` classes with strongly typed getters for each entry. Use this auto-generated getter whenever possible to avoid maintaining expensive wrappers.
 - Use `ToolChoiceConverter` for displaying localized string values for enum data. 
 - Plugins should call `TranslationManager.RegisterResources(static culture => PluginStrings.Culture = culture)` once before using their generated resource class.
-- To add a language, copy the default language resource and add a culture-suffix, extend supported language normalization in `TranslationManager` and the native language choices in Preferences.
+- To add a language, copy the default language resource and add a culture-suffix, check supported language normalization in `TranslationManager` and update the native language choices in Preferences.
+- Language choices in Preferences are ordered alphabetically by language code while system default and english are always at the top.
 - Resource comments must identify the actual screen or workflow, disambiguate terms, describe each placeholder's value/type/unit, and state applicable names or syntax to preserve. Include relevant context only; a filename or "translate this label" is insufficient. Update comments when behavior changes and copy the same context into translated catalogs for reviewers.
