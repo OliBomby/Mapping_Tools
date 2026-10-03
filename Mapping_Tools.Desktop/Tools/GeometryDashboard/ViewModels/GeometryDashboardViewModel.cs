@@ -4,6 +4,7 @@ using Avalonia.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Abstractions;
+using Mapping_Tools.Application.Localization;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Platform.FilePicker;
@@ -18,6 +19,7 @@ using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.Models;
@@ -30,7 +32,7 @@ namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 ///     Adapts the application Geometry Dashboard session to Avalonia bindings,
 ///     shell project persistence, dialogs, and Desktop hotkeys.
 /// </summary>
-public sealed partial class GeometryDashboardViewModel : ObservableObject,
+public sealed partial class GeometryDashboardViewModel : LocalizedObservableObject,
     IShellProjectFeature<GeometryDashboardProject>, IShellExtraProjectMenuFeature, IShellFeatureActivation, IDisposable
 {
     /// <inheritdoc />
@@ -57,6 +59,9 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     private readonly IProjectSerializer serializer;
     private bool disposed;
     private bool viewActive;
+    private string rawStatus = "Stopped";
+    private GeometryDashboardStatusCategory rawStatusCategory = GeometryDashboardStatusCategory.Stopped;
+    private int rawDrawableCount;
 
     /// <summary>Creates the dashboard presentation over an application session.</summary>
     /// <param name="project">The Desktop-owned project state.</param>
@@ -108,9 +113,14 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     /// <summary>Gets filtered generator groups for the dashboard list.</summary>
     public ObservableCollection<GeometryDashboardGeneratorGroupViewModel> GeneratorGroups { get; } = [];
 
-    /// <summary>Gets the current connection, validation, or empty-state message.</summary>
-    [ObservableProperty]
-    public partial string Status { get; private set; } = "Stopped";
+    /// <summary>Gets the localized connection, validation, or empty-state message.</summary>
+    public string Status => LocalizeStatus(rawStatusCategory, rawDrawableCount);
+
+    /// <summary>Gets the unlocalized status details for diagnostic inspection.</summary>
+    public string DiagnosticStatus => rawStatus;
+
+    /// <summary>Gets the localized creator attribution shown below the dashboard.</summary>
+    public string MadeByLabel => DesktopStrings.GeometryDashboard_MadeBy;
 
     /// <summary>Gets the visual state used by the dashboard status indicator.</summary>
     [ObservableProperty]
@@ -126,6 +136,13 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
             if (SetProperty(ref field, value)) RebuildGroups();
         }
     } = string.Empty;
+
+    /// <inheritdoc />
+    protected override void RefreshLocalizedProperties()
+    {
+        base.RefreshLocalizedProperties();
+        RebuildGroups();
+    }
 
     /// <summary>Gets the current engine preferences edited by the dashboard.</summary>
     public GeometryDashboardPreferences Preferences => Project.CurrentPreferences;
@@ -155,8 +172,8 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
 
     IReadOnlyList<ShellProjectMenuItem> IShellExtraProjectMenuFeature.ExtraProjectMenuItems =>
     [
-        new("_Save virtual objects", "Save locked virtual objects to a file.", SaveLockedObjectsCommand, MaterialIconKind.ContentSaveOutline),
-        new("_Load virtual objects", "Load locked virtual objects from a save file.", LoadLockedObjectsCommand, MaterialIconKind.FolderOpen),
+        new(DesktopStrings.GeometryDashboard_SaveVirtualObjectsMenu, DesktopStrings.GeometryDashboard_SaveVirtualObjectsMenuTip, SaveLockedObjectsCommand, MaterialIconKind.ContentSaveOutline),
+        new(DesktopStrings.GeometryDashboard_LoadVirtualObjectsMenu, DesktopStrings.GeometryDashboard_LoadVirtualObjectsMenuTip, LoadLockedObjectsCommand, MaterialIconKind.FolderOpen),
     ];
 
     /// <inheritdoc />
@@ -305,7 +322,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         {
             string? path = await filePicker.PickSaveFileAsync(new SaveFilePickerRequest
             {
-                Title = "Save locked virtual objects",
+                Title = DesktopStrings.GeometryDashboard_SaveVirtualObjectsPickerTitle,
                 SuggestedFileName = "locked-virtual-objects.json",
                 DefaultExtension = ".json",
                 Filters = [CommonFilePickerFilters.MappingToolsProjects],
@@ -318,8 +335,8 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
             files.WriteAllText(path, json);
             await notifications.PublishAsync(new UserNotification(
                 UserNotificationSeverity.Success,
-                "Save virtual objects",
-                "Successfully saved locked virtual objects!"));
+                DesktopStrings.GeometryDashboard_SaveVirtualObjectsSuccessTitle,
+                DesktopStrings.GeometryDashboard_SaveVirtualObjectsSuccessMessage));
         }
         catch (OperationCanceledException)
         {
@@ -328,8 +345,8 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         {
             await notifications.PublishAsync(new UserNotification(
                 UserNotificationSeverity.Error,
-                "Could not save virtual objects",
-                exception.Message,
+                DesktopStrings.GeometryDashboard_SaveVirtualObjectsFailureTitle,
+                ApplicationExceptionText.GetSummary(exception),
                 exception));
         }
     }
@@ -343,7 +360,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         {
             var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
             {
-                Title = "Load locked virtual objects",
+                Title = DesktopStrings.GeometryDashboard_LoadVirtualObjectsPickerTitle,
                 AllowMultiple = false,
                 Filters = [CommonFilePickerFilters.MappingToolsProjects],
             });
@@ -356,8 +373,8 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
             ApplyDashboardState(dashboardService.State);
             await notifications.PublishAsync(new UserNotification(
                 UserNotificationSeverity.Success,
-                "Load virtual objects",
-                "Successfully loaded locked virtual objects!"));
+                DesktopStrings.GeometryDashboard_LoadVirtualObjectsSuccessTitle,
+                DesktopStrings.GeometryDashboard_LoadVirtualObjectsSuccessMessage));
         }
         catch (ArgumentException)
         {
@@ -369,8 +386,8 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         {
             await notifications.PublishAsync(new UserNotification(
                 UserNotificationSeverity.Error,
-                "Could not load virtual objects",
-                exception.Message,
+                DesktopStrings.GeometryDashboard_LoadVirtualObjectsFailureTitle,
+                ApplicationExceptionText.GetSummary(exception),
                 exception));
         }
     }
@@ -385,24 +402,51 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         dispatcher.Post(() =>
         {
             if (disposed) return;
-            Status = state.Status;
-            StatusIndicatorState = GetStatusIndicatorState(state.Status);
+            rawStatus = state.Status;
+            rawStatusCategory = state.StatusCategory;
+            rawDrawableCount = state.DrawableCount;
+            OnPropertyChanged(nameof(Status));
+            OnPropertyChanged(nameof(DiagnosticStatus));
+            StatusIndicatorState = GetStatusIndicatorState(state.StatusCategory);
             OnPropertyChanged(nameof(DrawableCount));
             OnPropertyChanged(nameof(SelectedCount));
             OnPropertyChanged(nameof(IsConnected));
         });
     }
 
-    private static GeometryDashboardStatusIndicatorState GetStatusIndicatorState(string status)
+    private static GeometryDashboardStatusIndicatorState GetStatusIndicatorState(
+        GeometryDashboardStatusCategory statusCategory)
     {
-        if (status.StartsWith("Error:", StringComparison.OrdinalIgnoreCase)
-            || status.StartsWith("Unable to run:", StringComparison.OrdinalIgnoreCase))
+        if (statusCategory is GeometryDashboardStatusCategory.ConfigurationUnavailable
+            or GeometryDashboardStatusCategory.UnsupportedPlatform
+            or GeometryDashboardStatusCategory.LiveStateReadingDisabled
+            or GeometryDashboardStatusCategory.RetryingAfterError)
             return GeometryDashboardStatusIndicatorState.Error;
 
-        return status.StartsWith("Running:", StringComparison.OrdinalIgnoreCase)
-               || status.StartsWith("Unfocused:", StringComparison.OrdinalIgnoreCase)
+        return statusCategory is GeometryDashboardStatusCategory.Running
+               or GeometryDashboardStatusCategory.Unfocused
             ? GeometryDashboardStatusIndicatorState.Running
             : GeometryDashboardStatusIndicatorState.Waiting;
+    }
+
+    private static string LocalizeStatus(GeometryDashboardStatusCategory statusCategory, int drawableCount)
+    {
+        return statusCategory switch
+        {
+            GeometryDashboardStatusCategory.Stopped => DesktopStrings.GeometryDashboard_StatusStopped,
+            GeometryDashboardStatusCategory.Starting => DesktopStrings.GeometryDashboard_StatusStarting,
+            GeometryDashboardStatusCategory.WaitingForEditor => DesktopStrings.GeometryDashboard_StatusWaitingEditor,
+            GeometryDashboardStatusCategory.WaitingForOsu => DesktopStrings.GeometryDashboard_StatusWaitingOsu,
+            GeometryDashboardStatusCategory.Running => ApplicationText.Format(
+                drawableCount == 1 ? DesktopStrings.GeometryDashboard_StatusRunningOne : DesktopStrings.GeometryDashboard_StatusRunningMany, drawableCount),
+            GeometryDashboardStatusCategory.Unfocused => ApplicationText.Format(
+                drawableCount == 1 ? DesktopStrings.GeometryDashboard_StatusUnfocusedOne : DesktopStrings.GeometryDashboard_StatusUnfocusedMany, drawableCount),
+            GeometryDashboardStatusCategory.ConfigurationUnavailable => DesktopStrings.GeometryDashboard_StatusConfigurationUnavailable,
+            GeometryDashboardStatusCategory.UnsupportedPlatform => DesktopStrings.GeometryDashboard_StatusRequiresWindows,
+            GeometryDashboardStatusCategory.LiveStateReadingDisabled => DesktopStrings.GeometryDashboard_StatusEnableReading,
+            GeometryDashboardStatusCategory.RetryingAfterError => DesktopStrings.GeometryDashboard_StatusErrorRetrying,
+            _ => DesktopStrings.GeometryDashboard_StatusUnavailable,
+        };
     }
 
     private void LoadSaveSlot(GeometryDashboardSaveSlot slot)
@@ -492,7 +536,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
                                         || generator.Name.Contains(Filter, StringComparison.OrdinalIgnoreCase)))
                 .ToArray();
             if (generators.Length > 0)
-                GeneratorGroups.Add(new GeometryDashboardGeneratorGroupViewModel(type.ToString(), generators));
+                GeneratorGroups.Add(new GeometryDashboardGeneratorGroupViewModel(type, generators));
         }
     }
 

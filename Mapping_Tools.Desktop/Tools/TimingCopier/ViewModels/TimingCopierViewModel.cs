@@ -11,10 +11,13 @@ using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Tools.TimingCopier.Models;
 using Mapping_Tools.Desktop.Services.Dialogs;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tools.TimingCopier.Models;
 using Mapping_Tools.Desktop.ViewModels;
+
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Desktop.Tools.TimingCopier.ViewModels;
 
@@ -87,7 +90,7 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
     public partial IBeatDivisor[] BeatDivisors { get; set; } =
         RationalBeatDivisor.GetDefaultBeatDivisors();
 
-    /// <summary>Gets the legacy singular or plural target-map count label.</summary>
+    /// <summary>Gets the localized singular or plural target-map count label.</summary>
     public string ExportMapCountText
     {
         get
@@ -95,7 +98,9 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
             int count = string.IsNullOrEmpty(ExportPath)
                 ? 0
                 : ExportPath.Split('|').Length;
-            return count == 1 ? "(1) map total" : $"({count}) maps total";
+            return count == 1
+                ? DesktopStrings.Common_MapCountOne
+                : ApplicationText.Format(DesktopStrings.Common_MapCountMany, count);
         }
     }
 
@@ -131,7 +136,7 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
     {
         using var edit = UndoHistory?.BeginEdit();
         await PickBeatmapsAsync(
-            "Copy timing from",
+            DesktopStrings.TimingCopier_CopyFrom,
             workspace.GetBeatmapPickerStartLocation(Path.GetDirectoryName(ImportPath)),
             false,
             paths => ImportPath = paths[0]);
@@ -162,7 +167,7 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
         }
 
         await PickBeatmapsAsync(
-            "Copy timing to",
+            DesktopStrings.TimingCopier_CopyTo,
             suggestedStartLocation,
             true,
             paths => ExportPath = string.Join('|', paths));
@@ -181,11 +186,13 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
                         var result = await timingCopier.CopyAsync(
                             options,
                             new Progress<double>(value =>
-                                context.ReportProgress(value, "Copying timing")),
+                                context.ReportProgress(value, DesktopStrings.TimingCopier_Copying)),
                             context.CancellationToken);
                         return new ToolExecutionOutput<TimingCopierResult>(
                             result,
-                            $"Successfully copied timing to {result.ProcessedCount} " + $"{(result.ProcessedCount == 1 ? "beatmap" : "beatmaps")}!");
+                            result.ProcessedCount == 1
+                                ? ApplicationText.Format(DesktopStrings.TimingCopier_ResultOne, result.ProcessedCount)
+                                : ApplicationText.Format(DesktopStrings.TimingCopier_ResultMany, result.ProcessedCount));
                     }),
                 CreateProgress())
             .ConfigureAwait(false);
@@ -234,8 +241,8 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
         catch (Exception exception)
         {
             await PublishFailureAsync(
-                "Could not select beatmaps",
-                "The file picker could not return local beatmap paths.",
+                DesktopStrings.Common_SelectBeatmapsFailureTitle,
+                DesktopStrings.Common_SelectBeatmapsFailureMessage,
                 exception);
         }
     }

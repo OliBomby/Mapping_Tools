@@ -16,11 +16,14 @@ using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Images;
 using Mapping_Tools.Core.Tools.SliderPicturator;
 using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tools.SliderPicturator.Models;
 using Mapping_Tools.Desktop.Utilities;
 using Mapping_Tools.Desktop.ViewModels;
+
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Desktop.Tools.SliderPicturator.ViewModels;
 
@@ -112,6 +115,25 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     /// <summary>Gets or sets the estimated segment count.</summary>
     [ObservableProperty]
     public partial long SegmentCount { get; set; }
+
+    /// <summary>
+    /// Gets the localized label for the estimated slider segment count.
+    /// </summary>
+    public string SegmentCountLabel => ApplicationText.Format(DesktopStrings.SliderPicturator_SegmentCount, SegmentCount);
+
+    partial void OnSegmentCountChanged(long value)
+    {
+        OnPropertyChanged(nameof(SegmentCountLabel));
+    }
+
+    /// <summary>
+    /// Refreshes computed labels after the display language changes.
+    /// </summary>
+    protected override void RefreshLocalizedProperties()
+    {
+        base.RefreshLocalizedProperties();
+        OnPropertyChanged(nameof(SegmentCountLabel));
+    }
 
     /// <summary>Gets or sets the image vertical resolution.</summary>
     [ObservableProperty]
@@ -234,7 +256,10 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
         }
         catch (Exception exception)
         {
-            await PublishFailureAsync("Could not run Slider Picturator", "The current beatmap could not be found.", exception);
+            await PublishFailureAsync(
+                DesktopStrings.SliderPicturator_RunFailureTitle,
+                DesktopStrings.SliderPicturator_NoBeatmap,
+                exception);
             return;
         }
 
@@ -292,16 +317,16 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
         {
             var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
             {
-                Title = "Select an image", AllowMultiple = false, Filters =
+                Title = DesktopStrings.SliderPicturator_SelectImage, AllowMultiple = false, Filters =
                 [
                     new FilePickerFilter(
-                        "All Image Files", ["*.bmp", "*.jpg", "*.jpeg", "*.png", "*.gif", "*.tif", "*.tiff", "*.ico"]),
+                        DesktopStrings.SliderPicturator_AllImageFiles, ["*.bmp", "*.jpg", "*.jpeg", "*.png", "*.gif", "*.tif", "*.tiff", "*.ico"]),
                 ],
             });
             if (paths.Count > 0) PictureFile = paths[0];
         }
         catch (OperationCanceledException) { }
-        catch (Exception exception) { await PublishFailureAsync("Could not select image", "The selected file was not a valid local image.", exception); }
+        catch (Exception exception) { await PublishFailureAsync(DesktopStrings.SliderPicturator_SelectImageFailure, DesktopStrings.SliderPicturator_InvalidLocalImage, exception); }
     }
 
     /// <summary>Imports the first selected slider from the current editor.</summary>
@@ -314,7 +339,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
             string path = await workspace.ResolveQuickRunBeatmapAsync(false);
             SelectedSlider = await picturator.GetSelectedSliderAsync(path);
         }
-        catch (Exception exception) { await PublishFailureAsync("Could not import slider", "The selected hit object could not be read.", exception); }
+        catch (Exception exception) { await PublishFailureAsync(DesktopStrings.SliderPicturator_ImportSliderFailure, DesktopStrings.SliderPicturator_ReadHitObjectFailure, exception); }
     }
 
     /// <summary>Removes the imported slider so duration uses the explicit field.</summary>
@@ -345,7 +370,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
             SetAvailableColors(colours);
         }
         catch (OperationCanceledException) { }
-        catch (Exception exception) { await PublishFailureAsync("Could not read map colours", "The current beatmap palette could not be loaded.", exception); }
+        catch (Exception exception) { await PublishFailureAsync(DesktopStrings.SliderPicturator_ReadColorsFailure, DesktopStrings.SliderPicturator_PaletteFailure, exception); }
         finally
         {
             if (ReferenceEquals(colorRefreshCancellation, cancellation)) colorRefreshCancellation = null;
@@ -451,11 +476,11 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
             {
                 var result = await picturator.PicturateAsync(path, options,
                     quick,
-                    new Progress<double>(value => context.ReportProgress(value, "Generating slider picture")),
+                    new Progress<double>(value => context.ReportProgress(value, DesktopStrings.SliderPicturator_Generating)),
                     context.CancellationToken);
                 return new ToolExecutionOutput<SliderPicturatorResult>(
                     result,
-                    "Done!");
+                    DesktopStrings.Common_Done);
             }), CreateProgress(), cancellationToken);
         if (execution is { Status: ToolExecutionStatus.Succeeded, Value: { } result2 })
             SegmentCount = result2.SegmentCount;
@@ -497,7 +522,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
             {
                 sourceImage = null;
                 PreviewImage = null;
-                await PublishFailureAsync("Could not load image", "Not a valid image file.", exception);
+                await PublishFailureAsync(DesktopStrings.SliderPicturator_ImageLoadFailure, DesktopStrings.SliderPicturator_NotValidImage, exception);
             }
         }
         finally
@@ -537,7 +562,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
             SegmentCount = result.segments;
         }
         catch (OperationCanceledException) { }
-        catch (Exception exception) { await PublishFailureAsync("Preview generation failed", "The image could not be picturated.", exception); }
+        catch (Exception exception) { await PublishFailureAsync(DesktopStrings.SliderPicturator_PreviewFailure, DesktopStrings.SliderPicturator_CouldNotPicturate, exception); }
         finally
         {
             if (ReferenceEquals(previewCancellation, cancellation))

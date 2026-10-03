@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using Avalonia.Input;
+using Mapping_Tools.Application.Localization;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Settings.Models;
@@ -8,12 +9,14 @@ using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Infrastructure.Projects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Tools.GeometryDashboard.ViewModels;
 
 [TestClass]
+[DoNotParallelize]
 public sealed class GeometryDashboardViewModelTests
 {
     [TestMethod]
@@ -125,7 +128,7 @@ public sealed class GeometryDashboardViewModelTests
         await viewModel.RefreshOnceAsync();
 
         // Assert
-        viewModel.Status.Should().Be("Unable to run: Geometry Dashboard requires Windows.");
+        viewModel.Status.Should().Be(DesktopStrings.GeometryDashboard_StatusRequiresWindows);
         viewModel.StatusIndicatorState.Should().Be(GeometryDashboardStatusIndicatorState.Error);
     }
 
@@ -141,8 +144,38 @@ public sealed class GeometryDashboardViewModelTests
         await viewModel.RefreshOnceAsync();
 
         // Assert
-        viewModel.Status.Should().Be($"Unfocused: {viewModel.DrawableCount} virtual object(s)");
+        viewModel.Status.Should().Be(ApplicationText.Format(
+            viewModel.DrawableCount == 1 ? DesktopStrings.GeometryDashboard_StatusUnfocusedOne : DesktopStrings.GeometryDashboard_StatusUnfocusedMany,
+            viewModel.DrawableCount));
         viewModel.StatusIndicatorState.Should().Be(GeometryDashboardStatusIndicatorState.Running);
+    }
+
+    [TestMethod]
+    public async Task RefreshOnceAsync_WhenDashboardRunsInDutch_FormatsLocalizedDrawableCount()
+    {
+        // Arrange
+        string? previousLanguage = TranslationManager.Language;
+        TranslationManager.SetLanguage("nl");
+        using var viewModel = GeometryDashboardViewModelTestFactory.CreateViewModel(
+            snapshots: GeometryDashboardViewModelTestFactory.CreateRuntimeSnapshot(
+                DecodeHitObject("64,96,1000,1,0,0:0:0:0:"), 0, []));
+
+        try
+        {
+            // Act
+            await viewModel.RefreshOnceAsync();
+
+            // Assert
+            viewModel.Status.Should().Be(ApplicationText.Format(
+                viewModel.DrawableCount == 1 ? DesktopStrings.GeometryDashboard_StatusRunningOne : DesktopStrings.GeometryDashboard_StatusRunningMany,
+                viewModel.DrawableCount));
+            viewModel.Status.Should().Contain(viewModel.DrawableCount == 1 ? "virtueel object" : "virtuele objecten");
+            viewModel.StatusIndicatorState.Should().Be(GeometryDashboardStatusIndicatorState.Running);
+        }
+        finally
+        {
+            TranslationManager.SetLanguage(previousLanguage);
+        }
     }
 
     [TestMethod]
@@ -158,8 +191,37 @@ public sealed class GeometryDashboardViewModelTests
         viewModel.Deactivate();
 
         // Assert
-        viewModel.Status.Should().Be("Stopped");
+        viewModel.Status.Should().Be(DesktopStrings.GeometryDashboard_StatusStopped);
         changedProperties.Should().Contain(nameof(viewModel.Status));
+    }
+
+    [TestMethod]
+    public async Task RefreshOnceAsync_WhenOverlayConfigurationFails_ShowsDutchActionableStatusAndPreservesDiagnostic()
+    {
+        // Arrange
+        string? previousLanguage = TranslationManager.Language;
+        TranslationManager.SetLanguage("nl");
+        using var viewModel = GeometryDashboardViewModelTestFactory.CreateViewModelSession(
+            overlaySupported: true,
+            overlayConfigurationStatus: "The overlay configuration file could not be read.",
+            snapshots: GeometryDashboardViewModelTestFactory.CreateRuntimeSnapshot(
+                DecodeHitObject("64,96,1000,1,0,0:0:0:0:"), 0, [])).ViewModel;
+
+        try
+        {
+            // Act
+            await viewModel.RefreshOnceAsync();
+
+            // Assert
+            viewModel.Status.Should().Be(DesktopStrings.GeometryDashboard_StatusConfigurationUnavailable);
+            viewModel.Status.Should().Contain("configuratie");
+            viewModel.DiagnosticStatus.Should().Contain("The overlay configuration file could not be read.");
+            viewModel.StatusIndicatorState.Should().Be(GeometryDashboardStatusIndicatorState.Error);
+        }
+        finally
+        {
+            TranslationManager.SetLanguage(previousLanguage);
+        }
     }
 
     [TestMethod]

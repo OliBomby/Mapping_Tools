@@ -1,3 +1,4 @@
+using Mapping_Tools.Application.Localization;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -17,6 +18,7 @@ using Mapping_Tools.Core.Tools.TumourGenerator;
 using Mapping_Tools.Core.Tools.TumourGenerator.Models;
 using Mapping_Tools.Core.Tools.TumourGenerator.Templates;
 using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Services.Undo;
@@ -285,7 +287,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         }
         catch (Exception exception)
         {
-            await ShowMessageAsync(exception.Message);
+            await ShowMessageAsync(ApplicationExceptionText.GetSummary(exception), exception.ToString());
             return;
         }
 
@@ -361,7 +363,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         }
         catch (Exception exception)
         {
-            await ShowMessageAsync(exception.Message);
+            await ShowMessageAsync(ApplicationExceptionText.GetSummary(exception), exception.ToString());
             return;
         }
 
@@ -369,8 +371,8 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         {
             await ShowMessageAsync(
                 ImportModeSetting == HitObjectSelectionMode.Selected
-                    ? "No beatmap is open in osu!."
-                    : "Select a beatmap to import from.");
+                    ? DesktopStrings.TumourGenerator_NoBeatmapOpen
+                    : DesktopStrings.TumourGenerator_SelectBeatmap);
             return;
         }
 
@@ -383,7 +385,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
                 CancellationToken.None);
             if (result.Sliders.Count == 0)
             {
-                await ShowMessageAsync("Could not find any sliders in imported hit objects.");
+                await ShowMessageAsync(DesktopStrings.TumourGenerator_NoSlidersFound);
                 return;
             }
 
@@ -396,7 +398,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         }
         catch (Exception exception)
         {
-            await ShowMessageAsync(exception.Message);
+            await ShowMessageAsync(ApplicationExceptionText.GetSummary(exception), exception.ToString());
         }
     }
 
@@ -406,7 +408,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     {
         using var edit = UndoHistory?.BeginEdit();
         ObservableTumourLayer layer = new(TumourLayer.GetDefaultLayer());
-        layer.Name = $"Layer {TumourLayers.Count + 1}";
+        layer.Name = ApplicationText.Format(DesktopStrings.TumourGenerator_DefaultLayerName, TumourLayers.Count + 1);
         layer.TumourEnd = LayerRangeSliderMaxes.LastOrDefault(PreviewHitObject.PixelLength);
         InsertAfterCurrent(layer);
     }
@@ -419,7 +421,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         if (CurrentLayer is null) return;
 
         ObservableTumourLayer copy = new(CurrentLayer.Snapshot());
-        copy.Name = $"{copy.Name} (Copy)";
+        copy.Name = ApplicationText.Format(DesktopStrings.TumourGenerator_CopiedLayerName, copy.Name);
         InsertAfterCurrent(copy);
     }
 
@@ -491,7 +493,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
             }
             catch (Exception exception)
             {
-                await ShowMessageAsync(exception.Message);
+                await ShowMessageAsync(ApplicationExceptionText.GetSummary(exception), exception.ToString());
                 return;
             }
 
@@ -636,7 +638,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     {
         if (paths.Count == 0)
         {
-            await ShowMessageAsync("Select at least one beatmap or open one in osu! before running Tumour Generator 2.");
+            await ShowMessageAsync(DesktopStrings.TumourGenerator_SelectTarget);
             return;
         }
 
@@ -651,9 +653,11 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
                         paths,
                         project,
                         quick,
-                        new Progress<double>(value => context.ReportProgress(value, "Generating tumours")),
+                        new Progress<double>(value => context.ReportProgress(value, DesktopStrings.TumourGenerator_Progress)),
                         context.CancellationToken);
-                    string summary = $"Successfully generated tumours on {result.SlidersTumourated} " + $"{(result.SlidersTumourated == 1 ? "slider" : "sliders")}" + "!";
+                    string summary = result.SlidersTumourated == 1
+                        ? ApplicationText.Format(DesktopStrings.TumourGenerator_ResultOne, result.SlidersTumourated)
+                        : ApplicationText.Format(DesktopStrings.TumourGenerator_ResultMany, result.SlidersTumourated);
                     return new ToolExecutionOutput<TumourRunResult>(
                         result,
                         summary);
@@ -733,13 +737,14 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         QueuePreview();
     }
 
-    private async Task ShowMessageAsync(string message)
+    private async Task ShowMessageAsync(string message, string? details = null)
     {
         await dialogs.ShowMessageAsync(
             new MessageDialogRequest<bool>(
                 "Tumour Generator 2",
                 message,
-                [new DialogChoice<bool>("OK", true, true, true)],
-                false));
+                [new DialogChoice<bool>(DesktopStrings.Common_Ok, true, true, true)],
+                false,
+                details));
     }
 }

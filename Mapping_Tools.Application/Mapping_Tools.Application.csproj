@@ -7,6 +7,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="Localization/Application*.resx">
+      <LogicalName>Mapping_Tools.Application.Localization.$([System.String]::Copy('%(Filename)').Replace('Application', 'ApplicationStrings')).resources</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization/Application.resx">
+      <Generator>MSBuild:Compile</Generator>
+      <StronglyTypedFileName>$(IntermediateOutputPath)ApplicationStrings.Designer.cs</StronglyTypedFileName>
+      <StronglyTypedLanguage>CSharp</StronglyTypedLanguage>
+      <StronglyTypedNamespace>Mapping_Tools.Application.Localization</StronglyTypedNamespace>
+      <StronglyTypedClassName>ApplicationStrings</StronglyTypedClassName>
+      <PublicClass>true</PublicClass>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.9"/>
     <ProjectReference Include="..\Mapping_Tools.Core\Mapping_Tools.Core.csproj"/>
   </ItemGroup>

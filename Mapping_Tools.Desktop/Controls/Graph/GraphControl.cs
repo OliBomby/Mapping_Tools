@@ -15,6 +15,7 @@ using Mapping_Tools.Core.Graph.Interpolation.Interpolators;
 using Mapping_Tools.Core.Graph.Markers;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Desktop.Converters;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Utilities;
 using Mapping_Tools.Desktop.ViewModels.Dialogs;
 using Mapping_Tools.Desktop.Views.Dialogs;
@@ -1575,7 +1576,8 @@ public sealed class GraphControl : Decorator
     private ContextMenu CreateContextMenu()
     {
         ContextMenu menu = new();
-        MenuItem delete = new() { Header = "Delete" };
+        MenuItem delete = new();
+        delete.Bind(HeaderedSelectingItemsControl.HeaderProperty, (Binding)new TrExtension("Shell_GraphDelete").ProvideValue(null!));
         delete.Click += (_, _) =>
         {
             if (contextAnchorIndex is { } index) RemoveAnchor(index);
@@ -1587,10 +1589,10 @@ public sealed class GraphControl : Decorator
         {
             MenuItem item = new()
             {
-                Header = GraphInterpolatorCatalog.GetName(type),
                 Tag = type,
                 Icon = CreateInterpolatorIcon(false),
             };
+            item.Bind(HeaderedSelectingItemsControl.HeaderProperty, (Binding)new TrExtension("Shell_Graph" + type.Name).ProvideValue(null!));
             item.Click += (_, _) =>
             {
                 if (contextAnchorIndex is { } index && item.Tag is Type interpolatorType) SetInterpolator(index, interpolatorType);
@@ -1599,7 +1601,8 @@ public sealed class GraphControl : Decorator
         }
 
         menu.Items.Add(new Separator());
-        MenuItem typeIn = new() { Header = "Type in value..." };
+        MenuItem typeIn = new();
+        typeIn.Bind(HeaderedSelectingItemsControl.HeaderProperty, (Binding)new TrExtension("Shell_GraphTypeValue").ProvideValue(null!));
         typeIn.Click += async (_, _) => await TypeInValueAsync();
         menu.Items.Add(typeIn);
         return menu;
@@ -1633,13 +1636,13 @@ public sealed class GraphControl : Decorator
         var anchor = GraphState.Anchors[index];
         ValueDialog dialog = new();
         ValueDialogViewModel viewModel = new(
-            "Graph value",
-            "Value",
+            DesktopStrings.Shell_GraphValue,
+            DesktopStrings.Shell_Value,
             anchor.Pos.Y,
             new InvariantDoubleConverter(),
             typeof(double),
-            "ACCEPT",
-            "CANCEL",
+            DesktopStrings.Shell_UpperAccept,
+            DesktopStrings.Shell_UpperCancel,
             _ => ValidationResult.Success,
             value =>
             {

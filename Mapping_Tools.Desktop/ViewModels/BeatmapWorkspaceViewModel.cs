@@ -1,3 +1,5 @@
+using Mapping_Tools.Desktop.Localization;
+using Mapping_Tools.Application.Localization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Backups.Contracts;
@@ -19,7 +21,7 @@ namespace Mapping_Tools.Desktop.ViewModels;
 /// <summary>
 ///     Presents current-map selection and safety-copy actions in the desktop shell.
 /// </summary>
-public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDisposable
+public sealed partial class BeatmapWorkspaceViewModel : LocalizedObservableObject, IDisposable
 {
     private readonly IApplicationDirectories applicationDirectories;
     private readonly ILogger<BeatmapWorkspaceViewModel> logger;
@@ -92,8 +94,9 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
     public partial string SelectedMapToolTip { get; private set; } = string.Empty;
 
     /// <summary>Gets the legacy singular or plural selected-map count label.</summary>
-    [ObservableProperty]
-    public partial string SelectedMapCountText { get; private set; } = "(0) maps total";
+    public string SelectedMapCountText => workspace.SelectedPaths.Count == 1
+        ? DesktopStrings.Shell_MapsTotalOne
+        : ApplicationText.Format(DesktopStrings.Shell_MapsTotal, workspace.SelectedPaths.Count);
 
     /// <summary>Gets whether at least one beatmap is selected.</summary>
     [ObservableProperty]
@@ -129,7 +132,7 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
     {
         return RunUserOperationAsync(
             () => workspace.PickBeatmapsAsync(true),
-            "Open beatmap");
+            DesktopStrings.Shell_OpenBeatmap);
     }
 
     [RelayCommand]
@@ -140,7 +143,7 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
             string? path = await currentBeatmapDialogService.FetchAsync();
             if (path is not null)
                 workspace.SetSelection([path], BeatmapSelectionSource.CurrentEditor);
-        }, "Open current beatmap");
+        }, DesktopStrings.Shell_OpenCurrentBeatmap);
     }
 
     private bool CanCreateBackup()
@@ -160,11 +163,11 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
             int count = result.Artifacts.Count;
             await PublishAsync(
                 UserNotificationSeverity.Success,
-                "Backup created",
+                DesktopStrings.Shell_BackupCreated,
                 count == 1
-                    ? "The selected beatmap was copied to the backups folder."
-                    : $"{count} selected beatmaps were copied to the backups folder.");
-        }, "Generate backup");
+                    ? DesktopStrings.Shell_TheSelectedBeatmapWasCopiedToTheBackupsFolder
+                    : ApplicationText.Format(DesktopStrings.Shell_BackupMany, count));
+        }, DesktopStrings.Shell_GenerateBackup);
     }
 
     private bool CanRestoreBackup()
@@ -180,7 +183,7 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
             var selected = await filePicker.PickOpenFilesAsync(
                 new OpenFilePickerRequest
                 {
-                    Title = "Load backup",
+                    Title = DesktopStrings.Shell_LoadBackup,
                     SuggestedStartLocation = settings.BackupsPath,
                     AllowMultiple = false,
                     Filters = [CommonFilePickerFilters.BeatmapBackups],
@@ -196,14 +199,14 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
             {
                 bool restore = await dialogs.ShowMessageAsync(
                     new MessageDialogRequest<bool>(
-                        "Load backup",
-                        "The backup belongs to a different beatmap. Load it anyway?",
+                        DesktopStrings.Shell_LoadBackup,
+                        DesktopStrings.Shell_TheBackupBelongsToADifferentBeatmapLoadItAnyway,
                         [
-                            new DialogChoice<bool>("Load anyway", true, true),
-                            new DialogChoice<bool>("Cancel", false, IsCancel: true),
+                            new DialogChoice<bool>(DesktopStrings.Shell_LoadAnyway, true, true),
+                            new DialogChoice<bool>(DesktopStrings.Shell_Cancel, false, IsCancel: true),
                         ],
                         false,
-                        $"Backup: {exception.BackupFileName}{Environment.NewLine}Current: {exception.DestinationFileName}"));
+                        ApplicationText.Format(DesktopStrings.Shell_BackupMismatch, exception.BackupFileName, exception.DestinationFileName)));
                 if (!restore) return;
 
                 await RestoreAsync(selected[0], destination, true);
@@ -211,9 +214,9 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
 
             await PublishAsync(
                 UserNotificationSeverity.Success,
-                "Backup loaded",
-                "The selected backup replaced the current beatmap successfully.");
-        }, "Load backup");
+                DesktopStrings.Shell_BackupLoaded,
+                DesktopStrings.Shell_TheSelectedBackupReplacedTheCurrentBeatmapSuccessfully);
+        }, DesktopStrings.Shell_LoadBackup);
     }
 
     [RelayCommand]
@@ -227,13 +230,13 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
     [RelayCommand]
     private Task OpenBackupsFolderAsync()
     {
-        return RevealAsync(settings.BackupsPath, "backups folder");
+        return RevealAsync(settings.BackupsPath, DesktopStrings.Shell_BackupsFolderPhrase);
     }
 
     [RelayCommand]
     private Task OpenApplicationFolderAsync()
     {
-        return RevealAsync(applicationDirectories.ApplicationData, "Mapping Tools folder");
+        return RevealAsync(applicationDirectories.ApplicationData, DesktopStrings.Shell_MappingToolsFolder);
     }
 
     private Task RestoreAsync(
@@ -255,9 +258,9 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
                 if (!accepted)
                     await PublishAsync(
                         UserNotificationSeverity.Warning,
-                        "Could not open folder",
-                        $"The operating system did not open the {description}.");
-            }, $"Open {description}");
+                        DesktopStrings.Shell_CouldNotOpenFolder,
+                        ApplicationText.Format(DesktopStrings.Shell_FolderOpenFailed, description));
+            }, ApplicationText.Format(DesktopStrings.Shell_OpenDestination, description));
     }
 
     private async Task RunUserOperationAsync(Func<Task> operation, string title)
@@ -279,7 +282,7 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
             await PublishAsync(
                 UserNotificationSeverity.Error,
                 title,
-                exception.Message,
+                ApplicationExceptionText.GetSummary(exception),
                 exception);
         }
     }
@@ -296,9 +299,7 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
         SelectedMapNames = string.Join("|", paths.Select(Path.GetFileName));
         SelectedMapToolTip = string.Join(Environment.NewLine, paths);
         int count = paths.Count;
-        SelectedMapCountText = count == 1
-            ? "(1) map total"
-            : $"({count}) maps total";
+        OnPropertyChanged(nameof(SelectedMapCountText));
         HasSelection = count > 0;
         HasSingleSelection = count == 1;
     }

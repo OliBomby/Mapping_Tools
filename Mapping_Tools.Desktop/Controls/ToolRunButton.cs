@@ -1,6 +1,8 @@
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Data;
+using Mapping_Tools.Desktop.Localization;
 using Material.Icons;
 using Material.Icons.Avalonia;
 using Material.Styles.Controls;
@@ -38,7 +40,7 @@ public sealed class ToolRunButton : Viewbox
             },
         };
         runButton.Classes.Add("no-transitions");
-        ToolTip.SetTip(runButton, "Run this tool.");
+        runButton.Bind(ToolTip.TipProperty, (Binding)new TrExtension("Shell_RunThisTool").ProvideValue(null!));
         runButton.Command = validationCommand;
         Child = runButton;
     }

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Mapping_Tools.Desktop.Localization;
 
 namespace Mapping_Tools.Desktop.Validation;
 
@@ -11,7 +12,7 @@ public sealed class AsciiOnlyAttribute : ValidationAttribute
 {
     /// <summary>Creates an ASCII-only validation rule.</summary>
     public AsciiOnlyAttribute()
-        : base("Use only ASCII characters.")
+        : base(() => DesktopStrings.Shell_UseOnlyAsciiCharacters)
     {
     }
 

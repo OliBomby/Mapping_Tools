@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Localization;
 using System.Globalization;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
@@ -36,7 +37,7 @@ public sealed class DoubleArrayToStringConverter : IValueConverter
         for (int index = 0; index < parts.Length; index++)
             if (!TypeConverters.TryParseDouble(parts[index], out values[index]))
                 return new BindingNotification(
-                    new FormatException("Enter comma-separated numbers."),
+                    new FormatException(DesktopStrings.Shell_EnterCommaSeparatedNumbers),
                     BindingErrorType.DataValidationError);
 
         return values;

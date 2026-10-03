@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:materialIcons="using:Material.Icons.Avalonia"
              xmlns:patternGallery="clr-namespace:Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels"
@@ -7,25 +8,25 @@
              x:DataType="patternGallery:PatternGalleryFileImportViewModel">
     <Grid Margin="8" RowDefinitions="*,*">
         <StackPanel Grid.Row="0">
-            <TextBox materialAssists:TextFieldAssist.Label="Name"
+            <TextBox materialAssists:TextFieldAssist.Label="{loc:Tr PatternGallery_Name}"
                      Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                      MinWidth="100"
                      Margin="0,0,0,5"
-                     ToolTip.Tip="The name for the pattern." />
+                     ToolTip.Tip="{loc:Tr PatternGallery_ImportNameTip}" />
             <Grid ColumnDefinitions="*,5,Auto,5,Auto"
                   Margin="0,0,0,5">
                 <TextBox Grid.Column="0"
-                         materialAssists:TextFieldAssist.Label="Pattern file path"
+                         materialAssists:TextFieldAssist.Label="{loc:Tr PatternGallery_Path}"
                          Text="{Binding FilePath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          MinWidth="100"
                          MaxWidth="200"
-                         ToolTip.Tip="The path to the pattern file to import." />
+                         ToolTip.Tip="{loc:Tr PatternGallery_PathTip}" />
                 <Button Grid.Column="2"
                         Classes="flat path-picker"
                         Cursor="Hand"
                         VerticalAlignment="Bottom"
                         Command="{Binding UseCurrentCommand}"
-                        ToolTip.Tip="Fetch the selected beatmap from your osu! client.">
+                        ToolTip.Tip="{loc:Tr PatternGallery_FetchTip}">
                     <materialIcons:MaterialIcon Width="30"
                                                 Height="30"
                                                 Kind="RestoreFromTrash" />
@@ -35,27 +36,27 @@
                         Cursor="Hand"
                         VerticalAlignment="Bottom"
                         Command="{Binding BrowseCommand}"
-                        ToolTip.Tip="Select beatmaps with File Explorer.">
+                        ToolTip.Tip="{loc:Tr PatternGallery_BrowseTip}">
                     <materialIcons:MaterialIcon Width="30"
                                                 Height="30"
                                                 Kind="Folder" />
                 </Button>
             </Grid>
-            <TextBox materialAssists:TextFieldAssist.Label="Filter"
+            <TextBox materialAssists:TextFieldAssist.Label="{loc:Tr PatternGallery_Filter}"
                      Text="{Binding Filter, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                      MinWidth="100"
                      Margin="0,0,0,5"
-                     ToolTip.Tip="Input an optional time code here. Example time code: 00:56:823 (1,2,1,2) - " />
-            <TextBox materialAssists:TextFieldAssist.Label="Start time"
+                     ToolTip.Tip="{loc:Tr PatternGallery_FilterTip}" />
+            <TextBox materialAssists:TextFieldAssist.Label="{loc:Tr PatternGallery_Start}"
                      Text="{Binding StartTime, Mode=TwoWay, Converter={StaticResource TimeToStringConverter}, ConverterParameter=-1, UpdateSourceTrigger=LostFocus}"
                      MinWidth="100"
                      Margin="0,0,0,5"
-                     ToolTip.Tip="Optional lower bound time. All objects before this time will be ignored." />
-            <TextBox materialAssists:TextFieldAssist.Label="End time"
+                     ToolTip.Tip="{loc:Tr PatternGallery_StartTip}" />
+            <TextBox materialAssists:TextFieldAssist.Label="{loc:Tr PatternGallery_End}"
                      Text="{Binding EndTime, Mode=TwoWay, Converter={StaticResource TimeToStringConverter}, ConverterParameter=-1, UpdateSourceTrigger=LostFocus}"
                      MinWidth="100"
                      Margin="0,0,0,5"
-                     ToolTip.Tip="Optional upper bound time. All objects after this time will be ignored." />
+                     ToolTip.Tip="{loc:Tr PatternGallery_EndTip}" />
         </StackPanel>
         <StackPanel Grid.Row="1"
                     Orientation="Horizontal"
@@ -63,12 +64,12 @@
                     Margin="0,16,0,0">
             <Button Classes="dialog-action primary"
                     Theme="{StaticResource MaterialFlatButton}"
-                    Content="ACCEPT"
+                         Content="{loc:Tr Common_Accept}"
                     Command="{Binding AcceptCommand}"
                     IsDefault="True" />
             <Button Classes="dialog-action primary"
                     Theme="{StaticResource MaterialFlatButton}"
-                    Content="CANCEL"
+                         Content="{loc:Tr Common_CancelUppercase}"
                     Command="{Binding CancelCommand}"
                     Margin="8,0,0,0"
                     IsCancel="True" />

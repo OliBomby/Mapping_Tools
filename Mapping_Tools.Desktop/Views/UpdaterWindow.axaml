@@ -1,5 +1,6 @@
 <Window x:Class="Mapping_Tools.Desktop.Views.UpdaterWindow"
         xmlns="https://github.com/avaloniaui"
+        xmlns:loc="using:Mapping_Tools.Desktop.Localization"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
         xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
@@ -7,7 +8,7 @@
         xmlns:controls="using:Mapping_Tools.Desktop.Controls"
         xmlns:viewModels="clr-namespace:Mapping_Tools.Desktop.ViewModels"
         x:DataType="viewModels:UpdaterViewModel"
-        Title="Mapping Tools - Updater"
+        Title="{loc:Tr Shell_MappingToolsUpdater}"
         Width="700"
         Height="500"
         CanResize="True"
@@ -23,7 +24,7 @@
         FontSize="14"
         FontWeight="Medium">
     <Grid RowDefinitions="35,*">
-        <controls:WindowChrome Grid.Row="0" Title="Mapping Tools - Updater" />
+        <controls:WindowChrome Grid.Row="0" Title="{loc:Tr Shell_MappingToolsUpdater}" />
 
         <Grid Grid.Row="1"
               Margin="20,10,20,20">
@@ -37,7 +38,7 @@
                            Width="64"
                            Margin="10" />
                     <TextBlock Grid.Column="1"
-                               Text="A new version of Mapping Tools is ready to be installed!"
+                               Text="{loc:Tr Shell_ANewVersionOfMappingToolsIsReadyToBeInstalled}"
                                FontSize="18"
                                VerticalAlignment="Center"
                                TextWrapping="Wrap" />
@@ -68,14 +69,14 @@
                             Grid.Column="1"
                             VerticalAlignment="Center"
                             Margin="20,0,0,0">
-                    <Button Content="Install now"
+                    <Button Content="{loc:Tr Shell_InstallNow}"
                             Command="{Binding InstallNowCommand}"
                             Margin="0,0,0,20" />
-                    <Button Content="Install after closing"
+                    <Button Content="{loc:Tr Shell_InstallAfterClosing}"
                             Command="{Binding InstallAfterClosingCommand}"
                             Classes="light"
                             Margin="0,0,0,20" />
-                    <Button Content="Skip this version"
+                    <Button Content="{loc:Tr Shell_SkipThisVersion}"
                             Command="{Binding SkipVersionCommand}"
                             Classes="outline"
                             Margin="20,20,20,0" />
@@ -93,7 +94,7 @@
                                Height="128"
                                HorizontalAlignment="Center" />
                         <TextBlock FontSize="15"
-                                   Text="Downloading new update ..."
+                                   Text="{loc:Tr Shell_DownloadingNewUpdate}"
                                    HorizontalAlignment="Center"
                                    Foreground="{DynamicResource MaterialDarkForegroundBrush}"
                                    FontWeight="Normal" />

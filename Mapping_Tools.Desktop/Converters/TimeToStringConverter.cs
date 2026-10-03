@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Localization;
 using System.Globalization;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
@@ -43,7 +44,7 @@ public sealed class TimeToStringConverter : IValueConverter
     {
         if (value is not string text)
             return new BindingNotification(
-                new FormatException("Enter a valid time."),
+                new FormatException(DesktopStrings.Shell_EnterAValidTime),
                 BindingErrorType.DataValidationError);
 
         try
@@ -57,7 +58,7 @@ public sealed class TimeToStringConverter : IValueConverter
             if (parameter is not null) return -1d;
 
             return new BindingNotification(
-                new FormatException("Time format error."),
+                new FormatException(DesktopStrings.Shell_TimeFormatError),
                 BindingErrorType.DataValidationError);
         }
     }

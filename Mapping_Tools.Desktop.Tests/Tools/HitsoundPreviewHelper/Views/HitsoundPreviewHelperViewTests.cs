@@ -10,12 +10,14 @@ using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
+using Mapping_Tools.Application.Localization;
 using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.QuickRun.Models;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.HitsoundPreviewHelper;
 using Mapping_Tools.Application.Tools.RhythmGuide;
 using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tests.TestHelpers;
@@ -35,6 +37,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Mapping_Tools.Desktop.Tests.Tools.HitsoundPreviewHelper.Views;
 
 [TestClass]
+[DoNotParallelize]
 public sealed class HitsoundPreviewHelperViewTests
 {
     [TestMethod]
@@ -123,6 +126,67 @@ public sealed class HitsoundPreviewHelperViewTests
         editorFocused.Should().BeTrue();
         dropDownOpenedWithF4.Should().BeTrue();
         zone.Hitsound.Should().NotBe(originalHitsound);
+    }
+
+    [TestMethod]
+    public void SampleSetCell_DutchAutoChoicePreservesLabelAndKeepsEnumValue()
+    {
+        // Arrange
+        string? previousLanguage = TranslationManager.Language;
+        TranslationManager.SetLanguage("nl");
+        try
+        {
+            HitsoundPreviewHelperViewModel viewModel = CreateViewModel(new RecordingPreviewService());
+            ObservableHitsoundZone zone = new() { Name = "zone" };
+            viewModel.Items.Add(zone);
+            HitsoundPreviewHelperView view = new() { DataContext = viewModel };
+            using HeadlessViewHost host = HeadlessViewHost.Show(view);
+            var grid = view.GetVisualDescendants().OfType<DataGrid>().Single();
+            DataGridCell sampleSetCell = grid.GetVisualDescendants().OfType<DataGridCell>()
+                .Where(cell => ReferenceEquals(cell.DataContext, zone) && cell.IsVisible && cell.Bounds.Width > 0)
+                .OrderBy(cell => cell.Bounds.X)
+                .ElementAt(5);
+            TextBlock inheritedChoice = sampleSetCell.GetVisualDescendants().OfType<TextBlock>()
+                .Single(textBlock => textBlock.Text == "Auto");
+            string inheritedChoiceText = inheritedChoice.Text!;
+
+            // Act
+            host.Click(sampleSetCell);
+            ComboBox editor = sampleSetCell.GetVisualDescendants().OfType<ComboBox>()
+                .Single(comboBox => comboBox.IsVisible && comboBox.Bounds.Width > 0);
+            editor.Focus();
+            host.PressKey(Key.F4, RawInputModifiers.None, PhysicalKey.F4, "");
+            Popup dropdownPopup = editor.GetVisualDescendants().OfType<Popup>().Single();
+            Control dropdownContent = dropdownPopup.Child
+                                       ?? throw new InvalidOperationException("The sample-set dropdown has no content.");
+            TopLevel dropdown = TopLevel.GetTopLevel(dropdownContent)
+                               ?? throw new InvalidOperationException("The sample-set dropdown has no input root.");
+            ComboBoxItem normalOption = dropdown.GetVisualDescendants().OfType<ComboBoxItem>()
+                .Single(item => item.IsVisible && Equals(item.DataContext, SampleSet.Normal));
+            Point optionPoint = normalOption.TranslatePoint(
+                                    new Point(normalOption.Bounds.Width / 2, normalOption.Bounds.Height / 2),
+                                    dropdown)
+                                ?? throw new InvalidOperationException("Could not locate the Normal sample-set option.");
+            dropdown.MouseMove(optionPoint);
+            dropdown.MouseDown(optionPoint, MouseButton.Left, RawInputModifiers.LeftMouseButton);
+            dropdown.MouseUp(optionPoint, MouseButton.Left);
+            HeadlessViewHost.RunDispatcherJobs();
+            object? selectedValue = editor.SelectedItem;
+            host.Click(grid.GetVisualDescendants().OfType<DataGridCell>()
+                .Where(cell => ReferenceEquals(cell.DataContext, zone) && cell.IsVisible && cell.Bounds.Width > 0)
+                .OrderBy(cell => cell.Bounds.X)
+                .First());
+
+            // Assert
+            inheritedChoiceText.Should().Be("Auto");
+            selectedValue.Should().Be(SampleSet.Normal);
+            zone.SampleSet.Should().Be(SampleSet.Normal);
+            zone.Model.SampleSet.Should().Be(SampleSet.Normal);
+        }
+        finally
+        {
+            TranslationManager.SetLanguage(previousLanguage);
+        }
     }
 
     [TestMethod]
@@ -269,7 +333,7 @@ public sealed class HitsoundPreviewHelperViewTests
         // Assert
         viewModel.Items.Should().BeEmpty();
         dialogs.MessageCount.Should().Be(1);
-        dialogs.LastMessage.Should().Contain("Open a beatmap in osu!");
+        dialogs.LastMessage.Should().Be(ApplicationStrings.Exception_LiveEditorUnavailable);
         published.Should().BeEmpty();
     }
 

@@ -2,6 +2,7 @@ using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.QuickRun.Contracts;
+using Mapping_Tools.Application.Localization;
 using Mapping_Tools.Application.QuickRun.Models;
 using Mapping_Tools.Application.Settings.Models;
 using Microsoft.Extensions.Logging;
@@ -74,7 +75,7 @@ public sealed class QuickRunService : IQuickRunService
                     await PublishAsync(
                             UserNotificationSeverity.Warning,
                             "QuickRun",
-                            "QuickRun could not determine the current osu! editor selection.")
+                            ApplicationStrings.QuickRun_EditorUnavailable)
                         .ConfigureAwait(false);
                     return new QuickRunResult(QuickRunStatus.EditorUnavailable);
                 }
@@ -102,8 +103,10 @@ public sealed class QuickRunService : IQuickRunService
                             UserNotificationSeverity.Warning,
                             "QuickRun",
                             status == QuickRunStatus.NoCurrentCommand
-                                ? "The current screen does not provide a QuickRun command."
-                                : $"The configured QuickRun tool '{configuredName}' is not available.")
+                                ? snapshot.SelectedHitObjects.Count == 0
+                                    ? ApplicationStrings.QuickRun_NoObjectsSelected
+                                    : ApplicationStrings.QuickRun_CommandUnavailable
+                                : ApplicationText.Format(ApplicationStrings.QuickRun_NamedCommandUnavailable, configuredName))
                         .ConfigureAwait(false);
                     return new QuickRunResult(status);
                 }
@@ -125,7 +128,7 @@ public sealed class QuickRunService : IQuickRunService
             await PublishAsync(
                     UserNotificationSeverity.Error,
                     "QuickRun",
-                    exception.Message,
+                    ApplicationExceptionText.GetSummary(exception, ApplicationStrings.QuickRun_Failed),
                     exception)
                 .ConfigureAwait(false);
             return new QuickRunResult(

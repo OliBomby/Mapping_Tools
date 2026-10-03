@@ -1,16 +1,16 @@
 using Mapping_Tools.Desktop.Services.Undo;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
+using Mapping_Tools.Desktop.Localization;
 
 namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 
 /// <summary>Reflects typed generator settings into a compact dialog row model.</summary>
-public sealed partial class GeometryDashboardGeneratorSettingsDialogViewModel : ObservableObject
+public sealed partial class GeometryDashboardGeneratorSettingsDialogViewModel : LocalizedObservableObject
 {
     /// <summary>Creates the dialog over an independent generator-settings clone.</summary>
     public GeometryDashboardGeneratorSettingsDialogViewModel(GeneratorSettings settings)
@@ -199,8 +199,7 @@ public sealed partial class GeometryDashboardGeneratorSettingsDialogViewModel : 
                                                               && property.PropertyType == typeof(SelectionPredicateCollection)))
             if (property.GetValue(settings) is SelectionPredicateCollection collection)
             {
-                string name = property.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ?? property.Name;
-                yield return new GeometryDashboardPredicateCollectionViewModel(name, collection);
+                yield return new GeometryDashboardPredicateCollectionViewModel(property.Name, collection);
             }
     }
 

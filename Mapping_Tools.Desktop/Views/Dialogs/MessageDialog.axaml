@@ -1,4 +1,5 @@
 <Window xmlns="https://github.com/avaloniaui"
+        xmlns:loc="using:Mapping_Tools.Desktop.Localization"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="using:Mapping_Tools.Desktop.Controls"
         xmlns:vm="using:Mapping_Tools.Desktop.ViewModels.Dialogs"
@@ -35,7 +36,7 @@
                 <SelectableTextBlock Text="{Binding Message}"
                                      FontSize="14"
                                      TextWrapping="Wrap" />
-                <Expander Header="Show Error Details"
+                <Expander Header="{loc:Tr Shell_ShowErrorDetails}"
                           IsVisible="{Binding HasDetails}">
                     <SelectableTextBlock Text="{Binding Details}"
                                          Padding="8"

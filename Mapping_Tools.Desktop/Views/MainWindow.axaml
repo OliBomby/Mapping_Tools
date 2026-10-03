@@ -1,4 +1,5 @@
 <Window xmlns="https://github.com/avaloniaui"
+        xmlns:loc="using:Mapping_Tools.Desktop.Localization"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Mapping_Tools.Desktop.ViewModels"
         xmlns:controls="using:Mapping_Tools.Desktop.Controls"
@@ -159,121 +160,119 @@
                                               Width="45"
                                               Height="35"
                                               VerticalAlignment="Center"
-                                              AutomationProperties.Name="Navigation menu"
+                                              AutomationProperties.Name="{loc:Tr Shell_NavigationMenu}"
                                               IsChecked="{Binding IsNavigationOpen, Mode=TwoWay}"
-                                              ToolTip.Tip="Use Ctrl+K to open navigation.">
+                                              ToolTip.Tip="{loc:Tr Shell_UseCtrlKToOpenNavigation}">
                                     <materialIcons:MaterialIcon Kind="Menu"
                                                                 Width="28"
                                                                 Height="28" />
                                 </ToggleButton>
 
                                 <Menu Classes="top-menu">
-                                    <MenuItem Header="_File"
-                                              MinWidth="50"
+                                    <MenuItem Header="{loc:Tr Shell_MenuFile}"
                                               Height="35">
-                                        <MenuItem Header="_Open beatmap"
+                                        <MenuItem Header="{loc:Tr Shell_MenuOpenBeatmap}"
                                                   Command="{Binding Workspace.OpenBeatmapCommand}"
-                                                  ToolTip.Tip="Select the current beatmap with File Explorer.">
+                                                  ToolTip.Tip="{loc:Tr Shell_SelectTheCurrentBeatmapWithFileExplorer}">
                                             <MenuItem.Icon>
                                                 <materialIcons:MaterialIcon Kind="Folder" />
                                             </MenuItem.Icon>
                                         </MenuItem>
-                                        <MenuItem Header="_Open current beatmap"
+                                        <MenuItem Header="{loc:Tr Shell_MenuOpenCurrentBeatmap}"
                                                   Command="{Binding Workspace.OpenCurrentBeatmapCommand}"
-                                                  ToolTip.Tip="Set the current beatmap to the selected beatmap in your osu! client.">
+                                                  ToolTip.Tip="{loc:Tr Shell_SetTheCurrentBeatmapToTheSelectedBeatmapInYourOsuClient}">
                                             <MenuItem.Icon>
                                                 <materialIcons:MaterialIcon Kind="Restore" />
                                             </MenuItem.Icon>
                                         </MenuItem>
-                                        <MenuItem Header="_Generate backup"
+                                        <MenuItem Header="{loc:Tr Shell_MenuGenerateBackup}"
                                                   Command="{Binding Workspace.CreateBackupCommand}"
-                                                  ToolTip.Tip="Save a backup of the current beatmap to the backups folder.">
+                                                  ToolTip.Tip="{loc:Tr Shell_SaveABackupOfTheCurrentBeatmapToTheBackupsFolder}">
                                             <MenuItem.Icon>
                                                 <materialIcons:MaterialIcon Kind="Backup" />
                                             </MenuItem.Icon>
                                         </MenuItem>
-                                        <MenuItem Header="_Load backup"
+                                        <MenuItem Header="{loc:Tr Shell_MenuLoadBackup}"
                                                   Command="{Binding Workspace.RestoreBackupCommand}"
-                                                  ToolTip.Tip="Load a backup from the backups folder into the current beatmap.">
+                                                  ToolTip.Tip="{loc:Tr Shell_LoadABackupFromTheBackupsFolderIntoTheCurrentBeatmap}">
                                             <MenuItem.Icon>
                                                 <materialIcons:MaterialIcon Kind="BackupRestore" />
                                             </MenuItem.Icon>
                                         </MenuItem>
-                                        <MenuItem Header="_QuickUndo"
+                                        <MenuItem Header="{loc:Tr Shell_MenuQuickundo}"
                                                   Command="{Binding Workspace.QuickUndoCommand}"
-                                                  ToolTip.Tip="Restore the newest non-periodic backup into the beatmap open in osu!.">
+                                                  ToolTip.Tip="{loc:Tr Shell_RestoreTheNewestNonPeriodicBackupIntoTheBeatmapOpenInOsu}">
                                             <MenuItem.Icon>
                                                 <materialIcons:MaterialIcon Kind="Undo" />
                                             </MenuItem.Icon>
                                         </MenuItem>
-                                        <MenuItem Header="_BetterSave™ current beatmap"
+                                        <MenuItem Header="{loc:Tr Shell_MenuBettersaveCurrentBeatmap}"
                                                   Command="{Binding BetterSaveCommand}"
-                                                  ToolTip.Tip="Save the beatmap which is currently open in your osu! editor. BetterSave™ saves the beatmap just like the vanilla editor, but decimal values get rounded instead of truncated.">
+                                                  ToolTip.Tip="{loc:Tr Shell_SaveTheBeatmapWhichIsCurrentlyOpenInYourOsuEditorBettersaveSavesTheBeatmapJustLikeTheVanillaEditorBu}">
                                             <MenuItem.Icon>
                                                 <materialIcons:MaterialIcon Kind="ContentSave" />
                                             </MenuItem.Icon>
                                         </MenuItem>
                                     </MenuItem>
-                                    <MenuItem Header="_About"
-                                              MinWidth="67"
+                                    <MenuItem Header="{loc:Tr Shell_MenuAbout}"
                                               Height="35">
-                                        <MenuItem Header="_Open Mapping Tools folder"
+                                        <MenuItem Header="{loc:Tr Shell_MenuOpenMappingToolsFolder}"
                                                   Command="{Binding Workspace.OpenApplicationFolderCommand}"
-                                                  ToolTip.Tip="Open the Mapping Tools folder.">
+                                                  ToolTip.Tip="{loc:Tr Shell_OpenTheMappingToolsFolder}">
                                             <MenuItem.Icon>
                                                 <materialIcons:MaterialIcon Kind="FolderOpen" />
                                             </MenuItem.Icon>
                                         </MenuItem>
-                                        <MenuItem Header="_Open backups folder"
+                                        <MenuItem Header="{loc:Tr Shell_MenuOpenBackupsFolder}"
                                                   Command="{Binding Workspace.OpenBackupsFolderCommand}"
-                                                  ToolTip.Tip="Open the backups folder.">
+                                                  ToolTip.Tip="{loc:Tr Shell_OpenTheBackupsFolder}">
                                             <MenuItem.Icon>
                                                 <materialIcons:MaterialIcon Kind="FolderOpen" />
                                             </MenuItem.Icon>
                                         </MenuItem>
-                                        <MenuItem Header="_Check for updates"
+                                        <MenuItem Header="{loc:Tr Shell_MenuCheckForUpdates}"
                                                   Command="{Binding CheckForUpdatesCommand}"
-                                                  ToolTip.Tip="Check if there are updates available.">
+                                                  ToolTip.Tip="{loc:Tr Shell_CheckIfThereAreUpdatesAvailable}">
                                             <MenuItem.Icon>
                                                 <materialIcons:MaterialIcon Kind="Update" />
                                             </MenuItem.Icon>
                                         </MenuItem>
-                                        <MenuItem Header="_Website"
+                                        <MenuItem Header="{loc:Tr Shell_MenuWebsite}"
                                                   Command="{Binding OpenWebsiteCommand}"
-                                                  ToolTip.Tip="Open the official Mapping Tools website in your browser.">
+                                                  ToolTip.Tip="{loc:Tr Shell_OpenTheOfficialMappingToolsWebsiteInYourBrowser}">
                                             <MenuItem.Icon>
                                                 <materialIcons:MaterialIcon Kind="OpenInBrowser" />
                                             </MenuItem.Icon>
                                         </MenuItem>
-                                        <MenuItem Header="_Github"
+                                        <MenuItem Header="{loc:Tr Shell_MenuGithub}"
                                                   Command="{Binding OpenGitHubCommand}"
-                                                  ToolTip.Tip="Go to the Mapping Tools Github.">
+                                                  ToolTip.Tip="{loc:Tr Shell_GoToTheMappingToolsGithub}">
                                             <MenuItem.Icon>
                                                 <materialIcons:MaterialIcon Kind="Github" />
                                             </MenuItem.Icon>
                                         </MenuItem>
-                                        <MenuItem Header="_Report an issue"
+                                        <MenuItem Header="{loc:Tr Shell_MenuReportAnIssue}"
                                                   Command="{Binding OpenIssuesCommand}"
-                                                  ToolTip.Tip="Report a bug or request a feature on GitHub.">
+                                                  ToolTip.Tip="{loc:Tr Shell_ReportABugOrRequestAFeatureOnGithub}">
                                             <MenuItem.Icon>
                                                 <materialIcons:MaterialIcon Kind="BugReport" />
                                             </MenuItem.Icon>
                                         </MenuItem>
-                                        <MenuItem Header="_Donate"
+                                        <MenuItem Header="{loc:Tr Shell_MenuDonate}"
                                                   Command="{Binding OpenDonateCommand}"
-                                                  ToolTip.Tip="Support Mapping Tools.">
+                                                  ToolTip.Tip="{loc:Tr Shell_SupportMappingTools}">
                                             <MenuItem.Icon>
                                                 <materialIcons:MaterialIcon Kind="Heart" />
                                             </MenuItem.Icon>
                                         </MenuItem>
-                                        <MenuItem Header="_About"
+                                        <MenuItem Header="{loc:Tr Shell_MenuAbout}"
                                                   Command="{Binding OpenAboutCommand}">
                                             <MenuItem.Icon>
                                                 <materialIcons:MaterialIcon Kind="Information" />
                                             </MenuItem.Icon>
                                         </MenuItem>
                                     </MenuItem>
-                                    <MenuItem Header="_Project"
+                                    <MenuItem Header="{loc:Tr Shell_MenuProject}"
                                               MinWidth="67"
                                               Height="35"
                                               IsVisible="{Binding HasProjectMenu}"
@@ -301,9 +300,9 @@
                                 <Button Theme="{StaticResource ChromeButtonTheme}"
                                         Width="49"
                                         Height="35"
-                                        AutomationProperties.Name="Minimize"
+                                        AutomationProperties.Name="{loc:Tr Shell_Minimize}"
                                         Click="MinimizeWindow"
-                                        ToolTip.Tip="Minimize">
+                                        ToolTip.Tip="{loc:Tr Shell_Minimize}">
                                     <materialIcons:MaterialIcon Kind="WindowMinimize"
                                                                 Width="16"
                                                                 Height="16" />
@@ -311,9 +310,9 @@
                                 <Button Theme="{StaticResource ChromeButtonTheme}"
                                         Width="47"
                                         Height="35"
-                                        AutomationProperties.Name="Maximize or restore"
+                                        AutomationProperties.Name="{loc:Tr Shell_MaximizeOrRestore}"
                                         Click="ToggleMaximizeWindow"
-                                        ToolTip.Tip="Maximize or restore">
+                                        ToolTip.Tip="{loc:Tr Shell_MaximizeOrRestore}">
                                     <materialIcons:MaterialIcon x:Name="MaximizeIcon"
                                                                 Kind="WindowMaximize"
                                                                 Width="16"
@@ -322,14 +321,14 @@
                                 <Button Theme="{StaticResource ChromeButtonTheme}"
                                         Width="49"
                                         Height="35"
-                                        AutomationProperties.Name="Close"
+                                        AutomationProperties.Name="{loc:Tr Shell_Close}"
                                         Click="CloseWindow"
-                                        ToolTip.Tip="Close">
+                                        ToolTip.Tip="{loc:Tr Shell_Close}">
                                     <Button.ContextMenu>
                                         <ContextMenu>
-                                            <MenuItem Header="_Exit without saving"
+                                            <MenuItem Header="{loc:Tr Shell_MenuExitWithoutSaving}"
                                                       Click="CloseWithoutSaving"
-                                                      ToolTip.Tip="Exits the program without saving any preferences or tool settings." />
+                                                      ToolTip.Tip="{loc:Tr Shell_ExitsTheProgramWithoutSavingAnyPreferencesOrToolSettings}" />
                                         </ContextMenu>
                                     </Button.ContextMenu>
                                     <materialIcons:MaterialIcon Kind="WindowClose"
@@ -343,51 +342,51 @@
                                                         CornerRadius="2"
                                                         Mode="PrimaryDark"
                                                         VerticalAlignment="Center"
-                                                        AutomationProperties.Name="Current maps"
+                                                        AutomationProperties.Name="{loc:Tr Shell_CurrentMaps}"
                                                         WindowDecorationProperties.ElementRole="User"
                                                         materialAssists:ShadowAssist.ShadowDepth="Depth0"
                                                         PointerPressed="DragCurrentMaps"
                                                         ToolTip.Tip="{Binding Workspace.SelectedMapToolTip}">
                                 <materialControls:ColorZone.ContextMenu>
                                     <ContextMenu>
-                                        <MenuItem Header="_Open beatmap"
+                                        <MenuItem Header="{loc:Tr Shell_MenuOpenBeatmap}"
                                                   Command="{Binding Workspace.OpenBeatmapCommand}"
-                                                  ToolTip.Tip="Select the current beatmap with File Explorer.">
+                                                  ToolTip.Tip="{loc:Tr Shell_SelectTheCurrentBeatmapWithFileExplorer}">
                                             <MenuItem.Icon>
                                                 <materialIcons:MaterialIcon Kind="Folder" />
                                             </MenuItem.Icon>
                                         </MenuItem>
-                                        <MenuItem Header="_Open current beatmap"
+                                        <MenuItem Header="{loc:Tr Shell_MenuOpenCurrentBeatmap}"
                                                   Command="{Binding Workspace.OpenCurrentBeatmapCommand}"
-                                                  ToolTip.Tip="Set the current beatmap to the selected beatmap in your osu! client.">
+                                                  ToolTip.Tip="{loc:Tr Shell_SetTheCurrentBeatmapToTheSelectedBeatmapInYourOsuClient}">
                                             <MenuItem.Icon>
                                                 <materialIcons:MaterialIcon Kind="Restore" />
                                             </MenuItem.Icon>
                                         </MenuItem>
-                                        <MenuItem Header="_Generate backup"
+                                        <MenuItem Header="{loc:Tr Shell_MenuGenerateBackup}"
                                                   Command="{Binding Workspace.CreateBackupCommand}"
-                                                  ToolTip.Tip="Save a backup of the current beatmap to the backups folder.">
+                                                  ToolTip.Tip="{loc:Tr Shell_SaveABackupOfTheCurrentBeatmapToTheBackupsFolder}">
                                             <MenuItem.Icon>
                                                 <materialIcons:MaterialIcon Kind="Backup" />
                                             </MenuItem.Icon>
                                         </MenuItem>
-                                        <MenuItem Header="_Load backup"
+                                        <MenuItem Header="{loc:Tr Shell_MenuLoadBackup}"
                                                   Command="{Binding Workspace.RestoreBackupCommand}"
-                                                  ToolTip.Tip="Load a backup from the backups folder into the current beatmap.">
+                                                  ToolTip.Tip="{loc:Tr Shell_LoadABackupFromTheBackupsFolderIntoTheCurrentBeatmap}">
                                             <MenuItem.Icon>
                                                 <materialIcons:MaterialIcon Kind="BackupRestore" />
                                             </MenuItem.Icon>
                                         </MenuItem>
-                                        <MenuItem Header="_QuickUndo"
+                                        <MenuItem Header="{loc:Tr Shell_MenuQuickundo}"
                                                   Command="{Binding Workspace.QuickUndoCommand}"
-                                                  ToolTip.Tip="Restore the newest non-periodic backup into the beatmap open in osu!.">
+                                                  ToolTip.Tip="{loc:Tr Shell_RestoreTheNewestNonPeriodicBackupIntoTheBeatmapOpenInOsu}">
                                             <MenuItem.Icon>
                                                 <materialIcons:MaterialIcon Kind="Undo" />
                                             </MenuItem.Icon>
                                         </MenuItem>
-                                        <MenuItem Header="_BetterSave™ current beatmap"
+                                        <MenuItem Header="{loc:Tr Shell_MenuBettersaveCurrentBeatmap}"
                                                   Command="{Binding BetterSaveCommand}"
-                                                  ToolTip.Tip="Save the beatmap which is currently open in your osu! editor. BetterSave™ saves the beatmap just like the vanilla editor, but decimal values get rounded instead of truncated.">
+                                                  ToolTip.Tip="{loc:Tr Shell_SaveTheBeatmapWhichIsCurrentlyOpenInYourOsuEditorBettersaveSavesTheBeatmapJustLikeTheVanillaEditorBu}">
                                             <MenuItem.Icon>
                                                 <materialIcons:MaterialIcon Kind="ContentSave" />
                                             </MenuItem.Icon>
@@ -430,11 +429,11 @@
                                              Margin="16,8,12,0"
                                              Classes="outline clearButton"
                                              Theme="{StaticResource OutlineTextBox}"
-                                             AutomationProperties.Name="Tool search"
+                                             AutomationProperties.Name="{loc:Tr Shell_ToolSearch}"
                                              UseFloatingPlaceholder="True"
-                                             materialAssists:TextFieldAssist.Label="Search"
+                                             materialAssists:TextFieldAssist.Label="{loc:Tr Shell_Search}"
                                              Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                             ToolTip.Tip="Search registered features">
+                                             ToolTip.Tip="{loc:Tr Shell_SearchRegisteredFeatures}">
                                         <TextBox.KeyBindings>
                                             <KeyBinding Gesture="Enter"
                                                         Command="{Binding ActivateHighlightedFeatureCommand}" />
@@ -455,7 +454,7 @@
                                                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
                                                                 ScrollViewer.AllowAutoHide="False"
                                                                 AutoScrollToSelectedItem="True"
-                                                                AutomationProperties.Name="Tools menu"
+                                                                AutomationProperties.Name="{loc:Tr Shell_ToolsMenu}"
                                                                 ItemsSource="{Binding NavigationEntries}"
                                                                 SelectedItem="{Binding HighlightedFeature, Mode=TwoWay}">
                                         <controls:NavigationListBox.KeyBindings>
@@ -488,6 +487,7 @@
                                 <featureLoading:FeatureContentHost Margin="20"
                                                                    ClipToBounds="False"
                                                                    ErrorMessage="{Binding FeatureLoadError}"
+                                                                   ErrorDetails="{Binding FeatureLoadDetails}"
                                                                    Feature="{Binding CurrentFeature}"
                                                                    HorizontalContentAlignment="Stretch"
                                                                    VerticalContentAlignment="Stretch" />

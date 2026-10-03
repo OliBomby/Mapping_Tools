@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
              xmlns:patternGalleryControls="using:Mapping_Tools.Desktop.Tools.PatternGallery.Controls"
              xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
@@ -14,9 +15,9 @@
         <Grid Grid.Row="0">
             <Grid RowDefinitions="Auto,*">
                 <Grid ColumnDefinitions="*,Auto">
-                    <controls:ToolViewHeader Title="Pattern Gallery"
+        <controls:ToolViewHeader Title="{loc:Tr PatternGallery_Title}"
                                              IsQuickRunSupported="True"
-                                             HelpText="Import and export patterns from osu! beatmaps and create pattern collections which you can share with your friends.&#x0a;You can add or remove patterns by using the buttons at the bottom.&#x0a;To export a pattern to the current beatmap simply select one or more patterns and click the run button. You can also double-click a pattern to instantly export it.&#x0a;On the right there are export options which allow for additional processing on the pattern during export.&#x0a;With the 'Project' menu you can save/load/rename/import/export your pattern collections." />
+                                 HelpText="{loc:Tr PatternGallery_Help}" />
                     <TextBlock Grid.Column="1"
                                FontSize="35"
                                FontWeight="Thin"
@@ -57,7 +58,7 @@
                                                                FontStyle="Italic"
                                                                Foreground="Silver"
                                                                VerticalAlignment="Bottom"
-                                                               Text=" item(s)" />
+                                                               Text="{Binding ItemCountText}" />
                                                 </StackPanel>
                                             </Expander.Header>
                                             <ListBox ItemsSource="{Binding Patterns}"
@@ -94,7 +95,7 @@
                                                                     <ContextMenu Opened="PatternContextMenuOpened" />
                                                                 </Border.ContextMenu>
                                                                 <Grid RowDefinitions="*,40"
-                                                                      ToolTip.Tip="Double-click to QuickRun this pattern.">
+                                                                      ToolTip.Tip="{loc:Tr PatternGallery_QuickRunTip}">
                                                                     <patternGalleryControls:PatternThumbnailControl
                                                                         Beatmap="{Binding ThumbnailBeatmap}" />
                                                                     <TextBlock Grid.Row="1"
@@ -124,26 +125,26 @@
                                 <materialControls:FloatingButton Classes="mini light no-transitions"
                                                                  Margin="5"
                                                                  Command="{Binding AddCodeCommand}"
-                                                                 ToolTip.Tip="Add a pattern from .osu code.">
+                                                                 ToolTip.Tip="{loc:Tr PatternGallery_CodeImportTip}">
                                     <materialIcons:MaterialIcon Kind="CodeBraces" Width="24" Height="24" />
                                 </materialControls:FloatingButton>
                                 <materialControls:FloatingButton Classes="mini light no-transitions"
                                                                  Margin="5"
                                                                  Command="{Binding AddFileCommand}"
-                                                                 ToolTip.Tip="Add a pattern from a file.">
+                                                                 ToolTip.Tip="{loc:Tr PatternGallery_FileImportTip}">
                                     <materialIcons:MaterialIcon Kind="FilePlus" Width="24" Height="24" />
                                 </materialControls:FloatingButton>
                                 <materialControls:FloatingButton Classes="mini light no-transitions"
                                                                  Margin="5"
                                                                  Command="{Binding AddSelectedCommand}"
-                                                                 ToolTip.Tip="Add a pattern from selected hit objects.">
+                                                                 ToolTip.Tip="{loc:Tr PatternGallery_SelectedImportTip}">
                                     <materialIcons:MaterialIcon Kind="PlusBox" Width="24" Height="24" />
                                 </materialControls:FloatingButton>
                                 <materialControls:FloatingButton Classes="mini light no-transitions"
                                                                  x:Name="RemoveButton"
                                                                  Margin="5"
                                                                  Click="RemoveButtonClick"
-                                                                 ToolTip.Tip="Delete selected patterns. Hold shift to skip dialog.">
+                                                                 ToolTip.Tip="{loc:Tr PatternGallery_DeleteTip}">
                                     <materialIcons:MaterialIcon Kind="TrashCan" Width="24" Height="24" />
                                 </materialControls:FloatingButton>
                             </StackPanel>
@@ -157,25 +158,31 @@
                                                             Height="24"
                                                             Margin="5" />
                                 <TextBox Classes="compact"
-                                         PlaceholderText="Search"
+                    PlaceholderText="{loc:Tr PatternGallery_Search}"
                                          Width="120"
                                          Height="24"
                                          Margin="5"
                                          Text="{Binding SearchFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                         ToolTip.Tip="Search for a pattern." />
+                    ToolTip.Tip="{loc:Tr PatternGallery_SearchTip}" />
                                 <ComboBox Width="120"
                                           Height="24"
                                           Margin="5"
                                           Classes="compact"
-                                          ItemsSource="{Binding SortableProperties}"
-                                          SelectedItem="{Binding SortProperty, Mode=TwoWay}" />
+                                           ItemsSource="{Binding SortableProperties}"
+                                          SelectedItem="{Binding SortProperty, Mode=TwoWay}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
                                 <ComboBox Width="100"
                                           Height="24"
                                           Margin="5"
                                           Classes="compact"
                                           SelectedIndex="{Binding SortDirection, Mode=TwoWay}">
-                                    <ComboBoxItem Content="Ascending" />
-                                    <ComboBoxItem Content="Descending" />
+                    <ComboBoxItem Content="{loc:Tr Common_Ascending}" />
+                    <ComboBoxItem Content="{loc:Tr Common_Descending}" />
                                 </ComboBox>
                             </StackPanel>
                         </Grid>
@@ -193,67 +200,85 @@
                         <StackPanel>
                             <ComboBox Margin="0,7,0,0"
                                       ItemsSource="{Binding ExportTimeModes}"
-                                      SelectedItem="{Binding ExportTimeMode, Mode=TwoWay}"
-                                      materialAssists:ComboBoxAssist.Label="Export offset"
-                                      ToolTip.Tip="Determines at what time to put the pattern." />
+                                       SelectedItem="{Binding ExportTimeMode, Mode=TwoWay}"
+                                       materialAssists:ComboBoxAssist.Label="{loc:Tr PatternGallery_Offset}"
+                                       ToolTip.Tip="{loc:Tr PatternGallery_OffsetTip}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
                             <TextBox Margin="0,5,0,0"
                                      IsVisible="{Binding CustomExportTimeVisible}"
-                                     materialAssists:TextFieldAssist.Label="Custom export offset"
+                                     materialAssists:TextFieldAssist.Label="{loc:Tr PatternGallery_CustomOffset}"
                                      Text="{Binding CustomExportTime, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
-                                     ToolTip.Tip="Determines at what time to put the pattern for the custom offset mode." />
+                                     ToolTip.Tip="{loc:Tr PatternGallery_CustomOffsetTip}" />
                             <TextBox Margin="0,5,0,0"
-                                     materialAssists:TextFieldAssist.Label="Deletion margin"
+                                     materialAssists:TextFieldAssist.Label="{loc:Tr PatternGallery_Margin}"
                                      Text="{Binding Padding, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
-                                     ToolTip.Tip="Extra time in milliseconds around the patterns for deleting parts of the original map." />
+                                     ToolTip.Tip="{loc:Tr PatternGallery_MarginTip}" />
                             <TextBox Margin="0,5,0,0"
-                                     materialAssists:TextFieldAssist.Label="Parting distance"
+                                     materialAssists:TextFieldAssist.Label="{loc:Tr PatternGallery_Parting}"
                                      Text="{Binding PartingDistance, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
-                                     ToolTip.Tip="Minimum number of beats required in a gap to split a pattern into smaller parts." />
+                                     ToolTip.Tip="{loc:Tr PatternGallery_PartingTip}" />
                             <TextBox Margin="0,5,0,0"
-                                     materialAssists:TextFieldAssist.Label="Beat divisors"
+                                     materialAssists:TextFieldAssist.Label="{loc:Tr PatternGallery_Divisors}"
                                      Text="{Binding BeatDivisors, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource BeatDivisorArrayToStringConverter}}"
-                                     ToolTip.Tip="Input any number of beat divisors here separated with commas. Example: 1/4, 1/12, 1/7, 4/5, 0.13435622499" />
+                                     ToolTip.Tip="{loc:Tr PatternGallery_DivisorsTip}" />
                             <Grid Margin="0,5,0,0" ColumnDefinitions="*,5,*">
-                                <TextBox materialAssists:TextFieldAssist.Label="Scale"
+                                <TextBox materialAssists:TextFieldAssist.Label="{loc:Tr PatternGallery_Scale}"
                                          Text="{Binding CustomScale, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
-                                         ToolTip.Tip="Scalar to change the size of the pattern." />
+                                         ToolTip.Tip="{loc:Tr PatternGallery_ScaleTip}" />
                                 <TextBox Grid.Column="2"
-                                         materialAssists:TextFieldAssist.Label="Rotate (degrees)"
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr PatternGallery_Rotate}"
                                          Text="{Binding CustomRotate, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
-                                         ToolTip.Tip="Degrees to rotate the pattern clockwise." />
+                                         ToolTip.Tip="{loc:Tr PatternGallery_RotateTip}" />
                             </Grid>
                             <ComboBox Margin="0,5,0,0"
                                       ItemsSource="{Binding PatternOverwriteModes}"
-                                      SelectedItem="{Binding PatternOverwriteMode, Mode=TwoWay}"
-                                      materialAssists:ComboBoxAssist.Label="Pattern overwrite mode"
-                                      ToolTip.Tip="Determines how to overwrite the objects in the original beatmap when a pattern gets placed on them." />
+                                       SelectedItem="{Binding PatternOverwriteMode, Mode=TwoWay}"
+                                       materialAssists:ComboBoxAssist.Label="{loc:Tr PatternGallery_ObjectOverwrite}"
+                                       ToolTip.Tip="{loc:Tr PatternGallery_ObjectOverwriteTip}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
                             <ComboBox Margin="0,5,0,0"
                                       ItemsSource="{Binding TimingOverwriteModes}"
-                                      SelectedItem="{Binding TimingOverwriteMode, Mode=TwoWay}"
-                                      materialAssists:ComboBoxAssist.Label="Timing overwrite mode"
-                                      ToolTip.Tip="Determines how to combine the timing of the orignal beatmap and the timing of the pattern." />
+                                       SelectedItem="{Binding TimingOverwriteMode, Mode=TwoWay}"
+                                       materialAssists:ComboBoxAssist.Label="{loc:Tr PatternGallery_TimingOverwrite}"
+                                       ToolTip.Tip="{loc:Tr PatternGallery_TimingOverwriteTip}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
 
-                            <CheckBox Margin="0,5,0,0" Content="Include hitsounds"
+                    <CheckBox Margin="0,5,0,0" Content="{loc:Tr PatternGallery_IncludeHitsounds}"
                                       IsChecked="{Binding IncludeHitsounds}"
-                                      ToolTip.Tip="Export the pattern with the hitsound effects of the pattern timing points." />
-                            <CheckBox Content="Include kiai" IsChecked="{Binding IncludeKiai}"
-                                      ToolTip.Tip="Export the pattern with the kiai of the pattern." />
-                            <CheckBox Content="Scale to new circle size" IsChecked="{Binding ScaleToNewCircleSize}"
-                                      ToolTip.Tip="Scale the pattern such that the spacing relative to the circle size stays the same." />
-                            <CheckBox Content="Scale to new timing" IsChecked="{Binding ScaleToNewTiming}"
-                                      ToolTip.Tip="Scale the pattern in time such that the number of beats between objects stays the same in the new timing. Incorrect snaps can occur if your timing has unsnapped redlines. Do not use this if you have 0 or infinite BPM redlines." />
-                            <CheckBox Content="Snap to new timing" IsChecked="{Binding SnapToNewTiming}"
-                                      ToolTip.Tip="Snap the objects of the pattern to the new timing using the specified beat divisors." />
-                            <CheckBox Content="Manualify stacks" IsChecked="{Binding FixStackLeniency}"
-                                      ToolTip.Tip="Manually stack objects of the pattern." />
-                            <CheckBox Content="Fix global SV" IsChecked="{Binding FixGlobalSv}"
-                                      ToolTip.Tip="Adjust greenline SV in the pattern to the new global SV so sliders have the same SV in the new beatmap." />
-                            <CheckBox Content="Fix BPM SV" IsChecked="{Binding FixBpmSv}"
-                                      ToolTip.Tip="Adjust greenline SV in the pattern to the new BPM so sliders have the same SV in the new beatmap. It is recommended to disable this feature if you are using the 'Scale to new timing' feature." />
-                            <CheckBox Content="Fix colourhax" IsChecked="{Binding FixColourHax}"
-                                      ToolTip.Tip="Adjust colour skip such that the colour indices of objects stay the same for the pattern and the original beatmap." />
-                            <CheckBox Content="Fix slider tick rate" IsChecked="{Binding FixTickRate}"
-                                      ToolTip.Tip="Multiply BPM in the pattern so the slider tick rate in the pattern stays the same." />
+                                      ToolTip.Tip="{loc:Tr PatternGallery_HitsoundsTip}" />
+                    <CheckBox Content="{loc:Tr PatternGallery_IncludeKiai}" IsChecked="{Binding IncludeKiai}"
+                                      ToolTip.Tip="{loc:Tr PatternGallery_KiaiTip}" />
+                    <CheckBox Content="{loc:Tr PatternGallery_ScaleCircleSize}" IsChecked="{Binding ScaleToNewCircleSize}"
+                                      ToolTip.Tip="{loc:Tr PatternGallery_CircleScaleTip}" />
+                    <CheckBox Content="{loc:Tr PatternGallery_ScaleTiming}" IsChecked="{Binding ScaleToNewTiming}"
+                                      ToolTip.Tip="{loc:Tr PatternGallery_TimeScaleTip}" />
+                    <CheckBox Content="{loc:Tr PatternGallery_SnapTiming}" IsChecked="{Binding SnapToNewTiming}"
+                                      ToolTip.Tip="{loc:Tr PatternGallery_SnapTip}" />
+                    <CheckBox Content="{loc:Tr PatternGallery_ManualifyStacks}" IsChecked="{Binding FixStackLeniency}"
+                                      ToolTip.Tip="{loc:Tr PatternGallery_StackTip}" />
+                    <CheckBox Content="{loc:Tr PatternGallery_FixGlobalSv}" IsChecked="{Binding FixGlobalSv}"
+                                      ToolTip.Tip="{loc:Tr PatternGallery_GlobalSvTip}" />
+                    <CheckBox Content="{loc:Tr PatternGallery_FixBpmSv}" IsChecked="{Binding FixBpmSv}"
+                                      ToolTip.Tip="{loc:Tr PatternGallery_BpmSvTip}" />
+                    <CheckBox Content="{loc:Tr PatternGallery_FixColourhax}" IsChecked="{Binding FixColourHax}"
+                                      ToolTip.Tip="{loc:Tr PatternGallery_ColourTip}" />
+                    <CheckBox Content="{loc:Tr PatternGallery_FixTickRate}" IsChecked="{Binding FixTickRate}"
+                                      ToolTip.Tip="{loc:Tr PatternGallery_TickTip}" />
                         </StackPanel>
                     </ScrollViewer>
                 </Grid>
@@ -271,7 +296,7 @@
                     <TextBlock TextWrapping="NoWrap"
                                FontWeight="Bold"
                                Opacity="0.58"
-                               Text="Made by OliBomby" />
+                               Text="{loc:Tr Common_MadeByOliBomby}" />
                 </WrapPanel>
             </Grid>
             <Grid Grid.Column="1">

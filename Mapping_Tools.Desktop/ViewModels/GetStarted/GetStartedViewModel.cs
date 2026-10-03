@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Localization;
 using System.Collections.ObjectModel;
 using System.Text.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -11,7 +12,7 @@ namespace Mapping_Tools.Desktop.ViewModels.GetStarted;
 /// <summary>
 ///     Supplies onboarding, GitHub release notes, recent-map, and support-link content.
 /// </summary>
-public sealed partial class GetStartedViewModel : ObservableObject, IDisposable
+public sealed partial class GetStartedViewModel : LocalizedObservableObject, IDisposable
 {
     private readonly CancellationTokenSource changelogCancellation = new();
     private readonly IUiDispatcher dispatcher;
@@ -110,7 +111,7 @@ public sealed partial class GetStartedViewModel : ObservableObject, IDisposable
                     if (string.IsNullOrWhiteSpace(note.Title) && string.IsNullOrWhiteSpace(note.Body)) continue;
 
                     Changelog.Add(new ChangelogEntryViewModel(
-                        string.IsNullOrWhiteSpace(note.Title) ? "Release" : note.Title!,
+                        string.IsNullOrWhiteSpace(note.Title) ? DesktopStrings.Shell_Release : note.Title!,
                         note.Body ?? string.Empty));
                 }
             });

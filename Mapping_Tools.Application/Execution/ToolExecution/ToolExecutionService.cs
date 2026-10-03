@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
+using Mapping_Tools.Application.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -180,7 +181,7 @@ public sealed class ToolExecutionService : IToolExecutionService
                     new UserNotification.Models.UserNotification(
                         UserNotificationSeverity.Error,
                         request.DisplayName,
-                        exception.Message,
+                        ApplicationExceptionText.GetSummary(exception),
                         exception))
                 .ConfigureAwait(false);
             return new ToolExecutionResult<T>(

@@ -1,8 +1,11 @@
+using Mapping_Tools.Desktop.Localization;
 using System.Globalization;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.SystemTools;
+
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Desktop.Converters;
 
@@ -46,7 +49,7 @@ public sealed class BeatDivisorArrayToStringConverter : IValueConverter
         object? parameter,
         CultureInfo culture)
     {
-        if (value is not string text || string.IsNullOrWhiteSpace(text)) return Invalid("Enter at least one beat divisor.");
+        if (value is not string text || string.IsNullOrWhiteSpace(text)) return Invalid(DesktopStrings.Shell_BeatDivisorEmpty);
 
         string[] entries = text.Split(',', StringSplitOptions.TrimEntries);
         var divisors = new IBeatDivisor[entries.Length];
@@ -64,9 +67,9 @@ public sealed class BeatDivisorArrayToStringConverter : IValueConverter
                 continue;
             }
 
-            if (!TypeConverters.TryParseDouble(entry, out double number)) return Invalid($"Beat divisor '{entry}' is not a valid fraction or number.");
+            if (!TypeConverters.TryParseDouble(entry, out double number)) return Invalid(ApplicationText.Format(DesktopStrings.Shell_BeatDivisorInvalid, entry));
 
-            if (!double.IsFinite(number) || number <= 0) return Invalid("Beat divisor must be greater than zero.");
+            if (!double.IsFinite(number) || number <= 0) return Invalid(DesktopStrings.Shell_BeatDivisorMustBeGreaterThanZero);
 
             divisors[index] = new IrrationalBeatDivisor(number);
         }

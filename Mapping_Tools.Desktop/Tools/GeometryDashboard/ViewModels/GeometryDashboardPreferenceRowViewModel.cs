@@ -1,17 +1,19 @@
 using Mapping_Tools.Desktop.Services.Undo;
 using System.Globalization;
 using Avalonia.Media;
-using CommunityToolkit.Mvvm.ComponentModel;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.GeometryDashboard;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject;
+using Mapping_Tools.Desktop.Localization;
 
 namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 
 /// <summary>Edits one neutral geometry appearance group.</summary>
-public sealed class GeometryDashboardPreferenceRowViewModel : ObservableObject
+public sealed class GeometryDashboardPreferenceRowViewModel : LocalizedObservableObject
 {
+    private readonly string originalName;
     private string? pendingColorText;
+    private bool hasColorTextError;
 
     /// <summary>Creates a row over one cloned appearance group.</summary>
     /// <param name="name">The stable preference-group label.</param>
@@ -22,13 +24,19 @@ public sealed class GeometryDashboardPreferenceRowViewModel : ObservableObject
         RelevantObjectPreferences preference,
         bool hasSizeOption)
     {
-        Name = name;
+        originalName = name;
         Preference = preference;
         HasSizeOption = hasSizeOption;
     }
 
     /// <summary>Gets the stable preference-group label.</summary>
-    public string Name { get; }
+    public string Name => originalName switch
+    {
+        "Virtual point preferences" => DesktopStrings.GeometryDashboard_AppearancePoint,
+        "Virtual line preferences" => DesktopStrings.GeometryDashboard_AppearanceLine,
+        "Virtual circle preferences" => DesktopStrings.GeometryDashboard_AppearanceCircle,
+        _ => originalName,
+    };
 
     /// <summary>Gets the Core appearance settings.</summary>
     [Undoable]
@@ -41,7 +49,7 @@ public sealed class GeometryDashboardPreferenceRowViewModel : ObservableObject
         set
         {
             Preference.Color = RgbaColour.FromArgb(value.A, value.R, value.G, value.B);
-            ColorTextError = null;
+            hasColorTextError = false;
             pendingColorText = null;
             OnPropertyChanged();
             OnPropertyChanged(nameof(ColorText));
@@ -64,12 +72,12 @@ public sealed class GeometryDashboardPreferenceRowViewModel : ObservableObject
                 && byte.TryParse(hex[6..8], NumberStyles.HexNumber, null, out byte b))
             {
                 Preference.Color = RgbaColour.FromArgb(a, r, g, b);
-                ColorTextError = null;
+                hasColorTextError = false;
                 pendingColorText = null;
             }
             else
             {
-                ColorTextError = "Color format error.";
+                hasColorTextError = true;
                 pendingColorText = value;
             }
 
@@ -80,7 +88,7 @@ public sealed class GeometryDashboardPreferenceRowViewModel : ObservableObject
     }
 
     /// <summary>Gets the validation message for invalid hexadecimal colour text.</summary>
-    public string? ColorTextError { get; private set; }
+    public string? ColorTextError => hasColorTextError ? DesktopStrings.GeometryDashboard_ColorFormatError : null;
 
     /// <summary>Gets or sets the opacity multiplier.</summary>
     public double Opacity

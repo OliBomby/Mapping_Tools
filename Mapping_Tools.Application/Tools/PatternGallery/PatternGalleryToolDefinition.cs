@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.QuickRun.Models;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Tools.PatternGallery;
 
@@ -11,5 +12,7 @@ public static class PatternGalleryToolDefinition
         "Pattern Gallery",
         "Collect, preview, organize, and place reusable hit-object patterns.",
         ["pattern", "gallery", "collection", "osu", "snippet"],
-        QuickRunTargets.Always);
+        QuickRunTargets.Always,
+        static () => ApplicationStrings.PatternGallery_Description,
+        static () => ApplicationStrings.PatternGallery_SearchTerms);
 }

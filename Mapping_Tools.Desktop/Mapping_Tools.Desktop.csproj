@@ -19,6 +19,20 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="Localization/Desktop*.resx">
+      <LogicalName>Mapping_Tools.Desktop.Localization.$([System.String]::Copy('%(Filename)').Replace('Desktop', 'DesktopStrings')).resources</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization/Desktop.resx">
+      <Generator>MSBuild:Compile</Generator>
+      <StronglyTypedFileName>$(IntermediateOutputPath)DesktopStrings.Designer.cs</StronglyTypedFileName>
+      <StronglyTypedLanguage>CSharp</StronglyTypedLanguage>
+      <StronglyTypedNamespace>Mapping_Tools.Desktop.Localization</StronglyTypedNamespace>
+      <StronglyTypedClassName>DesktopStrings</StronglyTypedClassName>
+      <PublicClass>true</PublicClass>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Avalonia.Markup.Xaml.Loader" Version="12.1.0" PrivateAssets="All" Publish="True"/>
     <PackageReference Include="HotAvalonia" Version="3.*" PrivateAssets="All" Publish="True"/>
     <PackageReference Include="Avalonia" Version="12.1.0"/>

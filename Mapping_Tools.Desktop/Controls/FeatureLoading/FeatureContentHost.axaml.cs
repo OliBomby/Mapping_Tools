@@ -1,3 +1,5 @@
+using Mapping_Tools.Desktop.Localization;
+using Mapping_Tools.Application.Localization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
@@ -17,6 +19,10 @@ public sealed partial class FeatureContentHost : UserControl
     /// <summary>Identifies the optional feature preparation error.</summary>
     public static readonly StyledProperty<string?> ErrorMessageProperty =
         AvaloniaProperty.Register<FeatureContentHost, string?>(nameof(ErrorMessage));
+
+    /// <summary>Identifies the original diagnostic details for a feature preparation failure.</summary>
+    public static readonly StyledProperty<string?> ErrorDetailsProperty =
+        AvaloniaProperty.Register<FeatureContentHost, string?>(nameof(ErrorDetails));
 
     private readonly Dictionary<Type, Control> viewCache = [];
     private readonly ViewLocator viewLocator = new();
@@ -43,11 +49,18 @@ public sealed partial class FeatureContentHost : UserControl
         set => SetValue(ErrorMessageProperty, value);
     }
 
+    /// <summary>Gets or sets the untranslated diagnostic details shown in the error expander.</summary>
+    public string? ErrorDetails
+    {
+        get => GetValue(ErrorDetailsProperty);
+        set => SetValue(ErrorDetailsProperty, value);
+    }
+
     /// <inheritdoc />
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
-        if (change.Property == FeatureProperty || change.Property == ErrorMessageProperty) BeginLoad();
+        if (change.Property == FeatureProperty || change.Property == ErrorMessageProperty || change.Property == ErrorDetailsProperty) BeginLoad();
     }
 
     private void BeginLoad()
@@ -55,7 +68,7 @@ public sealed partial class FeatureContentHost : UserControl
         long currentVersion = ++loadVersion;
         if (!string.IsNullOrWhiteSpace(ErrorMessage))
         {
-            ShowError(ErrorMessage);
+            ShowError(ErrorMessage, ErrorDetails);
             return;
         }
 
@@ -85,7 +98,7 @@ public sealed partial class FeatureContentHost : UserControl
 
             if (!string.IsNullOrWhiteSpace(ErrorMessage))
             {
-                ShowError(ErrorMessage);
+                ShowError(ErrorMessage, ErrorDetails);
                 return;
             }
 
@@ -97,7 +110,7 @@ public sealed partial class FeatureContentHost : UserControl
             }
             else
             {
-                view = viewLocator.Build(feature) ?? new TextBlock { Text = "No view registered." };
+                view = viewLocator.Build(feature) ?? new TextBlock { Text = DesktopStrings.Shell_NoViewRegistered };
                 view.DataContext = feature;
                 view.IsVisible = false;
                 view.IsHitTestVisible = false;
@@ -110,7 +123,7 @@ public sealed partial class FeatureContentHost : UserControl
         catch (Exception exception)
         {
             if (currentVersion == loadVersion && ReferenceEquals(feature, Feature))
-                ShowError(exception.Message);
+                ShowError(ApplicationExceptionText.GetSummary(exception), exception.ToString());
         }
     }
 
@@ -121,10 +134,10 @@ public sealed partial class FeatureContentHost : UserControl
         StateHost.IsVisible = true;
     }
 
-    private void ShowError(string? message)
+    private void ShowError(string? message, string? details = null)
     {
         HideCachedViews();
-        StateHost.Content = new FeatureLoadErrorView { Message = message };
+        StateHost.Content = new FeatureLoadErrorView { Message = message, Details = details };
         StateHost.IsVisible = true;
     }
 

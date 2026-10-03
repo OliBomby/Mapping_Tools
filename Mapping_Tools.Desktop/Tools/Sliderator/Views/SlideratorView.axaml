@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
              xmlns:vm="using:Mapping_Tools.Desktop.Tools.Sliderator.ViewModels"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
              xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
@@ -12,9 +13,9 @@
              x:CompileBindings="True">
     <Grid RowDefinitions="Auto,*,Auto">
         <controls:ToolViewHeader Grid.Row="0"
-                                 Title="Sliderator"
+                    Title="{loc:Tr Sliderator_Title}"
                                  IsQuickRunSupported="True"
-                                 HelpText="Sliderator is a tool meant to make sliders with variable velocity. That means sliders that change speed during the animation. You can also make variable velocity streams with this tool.&#x0a;&#x0a;The UI consists of a slider import section, some options, a position/velocity graph, and a slider preview.&#x0a;&#x0a;To get started, simply import one or more sliders using the 'Import sliders' button. Use any of the three different import methods from the dropdown menu.&#x0a;&#x0a;The most important element is the position/velocity graph. This is where you tell Sliderator what you want your slider animation to look like. You can toggle between position and velocity mode by clicking the accent colored button below.&#x0a;Add, remove, or edit anchors with right click and move stuff by dragging with left click. While dragging, hold Shift for horizontal clipping, hold Ctrl for vertical clipping, and hold Alt to disable snapping.&#x0a;&#x0a;Running Sliderator with a constant velocity will give back the original slider. You can manually choose a lower SV and bigger tumour length to optimise your slider.&#x0a;&#x0a;Check out all the options. The tooltips should help you further." />
+                    HelpText="{loc:Tr Sliderator_Help}" />
 
         <Grid Grid.Row="1" RowDefinitions="2*,*">
             <Grid.ColumnDefinitions>
@@ -46,7 +47,7 @@
                                  Padding="10"
                                  HorizontalAlignment="Stretch"
                                  VerticalAlignment="Stretch"
-                                 ToolTip.Tip="Result preview">
+                                 ToolTip.Tip="{loc:Tr Sliderator_ResultPreview}">
                 <controls:ObjectVisualiserControl x:Name="PreviewControl"
                                                   Width="200"
                                                   HitObject="{Binding VisibleHitObject}"
@@ -57,7 +58,7 @@
                                                   Fill="DarkSlateGray"
                                                   Stroke="YellowGreen"
                                                   SliderBallStroke="White"
-                                                  ToolTip.Tip="Preview the sliderball motion and generated path." />
+                                                  ToolTip.Tip="{loc:Tr Sliderator_PreviewMotionTip}" />
             </materialDesign:Card>
 
             <ScrollViewer Grid.Row="0"
@@ -74,7 +75,7 @@
                                   ItemsSource="{Binding ImportModes}"
                                   SelectedItem="{Binding ImportModeSetting}"
                                   Margin="0,0,5,0"
-                                  ToolTip.Tip="Import mode" />
+                                  ToolTip.Tip="{loc:Tr Sliderator_ImportModeTip}" />
                         <TextBox Grid.Column="1"
                                  Classes="compact"
                                  VerticalAlignment="Center"
@@ -82,30 +83,30 @@
                                  IsVisible="{Binding TimeCodeVisible}"
                                  Margin="5,0,5,0"
                                  Width="100"
-                                 ToolTip.Tip="Input a time code here. Example time code: 00:56:823 (1,2,1,2) - " />
+                                 ToolTip.Tip="{loc:Tr Sliderator_TimeCodeTip}" />
                         <Button Grid.Column="2"
                                 Command="{Binding ImportCommand}"
                                 Margin="5,0,0,0"
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Top"
-                                ToolTip.Tip="Import sliders into the preview.">
+                                ToolTip.Tip="{loc:Tr Sliderator_ImportSlidersTip}">
                             Import sliders
                         </Button>
                     </Grid>
 
                     <Grid Margin="0,10,0,0" ColumnDefinitions="Auto,*">
                         <TextBlock Grid.Column="0"
-                                   Text="{Binding LoadedHitObjects.Count, StringFormat='Loaded {0} slider(s)'}" />
+                                   Text="{Binding LoadedHitObjectsCountText}" />
                         <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal">
                             <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="0,0,5,0"
                                                            x:Name="MoveLeftButton"
                                                            Click="MoveLeft"
-                                                           ToolTip.Tip="Go to previous slider. Hold Shift for quick run before going to previous slider.">
+                                                           ToolTip.Tip="{loc:Tr Sliderator_PreviousSliderTip}">
                                 <materialIcons:MaterialIcon Kind="KeyboardArrowLeft" Width="24" Height="24" />
                             </materialDesign:FloatingButton>
                             <materialDesign:FloatingButton Classes="mini light no-transitions" x:Name="MoveRightButton"
                                                            Click="MoveRight"
-                                                           ToolTip.Tip="Go to next slider. Hold Shift for quick run before going to next slider.">
+                                                           ToolTip.Tip="{loc:Tr Sliderator_NextSliderTip}">
                                 <materialIcons:MaterialIcon Kind="KeyboardArrowRight" Width="24" Height="24" />
                             </materialDesign:FloatingButton>
                         </StackPanel>
@@ -115,76 +116,76 @@
                         <TextBox Grid.Column="0"
                                  Margin="0,0,10,0"
                                  Text="{Binding GraphBeats, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}"
-                                 materialAssists:TextFieldAssist.Label="Beat length"
-                                 ToolTip.Tip="Duration of the slider in beats." />
+                                 materialAssists:TextFieldAssist.Label="{loc:Tr Common_BeatLength}"
+                                 ToolTip.Tip="{loc:Tr Sliderator_GraphBeatsTip}" />
                         <TextBox Grid.Column="1"
                                  Margin="0,0,10,0"
                                  Text="{Binding BeatsPerMinute, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}"
-                                 materialAssists:TextFieldAssist.Label="BPM"
-                                 ToolTip.Tip="The BPM at which this slider gets played." />
+                                 materialAssists:TextFieldAssist.Label="{loc:Tr Sliderator_BpmLabel}"
+                                 ToolTip.Tip="{loc:Tr Sliderator_BpmTip}" />
                         <TextBox Grid.Column="2"
                                  Text="{Binding GlobalSv, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}"
-                                 materialAssists:TextFieldAssist.Label="Global SV"
-                                 ToolTip.Tip="The Global Slider Velocity at which this slider gets played." />
+                                 materialAssists:TextFieldAssist.Label="{loc:Tr Sliderator_GlobalSvLabel}"
+                                 ToolTip.Tip="{loc:Tr Sliderator_GlobalSvTip}" />
                     </Grid>
 
                     <TextBox Margin="0,20,0,0"
                              Text="{Binding ExportTime, Converter={StaticResource TimeToStringConverter}, UpdateSourceTrigger=LostFocus}"
-                             materialAssists:TextFieldAssist.Label="Time"
-                             ToolTip.Tip="The time in the current beatmap to export the sliderated slider to." />
+                             materialAssists:TextFieldAssist.Label="{loc:Tr Sliderator_TimeLabel}"
+                             ToolTip.Tip="{loc:Tr Sliderator_ExportTimeTip}" />
                     <ComboBox Margin="0,10,0,0"
                               Classes="compact"
                               ItemsSource="{Binding ExportModes}"
                               SelectedItem="{Binding ExportModeSetting}"
-                              ToolTip.Tip="Choose how you want to export sliders." />
+                              ToolTip.Tip="{loc:Tr Sliderator_ExportModeTip}" />
 
-                    <RadioButton Content="Export as slider"
+                    <RadioButton Content="{loc:Tr Sliderator_ExportSlider}"
                                  Margin="0,10,0,0"
                                  GroupName="exportFormat"
                                  IsChecked="{Binding ExportAsNormal}"
-                                 ToolTip.Tip="Exports a normal sliderated slider." />
-                    <RadioButton Content="Export as stream"
+                                 ToolTip.Tip="{loc:Tr Sliderator_ExportSliderTip}" />
+                    <RadioButton Content="{loc:Tr Sliderator_ExportStream}"
                                  GroupName="exportFormat"
                                  IsChecked="{Binding ExportAsStream}"
-                                 ToolTip.Tip="Exports an accelerating stream. This stream uses the beat snap divisor of the graph to determine the density of notes." />
-                    <RadioButton Content="Export as invisible slider"
+                                 ToolTip.Tip="{loc:Tr Sliderator_ExportStreamTip}" />
+                    <RadioButton Content="{loc:Tr Sliderator_ExportInvisible}"
                                  GroupName="exportFormat"
                                  IsChecked="{Binding ExportAsInvisibleSlider}"
-                                 ToolTip.Tip="Makes the slider invisible using a method by JPK314. This will also delegate SV to BPM." />
+                                 ToolTip.Tip="{loc:Tr Sliderator_ExportInvisibleTip}" />
 
-                    <CheckBox Content="Manually choose new SV"
+                    <CheckBox Content="{loc:Tr Sliderator_ManualSv}"
                               Margin="0,10,0,5"
                               IsChecked="{Binding ManualVelocity}"
                               IsVisible="{Binding ExportAsNormal}"
-                              ToolTip.Tip="Allows you to manually choose the SV for the sliderator algorithm and optimise the resulting slider." />
+                              ToolTip.Tip="{loc:Tr Sliderator_ManualSvTip}" />
                     <TextBox IsVisible="{Binding ExportAsNormal}"
                              IsEnabled="{Binding ManualVelocity}"
                              Margin="0,0,0,5"
                              Text="{Binding NewVelocity, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}"
-                             materialAssists:TextFieldAssist.Label="New SV"
-                             ToolTip.Tip="The new SV for the sliderated slider. This SV influences the Sliderator algorithm. Use lower SV for less lag." />
+                             materialAssists:TextFieldAssist.Label="{loc:Tr Sliderator_NewSvLabel}"
+                             ToolTip.Tip="{loc:Tr Sliderator_NewSvTip}" />
                     <TextBox IsVisible="{Binding ExportAsNormal}"
                              Text="{Binding MinDendrite, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}"
-                             materialAssists:TextFieldAssist.Label="Minimum tumour length"
-                             ToolTip.Tip="Minimum length for tumours which slow down the sliderball in the sliderated slider. Longer tumours result in less lag but a more shaky sliderball." />
+                             materialAssists:TextFieldAssist.Label="{loc:Tr Sliderator_MinimumTumourLengthLabel}"
+                             ToolTip.Tip="{loc:Tr Sliderator_MinTumourTip}" />
 
                     <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                        <TextBlock Text="Expected segment count: "
-                                   ToolTip.Tip="This is the estimated segment count for your result. More segments means more lag, so try to optimise this value." />
+                        <TextBlock Text="{loc:Tr Sliderator_ExpectedSegments}"
+                                   ToolTip.Tip="{loc:Tr Sliderator_ExpectedSegmentsTip}" />
                         <TextBlock Text="{Binding ExpectedSegments}"
-                                   ToolTip.Tip="This is the estimated segment count for your result. More segments means more lag, so try to optimise this value." />
+                                   ToolTip.Tip="{loc:Tr Sliderator_ExpectedSegmentsTip}" />
                     </StackPanel>
 
-                    <CheckBox Content="Delegate SV to BPM"
+                    <CheckBox Content="{loc:Tr Sliderator_DelegateSv}"
                               Margin="0,15,0,0"
                               IsChecked="{Binding DelegateToBpm}"
                               IsVisible="{Binding ExportAsNormal}"
-                              ToolTip.Tip="Use BPM to determine the velocity of the resulting slider instead of greenline SV. This allows you to use SV higher than 10x." />
-                    <CheckBox Content="Remove slider ticks"
+                              ToolTip.Tip="{loc:Tr Sliderator_DelegateSvTip}" />
+                    <CheckBox Content="{loc:Tr Sliderator_RemoveTicks}"
                               IsChecked="{Binding RemoveSliderTicks}"
                               IsVisible="{Binding ExportAsNormal}"
                               IsEnabled="{Binding DelegateToBpm}"
-                              ToolTip.Tip="Use a NaN greenline to remove slider ticks from the resulting slider." />
+                              ToolTip.Tip="{loc:Tr Sliderator_RemoveTicksTip}" />
                 </StackPanel>
             </ScrollViewer>
 
@@ -197,21 +198,21 @@
                              HorizontalAlignment="Left"
                              IsVisible="{Binding ExportAsNormal}"
                              Text="{Binding VelocityLimit, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}"
-                             materialAssists:TextFieldAssist.Label="SV limit"
-                             ToolTip.Tip="Self-imposed SV limit to help you make sure the slope in the graph doesn't become greater than this speed limit. For example use 10x SV limit to match the osu! speed limit." />
+                             materialAssists:TextFieldAssist.Label="{loc:Tr Sliderator_SvLimitLabel}"
+                             ToolTip.Tip="{loc:Tr Sliderator_VelocityLimitTip}" />
                     <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                         <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="0,0,5,0"
                                                        Command="{Binding ScaleCompleteCommand}"
-                                                       ToolTip.Tip="Scale graph to completion.">
+                                                       ToolTip.Tip="{loc:Tr Sliderator_ScaleToCompletion}">
                             <materialIcons:MaterialIcon Kind="RelativeScale" Width="24" Height="24" />
                         </materialDesign:FloatingButton>
                         <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="0,0,5,0"
-                                                       Command="{Binding ClearGraphCommand}" ToolTip.Tip="Reset graph.">
+                                                       Command="{Binding ClearGraphCommand}" ToolTip.Tip="{loc:Tr Sliderator_ResetGraph}">
                             <materialIcons:MaterialIcon Kind="Rocket" Width="24" Height="24" />
                         </materialDesign:FloatingButton>
                         <materialDesign:FloatingButton Classes="mini Accent no-transitions" Margin="5,0,0,0"
                                                        Command="{Binding GraphToggleCommand}"
-                                                       ToolTip.Tip="Toggle graph mode.">
+                                                       ToolTip.Tip="{loc:Tr Sliderator_ToggleGraphMode}">
                             <TextBlock Text="{Binding GraphModeText}" FontWeight="Bold"
                                        Width="24" Height="24"
                                        TextAlignment="Center"
@@ -231,7 +232,7 @@
                         TickFrequency="1"
                         TickPlacement="BottomRight"
                         Value="{Binding BeatSnapDivisor}"
-                        ToolTip.Tip="Beat snap divisor."
+                        ToolTip.Tip="{loc:Tr Sliderator_BeatSnapDivisorTip}"
                         Margin="8,15,8,5" />
 
                 <WrapPanel Grid.Row="2"
@@ -239,12 +240,12 @@
                            HorizontalAlignment="Left"
                            Margin="5,10,5,0">
                     <CheckBox IsChecked="{Binding ShowRedAnchors}"
-                              Content="Show red anchors"
+                              Content="{loc:Tr Sliderator_ShowRedAnchors}"
                               Margin="0,0,5,0"
-                              ToolTip.Tip="Show the positions of red anchors in the graph and preview." />
+                              ToolTip.Tip="{loc:Tr Sliderator_ShowRedAnchorsTip}" />
                     <CheckBox IsChecked="{Binding ShowGraphAnchors}"
-                              Content="Show graph anchors"
-                              ToolTip.Tip="Show the positions of graph anchors in the preview." />
+                              Content="{loc:Tr Sliderator_ShowGraphAnchors}"
+                              ToolTip.Tip="{loc:Tr Sliderator_ShowGraphAnchorsTip}" />
                 </WrapPanel>
             </Grid>
 
@@ -261,7 +262,7 @@
                        FontWeight="Bold"
                        Opacity="0.58"
                        TextWrapping="NoWrap"
-                       Text="Made by OliBomby, Karoo, &amp; JPK314" />
+                       Text="{loc:Tr Sliderator_MadeBy}" />
             <controls:ToolProgressBar Grid.Column="1"
                                       Height="20"
                                       Margin="20,0"

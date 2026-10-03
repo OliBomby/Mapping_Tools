@@ -66,7 +66,8 @@ internal sealed class ToolDefinitionCatalog
                 registration.Definition.SearchTerms,
                 () => (ObservableObject)provider.GetRequiredService(registration.ViewModelType),
                 ToAvaloniaScrollBarVisibility(registration.HorizontalScrollBarVisibility),
-                ToAvaloniaScrollBarVisibility(registration.VerticalScrollBarVisibility)));
+                ToAvaloniaScrollBarVisibility(registration.VerticalScrollBarVisibility),
+                toolDefinition: registration.Definition));
 
             if (registration.Definition.QuickRunTargets is not null)
                 services.AddSingleton(provider => new MappingToolQuickRunRegistration(

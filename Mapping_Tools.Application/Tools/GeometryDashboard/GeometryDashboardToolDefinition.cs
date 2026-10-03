@@ -1,3 +1,5 @@
+using Mapping_Tools.Application.Localization;
+
 namespace Mapping_Tools.Application.Tools.GeometryDashboard;
 
 /// <summary>Provides the discoverable metadata for Geometry Dashboard.</summary>
@@ -8,5 +10,7 @@ public static class GeometryDashboardToolDefinition
         "geometry-dashboard",
         "Geometry Dashboard",
         "Generate, display, snap to, and save useful geometry around osu! hit objects.",
-        ["geometry", "snapping", "virtual objects", "overlay", "generators"]);
+        ["geometry", "snapping", "virtual objects", "overlay", "generators"],
+        translatedDescriptionGetter: static () => ApplicationStrings.GeometryDashboard_Description,
+        translatedSearchTermsGetter: static () => ApplicationStrings.GeometryDashboard_SearchTerms);
 }

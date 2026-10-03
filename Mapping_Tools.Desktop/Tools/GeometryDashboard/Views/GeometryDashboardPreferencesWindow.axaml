@@ -4,16 +4,17 @@
         xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
         xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         xmlns:geometryDashboard="clr-namespace:Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels"
+        xmlns:loc="using:Mapping_Tools.Desktop.Localization"
         x:Class="Mapping_Tools.Desktop.Tools.GeometryDashboard.Views.GeometryDashboardPreferencesWindow"
         x:DataType="geometryDashboard:GeometryDashboardPreferencesDialogViewModel"
-        Title="Geometry Dashboard Preferences" Height="500" Width="570" MinWidth="575" MinHeight="360"
+        Title="{loc:Tr GeometryDashboard_PreferencesWindowTitle}" Height="500" Width="700" MinWidth="700" MinHeight="360"
         CanResize="True" WindowStartupLocation="CenterOwner" WindowDecorations="BorderOnly"
         ExtendClientAreaToDecorationsHint="True" ExtendClientAreaTitleBarHeightHint="35"
         FontSize="14"
         Background="{DynamicResource MaterialPaperBrush}" Foreground="{DynamicResource MaterialBodyBrush}">
     <Grid RowDefinitions="Auto,*,Auto">
         <controls:WindowChrome Grid.Row="0"
-                               Title="Preferences" />
+                               Title="{loc:Tr GeometryDashboard_PreferencesTitle}" />
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Hidden">
@@ -25,81 +26,112 @@
                         </Style>
                     </StackPanel.Styles>
                     <Border Padding="5,10">
-                        <StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="10">
-                                <TextBlock Width="100" Text="Snap key" VerticalAlignment="Bottom" Margin="0,0,0,6"
-                                           ToolTip.Tip="Press and hold this key to snap your cursor to the closest virtual object." />
-                                <controls:HotkeyEditor Width="150" VerticalAlignment="Bottom"
+                        <StackPanel Grid.IsSharedSizeScope="True">
+                            <Grid Margin="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" MinWidth="100" SharedSizeGroup="PreferenceLabel" />
+                                    <ColumnDefinition Width="150" />
+                                    <ColumnDefinition Width="Auto" MinWidth="100" SharedSizeGroup="PreferenceSecondaryLabel" />
+                                    <ColumnDefinition Width="150" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{loc:Tr GeometryDashboard_SnapKey}" VerticalAlignment="Bottom" Margin="0,0,0,6"
+                                           ToolTip.Tip="{loc:Tr GeometryDashboard_SnapKeyTip}" />
+                                <controls:HotkeyEditor Grid.Column="1" Width="150" VerticalAlignment="Bottom"
                                                        Classes="compact"
                                                        Hotkey="{Binding Preferences.SnapHotkey, Mode=TwoWay}"
-                                                       ToolTip.Tip="Press and hold this key to snap your cursor to the closest virtual object." />
-                                <TextBlock Width="100" Text="Select key" VerticalAlignment="Bottom" Margin="10,0,0,6"
-                                           ToolTip.Tip="Press or hold this key to select virtual objects." />
-                                <controls:HotkeyEditor Width="150" VerticalAlignment="Bottom"
+                                                       ToolTip.Tip="{loc:Tr GeometryDashboard_SnapKeyTip}" />
+                                <TextBlock Grid.Column="2" Text="{loc:Tr GeometryDashboard_SelectKey}" VerticalAlignment="Bottom" Margin="10,0,0,6"
+                                           ToolTip.Tip="{loc:Tr GeometryDashboard_SelectKeyTip}" />
+                                <controls:HotkeyEditor Grid.Column="3" Width="150" VerticalAlignment="Bottom"
                                                        Classes="compact"
                                                        Hotkey="{Binding Preferences.SelectHotkey, Mode=TwoWay}"
-                                                       ToolTip.Tip="Press or hold this key to select virtual objects." />
-                            </StackPanel>
+                                                       ToolTip.Tip="{loc:Tr GeometryDashboard_SelectKeyTip}" />
+                            </Grid>
 
-                            <StackPanel Orientation="Horizontal" Margin="10">
-                                <TextBlock Width="100" Text="Lock key" VerticalAlignment="Bottom" Margin="0,0,0,6"
-                                           ToolTip.Tip="Press or hold this key to lock virtual objects." />
-                                <controls:HotkeyEditor Width="150" VerticalAlignment="Bottom"
+                            <Grid Margin="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" MinWidth="100" SharedSizeGroup="PreferenceLabel" />
+                                    <ColumnDefinition Width="150" />
+                                    <ColumnDefinition Width="Auto" MinWidth="100" SharedSizeGroup="PreferenceSecondaryLabel" />
+                                    <ColumnDefinition Width="150" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{loc:Tr GeometryDashboard_LockKey}" VerticalAlignment="Bottom" Margin="0,0,0,6"
+                                           ToolTip.Tip="{loc:Tr GeometryDashboard_LockKeyTip}" />
+                                <controls:HotkeyEditor Grid.Column="1" Width="150" VerticalAlignment="Bottom"
                                                        Classes="compact"
                                                        Hotkey="{Binding Preferences.LockHotkey, Mode=TwoWay}"
-                                                       ToolTip.Tip="Press or hold this key to lock virtual objects." />
-                                <TextBlock Width="100" Text="Usability key" VerticalAlignment="Bottom"
+                                                       ToolTip.Tip="{loc:Tr GeometryDashboard_LockKeyTip}" />
+                                <TextBlock Grid.Column="2" Text="{loc:Tr GeometryDashboard_UsabilityKey}" VerticalAlignment="Bottom"
                                            Margin="10,0,0,6"
-                                           ToolTip.Tip="Press or hold this key to select which virtual objects can get used by generators." />
-                                <controls:HotkeyEditor Width="150" VerticalAlignment="Bottom"
+                                           ToolTip.Tip="{loc:Tr GeometryDashboard_UsabilityKeyTip}" />
+                                <controls:HotkeyEditor Grid.Column="3" Width="150" VerticalAlignment="Bottom"
                                                        Classes="compact"
                                                        Hotkey="{Binding Preferences.InheritHotkey, Mode=TwoWay}"
-                                                       ToolTip.Tip="Press or hold this key to select which virtual objects can get used by generators." />
-                            </StackPanel>
+                                                       ToolTip.Tip="{loc:Tr GeometryDashboard_UsabilityKeyTip}" />
+                            </Grid>
 
-                            <StackPanel Orientation="Horizontal" Margin="10">
-                                <TextBlock Width="100" Text="Refresh key" VerticalAlignment="Bottom" Margin="0,0,0,6"
-                                           ToolTip.Tip="Press and hold this key to continuously refresh the hit objects in the root layer of the object tree." />
-                                <controls:HotkeyEditor Width="150" VerticalAlignment="Bottom"
+                            <Grid Margin="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" MinWidth="100" SharedSizeGroup="PreferenceLabel" />
+                                    <ColumnDefinition Width="150" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{loc:Tr GeometryDashboard_RefreshKey}" VerticalAlignment="Bottom" Margin="0,0,0,6"
+                                           ToolTip.Tip="{loc:Tr GeometryDashboard_RefreshKeyTip}" />
+                                <controls:HotkeyEditor Grid.Column="1" Width="150" VerticalAlignment="Bottom"
                                                        Classes="compact"
                                                        Hotkey="{Binding Preferences.RefreshHotkey, Mode=TwoWay}"
-                                                       ToolTip.Tip="Press and hold this key to continuously refresh the hit objects in the root layer of the object tree." />
-                            </StackPanel>
+                                                       ToolTip.Tip="{loc:Tr GeometryDashboard_RefreshKeyTip}" />
+                            </Grid>
 
-                            <StackPanel Orientation="Horizontal" Margin="10">
-                                <TextBlock Width="100" Text="Offset" VerticalAlignment="Bottom" Margin="0,0,0,6"
-                                           ToolTip.Tip="Offsets the overlay box. Use these fields when the automatic editor-to-screen coordinate conversion seems to fail." />
-                                <TextBox Width="95" VerticalAlignment="Bottom" Margin="0,0,10,0"
-                                         materialAssists:TextFieldAssist.Label="Left offset"
+                            <Grid Margin="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" MinWidth="100" SharedSizeGroup="PreferenceLabel" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{loc:Tr GeometryDashboard_Offset}" VerticalAlignment="Bottom" Margin="0,0,0,6"
+                                           ToolTip.Tip="{loc:Tr GeometryDashboard_OffsetTip}" />
+                                <TextBox Grid.Column="1" Width="95" VerticalAlignment="Bottom" Margin="0,0,10,0"
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr GeometryDashboard_LeftOffset}"
                                          Text="{Binding Preferences.OffsetLeft, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
-                                         ToolTip.Tip="Offset the left side of the overlay in osu! pixels." />
-                                <TextBox Width="95" VerticalAlignment="Bottom" Margin="0,0,10,0"
-                                         materialAssists:TextFieldAssist.Label="Top offset"
+                                         ToolTip.Tip="{loc:Tr GeometryDashboard_OffsetLeftTip}" />
+                                <TextBox Grid.Column="2" Width="95" VerticalAlignment="Bottom" Margin="0,0,10,0"
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr GeometryDashboard_TopOffset}"
                                          Text="{Binding Preferences.OffsetTop, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
-                                         ToolTip.Tip="Offset the top side of the overlay in osu! pixels." />
-                                <TextBox Width="95" VerticalAlignment="Bottom" Margin="0,0,10,0"
-                                         materialAssists:TextFieldAssist.Label="Right offset"
+                                         ToolTip.Tip="{loc:Tr GeometryDashboard_OffsetTopTip}" />
+                                <TextBox Grid.Column="3" Width="95" VerticalAlignment="Bottom" Margin="0,0,10,0"
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr GeometryDashboard_RightOffset}"
                                          Text="{Binding Preferences.OffsetRight, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
-                                         ToolTip.Tip="Offset the right side of the overlay in osu! pixels." />
-                                <TextBox Width="95" VerticalAlignment="Bottom"
-                                         materialAssists:TextFieldAssist.Label="Bottom offset"
+                                         ToolTip.Tip="{loc:Tr GeometryDashboard_OffsetRightTip}" />
+                                <TextBox Grid.Column="4" Width="95" VerticalAlignment="Bottom"
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr GeometryDashboard_BottomOffset}"
                                          Text="{Binding Preferences.OffsetBottom, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
-                                         ToolTip.Tip="Offset the bottom side of the overlay in osu! pixels." />
-                            </StackPanel>
+                                         ToolTip.Tip="{loc:Tr GeometryDashboard_OffsetBottomTip}" />
+                            </Grid>
 
-                            <StackPanel Orientation="Horizontal" Margin="10">
-                                <TextBlock Width="100" Text="Complexity" VerticalAlignment="Bottom" Margin="0,0,0,6"
-                                           ToolTip.Tip="Specifies how many layers of virtual objects can be used. More layers means more recursion of generating virtual objects." />
-                                <TextBox Width="120" VerticalAlignment="Bottom"
-                                         materialAssists:TextFieldAssist.Label="Inception level"
+                            <Grid Margin="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" MinWidth="100" SharedSizeGroup="PreferenceLabel" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{loc:Tr GeometryDashboard_Complexity}" VerticalAlignment="Bottom" Margin="0,0,0,6"
+                                           ToolTip.Tip="{loc:Tr GeometryDashboard_ComplexityTip}" />
+                                <TextBox Grid.Column="1" Width="120" VerticalAlignment="Bottom"
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr GeometryDashboard_InceptionLevel}"
                                          Text="{Binding Preferences.InceptionLevel, Mode=TwoWay, Converter={StaticResource InvariantInt32Converter}, UpdateSourceTrigger=LostFocus}"
-                                         ToolTip.Tip="Specifies how many layers of virtual objects can be used. More layers means more recursion of generating virtual objects. It is recommended to use between 2 and 10 layers." />
-                            </StackPanel>
+                                         ToolTip.Tip="{loc:Tr GeometryDashboard_ComplexityTip}" />
+                            </Grid>
 
-                            <StackPanel Orientation="Horizontal" Margin="10">
-                                <TextBlock Width="100" Text="Downkey" VerticalAlignment="Center" Margin="0,0,0,6"
-                                           ToolTip.Tip="Customize what gets displayed while the Snap Key is pressed." />
-                                <ListBox Classes="material-tool-toggle-list" SelectionMode="Multiple,Toggle"
+                            <Grid Margin="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" MinWidth="100" SharedSizeGroup="PreferenceLabel" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{loc:Tr GeometryDashboard_Downkey}" VerticalAlignment="Center" Margin="0,0,0,6"
+                                           ToolTip.Tip="{loc:Tr GeometryDashboard_SnapOptionTip}" />
+                                <ListBox Grid.Column="1" Classes="material-tool-toggle-list" SelectionMode="Multiple,Toggle"
                                          HorizontalAlignment="Left" VerticalAlignment="Center"
                                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                          ScrollViewer.VerticalScrollBarVisibility="Disabled">
@@ -109,96 +141,124 @@
                                         </ItemsPanelTemplate>
                                     </ListBox.ItemsPanel>
                                     <ListBoxItem IsSelected="{Binding KeyDownEverything, Mode=TwoWay}"
-                                                 ToolTip.Tip="Everything">
+                                                 ToolTip.Tip="{loc:Tr GeometryDashboard_Everything}">
                                         <materialIcons:MaterialIcon Kind="AllInclusive" Width="20" Height="20" />
                                     </ListBoxItem>
-                                    <ListBoxItem Content="P" IsSelected="{Binding KeyDownParents, Mode=TwoWay}"
-                                                 ToolTip.Tip="Parents and parents of parents" />
-                                    <ListBoxItem Content="DP" IsSelected="{Binding KeyDownDirectParents, Mode=TwoWay}"
-                                                 ToolTip.Tip="Direct parents" />
-                                    <ListBoxItem Content="C" IsSelected="{Binding KeyDownChildren, Mode=TwoWay}"
-                                                 ToolTip.Tip="Children and children of children" />
-                                    <ListBoxItem Content="DC" IsSelected="{Binding KeyDownDirectChildren, Mode=TwoWay}"
-                                                 ToolTip.Tip="Direct children" />
+                                    <ListBoxItem Content="{loc:Tr GeometryDashboard_ParentsAbbreviation}" IsSelected="{Binding KeyDownParents, Mode=TwoWay}"
+                                                 ToolTip.Tip="{loc:Tr GeometryDashboard_Parents}" />
+                                    <ListBoxItem Content="{loc:Tr GeometryDashboard_DirectParentsAbbreviation}" IsSelected="{Binding KeyDownDirectParents, Mode=TwoWay}"
+                                                 ToolTip.Tip="{loc:Tr GeometryDashboard_DirectParents}" />
+                                    <ListBoxItem Content="{loc:Tr GeometryDashboard_ChildrenAbbreviation}" IsSelected="{Binding KeyDownChildren, Mode=TwoWay}"
+                                                 ToolTip.Tip="{loc:Tr GeometryDashboard_Children}" />
+                                    <ListBoxItem Content="{loc:Tr GeometryDashboard_DirectChildrenAbbreviation}" IsSelected="{Binding KeyDownDirectChildren, Mode=TwoWay}"
+                                                 ToolTip.Tip="{loc:Tr GeometryDashboard_DirectChildren}" />
                                 </ListBox>
-                            </StackPanel>
+                            </Grid>
 
-                            <StackPanel Orientation="Horizontal" Margin="10">
-                                <TextBlock Width="100" Text="Upkey" VerticalAlignment="Center" Margin="0,0,0,6"
-                                           ToolTip.Tip="Customize what gets displayed while the Snap Key is not pressed." />
-                                <StackPanel>
-                                    <RadioButton Content="Everything" GroupName="KeyUpView"
+                            <Grid Margin="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" MinWidth="100" SharedSizeGroup="PreferenceLabel" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{loc:Tr GeometryDashboard_Upkey}" VerticalAlignment="Center" Margin="0,0,0,6"
+                                           ToolTip.Tip="{loc:Tr GeometryDashboard_UpkeyTip}" />
+                                <StackPanel Grid.Column="1">
+                                    <RadioButton Content="{loc:Tr GeometryDashboard_Everything}" GroupName="KeyUpView"
                                                  IsChecked="{Binding KeyUpEverything, Mode=TwoWay}"
-                                                 ToolTip.Tip="Default behavior. Display all virtual objects even if the Activation Key is not pressed." />
-                                    <RadioButton Content="Nothing" GroupName="KeyUpView"
+                                                 ToolTip.Tip="{loc:Tr GeometryDashboard_DefaultBehaviorTip}" />
+                                    <RadioButton Content="{loc:Tr GeometryDashboard_Nothing}" GroupName="KeyUpView"
                                                  IsChecked="{Binding KeyUpNothing, Mode=TwoWay}"
-                                                 ToolTip.Tip="Do not display anything if the Activation Key is not pressed." />
+                                                 ToolTip.Tip="{loc:Tr GeometryDashboard_HideWhenReleasedTip}" />
                                 </StackPanel>
-                            </StackPanel>
+                            </Grid>
 
-                            <StackPanel Orientation="Horizontal" Margin="10">
-                                <TextBlock Width="100" Text="Selection" VerticalAlignment="Center" Margin="0,0,0,6"
-                                           ToolTip.Tip="Customize which hit objects get used for generating virtual objects." />
-                                <StackPanel>
-                                    <RadioButton Content="All visible" GroupName="SelectedObjects"
+                            <Grid Margin="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" MinWidth="100" SharedSizeGroup="PreferenceLabel" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{loc:Tr GeometryDashboard_Selection}" VerticalAlignment="Center" Margin="0,0,0,6"
+                                           ToolTip.Tip="{loc:Tr GeometryDashboard_SelectionTip}" />
+                                <StackPanel Grid.Column="1">
+                                    <RadioButton Content="{loc:Tr GeometryDashboard_AllVisible}" GroupName="SelectedObjects"
                                                  IsChecked="{Binding SelectedAllVisible, Mode=TwoWay}"
-                                                 ToolTip.Tip="Use the visible hit objects regardless of selection." />
-                                    <RadioButton Content="Visible or selected" GroupName="SelectedObjects"
+                                                 ToolTip.Tip="{loc:Tr GeometryDashboard_UseVisibleTip}" />
+                                    <RadioButton Content="{loc:Tr GeometryDashboard_VisibleOrSelected}" GroupName="SelectedObjects"
                                                  IsChecked="{Binding SelectedVisibleOrSelected, Mode=TwoWay}"
-                                                 ToolTip.Tip="Use the visible hit objects, or use the selected hit objects if there are any selected." />
-                                    <RadioButton Content="Selected only" GroupName="SelectedObjects"
+                                                 ToolTip.Tip="{loc:Tr GeometryDashboard_UseVisibleOrSelectedTip}" />
+                                    <RadioButton Content="{loc:Tr GeometryDashboard_SelectedOnly}" GroupName="SelectedObjects"
                                                  IsChecked="{Binding SelectedOnly, Mode=TwoWay}"
-                                                 ToolTip.Tip="Exclusively use selected hit objects." />
+                                                 ToolTip.Tip="{loc:Tr GeometryDashboard_UseSelectedOnlyTip}" />
                                 </StackPanel>
-                            </StackPanel>
+                            </Grid>
 
-                            <StackPanel Orientation="Horizontal" Margin="10">
-                                <TextBlock Width="100" Text="Updating" VerticalAlignment="Center" Margin="0,0,0,6"
-                                           ToolTip.Tip="Customize on which events the virtual objects get updated." />
-                                <StackPanel>
-                                    <RadioButton Content="Any change" GroupName="Updating"
+                            <Grid Margin="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" MinWidth="100" SharedSizeGroup="PreferenceLabel" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{loc:Tr GeometryDashboard_Updating}" VerticalAlignment="Center" Margin="0,0,0,6"
+                                           ToolTip.Tip="{loc:Tr GeometryDashboard_UpdatingTip}" />
+                                <StackPanel Grid.Column="1">
+                                    <RadioButton Content="{loc:Tr GeometryDashboard_AnyChange}" GroupName="Updating"
                                                  IsChecked="{Binding UpdatingAnyChange, Mode=TwoWay}" />
-                                    <RadioButton Content="Time change" GroupName="Updating"
+                                    <RadioButton Content="{loc:Tr GeometryDashboard_TimeChange}" GroupName="Updating"
                                                  IsChecked="{Binding UpdatingTimeChange, Mode=TwoWay}" />
-                                    <RadioButton Content="osu! activated" GroupName="Updating"
+                                    <RadioButton Content="{loc:Tr GeometryDashboard_OsuActivated}" GroupName="Updating"
                                                  IsChecked="{Binding UpdatingOsuActivated, Mode=TwoWay}" />
-                                    <RadioButton Content="Hotkey down" GroupName="Updating"
+                                    <RadioButton Content="{loc:Tr GeometryDashboard_HotkeyDown}" GroupName="Updating"
                                                  IsChecked="{Binding UpdatingHotkeyDown, Mode=TwoWay}" />
                                 </StackPanel>
-                            </StackPanel>
+                            </Grid>
 
-                            <StackPanel Orientation="Horizontal" Margin="10">
-                                <TextBlock Width="100" Text="Minimal diff" VerticalAlignment="Bottom" Margin="0,0,0,6"
-                                           ToolTip.Tip="Similar virtual objects get merged together to reduce clutter. This field sets the minimal difference that two objects must have to not get merged together." />
-                                <TextBox Width="150" VerticalAlignment="Bottom"
-                                         materialAssists:TextFieldAssist.Label="Minimal difference"
+                            <Grid Margin="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" MinWidth="100" SharedSizeGroup="PreferenceLabel" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{loc:Tr GeometryDashboard_MinimalDiff}" VerticalAlignment="Bottom" Margin="0,0,0,6"
+                                           ToolTip.Tip="{loc:Tr GeometryDashboard_MinimalDiffTip}" />
+                                <TextBox Grid.Column="1" Width="150" VerticalAlignment="Bottom"
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr GeometryDashboard_MinimalDifference}"
                                          Text="{Binding Preferences.AcceptableDifference, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
-                                         ToolTip.Tip="Similar virtual objects get merged together to reduce clutter. This field sets the minimal difference that two objects must have to not get merged together." />
-                            </StackPanel>
+                                         ToolTip.Tip="{loc:Tr GeometryDashboard_MinimalDiffTip}" />
+                            </Grid>
 
-                            <StackPanel Orientation="Horizontal" Margin="10">
-                                <TextBlock Width="100" Text="Keep running" VerticalAlignment="Center" Margin="0,0,0,6"
-                                           ToolTip.Tip="Keep the tool running when another tool is selected." />
-                                <ToggleSwitch OnContent="" OffContent=""
+                            <Grid Margin="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" MinWidth="100" SharedSizeGroup="PreferenceLabel" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{loc:Tr GeometryDashboard_KeepRunning}" VerticalAlignment="Center" Margin="0,0,0,6"
+                                           ToolTip.Tip="{loc:Tr GeometryDashboard_KeepRunningTip}" />
+                                <ToggleSwitch Grid.Column="1" HorizontalAlignment="Left" OnContent="" OffContent=""
                                               IsChecked="{Binding KeepRunning, Mode=TwoWay}"
-                                              ToolTip.Tip="Keep the tool running when another tool is selected." />
-                            </StackPanel>
+                                              ToolTip.Tip="{loc:Tr GeometryDashboard_KeepRunningTip}" />
+                            </Grid>
 
-                            <StackPanel Orientation="Horizontal" Margin="10">
-                                <TextBlock Width="100" Text="See playfield" VerticalAlignment="Center" Margin="0,0,0,6"
-                                           ToolTip.Tip="Show the osu! playfield boundary." />
-                                <ToggleSwitch OnContent="" OffContent=""
+                            <Grid Margin="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" MinWidth="100" SharedSizeGroup="PreferenceLabel" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{loc:Tr GeometryDashboard_SeePlayfield}" VerticalAlignment="Center" Margin="0,0,0,6"
+                                           ToolTip.Tip="{loc:Tr GeometryDashboard_SeePlayfieldTip}" />
+                                <ToggleSwitch Grid.Column="1" HorizontalAlignment="Left" OnContent="" OffContent=""
                                               IsChecked="{Binding Preferences.VisiblePlayfieldBoundary, Mode=TwoWay}"
-                                              ToolTip.Tip="Show the osu! playfield boundary." />
-                            </StackPanel>
+                                              ToolTip.Tip="{loc:Tr GeometryDashboard_SeePlayfieldTip}" />
+                            </Grid>
 
-                            <StackPanel Orientation="Horizontal" Margin="10">
-                                <TextBlock Width="100" Text="Debug" VerticalAlignment="Center" Margin="0,0,0,6"
-                                           ToolTip.Tip="Show the Geometry Dashboard debug border." />
-                                <ToggleSwitch OnContent="" OffContent=""
+                            <Grid Margin="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" MinWidth="100" SharedSizeGroup="PreferenceLabel" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{loc:Tr GeometryDashboard_Debug}" VerticalAlignment="Center" Margin="0,0,0,6"
+                                           ToolTip.Tip="{loc:Tr GeometryDashboard_DebugTip}" />
+                                <ToggleSwitch Grid.Column="1" HorizontalAlignment="Left" OnContent="" OffContent=""
                                               IsChecked="{Binding Preferences.DebugEnabled, Mode=TwoWay}"
-                                              ToolTip.Tip="Show the Geometry Dashboard debug border." />
-                            </StackPanel>
+                                              ToolTip.Tip="{loc:Tr GeometryDashboard_DebugTip}" />
+                            </Grid>
                         </StackPanel>
                     </Border>
 
@@ -209,13 +269,13 @@
                                           HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
                                     <StackPanel Margin="20, 10">
                                         <Grid ColumnDefinitions="130,*,70" MinHeight="35">
-                                            <TextBlock Text="Colour" Grid.Column="0" VerticalAlignment="Center" />
+                                            <TextBlock Text="{loc:Tr GeometryDashboard_Color}" Grid.Column="0" VerticalAlignment="Center" />
                                             <ColorPicker Grid.Column="1" HorizontalAlignment="Left"
                                                          Color="{Binding Color, Mode=TwoWay}" />
                                         </Grid>
 
                                         <StackPanel Orientation="Horizontal" MinHeight="35" Spacing="10">
-                                            <TextBlock Text="Opacity" Width="120" VerticalAlignment="Center" />
+                                            <TextBlock Text="{loc:Tr GeometryDashboard_Opacity}" Width="120" VerticalAlignment="Center" />
                                             <Slider Width="300" VerticalAlignment="Center" TickFrequency="0.01"
                                                     Orientation="Horizontal"
                                                     Minimum="0" Maximum="1" Value="{Binding Opacity, Mode=TwoWay}" />
@@ -224,7 +284,7 @@
                                         </StackPanel>
 
                                         <StackPanel Orientation="Horizontal" MinHeight="35" Spacing="10">
-                                            <TextBlock Text="Thickness" Width="120" VerticalAlignment="Center" />
+                                            <TextBlock Text="{loc:Tr GeometryDashboard_Thickness}" Width="120" VerticalAlignment="Center" />
                                             <Slider Width="300" VerticalAlignment="Center" TickFrequency="1"
                                                     Orientation="Horizontal"
                                                     Minimum="1" Maximum="10" Value="{Binding Thickness, Mode=TwoWay}" />
@@ -233,16 +293,22 @@
                                         </StackPanel>
 
                                         <StackPanel Orientation="Horizontal" MinHeight="35" Spacing="10">
-                                            <TextBlock Text="DashStyle" Width="120" VerticalAlignment="Center" />
+                                            <TextBlock Text="{loc:Tr GeometryDashboard_DashStyle}" Width="120" VerticalAlignment="Center" />
                                             <ComboBox Classes="compact" Width="305" VerticalAlignment="Center"
                                                       ItemsSource="{Binding DashStyles}"
                                                       Margin="5, 0, 0, 0"
-                                                      SelectedItem="{Binding DashStyle, Mode=TwoWay}" />
+                                                      SelectedItem="{Binding DashStyle, Mode=TwoWay}">
+                                                <ComboBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
+                                                    </DataTemplate>
+                                                </ComboBox.ItemTemplate>
+                                            </ComboBox>
                                         </StackPanel>
 
                                         <StackPanel Orientation="Horizontal" MinHeight="35" Spacing="10"
                                                     IsVisible="{Binding HasSizeOption}">
-                                            <TextBlock Text="Size" Width="120" VerticalAlignment="Center" />
+                                            <TextBlock Text="{loc:Tr GeometryDashboard_Size}" Width="120" VerticalAlignment="Center" />
                                             <Slider Width="300" VerticalAlignment="Center" TickFrequency="1"
                                                     Orientation="Horizontal"
                                                     Minimum="1" Maximum="10" Value="{Binding Size, Mode=TwoWay}" />
@@ -260,8 +326,8 @@
 
         <Border Grid.Row="2" Padding="10">
             <Grid ColumnDefinitions="*,*">
-                <Button Width="200" Content="Apply" CornerRadius="10" Command="{Binding ApplyCommand}" />
-                <Button Grid.Column="1" Width="200" Content="Cancel" CornerRadius="10"
+                <Button MinWidth="200" Content="{loc:Tr GeometryDashboard_Apply}" CornerRadius="10" Command="{Binding ApplyCommand}" />
+                <Button Grid.Column="1" MinWidth="200" Content="{loc:Tr GeometryDashboard_Cancel}" CornerRadius="10"
                         Command="{Binding CancelCommand}" />
             </Grid>
         </Border>

@@ -1,5 +1,6 @@
 using Mapping_Tools.Desktop.Services.Undo;
 using System.ComponentModel.DataAnnotations;
+using Mapping_Tools.Desktop.Localization;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -8,7 +9,7 @@ using Mapping_Tools.Core.Tools.PatternGallery.Models;
 namespace Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels;
 
 /// <summary>Owns the editable and read-only values shown by the properties dialog.</summary>
-public sealed partial class PatternGalleryDetailsViewModel : ObservableValidator
+public sealed partial class PatternGalleryDetailsViewModel : LocalizedObservableValidator
 {
     /// <summary>Creates a details form from persisted pattern metadata.</summary>
     /// <param name="pattern">The pattern whose values are displayed.</param>
@@ -30,7 +31,7 @@ public sealed partial class PatternGalleryDetailsViewModel : ObservableValidator
     /// <summary>Gets or sets the editable display name.</summary>
     [ObservableProperty]
     [NotifyDataErrorInfo]
-    [Required(ErrorMessage = "A pattern name is required.")]
+    [Required(ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.PatternGallery_Validation_PatternNameRequired))]
     [Undoable]
     public partial string Name { get; set; }
 

@@ -6,6 +6,7 @@ using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Application.Tools.PropertyTransformer;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tools.PropertyTransformer.Models;
@@ -273,7 +274,7 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
                     async context =>
                     {
                         Progress<double> progress = new(value =>
-                            context.ReportProgress(value, "Transforming documents"));
+                            context.ReportProgress(value, DesktopStrings.PropertyTransformer_Progress));
                         var result = await propertyTransformer
                             .TransformAsync(
                                 paths,
@@ -284,7 +285,7 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
                             .ConfigureAwait(false);
                         return new ToolExecutionOutput<PropertyTransformerResult>(
                             result,
-                            "Done!");
+                            DesktopStrings.Common_Done);
                     }),
                 CreateProgress(),
                 cancellationToken)

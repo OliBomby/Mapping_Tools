@@ -1,12 +1,12 @@
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Services.Undo;
-using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Core.Graph;
 
 namespace Mapping_Tools.Desktop.ViewModels.Dialogs;
 
 /// <summary>Owns the cloned graph state and modal actions for the graph editor window.</summary>
-public sealed class GraphEditorViewModel : ObservableObject
+public sealed class GraphEditorViewModel : LocalizedObservableObject
 {
     private GraphState graphState;
 

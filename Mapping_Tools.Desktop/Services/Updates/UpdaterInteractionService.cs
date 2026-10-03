@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Updates.Contracts;
@@ -6,6 +7,8 @@ using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Views;
+
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Desktop.Services.Updates;
 
@@ -132,15 +135,15 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
                 case UpdateAvailability.None when notifyUser:
                     await PublishAsync(
                         UserNotificationSeverity.Information,
-                        "Update check",
-                        "No new versions available.");
+                        DesktopStrings.Shell_UpdateCheck,
+                        DesktopStrings.Shell_NoNewVersionsAvailable);
                     break;
 
                 case UpdateAvailability.Skipped when notifyUser:
                     await PublishAsync(
                         UserNotificationSeverity.Information,
-                        "Update check",
-                        $"Version {result.LatestVersion} skipped because of user config.");
+                        DesktopStrings.Shell_UpdateCheck,
+                        ApplicationText.Format(DesktopStrings.Shell_VersionSkipped, result.LatestVersion));
                     break;
 
                 case UpdateAvailability.Available:
@@ -279,16 +282,17 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
         if (disposed) return;
 
         await dialogs().ShowMessageAsync(new MessageDialogRequest<bool>(
-            "Updater error",
-            "UPDATER_EXCEPTION: " + exception.Message,
-            [new DialogChoice<bool>("OK", true, true, true)],
-            true)).ConfigureAwait(true);
+            DesktopStrings.Shell_UpdaterError,
+            DesktopStrings.Shell_UpdateFailed,
+            [new DialogChoice<bool>(DesktopStrings.Shell_UpperOk, true, true, true)],
+            true,
+            exception.ToString())).ConfigureAwait(true);
 
         if (notifyUser)
             await PublishAsync(
                 UserNotificationSeverity.Error,
-                "Error fetching update",
-                exception.Message,
+                DesktopStrings.Shell_ErrorFetchingUpdate,
+                DesktopStrings.Shell_UpdateFailed,
                 exception);
     }
 

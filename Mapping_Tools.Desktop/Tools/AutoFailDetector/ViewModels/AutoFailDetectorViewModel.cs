@@ -11,11 +11,14 @@ using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.Tools.AutoFail.Models;
 using Mapping_Tools.Desktop.Controls.Timeline;
 using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tools.AutoFailDetector.Models;
 using Mapping_Tools.Desktop.ViewModels;
+
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Desktop.Tools.AutoFailDetector.ViewModels;
 
@@ -180,7 +183,7 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
             await notifications.PublishAsync(new UserNotification(
                 UserNotificationSeverity.Warning,
                 Tool.DisplayName,
-                "Select a beatmap or open one in osu! before running the detector."));
+                DesktopStrings.AutoFailDetector_SelectBeatmap));
             return;
         }
 
@@ -190,7 +193,7 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
                 Tool.DisplayName,
                 async context =>
                 {
-                    context.ReportProgress(0.33, "Loading beatmap");
+                    context.ReportProgress(0.33, DesktopStrings.AutoFailDetector_ProgressLoading);
                     var run = await autoFail.AnalyzeAsync(
                         new AutoFailServiceOptions(
                             path,
@@ -198,8 +201,8 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
                             OverallDifficultyOverride,
                             PhysicsUpdateLeniency),
                         context.CancellationToken);
-                    context.ReportProgress(0.67, "Planning fixes");
-                    context.ReportProgress(1, "Analysis complete");
+                    context.ReportProgress(0.67, DesktopStrings.AutoFailDetector_ProgressPlanning);
+                    context.ReportProgress(1, DesktopStrings.AutoFailDetector_ProgressComplete);
                     return new ToolExecutionOutput<AutoFailRun>(run, Summarize(run.Analysis));
                 }),
             CreateProgress(),
@@ -241,20 +244,23 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
                 var plan = plans.Current;
                 var choice = await dialogs.ShowMessageAsync(
                     new MessageDialogRequest<FixChoice>(
-                        $"Solution {++solutionCount}",
-                        $"{plan.Guide}{Environment.NewLine}{Environment.NewLine}Do you want to use this solution?",
+                        ApplicationText.Format(DesktopStrings.AutoFailDetector_SolutionTitle, ++solutionCount),
+                        ApplicationText.Format(DesktopStrings.AutoFailDetector_SolutionPrompt,
+                            plan.Guide,
+                            Environment.NewLine,
+                            Environment.NewLine),
                         AutoPlaceFix
                             ?
                             [
-                                new DialogChoice<FixChoice>("Yes", FixChoice.Apply, true),
-                                new DialogChoice<FixChoice>("No", FixChoice.Next),
-                                new DialogChoice<FixChoice>("Cancel", FixChoice.Cancel, IsCancel: true),
+                                new DialogChoice<FixChoice>(DesktopStrings.AutoFailDetector_Yes, FixChoice.Apply, true),
+                                new DialogChoice<FixChoice>(DesktopStrings.AutoFailDetector_No, FixChoice.Next),
+                                new DialogChoice<FixChoice>(DesktopStrings.AutoFailDetector_Cancel, FixChoice.Cancel, IsCancel: true),
                             ]
                             :
                             [
-                                new DialogChoice<FixChoice>("Yes", FixChoice.Done, true),
-                                new DialogChoice<FixChoice>("No", FixChoice.Next),
-                                new DialogChoice<FixChoice>("Cancel", FixChoice.Cancel, IsCancel: true),
+                                new DialogChoice<FixChoice>(DesktopStrings.AutoFailDetector_Yes, FixChoice.Done, true),
+                                new DialogChoice<FixChoice>(DesktopStrings.AutoFailDetector_No, FixChoice.Next),
+                                new DialogChoice<FixChoice>(DesktopStrings.AutoFailDetector_Cancel, FixChoice.Cancel, IsCancel: true),
                             ],
                         FixChoice.Cancel),
                     cancellationToken);
@@ -263,7 +269,7 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
                     await Execution.ExecuteAsync(
                         new ToolExecutionRequest<bool>(
                             Tool.Id + "-fix",
-                            "Auto-fail Fix",
+                            DesktopStrings.AutoFailDetector_FixToolName,
                             async context =>
                             {
                                 await autoFail.ApplyFixAsync(
@@ -271,7 +277,7 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
                                     plan,
                                     quick,
                                     context.CancellationToken);
-                                return new ToolExecutionOutput<bool>(true, "Applied the auto-fail fix.");
+                                return new ToolExecutionOutput<bool>(true, DesktopStrings.AutoFailDetector_FixApplied);
                             }),
                         cancellationToken: cancellationToken);
 
@@ -282,11 +288,11 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
         {
             await dialogs.ShowMessageAsync(
                 new MessageDialogRequest<bool>(
-                    "Auto-fail fix",
-                    "Could not create an auto-fail fix guide.",
-                    [new DialogChoice<bool>("OK", true, true, true)],
+                    DesktopStrings.AutoFailDetector_FixErrorTitle,
+                    DesktopStrings.AutoFailDetector_FixError,
+                    [new DialogChoice<bool>(DesktopStrings.AutoFailDetector_Ok, true, true, true)],
                     false,
-                    exception.Message),
+                    exception.ToString()),
                 cancellationToken);
         }
     }
@@ -294,10 +300,10 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
     private static string Summarize(AutoFailAnalysis analysis)
     {
         return analysis.HasAutoFail
-            ? $"{analysis.UnloadingObjects.Count} unloading objects detected and {analysis.PotentialUnloadingObjects.Count} potential unloading objects detected!"
+            ? ApplicationText.Format(DesktopStrings.AutoFailDetector_SummaryDetected, analysis.UnloadingObjects.Count, analysis.PotentialUnloadingObjects.Count)
             : analysis.PotentialUnloadingObjects.Count > 0
-                ? $"No auto-fail, but {analysis.PotentialUnloadingObjects.Count} potential unloading objects detected."
-                : "No auto-fail detected.";
+                ? ApplicationText.Format(DesktopStrings.AutoFailDetector_SummaryPotential, analysis.PotentialUnloadingObjects.Count)
+                : DesktopStrings.AutoFailDetector_SummaryNone;
     }
 
     private enum FixChoice { Apply, Next, Done, Cancel }

@@ -13,6 +13,7 @@ using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Desktop.Services;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Views;
+using Mapping_Tools.Application.Localization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -55,9 +56,9 @@ public partial class App : Avalonia.Application
             {
                 processLogger.LogInformation("Mapping Tools starting. Version {Version}; OS {OS}; architecture {Architecture}",
                     typeof(App).Assembly.GetName().Version, Environment.OSVersion, System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture);
+                var settings = host.Services.GetRequiredService<DesktopApplicationSettings>();
+                TranslationManager.SetLanguage(settings.Language);
                 host.Start();
-                var settings =
-                    host.Services.GetRequiredService<DesktopApplicationSettings>();
                 host.Services
                     .GetRequiredService<IApplicationThemeService>()
                     .Apply(settings.Theme);

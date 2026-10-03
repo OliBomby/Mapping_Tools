@@ -14,7 +14,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- The host supplies these assemblies at runtime. Excluding their runtime assets keeps the drop-in artifact to one DLL. -->
+    <EmbeddedResource Update="Localization/SamplePlugin*.resx">
+      <LogicalName>Mapping_Tools.SamplePlugin.Localization.$([System.String]::Copy('%(Filename)').Replace('SamplePlugin', 'SamplePluginStrings')).resources</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization/SamplePlugin.resx">
+      <Generator>MSBuild:Compile</Generator>
+      <StronglyTypedFileName>$(IntermediateOutputPath)SamplePluginStrings.Designer.cs</StronglyTypedFileName>
+      <StronglyTypedLanguage>CSharp</StronglyTypedLanguage>
+      <StronglyTypedNamespace>Mapping_Tools.SamplePlugin.Localization</StronglyTypedNamespace>
+      <StronglyTypedClassName>SamplePluginStrings</StronglyTypedClassName>
+      <PublicClass>true</PublicClass>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The host supplies these assemblies at runtime; package only the plugin and its own language satellites. -->
     <PackageReference Include="Avalonia" Version="12.1.0" ExcludeAssets="runtime"/>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" ExcludeAssets="runtime"/>
   </ItemGroup>
@@ -33,5 +47,8 @@
     <MakeDir Directories="$(PluginArtifactDirectory)"/>
     <Copy SourceFiles="$(TargetPath)"
           DestinationFiles="$(PluginArtifactDirectory)\$(TargetFileName)"/>
+    <Copy SourceFiles="@(IntermediateSatelliteAssembliesWithTargetPath)"
+          DestinationFiles="@(IntermediateSatelliteAssembliesWithTargetPath->'$(PluginArtifactDirectory)/%(TargetPath)')"
+          SkipUnchangedFiles="true"/>
   </Target>
 </Project>

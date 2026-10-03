@@ -1,16 +1,84 @@
 using Mapping_Tools.Application.Execution.ToolExecution;
+using Avalonia.Controls;
+using Avalonia.VisualTree;
+using Mapping_Tools.Desktop.Tests.TestHelpers;
+using Mapping_Tools.Desktop.Tools.TimingCopier.Views;
 using Mapping_Tools.Application.Execution.UserNotification;
+using Mapping_Tools.Application.Localization;
 using Mapping_Tools.Application.Tools.TimingCopier;
 using Mapping_Tools.Core.Tools.TimingCopier.Models;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
+using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Tools.TimingCopier.Models;
 using Mapping_Tools.Desktop.Tools.TimingCopier.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Tools.TimingCopier.ViewModels;
 
 [TestClass]
+[DoNotParallelize]
 public sealed class TimingCopierViewModelTests
 {
+    [DataTestMethod]
+    [DataRow(TimingCopierResnapMode.PreserveBeatSpacing, "Aantal beats tussen objecten blijft gelijk")]
+    [DataRow(TimingCopierResnapMode.Resnap, "Alleen opnieuw snappen")]
+    [DataRow(TimingCopierResnapMode.KeepObjectsFixed, "Objecten niet verplaatsen")]
+    public void ResnapMode_LanguageChanges_RefreshesSelectedLabelWithoutChangingMode(
+        TimingCopierResnapMode mode, string expectedLabel)
+    {
+        // Arrange
+        string? previous = TranslationManager.Language;
+        TranslationManager.SetLanguage("en");
+        var viewModel = Create();
+        viewModel.ResnapMode = mode;
+        TimingCopierView view = new() { DataContext = viewModel };
+        using var host = HeadlessViewHost.Show(view);
+        ComboBox picker = view.GetVisualDescendants().OfType<ComboBox>().Single();
+
+        try
+        {
+            // Act
+            TranslationManager.SetLanguage("nl");
+            HeadlessViewHost.RunDispatcherJobs();
+
+            // Assert
+            picker.GetVisualDescendants().OfType<TextBlock>().Where(block => block.IsEffectivelyVisible)
+                .Select(block => block.Text).Should().Contain(expectedLabel);
+            picker.SelectedItem.Should().Be(mode);
+            viewModel.ResnapMode.Should().Be(mode);
+        }
+        finally
+        {
+            TranslationManager.SetLanguage(previous);
+        }
+    }
+
+    [TestMethod]
+    public void Constructor_DutchLanguage_PreservesProjectStorageIdentityAndTypedOptions()
+    {
+        // Arrange
+        string? previous = TranslationManager.Language;
+
+        try
+        {
+            TranslationManager.SetLanguage("nl");
+
+            // Act
+            var viewModel = Create();
+            var definition = ((IShellProjectFeature<TimingCopierProject>)viewModel).ProjectDefinition;
+
+            // Assert
+            definition.ProjectFolderName.Should().Be("Timing Copier Projects");
+            definition.AutoSaveFileName.Should().Be("timingcopierproject.json");
+            definition.SuggestedFileName.Should().Be("timing-copier-project.json");
+            viewModel.ResnapMode.Should().Be(TimingCopierResnapMode.PreserveBeatSpacing);
+        }
+        finally
+        {
+            TranslationManager.SetLanguage(previous);
+        }
+    }
+
     [TestMethod]
     public void ExportPath_WithMultipleTargets_ReportsLegacyMapCount()
     {

@@ -1,5 +1,6 @@
 using Mapping_Tools.Desktop.Services.Undo;
 using System.ComponentModel.DataAnnotations;
+using Mapping_Tools.Desktop.Localization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
@@ -8,7 +9,7 @@ using Mapping_Tools.Desktop.Tools.PatternGallery.Models;
 namespace Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels;
 
 /// <summary>Owns the raw osu! code import dialog state.</summary>
-public sealed partial class PatternGalleryCodeImportViewModel : ObservableValidator
+public sealed partial class PatternGalleryCodeImportViewModel : LocalizedObservableValidator
 {
     /// <summary>Creates a raw-code import form.</summary>
     /// <param name="defaultName">The suggested display name.</param>
@@ -22,7 +23,7 @@ public sealed partial class PatternGalleryCodeImportViewModel : ObservableValida
     /// <summary>Gets or sets the pattern display name.</summary>
     [ObservableProperty]
     [NotifyDataErrorInfo]
-    [Required(ErrorMessage = "A pattern name is required.")]
+    [Required(ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.PatternGallery_Validation_PatternNameRequired))]
     [Undoable]
     public partial string Name { get; set; }
 

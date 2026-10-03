@@ -2,11 +2,13 @@ using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
+using Mapping_Tools.Application.Localization;
 using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.ViewModels;
+using Mapping_Tools.SamplePlugin.Localization;
 
 namespace Mapping_Tools.SamplePlugin;
 
@@ -45,8 +47,8 @@ public sealed partial class SampleToolViewModel : SingleRunToolViewModel,
     [ObservableProperty]
     [Undoable]
     [NotifyDataErrorInfo]
-    [Required(ErrorMessage = "Enter a tag.")]
-    [RegularExpression(@"^\S+$", ErrorMessage = "The tag must not contain spaces.")]
+    [Required(ErrorMessageResourceType = typeof(SamplePluginStrings), ErrorMessageResourceName = nameof(SamplePluginStrings.Sample_TagRequired))]
+    [RegularExpression(@"^\S+$", ErrorMessageResourceType = typeof(SamplePluginStrings), ErrorMessageResourceName = nameof(SamplePluginStrings.Sample_TagWhitespace))]
     public partial string Tag { get; set; } = "sample-plugin";
 
     /// <inheritdoc />
@@ -100,7 +102,7 @@ public sealed partial class SampleToolViewModel : SingleRunToolViewModel,
                 async context =>
                 {
                     Progress<double> progress = new(value =>
-                        context.ReportProgress(value, "Updating beatmaps"));
+                        context.ReportProgress(value, SamplePluginStrings.Sample_UpdatingBeatmaps));
                     int changedCount = await sampleTool
                         .AddTagAsync(paths, tag, quick, progress, context.CancellationToken)
                         .ConfigureAwait(false);
@@ -121,7 +123,7 @@ public sealed partial class SampleToolViewModel : SingleRunToolViewModel,
     private static string Summarize(int changedCount, int pathCount, string tag)
     {
         return changedCount == 0
-            ? $"The '{tag}' tag was already present in the selected beatmap{(pathCount == 1 ? string.Empty : "s")}."
-            : $"Added the '{tag}' tag to {changedCount} of {pathCount} selected beatmap{(pathCount == 1 ? string.Empty : "s")}.";
+            ? ApplicationText.Format(pathCount == 1 ? SamplePluginStrings.Sample_AlreadyTaggedOne : SamplePluginStrings.Sample_AlreadyTaggedMany, tag)
+            : ApplicationText.Format(pathCount == 1 ? SamplePluginStrings.Sample_TaggedOne : SamplePluginStrings.Sample_TaggedMany, tag, changedCount, pathCount);
     }
 }

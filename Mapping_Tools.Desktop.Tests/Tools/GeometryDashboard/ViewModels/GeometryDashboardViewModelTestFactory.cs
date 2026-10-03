@@ -34,6 +34,7 @@ internal static class GeometryDashboardViewModelTestFactory
         IGlobalHotkeyService? globalHotkeys = null,
         bool overlaySupported = false,
         Func<Window>? owner = null,
+        string? overlayConfigurationStatus = null,
         params GeometryDashboardRuntimeSnapshot?[] snapshots)
     {
         var project = new GeometryDashboardProject();
@@ -42,7 +43,7 @@ internal static class GeometryDashboardViewModelTestFactory
             project,
             new RuntimeStub(snapshots),
             new InputStub(inputSupported),
-            new OverlayStub { IsSupported = overlaySupported });
+            new OverlayStub { IsSupported = overlaySupported, ConfigurationStatus = overlayConfigurationStatus });
         var lifecycle = new GeometryDashboardLifecycleCoordinator(project, service);
         GeometryDashboardViewModel viewModel = new(
             project,
@@ -99,7 +100,7 @@ internal static class GeometryDashboardViewModelTestFactory
     {
         public bool IsSupported { get; init; }
         public bool IsVisible => false;
-        public string? ConfigurationStatus => null;
+        public string? ConfigurationStatus { get; init; }
         public void Update(GeometryDashboardOverlayScene scene, GeometryDashboardOverlayOptions options) { }
         public void Hide() { }
         public void Dispose() { }

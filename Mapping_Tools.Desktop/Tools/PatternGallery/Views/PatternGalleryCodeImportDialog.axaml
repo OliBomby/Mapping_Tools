@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:patternGallery="clr-namespace:Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels"
              x:Class="Mapping_Tools.Desktop.Tools.PatternGallery.Views.PatternGalleryCodeImportDialog"
@@ -10,36 +11,36 @@
                       HorizontalScrollBarVisibility="Disabled"
                       VerticalScrollBarVisibility="Auto">
             <StackPanel>
-                <TextBox materialAssists:TextFieldAssist.Label="Name"
+                <TextBox materialAssists:TextFieldAssist.Label="{loc:Tr PatternGallery_Name}"
                          Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          MinWidth="100"
                          Margin="0,0,0,5"
-                         ToolTip.Tip="The name for the pattern." />
-                <TextBox materialAssists:TextFieldAssist.Label="Hit objects"
+                         ToolTip.Tip="{loc:Tr PatternGallery_CodeImportNameTip}" />
+                <TextBox materialAssists:TextFieldAssist.Label="{loc:Tr PatternGallery_Objects}"
                          Text="{Binding HitObjects, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          AcceptsReturn="True"
                          TextWrapping="NoWrap"
                          MinWidth="100"
                          Margin="0,0,0,5"
-                         ToolTip.Tip="The hit objects for the pattern." />
-                <TextBox materialAssists:TextFieldAssist.Label="Timing points"
+                         ToolTip.Tip="{loc:Tr PatternGallery_CodeHitObjectsTip}" />
+                <TextBox materialAssists:TextFieldAssist.Label="{loc:Tr PatternGallery_Timing}"
                          Text="{Binding TimingPoints, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          AcceptsReturn="True"
                          TextWrapping="NoWrap"
                          MinWidth="100"
                          Margin="0,0,0,5"
-                         ToolTip.Tip="The timing points for the pattern. Tip: Include a redline so timing scaling works during export." />
-                <TextBox materialAssists:TextFieldAssist.Label="Global SV"
+                         ToolTip.Tip="{loc:Tr PatternGallery_CodeTimingPointsTip}" />
+                <TextBox materialAssists:TextFieldAssist.Label="{loc:Tr PatternGallery_GlobalSv}"
                          Text="{Binding GlobalSv, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
                          MinWidth="100"
                          Margin="0,0,0,5"
-                         ToolTip.Tip="The global slider multiplier for the pattern." />
-                <ComboBox materialAssists:ComboBoxAssist.Label="Game mode"
+                         ToolTip.Tip="{loc:Tr PatternGallery_CodeImportGlobalSvTip}" />
+                <ComboBox materialAssists:ComboBoxAssist.Label="{loc:Tr PatternGallery_Mode}"
                           ItemsSource="{Binding GameModes}"
                           SelectedItem="{Binding GameMode, Mode=TwoWay}"
                           MinWidth="100"
                           Margin="0,0,0,5"
-                          ToolTip.Tip="The game mode for the pattern." />
+                         ToolTip.Tip="{loc:Tr PatternGallery_GameModeTip}" />
             </StackPanel>
         </ScrollViewer>
         <StackPanel Grid.Row="1"
@@ -48,12 +49,12 @@
                     Margin="0,16,0,0">
             <Button Classes="dialog-action primary"
                     Theme="{StaticResource MaterialFlatButton}"
-                    Content="ACCEPT"
+                         Content="{loc:Tr Common_Accept}"
                     Command="{Binding AcceptCommand}"
                     IsDefault="True" />
             <Button Classes="dialog-action primary"
                     Theme="{StaticResource MaterialFlatButton}"
-                    Content="CANCEL"
+                         Content="{loc:Tr Common_CancelUppercase}"
                     Command="{Binding CancelCommand}"
                     Margin="8,0,0,0"
                     IsCancel="True" />

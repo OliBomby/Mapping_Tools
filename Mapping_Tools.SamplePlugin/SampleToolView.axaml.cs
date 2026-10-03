@@ -12,6 +12,7 @@ public sealed partial class SampleToolView : UserControl
     /// </summary>
     public SampleToolView()
     {
+        _ = SampleToolDefinition.Definition;
         InitializeComponent();
     }
 }

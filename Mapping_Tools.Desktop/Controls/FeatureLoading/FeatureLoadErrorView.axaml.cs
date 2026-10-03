@@ -10,6 +10,10 @@ public sealed partial class FeatureLoadErrorView : UserControl
     public static readonly StyledProperty<string?> MessageProperty =
         AvaloniaProperty.Register<FeatureLoadErrorView, string?>(nameof(Message));
 
+    /// <summary>Identifies the original diagnostic details for the loading failure.</summary>
+    public static readonly StyledProperty<string?> DetailsProperty =
+        AvaloniaProperty.Register<FeatureLoadErrorView, string?>(nameof(Details));
+
     /// <summary>Creates the feature loading error view.</summary>
     public FeatureLoadErrorView()
     {
@@ -21,5 +25,12 @@ public sealed partial class FeatureLoadErrorView : UserControl
     {
         get => GetValue(MessageProperty);
         set => SetValue(MessageProperty, value);
+    }
+
+    /// <summary>Gets or sets the untranslated exception details, available in a collapsible expander.</summary>
+    public string? Details
+    {
+        get => GetValue(DetailsProperty);
+        set => SetValue(DetailsProperty, value);
     }
 }

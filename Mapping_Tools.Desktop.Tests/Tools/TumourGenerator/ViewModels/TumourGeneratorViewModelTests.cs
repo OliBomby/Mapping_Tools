@@ -1,3 +1,5 @@
+using Mapping_Tools.Desktop.Localization;
+using Mapping_Tools.Application.Localization;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Settings.Models;
@@ -60,7 +62,7 @@ public sealed class TumourGeneratorViewModelTests
         // Assert
         dialogs.MessageCount.Should().BeGreaterThan(0);
         ((MessageDialogRequest<bool>)dialogs.LastMessageRequest!).Message
-            .Should().Be("Could not find any sliders in imported hit objects.");
+            .Should().Be(DesktopStrings.TumourGenerator_NoSlidersFound);
         viewModel.PreviewHitObject.Should().BeSameAs(original);
     }
 
@@ -104,8 +106,9 @@ public sealed class TumourGeneratorViewModelTests
 
         // Assert
         dialogs.MessageCount.Should().BeGreaterThan(0);
-        ((MessageDialogRequest<bool>)dialogs.LastMessageRequest!).Message
-            .Should().Be("import failed");
+        var request = (MessageDialogRequest<bool>)dialogs.LastMessageRequest!;
+        request.Message.Should().Be(ApplicationExceptionText.GetSummary(service.ImportException!));
+        request.Details.Should().Contain("import failed");
     }
 
     [TestMethod]

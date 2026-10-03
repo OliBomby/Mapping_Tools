@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Localization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution.UserNotification;
@@ -12,7 +13,7 @@ namespace Mapping_Tools.Desktop.ViewModels;
 /// <summary>
 ///     Holds the updater decision and package-preparation state for one window.
 /// </summary>
-internal sealed partial class UpdaterViewModel : ObservableObject, IDisposable
+internal sealed partial class UpdaterViewModel : LocalizedObservableObject, IDisposable
 {
     private readonly IDialogService dialogs;
     private readonly IUiDispatcher dispatcher;
@@ -48,7 +49,7 @@ internal sealed partial class UpdaterViewModel : ObservableObject, IDisposable
         this.dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
 
         ReleaseTitle = string.IsNullOrWhiteSpace(check.ReleaseTitle)
-            ? "Loading release notes..."
+            ? DesktopStrings.Shell_LoadingReleaseNotes
             : check.ReleaseTitle;
         ReleaseBody = check.ReleaseBody ?? string.Empty;
         IsReadyPanelVisible = !downloadImmediately;
@@ -180,14 +181,15 @@ internal sealed partial class UpdaterViewModel : ObservableObject, IDisposable
         if (disposed) return;
 
         await dialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
-            "Updater error",
-            "UPDATER_EXCEPTION: " + exception.Message,
-            [new DialogChoice<bool>("OK", true, true, true)],
-            true));
+            DesktopStrings.Shell_UpdaterError,
+            DesktopStrings.Shell_UpdateFailed,
+            [new DialogChoice<bool>(DesktopStrings.Shell_UpperOk, true, true, true)],
+            true,
+            exception.ToString()));
         await notifications.PublishAsync(new UserNotification(
             UserNotificationSeverity.Error,
-            "Error fetching update",
-            exception.Message,
+            DesktopStrings.Shell_ErrorFetchingUpdate,
+            DesktopStrings.Shell_UpdateFailed,
             exception));
     }
 

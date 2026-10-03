@@ -1,4 +1,4 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns:loc="using:Mapping_Tools.Desktop.Localization" xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="using:Mapping_Tools.Desktop.Tools.TumourGenerator.Controls"
              xmlns:converters="using:Mapping_Tools.Desktop.Converters"
@@ -14,12 +14,12 @@
                  Classes="compact"
                  Text="{Binding GraphState, ElementName=Root, Mode=TwoWay, Converter={StaticResource GraphStateTextConverter}, UpdateSourceTrigger=LostFocus}"
                  VerticalContentAlignment="Center"
-                 ToolTip.Tip="Enter a constant or graph anchors separated by |" />
+                 ToolTip.Tip="{loc:Tr TumourGenerator_Control_GraphInputTip}" />
         <Button Grid.Column="1"
                 Content="..."
                 Margin="4,0,0,0"
                 Padding="10,0"
                 Click="OpenGraphEditor"
-                ToolTip.Tip="Edit as graph" />
+                ToolTip.Tip="{loc:Tr TumourGenerator_Control_EditAsGraphTip}" />
     </Grid>
 </UserControl>

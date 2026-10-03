@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Localization;
 using System.ComponentModel.DataAnnotations;
 using Mapping_Tools.Desktop.ViewModels.Dialogs;
 
@@ -21,7 +22,7 @@ internal sealed class DialogValueAttribute : ValidationAttribute
         return result == ValidationResult.Success
             ? ValidationResult.Success
             : new ValidationResult(
-                result?.ErrorMessage ?? "The value is invalid.",
+                result?.ErrorMessage ?? DesktopStrings.Shell_TheValueIsInvalid,
                 validationContext.MemberName is null
                     ? null
                     : [validationContext.MemberName]);

@@ -8,6 +8,11 @@ namespace Mapping_Tools.Application.Tools;
 /// </summary>
 public sealed class ToolDefinition
 {
+    private readonly string description;
+    private readonly Func<string>? translatedDescriptionGetter;
+    private readonly Func<string>? translatedSearchTermsGetter;
+    private readonly string[] searchTerms;
+
     /// <summary>
     ///     Creates an immutable tool definition.
     /// </summary>
@@ -19,6 +24,8 @@ public sealed class ToolDefinition
     ///     The selection sizes for which QuickRun may offer this tool, or
     ///     <see langword="null" /> when the tool has no QuickRun command.
     /// </param>
+    /// <param name="translatedDescriptionGetter">Optional getter for the description in the currently selected text language.</param>
+    /// <param name="translatedSearchTermsGetter">Optional getter for additional translated search terms, separated by vertical bars.</param>
     /// <exception cref="ArgumentException">
     ///     A required text value is blank, or <paramref name="quickRunTargets" />
     ///     contains no known target.
@@ -28,7 +35,9 @@ public sealed class ToolDefinition
         string displayName,
         string description,
         IEnumerable<string> searchTerms,
-        QuickRunTargets? quickRunTargets = null)
+        QuickRunTargets? quickRunTargets = null,
+        Func<string>? translatedDescriptionGetter = null,
+        Func<string>? translatedSearchTermsGetter = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(id);
         ArgumentException.ThrowIfNullOrWhiteSpace(displayName);
@@ -39,13 +48,17 @@ public sealed class ToolDefinition
             || quickRunTargets is not null
             && (quickRunTargets.Value & ~QuickRun.Models.QuickRunTargets.Always) != 0)
             throw new ArgumentException(
+                // Developer diagnostic for invalid tool registration, not displayed in the UI.
+                // ReSharper disable once LocalizableElement
                 "QuickRun targets must contain at least one known selection size.",
                 nameof(quickRunTargets));
 
         Id = id;
         DisplayName = displayName;
-        Description = description;
-        SearchTerms = searchTerms
+        this.description = description;
+        this.translatedDescriptionGetter = translatedDescriptionGetter;
+        this.translatedSearchTermsGetter = translatedSearchTermsGetter;
+        this.searchTerms = searchTerms
             .Where(term => !string.IsNullOrWhiteSpace(term))
             .Select(term => term.Trim())
             .Distinct(StringComparer.OrdinalIgnoreCase)
@@ -60,10 +73,25 @@ public sealed class ToolDefinition
     public string DisplayName { get; }
 
     /// <summary>Gets the concise description used by tool discovery surfaces.</summary>
-    public string Description { get; }
+    public string Description => translatedDescriptionGetter is null
+        ? description
+        : translatedDescriptionGetter();
 
     /// <summary>Gets the normalized search terms used by tool discovery.</summary>
-    public IReadOnlyList<string> SearchTerms { get; }
+    public IReadOnlyList<string> SearchTerms
+    {
+        get
+        {
+            IEnumerable<string> localizedTerms = translatedSearchTermsGetter is null
+                ? []
+                : translatedSearchTermsGetter()
+                    .Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            return searchTerms
+                .Concat(localizedTerms)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+        }
+    }
 
     /// <summary>
     ///     Gets the live selection sizes for which the primary operation may be

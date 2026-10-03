@@ -8,10 +8,13 @@ using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.SliderMerger.Models;
 using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tools.SliderMerger.Models;
 using Mapping_Tools.Desktop.ViewModels;
+
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Desktop.Tools.SliderMerger.ViewModels;
 
@@ -78,7 +81,7 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
     [ObservableProperty]
     [Undoable]
     [NotifyDataErrorInfo]
-    [Range(0, double.MaxValue, ErrorMessage = "Enter a finite non-negative leniency.")]
+    [Range(0, double.MaxValue, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.SliderMerger_Validation_FiniteNonNegativeLeniency))]
     public partial double Leniency { get; set; } = 256;
 
     /// <summary>Gets or sets whether a fully linear merge uses the linear path type.</summary>
@@ -154,9 +157,11 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
                             quick,
                             new Progress<double>(value => context.ReportProgress(
                                 value,
-                                "Merging sliders")),
+                                DesktopStrings.SliderMerger_Merging)),
                             context.CancellationToken);
-                        string message = $"Successfully merged {result.ObjectsMerged} " + $"{(result.ObjectsMerged == 1 ? "slider" : "sliders")}!";
+                        string message = result.ObjectsMerged == 1
+                            ? ApplicationText.Format(DesktopStrings.SliderMerger_ResultOne, result.ObjectsMerged)
+                            : ApplicationText.Format(DesktopStrings.SliderMerger_ResultMany, result.ObjectsMerged);
                         return new ToolExecutionOutput<SliderMergerResult>(
                             result,
                             message);

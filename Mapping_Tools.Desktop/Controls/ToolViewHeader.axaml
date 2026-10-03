@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
              xmlns:converters="using:Avalonia.Data.Converters"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
@@ -34,8 +35,8 @@
 
         <Button Classes="flat tool-info-badge"
                 IsVisible="{Binding HelpText, ElementName=Root, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}"
-                AutomationProperties.Name="Tool information"
-                ToolTip.Tip="Click me!">
+                AutomationProperties.Name="{loc:Tr Shell_ToolInformation}"
+                ToolTip.Tip="{loc:Tr Shell_ClickMe}">
             <materialIcons:MaterialIcon Width="24"
                                         Height="24"
                                         Foreground="{DynamicResource MappingToolsHelpBadgeBrush}"
@@ -53,8 +54,8 @@
 
         <Button Classes="flat tool-info-badge"
                 IsVisible="{Binding IsQuickRunSupported, ElementName=Root}"
-                AutomationProperties.Name="QuickRun information"
-                ToolTip.Tip="Click me!">
+                AutomationProperties.Name="{loc:Tr Shell_QuickrunInformation}"
+                ToolTip.Tip="{loc:Tr Shell_ClickMe}">
             <materialIcons:MaterialIcon Width="24"
                                         Height="24"
                                         Foreground="{DynamicResource MappingToolsQuickRunBadgeBrush}"
@@ -64,7 +65,7 @@
                         FlyoutPresenterTheme="{StaticResource ToolHelpFlyoutPresenterTheme}">
                     <TextBlock MaxWidth="600"
                                Padding="5"
-                               Text="This tool is compatible with QuickRun!"
+                               Text="{loc:Tr Shell_ThisToolIsCompatibleWithQuickrun}"
                                TextWrapping="Wrap" />
                 </Flyout>
             </Button.Flyout>

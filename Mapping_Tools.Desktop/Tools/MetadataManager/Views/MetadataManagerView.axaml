@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
              xmlns:vm="using:Mapping_Tools.Desktop.Tools.MetadataManager.ViewModels"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
@@ -12,8 +13,8 @@
         <Grid>
             <Grid RowDefinitions="Auto,*,Auto">
                 <controls:ToolViewHeader
-                    Title="Metadata Manager"
-                    HelpText="To save you the time of editing metadata on every individual difficulty, edit metadata in this tool and copy it to multiple diffs anytime.&#x0a;&#x0a;You can also import metadata from beatmaps, so you can copy metadata from A to B.&#x0a;&#x0a;Save and load metadata configurations, so you can work on multiple mapsets without hassle." />
+                    Title="{loc:Tr MetadataManager_Title}"
+                    HelpText="{loc:Tr MetadataManager_Help}" />
 
                 <ScrollViewer Grid.Row="1" Margin="0,0,100,0"
                               HorizontalScrollBarVisibility="Disabled"
@@ -21,71 +22,71 @@
                     <StackPanel Margin="0,0,20,0">
                         <Grid Margin="0,20,0,0" ColumnDefinitions="*,Auto,5,Auto,5,Auto">
                             <TextBox Margin="0,0,5,0"
-                                     materialAssists:TextFieldAssist.Label="Import metadata from"
+                                     materialAssists:TextFieldAssist.Label="{loc:Tr MetadataManager_ImportLabel}"
                                      Text="{Binding ImportPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                     ToolTip.Tip="Beatmap to import metadata from. This is optional." />
+                                     ToolTip.Tip="{loc:Tr MetadataManager_ImportTip}" />
                             <Button Grid.Column="1" Classes="flat path-picker" Cursor="Hand"
                                     VerticalAlignment="Bottom"
                                     Command="{Binding UseCurrentImportCommand}"
-                                    ToolTip.Tip="Fetch the selected beatmap from your osu! client.">
+                                    ToolTip.Tip="{loc:Tr MetadataManager_CurrentBeatmapTip}">
                                 <materialIcons:MaterialIcon Width="30" Height="30" Kind="RestoreFromTrash" />
                             </Button>
                             <Button Grid.Column="3" Classes="flat path-picker" Cursor="Hand"
                                     VerticalAlignment="Bottom"
                                     Command="{Binding BrowseImportCommand}"
-                                    ToolTip.Tip="Select beatmaps with File Explorer.">
+                                    ToolTip.Tip="{loc:Tr MetadataManager_BrowseTip}">
                                 <materialIcons:MaterialIcon Width="30" Height="30" Kind="Folder" />
                             </Button>
                             <Button Grid.Column="5" VerticalAlignment="Bottom"
                                     Command="{Binding ImportCommand}"
-                                    ToolTip.Tip="Import metadata from the specified beatmap. This is optional."
-                                    Content="Import metadata" />
+                                    ToolTip.Tip="{loc:Tr MetadataManager_ImportButtonTip}"
+                                    Content="{loc:Tr MetadataManager_ImportButton}" />
                         </Grid>
 
                         <Grid Margin="0,10,0,0" ColumnDefinitions="*,Auto,Auto,5,Auto">
                             <TextBox Margin="0,0,5,0"
-                                     materialAssists:TextFieldAssist.Label="Export metadata to"
+                                     materialAssists:TextFieldAssist.Label="{loc:Tr MetadataManager_ExportLabel}"
                                      Text="{Binding ExportPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                     ToolTip.Tip="Beatmap(s) to export the metadata to. You can input multiple map paths seperated by '|'." />
+                                     ToolTip.Tip="{loc:Tr MetadataManager_ExportTip}" />
                             <TextBlock Grid.Column="1" Margin="3,15,2,0" Padding="0 0 3 0" FontStyle="Italic"
-                                       ToolTip.Tip="Multiple beatmaps can be inputted in this field. Separate the paths with the '|' character."
+                                       ToolTip.Tip="{loc:Tr MetadataManager_ExportPathsTip}"
                                        Text="{Binding ExportMapCountText}" />
                             <Button Grid.Column="2" Classes="flat path-picker" Cursor="Hand"
                                     VerticalAlignment="Bottom"
                                     Command="{Binding UseCurrentExportCommand}"
-                                    ToolTip.Tip="Fetch the selected beatmap from your osu! client.">
+                                    ToolTip.Tip="{loc:Tr MetadataManager_CurrentBeatmapTip}">
                                 <materialIcons:MaterialIcon Width="30" Height="30" Kind="RestoreFromTrash" />
                             </Button>
                             <Button Grid.Column="4" Classes="flat path-picker" Cursor="Hand"
                                     VerticalAlignment="Bottom"
                                     Command="{Binding BrowseExportCommand}"
-                                    ToolTip.Tip="Select beatmaps with File Explorer.">
+                                    ToolTip.Tip="{loc:Tr MetadataManager_BrowseTip}">
                                 <materialIcons:MaterialIcon Width="30" Height="30" Kind="Folder" />
                             </Button>
                         </Grid>
 
                         <Separator Margin="0,10" />
 
-                        <Grid ColumnDefinitions="150,10,*"
+                        <Grid ColumnDefinitions="Auto,10,*"
                               RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
                             <TextBlock Grid.Column="0" FontWeight="Bold" HorizontalAlignment="Right"
-                                       VerticalAlignment="Center" Text="Artist" />
+                                       VerticalAlignment="Center" Text="{loc:Tr MetadataManager_Artist}" />
                             <TextBlock Grid.Column="0" Grid.Row="1" FontWeight="Bold" HorizontalAlignment="Right"
-                                       VerticalAlignment="Center" Text="Romanised Artist" />
+                                       VerticalAlignment="Center" Text="{loc:Tr MetadataManager_RomanisedArtist}" />
                             <TextBlock Grid.Column="0" Grid.Row="2" FontWeight="Bold" HorizontalAlignment="Right"
-                                       VerticalAlignment="Center" Text="Title" />
+                                       VerticalAlignment="Center" Text="{loc:Tr MetadataManager_TitleField}" />
                             <TextBlock Grid.Column="0" Grid.Row="3" FontWeight="Bold" HorizontalAlignment="Right"
-                                       VerticalAlignment="Center" Text="Romanised Title" />
+                                       VerticalAlignment="Center" Text="{loc:Tr MetadataManager_RomanisedTitle}" />
                             <TextBlock Grid.Column="0" Grid.Row="4" FontWeight="Bold" HorizontalAlignment="Right"
-                                       VerticalAlignment="Center" Text="Beatmap Creator" />
+                                       VerticalAlignment="Center" Text="{loc:Tr MetadataManager_Creator}" />
                             <TextBlock Grid.Column="0" Grid.Row="5" FontWeight="Bold" HorizontalAlignment="Right"
-                                       VerticalAlignment="Center" Text="Source" />
+                                       VerticalAlignment="Center" Text="{loc:Tr MetadataManager_Source}" />
                             <TextBlock Grid.Column="0" Grid.Row="6" FontWeight="Bold" HorizontalAlignment="Right"
-                                       VerticalAlignment="Center" Text="Tags" />
+                                       VerticalAlignment="Center" Text="{loc:Tr MetadataManager_Tags}" />
                             <TextBlock Grid.Column="0" Grid.Row="7" Margin="0,50,0,0" FontWeight="Bold"
-                                       HorizontalAlignment="Right" VerticalAlignment="Center" Text="Preview Time" />
+                                       HorizontalAlignment="Right" VerticalAlignment="Center" Text="{loc:Tr MetadataManager_PreviewTime}" />
                             <TextBlock Grid.Column="0" Grid.Row="8" Margin="0,10,0,0" FontWeight="Bold"
-                                       HorizontalAlignment="Right" VerticalAlignment="Top" Text="Colours" />
+                                       HorizontalAlignment="Right" VerticalAlignment="Top" Text="{loc:Tr MetadataManager_Colours}" />
 
                             <TextBox Grid.Column="2" Grid.Row="0" Classes="compact"
                                      Text="{Binding Artist, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
@@ -103,12 +104,12 @@
                                      Text="{Binding Tags, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
 
                             <CheckBox Grid.Column="2" Grid.Row="7" VerticalAlignment="Top"
-                                      Content="Remove duplicate tags"
+                                       Content="{loc:Tr MetadataManager_RemoveDuplicateTags}"
                                       IsChecked="{Binding DoRemoveDuplicateTags}" />
                             <CheckBox Grid.Column="2" Grid.Row="7" Margin="0,24,0,0" VerticalAlignment="Top"
-                                      Content="Reset beatmap IDs"
+                                       Content="{loc:Tr MetadataManager_ResetIds}"
                                       IsChecked="{Binding ResetIds}"
-                                      ToolTip.Tip="Reset the BeatmapID and BeatmapSetID on all beatmaps. This might fix the 'The beatmap you're trying to submit isn't yours!' issue." />
+                                       ToolTip.Tip="{loc:Tr MetadataManager_ResetIdsTip}" />
                             <TextBox Grid.Column="2" Grid.Row="7" Classes="compact" Margin="0,50,0,0"
                                      TextWrapping="Wrap"
                                      Text="{Binding PreviewTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource TimeToStringConverter}, ConverterParameter=-1}" />
@@ -116,7 +117,7 @@
                             <StackPanel Grid.Column="2" Grid.Row="8">
                                 <ToggleSwitch HorizontalAlignment="Left" Margin="5,10,0,10"
                                               IsChecked="{Binding UseComboColours}"
-                                              ToolTip.Tip="Choose to export combo colours. You can disable this to have different colours between maps." />
+                                               ToolTip.Tip="{loc:Tr MetadataManager_ComboColoursTip}" />
                                 <StackPanel IsEnabled="{Binding UseComboColours}">
                                     <StackPanel Orientation="Horizontal">
                                         <materialDesign:Card>
@@ -137,13 +138,13 @@
                                         <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="5"
                                                                        VerticalAlignment="Bottom"
                                                                        Command="{Binding AddComboColourCommand}"
-                                                                       ToolTip.Tip="Add a new combo colour.">
+                                                                        ToolTip.Tip="{loc:Tr MetadataManager_AddComboColourTip}">
                                             <materialIcons:MaterialIcon Width="24" Height="24" Kind="Plus" />
                                         </materialDesign:FloatingButton>
                                         <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="5"
                                                                        VerticalAlignment="Bottom"
                                                                        Command="{Binding RemoveComboColourCommand}"
-                                                                       ToolTip.Tip="Remove last combo colour.">
+                                                                        ToolTip.Tip="{loc:Tr MetadataManager_RemoveComboColourTip}">
                                             <materialIcons:MaterialIcon Width="24" Height="24" Kind="Minus" />
                                         </materialDesign:FloatingButton>
                                     </StackPanel>
@@ -156,7 +157,7 @@
                                                         <StackPanel Orientation="Horizontal">
                                                             <TextBox Classes="compact" Width="202" Margin="0,0,10,0"
                                                                      Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                                                     ToolTip.Tip="Special colour name. Some example keywords are 'SliderTrackOverride' and 'SliderBorder'." />
+                                                                      ToolTip.Tip="{loc:Tr MetadataManager_SpecialColourNameTip}" />
                                                             <ColorPicker
                                                                 Color="{Binding Color, Mode=TwoWay, Converter={StaticResource RgbaColourToAvaloniaColorConverter}}" />
                                                         </StackPanel>
@@ -167,13 +168,13 @@
                                         <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="5"
                                                                        VerticalAlignment="Bottom"
                                                                        Command="{Binding AddSpecialColourCommand}"
-                                                                       ToolTip.Tip="Add a new special colour.">
+                                                                        ToolTip.Tip="{loc:Tr MetadataManager_AddSpecialColourTip}">
                                             <materialIcons:MaterialIcon Width="24" Height="24" Kind="Plus" />
                                         </materialDesign:FloatingButton>
                                         <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="5"
                                                                        VerticalAlignment="Bottom"
                                                                        Command="{Binding RemoveSpecialColourCommand}"
-                                                                       ToolTip.Tip="Remove last special colour.">
+                                                                        ToolTip.Tip="{loc:Tr MetadataManager_RemoveSpecialColourTip}">
                                             <materialIcons:MaterialIcon Width="24" Height="24" Kind="Minus" />
                                         </materialDesign:FloatingButton>
                                     </StackPanel>
@@ -185,10 +186,10 @@
 
                 <StackPanel Grid.Row="2">
                     <TextBlock Margin="10" Foreground="{DynamicResource MaterialValidationErrorBrush}"
-                               Text="Beatmap file name can not be over 255 characters long."
+                               Text="{loc:Tr MetadataManager_FileNameOverflow}"
                                IsVisible="{Binding IsBeatmapFileNameOverflowVisible}" />
                     <TextBlock Margin="10" Foreground="{DynamicResource MaterialValidationErrorBrush}"
-                               Text="Tags can have at most 100 words and 1024 characters."
+                               Text="{loc:Tr MetadataManager_TagsOverflow}"
                                IsVisible="{Binding IsTagsOverflowVisible}" />
                 </StackPanel>
 
@@ -201,7 +202,7 @@
             <Grid Grid.Column="0">
                 <WrapPanel VerticalAlignment="Bottom">
                     <TextBlock TextWrapping="NoWrap" FontWeight="Bold" Opacity="0.58"
-                               Text="Made by OliBomby" />
+                               Text="{loc:Tr MetadataManager_MadeBy}" />
                 </WrapPanel>
             </Grid>
             <Grid Grid.Column="1">

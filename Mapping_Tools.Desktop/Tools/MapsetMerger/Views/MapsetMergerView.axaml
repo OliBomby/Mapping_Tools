@@ -5,13 +5,14 @@
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:materialIcons="using:Material.Icons.Avalonia"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
              x:Class="Mapping_Tools.Desktop.Tools.MapsetMerger.Views.MapsetMergerView"
              x:DataType="vm:MapsetMergerViewModel">
     <Grid RowDefinitions="*,Auto">
         <Grid Grid.Row="0" RowDefinitions="Auto,*,Auto">
             <controls:ToolViewHeader
                 Title="Mapset Merger"
-                HelpText="Combine multiple mapsets into one mapset and automatically resolve file conflicts." />
+                HelpText="{loc:Tr MapsetMerger_Help}" />
 
             <Grid Grid.Row="1" RowDefinitions="*,Auto">
                 <DataGrid Grid.Row="0"
@@ -31,9 +32,9 @@
                         </Style>
                     </DataGrid.Styles>
                     <DataGrid.Columns>
-                        <controls:CompactDataGridTextColumn Header="Name"
+                        <controls:CompactDataGridTextColumn Header="{loc:Tr MapsetMerger_Name}"
                                                             Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
-                        <DataGridTemplateColumn Header="Path" Width="Auto">
+                        <DataGridTemplateColumn Header="{loc:Tr MapsetMerger_Path}" Width="Auto">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate x:DataType="vm:MapsetMergerItemViewModel">
                                     <TextBlock Text="{Binding Path}"
@@ -51,7 +52,7 @@
                                                                        Margin="10,0,5,0"
                                                                        VerticalAlignment="Center"
                                                                        Command="{Binding BrowseCommand}"
-                                                                       ToolTip.Tip="Browse">
+                                                                       ToolTip.Tip="{loc:Tr MapsetMerger_Browse}">
                                             <materialIcons:MaterialIcon Kind="Folder"
                                                                         Width="24"
                                                                         Height="24" />
@@ -73,23 +74,23 @@
                                              Margin="0,10,5,5">
                             <Grid ColumnDefinitions="*,Auto,Auto">
                                 <TextBox Margin="0,0,10,0"
-                                         materialAssists:TextFieldAssist.Label="Export path"
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr MapsetMerger_ExportPath}"
                                          Text="{Binding ExportPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                         ToolTip.Tip="The folder to put the merged mapset files in." />
+                                         ToolTip.Tip="{loc:Tr MapsetMerger_ExportPathTip}" />
                                 <Button Grid.Column="1"
                                         Classes="flat path-picker"
                                         VerticalAlignment="Bottom"
                                         Command="{Binding BrowseExportPathCommand}"
-                                        ToolTip.Tip="Select export path with File Explorer.">
+                                        ToolTip.Tip="{loc:Tr MapsetMerger_BrowseExportPath}">
                                     <materialIcons:MaterialIcon Width="30"
                                                                 Height="30"
                                                                 Kind="Folder" />
                                 </Button>
                                 <CheckBox Grid.Column="2"
-                                          Content="Move storyboard to .osu"
+                                          Content="{loc:Tr MapsetMerger_MoveStoryboard}"
                                           Margin="10,0,5,0"
                                           IsChecked="{Binding MoveSbToBeatmap}"
-                                          ToolTip.Tip="Moves the content of any .osb files into the .osu for beatmap-specific storyboards." />
+                                          ToolTip.Tip="{loc:Tr MapsetMerger_MoveStoryboardTip}" />
                             </Grid>
                         </materialDesign:Card>
                     </Grid>
@@ -103,13 +104,13 @@
                                                            Margin="5"
                                                            x:Name="AddMapsetButton"
                                                            Click="AddMapsetButtonClick"
-                                                           ToolTip.Tip="Add a mapset. Hold shift to get current beatmap from osu! client.">
+                                                           ToolTip.Tip="{loc:Tr MapsetMerger_AddMapset}">
                                 <materialIcons:MaterialIcon Kind="Plus" Width="24" Height="24" />
                             </materialDesign:FloatingButton>
                             <materialDesign:FloatingButton Classes="mini light no-transitions"
                                                            Margin="5"
                                                            Command="{Binding RemoveMapsetCommand}"
-                                                           ToolTip.Tip="Remove selected mapsets or last mapset.">
+                                                           ToolTip.Tip="{loc:Tr MapsetMerger_RemoveMapset}">
                                 <materialIcons:MaterialIcon Kind="Minus" Width="24" Height="24" />
                             </materialDesign:FloatingButton>
                         </StackPanel>
@@ -128,7 +129,7 @@
             <Grid Grid.Column="0">
                 <WrapPanel VerticalAlignment="Bottom">
                     <TextBlock TextWrapping="NoWrap"
-                               Text="Made by OliBomby"
+                               Text="{loc:Tr Common_FooterMadeBy}"
                                FontWeight="Bold"
                                Opacity="0.58" />
                 </WrapPanel>

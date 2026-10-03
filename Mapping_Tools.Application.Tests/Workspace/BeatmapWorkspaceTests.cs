@@ -1,6 +1,7 @@
 using System.Globalization;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
+using Mapping_Tools.Application.Localization;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Workspace;
@@ -177,8 +178,8 @@ public sealed class BeatmapWorkspaceTests
         selected.Should().BeFalse();
         published.Should().ContainSingle(notification =>
             notification.Severity == UserNotificationSeverity.Warning
-            && notification.Title == "Selected beatmap is missing"
-            && notification.Message == "It seems like one of the selected beatmaps does not exist. Please re-select the file with 'File > Open beatmap'.");
+            && notification.Title == ApplicationStrings.Workspace_MissingBeatmapTitle
+            && notification.Message == ApplicationStrings.Workspace_MissingBeatmapMessage);
     }
 
     [TestMethod]
@@ -312,8 +313,8 @@ public sealed class BeatmapWorkspaceTests
         selected.Should().Equal("missing.osu");
         published.Should().ContainSingle(notification =>
             notification.Severity == UserNotificationSeverity.Warning
-            && notification.Title == "Selected beatmap is missing"
-            && notification.Message == "It seems like one of the selected beatmaps does not exist. Please re-select the file with 'File > Open beatmap'.");
+            && notification.Title == ApplicationStrings.Workspace_MissingBeatmapTitle
+            && notification.Message == ApplicationStrings.Workspace_MissingBeatmapMessage);
     }
 
     [TestMethod]

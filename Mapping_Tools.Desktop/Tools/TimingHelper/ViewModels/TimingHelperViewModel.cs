@@ -8,9 +8,12 @@ using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Services.Undo;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Tools.TimingHelper.Models;
 using Mapping_Tools.Desktop.Validation;
 using Mapping_Tools.Desktop.ViewModels;
+
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Desktop.Tools.TimingHelper.ViewModels;
 
@@ -77,7 +80,7 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
     [ObservableProperty]
     [Undoable]
     [NotifyDataErrorInfo]
-    [InclusiveRange<double>(0, double.MaxValue, ErrorMessage = "Leniency must be non-negative and finite.")]
+    [InclusiveRange<double>(0, double.MaxValue, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.TimingHelper_Validation_TimingLeniencyNonNegative))]
     public partial double Leniency { get; set; } = 3;
 
     /// <summary>
@@ -157,7 +160,7 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
                     async context =>
                     {
                         Progress<double> progress = new(value =>
-                            context.ReportProgress(value, "Adjusting timing"));
+                            context.ReportProgress(value, DesktopStrings.TimingHelper_Adjusting));
                         var result = await timingHelper.AdjustAsync(
                             paths,
                             options,
@@ -166,7 +169,9 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
                             context.CancellationToken);
                         return new ToolExecutionOutput<TimingHelperResult>(
                             result,
-                            $"Successfully added {result.RedlinesAdded} redlines!");
+                            result.RedlinesAdded == 1
+                                ? ApplicationText.Format(DesktopStrings.TimingHelper_ResultOne, result.RedlinesAdded)
+                                : ApplicationText.Format(DesktopStrings.TimingHelper_ResultMany, result.RedlinesAdded));
                     }),
                 CreateProgress(),
                 cancellationToken)

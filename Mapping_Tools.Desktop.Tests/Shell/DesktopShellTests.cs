@@ -11,6 +11,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
+using Mapping_Tools.Application.Localization;
 using Mapping_Tools.Application.Migration.Contracts;
 using Mapping_Tools.Application.Migration.Models;
 using Mapping_Tools.Application.Platform;
@@ -24,6 +25,7 @@ using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.Settings.Models;
 using Mapping_Tools.Application.Workspace.Models;
 using Mapping_Tools.Desktop.Controls;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services;
 using Mapping_Tools.Desktop.Services.Dialogs;
@@ -707,15 +709,15 @@ public sealed class DesktopShellTests
             MessageDialog dialog = lifetime.Windows.OfType<MessageDialog>().Single(candidate => candidate.IsVisible);
             using HeadlessViewHost dialogHost = HeadlessViewHost.Attach(dialog);
             string displayedError = dialog.GetVisualDescendants().OfType<TextBlock>()
-                .Single(textBlock => textBlock.Text == "The editor state is unavailable.").Text!;
+                .Single(textBlock => textBlock.Text == ApplicationStrings.Exception_LiveEditorUnavailable).Text!;
             dialogHost.Click(dialog.GetVisualDescendants().OfType<Button>()
                 .Single(button => button.Content?.ToString() == "OK"));
             HeadlessViewHost.PumpDispatcherUntil(() => openTask.IsCompleted);
             await openTask;
 
             // Assert
-            displayedError.Should().Be("The editor state is unavailable.");
-            dialog.Title.Should().Be("Current beatmap unavailable");
+            displayedError.Should().Be(ApplicationStrings.Exception_LiveEditorUnavailable);
+            dialog.Title.Should().Be(DesktopStrings.Shell_CurrentBeatmapUnavailable);
             locator.FindCount.Should().Be(1);
             workspace.SelectedPaths.Should().BeEmpty();
         }
@@ -1250,7 +1252,8 @@ public sealed class DesktopShellTests
         viewModel.CurrentFeature.Should().BeNull();
         viewModel.IsFeatureLoading.Should().BeFalse();
         viewModel.HasProjectMenu.Should().BeFalse();
-        viewModel.FeatureLoadError.Should().Contain("factory failed");
+        viewModel.FeatureLoadError.Should().Be(ApplicationStrings.Exception_UnexpectedFailure);
+        viewModel.FeatureLoadDetails.Should().Contain("factory failed");
     }
 
     [TestMethod]

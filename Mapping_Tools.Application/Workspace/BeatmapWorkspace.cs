@@ -2,6 +2,7 @@ using System.Globalization;
 using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
+using Mapping_Tools.Application.Localization;
 using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Workspace.Contracts;
@@ -17,8 +18,6 @@ namespace Mapping_Tools.Application.Workspace;
 /// </summary>
 public sealed class BeatmapWorkspace : IBeatmapWorkspace
 {
-    private const string missing_selected_path_message =
-        "It seems like one of the selected beatmaps does not exist. Please re-select the file with 'File > Open beatmap'.";
     private const int recent_map_limit = 20;
     private readonly ICurrentBeatmapLocator currentBeatmapLocator;
     private readonly IFilePicker filePicker;
@@ -81,8 +80,8 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
                 _ = notifications.PublishAsync(
                     new UserNotification(
                         UserNotificationSeverity.Warning,
-                        "Selected beatmap is missing",
-                        missing_selected_path_message));
+                        ApplicationStrings.Workspace_MissingBeatmapTitle,
+                        ApplicationStrings.Workspace_MissingBeatmapMessage));
             }
 
             return paths;
@@ -169,7 +168,7 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
         var paths = await filePicker.PickOpenFilesAsync(
             new OpenFilePickerRequest
             {
-                Title = "Open beatmap",
+                Title = ApplicationStrings.Workspace_OpenBeatmapPicker,
                 SuggestedStartLocation = GetBeatmapPickerStartLocation(),
                 AllowMultiple = allowMultiple,
                 Filters = [CommonFilePickerFilters.BeatmapsAndStoryboards],

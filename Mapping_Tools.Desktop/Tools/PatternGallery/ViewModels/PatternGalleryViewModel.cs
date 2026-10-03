@@ -1,3 +1,4 @@
+using Mapping_Tools.Application.Localization;
 using System.Collections.Concurrent;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
@@ -20,6 +21,7 @@ using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Tools.PatternGallery.Models;
 using Mapping_Tools.Desktop.Converters;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
@@ -147,7 +149,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     /// <summary>Gets or sets the user-visible collection name.</summary>
     [ObservableProperty]
     [Undoable]
-    public partial string CollectionName { get; set; } = "My Pattern Collection";
+    public partial string CollectionName { get; set; } = DesktopStrings.PatternGallery_DefaultCollectionName;
 
     /// <summary>Gets the visible pattern groups after filtering and sorting.</summary>
     [ObservableProperty]
@@ -196,14 +198,14 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     [ObservableProperty]
     [Undoable]
     [NotifyDataErrorInfo]
-    [Range(0, double.MaxValue, ErrorMessage = "Padding must be zero or greater.")]
+    [Range(0, double.MaxValue, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.PatternGallery_Validation_PaddingNonNegative))]
     public partial double Padding { get; set; } = 5;
 
     /// <summary>Gets or sets the minimum partition gap in beats.</summary>
     [ObservableProperty]
     [Undoable]
     [NotifyDataErrorInfo]
-    [Range(0, double.MaxValue, ErrorMessage = "Parting distance must be zero or greater.")]
+    [Range(0, double.MaxValue, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.PatternGallery_Validation_PartingDistanceNonNegative))]
     public partial double PartingDistance { get; set; } = 4;
 
     /// <summary>Gets or sets the target-object overwrite mode.</summary>
@@ -306,12 +308,12 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
 
     IReadOnlyList<ShellProjectMenuItem> IShellExtraProjectMenuFeature.ExtraProjectMenuItems =>
     [
-        new("_Rename collection", "Rename this collection and the collection's directory in the Pattern Files directory.", RenameCollectionCommand, MaterialIconKind.Edit),
-        new("_Import collection", "Import a collection zip file to the projects folder.", ImportCollectionCommand, MaterialIconKind.Import),
-        new("_Export collection", "Export this collection to the Exports folder. The exported file can later be imported with the import menu.", ExportCollectionCommand,
+        new(DesktopStrings.PatternGallery_RenameCollectionMenu, DesktopStrings.PatternGallery_RenameCollectionMenuTip, RenameCollectionCommand, MaterialIconKind.Edit),
+        new(DesktopStrings.PatternGallery_ImportCollectionMenu, DesktopStrings.PatternGallery_ImportCollectionMenuTip, ImportCollectionCommand, MaterialIconKind.Import),
+        new(DesktopStrings.PatternGallery_ExportCollectionMenu, DesktopStrings.PatternGallery_ExportCollectionMenuTip, ExportCollectionCommand,
             MaterialIconKind.Export),
-        new("_Restore collection",
-            "Restore the collection from the pattern files directory. This will remove any patterns that have missing files, and add any patterns that have not been indexed. Make sure to back-up your collection before restoring it.",
+        new(DesktopStrings.PatternGallery_RestoreCollectionMenu,
+            DesktopStrings.PatternGallery_RestoreCollectionMenuTip,
             RestoreCollectionCommand, MaterialIconKind.Restore),
     ];
 
@@ -376,7 +378,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     private async Task AddCodeAsync()
     {
         using var edit = UndoHistory?.BeginEdit();
-        var input = await ShowCodeDialogAsync($"Pattern {Project.Patterns.Count + 1}");
+        var input = await ShowCodeDialogAsync(ApplicationText.Format(DesktopStrings.PatternGallery_DefaultPatternName, Project.Patterns.Count + 1));
         if (input is null) return;
 
         try
@@ -393,13 +395,13 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
                 CancellationToken.None,
                 fileEdit);
             Project.Patterns.Add(pattern);
-            await PublishSuccessAsync($"Imported {pattern.Name}.");
+            await PublishSuccessAsync(ApplicationText.Format(DesktopStrings.PatternGallery_ImportedPattern, pattern.Name));
             RebuildGroups();
             StartThumbnailRefresh();
         }
         catch (Exception exception)
         {
-            await PublishErrorAsync(exception.Message, exception);
+            await PublishErrorAsync(ApplicationExceptionText.GetSummary(exception), exception);
         }
     }
 
@@ -409,7 +411,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     {
         using var edit = UndoHistory?.BeginEdit();
         var input = await ShowFileDialogAsync(
-            $"Pattern {Project.Patterns.Count + 1}", string.Empty);
+            ApplicationText.Format(DesktopStrings.PatternGallery_DefaultPatternName, Project.Patterns.Count + 1), string.Empty);
         if (input is null) return;
 
         try
@@ -425,13 +427,13 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
                 CancellationToken.None,
                 fileEdit);
             Project.Patterns.Add(pattern);
-            await PublishSuccessAsync($"Imported {pattern.Name}.");
+            await PublishSuccessAsync(ApplicationText.Format(DesktopStrings.PatternGallery_ImportedPattern, pattern.Name));
             RebuildGroups();
             StartThumbnailRefresh();
         }
         catch (Exception exception)
         {
-            await PublishErrorAsync(exception.Message, exception);
+            await PublishErrorAsync(ApplicationExceptionText.GetSummary(exception), exception);
         }
     }
 
@@ -440,7 +442,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     private async Task AddSelectedAsync()
     {
         using var edit = UndoHistory?.BeginEdit();
-        string? name = await ShowSelectedDialogAsync($"Pattern {Project.Patterns.Count + 1}");
+        string? name = await ShowSelectedDialogAsync(ApplicationText.Format(DesktopStrings.PatternGallery_DefaultPatternName, Project.Patterns.Count + 1));
         if (string.IsNullOrWhiteSpace(name)) return;
 
         string? sourcePath = await currentBeatmapService.FetchAsync();
@@ -456,13 +458,13 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
                 CancellationToken.None,
                 fileEdit);
             Project.Patterns.Add(pattern);
-            await PublishSuccessAsync($"Imported {pattern.Name}.");
+            await PublishSuccessAsync(ApplicationText.Format(DesktopStrings.PatternGallery_ImportedPattern, pattern.Name));
             RebuildGroups();
             StartThumbnailRefresh();
         }
         catch (Exception exception)
         {
-            await PublishErrorAsync(exception.Message, exception);
+            await PublishErrorAsync(ApplicationExceptionText.GetSummary(exception), exception);
         }
     }
 
@@ -485,16 +487,16 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         if (selected.Length == 0) return;
 
         string message = selected.Length == 1
-            ? $"Are you sure you want to delete \"{selected[0].Name}\"?"
-            : $"Are you sure you want to delete \"{selected[0].Name}\" and {selected.Length - 1} others?";
+            ? ApplicationText.Format(DesktopStrings.PatternGallery_DeleteOneQuestion, selected[0].Name)
+            : ApplicationText.Format(DesktopStrings.PatternGallery_DeleteManyQuestion, selected[0].Name, selected.Length - 1);
         if (!skipConfirmation)
         {
-            bool confirmed = await dialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
-                "Confirm deletion",
+        bool confirmed = await dialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
+                DesktopStrings.PatternGallery_ConfirmDeletion,
                 message,
                 [
-                    new DialogChoice<bool>("Yes", true, true),
-                    new DialogChoice<bool>("No", false, IsCancel: true),
+                    new DialogChoice<bool>(DesktopStrings.Common_Yes, true, true),
+                    new DialogChoice<bool>(DesktopStrings.Common_No, false, IsCancel: true),
                 ],
                 false));
             if (!confirmed) return;
@@ -508,14 +510,15 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             await gallery.DeleteAsync(selected, Paths, fileEdit: fileEdit);
             foreach (var pattern in selected) Project.Patterns.Remove(pattern);
 
-            string deletionMessage =
-                $"Deleted {selected.Length} pattern{(selected.Length == 1 ? string.Empty : "s")}.";
+            string deletionMessage = selected.Length == 1
+                ? ApplicationText.Format(DesktopStrings.PatternGallery_DeletedOne, selected.Length)
+                : ApplicationText.Format(DesktopStrings.PatternGallery_DeletedMany, selected.Length);
             await PublishSuccessAsync(deletionMessage);
             RebuildGroups();
         }
         catch (Exception exception)
         {
-            await PublishErrorAsync(exception.Message, exception);
+            await PublishErrorAsync(ApplicationExceptionText.GetSummary(exception), exception);
         }
     }
 
@@ -620,9 +623,9 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     {
         using var edit = UndoHistory?.BeginEdit();
         var result = await dialogs.ShowValueAsync(new ValueDialogRequest<string>(
-            "New pattern group",
-            "Group name",
-            $"Group {Project.Patterns.Select(pattern => pattern.Group).Distinct().Count()}",
+            DesktopStrings.PatternGallery_NewPatternGroup,
+            DesktopStrings.PatternGallery_GroupName,
+            ApplicationText.Format(DesktopStrings.PatternGallery_DefaultGroupName, Project.Patterns.Select(pattern => pattern.Group).Distinct().Count()),
             new StringConverter()));
         if (result.Accepted && !string.IsNullOrWhiteSpace(result.Value)) AssignGroup(result.Value);
     }
@@ -637,9 +640,9 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
 
         string currentGroup = selected.Group;
         var result = await dialogs.ShowValueAsync(new ValueDialogRequest<string>(
-            "Rename pattern group",
-            "Group name",
-            string.IsNullOrWhiteSpace(currentGroup) ? "None" : currentGroup,
+            DesktopStrings.PatternGallery_RenamePatternGroup,
+            DesktopStrings.PatternGallery_GroupName,
+            string.IsNullOrWhiteSpace(currentGroup) ? DesktopStrings.Common_None : currentGroup,
             new StringConverter()));
         if (!result.Accepted || string.IsNullOrWhiteSpace(result.Value)) return;
 
@@ -671,11 +674,11 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
 
             CollectionName = rename.NewName;
             Project.CollectionName = rename.NewName;
-            await PublishSuccessAsync("Renamed collection.");
+            await PublishSuccessAsync(DesktopStrings.PatternGallery_RenamedCollection);
         }
         catch (Exception exception)
         {
-            await PublishErrorAsync(exception.Message, exception);
+            await PublishErrorAsync(ApplicationExceptionText.GetSummary(exception), exception);
         }
     }
 
@@ -723,11 +726,11 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
                 serializer.Serialize(definition.ConfigSchema, snapshot),
                 patternFiles);
             await reveal.RevealAsync(archivePath);
-            await PublishSuccessAsync("Exported Pattern Gallery collection.");
+            await PublishSuccessAsync(DesktopStrings.PatternGallery_ExportedCollection);
         }
         catch (Exception exception)
         {
-            await PublishErrorAsync(exception.Message, exception);
+            await PublishErrorAsync(ApplicationExceptionText.GetSummary(exception), exception);
         }
     }
 
@@ -738,9 +741,9 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         using var edit = UndoHistory?.BeginEdit();
         var selected = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
-            Title = "Import Pattern Gallery collection",
+            Title = DesktopStrings.PatternGallery_ImportCollectionTitle,
             AllowMultiple = false,
-            Filters = [new FilePickerFilter("ZIP archive", ["*.zip"], ["application/zip"])],
+            Filters = [new FilePickerFilter(DesktopStrings.PatternGallery_ZipArchive, ["*.zip"], ["application/zip"])],
         });
         string? archivePath = selected.FirstOrDefault();
         if (string.IsNullOrWhiteSpace(archivePath)) return;
@@ -749,11 +752,11 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         {
             var archive = await archives.ReadAsync(archivePath);
             bool merge = await dialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
-                "Import Pattern Gallery collection",
-                "Merge the imported patterns into the current collection?",
+                DesktopStrings.PatternGallery_ImportCollectionTitle,
+                DesktopStrings.PatternGallery_MergeQuestion,
                 [
-                    new DialogChoice<bool>("Merge", true, true),
-                    new DialogChoice<bool>("New collection", false, IsCancel: true),
+                    new DialogChoice<bool>(DesktopStrings.PatternGallery_Merge, true, true),
+                    new DialogChoice<bool>(DesktopStrings.PatternGallery_NewCollection, false, IsCancel: true),
                 ],
                 false));
 
@@ -769,7 +772,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
 
                 RebuildGroups();
                 StartThumbnailRefresh();
-                await PublishSuccessAsync("Merged Pattern Gallery collection.");
+                await PublishSuccessAsync(DesktopStrings.PatternGallery_MergedCollection);
                 return;
             }
 
@@ -780,11 +783,11 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             CancelThumbnailRefresh();
             await archives.ExtractAsync(archivePath, CollectionBasePath, fileEdit: importedFileEdit);
             bool load = await dialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
-                "Load imported collection",
-                $"Load '{imported.CollectionName}' as the active Pattern Gallery collection?",
+                DesktopStrings.PatternGallery_LoadImportedCollection,
+                ApplicationText.Format(DesktopStrings.PatternGallery_LoadCollectionQuestion, imported.CollectionName),
                 [
-                    new DialogChoice<bool>("Load", true, true),
-                    new DialogChoice<bool>("Keep current", false, IsCancel: true),
+                    new DialogChoice<bool>(DesktopStrings.PatternGallery_Load, true, true),
+                    new DialogChoice<bool>(DesktopStrings.PatternGallery_KeepCurrent, false, IsCancel: true),
                 ],
                 false));
             if (load)
@@ -801,11 +804,11 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
                 ((IShellProjectFeature<PatternGalleryProject>)this).Install(imported);
             }
 
-            await PublishSuccessAsync("Imported Pattern Gallery collection.");
+            await PublishSuccessAsync(DesktopStrings.PatternGallery_ImportedCollection);
         }
         catch (Exception exception)
         {
-            await PublishErrorAsync(exception.Message, exception);
+            await PublishErrorAsync(ApplicationExceptionText.GetSummary(exception), exception);
         }
     }
 
@@ -815,11 +818,11 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     {
         using var edit = UndoHistory?.BeginEdit();
         bool confirmed = await dialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
-            "Restore Pattern Gallery collection",
-            "Remove missing patterns and add pattern files that are not indexed?",
+            DesktopStrings.PatternGallery_RestoreCollection,
+            DesktopStrings.PatternGallery_RestoreQuestion,
             [
-                new DialogChoice<bool>("Restore", true, true),
-                new DialogChoice<bool>("Cancel", false, IsCancel: true),
+                new DialogChoice<bool>(DesktopStrings.PatternGallery_Restore, true, true),
+                new DialogChoice<bool>(DesktopStrings.Common_CancelUppercase, false, IsCancel: true),
             ],
             false));
         if (!confirmed) return;
@@ -831,11 +834,11 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             RebuildGroups();
             StartThumbnailRefresh();
             await PublishSuccessAsync(
-                $"Restored collection: removed {result.RemovedCount}, added {result.AddedCount}.");
+                ApplicationText.Format(DesktopStrings.PatternGallery_RestoredSummary, result.RemovedCount, result.AddedCount));
         }
         catch (Exception exception)
         {
-            await PublishErrorAsync(exception.Message, exception);
+            await PublishErrorAsync(ApplicationExceptionText.GetSummary(exception), exception);
         }
     }
 
@@ -897,7 +900,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         }
         catch (Exception exception)
         {
-            await PublishErrorAsync(exception.Message, exception);
+            await PublishErrorAsync(ApplicationExceptionText.GetSummary(exception), exception);
             throw;
         }
     }
@@ -910,7 +913,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     {
         if (targetPaths.Count == 0)
         {
-            await PublishWarningAsync("Open or select a target beatmap before running Pattern Gallery.");
+            await PublishWarningAsync(DesktopStrings.PatternGallery_TargetBeatmapRequired);
             return;
         }
 
@@ -929,7 +932,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
                         project,
                         Paths,
                         quick,
-                        new Progress<double>(value => context.ReportProgress(value, "Exporting patterns")),
+                        new Progress<double>(value => context.ReportProgress(value, DesktopStrings.PatternGallery_Exporting)),
                         context.CancellationToken);
                     return new ToolExecutionOutput<PatternGalleryRunResult>(
                         result,
@@ -1045,7 +1048,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     private void ConfigureProject(bool ensureCollection = true)
     {
         CollectionName = string.IsNullOrWhiteSpace(Project.CollectionName)
-            ? "My Pattern Collection"
+            ? DesktopStrings.PatternGallery_DefaultCollectionName
             : Project.CollectionName;
         ExportTimeMode = Project.ExportTimeMode;
         CustomExportTime = Project.CustomExportTime;
@@ -1080,7 +1083,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             .GroupBy(pattern => pattern.Group, StringComparer.Ordinal)
             .OrderBy(group => group.Key, StringComparer.Ordinal)
             .Select(group => new PatternGalleryGroupViewModel(
-                string.IsNullOrWhiteSpace(group.Key) ? "None" : group.Key,
+                group.Key,
                 group.Select(GetItem)))
             .ToArray();
         OnPropertyChanged(nameof(GroupNames));

@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.QuickRun.Models;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Tools.HitsoundStudio;
 
@@ -11,5 +12,7 @@ public static class HitsoundStudioToolDefinition
         "Hitsound Studio",
         "Import, edit, preview, generate, and export hitsound layers.",
         ["hitsound", "studio", "sample", "MIDI", "SoundFont", "export", "layer"],
-        QuickRunTargets.Always);
+        QuickRunTargets.Always,
+        static () => ApplicationStrings.HitsoundStudio_Description,
+        static () => ApplicationStrings.HitsoundStudio_SearchTerms);
 }

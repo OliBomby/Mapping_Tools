@@ -8,6 +8,7 @@ using Avalonia.VisualTree;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Desktop.Controls;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels.Adapters;
 
@@ -74,7 +75,7 @@ public partial class ComboColourStudioView : UserControl
         {
             contextMenu.Items.Add(new MenuItem
             {
-                Header = "Add at least one combo colour before adding colours to this sequence.",
+                Header = DesktopStrings.ComboColourStudio_SequenceRequiresColour,
                 IsEnabled = false,
             });
         }

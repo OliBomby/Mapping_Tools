@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Services.Undo;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -9,7 +10,7 @@ using Mapping_Tools.Desktop.Tools.HitsoundStudio.Models;
 namespace Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels;
 
 /// <summary>Owns the fields of the Hitsound Studio export dialog.</summary>
-public sealed partial class HitsoundStudioExportDialogViewModel : ObservableObject
+public sealed partial class HitsoundStudioExportDialogViewModel : LocalizedObservableObject
 {
     private readonly IFilePicker filePicker;
     private readonly HitsoundStudioProject project;
@@ -151,8 +152,9 @@ public sealed partial class HitsoundStudioExportDialogViewModel : ObservableObje
     public IReadOnlyList<HitsoundStudioSampleExportFormat> SampleExportFormats { get; } = Enum.GetValues<HitsoundStudioSampleExportFormat>();
 
     /// <summary>Gets the validation message.</summary>
-    [ObservableProperty]
-    public partial string Error { get; private set; } = string.Empty;
+    public string Error => hasError ? DesktopStrings.HitsoundStudio_ExportRequired : string.Empty;
+
+    private bool hasError;
 
     /// <summary>Gets the accept command.</summary>
     public IRelayCommand AcceptCommand { get; }
@@ -184,7 +186,7 @@ public sealed partial class HitsoundStudioExportDialogViewModel : ObservableObje
     {
         var paths = await filePicker.PickFoldersAsync(new OpenFolderPickerRequest
         {
-            Title = "Choose Hitsound Studio export folder",
+            Title = DesktopStrings.HitsoundStudio_PickExport,
             AllowMultiple = false,
         }).ConfigureAwait(false);
         if (paths.Count > 0) ExportFolder = paths[0];
@@ -192,10 +194,12 @@ public sealed partial class HitsoundStudioExportDialogViewModel : ObservableObje
 
     private void Accept()
     {
-        Error = string.Empty;
+        hasError = false;
+        OnPropertyChanged(nameof(Error));
         if (string.IsNullOrWhiteSpace(ExportFolder) || string.IsNullOrWhiteSpace(HitsoundDiffName))
         {
-            Error = "An export folder and map name are required.";
+            hasError = true;
+            OnPropertyChanged(nameof(Error));
             return;
         }
 

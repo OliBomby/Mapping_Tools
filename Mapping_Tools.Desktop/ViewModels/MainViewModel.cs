@@ -1,3 +1,5 @@
+using Mapping_Tools.Desktop.Localization;
+using Mapping_Tools.Application.Localization;
 using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Globalization;
@@ -28,7 +30,7 @@ namespace Mapping_Tools.Desktop.ViewModels;
 ///     Coordinates explicit feature discovery, navigation, favorites, activation,
 ///     and shell-level commands.
 /// </summary>
-public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyncDisposable
+public sealed partial class MainViewModel : LocalizedObservableObject, IDisposable, IAsyncDisposable
 {
     private static readonly Uri websiteUri = new("https://mappingtools.github.io");
     private static readonly Uri gitHubUri = new("https://github.com/OliBomby/Mapping_Tools");
@@ -180,6 +182,12 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
     [ObservableProperty]
     public partial string? FeatureLoadError { get; private set; }
 
+    /// <summary>Gets the original diagnostic details for a failed feature activation.</summary>
+    [ObservableProperty]
+    public partial string? FeatureLoadDetails { get; private set; }
+
+    private Exception? featureLoadException;
+
     /// <summary>Gets the title of the currently activated feature.</summary>
     [ObservableProperty]
     public partial string Header { get; private set; } = "Mapping Tools";
@@ -275,16 +283,16 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
             settingsService.Save(settings);
             await notifications.PublishAsync(new UserNotification(
                 UserNotificationSeverity.Success,
-                "Legacy data migrated",
-                $"Copied {result.AutosavesCopied} autosave(s) and {result.ProjectFilesCopied} project file(s) into the current layout."));
+                DesktopStrings.Shell_LegacyDataMigrated,
+                ApplicationText.Format(DesktopStrings.Shell_MigrationSummary, result.AutosavesCopied, result.ProjectFilesCopied)));
         }
         catch (Exception exception)
         {
             logger.LogError(exception, "Legacy data migration failed");
             await notifications.PublishAsync(new UserNotification(
                 UserNotificationSeverity.Error,
-                "Legacy data migration failed",
-                "The legacy files were not removed. Migration may be incomplete; you can try again the next time Mapping Tools starts.",
+                DesktopStrings.Shell_LegacyDataMigrationFailed,
+                DesktopStrings.Shell_TheLegacyFilesWereNotRemovedMigrationMayBeIncompleteYouCanTryAgainTheNextTimeMappingToolsStarts,
                 exception));
         }
     }
@@ -311,10 +319,12 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
         CurrentFeature = null;
         ContentHorizontalScrollBarVisibility = registration.HorizontalScrollBarVisibility;
         ContentVerticalScrollBarVisibility = registration.VerticalScrollBarVisibility;
-        Header = item.DisplayName == "Get started"
+        Header = item.Id == "get-started"
             ? "Mapping Tools"
             : $"Mapping Tools - {item.DisplayName}";
         FeatureLoadError = null;
+        featureLoadException = null;
+        FeatureLoadDetails = null;
         IsFeatureLoading = true;
 
         try
@@ -364,7 +374,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
             logger.LogError(exception, "Feature activation failed: {FeatureId}", item.Id);
             if (activationVersion == featureActivationVersion && ReferenceEquals(SelectedFeature, item))
             {
-                FeatureLoadError = exception.Message;
+                featureLoadException = exception;
+                FeatureLoadDetails = exception.ToString();
+                FeatureLoadError = ApplicationExceptionText.GetSummary(exception);
                 ClearProjectMenu();
             }
         }
@@ -382,15 +394,30 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
 
         List<ShellProjectMenuItem> items =
         [
-            new("_Undo", "Undo the last edit (Ctrl+Z).", UndoCommand, MaterialIconKind.Undo),
-            new("_Redo", "Redo the last undone edit (Ctrl+Y).", RedoCommand, MaterialIconKind.Redo),
-            new("_Save project", "Save tool settings to file.", SaveProjectCommand, MaterialIconKind.ContentSave),
-            new("_Open project", "Load tool settings from file.", OpenProjectCommand, MaterialIconKind.Folder),
-            new("_New project", "Load the default tool settings.", NewProjectCommand, MaterialIconKind.RocketLaunch),
+            new(DesktopStrings.Shell_MenuUndo, DesktopStrings.Shell_UndoTheLastEditCtrlZ, UndoCommand, MaterialIconKind.Undo),
+            new(DesktopStrings.Shell_MenuRedo, DesktopStrings.Shell_RedoTheLastUndoneEditCtrlY, RedoCommand, MaterialIconKind.Redo),
+            new(DesktopStrings.Shell_MenuSaveProject, DesktopStrings.Shell_SaveToolSettingsToFile, SaveProjectCommand, MaterialIconKind.ContentSave),
+            new(DesktopStrings.Shell_MenuOpenProject, DesktopStrings.Shell_LoadToolSettingsFromFile, OpenProjectCommand, MaterialIconKind.Folder),
+            new(DesktopStrings.Shell_MenuNewProject, DesktopStrings.Shell_LoadTheDefaultToolSettings, NewProjectCommand, MaterialIconKind.RocketLaunch),
         ];
         if (viewModel is IShellExtraProjectMenuFeature extra) items.AddRange(extra.ExtraProjectMenuItems);
 
         return items;
+    }
+
+    /// <inheritdoc />
+    protected override void RefreshLocalizedProperties()
+    {
+        base.RefreshLocalizedProperties();
+        if (featureLoadException is { } exception) FeatureLoadError = ApplicationExceptionText.GetSummary(exception);
+        RefreshVisibleFeatures();
+        if (SelectedFeature is { } feature)
+            Header = feature.Id == "get-started" ? "Mapping Tools" : $"Mapping Tools - {feature.DisplayName}";
+        if (CurrentFeature is { } viewModel)
+        {
+            ProjectMenuItems = CreateProjectMenuItems(viewModel);
+            OnPropertyChanged(nameof(ProjectMenuItems));
+        }
     }
 
     private void ClearProjectMenu()
@@ -414,7 +441,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
     [RelayCommand]
     private Task OpenWebsiteAsync()
     {
-        return OpenUriAsync(websiteUri, "website");
+        return OpenUriAsync(websiteUri, DesktopStrings.Shell_Website);
     }
 
     [RelayCommand]
@@ -438,19 +465,19 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
     [RelayCommand]
     private Task OpenGitHubAsync()
     {
-        return OpenUriAsync(gitHubUri, "source repository");
+        return OpenUriAsync(gitHubUri, DesktopStrings.Shell_SourceRepository);
     }
 
     [RelayCommand]
     private Task OpenIssuesAsync()
     {
-        return OpenUriAsync(issuesUri, "issue tracker");
+        return OpenUriAsync(issuesUri, DesktopStrings.Shell_IssueTracker);
     }
 
     [RelayCommand]
     private Task OpenDonateAsync()
     {
-        return OpenUriAsync(donateUri, "donation page");
+        return OpenUriAsync(donateUri, DesktopStrings.Shell_DonationPage);
     }
 
     [RelayCommand]
@@ -461,10 +488,10 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
         StringBuilder message = new();
         message.AppendLine($"Mapping Tools {version}");
         message.AppendLine();
-        message.AppendLine("Made by:");
+        message.AppendLine(DesktopStrings.Shell_MadeBy);
         message.AppendLine("OliBomby");
         message.AppendLine();
-        message.AppendLine("Supporters:");
+        message.AppendLine(DesktopStrings.Shell_Supporters);
         message.AppendLine("Mercury");
         message.AppendLine("Ryuusei Aika");
         message.AppendLine("Pon -");
@@ -477,16 +504,16 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
         message.AppendLine("ZEduards");
         message.AppendLine("Dcs");
         message.AppendLine();
-        message.AppendLine("Contributors:");
+        message.AppendLine(DesktopStrings.Shell_Contributors);
         message.AppendLine("Potoofu");
         message.AppendLine("Karoo13");
         message.AppendLine("Coppertine");
         message.Append("JPK314");
 
         await dialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
-            "Info",
+            DesktopStrings.Shell_Info,
             message.ToString(),
-            [new DialogChoice<bool>("OK", true, true, true)],
+            [new DialogChoice<bool>(DesktopStrings.Shell_UpperOk, true, true, true)],
             true));
     }
 
@@ -518,7 +545,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
         catch (Exception exception)
         {
             await notifications.PublishAsync(new UserNotification(
-                UserNotificationSeverity.Error, "Could not undo", exception.Message, exception));
+                UserNotificationSeverity.Error, DesktopStrings.Shell_CouldNotUndo, ApplicationExceptionText.GetSummary(exception), exception));
         }
     }
 
@@ -538,7 +565,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
         catch (Exception exception)
         {
             await notifications.PublishAsync(new UserNotification(
-                UserNotificationSeverity.Error, "Could not redo", exception.Message, exception));
+                UserNotificationSeverity.Error, DesktopStrings.Shell_CouldNotRedo, ApplicationExceptionText.GetSummary(exception), exception));
         }
     }
 
@@ -711,7 +738,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
         if (!accepted)
             await notifications.PublishAsync(new UserNotification(
                 UserNotificationSeverity.Warning,
-                "Could not open link",
-                $"The {destination} could not be opened by the operating system.")).ConfigureAwait(false);
+                DesktopStrings.Shell_CouldNotOpenLink,
+                ApplicationText.Format(DesktopStrings.Shell_LinkOpenFailed, destination))).ConfigureAwait(false);
     }
 }

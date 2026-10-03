@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Localization;
 using System.Globalization;
 using Avalonia.Data.Converters;
 using Mapping_Tools.Core.SystemTools;
@@ -34,7 +35,7 @@ public sealed class ConstantTimeSpanConverter : IValueConverter
             if (TypeConverters.TryParseTimeSpan(text, out var converted)) return converted;
 
             throw new FormatException(
-                "Use the format hh:mm:ss or enter an arithmetic expression in milliseconds.");
+                DesktopStrings.Shell_UseTheFormatHhMmSsOrEnterAnArithmeticExpressionInMilliseconds);
         });
     }
 }

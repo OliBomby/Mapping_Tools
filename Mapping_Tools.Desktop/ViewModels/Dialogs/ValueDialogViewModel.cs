@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Services.Undo;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
@@ -10,7 +11,7 @@ using Mapping_Tools.Desktop.Validation;
 namespace Mapping_Tools.Desktop.ViewModels.Dialogs;
 
 /// <summary>Owns editable dialog text and validates its converted value through DataAnnotations.</summary>
-public sealed partial class ValueDialogViewModel : ObservableValidator
+public sealed partial class ValueDialogViewModel : LocalizedObservableValidator
 {
     private readonly Action<object?> accept;
     private readonly Action cancel;
@@ -108,7 +109,7 @@ public sealed partial class ValueDialogViewModel : ObservableValidator
         }
 
         if (converted is BindingNotification notification)
-            return new ValidationResult(notification.Error?.Message ?? "The value could not be converted.");
+            return new ValidationResult(notification.Error?.Message ?? DesktopStrings.Shell_ValueConversionFailed);
 
         var result = validate(converted);
         if (result == ValidationResult.Success) parsedValue = converted;

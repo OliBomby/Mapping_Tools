@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.QuickRun.Models;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Tools.SliderPicturator;
 
@@ -11,5 +12,7 @@ public static class SliderPicturatorToolDefinition
         "Slider Picturator",
         "Generate a slider path that reproduces an imported image.",
         ["slider", "picture", "image", "picturator", "render"],
-        QuickRunTargets.AnySelection);
+        QuickRunTargets.AnySelection,
+        static () => ApplicationStrings.SliderPicturator_Description,
+        static () => ApplicationStrings.SliderPicturator_SearchTerms);
 }

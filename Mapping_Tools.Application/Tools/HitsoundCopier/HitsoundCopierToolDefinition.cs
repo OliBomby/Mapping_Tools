@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.QuickRun.Models;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Tools.HitsoundCopier;
 
@@ -11,5 +12,7 @@ public static class HitsoundCopierToolDefinition
         "Hitsound Copier",
         "Copy hitsounds, samples, and storyboard sounds between beatmaps.",
         ["hitsound", "copy", "sample", "storyboard", "mute", "multi-map"],
-        QuickRunTargets.Always);
+        QuickRunTargets.Always,
+        static () => ApplicationStrings.HitsoundCopier_Description,
+        static () => ApplicationStrings.HitsoundCopier_SearchTerms);
 }

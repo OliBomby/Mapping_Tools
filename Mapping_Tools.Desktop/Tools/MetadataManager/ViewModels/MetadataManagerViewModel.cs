@@ -16,10 +16,13 @@ using Mapping_Tools.Core.Tools.MetadataManager;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Services.Undo;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels.Adapters;
 using Mapping_Tools.Desktop.Tools.MetadataManager.Models;
 using Mapping_Tools.Desktop.Validation;
 using Mapping_Tools.Desktop.ViewModels;
+
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Desktop.Tools.MetadataManager.ViewModels;
 
@@ -91,7 +94,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     [ObservableProperty]
     [Undoable]
     [NotifyDataErrorInfo]
-    [StringLength(81, ErrorMessage = "Artist names must be 81 characters or fewer.")]
+    [StringLength(81, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.MetadataManager_Validation_ArtistMaxLength))]
     [NotifyPropertyChangedFor(nameof(IsBeatmapFileNameOverflowVisible))]
     public partial string Artist { get; set; } = string.Empty;
 
@@ -99,7 +102,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     [ObservableProperty]
     [Undoable]
     [NotifyDataErrorInfo]
-    [StringLength(81, ErrorMessage = "Artist names must be 81 characters or fewer.")]
+    [StringLength(81, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.MetadataManager_Validation_ArtistMaxLength))]
     [AsciiOnly]
     [NotifyPropertyChangedFor(nameof(IsBeatmapFileNameOverflowVisible))]
     public partial string RomanisedArtist { get; set; } = string.Empty;
@@ -108,7 +111,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     [ObservableProperty]
     [Undoable]
     [NotifyDataErrorInfo]
-    [StringLength(81, ErrorMessage = "Titles must be 81 characters or fewer.")]
+    [StringLength(81, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.MetadataManager_Validation_TitleMaxLength))]
     [NotifyPropertyChangedFor(nameof(IsBeatmapFileNameOverflowVisible))]
     public partial string Title { get; set; } = string.Empty;
 
@@ -116,7 +119,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     [ObservableProperty]
     [Undoable]
     [NotifyDataErrorInfo]
-    [StringLength(81, ErrorMessage = "Titles must be 81 characters or fewer.")]
+    [StringLength(81, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.MetadataManager_Validation_TitleMaxLength))]
     [AsciiOnly]
     [NotifyPropertyChangedFor(nameof(IsBeatmapFileNameOverflowVisible))]
     public partial string RomanisedTitle { get; set; } = string.Empty;
@@ -125,7 +128,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     [ObservableProperty]
     [Undoable]
     [NotifyDataErrorInfo]
-    [StringLength(81, ErrorMessage = "Mapper names must be 81 characters or fewer.")]
+    [StringLength(81, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.MetadataManager_Validation_CreatorMaxLength))]
     [NotifyPropertyChangedFor(nameof(IsBeatmapFileNameOverflowVisible))]
     public partial string BeatmapCreator { get; set; } = string.Empty;
 
@@ -133,14 +136,14 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     [ObservableProperty]
     [Undoable]
     [NotifyDataErrorInfo]
-    [StringLength(81, ErrorMessage = "Source text must be 81 characters or fewer.")]
+    [StringLength(81, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.MetadataManager_Validation_SourceMaxLength))]
     public partial string Source { get; set; } = string.Empty;
 
     /// <summary>Gets or sets the space-separated beatmap tags.</summary>
     [ObservableProperty]
     [Undoable]
     [NotifyDataErrorInfo]
-    [StringLength(1000, ErrorMessage = "Tags must be 1000 characters or fewer.")]
+    [StringLength(1000, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.MetadataManager_Validation_TagsMaxLength))]
     [NotifyPropertyChangedFor(nameof(IsTagsOverflowVisible))]
     public partial string Tags { get; set; } = string.Empty;
 
@@ -180,7 +183,9 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
             int count = string.IsNullOrEmpty(ExportPath)
                 ? 0
                 : ExportPath.Split('|').Length;
-            return count == 1 ? "(1) map total" : $"({count}) maps total";
+            return count == 1
+                ? DesktopStrings.Common_MapCountOne
+                : ApplicationText.Format(DesktopStrings.Common_MapCountMany, count);
         }
     }
 
@@ -208,7 +213,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     private async Task BrowseImportAsync()
     {
         await PickBeatmapsAsync(
-            "Import metadata from",
+            DesktopStrings.MetadataManager_ImportMetadataFrom,
             workspace.GetBeatmapPickerStartLocation(Path.GetDirectoryName(ImportPath)),
             false,
             paths => ImportPath = paths[0]);
@@ -254,8 +259,8 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         catch (Exception exception)
         {
             await PublishFailureAsync(
-                "Metadata could not be imported",
-                "The selected beatmap could not be read.",
+                DesktopStrings.MetadataManager_ImportFailureTitle,
+                DesktopStrings.MetadataManager_ImportFailureMessage,
                 exception);
         }
     }
@@ -264,7 +269,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     private async Task BrowseExportAsync()
     {
         await PickBeatmapsAsync(
-            "Export metadata to",
+            DesktopStrings.MetadataManager_ExportMetadataTo,
             GetExportPickerStartLocation(),
             true,
             paths => ExportPath = string.Join('|', paths));
@@ -323,14 +328,16 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
                 Tool.DisplayName,
                 async context =>
                 {
-                    context.ReportProgress(0, "Preparing metadata export");
+                    context.ReportProgress(0, DesktopStrings.MetadataManager_PreparingExport);
                     var result = await metadataManager.ExportAsync(
                         options,
-                        new Progress<double>(value => context.ReportProgress(value, "Exporting metadata")),
+                        new Progress<double>(value => context.ReportProgress(value, DesktopStrings.MetadataManager_Exporting)),
                         context.CancellationToken);
                     return new ToolExecutionOutput<MetadataManagerResult>(
                         result,
-                        $"Successfully exported metadata to {result.ProcessedCount} beatmap(s)!");
+                        result.ProcessedCount == 1
+                            ? ApplicationText.Format(DesktopStrings.MetadataManager_ExportResultOne, result.ProcessedCount)
+                            : ApplicationText.Format(DesktopStrings.MetadataManager_ExportResultMany, result.ProcessedCount));
                 }),
             CreateProgress());
     }
@@ -423,8 +430,8 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         catch (Exception exception)
         {
             await PublishFailureAsync(
-                "Could not select beatmaps",
-                "The file picker could not return local beatmap paths.",
+                DesktopStrings.Common_SelectBeatmapsFailureTitle,
+                DesktopStrings.Common_SelectBeatmapsFailureMessage,
                 exception);
         }
     }

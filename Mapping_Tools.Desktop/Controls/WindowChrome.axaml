@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
              xmlns:converters="using:Avalonia.Data.Converters"
              xmlns:materialIcons="using:Material.Icons.Avalonia"
@@ -43,9 +44,9 @@
                 Padding="0"
                 HorizontalAlignment="Right"
                 Theme="{StaticResource MaterialFlatButton}"
-                AutomationProperties.Name="Close"
+                AutomationProperties.Name="{loc:Tr Shell_Close}"
                 Click="CloseWindow"
-                ToolTip.Tip="Close dialog.">
+                ToolTip.Tip="{loc:Tr Shell_CloseDialog}">
             <materialIcons:MaterialIcon Width="22"
                                         Height="22"
                                         Kind="WindowClose" />

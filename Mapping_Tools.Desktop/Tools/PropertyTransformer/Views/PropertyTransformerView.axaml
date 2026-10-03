@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
              xmlns:vm="using:Mapping_Tools.Desktop.Tools.PropertyTransformer.ViewModels"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
              xmlns:converters="using:Mapping_Tools.Desktop.Converters"
@@ -13,9 +14,9 @@
     </UserControl.Resources>
     <Grid RowDefinitions="Auto,*,Auto">
         <controls:ToolViewHeader
-            Title="Property Transformer"
+                    Title="{loc:Tr PropertyTransformer_Title}"
             IsQuickRunSupported="True"
-            HelpText="Multiply and add to properties of all the timingpoints, hitobjects, bookmarks and storyboarded samples of the current map.&#x0a;The new value is the old value times the multiplier plus the offset. The multiplier is the left textbox and the offset is the right textbox. The multiplier gets done first.&#x0a;Resulting values get rounded if they have to be integer." />
+                    HelpText="{loc:Tr PropertyTransformer_Help}" />
 
         <Grid Grid.Row="1" Margin="0,10,0,0" ColumnDefinitions="470,*">
             <StackPanel>
@@ -24,12 +25,12 @@
                         <Setter Property="VerticalAlignment" Value="Center" />
                     </Style>
                 </StackPanel.Styles>
-                <GroupBox Header="Timing points" Margin="0,10,0,0" MaxWidth="600"
+                <GroupBox Header="{loc:Tr PropertyTransformer_TimingPoints}" Margin="0,10,0,0" MaxWidth="600"
                           Padding="5"
                           HorizontalAlignment="Left">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Offset" MinWidth="150" />
+                            <TextBlock Text="{loc:Tr PropertyTransformer_Offset}" MinWidth="150" />
                             <TextBlock Text="x " />
                             <TextBox Classes="compact" MinWidth="120"
                                      Text="{Binding TimingpointOffsetMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
@@ -38,7 +39,7 @@
                                      Text="{Binding TimingpointOffsetOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="BPM" MinWidth="150" />
+                            <TextBlock Text="{loc:Tr PropertyTransformer_Bpm}" MinWidth="150" />
                             <TextBlock Text="x " />
                             <TextBox Classes="compact" MinWidth="120"
                                      Text="{Binding TimingpointBpmMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
@@ -47,7 +48,7 @@
                                      Text="{Binding TimingpointBpmOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Slider Velocity" MinWidth="150" />
+                            <TextBlock Text="{loc:Tr PropertyTransformer_SliderVelocity}" MinWidth="150" />
                             <TextBlock Text="x " />
                             <TextBox Classes="compact" MinWidth="120"
                                      Text="{Binding TimingpointSvMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
@@ -56,7 +57,7 @@
                                      Text="{Binding TimingpointSvOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Custom index" MinWidth="150" />
+                            <TextBlock Text="{loc:Tr PropertyTransformer_CustomIndex}" MinWidth="150" />
                             <TextBlock Text="x " />
                             <TextBox Classes="compact" MinWidth="120"
                                      Text="{Binding TimingpointIndexMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
@@ -65,7 +66,7 @@
                                      Text="{Binding TimingpointIndexOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Volume" MinWidth="150" />
+                            <TextBlock Text="{loc:Tr PropertyTransformer_Volume}" MinWidth="150" />
                             <TextBlock Text="x " />
                             <TextBox Classes="compact" MinWidth="120"
                                      Text="{Binding TimingpointVolumeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
@@ -76,11 +77,11 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="Storyboard" Margin="0,10,0,0" MaxWidth="600" HorizontalAlignment="Left"
+                <GroupBox Header="{loc:Tr PropertyTransformer_Storyboard}" Margin="0,10,0,0" MaxWidth="600" HorizontalAlignment="Left"
                           Padding="5">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Event time" MinWidth="150" />
+                            <TextBlock Text="{loc:Tr PropertyTransformer_EventTime}" MinWidth="150" />
                             <TextBlock Text="x " />
                             <TextBox Classes="compact" MinWidth="120"
                                      Text="{Binding SbEventTimeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
@@ -89,7 +90,7 @@
                                      Text="{Binding SbEventTimeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Sample time" MinWidth="150" />
+                            <TextBlock Text="{loc:Tr PropertyTransformer_SampleTime}" MinWidth="150" />
                             <TextBlock Text="x " />
                             <TextBox Classes="compact" MinWidth="120"
                                      Text="{Binding SbSampleTimeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
@@ -98,7 +99,7 @@
                                      Text="{Binding SbSampleTimeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Sample volume" MinWidth="150" />
+                            <TextBlock Text="{loc:Tr PropertyTransformer_SampleVolume}" MinWidth="150" />
                             <TextBlock Text="x " />
                             <TextBox Classes="compact" MinWidth="120"
                                      Text="{Binding SbSampleVolumeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
@@ -109,11 +110,11 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="Other" Margin="0,10,0,0" MaxWidth="600" HorizontalAlignment="Left"
+                <GroupBox Header="{loc:Tr PropertyTransformer_Other}" Margin="0,10,0,0" MaxWidth="600" HorizontalAlignment="Left"
                           Padding="5">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Hitobject time" MinWidth="150" />
+                            <TextBlock Text="{loc:Tr PropertyTransformer_HitObjectTime}" MinWidth="150" />
                             <TextBlock Text="x " />
                             <TextBox Classes="compact" MinWidth="120"
                                      Text="{Binding HitObjectTimeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
@@ -122,7 +123,7 @@
                                      Text="{Binding HitObjectTimeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Hitobject volume" MinWidth="150" />
+                            <TextBlock Text="{loc:Tr PropertyTransformer_HitObjectVolume}" MinWidth="150" />
                             <TextBlock Text="x " />
                             <TextBox Classes="compact" MinWidth="120"
                                      Text="{Binding HitObjectVolumeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
@@ -131,7 +132,7 @@
                                      Text="{Binding HitObjectVolumeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Bookmark time" MinWidth="150" />
+                            <TextBlock Text="{loc:Tr PropertyTransformer_BookmarkTime}" MinWidth="150" />
                             <TextBlock Text="x " />
                             <TextBox Classes="compact" MinWidth="120"
                                      Text="{Binding BookmarkTimeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
@@ -140,7 +141,7 @@
                                      Text="{Binding BookmarkTimeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Break time" MinWidth="150" />
+                            <TextBlock Text="{loc:Tr PropertyTransformer_BreakTime}" MinWidth="150" />
                             <TextBlock Text="x " />
                             <TextBox Classes="compact" MinWidth="120"
                                      Text="{Binding BreakTimeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
@@ -149,7 +150,7 @@
                                      Text="{Binding BreakTimeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Video time" MinWidth="150" />
+                            <TextBlock Text="{loc:Tr PropertyTransformer_VideoTime}" MinWidth="150" />
                             <TextBlock Text="x " />
                             <TextBox Classes="compact" MinWidth="120"
                                      Text="{Binding VideoTimeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
@@ -158,7 +159,7 @@
                                      Text="{Binding VideoTimeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Preview time" MinWidth="150" />
+                            <TextBlock Text="{loc:Tr PropertyTransformer_PreviewTime}" MinWidth="150" />
                             <TextBlock Text="x " />
                             <TextBox Classes="compact" MinWidth="120"
                                      Text="{Binding PreviewTimeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
@@ -171,44 +172,44 @@
 
                 <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                     <ToggleSwitch IsChecked="{Binding SyncTimeFields}" Margin="5,0,0,0"
-                                  ToolTip.Tip="Enable this to synchronize the fields of all time-related elements." />
-                    <TextBlock Text="Synchronize time fields" VerticalAlignment="Center" Margin="5,0,0,0"
-                               ToolTip.Tip="Enable this to synchronize the fields of all time-related elements." />
+                                  ToolTip.Tip="{loc:Tr PropertyTransformer_SyncTimeTip}" />
+                    <TextBlock Text="{loc:Tr PropertyTransformer_SyncTime}" VerticalAlignment="Center" Margin="5,0,0,0"
+                               ToolTip.Tip="{loc:Tr PropertyTransformer_SyncTimeTip}" />
                     <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="200,0,0,0"
                                                    Command="{Binding ResetCommand}"
-                                                   ToolTip.Tip="Reset all multipliers and offsets.">
+                                                   ToolTip.Tip="{loc:Tr PropertyTransformer_Reset}">
                         <materialIcons:MaterialIcon Kind="Rocket" Height="24" Width="24" />
                     </materialDesign:FloatingButton>
                 </StackPanel>
             </StackPanel>
 
             <StackPanel Grid.Column="1" Margin="0,10,0,0">
-                <CheckBox Content="Clip properties"
-                          ToolTip.Tip="Clips the parameters to stay within bounds. (Volume: 5-100 etc)"
+                <CheckBox Content="{loc:Tr PropertyTransformer_ClipProperties}"
+                          ToolTip.Tip="{loc:Tr PropertyTransformer_ClipPropertiesTip}"
                           IsChecked="{Binding ClipProperties}" />
-                <CheckBox Content="Enable filters"
+                <CheckBox Content="{loc:Tr PropertyTransformer_EnableFilters}"
                           IsChecked="{Binding EnableFilters}"
                           HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                          ToolTip.Tip="Enable filtering to control which objects get transformed." />
+                          ToolTip.Tip="{loc:Tr PropertyTransformer_EnableFiltersTip}" />
                 <StackPanel IsVisible="{Binding EnableFilters}">
                     <TextBox Width="259" HorizontalAlignment="Left"
-                             materialAssists:TextFieldAssist.Label="Whitelist"
+                             materialAssists:TextFieldAssist.Label="{loc:Tr PropertyTransformer_Whitelist}"
                              Text="{Binding MatchFilter, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource DoubleArrayToStringConverter}}"
-                             ToolTip.Tip="Parameters must match this value to be eligible for change." />
+                             ToolTip.Tip="{loc:Tr PropertyTransformer_WhitelistTip}" />
                     <TextBox Width="259" HorizontalAlignment="Left"
-                             materialAssists:TextFieldAssist.Label="Blacklist"
+                             materialAssists:TextFieldAssist.Label="{loc:Tr PropertyTransformer_Blacklist}"
                              Text="{Binding UnmatchFilter, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource DoubleArrayToStringConverter}}"
-                             ToolTip.Tip="Parameters must NOT match this value to be eligible for change." />
+                             ToolTip.Tip="{loc:Tr PropertyTransformer_BlacklistTip}" />
                     <StackPanel Orientation="Horizontal">
                         <TextBox MinWidth="120"
-                                 materialAssists:TextFieldAssist.Label="Start time"
+                                 materialAssists:TextFieldAssist.Label="{loc:Tr PropertyTransformer_StartTime}"
                                  Text="{Binding MinTimeFilter, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource TimeToStringConverter}, ConverterParameter=-1}"
-                                 ToolTip.Tip="Minimum time in milliseconds of the object for the parameters to be changed." />
+                                 ToolTip.Tip="{loc:Tr PropertyTransformer_StartTimeTip}" />
                         <TextBlock Text=" to " VerticalAlignment="Center" />
                         <TextBox MinWidth="120"
-                                 materialAssists:TextFieldAssist.Label="End time"
+                                 materialAssists:TextFieldAssist.Label="{loc:Tr PropertyTransformer_EndTime}"
                                  Text="{Binding MaxTimeFilter, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource TimeToStringConverter}, ConverterParameter=-1}"
-                                 ToolTip.Tip="Maximum time in milliseconds of the object for the parameters to be changed." />
+                                 ToolTip.Tip="{loc:Tr PropertyTransformer_EndTimeTip}" />
                     </StackPanel>
                 </StackPanel>
             </StackPanel>
@@ -221,7 +222,7 @@
         <Grid Grid.Row="2" ColumnDefinitions="Auto,*">
             <Grid Grid.Column="0">
                 <WrapPanel VerticalAlignment="Bottom">
-                    <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Opacity="0.58" />
+                    <TextBlock TextWrapping="NoWrap" Text="{loc:Tr PropertyTransformer_MadeBy}" FontWeight="Bold" Opacity="0.58" />
                 </WrapPanel>
             </Grid>
             <Grid Grid.Column="1">

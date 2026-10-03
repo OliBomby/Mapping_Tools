@@ -1,15 +1,15 @@
 using Mapping_Tools.Desktop.Services.Undo;
 using System.Collections.ObjectModel;
-using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject;
 using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.Models;
 
 namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 
 /// <summary>Edits a cloned preference document until Apply or Cancel is selected.</summary>
-public sealed partial class GeometryDashboardPreferencesDialogViewModel : ObservableObject
+public sealed partial class GeometryDashboardPreferencesDialogViewModel : LocalizedObservableObject
 {
     private bool keepRunning;
 

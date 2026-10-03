@@ -1,60 +1,57 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
              xmlns:vm="using:Mapping_Tools.Desktop.Tools.TimingCopier.ViewModels"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
-             xmlns:converters="using:Mapping_Tools.Desktop.Tools.TimingCopier.Converters"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:Class="Mapping_Tools.Desktop.Tools.TimingCopier.Views.TimingCopierView"
              x:DataType="vm:TimingCopierViewModel">
-    <UserControl.Resources>
-        <converters:TimingCopierResnapModeConverter x:Key="TimingCopierResnapModeConverter" />
-    </UserControl.Resources>
     <Grid RowDefinitions="*,Auto">
         <Grid>
             <StackPanel Margin="0,0,120,0">
                 <controls:ToolViewHeader
-                    Title="Timing Copier"
-                    HelpText="Copies timing from A to B.&#x0a;There are 3 modes that describe how this program will handle moving objects (hitobjects/timingpoints/bookmarks) to the new timing:&#x0a;&quot;Number of beats between objects stays the same&quot; will move the objects so that the number of beats between objects stays the same. After that it will also resnap to the specified snap divisors. Make sure everything is snapped and don't use this if your new timing is supposed to change the number of beats between objects.&#x0a;&quot;Just resnap&quot; will snap the objects to the new timing on the specified snap divisors. This doesn't resnap bookmarks.&#x0a;&quot;Don't move objects&quot; will not move the objects at all." />
+                    Title="{loc:Tr TimingCopier_Title}"
+                    HelpText="{loc:Tr TimingCopier_Help}" />
 
                 <Grid Margin="0,20,0,0" ColumnDefinitions="*,Auto,5,Auto">
                     <TextBox Margin="0,0,5,0"
-                             materialAssists:TextFieldAssist.Label="Copy timing from"
+                             materialAssists:TextFieldAssist.Label="{loc:Tr TimingCopier_ImportLabel}"
                              Text="{Binding ImportPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                             ToolTip.Tip="Path to the beatmap to copy timing from." />
+                             ToolTip.Tip="{loc:Tr TimingCopier_ImportPathTip}" />
                     <Button Grid.Column="1" Classes="flat path-picker" Cursor="Hand"
                             VerticalAlignment="Bottom"
                             Command="{Binding ImportLoadCommand}"
-                            ToolTip.Tip="Fetch the selected beatmap from your osu! client.">
+                            ToolTip.Tip="{loc:Tr MetadataManager_CurrentBeatmapTip}">
                         <materialIcons:MaterialIcon Width="30" Height="30" Kind="RestoreFromTrash" />
                     </Button>
                     <Button Grid.Column="3" Classes="flat path-picker" Cursor="Hand"
                             VerticalAlignment="Bottom"
                             Command="{Binding ImportBrowseCommand}"
-                            ToolTip.Tip="Select beatmaps with File Explorer.">
+                            ToolTip.Tip="{loc:Tr MetadataManager_BrowseTip}">
                         <materialIcons:MaterialIcon Width="30" Height="30" Kind="Folder" />
                     </Button>
                 </Grid>
 
                 <Grid Margin="0,10,0,0" ColumnDefinitions="*,Auto,Auto,5,Auto">
                     <TextBox Margin="0,0,5,0"
-                             materialAssists:TextFieldAssist.Label="Copy timing to"
+                             materialAssists:TextFieldAssist.Label="{loc:Tr TimingCopier_ExportLabel}"
                              Text="{Binding ExportPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                             ToolTip.Tip="Beatmap(s) to copy timing to. You can input multiple beatmap paths seperated with '|' character." />
+                             ToolTip.Tip="{loc:Tr TimingCopier_ExportPathTip}" />
                     <TextBlock Grid.Column="1" Margin="3,15,2,0" Padding="0,0,3,0"
                                FontStyle="Italic"
-                               ToolTip.Tip="Multiple beatmaps can be inputted in this field. Separate the paths with the '|' character."
+                               ToolTip.Tip="{loc:Tr TimingCopier_ExportPathsTip}"
                                Text="{Binding ExportMapCountText}" />
                     <Button Grid.Column="2" Classes="flat path-picker" Cursor="Hand"
                             VerticalAlignment="Bottom"
                             Command="{Binding ExportLoadCommand}"
-                            ToolTip.Tip="Fetch the selected beatmap from your osu! client.">
+                            ToolTip.Tip="{loc:Tr MetadataManager_CurrentBeatmapTip}">
                         <materialIcons:MaterialIcon Width="30" Height="30" Kind="RestoreFromTrash" />
                     </Button>
                     <Button Grid.Column="4" Classes="flat path-picker" Cursor="Hand"
                             VerticalAlignment="Bottom"
                             Command="{Binding ExportBrowseCommand}"
-                            ToolTip.Tip="Select beatmaps with File Explorer.">
+                            ToolTip.Tip="{loc:Tr MetadataManager_BrowseTip}">
                         <materialIcons:MaterialIcon Width="30" Height="30" Kind="Folder" />
                     </Button>
                 </Grid>
@@ -62,21 +59,21 @@
                 <ComboBox Margin="0,20,0,0" Cursor="Hand"
                           ItemsSource="{Binding ResnapModes}"
                           SelectedItem="{Binding ResnapMode, Mode=TwoWay}"
-                          materialAssists:ComboBoxAssist.Label="Resnapping mode"
-                          ToolTip.Tip="Choose how to move hit objects to the new timing.">
+                          materialAssists:ComboBoxAssist.Label="{loc:Tr TimingCopier_ModeLabel}"
+                          ToolTip.Tip="{loc:Tr TimingCopier_ModeTip}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Converter={StaticResource TimingCopierResnapModeConverter}}" />
+                            <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
 
                 <TextBlock Margin="0,20,0,0" FontSize="14" FontWeight="Bold"
-                           Text="Signatures" ToolTip.Tip="Beat snap divisors for resnapping." />
+                           Text="{loc:Tr Common_Signatures}" ToolTip.Tip="{loc:Tr Common_SignaturesTip}" />
                 <TextBox HorizontalAlignment="Left" MinWidth="100" FontSize="14" Cursor="Hand"
-                         materialAssists:TextFieldAssist.Label="Beat divisors"
+                         materialAssists:TextFieldAssist.Label="{loc:Tr Common_BeatDivisorsLabel}"
                          Text="{Binding BeatDivisors, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource BeatDivisorArrayToStringConverter}}"
-                         ToolTip.Tip="Input any number of beat divisors here separated with commas. Example: 1/4, 1/12, 1/7, 4/5, 0.13435622499" />
+                         ToolTip.Tip="{loc:Tr Common_BeatDivisorsTip}" />
             </StackPanel>
 
             <controls:ToolRunButton Margin="10"
@@ -89,7 +86,7 @@
             <Grid Grid.Column="0">
                 <WrapPanel VerticalAlignment="Bottom">
                     <TextBlock TextWrapping="NoWrap" FontWeight="Bold" Opacity="0.58"
-                               Text="Made by OliBomby" />
+                               Text="{loc:Tr TimingCopier_MadeBy}" />
                 </WrapPanel>
             </Grid>
             <Grid Grid.Column="1">

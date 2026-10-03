@@ -1,3 +1,5 @@
+using Mapping_Tools.Desktop.Localization;
+using Mapping_Tools.Application.Localization;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Projects.Contracts;
@@ -94,7 +96,7 @@ public sealed class ProjectAutosaveCoordinator
     {
         return RunAsync(
             () => SaveProjectAsync(feature, cancellationToken),
-            "Save project", feature);
+            DesktopStrings.Shell_SaveProject, feature);
     }
 
     /// <summary>
@@ -109,7 +111,7 @@ public sealed class ProjectAutosaveCoordinator
     {
         return RunAsync(
             () => OpenProjectAsync(feature, cancellationToken),
-            "Open project", feature);
+            DesktopStrings.Shell_OpenProject, feature);
     }
 
     /// <summary>
@@ -124,7 +126,7 @@ public sealed class ProjectAutosaveCoordinator
     {
         return RunAsync(
             () => NewProjectAsync(feature, cancellationToken),
-            "New project", feature);
+            DesktopStrings.Shell_NewProject, feature);
     }
 
     private async Task LoadAutosaveAsync(IShellProjectFeature feature)
@@ -147,7 +149,7 @@ public sealed class ProjectAutosaveCoordinator
         catch (Exception exception)
         {
             logger.LogError(exception, "Recovery project load failed for {Feature}", feature.GetType().Name);
-            await PublishFailureAsync("Project could not be loaded", exception);
+            await PublishFailureAsync(DesktopStrings.Shell_ProjectLoadFailed, exception);
         }
 
         if (serializer is not null)
@@ -169,7 +171,7 @@ public sealed class ProjectAutosaveCoordinator
         catch (Exception exception)
         {
             logger.LogError(exception, "Recovery project save failed for {Feature}", feature.GetType().Name);
-            await PublishFailureAsync("Project could not be saved", exception);
+            await PublishFailureAsync(DesktopStrings.Shell_ProjectSaveFailed, exception);
         }
     }
 
@@ -199,11 +201,11 @@ public sealed class ProjectAutosaveCoordinator
     {
         bool confirmed = await dialogs.ShowMessageAsync(
             new MessageDialogRequest<bool>(
-                "Confirm new project",
-                "Are you sure you want to start a new project? All unsaved progress will be lost.",
+                DesktopStrings.Shell_ConfirmNewProject,
+                DesktopStrings.Shell_ConfirmNewProjectMessage,
                 [
-                    new DialogChoice<bool>("Yes", true, true),
-                    new DialogChoice<bool>("No", false, IsCancel: true),
+                    new DialogChoice<bool>(DesktopStrings.Shell_Yes, true, true),
+                    new DialogChoice<bool>(DesktopStrings.Shell_No, false, IsCancel: true),
                 ],
                 false),
             cancellationToken);
@@ -245,7 +247,7 @@ public sealed class ProjectAutosaveCoordinator
         return notifications.PublishAsync(new UserNotification(
             UserNotificationSeverity.Error,
             title,
-            exception.Message,
+            ApplicationExceptionText.GetSummary(exception),
             exception));
     }
 

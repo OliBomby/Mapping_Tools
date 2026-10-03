@@ -11,11 +11,14 @@ using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.RhythmGuide.Models;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.Services;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.Models;
 using Mapping_Tools.Desktop.ViewModels;
+
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Desktop.Tools.RhythmGuide.ViewModels;
 
@@ -78,6 +81,7 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
     [ObservableProperty]
     [Undoable]
     [NotifyPropertyChangedFor(nameof(SourceCount))]
+    [NotifyPropertyChangedFor(nameof(SourceCountText))]
     public partial string[] SourcePaths { get; set; } = [];
 
     /// <summary>Gets or sets the destination beatmap path.</summary>
@@ -125,6 +129,18 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
     /// <summary>Gets the number of non-empty source beatmap paths.</summary>
     public int SourceCount => SourcePaths.Length;
 
+    /// <summary>Gets the localized total number of source beatmaps.</summary>
+    public string SourceCountText => SourceCount == 1
+        ? ApplicationText.Format(DesktopStrings.RhythmGuide_SourceCountOne, SourceCount)
+        : ApplicationText.Format(DesktopStrings.RhythmGuide_SourceCountMany, SourceCount);
+
+    /// <summary>Refreshes computed labels when the display language changes.</summary>
+    protected override void RefreshLocalizedProperties()
+    {
+        base.RefreshLocalizedProperties();
+        OnPropertyChanged(nameof(SourceCountText));
+    }
+
     ProjectDefinition<RhythmGuideProject> IShellProjectFeature<RhythmGuideProject>.ProjectDefinition => definition;
 
     RhythmGuideProject IShellProjectFeature<RhythmGuideProject>.Snapshot()
@@ -143,7 +159,7 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
         var paths = await filePicker.PickOpenFilesAsync(
             new OpenFilePickerRequest
             {
-                Title = "Copy rhythm from",
+                Title = DesktopStrings.RhythmGuide_CopyRhythmFrom,
                 SuggestedStartLocation = workspace.GetBeatmapPickerStartLocation(
                     Path.GetDirectoryName(SourcePaths.FirstOrDefault())),
                 AllowMultiple = true,
@@ -168,7 +184,7 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
         var paths = await filePicker.PickOpenFilesAsync(
             new OpenFilePickerRequest
             {
-                Title = "Copy rhythm to",
+                Title = DesktopStrings.RhythmGuide_CopyRhythmTo,
                 SuggestedStartLocation = workspace.GetBeatmapPickerStartLocation(
                     Path.GetDirectoryName(ExportPath)),
                 AllowMultiple = false,
@@ -197,14 +213,14 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
                 Tool.DisplayName,
                 async context =>
                 {
-                    context.ReportProgress(0.1, "Loading beatmaps");
+                    context.ReportProgress(0.1, DesktopStrings.RhythmGuide_Loading);
                     var generated = await rhythmGuide.GenerateAsync(
                         options,
                         context.CancellationToken);
-                    context.ReportProgress(1, "Complete");
+                    context.ReportProgress(1, DesktopStrings.RhythmGuide_Complete);
                     return new ToolExecutionOutput<RhythmGuideResult>(
                         generated,
-                        "Done!");
+                        DesktopStrings.Common_Done);
                 }),
             CreateProgress());
         if (result is { Status: ToolExecutionStatus.Succeeded, Value: { } exported })

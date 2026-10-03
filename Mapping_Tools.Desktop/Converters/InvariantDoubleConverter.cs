@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Localization;
 using System.Globalization;
 using Avalonia.Data.Converters;
 using Mapping_Tools.Core.MathUtil;
@@ -45,7 +46,7 @@ public sealed class InvariantDoubleConverter : IValueConverter
                 && TypeConverters.TryParseDouble(parameter.ToString()!, out double fallback))
                 return fallback;
 
-            throw new FormatException("Enter a valid number or arithmetic expression.");
+            throw new FormatException(DesktopStrings.Shell_EnterAValidNumberOrArithmeticExpression);
         });
     }
 }

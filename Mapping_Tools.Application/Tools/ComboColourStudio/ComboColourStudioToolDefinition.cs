@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.QuickRun.Models;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Tools.ComboColourStudio;
 
@@ -11,5 +12,7 @@ public static class ComboColourStudioToolDefinition
         "Combo Colour Studio",
         "Customize combo-colour sequences, bursts, and colour haxing.",
         ["combo", "colour", "color", "hax", "palette", "burst"],
-        QuickRunTargets.Always);
+        QuickRunTargets.Always,
+        static () => ApplicationStrings.ComboColourStudio_Description,
+        static () => ApplicationStrings.ComboColourStudio_SearchTerms);
 }

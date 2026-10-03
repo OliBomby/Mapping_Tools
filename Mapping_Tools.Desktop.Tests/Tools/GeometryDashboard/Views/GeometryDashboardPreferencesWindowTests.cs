@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia;
 using Avalonia.VisualTree;
+using Mapping_Tools.Application.Localization;
 using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 using Mapping_Tools.Desktop.Tests.TestHelpers;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
@@ -10,8 +11,35 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Mapping_Tools.Desktop.Tests.Tools.GeometryDashboard.Views;
 
 [TestClass]
+[DoNotParallelize]
 public sealed class GeometryDashboardPreferencesWindowTests
 {
+    [TestMethod]
+    public void Show_DutchPreferenceLabel_DisplaysTextWithoutClipping()
+    {
+        // Arrange
+        string? previousLanguage = TranslationManager.Language;
+        TranslationManager.SetLanguage("nl");
+        GeometryDashboardPreferencesDialogViewModel viewModel = new(new GeometryDashboardPreferences(), false);
+        GeometryDashboardPreferencesWindow window = new() { DataContext = viewModel };
+
+        try
+        {
+            using HeadlessViewHost host = HeadlessViewHost.ShowWindow(window);
+            TextBlock label = window.GetVisualDescendants().OfType<TextBlock>()
+                .Single(block => block.Text == "Bruikbaarheidstoets");
+            // Act
+            double textWidth = label.TextLayout.TextLines.Max(line => line.WidthIncludingTrailingWhitespace);
+
+            // Assert
+            label.Bounds.Width.Should().BeGreaterThanOrEqualTo(textWidth);
+        }
+        finally
+        {
+            TranslationManager.SetLanguage(previousLanguage);
+        }
+    }
+
     [TestMethod]
     public void UpdatingModeRadioButton_Click_SetsHotkeyDownPreference()
     {

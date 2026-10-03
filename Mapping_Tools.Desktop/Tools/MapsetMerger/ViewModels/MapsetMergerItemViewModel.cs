@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Application.Platform.FilePicker;
 
 namespace Mapping_Tools.Desktop.Tools.MapsetMerger.ViewModels;
@@ -38,7 +39,7 @@ public sealed partial class MapsetMergerItemViewModel : ObservableObject
     {
         var paths = await filePicker.PickFoldersAsync(new OpenFolderPickerRequest
         {
-            Title = "Select mapset",
+            Title = DesktopStrings.MapsetMerger_SelectMapset,
             AllowMultiple = false,
         });
         string? path = paths.FirstOrDefault();

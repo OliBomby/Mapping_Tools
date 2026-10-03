@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Desktop.Services.Dialogs;
+using Mapping_Tools.Desktop.Localization;
 
 namespace Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels;
 
@@ -75,7 +76,7 @@ public sealed partial class ComboColourStudioImportDialogViewModel : ObservableO
     {
         var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
-            Title = "Select beatmap to import",
+            Title = DesktopStrings.ComboColourStudio_SelectBeatmapToImport,
             SuggestedStartLocation = workspace.GetBeatmapPickerStartLocation(
                 System.IO.Path.GetDirectoryName(Path)),
             AllowMultiple = false,

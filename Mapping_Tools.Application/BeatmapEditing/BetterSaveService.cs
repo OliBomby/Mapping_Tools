@@ -2,6 +2,7 @@ using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
+using Mapping_Tools.Application.Localization;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -60,7 +61,7 @@ public sealed class BetterSaveService : IBetterSaveService
                 await PublishAsync(
                     UserNotificationSeverity.Warning,
                     "BetterSave",
-                    "BetterSave could not determine the beatmap open in osu!.");
+                    ApplicationStrings.BetterSave_EditorUnavailable);
                 return new BetterSaveResult(BetterSaveStatus.NoCurrentBeatmap);
             }
 
@@ -78,7 +79,7 @@ public sealed class BetterSaveService : IBetterSaveService
             await PublishAsync(
                 UserNotificationSeverity.Success,
                 "BetterSave",
-                "The current beatmap was saved successfully.");
+                ApplicationStrings.BetterSave_Saved);
             logger.LogInformation("BetterSave completed for {Path}", path);
             return new BetterSaveResult(BetterSaveStatus.Saved, path);
         }
@@ -93,7 +94,7 @@ public sealed class BetterSaveService : IBetterSaveService
             await PublishAsync(
                 UserNotificationSeverity.Error,
                 "BetterSave",
-                exception.Message,
+                ApplicationExceptionText.GetSummary(exception, ApplicationStrings.BetterSave_Failed),
                 exception);
             return new BetterSaveResult(BetterSaveStatus.Failed, path, exception);
         }

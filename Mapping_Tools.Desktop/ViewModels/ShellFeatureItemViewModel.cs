@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Localization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Desktop.Shell;
@@ -7,8 +8,9 @@ namespace Mapping_Tools.Desktop.ViewModels;
 /// <summary>
 ///     Presents one explicit feature registration in shell navigation.
 /// </summary>
-public sealed partial class ShellFeatureItemViewModel : ObservableObject
+public sealed partial class ShellFeatureItemViewModel : LocalizedObservableObject
 {
+    private readonly ShellFeatureRegistration registration;
     private readonly Action<ShellFeatureItemViewModel> activate;
     private readonly Action<ShellFeatureItemViewModel> toggleFavorite;
 
@@ -19,15 +21,10 @@ public sealed partial class ShellFeatureItemViewModel : ObservableObject
         Action<ShellFeatureItemViewModel> toggleFavorite)
     {
         Id = registration.Id;
-        DisplayName = registration.DisplayName;
+        this.registration = registration;
         Category = registration.Category;
-        Description = registration.Description;
         this.activate = activate;
         this.toggleFavorite = toggleFavorite;
-        SearchableText = string.Join(
-            ' ',
-            new[] { registration.DisplayName, registration.Category, registration.Description }
-                .Concat(registration.SearchTerms));
         IsFavorite = isFavorite;
     }
 
@@ -35,13 +32,13 @@ public sealed partial class ShellFeatureItemViewModel : ObservableObject
     public string Id { get; }
 
     /// <summary>Gets the navigation label.</summary>
-    public string DisplayName { get; }
+    public string DisplayName => registration.DisplayName;
 
     /// <summary>Gets the navigation category.</summary>
     public string Category { get; }
 
     /// <summary>Gets the feature summary.</summary>
-    public string Description { get; }
+    public string Description => registration.Description;
 
     /// <summary>Gets whether this feature is pinned ahead of ordinary items.</summary>
     [ObservableProperty]
@@ -53,7 +50,7 @@ public sealed partial class ShellFeatureItemViewModel : ObservableObject
     public string FavoriteGlyph => IsFavorite ? "★" : "☆";
 
     /// <summary>Gets the context-menu action for the current favorite state.</summary>
-    public string FavoriteActionLabel => IsFavorite ? "Unfavorite" : "Favorite";
+    public string FavoriteActionLabel => IsFavorite ? DesktopStrings.Shell_Unfavorite : DesktopStrings.Shell_Favorite;
 
     /// <summary>Gets whether this feature currently occupies the shell content area.</summary>
     [ObservableProperty]
@@ -64,7 +61,8 @@ public sealed partial class ShellFeatureItemViewModel : ObservableObject
         ? 37
         : 41;
 
-    internal string SearchableText { get; }
+    internal string SearchableText => string.Join(' ',
+        new[] { registration.DisplayName, registration.Category, registration.Description }.Concat(registration.SearchTerms));
 
     [RelayCommand]
     private void Activate()

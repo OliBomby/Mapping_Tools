@@ -41,6 +41,7 @@
 
         <Style Selector="^ /template/ TextBlock#PART_LabelText">
             <Setter Property="Foreground" Value="{DynamicResource MaterialBodyLightBrush}" />
+            <Setter Property="ClipToBounds" Value="False" />
         </Style>
         <Style Selector="^:focus-within /template/ TextBlock#PART_LabelText">
             <Setter Property="Foreground" Value="{DynamicResource MaterialPrimaryMidBrush}" />

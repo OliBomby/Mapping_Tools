@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Localization;
 using System.Globalization;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
@@ -19,13 +20,13 @@ public sealed class GraphStateTextConverter : IValueConverter
     {
         if (value is not string text)
             return new BindingNotification(
-                new FormatException("A graph value must be text."),
+                new FormatException(DesktopStrings.Shell_AGraphValueMustBeText),
                 BindingErrorType.DataValidationError);
 
         return GraphStateTextCodec.TryParse(text, out var state)
             ? state
             : new BindingNotification(
-                new FormatException("Enter a number or at least two graph anchors."),
+                new FormatException(DesktopStrings.Shell_EnterANumberOrAtLeastTwoGraphAnchors),
                 BindingErrorType.DataValidationError);
     }
 }

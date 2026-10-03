@@ -1,6 +1,7 @@
 using Mapping_Tools.Desktop.Services.Undo;
 using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Mapping_Tools.Desktop.Localization;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.Workspace.Contracts;
@@ -10,7 +11,7 @@ using Mapping_Tools.Desktop.Tools.PatternGallery.Models;
 namespace Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels;
 
 /// <summary>Owns the pattern-file import dialog state and picker actions.</summary>
-public sealed partial class PatternGalleryFileImportViewModel : ObservableValidator
+public sealed partial class PatternGalleryFileImportViewModel : LocalizedObservableValidator
 {
     private readonly ICurrentBeatmapDialogService currentBeatmapService;
     private readonly IFilePicker filePicker;
@@ -44,14 +45,14 @@ public sealed partial class PatternGalleryFileImportViewModel : ObservableValida
     /// <summary>Gets or sets the pattern display name.</summary>
     [ObservableProperty]
     [NotifyDataErrorInfo]
-    [Required(ErrorMessage = "A pattern name is required.")]
+    [Required(ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.PatternGallery_Validation_PatternNameRequired))]
     [Undoable]
     public partial string Name { get; set; }
 
     /// <summary>Gets or sets the source pattern file path.</summary>
     [ObservableProperty]
     [NotifyDataErrorInfo]
-    [Required(ErrorMessage = "A pattern file path is required.")]
+    [Required(ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.PatternGallery_Validation_PatternFileRequired))]
     [Undoable]
     public partial string FilePath { get; set; }
 
@@ -103,7 +104,7 @@ public sealed partial class PatternGalleryFileImportViewModel : ObservableValida
     {
         var selected = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
-            Title = "Import pattern file",
+            Title = DesktopStrings.PatternGallery_ImportPatternFileTitle,
             SuggestedStartLocation = workspace.GetBeatmapPickerStartLocation(
                 Path.GetDirectoryName(FilePath)),
             AllowMultiple = false,

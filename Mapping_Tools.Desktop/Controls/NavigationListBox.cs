@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Data;
 using Mapping_Tools.Desktop.ViewModels;
 using Material.Icons;
 using Material.Icons.Avalonia;
@@ -97,7 +98,7 @@ internal sealed class NavigationListBoxItem : ListBoxItem
                 {
                     new MenuItem
                     {
-                        Header = item.IsFavorite ? "Unfavorite" : "Favorite",
+                        [!HeaderedSelectingItemsControl.HeaderProperty] = new Binding(nameof(ShellFeatureItemViewModel.FavoriteActionLabel)) { Source = item },
                         Command = item.ToggleFavoriteCommand,
                         Icon = icon,
                     },

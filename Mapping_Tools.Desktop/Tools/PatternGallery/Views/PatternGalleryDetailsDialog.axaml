@@ -1,42 +1,43 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:patternGallery="clr-namespace:Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels"
              x:Class="Mapping_Tools.Desktop.Tools.PatternGallery.Views.PatternGalleryDetailsDialog"
              x:DataType="patternGallery:PatternGalleryDetailsViewModel">
     <Grid Margin="8" RowDefinitions="*,*">
         <StackPanel Grid.Row="0">
-            <TextBox materialAssists:TextFieldAssist.Label="Name"
+            <TextBox materialAssists:TextFieldAssist.Label="{loc:Tr PatternGallery_Name}"
                      Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                      MinWidth="100"
                      Margin="0,0,0,5"
-                     ToolTip.Tip="The name shown for this pattern." />
+                     ToolTip.Tip="{loc:Tr PatternGallery_NameTip}" />
             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                <TextBlock Width="150" Text="Creation time" />
+                <TextBlock MinWidth="150" Text="{loc:Tr PatternGallery_Created}" />
                 <TextBlock Text="{Binding CreationTimeText}" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                <TextBlock Width="150" Text="Time of last use" />
+                <TextBlock MinWidth="150" Text="{loc:Tr PatternGallery_LastUsed}" />
                 <TextBlock Text="{Binding LastUsedTimeText}" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                <TextBlock Width="150" Text="Usage count" />
+                <TextBlock MinWidth="150" Text="{loc:Tr PatternGallery_Usage}" />
                 <TextBlock Text="{Binding UseCountText}" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                <TextBlock Width="150" Text="Object count" />
+                <TextBlock MinWidth="150" Text="{loc:Tr PatternGallery_ObjectCount}" />
                 <TextBlock Text="{Binding ObjectCountText}" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                <TextBlock Width="150" Text="Duration" />
+                <TextBlock MinWidth="150" Text="{loc:Tr PatternGallery_Duration}" />
                 <TextBlock Text="{Binding DurationText}" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                <TextBlock Width="150" Text="Beat length" />
+                <TextBlock MinWidth="150" Text="{loc:Tr PatternGallery_BeatLength}" />
                 <TextBlock Text="{Binding BeatLengthText}" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                <TextBlock Width="150" Text="File name" />
+                <TextBlock MinWidth="150" Text="{loc:Tr PatternGallery_FileName}" />
                 <TextBlock Text="{Binding FileName}" TextWrapping="Wrap" />
             </StackPanel>
         </StackPanel>
@@ -46,12 +47,12 @@
                     Margin="0,16,0,0">
             <Button Classes="dialog-action primary"
                     Theme="{StaticResource MaterialFlatButton}"
-                    Content="ACCEPT"
+                         Content="{loc:Tr Common_Accept}"
                     Command="{Binding AcceptCommand}"
                     IsDefault="True" />
             <Button Classes="dialog-action primary"
                     Theme="{StaticResource MaterialFlatButton}"
-                    Content="CANCEL"
+                         Content="{loc:Tr Common_CancelUppercase}"
                     Command="{Binding CancelCommand}"
                     Margin="8,0,0,0"
                     IsCancel="True" />

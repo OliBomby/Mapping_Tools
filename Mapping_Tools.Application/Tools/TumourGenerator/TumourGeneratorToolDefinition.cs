@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.QuickRun.Models;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Tools.TumourGenerator;
 
@@ -11,5 +12,7 @@ public static class TumourGeneratorToolDefinition
         "Tumour Generator 2",
         "Generate copious amounts of tumours on sliders.",
         ["tumour", "tumor", "slider", "layers", "graph", "templates"],
-        QuickRunTargets.AnySelection);
+        QuickRunTargets.AnySelection,
+        static () => ApplicationStrings.TumourGenerator_Description,
+        static () => ApplicationStrings.TumourGenerator_SearchTerms);
 }

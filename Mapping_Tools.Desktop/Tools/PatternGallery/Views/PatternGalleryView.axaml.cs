@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Mapping_Tools.Desktop.Controls;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels;
 
 namespace Mapping_Tools.Desktop.Tools.PatternGallery.Views;
@@ -90,24 +91,24 @@ public sealed partial class PatternGalleryView : UserControl
         menu.Items.Clear();
         MenuItem deleteItem = new()
         {
-            Header = "_Delete",
+            Header = DesktopStrings.PatternGallery_DeleteMenu,
             Command = viewModel.RemoveCommand,
         };
-        ToolTip.SetTip(deleteItem, "Delete selected patterns. Hold shift to skip dialog.");
+        ToolTip.SetTip(deleteItem, DesktopStrings.PatternGallery_DeleteButtonTip);
         menu.Items.Add(deleteItem);
 
         MenuItem openItem = new()
         {
-            Header = "_Open in File Explorer",
+            Header = DesktopStrings.PatternGallery_OpenInExplorer,
             Command = viewModel.OpenExplorerSelectedCommand,
         };
-        ToolTip.SetTip(openItem, "Open the source files of the selected patterns in the File Explorer.");
+        ToolTip.SetTip(openItem, DesktopStrings.PatternGallery_OpenSourceFilesTip);
         menu.Items.Add(openItem);
         menu.Items.Add(new Separator());
-        MenuItem groupMenu = new() { Header = "_Group" };
+        MenuItem groupMenu = new() { Header = DesktopStrings.PatternGallery_GroupMenu };
         groupMenu.Items.Add(new MenuItem
         {
-            Header = "None",
+            Header = DesktopStrings.Common_None,
             Command = viewModel.AssignGroupCommand,
             CommandParameter = string.Empty,
         });
@@ -120,15 +121,15 @@ public sealed partial class PatternGalleryView : UserControl
             });
 
         groupMenu.Items.Add(new Separator());
-        groupMenu.Items.Add(new MenuItem { Header = "Type new group name...", Command = viewModel.NewGroupCommand });
-        groupMenu.Items.Add(new MenuItem { Header = "Rename group...", Command = viewModel.RenameGroupCommand });
+        groupMenu.Items.Add(new MenuItem { Header = DesktopStrings.PatternGallery_NewGroupName, Command = viewModel.NewGroupCommand });
+        groupMenu.Items.Add(new MenuItem { Header = DesktopStrings.PatternGallery_RenameGroup, Command = viewModel.RenameGroupCommand });
         menu.Items.Add(groupMenu);
         MenuItem propertiesItem = new()
         {
-            Header = "_Properties",
+            Header = DesktopStrings.PatternGallery_PropertiesMenu,
             Command = viewModel.ShowDetailsCommand,
         };
-        ToolTip.SetTip(propertiesItem, "View additional properties of the pattern.");
+        ToolTip.SetTip(propertiesItem, DesktopStrings.PatternGallery_ViewPropertiesTip);
         menu.Items.Add(propertiesItem);
     }
 }

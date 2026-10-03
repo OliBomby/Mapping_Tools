@@ -1,9 +1,9 @@
 using Avalonia.Controls.ApplicationLifetimes;
-using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
 using Mapping_Tools.Application.Tools;
+using Mapping_Tools.Desktop.Localization;
 
 namespace Mapping_Tools.Desktop.ViewModels;
 
@@ -11,7 +11,7 @@ namespace Mapping_Tools.Desktop.ViewModels;
 ///     Provides the shared command and presentation state for a tool that has one
 ///     ordinary run at a time.
 /// </summary>
-public abstract class SingleRunToolViewModel : ObservableValidator
+public abstract class SingleRunToolViewModel : LocalizedObservableValidator
 {
     private readonly object progressGate = new();
     private long runGeneration;

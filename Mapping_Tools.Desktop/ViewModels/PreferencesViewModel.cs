@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Localization;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.CompilerServices;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -14,6 +15,7 @@ using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services;
 using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Desktop.ViewModels;
 
@@ -21,7 +23,7 @@ namespace Mapping_Tools.Desktop.ViewModels;
 ///     Edits the process-lifetime settings document and applies live-only side
 ///     effects without exposing Avalonia controls or storage-provider objects.
 /// </summary>
-public sealed partial class PreferencesViewModel : ObservableValidator, IShellFeatureActivation, IShellUndoFeature, IDisposable
+public sealed partial class PreferencesViewModel : LocalizedObservableValidator, IShellFeatureActivation, IShellUndoFeature, IDisposable
 {
     private const string current_tool = "<Current Tool>";
     private readonly IBetterSaveOverrideService betterSaveOverride;
@@ -67,6 +69,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
         PeriodicBackupInterval = settings.PeriodicBackupInterval;
         RefreshQuickRunTools();
         UndoHistory = new DialogUndoHistory(this, () => { });
+        TranslationManager.LanguageChanged += OnLanguageChanged;
     }
 
     /// <summary>Gets the Preferences edit history retained for this app session.</summary>
@@ -77,13 +80,41 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
     /// <inheritdoc />
     public void Dispose()
     {
+        TranslationManager.LanguageChanged -= OnLanguageChanged;
         UndoHistory.Dispose();
+    }
+
+    /// <summary>Gets supported text languages in their native spelling, preceded by the system default.</summary>
+    public IReadOnlyList<LanguageOption> Languages { get; } =
+    [
+        new(null, string.Empty),
+        new("en", "English"),
+        new("nl", "Nederlands"),
+    ];
+
+    /// <summary>Gets or sets the live interface language without changing date, number or expression syntax.</summary>
+    public LanguageOption SelectedLanguage
+    {
+        get => settings.Language is null
+            ? Languages[0]
+            : Languages.FirstOrDefault(option => string.Equals(option.Code, settings.Language.Split('-')[0], StringComparison.OrdinalIgnoreCase)) ?? Languages[1];
+        set
+        {
+            if (SetProperty(settings.Language, value.Code, settings, static (document, code) => document.Language = code, false))
+                TranslationManager.SetLanguage(value.Code);
+        }
+    }
+
+    private void OnLanguageChanged(object? sender, EventArgs eventArgs)
+    {
+        foreach (var language in Languages) language.Refresh();
+        OnPropertyChanged(nameof(SelectedLanguage));
     }
 
     /// <summary>Gets or edits the directory that receives beatmap backups.</summary>
     [ObservableProperty]
     [NotifyDataErrorInfo]
-    [Required(ErrorMessage = "Select a path.")]
+    [Required(ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.Shell_SelectAPath))]
     [Undoable]
     public partial string BackupsPath { get; set; }
 
@@ -95,14 +126,14 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
     /// <summary>Gets or edits the current user's osu! configuration file.</summary>
     [ObservableProperty]
     [NotifyDataErrorInfo]
-    [Required(ErrorMessage = "Select a path.")]
+    [Required(ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.Shell_SelectAPath))]
     [Undoable]
     public partial string OsuConfigPath { get; set; }
 
     /// <summary>Gets or edits the directory containing the osu! executable.</summary>
     [ObservableProperty]
     [NotifyDataErrorInfo]
-    [Required(ErrorMessage = "Select a path.")]
+    [Required(ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.Shell_SelectAPath))]
     [Undoable]
     public partial string OsuPath { get; set; }
 
@@ -114,7 +145,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
     /// <summary>Gets or edits osu!'s beatmap-library directory.</summary>
     [ObservableProperty]
     [NotifyDataErrorInfo]
-    [Required(ErrorMessage = "Select a path.")]
+    [Required(ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.Shell_SelectAPath))]
     [Undoable]
     public partial string SongsPath { get; set; }
 
@@ -420,19 +451,19 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
     [RelayCommand]
     private Task BrowseOsuPathAsync()
     {
-        return PickFolderAsync("Select the osu! folder", OsuPath, path => OsuPath = path);
+        return PickFolderAsync(DesktopStrings.Shell_SelectTheOsuFolder, OsuPath, path => OsuPath = path);
     }
 
     [RelayCommand]
     private Task BrowseSongsPathAsync()
     {
-        return PickFolderAsync("Select the osu! Songs folder", SongsPath, path => SongsPath = path);
+        return PickFolderAsync(DesktopStrings.Shell_SelectTheOsuSongsFolder, SongsPath, path => SongsPath = path);
     }
 
     [RelayCommand]
     private Task BrowseBackupsPathAsync()
     {
-        return PickFolderAsync("Select the Mapping Tools backups folder", BackupsPath, path => BackupsPath = path);
+        return PickFolderAsync(DesktopStrings.Shell_SelectTheMappingToolsBackupsFolder, BackupsPath, path => BackupsPath = path);
     }
 
     private void ApplyValidatedValue<T>(
@@ -466,8 +497,8 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
         catch (Exception exception)
         {
             await PublishFailureAsync(
-                "Could not select folder",
-                "The folder picker could not return a local path.",
+                DesktopStrings.Shell_FolderPickerFailed,
+                DesktopStrings.Shell_FolderPickerFailedMessage,
                 exception).ConfigureAwait(false);
         }
     }
@@ -480,7 +511,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
             var paths = await filePicker.PickOpenFilesAsync(
                 new OpenFilePickerRequest
                 {
-                    Title = "Select the osu! user configuration file",
+                    Title = DesktopStrings.Shell_SelectTheOsuUserConfigurationFile,
                     SuggestedStartLocation = OsuPath,
                     AllowMultiple = false,
                     Filters = [CommonFilePickerFilters.OsuConfiguration],
@@ -493,8 +524,8 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
         catch (Exception exception)
         {
             await PublishFailureAsync(
-                "Could not select configuration",
-                "The file picker could not return a local osu! configuration path.",
+                DesktopStrings.Shell_ConfigPickerFailed,
+                DesktopStrings.Shell_ConfigPickerFailedMessage,
                 exception).ConfigureAwait(false);
         }
     }

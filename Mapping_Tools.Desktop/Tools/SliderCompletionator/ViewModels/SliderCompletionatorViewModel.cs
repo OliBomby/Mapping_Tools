@@ -10,8 +10,11 @@ using Mapping_Tools.Core.Tools.SliderCompletionator.Models;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Services.Undo;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Tools.SliderCompletionator.Models;
 using Mapping_Tools.Desktop.ViewModels;
+
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Desktop.Tools.SliderCompletionator.ViewModels;
 
@@ -84,28 +87,28 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
     [ObservableProperty]
     [Undoable]
     [NotifyDataErrorInfo]
-    [Range(double.MinValue, double.MaxValue, ErrorMessage = "Enter a finite duration.")]
+    [Range(double.MinValue, double.MaxValue, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.SliderCompletionator_Validation_FiniteDuration))]
     public partial double Duration { get; set; } = -1;
 
     /// <summary>Gets or sets the requested end time in milliseconds, or <c>-1</c> to preserve it.</summary>
     [ObservableProperty]
     [Undoable]
     [NotifyDataErrorInfo]
-    [Range(double.MinValue, double.MaxValue, ErrorMessage = "Enter a finite end time.")]
+    [Range(double.MinValue, double.MaxValue, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.SliderCompletionator_Validation_FiniteEndTime))]
     public partial double EndTime { get; set; } = -1;
 
     /// <summary>Gets or sets the requested complete-path fraction, or <c>-1</c> to preserve it.</summary>
     [ObservableProperty]
     [Undoable]
     [NotifyDataErrorInfo]
-    [Range(double.MinValue, double.MaxValue, ErrorMessage = "Enter a finite length.")]
+    [Range(double.MinValue, double.MaxValue, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.SliderCompletionator_Validation_FiniteLength))]
     public partial double Length { get; set; } = 1;
 
     /// <summary>Gets or sets the requested slider velocity multiplier, or <c>-1</c> to preserve it.</summary>
     [ObservableProperty]
     [Undoable]
     [NotifyDataErrorInfo]
-    [Range(double.MinValue, double.MaxValue, ErrorMessage = "Enter a finite velocity.")]
+    [Range(double.MinValue, double.MaxValue, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.SliderCompletionator_Validation_FiniteVelocity))]
     public partial double SliderVelocity { get; set; } = -1;
 
     /// <summary>Gets or sets whether anchors are moved to the new slider length.</summary>
@@ -213,9 +216,11 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
                             quick,
                             new Progress<double>(value => context.ReportProgress(
                                 value,
-                                "Completing sliders")),
+                                DesktopStrings.SliderCompletionator_Progress)),
                             context.CancellationToken);
-                        string message = $"Successfully completed {result.SlidersCompleted} " + $"{(result.SlidersCompleted == 1 ? "slider" : "sliders")}!";
+                        string message = result.SlidersCompleted == 1
+                            ? ApplicationText.Format(DesktopStrings.SliderCompletionator_ResultOne, result.SlidersCompleted)
+                            : ApplicationText.Format(DesktopStrings.SliderCompletionator_ResultMany, result.SlidersCompleted);
                         return new ToolExecutionOutput<SliderCompletionatorResult>(
                             result,
                             message);

@@ -1,29 +1,35 @@
-using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators;
+using Mapping_Tools.Desktop.Localization;
 
 namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 
 /// <summary>Wraps one Core generator for compiled Avalonia bindings.</summary>
-public sealed partial class GeometryDashboardGeneratorViewModel : ObservableObject
+public sealed partial class GeometryDashboardGeneratorViewModel : LocalizedObservableObject
 {
     private readonly GeometryDashboardViewModel owner;
+    private readonly Func<string>? nameGetter;
+    private readonly Func<string>? descriptionGetter;
 
     /// <summary>Creates a generator row.</summary>
     public GeometryDashboardGeneratorViewModel(RelevantObjectsGenerator model, GeometryDashboardViewModel owner)
     {
         Model = model ?? throw new ArgumentNullException(nameof(model));
         this.owner = owner ?? throw new ArgumentNullException(nameof(owner));
+        nameGetter = ResourceAccessor.FindGetter(
+            typeof(DesktopStrings), $"GeometryDashboard_Generator_{Model.GetType().Name}_Name");
+        descriptionGetter = ResourceAccessor.FindGetter(
+            typeof(DesktopStrings), $"GeometryDashboard_Generator_{Model.GetType().Name}_Description");
     }
 
     /// <summary>Gets the Core generator.</summary>
     public RelevantObjectsGenerator Model { get; }
 
     /// <summary>Gets the display name.</summary>
-    public string Name => Model.Name;
+    public string Name => nameGetter?.Invoke() ?? Model.Name;
 
     /// <summary>Gets the tooltip text.</summary>
-    public string Tooltip => Model.Description;
+    public string Tooltip => descriptionGetter?.Invoke() ?? Model.Description;
 
     /// <summary>Gets the settings object shown in the row.</summary>
     public GeneratorSettings Settings => Model.Settings;

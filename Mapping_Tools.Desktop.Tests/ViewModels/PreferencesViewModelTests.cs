@@ -1,5 +1,8 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
+using Mapping_Tools.Application.Localization;
+using Mapping_Tools.Desktop.Localization;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.Execution.UserNotification;
@@ -18,8 +21,64 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Mapping_Tools.Desktop.Tests.ViewModels;
 
 [TestClass]
+[DoNotParallelize]
 public sealed class PreferencesViewModelTests
 {
+    [TestMethod]
+    public void SelectedLanguage_Dutch_UpdatesLiveTextAndSerializesTheLanguageChoice()
+    {
+        // Arrange
+        string? previous = TranslationManager.Language;
+        var settings = CreateSettings();
+        using var viewModel = CreateViewModel(settings);
+
+        try
+        {
+            // Act
+            viewModel.SelectedLanguage = viewModel.Languages.Single(option => option.Code == "nl");
+            var restored = JsonSerializer.Deserialize<DesktopApplicationSettings>(JsonSerializer.Serialize(settings))!;
+
+            // Assert
+            DesktopStrings.Shell_Preferences.Should().Be("Voorkeuren");
+            restored.Language.Should().Be("nl");
+            viewModel.SelectedLanguage.Name.Should().Be("Nederlands");
+            viewModel.UndoHistory.CanUndo.Should().BeFalse();
+        }
+        finally
+        {
+            TranslationManager.SetLanguage(previous);
+        }
+    }
+
+    [TestMethod]
+    public void SelectedLanguage_ExistingValidationError_TranslatesWithoutChangingTheDraftOrAcceptedSetting()
+    {
+        // Arrange
+        string? previous = TranslationManager.Language;
+        TranslationManager.SetLanguage("en");
+        var settings = CreateSettings();
+        string original = settings.SongsPath;
+        using var viewModel = CreateViewModel(settings);
+        viewModel.SongsPath = string.Empty;
+
+        try
+        {
+            // Act
+            viewModel.SelectedLanguage = viewModel.Languages.Single(option => option.Code == "nl");
+
+            // Assert
+            viewModel.GetErrors(nameof(PreferencesViewModel.SongsPath)).Should().ContainSingle()
+                .Which.ErrorMessage.Should().Be(DesktopStrings.Shell_SelectAPath);
+            DesktopStrings.Shell_SelectAPath.Should().NotBe("A path is required.");
+            viewModel.SongsPath.Should().BeEmpty();
+            settings.SongsPath.Should().Be(original);
+        }
+        finally
+        {
+            TranslationManager.SetLanguage(previous);
+        }
+    }
+
     [DataTestMethod]
     [DataRow(false)]
     [DataRow(true)]

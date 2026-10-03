@@ -1,3 +1,5 @@
+using Mapping_Tools.Desktop.Localization;
+using Mapping_Tools.Application.Localization;
 using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
@@ -10,7 +12,7 @@ namespace Mapping_Tools.Desktop.Services.Dialogs;
 /// </summary>
 public sealed class CurrentBeatmapDialogService : ICurrentBeatmapDialogService
 {
-    private const string dialog_title = "Current beatmap unavailable";
+    private static string DialogTitle => DesktopStrings.Shell_CurrentBeatmapUnavailable;
 
     private readonly IDialogService dialogs;
     private readonly IBeatmapsetFileSystem fileSystem;
@@ -64,8 +66,8 @@ public sealed class CurrentBeatmapDialogService : ICurrentBeatmapDialogService
         await notifications.PublishAsync(
             new UserNotification(
                 UserNotificationSeverity.Warning,
-                "Current beatmap is missing",
-                $"The path reported by osu! does not exist: {path}"),
+                DesktopStrings.Shell_CurrentBeatmapIsMissing,
+                ApplicationText.Format(DesktopStrings.Shell_PathMissing, path)),
             cancellationToken);
         return null;
     }
@@ -74,9 +76,9 @@ public sealed class CurrentBeatmapDialogService : ICurrentBeatmapDialogService
     {
         return dialogs.ShowMessageAsync(
             new MessageDialogRequest<bool>(
-                dialog_title,
-                exception.Message,
-                [new DialogChoice<bool>("OK", true, true, true)],
+                DialogTitle,
+                ApplicationExceptionText.GetSummary(exception, ApplicationStrings.Exception_LiveEditorUnavailable),
+                [new DialogChoice<bool>(DesktopStrings.Shell_UpperOk, true, true, true)],
                 true,
                 exception.ToString()),
             cancellationToken);

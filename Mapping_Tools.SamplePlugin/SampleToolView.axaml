@@ -1,5 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
+             xmlns:strings="using:Mapping_Tools.SamplePlugin.Localization"
              xmlns:vm="using:Mapping_Tools.SamplePlugin"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
@@ -11,14 +13,14 @@
                 <controls:ToolViewHeader
                     Title="Sample Plugin"
                     IsQuickRunSupported="True"
-                    HelpText="Adds the configured tag to the beatmaps selected in Mapping Tools. QuickRun uses the shell's current beatmap and reloads osu! after a successful edit." />
+                    HelpText="{loc:Tr Sample_Help, ResourceType={x:Type strings:SamplePluginStrings}}" />
 
                 <TextBox Width="300"
                          Margin="0,10,0,0"
                          HorizontalAlignment="Left"
-                         materialAssists:TextFieldAssist.Label="Tag"
+                         materialAssists:TextFieldAssist.Label="{loc:Tr Sample_Tag, ResourceType={x:Type strings:SamplePluginStrings}}"
                          Text="{Binding Tag, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                         ToolTip.Tip="The whitespace-free tag to add to selected beatmaps." />
+                         ToolTip.Tip="{loc:Tr Sample_TagHelp, ResourceType={x:Type strings:SamplePluginStrings}}" />
             </StackPanel>
 
             <controls:ToolRunButton Margin="10"

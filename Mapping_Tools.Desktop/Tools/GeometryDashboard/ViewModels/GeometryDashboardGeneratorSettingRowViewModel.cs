@@ -2,30 +2,40 @@ using Mapping_Tools.Desktop.Services.Undo;
 using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
-using CommunityToolkit.Mvvm.ComponentModel;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators;
+using Mapping_Tools.Desktop.Localization;
 
 namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 
 /// <summary>Provides a reflected generator property to Avalonia bindings.</summary>
-public sealed class GeometryDashboardGeneratorSettingRowViewModel : ObservableObject
+public sealed class GeometryDashboardGeneratorSettingRowViewModel : LocalizedObservableObject
 {
     private readonly PropertyInfo property;
     private readonly GeneratorSettings settings;
+    private readonly Func<string>? nameGetter;
+    private readonly Func<string>? descriptionGetter;
     private string? pendingValueText;
+    private bool hasValueTextError;
 
     /// <summary>Creates one reflected property row.</summary>
     public GeometryDashboardGeneratorSettingRowViewModel(GeneratorSettings settings, PropertyInfo property)
     {
         this.settings = settings;
         this.property = property;
+        nameGetter = ResourceAccessor.FindGetter(
+            typeof(DesktopStrings), $"GeometryDashboard_Setting_{property.Name}_Name");
+        descriptionGetter = ResourceAccessor.FindGetter(
+            typeof(DesktopStrings), $"GeometryDashboard_Setting_{property.Name}_Description");
     }
 
     /// <summary>Gets the property display name.</summary>
-    public string Name => property.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ?? property.Name;
+    public string Name => nameGetter?.Invoke()
+        ?? property.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName
+        ?? property.Name;
 
     /// <summary>Gets the explanatory tooltip declared by the Core setting.</summary>
-    public string? Description => property.GetCustomAttribute<DescriptionAttribute>()?.Description;
+    public string? Description => descriptionGetter?.Invoke()
+        ?? property.GetCustomAttribute<DescriptionAttribute>()?.Description;
 
     /// <summary>Gets the underlying property value.</summary>
     [Undoable]
@@ -36,7 +46,7 @@ public sealed class GeometryDashboardGeneratorSettingRowViewModel : ObservableOb
         {
             property.SetValue(settings, value);
             pendingValueText = null;
-            ValueTextError = null;
+            hasValueTextError = false;
             OnPropertyChanged();
             OnPropertyChanged(nameof(ValueText));
             OnPropertyChanged(nameof(ValueTextError));
@@ -60,26 +70,26 @@ public sealed class GeometryDashboardGeneratorSettingRowViewModel : ObservableOb
             catch (FormatException)
             {
                 pendingValueText = value;
-                ValueTextError = "Number format error.";
+                hasValueTextError = true;
                 OnPropertyChanged(nameof(ValueTextError));
             }
             catch (OverflowException)
             {
                 pendingValueText = value;
-                ValueTextError = "Number format error.";
+                hasValueTextError = true;
                 OnPropertyChanged(nameof(ValueTextError));
             }
             catch (InvalidCastException)
             {
                 pendingValueText = value;
-                ValueTextError = "Number format error.";
+                hasValueTextError = true;
                 OnPropertyChanged(nameof(ValueTextError));
             }
         }
     }
 
     /// <summary>Gets the validation message for an invalid typed setting value.</summary>
-    public string? ValueTextError { get; private set; }
+    public string? ValueTextError => hasValueTextError ? DesktopStrings.GeometryDashboard_NumberFormatError : null;
 
     /// <summary>Gets whether the reflected value has a simple text editor.</summary>
     public bool IsTextEditable => property.PropertyType != typeof(bool);

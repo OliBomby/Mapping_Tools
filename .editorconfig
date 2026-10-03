@@ -19,6 +19,10 @@ resharper_virtual_member_call_in_constructor_highlighting = none
 resharper_xaml_static_resource_not_resolved_highlighting = none
 resharper_xaml_style_class_not_found_highlighting = none
 
+[Mapping_Tools.Infrastructure/**/*.cs]
+# Infrastructure diagnostics are technical details, not localized interface text.
+resharper_localizable_element_highlighting = none
+
 [Mapping_Tools.*.Tests/**/*.cs]
 # Recording test doubles intentionally expose observations and configurable behavior.
 resharper_collection_never_queried_global_highlighting = hint

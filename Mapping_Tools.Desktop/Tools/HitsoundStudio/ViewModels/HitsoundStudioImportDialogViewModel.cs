@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Services.Undo;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -11,7 +12,7 @@ using Mapping_Tools.Desktop.Services.Dialogs;
 namespace Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels;
 
 /// <summary>Owns the typed fields of the layer import form.</summary>
-public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObject
+public sealed partial class HitsoundStudioImportDialogViewModel : LocalizedObservableObject
 {
     private readonly ICurrentBeatmapDialogService currentBeatmapService;
     private readonly IFilePicker filePicker;
@@ -233,14 +234,14 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
     {
         var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
-            Title = "Choose Hitsound Studio source",
+            Title = DesktopStrings.HitsoundStudio_PickStudioSource,
             SuggestedStartLocation = ImportType == ImportType.MIDI
                 ? null
                 : workspace.GetBeatmapPickerStartLocation(
                     Path.GetDirectoryName(BeatmapPath)),
             AllowMultiple = false,
             Filters = ImportType == ImportType.MIDI
-                ? [new FilePickerFilter("MIDI files", ["*.mid"])]
+                ? [new FilePickerFilter(DesktopStrings.HitsoundStudio_MidiFiles, ["*.mid"])]
                 : [CommonFilePickerFilters.BeatmapsAndStoryboards],
         }).ConfigureAwait(false);
         if (paths.Count == 0) return;
@@ -262,7 +263,7 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
     {
         var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
-            Title = "Choose sample",
+            Title = DesktopStrings.HitsoundStudio_PickSample,
             AllowMultiple = false,
             Filters = [CommonFilePickerFilters.SampleFiles],
         }).ConfigureAwait(false);

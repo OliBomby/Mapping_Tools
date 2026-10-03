@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.QuickRun.Models;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Tools.Sliderator;
 
@@ -11,5 +12,7 @@ public static class SlideratorToolDefinition
         "Sliderator",
         "Create variable-velocity sliders and streams from an editable graph.",
         ["slider", "sliderator", "variable velocity", "stream", "graph", "SV"],
-        QuickRunTargets.SingleSelection);
+        QuickRunTargets.SingleSelection,
+        static () => ApplicationStrings.Sliderator_Description,
+        static () => ApplicationStrings.Sliderator_SearchTerms);
 }

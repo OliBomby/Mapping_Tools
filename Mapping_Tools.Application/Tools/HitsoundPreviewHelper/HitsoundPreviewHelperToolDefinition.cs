@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.QuickRun.Models;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Tools.HitsoundPreviewHelper;
 
@@ -11,5 +12,7 @@ public static class HitsoundPreviewHelperToolDefinition
         "Hitsound Preview Helper",
         "Place provisional hitsounds from positional zones.",
         ["hitsound", "preview", "zone", "sample", "position"],
-        QuickRunTargets.Always);
+        QuickRunTargets.Always,
+        static () => ApplicationStrings.HitsoundPreviewHelper_Description,
+        static () => ApplicationStrings.HitsoundPreviewHelper_SearchTerms);
 }

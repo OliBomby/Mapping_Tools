@@ -23,6 +23,7 @@ using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tests.TestHelpers;
 using Mapping_Tools.Desktop.Tools.Sliderator.Models;
 using Mapping_Tools.Desktop.Tools.Sliderator.ViewModels;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Tools.Sliderator.Views;
 using Mapping_Tools.Infrastructure.Projects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -588,7 +589,7 @@ public sealed class SlideratorViewModelTests
         // Assert
         viewModel.LoadedHitObjects.Should().ContainSingle().Which.Should().BeSameAs(slider);
         ((MessageDialogRequest<bool>)dialogs.LastMessageRequest!).Message
-            .Should().Be("Could not find any sliders in imported hit objects.");
+            .Should().Be(DesktopStrings.Sliderator_NoSlidersFound);
     }
 
     [TestMethod]
@@ -608,7 +609,7 @@ public sealed class SlideratorViewModelTests
         // Assert
         service.ImportPath.Should().BeNull();
         ((MessageDialogRequest<bool>)dialogs.LastMessageRequest!).Message
-            .Should().Be("No beatmap is open in osu!.");
+            .Should().Be(DesktopStrings.Sliderator_NoBeatmapOpen);
     }
 
     [DataTestMethod]

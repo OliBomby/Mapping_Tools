@@ -1,3 +1,4 @@
+using Mapping_Tools.Application.Localization;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.Projects.Contracts;
@@ -162,7 +163,7 @@ public sealed class ProjectService : IProjectService
         string? path = await filePicker.PickSaveFileAsync(
             new SaveFilePickerRequest
             {
-                Title = "Save project",
+                Title = ApplicationStrings.Picker_SaveProject,
                 SuggestedStartLocation = projectFolder,
                 SuggestedFileName = suggestedFileName,
                 DefaultExtension = "json",
@@ -194,7 +195,7 @@ public sealed class ProjectService : IProjectService
         var paths = await filePicker.PickOpenFilesAsync(
             new OpenFilePickerRequest
             {
-                Title = "Open project",
+                Title = ApplicationStrings.Picker_OpenProject,
                 SuggestedStartLocation = projectFolder,
                 AllowMultiple = false,
                 Filters = [CommonFilePickerFilters.MappingToolsProjects],

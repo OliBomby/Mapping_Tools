@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Avalonia.Data.Converters;
+using Mapping_Tools.Desktop.Localization;
 
 namespace Mapping_Tools.Desktop.Services.Dialogs;
 
@@ -25,12 +26,14 @@ public sealed class ValueDialogRequest<TValue>
         TValue initialValue,
         IValueConverter converter,
         IReadOnlyList<ValidationAttribute>? validators = null,
-        string acceptLabel = "ACCEPT",
-        string cancelLabel = "CANCEL")
+        string? acceptLabel = null,
+        string? cancelLabel = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(title);
         ArgumentException.ThrowIfNullOrWhiteSpace(prompt);
         ArgumentNullException.ThrowIfNull(converter);
+        acceptLabel ??= DesktopStrings.Shell_UpperAccept;
+        cancelLabel ??= DesktopStrings.Shell_UpperCancel;
         ArgumentException.ThrowIfNullOrWhiteSpace(acceptLabel);
         ArgumentException.ThrowIfNullOrWhiteSpace(cancelLabel);
 

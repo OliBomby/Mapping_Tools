@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.QuickRun.Models;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Tools.SliderCompletionator;
 
@@ -11,5 +12,7 @@ public static class SliderCompletionatorToolDefinition
         "Slider Completionator",
         "Change slider length and duration while calculating slider velocity.",
         ["slider", "completion", "duration", "length", "velocity"],
-        QuickRunTargets.AnySelection);
+        QuickRunTargets.AnySelection,
+        static () => ApplicationStrings.SliderCompletionator_Description,
+        static () => ApplicationStrings.SliderCompletionator_SearchTerms);
 }

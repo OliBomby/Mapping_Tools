@@ -1,3 +1,4 @@
+using Mapping_Tools.Desktop.Localization;
 using System.Globalization;
 using Avalonia.Data.Converters;
 using Mapping_Tools.Core.SystemTools;
@@ -33,7 +34,7 @@ public sealed class InvariantInt32Converter : IValueConverter
             string text = ValueConverterHelper.RequireText(value, targetType);
             if (TypeConverters.TryParseInt(text, out int converted)) return converted;
 
-            throw new FormatException("Enter a whole number or arithmetic expression.");
+            throw new FormatException(DesktopStrings.Shell_EnterAWholeNumberOrArithmeticExpression);
         });
     }
 }

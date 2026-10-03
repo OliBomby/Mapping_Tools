@@ -1,0 +1,4 @@
+interface:
+  display_name: "Translate"
+  short_description: "Translate strings in the program for localization"
+  default_prompt: "Use $translate to create translations in Mapping Tools."

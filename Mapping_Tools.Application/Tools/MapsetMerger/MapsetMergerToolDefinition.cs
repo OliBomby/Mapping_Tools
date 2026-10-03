@@ -1,3 +1,5 @@
+using Mapping_Tools.Application.Localization;
+
 namespace Mapping_Tools.Application.Tools.MapsetMerger;
 
 /// <summary>Provides the discoverable metadata for Mapset Merger.</summary>
@@ -8,5 +10,7 @@ public static class MapsetMergerToolDefinition
         "mapset-merger",
         "Mapset Merger",
         "Combine multiple mapsets and resolve beatmap, audio, image, storyboard, and sample conflicts.",
-        ["mapset", "merge", "audio", "image", "storyboard", "samples", "conflicts"]);
+        ["mapset", "merge", "audio", "image", "storyboard", "samples", "conflicts"],
+        translatedDescriptionGetter: static () => ApplicationStrings.MapsetMerger_Description,
+        translatedSearchTermsGetter: static () => ApplicationStrings.MapsetMerger_SearchTerms);
 }

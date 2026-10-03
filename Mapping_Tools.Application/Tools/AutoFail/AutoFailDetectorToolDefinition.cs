@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.QuickRun.Models;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Tools.AutoFail;
 
@@ -11,5 +12,7 @@ public static class AutoFailDetectorToolDefinition
         "Auto-fail Detector",
         "Detect incorrect object loading in overlapping patterns.",
         ["auto fail", "2b", "unloading", "objects"],
-        QuickRunTargets.Always);
+        QuickRunTargets.Always,
+        static () => ApplicationStrings.AutoFailDetector_Description,
+        static () => ApplicationStrings.AutoFailDetector_SearchTerms);
 }

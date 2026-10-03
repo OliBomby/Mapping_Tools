@@ -18,8 +18,11 @@ using Mapping_Tools.Core.Tools.MapsetMerger.Models;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Services.Undo;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Tools.MapsetMerger.Models;
 using Mapping_Tools.Desktop.ViewModels;
+
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Desktop.Tools.MapsetMerger.ViewModels;
 
@@ -76,7 +79,7 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
     [ObservableProperty]
     [Undoable]
     [NotifyDataErrorInfo]
-    [Required(ErrorMessage = "Select an export directory.")]
+    [Required(ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.MapsetMerger_ExportPathRequired))]
     public partial string ExportPath { get; set; }
 
     /// <summary>Gets or sets whether the first storyboard is embedded in beatmaps.</summary>
@@ -84,7 +87,7 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
     [Undoable]
     public partial bool MoveSbToBeatmap { get; set; }
 
-    ProjectDefinition<MapsetMergerProject> IShellProjectFeature<MapsetMergerProject>.ProjectDefinition { get; } = new(
+    ProjectDefinition<MapsetMergerProject> IShellProjectFeature<MapsetMergerProject>.ProjectDefinition => new(
         "mapsetmergerproject.json",
         "Mapset Merger Projects",
         static () => new MapsetMergerProject(),
@@ -114,7 +117,7 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
     {
         return AddMapsetFromPathAsync(
             workspace.SelectedPaths.FirstOrDefault(),
-            "Select a beatmap in the shell or hold Shift to fetch the current osu! beatmap.");
+            DesktopStrings.MapsetMerger_SelectBeatmap);
     }
 
     /// <summary>Adds the mapset containing the beatmap currently open in osu!.</summary>
@@ -126,7 +129,7 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
         if (path is not null)
             await AddMapsetFromPathAsync(
                 path,
-                "Open a beatmap in osu! or select one in the shell before adding a mapset.");
+                DesktopStrings.MapsetMerger_OpenBeatmap);
     }
 
     private async Task AddMapsetFromPathAsync(string? beatmapPath, string unavailableMessage)
@@ -171,7 +174,7 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
         {
             var paths = await filePicker.PickFoldersAsync(new OpenFolderPickerRequest
             {
-                Title = "Select export path",
+                Title = DesktopStrings.MapsetMerger_SelectExportPath,
                 SuggestedStartLocation = workspace.GetBeatmapPickerStartLocation(ExportPath),
                 AllowMultiple = false,
             });
@@ -181,8 +184,8 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
         catch (Exception exception)
         {
             await PublishErrorAsync(
-                "Could not select the export path",
-                exception.Message,
+                DesktopStrings.MapsetMerger_CouldNotSelectExportPath,
+                DesktopStrings.MapsetMerger_ExportPickerError,
                 exception);
         }
     }
@@ -192,7 +195,7 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
     {
         if (!base.PrepareRun())
         {
-            PublishWarning("Select an export directory.");
+            PublishWarning(DesktopStrings.MapsetMerger_SelectExportPath);
             return false;
         }
 
@@ -212,16 +215,18 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
                 {
                     var merged = await merger.MergeAsync(
                         project,
-                        new Progress<double>(value => context.ReportProgress(value, "Merging mapsets")),
+                        new Progress<double>(value => context.ReportProgress(value, DesktopStrings.MapsetMerger_MergeProgress)),
                         context.CancellationToken);
                     return new ToolExecutionOutput<MapsetMergerResult>(
                         merged,
-                        $"Successfully merged {merged.MapsetsMerged} " + $"{(merged.MapsetsMerged == 1 ? "mapset" : "mapsets")}!");
+                        merged.MapsetsMerged == 1
+                            ? ApplicationText.Format(DesktopStrings.MapsetMerger_MergedOne, merged.MapsetsMerged)
+                            : ApplicationText.Format(DesktopStrings.MapsetMerger_MergedMany, merged.MapsetsMerged));
                 }),
             CreateProgress());
 
         if (result.Status == ToolExecutionStatus.Cancelled)
-            await PublishInformationAsync("Mapset Merger was cancelled.");
+            await PublishInformationAsync(DesktopStrings.MapsetMerger_Cancelled);
     }
 
     private MapsetMergerProject Snapshot()

@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
              xmlns:vm="using:Mapping_Tools.Desktop.Tools.SliderMerger.ViewModels"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
@@ -9,40 +10,52 @@
         <Grid>
             <StackPanel>
                 <controls:ToolViewHeader
-                    Title="Slider Merger"
+                    Title="{loc:Tr SliderMerger_Title}"
                     IsQuickRunSupported="True"
-                    HelpText="Merge 2 or more sliders and circles into one big slider.&#x0a;This program will automatically convert any type of slider into a Beziér slider for the purpose of merging.&#x0a;Circles can be merged too and will always use the linear connection mode.&#x0a;&#x0a;The maximum distance in osu! pixels between two merging hit objects is controlled by the connection leniency." />
+                    HelpText="{loc:Tr SliderMerger_Help}" />
 
                 <TextBox Width="258" HorizontalAlignment="Left" Margin="0,20,0,0"
-                         materialAssists:TextFieldAssist.Label="Merge connection leniency"
+                         materialAssists:TextFieldAssist.Label="{loc:Tr SliderMerger_LeniencyLabel}"
                          Text="{Binding Leniency, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}"
-                         ToolTip.Tip="The maximum distance in osu! pixels between two merging hit objects." />
+                         ToolTip.Tip="{loc:Tr SliderMerger_LeniencyTip}" />
 
                 <StackPanel Orientation="Horizontal" Margin="0,26,0,0" HorizontalAlignment="Left">
                     <ComboBox Width="258" Cursor="Hand"
                               ItemsSource="{Binding ImportModes}"
                               SelectedItem="{Binding ImportModeSetting}"
-                              materialAssists:ComboBoxAssist.Label="Object selection mode"
-                              ToolTip.Tip="Choose how to select hit objects to merge. Slider Merger will not always merge all the specified objects, because the distance between every pair of objects must still be within the connection distance leniency." />
+                              materialAssists:ComboBoxAssist.Label="{loc:Tr SliderMerger_ObjectSelectionLabel}"
+                              ToolTip.Tip="{loc:Tr SliderMerger_SelectionModeTip}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
                     <TextBox Margin="15,0,0,0" Width="258"
                              IsVisible="{Binding TimeCodeVisible}"
-                             materialAssists:TextFieldAssist.Label="Time code"
+                             materialAssists:TextFieldAssist.Label="{loc:Tr Common_TimeCodeLabel}"
                              Text="{Binding TimeCode, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                             ToolTip.Tip="Input a time code here. Example time code: 00:56:823 (1,2,1,2) - " />
+                             ToolTip.Tip="{loc:Tr SliderMerger_TimeCodeTip}" />
                 </StackPanel>
 
                 <ComboBox Margin="0,26,0,0" Width="258" Cursor="Hand" HorizontalAlignment="Left"
                           ItemsSource="{Binding ConnectionModes}"
                           SelectedItem="{Binding ConnectionModeSetting}"
-                          materialAssists:ComboBoxAssist.Label="Object connection mode"
-                          ToolTip.Tip="Choose what to do with space gaps between hit objects that want to merge." />
+                          materialAssists:ComboBoxAssist.Label="{loc:Tr SliderMerger_ConnectionModeLabel}"
+                          ToolTip.Tip="{loc:Tr SliderMerger_ConnectionModeTip}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
 
-                <CheckBox Margin="0,26,0,0" Content="Merge on slider end"
+                <CheckBox Margin="0,26,0,0" Content="{loc:Tr SliderMerger_MergeOnSliderEnd}"
                           IsChecked="{Binding MergeOnSliderEnd}"
-                          ToolTip.Tip="Merge on the slider end instead of the last anchor of the slider." />
-                <CheckBox Margin="0,5,0,0" Content="Use linear curve type on fully linear merge"
+                          ToolTip.Tip="{loc:Tr SliderMerger_MergeOnSliderEndTip}" />
+                <CheckBox Margin="0,5,0,0" Content="{loc:Tr SliderMerger_LinearCurve}"
                           IsChecked="{Binding LinearOnLinear}"
-                          ToolTip.Tip="This option will make Slider Merger, if possible, use linear curve type and no red anchors for the resulting slider." />
+                          ToolTip.Tip="{loc:Tr SliderMerger_LinearCurveTip}" />
             </StackPanel>
 
             <controls:ToolRunButton Margin="10" HorizontalAlignment="Right" VerticalAlignment="Bottom"
@@ -51,7 +64,7 @@
 
         <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
             <TextBlock VerticalAlignment="Bottom" FontWeight="Bold" Opacity="0.58"
-                       Text="Made by OliBomby" TextWrapping="NoWrap" />
+                       Text="{loc:Tr Common_MadeByOliBomby}" TextWrapping="NoWrap" />
             <controls:ToolProgressBar Grid.Column="1" Height="20" Margin="20,0,20,0"
                                       Maximum="100" Value="{Binding Progress}" />
         </Grid>

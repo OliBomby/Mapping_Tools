@@ -13,10 +13,13 @@ using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.HitsoundCopier.Models;
 using Mapping_Tools.Desktop.Services.Dialogs;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tools.HitsoundCopier.Models;
 using Mapping_Tools.Desktop.ViewModels;
+
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Desktop.Tools.HitsoundCopier.ViewModels;
 
@@ -83,7 +86,7 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     [ObservableProperty]
     [Undoable]
     [NotifyDataErrorInfo]
-    [Range(0, double.MaxValue)]
+    [Range(0, double.MaxValue, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.HitsoundCopier_NonnegativeValue))]
     public partial double TemporalLeniency { get; set; } = 5;
 
     /// <summary>Gets or sets whether object and edge hitsounds are copied.</summary>
@@ -167,7 +170,7 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     [ObservableProperty]
     [Undoable]
     [NotifyDataErrorInfo]
-    [Range(0, double.MaxValue)]
+    [Range(0, double.MaxValue, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.HitsoundCopier_NonnegativeValue))]
     public partial double MinLength { get; set; } = 0.5;
 
     /// <summary>Gets or sets the optional muted custom index.</summary>
@@ -193,7 +196,9 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
         get
         {
             int count = PathTo.Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Length;
-            return count == 1 ? "(1) map total" : $"({count}) maps total";
+            return count == 1
+                ? DesktopStrings.HitsoundCopier_MapCountOne
+                : ApplicationText.Format(DesktopStrings.HitsoundCopier_MapCountMany, count);
         }
     }
 
@@ -205,7 +210,7 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
 
         if (string.IsNullOrWhiteSpace(path))
         {
-            PublishWarning("Open a target beatmap in osu! before using QuickRun.");
+            PublishWarning(DesktopStrings.HitsoundCopier_OpenTarget);
             return;
         }
 
@@ -250,7 +255,7 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     private async Task ImportBrowseAsync()
     {
         await PickAsync(
-            "Copy hitsounds from",
+            DesktopStrings.HitsoundCopier_BrowseSource,
             workspace.GetBeatmapPickerStartLocation(Path.GetDirectoryName(PathFrom)),
             false,
             paths => PathFrom = paths[0]);
@@ -261,7 +266,10 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     private async Task ExportBrowseAsync()
     {
         await PickAsync(
-            "Copy hitsounds to", GetExportPickerStartLocation(), true, paths => PathTo = string.Join('|', paths));
+            DesktopStrings.HitsoundCopier_BrowseTarget,
+            GetExportPickerStartLocation(),
+            true,
+            paths => PathTo = string.Join('|', paths));
     }
 
     /// <inheritdoc />
@@ -269,7 +277,7 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     {
         if (!base.PrepareRun())
         {
-            PublishWarning("Correct the invalid Hitsound Copier settings before running.");
+            PublishWarning(DesktopStrings.HitsoundCopier_InvalidSettings);
             return false;
         }
 
@@ -346,11 +354,13 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
                     var result = await copier.CopyAsync(
                         options,
                         quick,
-                        new Progress<double>(value => context.ReportProgress(value, "Copying hitsounds")),
+                        new Progress<double>(value => context.ReportProgress(value, DesktopStrings.HitsoundCopier_Progress)),
                         context.CancellationToken);
                     return new ToolExecutionOutput<HitsoundCopierResult>(
                         result,
-                        $"Successfully copied hitsounds to {result.ProcessedCount} " + $"{(result.ProcessedCount == 1 ? "beatmap" : "beatmaps")}!");
+                        result.ProcessedCount == 1
+                            ? ApplicationText.Format(DesktopStrings.HitsoundCopier_ResultOne, result.ProcessedCount)
+                            : ApplicationText.Format(DesktopStrings.HitsoundCopier_ResultMany, result.ProcessedCount));
                 }),
             CreateProgress());
     }
@@ -380,7 +390,7 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
         }
         catch (Exception exception)
         {
-            await PublishFailureAsync("Could not select beatmaps", exception);
+            await PublishFailureAsync(DesktopStrings.HitsoundCopier_PickerFailure, exception);
         }
     }
 
@@ -404,7 +414,7 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     {
         return notifications.PublishAsync(
             new UserNotification(UserNotificationSeverity.Error, title,
-                "The beatmap path could not be obtained.", exception));
+                DesktopStrings.HitsoundCopier_MissingBeatmapPath, exception));
     }
 
     private void PublishWarning(string message)

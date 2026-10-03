@@ -2,13 +2,14 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Desktop.Services.Undo;
 
 namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 
 /// <summary>Edits ordered Geometry Dashboard save slots.</summary>
-public sealed partial class GeometryDashboardSavestatesViewModel : ObservableObject
+public sealed partial class GeometryDashboardSavestatesViewModel : LocalizedObservableObject
 {
     private readonly Action<GeometryDashboardSaveSlot> loadSlot;
     private readonly Action refreshHotkeys;

@@ -4,6 +4,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.VisualTree;
 using Mapping_Tools.Application.Execution.UserNotification;
+using Mapping_Tools.Application.Localization;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
 using Mapping_Tools.Core.HitsoundStuff;
@@ -13,6 +14,7 @@ using Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels;
 using Mapping_Tools.Desktop.Tools.HitsoundStudio.Views;
 using Mapping_Tools.Desktop.Views;
 using Mapping_Tools.Desktop.Views.Dialogs;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Infrastructure.Files;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -35,11 +37,11 @@ public sealed class HitsoundStudioImportDialogViewTests
         using HeadlessViewHost host = HeadlessViewHost.ShowWindow(dialog);
         string header = tabIndex switch
         {
-            0 => "Simple layer",
-            1 => "Import layer stack",
-            2 => "Import hitsounds",
-            3 => "Import MIDI",
-            4 => "Import storyboard",
+            0 => DesktopStrings.HitsoundStudio_SimpleLayer,
+            1 => DesktopStrings.HitsoundStudio_ImportLayerStack,
+            2 => DesktopStrings.HitsoundStudio_ImportTab_Hitsounds,
+            3 => DesktopStrings.HitsoundStudio_ImportTab_Midi,
+            4 => DesktopStrings.HitsoundStudio_ImportTab_Storyboard,
             _ => throw new ArgumentOutOfRangeException(nameof(tabIndex)),
         };
 
@@ -63,8 +65,8 @@ public sealed class HitsoundStudioImportDialogViewTests
         viewModel.Close = _ => closeCount++;
         HitsoundStudioImportDialog dialog = new() { DataContext = viewModel };
         using HeadlessViewHost host = HeadlessViewHost.ShowWindow(dialog);
-        Button accept = FindButton(host, "ACCEPT");
-        TextBox source = FindVisibleTextBox(dialog, "The beatmap to import hitsounds from.");
+        Button accept = FindButton(host, DesktopStrings.HitsoundStudio_Accept);
+        TextBox source = FindVisibleTextBox(dialog, DesktopStrings.HitsoundStudio_HitsoundsSourceBeatmapTip);
 
         // Act
         host.Click(accept);
@@ -84,12 +86,12 @@ public sealed class HitsoundStudioImportDialogViewTests
         viewModel.Close = value => result = value;
         HitsoundStudioImportDialog dialog = new() { DataContext = viewModel };
         using HeadlessViewHost host = HeadlessViewHost.ShowWindow(dialog);
-        Button accept = FindButton(host, "ACCEPT");
-        TextBox name = FindVisibleTextBox(dialog, "The name prefix for imported MIDI layers.");
-        TextBox midiPath = FindVisibleTextBox(dialog, "The MIDI file to import.");
-        TextBox offset = FindVisibleTextBox(dialog, "The start time offset of the MIDI in milliseconds.");
-        CheckBox discriminateInstruments = FindVisibleCheckBox(dialog, "Make separate hitsound layers for different instruments.");
-        CheckBox discriminateLengths = FindVisibleCheckBox(dialog, "Make separate hitsound layers for different note lengths.");
+        Button accept = FindButton(host, DesktopStrings.HitsoundStudio_Accept);
+        TextBox name = FindVisibleTextBox(dialog, DesktopStrings.HitsoundStudio_ImportMidiLayerNamePrefixTip);
+        TextBox midiPath = FindVisibleTextBox(dialog, DesktopStrings.HitsoundStudio_MidiFileTip);
+        TextBox offset = FindVisibleTextBox(dialog, DesktopStrings.HitsoundStudio_MidiOffsetTip);
+        CheckBox discriminateInstruments = FindVisibleCheckBox(dialog, DesktopStrings.HitsoundStudio_DiscriminateInstrumentsTip);
+        CheckBox discriminateLengths = FindVisibleCheckBox(dialog, DesktopStrings.HitsoundStudio_DiscriminateLengthsTip);
 
         // Act
         TypeText(host, name, "MIDI layer");
@@ -122,7 +124,7 @@ public sealed class HitsoundStudioImportDialogViewTests
         viewModel.Close = value => result = value;
         HitsoundStudioImportDialog dialog = new() { DataContext = viewModel };
         using HeadlessViewHost host = HeadlessViewHost.ShowWindow(dialog);
-        Button cancel = FindButton(host, "CANCEL");
+        Button cancel = FindButton(host, DesktopStrings.HitsoundStudio_Cancel);
 
         // Act
         host.Click(cancel);
@@ -168,7 +170,7 @@ public sealed class HitsoundStudioImportDialogViewTests
         HitsoundStudioImportDialog dialog = new() { DataContext = viewModel };
         using HeadlessViewHost host = HeadlessViewHost.ShowWindow(dialog);
         Button browse = dialog.GetVisualDescendants().OfType<Button>().Single(button =>
-            ToolTip.GetTip(button)?.ToString() == "Select a beatmap with File Explorer.");
+            ToolTip.GetTip(button)?.ToString() == DesktopStrings.HitsoundStudio_SelectBeatmapFile);
 
         // Act
         host.Click(browse);
@@ -185,7 +187,7 @@ public sealed class HitsoundStudioImportDialogViewTests
     }
 
     [TestMethod]
-    public async Task LoadSourceButton_WhenLookupFails_ShowsOriginalErrorInProductionDialog()
+    public async Task LoadSourceButton_WhenLookupFails_ShowsLocalizedSummaryAndOriginalDetails()
     {
         // Arrange
         RecordingCurrentBeatmapLocator locator = new()
@@ -210,7 +212,7 @@ public sealed class HitsoundStudioImportDialogViewTests
         HeadlessViewHost mainHost = HeadlessViewHost.ShowWindow(mainWindow);
         using HeadlessViewHost importHost = HeadlessViewHost.ShowWindow(dialog);
         Button loadSource = dialog.GetVisualDescendants().OfType<Button>().Single(button =>
-            ToolTip.GetTip(button)?.ToString() == "Fetch the selected beatmap from your osu! client.");
+            ToolTip.GetTip(button)?.ToString() == DesktopStrings.HitsoundStudio_FetchSelectedBeatmap);
 
         try
         {
@@ -222,15 +224,19 @@ public sealed class HitsoundStudioImportDialogViewTests
             MessageDialog message = lifetime.Windows.OfType<MessageDialog>().Single(candidate => candidate.IsVisible);
             using HeadlessViewHost messageHost = HeadlessViewHost.Attach(message);
             string displayedError = message.GetVisualDescendants().OfType<TextBlock>()
-                .Single(textBlock => textBlock.Text == "The editor state is unavailable.").Text!;
+                .Single(textBlock => textBlock.Text == ApplicationStrings.Exception_LiveEditorUnavailable).Text!;
+            string? displayedDetails = message.GetVisualDescendants().OfType<SelectableTextBlock>()
+                .Single(textBlock => textBlock.Text?.Contains("The editor state is unavailable.", StringComparison.Ordinal) == true)
+                .Text;
             messageHost.Click(message.GetVisualDescendants().OfType<Button>()
                 .Single(button => button.Content?.ToString() == "OK"));
             HeadlessViewHost.PumpDispatcherUntil(() => loadTask.IsCompleted);
             await loadTask;
 
             // Assert
-            displayedError.Should().Be("The editor state is unavailable.");
-            message.Title.Should().Be("Current beatmap unavailable");
+            displayedError.Should().Be(ApplicationStrings.Exception_LiveEditorUnavailable);
+            displayedDetails.Should().Contain("The editor state is unavailable.");
+            message.Title.Should().Be(DesktopStrings.Shell_CurrentBeatmapUnavailable);
             locator.FindCount.Should().Be(1);
             viewModel.BeatmapPath.Should().BeEmpty();
         }
@@ -263,11 +269,11 @@ public sealed class HitsoundStudioImportDialogViewTests
     {
         return tabIndex switch
         {
-            0 => FindVisibleTextBox(dialog, "Audio file or SoundFont used by the new layer."),
-            1 => FindVisibleTextBox(dialog, "The X coordinate of the stack in the source beatmap which dictates all the times when the sound has to be played."),
-            2 => FindVisibleCheckBox(dialog, "Canonicalize identical audio files in the source mapset."),
-            3 => FindVisibleTextBox(dialog, "The MIDI file to import."),
-            4 => FindVisibleCheckBox(dialog, "Remove duplicate values in the imported times."),
+            0 => FindVisibleTextBox(dialog, DesktopStrings.HitsoundStudio_NewLayerSampleTip),
+            1 => FindVisibleTextBox(dialog, DesktopStrings.HitsoundStudio_StackSampleTip),
+            2 => FindVisibleCheckBox(dialog, DesktopStrings.HitsoundStudio_CanonicalizeSamplesTip),
+            3 => FindVisibleTextBox(dialog, DesktopStrings.HitsoundStudio_MidiFileTip),
+            4 => FindVisibleCheckBox(dialog, DesktopStrings.HitsoundStudio_RemoveDuplicateTimesTip),
             _ => throw new ArgumentOutOfRangeException(nameof(tabIndex)),
         };
     }

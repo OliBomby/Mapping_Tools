@@ -2,9 +2,11 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.VisualTree;
 using Mapping_Tools.Application.Execution.ToolExecution;
+using Mapping_Tools.Application.Localization;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Tools.RhythmGuide;
 using Mapping_Tools.Desktop.Services.Dialogs;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tests.TestHelpers;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.Services;
@@ -21,7 +23,7 @@ namespace Mapping_Tools.Desktop.Tests.Tools.RhythmGuide.Views;
 public sealed class RhythmGuideViewTests
 {
     [TestMethod]
-    public async Task UseCurrentSourceButton_WhenLookupFails_ShowsOriginalErrorInProductionDialog()
+    public async Task UseCurrentSourceButton_WhenLookupFails_ShowsLocalizedActionableErrorInProductionDialog()
     {
         // Arrange
         RecordingCurrentBeatmapLocator locator = new()
@@ -71,7 +73,7 @@ public sealed class RhythmGuideViewTests
             MessageDialog dialog = lifetime.Windows.OfType<MessageDialog>().Single(candidate => candidate.IsVisible);
             using HeadlessViewHost dialogHost = HeadlessViewHost.Attach(dialog);
             string message = dialog.GetVisualDescendants().OfType<TextBlock>()
-                .Single(textBlock => textBlock.Text == "The editor state is unavailable.")
+                .Single(textBlock => textBlock.Text == ApplicationStrings.Exception_LiveEditorUnavailable)
                 .Text!;
             dialogHost.Click(dialog.GetVisualDescendants().OfType<Button>()
                 .Single(button => button.Content?.ToString() == "OK"));
@@ -79,8 +81,8 @@ public sealed class RhythmGuideViewTests
             await lookupTask;
 
             // Assert
-            message.Should().Be("The editor state is unavailable.");
-            dialog.Title.Should().Be("Current beatmap unavailable");
+            message.Should().Be(ApplicationStrings.Exception_LiveEditorUnavailable);
+            dialog.Title.Should().Be(DesktopStrings.Shell_CurrentBeatmapUnavailable);
             locator.FindCount.Should().Be(1);
             viewModel.SourcePaths.Should().BeEmpty();
         }

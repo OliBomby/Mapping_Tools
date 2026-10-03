@@ -1,3 +1,5 @@
+using Mapping_Tools.Desktop.Localization;
+using Mapping_Tools.Application.Localization;
 using Avalonia.Controls;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
@@ -400,12 +402,13 @@ public sealed class HitsoundStudioViewModelTests
             .Should()
             .BeOfType<MessageDialogRequest<bool>>()
             .Subject;
-        request.Message.Should().Contain("broken layer: decoder failed");
+        request.Message.Should().Contain(ApplicationText.Format(DesktopStrings.HitsoundStudio_LayerFailure, "broken layer",
+            ApplicationStrings.Exception_UnexpectedFailure));
         request.Details.Should().Contain("decoder failed");
     }
 
     [TestMethod]
-    public async Task ValidateSamplesCommand_WithMultipleDecoderFailures_ShowsFirstExceptionDetails()
+    public async Task ValidateSamplesCommand_WithMultipleDecoderFailures_PreservesEveryExceptionInDetails()
     {
         // Arrange
         HitsoundStudioViewModelTestFactory.RecordingHitsoundStudioService service = new();
@@ -445,7 +448,7 @@ public sealed class HitsoundStudioViewModelTests
             .BeOfType<MessageDialogRequest<bool>>()
             .Subject;
         request.Details.Should().Contain("first decoder failure")
-            .And.NotContain("second decoder failure");
+            .And.Contain("second decoder failure");
     }
 
 

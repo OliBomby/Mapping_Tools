@@ -11,11 +11,14 @@ using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Tools.MapCleaner.Models;
 using Mapping_Tools.Desktop.Controls.Timeline;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tools.MapCleaner.Models;
 using Mapping_Tools.Desktop.ViewModels;
+
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Desktop.Tools.MapCleaner.ViewModels;
 
@@ -139,7 +142,7 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
             cancellationToken));
     }
 
-    ProjectDefinition<MapCleanerProject> IShellProjectFeature<MapCleanerProject>.ProjectDefinition { get; } = new(
+    ProjectDefinition<MapCleanerProject> IShellProjectFeature<MapCleanerProject>.ProjectDefinition => new(
         "mapcleanerproject.json",
         "Map Cleaner Projects",
         () => new MapCleanerProject(),
@@ -188,7 +191,7 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
             await notifications.PublishAsync(new UserNotification(
                 UserNotificationSeverity.Warning,
                 Tool.DisplayName,
-                "Select at least one beatmap or open one in osu! before running Map Cleaner."));
+                DesktopStrings.MapCleaner_EmptySelection));
             return;
         }
 
@@ -201,7 +204,7 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
                 async context =>
                 {
                     Progress<double> progress = new(value =>
-                        context.ReportProgress(value, "Cleaning beatmaps"));
+                        context.ReportProgress(value, DesktopStrings.MapCleaner_CleaningProgress));
                     var result = await cleaner.CleanAsync(
                         paths,
                         options,
@@ -277,15 +280,29 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
 
     private static string Summarize(MapCleanerResult result, MapCleanerServiceOptions.MapCleanerCleanupOptions options)
     {
-        return $"Successfully {(result.TimingPointsRemoved < 0 ? "added" : "removed")} "
-               + $"{Math.Abs(result.TimingPointsRemoved)} "
-               + $"{(Math.Abs(result.TimingPointsRemoved) == 1 ? "greenline" : "greenlines")}"
-               + (options.ResnapObjects
-                   ? $" and resnapped {result.ObjectsResnapped} " + $"{(result.ObjectsResnapped == 1 ? "object" : "objects")}"
-                   : string.Empty)
-               + (options.RemoveUnusedSamples
-                   ? $" and removed {result.SamplesRemoved} unused " + $"{(result.SamplesRemoved == 1 ? "sample" : "samples")}"
-                   : string.Empty)
-               + "!";
+        int greenlines = Math.Abs(result.TimingPointsRemoved);
+        string summary = result.TimingPointsRemoved < 0
+            ? greenlines == 1
+                ? DesktopStrings.MapCleaner_SummaryAddedOne
+                : ApplicationText.Format(DesktopStrings.MapCleaner_SummaryAddedMany, greenlines)
+            : greenlines == 1
+                ? DesktopStrings.MapCleaner_SummaryRemovedOne
+                : ApplicationText.Format(DesktopStrings.MapCleaner_SummaryRemovedMany, greenlines);
+
+        if (options.ResnapObjects)
+        {
+            summary += " " + (result.ObjectsResnapped == 1
+                ? DesktopStrings.MapCleaner_SummaryResnappedOne
+                : ApplicationText.Format(DesktopStrings.MapCleaner_SummaryResnappedMany, result.ObjectsResnapped));
+        }
+
+        if (options.RemoveUnusedSamples)
+        {
+            summary += " " + (result.SamplesRemoved == 1
+                ? DesktopStrings.MapCleaner_SummaryRemovedSampleOne
+                : ApplicationText.Format(DesktopStrings.MapCleaner_SummaryRemovedSampleMany, result.SamplesRemoved));
+        }
+
+        return summary + "!";
     }
 }

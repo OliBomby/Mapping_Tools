@@ -3,24 +3,30 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
+using Mapping_Tools.Desktop.Localization;
 
 namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 
 /// <summary>Edits one ordered selection-predicate collection in the generator settings dialog.</summary>
-public sealed partial class GeometryDashboardPredicateCollectionViewModel : ObservableObject
+public sealed partial class GeometryDashboardPredicateCollectionViewModel : LocalizedObservableObject
 {
+    private readonly string propertyName;
+    private readonly Func<string>? nameGetter;
+
     /// <summary>Creates an editor for a predicate collection.</summary>
-    /// <param name="name">The display name for the collection.</param>
+    /// <param name="propertyName">The stable settings-property name used to resolve the collection's translated display name.</param>
     /// <param name="model">The settings collection edited by this view model.</param>
-    public GeometryDashboardPredicateCollectionViewModel(string name, SelectionPredicateCollection model)
+    public GeometryDashboardPredicateCollectionViewModel(string propertyName, SelectionPredicateCollection model)
     {
-        Name = name ?? throw new ArgumentNullException(nameof(name));
+        this.propertyName = propertyName ?? throw new ArgumentNullException(nameof(propertyName));
         Model = model ?? throw new ArgumentNullException(nameof(model));
+        nameGetter = ResourceAccessor.FindGetter(
+            typeof(DesktopStrings), $"GeometryDashboard_Setting_{propertyName}_Name");
         Predicates = new ObservableCollection<SelectionPredicate>(Model.Predicates);
     }
 
     /// <summary>Gets the display name for this predicate collection.</summary>
-    public string Name { get; }
+    public string Name => nameGetter?.Invoke() ?? propertyName;
 
     /// <summary>Gets the settings collection kept in sync with the visible rows.</summary>
     [Undoable]

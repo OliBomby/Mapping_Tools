@@ -1,11 +1,11 @@
 <Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:loc="using:Mapping_Tools.Desktop.Localization"
         xmlns:vm="using:Mapping_Tools.Desktop.Tools.RhythmGuide.ViewModels"
         xmlns:views="using:Mapping_Tools.Desktop.Tools.RhythmGuide.Views"
         xmlns:controls="using:Mapping_Tools.Desktop.Controls"
         x:Class="Mapping_Tools.Desktop.Tools.RhythmGuide.Views.RhythmGuideWindow"
         x:DataType="vm:RhythmGuideViewModel"
-        Title="Rhythm Guide"
+        Title="{loc:Tr RhythmGuide_WindowTitle}"
         Width="800"
         Height="600"
         CanResize="True"
@@ -20,7 +20,7 @@
         FontWeight="Medium">
     <Grid RowDefinitions="Auto,*">
         <controls:WindowChrome Grid.Row="0"
-                               Title="Rhythm Guide" />
+                               Title="{loc:Tr RhythmGuide_WindowTitle}" />
 
         <Grid Grid.Row="1">
             <ContentControl Margin="10">

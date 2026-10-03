@@ -6,6 +6,7 @@
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:materialIcons="using:Material.Icons.Avalonia"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
              x:Class="Mapping_Tools.Desktop.Tools.ComboColourStudio.Views.ComboColourStudioView"
              x:Name="Root"
              x:DataType="vm:ComboColourStudioViewModel">
@@ -14,7 +15,7 @@
             <controls:ToolViewHeader
                 Title="Combo Colour Studio"
                 IsQuickRunSupported="True"
-                HelpText="With Combo Colour Studio you can easily customize the combo colours of your beatmap. AKA colour haxing.&#x0a;&#x0a;You define colored sections much like how you use timing points in the osu! editor. Just add a new colour point and define the sequence of combo colours.&#x0a;&#x0a;You can also define 'burst' colour points which only work for one combo, so you can emphasize specific patterns using colour.&#x0a;&#x0a;You can get started by adding a combo colour using the plus on the bottom left or by importing combo colours from an existing map. The combo colours can be edited by clicking on the coloured circles.&#x0a;&#x0a;Add a colour point by clicking on the plus on the bottom right. You can edit the colour sequence by double clicking the colour sequence cell." />
+                HelpText="{loc:Tr ComboColourStudio_StudioHelp}" />
 
             <Grid Grid.Row="1" RowDefinitions="*,Auto">
                 <DataGrid Grid.Row="0" ItemsSource="{Binding ColourPoints}"
@@ -28,14 +29,29 @@
                           UseLogicalScrollable="True"
                           ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <DataGrid.Columns>
-                        <controls:CompactDataGridTextColumn Header="Offset"
+                        <controls:CompactDataGridTextColumn Header="{loc:Tr ComboColourStudio_Offset}"
                                                             Binding="{Binding Time, Mode=TwoWay, Converter={StaticResource TimeToStringConverter}}" />
-                        <controls:CompactDataGridComboBoxColumn Header="Mode"
-                                                                ItemsSource="{Binding ColourPointModes}"
-                                                                SelectedItemBinding="{ReflectionBinding Mode, Mode=TwoWay}"
-                                                                SortMemberPath="Mode"
-                                                                IsReadOnly="False" />
-                        <DataGridTemplateColumn Header="Colour Sequence">
+                        <DataGridTemplateColumn Header="{loc:Tr ComboColourStudio_Mode}" SortMemberPath="Mode">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="adapter:ObservableColourPoint">
+                                    <TextBlock Text="{loc:TranslatedBinding Mode, Converter={x:Static loc:ToolChoiceConverter.Instance}}"
+                                               VerticalAlignment="Center" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                            <DataGridTemplateColumn.CellEditingTemplate>
+                                <DataTemplate x:DataType="adapter:ObservableColourPoint">
+                                    <ComboBox Classes="compact" ItemsSource="{Binding ColourPointModes}"
+                                              SelectedItem="{Binding Mode, Mode=TwoWay}">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellEditingTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="{loc:Tr ComboColourStudio_Sequence}">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate x:DataType="adapter:ObservableColourPoint">
                                     <ItemsControl ItemsSource="{Binding ColourSequence}">
@@ -80,7 +96,7 @@
                                                                     Width="32" Height="32" Padding="0"
                                                                     CornerRadius="16" ClipToBounds="True"
                                                                     Click="RemoveSequenceColour_OnClick"
-                                                                    ToolTip.Tip="Remove this colour.">
+                                                                    ToolTip.Tip="{loc:Tr ComboColourStudio_RemoveSequenceEntry}">
                                                                 <materialIcons:MaterialIcon Kind="Close" Width="18"
                                                                         Height="18" />
                                                             </Button>
@@ -91,12 +107,12 @@
                                         </ListBox>
                                         <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="5,0"
                                                                        Click="AddSequenceColourButtonClick"
-                                                                       ToolTip.Tip="Add a colour to this sequence.">
+                                                                       ToolTip.Tip="{loc:Tr ComboColourStudio_AddToSequence}">
                                             <materialIcons:MaterialIcon Kind="Plus" Width="22" Height="22" />
                                         </materialDesign:FloatingButton>
                                         <materialDesign:FloatingButton Classes="mini light no-transitions"
                                                                        Command="{Binding $parent[DataGrid].((vm:ComboColourStudioViewModel)DataContext)?.RemoveSequenceColourCommand}"
-                                                                       ToolTip.Tip="Remove the last colour from this sequence.">
+                                                                       ToolTip.Tip="{loc:Tr ComboColourStudio_RemoveLastFromSequence}">
                                             <materialIcons:MaterialIcon Kind="Minus" Width="22" Height="22" />
                                         </materialDesign:FloatingButton>
                                     </StackPanel>
@@ -130,12 +146,12 @@
                             </materialDesign:Card>
                             <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="10,5,5,5"
                                                            Command="{Binding AddComboColourCommand}"
-                                                           ToolTip.Tip="Add a new combo colour.">
+                                                           ToolTip.Tip="{loc:Tr ComboColourStudio_AddPaletteColour}">
                                 <materialIcons:MaterialIcon Kind="Plus" Width="24" Height="24" />
                             </materialDesign:FloatingButton>
                             <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="5"
                                                            Command="{Binding RemoveComboColourCommand}"
-                                                           ToolTip.Tip="Remove the last combo colour.">
+                                                           ToolTip.Tip="{loc:Tr ComboColourStudio_RemoveLastPaletteColour}">
                                 <materialIcons:MaterialIcon Kind="Minus" Width="24" Height="24" />
                             </materialDesign:FloatingButton>
                         </StackPanel>
@@ -145,12 +161,12 @@
                             <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="5"
                                                            x:Name="AddColourPointButton"
                                                            Click="AddColourPointButtonClick"
-                                                           ToolTip.Tip="Add a new colour point. Hold shift to add current editor time.">
+                                                           ToolTip.Tip="{loc:Tr ComboColourStudio_AddPoint}">
                                 <materialIcons:MaterialIcon Kind="Plus" Width="24" Height="24" />
                             </materialDesign:FloatingButton>
                             <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="5"
                                                            Command="{Binding RemoveColourPointCommand}"
-                                                           ToolTip.Tip="Remove selected colour points or the last point.">
+                                                           ToolTip.Tip="{loc:Tr ComboColourStudio_RemovePoints}">
                                 <materialIcons:MaterialIcon Kind="Minus" Width="24" Height="24" />
                             </materialDesign:FloatingButton>
                         </StackPanel>
@@ -159,16 +175,16 @@
                     <materialDesign:Card Grid.Row="1" Padding="2" Margin="0,10,5,5"
                                          HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
                         <StackPanel Orientation="Horizontal">
-                            <Button Content="Import colours" Margin="5"
+                            <Button Content="{loc:Tr ComboColourStudio_ImportColours}" Margin="5"
                                     Command="{Binding ImportColoursCommand}"
-                                    ToolTip.Tip="Import combo colours from a beatmap." />
-                            <Button Content="Import colourhax" Margin="5"
+                                    ToolTip.Tip="{loc:Tr ComboColourStudio_ImportColoursTip}" />
+                            <Button Content="{loc:Tr ComboColourStudio_ImportHax}" Margin="5"
                                     Command="{Binding ImportColourHaxCommand}"
-                                    ToolTip.Tip="Import colour haxing from a beatmap and populate colour points." />
+                                    ToolTip.Tip="{loc:Tr ComboColourStudio_ImportHaxTip}" />
                             <TextBox Width="130" Margin="25,0,10,5"
-                                     materialAssists:TextFieldAssist.Label="Max burst length"
+                                     materialAssists:TextFieldAssist.Label="{loc:Tr ComboColourStudio_MaxBurstLength}"
                                      Text="{Binding Project.MaxBurstLength, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantInt32Converter}}"
-                                     ToolTip.Tip="Determines the maximum combo size for burst combos. Combos longer than this value can't get a colour from burst colour points." />
+                                     ToolTip.Tip="{loc:Tr ComboColourStudio_MaxBurstLengthTip}" />
                         </StackPanel>
                     </materialDesign:Card>
                 </Grid>
@@ -183,7 +199,7 @@
             <Grid Grid.Column="0">
                 <WrapPanel VerticalAlignment="Bottom">
                     <TextBlock TextWrapping="NoWrap" FontWeight="Bold" Opacity="0.58"
-                               Text="Made by OliBomby" />
+                               Text="{loc:Tr Common_FooterMadeBy}" />
                 </WrapPanel>
             </Grid>
             <Grid Grid.Column="1">

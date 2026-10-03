@@ -2,6 +2,7 @@ using Mapping_Tools.Application.Backups.Contracts;
 using Mapping_Tools.Application.Backups.Models;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
+using Mapping_Tools.Application.Localization;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Workspace.Contracts;
 
@@ -61,7 +62,7 @@ public sealed class QuickUndoCommandService : IQuickUndoCommandService
                 await PublishAsync(
                         UserNotificationSeverity.Warning,
                         "QuickUndo",
-                        "QuickUndo could not determine the beatmap open in osu!.")
+                        ApplicationStrings.QuickUndo_NoCurrentBeatmap)
                     .ConfigureAwait(false);
                 return new QuickUndoCommandResult(
                     QuickUndoCommandStatus.NoCurrentBeatmap);
@@ -78,7 +79,7 @@ public sealed class QuickUndoCommandService : IQuickUndoCommandService
                 await PublishAsync(
                         UserNotificationSeverity.Warning,
                         "QuickUndo",
-                        "No non-periodic retained backup is available to restore.")
+                        ApplicationStrings.QuickUndo_NoBackup)
                     .ConfigureAwait(false);
                 return new QuickUndoCommandResult(
                     QuickUndoCommandStatus.NoBackup);
@@ -87,7 +88,7 @@ public sealed class QuickUndoCommandService : IQuickUndoCommandService
             await PublishAsync(
                     UserNotificationSeverity.Success,
                     "QuickUndo",
-                    "The newest non-periodic backup was restored successfully.")
+                    ApplicationStrings.QuickUndo_Restored)
                 .ConfigureAwait(false);
             return new QuickUndoCommandResult(
                 QuickUndoCommandStatus.Restored,
@@ -103,7 +104,7 @@ public sealed class QuickUndoCommandService : IQuickUndoCommandService
             await PublishAsync(
                     UserNotificationSeverity.Error,
                     "QuickUndo",
-                    exception.Message,
+                    ApplicationExceptionText.GetSummary(exception),
                     exception)
                 .ConfigureAwait(false);
             return new QuickUndoCommandResult(

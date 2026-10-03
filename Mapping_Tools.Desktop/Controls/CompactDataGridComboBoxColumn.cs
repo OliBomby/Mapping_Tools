@@ -19,8 +19,12 @@ public sealed class CompactDataGridComboBoxColumn : DataGridComboBoxColumn
     protected override Control GenerateEditingElement(DataGridCell cell, object dataItem, out ICellEditBinding editBinding)
     {
         var element = base.GenerateEditingElement(cell, dataItem, out editBinding);
-        if (element is ComboBox comboBox && !comboBox.Classes.Contains("compact"))
-            comboBox.Classes.Add("compact");
+        if (element is ComboBox comboBox)
+        {
+            comboBox.ItemTemplate = ItemTemplate ?? comboBox.ItemTemplate;
+            if (!comboBox.Classes.Contains("compact"))
+                comboBox.Classes.Add("compact");
+        }
 
         return element;
     }
@@ -34,8 +38,12 @@ public sealed class CompactDataGridComboBoxColumn : DataGridComboBoxColumn
     protected override Control GenerateElement(DataGridCell cell, object dataItem)
     {
         var element = base.GenerateElement(cell, dataItem);
-        if (element is ComboBox comboBox && !comboBox.Classes.Contains("compact"))
-            comboBox.Classes.Add("compact");
+        if (element is ComboBox comboBox)
+        {
+            comboBox.ItemTemplate = ItemTemplate ?? comboBox.ItemTemplate;
+            if (!comboBox.Classes.Contains("compact"))
+                comboBox.Classes.Add("compact");
+        }
 
         return element;
     }

@@ -1,8 +1,11 @@
 using System.Diagnostics;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Microsoft.Extensions.Hosting;
+
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Desktop.Services.Notifications;
 
@@ -65,9 +68,9 @@ internal sealed class NotificationPresenter : IHostedService
         {
             await dialogs.ShowMessageAsync(
                 new MessageDialogRequest<bool>(
-                    $"Error: {notification.Title}",
+                    ApplicationText.Format(DesktopStrings.Shell_ErrorTitle, notification.Title),
                     notification.Message,
-                    [new DialogChoice<bool>("OK", true, true, true)],
+                    [new DialogChoice<bool>(DesktopStrings.Shell_UpperOk, true, true, true)],
                     true,
                     FormatExceptionDetails(notification.Exception)));
         }

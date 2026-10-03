@@ -1,5 +1,6 @@
 using Mapping_Tools.Desktop.Services.Undo;
 using System.ComponentModel.DataAnnotations;
+using Mapping_Tools.Desktop.Localization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Desktop.Tools.PatternGallery.Models;
@@ -7,7 +8,7 @@ using Mapping_Tools.Desktop.Tools.PatternGallery.Models;
 namespace Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels;
 
 /// <summary>Owns the two names edited by the Pattern Gallery collection rename form.</summary>
-public sealed partial class PatternGalleryCollectionRenameViewModel : ObservableValidator
+public sealed partial class PatternGalleryCollectionRenameViewModel : LocalizedObservableValidator
 {
     /// <summary>Creates the rename form with the current collection names.</summary>
     /// <param name="newName">The current display name.</param>
@@ -23,14 +24,14 @@ public sealed partial class PatternGalleryCollectionRenameViewModel : Observable
     /// <summary>Gets or sets the collection's new display name.</summary>
     [ObservableProperty]
     [NotifyDataErrorInfo]
-    [Required(ErrorMessage = "A collection name is required.")]
+    [Required(ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.PatternGallery_Validation_CollectionNameRequired))]
     [Undoable]
     public partial string NewName { get; set; }
 
     /// <summary>Gets or sets the collection's new directory name.</summary>
     [ObservableProperty]
     [NotifyDataErrorInfo]
-    [Required(ErrorMessage = "A collection directory name is required.")]
+    [Required(ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.PatternGallery_Validation_CollectionDirectoryRequired))]
     [Undoable]
     public partial string NewFolderName { get; set; }
 

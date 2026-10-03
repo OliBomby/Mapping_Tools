@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Globalization;
 using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.Audio.Contracts;
@@ -7,6 +8,7 @@ using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Tools.HitsoundStudio.Contracts;
 using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
+using Mapping_Tools.Application.Localization;
 using Mapping_Tools.Application.Tools.MapCleaner;
 using Mapping_Tools.Core.Audio;
 using Mapping_Tools.Core.Audio.Midi;
@@ -214,10 +216,11 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             standard.Events.Count, standard.Schema.Count);
         Report(progress, 0.6);
 
-        string detailedSummary =
-            $"Number of sample indices: {standard.Schema.GetCustomIndices(comparer).Count}, "
-            + $"Number of samples: {standard.Schema.Count(entry => entry.Value.Any(isValid))}, "
-            + $"Number of greenlines: {CountIndexChanges(standard.Events)}";
+        string detailedSummary = ApplicationText.Format(
+            "HitsoundStudio_ExportSummary",
+            standard.Schema.GetCustomIndices(comparer).Count,
+            standard.Schema.Count(entry => entry.Value.Any(isValid)),
+            CountIndexChanges(standard.Events));
 
         bool writesFiles = project.ExportSamples || project.ExportMap;
         DeleteExportFilesIfRequested(project, writesFiles, cancellationToken);
@@ -322,10 +325,9 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             named.Events.Count, named.Schema.Count);
         Report(progress, 0.5);
 
-        string detailedSummary =
-            "Number of sample indices: 0, Number of samples: "
-            + $"{packages.SelectMany(package => package.Samples).Select(sample => sample.SampleArgs).Distinct(comparer).Count()}, "
-            + "Number of greenlines: 0";
+        string detailedSummary = ApplicationText.Format(
+            "HitsoundStudio_ImportSummary",
+            packages.SelectMany(package => package.Samples).Select(sample => sample.SampleArgs).Distinct(comparer).Count());
 
         bool writesFiles = project.ExportSamples || project.ExportMap;
         DeleteExportFilesIfRequested(project, writesFiles, cancellationToken);
@@ -377,9 +379,10 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             cancellationToken).ConfigureAwait(false);
         var beatmap = session.Beatmap;
 
-        string detailedSummary =
-            $"Number of notes: {packages.Sum(package => package.Samples.Count)}, "
-            + $"Number of volume changes: {(project.AddGreenLineVolumeToMidi ? beatmap.BeatmapTiming.TimingPoints.Count : 0)}";
+        string detailedSummary = ApplicationText.Format(
+            "HitsoundStudio_MidiSummary",
+            packages.Sum(package => package.Samples.Count),
+            project.AddGreenLineVolumeToMidi ? beatmap.BeatmapTiming.TimingPoints.Count : 0);
         Report(progress, 0.2);
 
         bool writesFiles = project.ExportMap;
@@ -1001,6 +1004,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         return Math.Pow(Math.Ceiling(Math.Pow(length, 1 / roughness)), roughness);
     }
 
+    [Localizable(false)] // Preserve technical diagnostics; the presentation supplies a translated exception summary.
     private static void Validate(HitsoundStudioServiceOptions project)
     {
         ArgumentNullException.ThrowIfNull(project);

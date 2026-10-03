@@ -7,6 +7,7 @@
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:materialIcons="using:Material.Icons.Avalonia"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
              x:Class="Mapping_Tools.Desktop.Tools.HitsoundStudio.Views.HitsoundStudioView"
              x:DataType="vm:HitsoundStudioViewModel">
     <UserControl.Resources>
@@ -19,7 +20,7 @@
         <controls:ToolViewHeader Grid.ColumnSpan="2"
                                  Title="Hitsound Studio"
                                  IsQuickRunSupported="True"
-                                 HelpText="Hitsound Studio is the tool that lets you import data from multiple outside sources and convert them to osu! standard hitsounds in the form of a hitsounding difficulty that you can copy to other beatmaps.&#x0a;&#x0a;It represents hitsounds as a list of layers (hitsound layers). One layer contains a unique sound, the sampleset and hitsound that accompany that sound and a list of times that sound has to be played." />
+                                 HelpText="{loc:Tr HitsoundStudio_Help}" />
 
         <Grid Grid.Row="1"
               Grid.ColumnSpan="2" Grid.Column="0">
@@ -43,53 +44,57 @@
                                 Margin="0,0,0,20">
                         <TextBlock FontSize="14"
                                    FontWeight="Bold"
-                                   Text="General" />
+                                   Text="{loc:Tr HitsoundStudio_General}" />
                         <TextBox x:Name="NameEditor"
                                  Margin="0,5,0,0"
                                  Text="{Binding EditName, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                 materialAssists:TextFieldAssist.Label="Name"
-                                 ToolTip.Tip="The name of this hitsound layer." />
+                                 materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_LayerName}"
+                                 ToolTip.Tip="{loc:Tr HitsoundStudio_LayerNameTip}" />
                         <ComboBox x:Name="SampleSetEditor"
                                   Margin="0,5,0,0"
                                   Cursor="Hand"
                                   ItemsSource="{Binding SampleSets}"
                                   SelectedItem="{Binding EditSampleSet, Mode=TwoWay}"
-                                  materialAssists:ComboBoxAssist.Label="Sample set"
-                                  ToolTip.Tip="The sampleset that this sample should play on." />
+                                  materialAssists:ComboBoxAssist.Label="{loc:Tr HitsoundStudio_SampleSet}"
+                                  ToolTip.Tip="{loc:Tr HitsoundStudio_SampleSetTip}">
+                            <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" /></DataTemplate></ComboBox.ItemTemplate>
+                        </ComboBox>
                         <ComboBox Margin="0,5,0,0"
                                   Cursor="Hand"
                                   ItemsSource="{Binding Hitsounds}"
                                   SelectedItem="{Binding EditHitsound, Mode=TwoWay}"
-                                  materialAssists:ComboBoxAssist.Label="Hitsound"
-                                  ToolTip.Tip="The hitsound that this sample should play on." />
+                                  materialAssists:ComboBoxAssist.Label="{loc:Tr HitsoundStudio_Hitsound}"
+                                  ToolTip.Tip="{loc:Tr HitsoundStudio_HitsoundTip}">
+                            <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" /></DataTemplate></ComboBox.ItemTemplate>
+                        </ComboBox>
                         <CheckBox Margin="0,5,0,0"
-                                  Content="Show times"
+                                  Content="{loc:Tr HitsoundStudio_ShowTimes}"
                                   IsChecked="{Binding ShowTimes, Mode=TwoWay}"
-                                  ToolTip.Tip="Show the times when the sound of this hitsound layer has to be played." />
+                                  ToolTip.Tip="{loc:Tr HitsoundStudio_ShowTimesTip}" />
                         <StackPanel IsVisible="{Binding ShowTimes}">
                             <TextBox
                                 Text="{Binding EditTimes, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource DoubleArrayToStringConverter}}"
                                 TextWrapping="Wrap"
-                                materialAssists:TextFieldAssist.Label="Times"
-                                ToolTip.Tip="Times in milliseconds, separated by commas." />
+                                materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Times}"
+                                ToolTip.Tip="{loc:Tr HitsoundStudio_TimesTip}" />
                         </StackPanel>
 
                         <TextBlock Margin="0,20,0,0"
                                    FontSize="14"
                                    FontWeight="Bold"
-                                   Text="Hitsound sample" />
+                                   Text="{loc:Tr HitsoundStudio_SampleHeading}" />
                         <Grid Margin="0,5,0,0"
                               ColumnDefinitions="*,Auto">
                             <TextBox Margin="0,0,5,0"
                                      Text="{Binding EditSamplePath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                     materialAssists:TextFieldAssist.Label="Path"
-                                     ToolTip.Tip="Audio or SoundFont source used to generate this layer." />
+                                     materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_SamplePath}"
+                                     ToolTip.Tip="{loc:Tr HitsoundStudio_SamplePathTip}" />
                             <Button Grid.Column="1"
                                     Classes="flat path-picker"
                                     Cursor="Hand"
                                     Command="{Binding PickEditSamplePathCommand}"
                                     VerticalAlignment="Bottom"
-                                    ToolTip.Tip="Choose the layer's audio or SoundFont source.">
+                                    ToolTip.Tip="{loc:Tr HitsoundStudio_ChooseSampleSource}">
                                 <materialIcons:MaterialIcon Width="30"
                                                             Height="30"
                                                             Kind="Folder" />
@@ -97,67 +102,69 @@
                         </Grid>
                         <TextBox Margin="0,5,0,0"
                                  Text="{Binding EditSampleVolume, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource HitsoundStudioSampleVolumeConverter}, ConverterParameter=100}"
-                                 materialAssists:TextFieldAssist.Label="Volume %"
-                                 ToolTip.Tip="The volume at which the sound of this hitsound layer has to play. Ranges from 0 to 100." />
+                                 materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Volume}"
+                                 ToolTip.Tip="{loc:Tr HitsoundStudio_VolumeTip}" />
                         <TextBox Margin="0,5,0,0"
                                  Text="{Binding EditSamplePanning, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=0}"
-                                 materialAssists:TextFieldAssist.Label="Panning"
-                                 ToolTip.Tip="Panning of the sound. -1 means all left and 1 means all right." />
+                                 materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Panning}"
+                                 ToolTip.Tip="{loc:Tr HitsoundStudio_PanningTip}" />
                         <TextBox Margin="0,5,0,0"
                                  Text="{Binding EditSamplePitchShift, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=0}"
-                                 materialAssists:TextFieldAssist.Label="Pitch shift"
-                                 ToolTip.Tip="Pitch shift of the sound in keys. 12 is plus one octave. -12 is minus one octave." />
+                                 materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_PitchShift}"
+                                 ToolTip.Tip="{loc:Tr HitsoundStudio_PitchShiftTip}" />
                         <StackPanel IsVisible="{Binding IsSoundFontSample}">
                             <TextBox Margin="0,5,0,0"
                                      Text="{Binding EditSampleBank, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                     materialAssists:TextFieldAssist.Label="Bank"
-                                     ToolTip.Tip="The bank number of the sample." />
+                                     materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Bank}"
+                                     ToolTip.Tip="{loc:Tr HitsoundStudio_BankTip}" />
                             <TextBox Margin="0,5,0,0"
                                      Text="{Binding EditSamplePatch, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                     materialAssists:TextFieldAssist.Label="Patch"
-                                     ToolTip.Tip="The patch number of the sample." />
+                                     materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Patch}"
+                                     ToolTip.Tip="{loc:Tr HitsoundStudio_PatchTip}" />
                             <TextBox Margin="0,5,0,0"
                                      Text="{Binding EditSampleInstrument, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                     materialAssists:TextFieldAssist.Label="Instrument"
-                                     ToolTip.Tip="The layer index in the sound font preset or instrument index." />
+                                     materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Instrument}"
+                                     ToolTip.Tip="{loc:Tr HitsoundStudio_InstrumentTip}" />
                             <TextBox Margin="0,5,0,0"
                                      Text="{Binding EditSampleKey, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                     materialAssists:TextFieldAssist.Label="Key"
-                                     ToolTip.Tip="The key number of the sample." />
+                                     materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Key}"
+                                     ToolTip.Tip="{loc:Tr HitsoundStudio_KeyTip}" />
                             <TextBox Margin="0,5,0,0"
                                      Text="{Binding EditSampleLength, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}"
-                                     materialAssists:TextFieldAssist.Label="Length"
-                                     ToolTip.Tip="The length in milliseconds of the sample." />
+                                     materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Length}"
+                                     ToolTip.Tip="{loc:Tr HitsoundStudio_LengthTip}" />
                             <TextBox Margin="0,5,0,0"
                                      Text="{Binding EditSampleVelocity, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                     materialAssists:TextFieldAssist.Label="Velocity"
-                                     ToolTip.Tip="The velocity of the sample. Synonymous with the volume field." />
+                                     materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Velocity}"
+                                     ToolTip.Tip="{loc:Tr HitsoundStudio_VelocityTip}" />
                         </StackPanel>
 
                         <TextBlock Margin="0,20,0,0"
                                    FontSize="14"
                                    FontWeight="Bold"
-                                   Text="Import info"
-                                   ToolTip.Tip="Holds all the info from importing such that the layer can be re-imported with the same result." />
+                                   Text="{loc:Tr HitsoundStudio_ImportInfo}"
+                                   ToolTip.Tip="{loc:Tr HitsoundStudio_ImportInfoTip}" />
                         <ComboBox Margin="0,5,0,0"
                                   Cursor="Hand"
                                   ItemsSource="{Binding ImportTypes}"
                                   SelectedItem="{Binding EditImportType, Mode=TwoWay}"
-                                  materialAssists:ComboBoxAssist.Label="Import type"
-                                  ToolTip.Tip="How to import the source of this hitsound layer." />
+                                  materialAssists:ComboBoxAssist.Label="{loc:Tr HitsoundStudio_ImportType}"
+                                  ToolTip.Tip="{loc:Tr HitsoundStudio_ImportTypeTip}">
+                            <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" /></DataTemplate></ComboBox.ItemTemplate>
+                        </ComboBox>
                         <StackPanel IsVisible="{Binding HasImport}">
                             <Grid Margin="0,5,0,0"
                                   ColumnDefinitions="*,Auto,5,Auto">
                                 <TextBox Margin="0,0,5,0"
                                          Text="{Binding EditImportPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                         materialAssists:TextFieldAssist.Label="Source path"
-                                         ToolTip.Tip="The source of this hitsound layer." />
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_SourcePath}"
+                                         ToolTip.Tip="{loc:Tr HitsoundStudio_SourcePathTip}" />
                                 <Button Grid.Column="1"
                                         Classes="flat path-picker"
                                         Cursor="Hand"
                                         Command="{Binding LoadEditImportPathCommand}"
                                         VerticalAlignment="Bottom"
-                                        ToolTip.Tip="Fetch the selected beatmap from your osu! client.">
+                                        ToolTip.Tip="{loc:Tr HitsoundStudio_FetchSelectedBeatmap}">
                                     <materialIcons:MaterialIcon Width="30"
                                                                 Height="30"
                                                                 Kind="RestoreFromTrash" />
@@ -167,7 +174,7 @@
                                         Cursor="Hand"
                                         Command="{Binding PickEditImportPathCommand}"
                                         VerticalAlignment="Bottom"
-                                        ToolTip.Tip="Select the import source with a file picker.">
+                                        ToolTip.Tip="{loc:Tr HitsoundStudio_PickImportSource}">
                                     <materialIcons:MaterialIcon Width="30"
                                                                 Height="30"
                                                                 Kind="Folder" />
@@ -178,12 +185,12 @@
                                       ColumnDefinitions="*,5,*">
                                     <TextBox
                                         Text="{Binding EditImportX, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}"
-                                        materialAssists:TextFieldAssist.Label="X coordinate"
-                                        ToolTip.Tip="The X coordinate of the stack in the source beatmap." />
+                                        materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_XCoordinate}"
+                                        ToolTip.Tip="{loc:Tr HitsoundStudio_XCoordinateTip}" />
                                     <TextBox Grid.Column="2"
                                              Text="{Binding EditImportY, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}"
-                                             materialAssists:TextFieldAssist.Label="Y coordinate"
-                                             ToolTip.Tip="The Y coordinate of the stack in the source beatmap." />
+                                             materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_YCoordinate}"
+                                             ToolTip.Tip="{loc:Tr HitsoundStudio_YCoordinateTip}" />
                                 </Grid>
                             </StackPanel>
                             <StackPanel IsVisible="{Binding IsSampleImport}">
@@ -191,14 +198,14 @@
                                       ColumnDefinitions="*,Auto">
                                     <TextBox Margin="0,0,5,0"
                                              Text="{Binding EditImportSamplePath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                             materialAssists:TextFieldAssist.Label="Sample path"
-                                             ToolTip.Tip="Unique sample which this layer imported from the source beatmap." />
+                                             materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_ImportedSamplePath}"
+                                             ToolTip.Tip="{loc:Tr HitsoundStudio_ImportedSamplePathTip}" />
                                     <Button Grid.Column="1"
                                             Classes="flat path-picker"
                                             Cursor="Hand"
                                             Command="{Binding PickEditImportSamplePathCommand}"
                                             VerticalAlignment="Bottom"
-                                            ToolTip.Tip="Choose the imported sample file.">
+                                            ToolTip.Tip="{loc:Tr HitsoundStudio_ChooseImportedSample}">
                                         <materialIcons:MaterialIcon Width="30"
                                                                     Height="30"
                                                                     Kind="Folder" />
@@ -206,59 +213,59 @@
                                 </Grid>
                                 <CheckBox Margin="0,5,0,0"
                                           IsVisible="{Binding IsHitsoundsImport}"
-                                          Content="Discriminate volumes"
+                                          Content="{loc:Tr HitsoundStudio_DiscriminateVolumes}"
                                           IsChecked="{Binding EditImportDiscriminateVolumes, Mode=TwoWay}"
-                                          ToolTip.Tip="Make separate hitsound layers for different source volumes." />
+                                          ToolTip.Tip="{loc:Tr HitsoundStudio_DiscriminateVolumesTip}" />
                                 <CheckBox IsVisible="{Binding IsHitsoundsImport}"
-                                          Content="Detect duplicate samples"
+                                          Content="{loc:Tr HitsoundStudio_DetectDuplicateSamples}"
                                           IsChecked="{Binding EditImportDetectDuplicates, Mode=TwoWay}"
-                                          ToolTip.Tip="Merge hitsound layers which produce the exact same sound." />
+                                          ToolTip.Tip="{loc:Tr HitsoundStudio_DetectDuplicateSamplesTip}" />
                                 <CheckBox IsVisible="{Binding IsSampleImport}"
-                                          Content="Remove duplicates"
+                                          Content="{loc:Tr HitsoundStudio_RemoveDuplicates}"
                                           IsChecked="{Binding EditImportRemoveDuplicates, Mode=TwoWay}"
-                                          ToolTip.Tip="Remove duplicate values in the Times field." />
+                                          ToolTip.Tip="{loc:Tr HitsoundStudio_RemoveDuplicatesTip}" />
                             </StackPanel>
                             <StackPanel IsVisible="{Binding IsMidiImport}">
                                 <TextBox Margin="0,5,0,0"
                                          Text="{Binding EditImportBank, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                         materialAssists:TextFieldAssist.Label="Bank"
-                                         ToolTip.Tip="SoundFont bank filter, or -1 for any bank." />
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Bank}"
+                                         ToolTip.Tip="{loc:Tr HitsoundStudio_BankFilterTip}" />
                                 <TextBox Margin="0,5,0,0"
                                          Text="{Binding EditImportPatch, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                         materialAssists:TextFieldAssist.Label="Patch"
-                                         ToolTip.Tip="SoundFont patch filter, or -1 for any patch." />
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Patch}"
+                                         ToolTip.Tip="{loc:Tr HitsoundStudio_PatchFilterTip}" />
                                 <TextBox Margin="0,5,0,0"
                                          Text="{Binding EditImportKey, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                         materialAssists:TextFieldAssist.Label="Key"
-                                         ToolTip.Tip="MIDI key filter, or -1 for any key." />
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Key}"
+                                         ToolTip.Tip="{loc:Tr HitsoundStudio_KeyFilterTip}" />
                                 <TextBox Margin="0,5,0,0"
                                          Text="{Binding EditImportLength, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}"
-                                         materialAssists:TextFieldAssist.Label="Length"
-                                         ToolTip.Tip="MIDI length filter, or -1 for any length." />
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Length}"
+                                         ToolTip.Tip="{loc:Tr HitsoundStudio_LengthFilterTip}" />
                                 <TextBox
                                     Text="{Binding EditImportLengthRoughness, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=1}"
-                                    materialAssists:TextFieldAssist.Label="Length roughness"
-                                    ToolTip.Tip="Quantization used when importing MIDI note lengths." />
+                                    materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_LengthRoughness}"
+                                    ToolTip.Tip="{loc:Tr HitsoundStudio_LengthRoughnessTip}" />
                                 <TextBox Margin="0,5,0,0"
                                          Text="{Binding EditImportVelocity, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                         materialAssists:TextFieldAssist.Label="Velocity"
-                                         ToolTip.Tip="MIDI velocity filter, or -1 for any velocity." />
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Velocity}"
+                                         ToolTip.Tip="{loc:Tr HitsoundStudio_VelocityFilterTip}" />
                                 <TextBox Margin="0,5,0,0"
                                          Text="{Binding EditImportVelocityRoughness, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=1}"
-                                         materialAssists:TextFieldAssist.Label="Velocity roughness"
-                                         ToolTip.Tip="Quantization used when importing MIDI velocities." />
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_VelocityRoughness}"
+                                         ToolTip.Tip="{loc:Tr HitsoundStudio_VelocityRoughnessTip}" />
                                 <TextBox Margin="0,5,0,0"
                                          Text="{Binding EditImportOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=0}"
-                                         materialAssists:TextFieldAssist.Label="Offset"
-                                         ToolTip.Tip="Millisecond offset applied to imported events." />
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Offset}"
+                                         ToolTip.Tip="{loc:Tr HitsoundStudio_OffsetTip}" />
                             </StackPanel>
                             <Button x:Name="ReloadButton"
                                     Margin="0,20,0,0"
                                     FontSize="16"
                                     FontWeight="Bold"
-                                    Content="Reload from source"
+                                    Content="{loc:Tr HitsoundStudio_ReloadFromSource}"
                                     Command="{Binding ReloadCommand}"
-                                    ToolTip.Tip="Reload selected layers from their source." />
+                                    ToolTip.Tip="{loc:Tr HitsoundStudio_ReloadFromSourceTip}" />
                         </StackPanel>
                     </StackPanel>
                 </ScrollViewer>
@@ -286,26 +293,16 @@
                                            ScrollViewer.VerticalScrollBarVisibility="Visible"
                                            ScrollViewer.HorizontalScrollBarVisibility="Auto">
                 <controls:MaterialGridListView.Columns>
-                    <TableViewColumn Width="200"
-                                     Binding="{Binding Name}">
-                        <TableViewColumn.Header>Name</TableViewColumn.Header>
-                    </TableViewColumn>
-                    <TableViewColumn Width="90"
-                                     Binding="{Binding Times.Count}">
-                        <TableViewColumn.Header>Amount</TableViewColumn.Header>
-                    </TableViewColumn>
-                    <TableViewColumn Width="90"
-                                     Binding="{Binding SampleSet}">
-                        <TableViewColumn.Header>SampleSet</TableViewColumn.Header>
-                    </TableViewColumn>
-                    <TableViewColumn Width="90"
-                                     Binding="{Binding Hitsound}">
-                        <TableViewColumn.Header>Hitsound</TableViewColumn.Header>
-                    </TableViewColumn>
-                    <TableViewColumn Width="1000"
-                                     Binding="{Binding SampleArgs.Path}">
-                        <TableViewColumn.Header>Sample Path</TableViewColumn.Header>
-                    </TableViewColumn>
+                    <TableViewColumn Header="{loc:Tr HitsoundStudio_ColumnName}" Width="200"
+                                     Binding="{Binding Name}" />
+                    <TableViewColumn Header="{loc:Tr HitsoundStudio_ColumnAmount}" Width="90"
+                                     Binding="{Binding Times.Count}" />
+                    <TableViewColumn Header="{loc:Tr HitsoundStudio_SampleSet}" Width="90"
+                                     Binding="{Binding SampleSet}" />
+                    <TableViewColumn Header="{loc:Tr HitsoundStudio_Hitsound}" Width="90"
+                                     Binding="{Binding Hitsound}" />
+                    <TableViewColumn Header="{loc:Tr HitsoundStudio_SamplePath}" Width="1000"
+                                     Binding="{Binding SampleArgs.Path}" />
                 </controls:MaterialGridListView.Columns>
             </controls:MaterialGridListView>
 
@@ -316,7 +313,7 @@
                         VerticalAlignment="Bottom"
                         IsVisible="{Binding HasLayers, Converter={StaticResource BooleanNotConverter}}">
                 <TextBlock Foreground="{DynamicResource MaterialBodyLightBrush}"
-                           Text="Press the + button to import some hitsounds!"
+                           Text="{loc:Tr HitsoundStudio_EmptyLayersHint}"
                            FontSize="16"
                            TextAlignment="Center"
                            TextWrapping="Wrap" />
@@ -351,7 +348,7 @@
                 <materialDesign:FloatingButton Classes="mini light no-transitions"
                                                Margin="5"
                                                Command="{Binding AddCommand}"
-                                               ToolTip.Tip="Add or import a hitsound layer.">
+                                               ToolTip.Tip="{loc:Tr HitsoundStudio_AddLayerTip}">
                     <materialIcons:MaterialIcon Width="24"
                                                 Height="24"
                                                 Kind="Plus" />
@@ -360,7 +357,7 @@
                                                Margin="5"
                                                x:Name="RemoveButton"
                                                Command="{Binding RemoveCommand}"
-                                               ToolTip.Tip="Remove selected layers.">
+                                               ToolTip.Tip="{loc:Tr HitsoundStudio_RemoveLayersTip}">
                     <materialIcons:MaterialIcon Width="24"
                                                 Height="24"
                                                 Kind="TrashCan" />
@@ -369,7 +366,7 @@
                                                Margin="5"
                                                x:Name="RaiseButton"
                                                Click="RaiseLayers"
-                                               ToolTip.Tip="Raise selected layers in priority. Hold Shift to move ten positions.">
+                                               ToolTip.Tip="{loc:Tr HitsoundStudio_RaiseLayersTip}">
                     <materialIcons:MaterialIcon Width="24"
                                                 Height="24"
                                                 Kind="KeyboardArrowUp" />
@@ -378,7 +375,7 @@
                                                Margin="5"
                                                x:Name="LowerButton"
                                                Click="LowerLayers"
-                                               ToolTip.Tip="Lower selected layers in priority. Hold Shift to move ten positions.">
+                                               ToolTip.Tip="{loc:Tr HitsoundStudio_LowerLayersTip}">
                     <materialIcons:MaterialIcon Width="24"
                                                 Height="24"
                                                 Kind="KeyboardArrowDown" />
@@ -389,9 +386,9 @@
                     VerticalAlignment="Bottom"
                     FontSize="16"
                     FontWeight="Bold"
-                    Content="Validate samples"
+                    Content="{loc:Tr HitsoundStudio_ValidateSamples}"
                     Command="{Binding ValidateSamplesCommand}"
-                    ToolTip.Tip="Validate every sample source and report missing or unreadable files." />
+                    ToolTip.Tip="{loc:Tr HitsoundStudio_ValidateSamplesTip}" />
         </Grid>
 
         <Grid Grid.Row="2"
@@ -406,19 +403,19 @@
                             <TextBlock FontSize="14"
                                        VerticalAlignment="Bottom"
                                        Margin="0, 0, 0, 5"
-                                       Text="Base beatmap:"
-                                       ToolTip.Tip="Beatmap used as the export baseline and MIDI timing source." />
+                                       Text="{loc:Tr HitsoundStudio_BaseBeatmap}"
+                                       ToolTip.Tip="{loc:Tr HitsoundStudio_BaseBeatmapTip}" />
                             <TextBox x:Name="BaseBeatmapEditor"
                                      Grid.Column="1"
                                      Classes="compact"
                                      Margin="5,14,5,0"
                                      Text="{Binding BaseBeatmap, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                     ToolTip.Tip="Choose the base beatmap used as the export baseline and MIDI timing source." />
+                                     ToolTip.Tip="{loc:Tr HitsoundStudio_ChooseBaseBeatmapTip}" />
                             <Button Grid.Column="2"
                                     Classes="flat path-picker"
                                     Cursor="Hand"
                                     Command="{Binding LoadBaseBeatmapCommand}"
-                                    ToolTip.Tip="Load the beatmap currently open in osu!.">
+                                    ToolTip.Tip="{loc:Tr HitsoundStudio_LoadCurrentBeatmapTip}">
                                 <materialIcons:MaterialIcon Width="30"
                                                             Height="30"
                                                             Kind="RestoreFromTrash" />
@@ -427,7 +424,7 @@
                                     Classes="flat path-picker"
                                     Cursor="Hand"
                                     Command="{Binding PickBaseBeatmapCommand}"
-                                    ToolTip.Tip="Choose the base beatmap.">
+                                    ToolTip.Tip="{loc:Tr HitsoundStudio_ChooseBaseBeatmapTip}">
                                 <materialIcons:MaterialIcon Width="30"
                                                             Height="30"
                                                             Kind="Folder" />
@@ -437,33 +434,37 @@
                             <TextBlock FontSize="14"
                                        VerticalAlignment="Bottom"
                                        Margin="0, 0, 0, 5"
-                                       Text="Default sample:"
-                                       ToolTip.Tip="Normal sample added to packages that contain only additions." />
+                                       Text="{loc:Tr HitsoundStudio_DefaultSample}"
+                                       ToolTip.Tip="{loc:Tr HitsoundStudio_DefaultSampleTip}" />
                             <TextBox Grid.Column="1"
                                      Classes="compact"
                                      Margin="5,14,5,0"
                                      Text="{Binding DefaultSample.SampleArgs.Path, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                     ToolTip.Tip="Choose the default sample added to packages that contain only additions." />
+                                     ToolTip.Tip="{loc:Tr HitsoundStudio_ChooseDefaultSampleTip}" />
                             <ComboBox Grid.Column="2"
                                       Classes="compact"
-                                      Width="70"
+                                      MinWidth="70"
                                       Margin="0,14,5,-1"
                                       VerticalAlignment="Bottom"
                                       Cursor="Hand"
                                       ItemsSource="{Binding DefaultSampleSets}"
                                       SelectedItem="{Binding DefaultSample.SampleSet, Mode=TwoWay}"
-                                      ToolTip.Tip="Sample set of the default normal sample." />
+                                      ToolTip.Tip="{loc:Tr HitsoundStudio_DefaultSampleSetTip}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate><TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" /></DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
                             <TextBox Grid.Column="3"
                                      Classes="compact"
                                      Width="50"
                                      Margin="0,14,5,0"
                                      Text="{Binding DefaultSample.SampleArgs.Volume, Mode=TwoWay, UpdateSourceTrigger=LostFocus, ConverterParameter=-1, Converter={StaticResource HitsoundStudioSampleVolumeConverter}}"
-                                     ToolTip.Tip="Volume % of the default sample. Use -1 for invariant volume." />
+                                     ToolTip.Tip="{loc:Tr HitsoundStudio_DefaultSampleVolumeTip}" />
                             <Button Grid.Column="4"
                                     Classes="flat path-picker"
                                     Cursor="Hand"
                                     Command="{Binding PickDefaultSampleCommand}"
-                                    ToolTip.Tip="Choose the default sample.">
+                                    ToolTip.Tip="{loc:Tr HitsoundStudio_ChooseDefaultSampleTip}">
                                 <materialIcons:MaterialIcon Width="30"
                                                             Height="30"
                                                             Kind="Folder" />
@@ -479,7 +480,7 @@
                             <TextBlock TextWrapping="NoWrap"
                                        FontWeight="Bold"
                                        Opacity="0.58"
-                                       Text="Made by OliBomby" />
+                                       Text="{loc:Tr Common_FooterMadeBy}" />
                         </WrapPanel>
                     </Grid>
                     <Grid Grid.Column="1">

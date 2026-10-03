@@ -26,7 +26,12 @@ public sealed class ToolDefinitionTests
             "redlines",
             "BPM",
             "markers",
-            "beat divisors");
+            "beat divisors",
+            "redline",
+            "marker",
+            "beat divisor",
+            "snap",
+            "timing point");
         definition.QuickRunTargets.Should().Be(QuickRunTargets.Always);
     }
 

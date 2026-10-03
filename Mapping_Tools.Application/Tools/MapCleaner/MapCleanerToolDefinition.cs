@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.QuickRun.Models;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Tools.MapCleaner;
 
@@ -11,5 +12,7 @@ public static class MapCleanerToolDefinition
         "Map Cleaner",
         "Rebuild useful greenlines and optionally resnap map content.",
         ["clean", "greenline", "resnap", "samples"],
-        QuickRunTargets.Always);
+        QuickRunTargets.Always,
+        static () => ApplicationStrings.MapCleaner_Description,
+        static () => ApplicationStrings.MapCleaner_SearchTerms);
 }

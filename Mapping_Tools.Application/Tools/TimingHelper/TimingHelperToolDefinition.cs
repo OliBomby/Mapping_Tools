@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.QuickRun.Models;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Tools.TimingHelper;
 
@@ -11,5 +12,7 @@ public static class TimingHelperToolDefinition
         "Timing Helper",
         "Adjust BPM and add redlines so selected markers become snapped.",
         ["timing", "redlines", "BPM", "markers", "beat divisors"],
-        QuickRunTargets.Always);
+        QuickRunTargets.Always,
+        static () => ApplicationStrings.TimingHelper_Description,
+        static () => ApplicationStrings.TimingHelper_SearchTerms);
 }

@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
              xmlns:md="https://github.com/whistyun/Markdown.Avalonia"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -18,7 +19,7 @@
               Grid.Column="0"
               RowDefinitions="Auto,*">
             <TextBlock Grid.Row="0"
-                       Text="Get started"
+                       Text="{loc:Tr Shell_GetStarted}"
                        FontSize="32"
                        FontWeight="Bold"
                        Foreground="{DynamicResource MaterialPrimaryMidBrush}" />
@@ -29,14 +30,14 @@
                      ScrollViewer.AllowAutoHide="False"
                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
                      ScrollViewer.VerticalScrollBarVisibility="Auto">
-                <ListBoxItem>0. Set the correct path to your Songs folder in the [Preferences].</ListBoxItem>
-                <ListBoxItem>1. Select a beatmap [File] -&gt; [Open beatmap/Open current beatmap] to select a file from your system OR the current in-game selected beatmap.</ListBoxItem>
-                <ListBoxItem>2. Select a tool that you want to use from the navigation menu. (Ctrl+K)</ListBoxItem>
-                <ListBoxItem>3. Read a basic summary of the tool by clicking the (?) button.</ListBoxItem>
-                <ListBoxItem>4. Configure your tool. To find out what specific things do, read the tooltips by hovering over them.</ListBoxItem>
-                <ListBoxItem>5. Click the run button in the bottom right to run the program.</ListBoxItem>
-                <ListBoxItem>6. Reload your beatmap WITHOUT SAVING by either leaving and re-entering the editor or pressing Ctrl+L, Enter.</ListBoxItem>
-                <ListBoxItem>7. If you run into issues, consult the FAQ over on the [About] -&gt; [Website].</ListBoxItem>
+                <ListBoxItem Content="{loc:Tr Shell_Intro0}" />
+                <ListBoxItem Content="{loc:Tr Shell_Intro1}" />
+                <ListBoxItem Content="{loc:Tr Shell_Intro2}" />
+                <ListBoxItem Content="{loc:Tr Shell_Intro3}" />
+                <ListBoxItem Content="{loc:Tr Shell_Intro4}" />
+                <ListBoxItem Content="{loc:Tr Shell_Intro5}" />
+                <ListBoxItem Content="{loc:Tr Shell_Intro6}" />
+                <ListBoxItem Content="{loc:Tr Shell_Intro7}" />
             </ListBox>
         </Grid>
 
@@ -54,7 +55,7 @@
               Grid.Column="2"
               RowDefinitions="Auto,*">
             <TextBlock Grid.Row="0"
-                       Text="Changelog"
+                       Text="{loc:Tr Shell_Changelog}"
                        FontSize="32"
                        FontWeight="Bold"
                        Foreground="{DynamicResource MaterialPrimaryMidBrush}" />
@@ -95,7 +96,7 @@
               Grid.ColumnSpan="3"
               RowDefinitions="Auto,*">
             <TextBlock Grid.Row="0"
-                       Text="Recent"
+                       Text="{loc:Tr Shell_Recent}"
                        FontSize="32"
                        FontWeight="Bold"
                        Foreground="{DynamicResource MaterialPrimaryMidBrush}" />
@@ -106,7 +107,7 @@
                                            CanUserResizeColumns="True"
                                            SelectionMode="Multiple"
                                            DoubleTapped="SelectRecentMaps"
-                                           ToolTip.Tip="Double-click any selection of items to set them as the current beatmap.">
+                                           ToolTip.Tip="{loc:Tr Shell_DoubleClickAnySelectionOfItemsToSetThemAsTheCurrentBeatmap}">
                 <controls:MaterialGridListView.Columns>
                     <TableViewColumn x:Name="RecentPathColumn"
                                      Width="90"
@@ -114,14 +115,14 @@
                         <TableViewColumn.Header>
                             <TextBlock MinWidth="78"
                                        Margin="18,0,0,0"
-                                       Text="Path" />
+                                       Text="{loc:Tr Shell_Path}" />
                         </TableViewColumn.Header>
                     </TableViewColumn>
                     <TableViewColumn Width="*"
                                      Binding="{Binding DisplayDate}">
                         <TableViewColumn.Header>
                             <TextBlock Margin="18,0,0,0"
-                                       Text="Date" />
+                                       Text="{loc:Tr Shell_Date}" />
                         </TableViewColumn.Header>
                     </TableViewColumn>
                 </controls:MaterialGridListView.Columns>
@@ -130,7 +131,7 @@
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
                        IsVisible="{Binding HasNoRecentMaps}"
-                       Text="No recent beatmaps." />
+                       Text="{loc:Tr Shell_NoRecentBeatmaps}" />
         </Grid>
     </Grid>
 </UserControl>

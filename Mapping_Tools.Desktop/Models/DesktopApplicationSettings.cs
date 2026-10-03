@@ -9,6 +9,9 @@ namespace Mapping_Tools.Desktop.Models;
 /// </summary>
 public sealed class DesktopApplicationSettings : ApplicationSettings
 {
+    /// <summary>Selects the interface text language (en or nl); null follows the system UI language.</summary>
+    public string? Language { get; set; }
+
     /// <summary>
     ///     Lists tool names pinned into the desktop shell's favorites section.
     /// </summary>

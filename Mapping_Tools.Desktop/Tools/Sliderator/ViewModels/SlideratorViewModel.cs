@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
+using Mapping_Tools.Application.Localization;
 using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Application.Tools.Sliderator;
 using Mapping_Tools.Application.Tools.Sliderator.Contracts;
@@ -17,6 +18,7 @@ using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.Sliderator;
 using Mapping_Tools.Core.Tools.Sliderator.Models;
 using Mapping_Tools.Desktop.Converters;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
@@ -81,6 +83,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         {
             OnPropertyChanged(nameof(VisibleHitObject));
             OnPropertyChanged(nameof(ExpectedSegments));
+            OnPropertyChanged(nameof(LoadedHitObjectsCountText));
         };
         acceptedGraphState = GraphState.Clone();
         UpdateGraphDerivedValues();
@@ -118,6 +121,22 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     /// <summary>Gets the imported slider candidates.</summary>
     public ObservableCollection<HitObject> LoadedHitObjects { get; } = [];
 
+    /// <summary>
+    /// Gets the localized count of sliders currently loaded into the preview.
+    /// </summary>
+    public string LoadedHitObjectsCountText => LoadedHitObjects.Count == 1
+        ? ApplicationText.Format(DesktopStrings.Sliderator_LoadedSlidersOne, LoadedHitObjects.Count)
+        : ApplicationText.Format(DesktopStrings.Sliderator_LoadedSlidersMany, LoadedHitObjects.Count);
+
+    /// <summary>
+    /// Refreshes computed labels after the display language changes.
+    /// </summary>
+    protected override void RefreshLocalizedProperties()
+    {
+        base.RefreshLocalizedProperties();
+        OnPropertyChanged(nameof(LoadedHitObjectsCountText));
+    }
+
     /// <summary>Gets the slider currently used by the preview and export.</summary>
     public HitObject? VisibleHitObject =>
         VisibleHitObjectIndex >= 0 && VisibleHitObjectIndex < LoadedHitObjects.Count
@@ -128,21 +147,21 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     [ObservableProperty]
     [Undoable]
     [NotifyDataErrorInfo]
-    [Range(0.4, 3.6, ErrorMessage = "Global SV must be between 0.4 and 3.6.")]
+    [Range(0.4, 3.6, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.Sliderator_Validation_SlideratorGlobalSvRange))]
     public partial double GlobalSv { get; set; } = 1.4;
 
     /// <summary>Gets or sets the graph duration in beats.</summary>
     [ObservableProperty]
     [Undoable]
     [NotifyDataErrorInfo]
-    [Range(0, 10000, ErrorMessage = "Beat length must be between 0 and 10000.")]
+    [Range(0, 10000, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.Sliderator_Validation_SlideratorBeatLengthRange))]
     public partial double GraphBeats { get; set; } = 3;
 
     /// <summary>Gets or sets the graph playback BPM.</summary>
     [ObservableProperty]
     [Undoable]
     [NotifyDataErrorInfo]
-    [Range(double.Epsilon, double.MaxValue, ErrorMessage = "BPM must be greater than zero.")]
+    [Range(double.Epsilon, double.MaxValue, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.Sliderator_Validation_SlideratorBpmPositive))]
     public partial double BeatsPerMinute { get; set; } = 180;
 
     /// <summary>Gets or sets the graph-to-preview slider pixel length.</summary>
@@ -172,7 +191,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     [ObservableProperty]
     [Undoable]
     [NotifyDataErrorInfo]
-    [Range(1, 16, ErrorMessage = "Beat snap divisor must be between 1 and 16.")]
+    [Range(1, 16, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.Sliderator_Validation_SlideratorBeatSnapRange))]
     [NotifyPropertyChangedFor(nameof(ExpectedSegments))]
     public partial int BeatSnapDivisor { get; set; } = 4;
 
@@ -180,7 +199,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     [ObservableProperty]
     [Undoable]
     [NotifyDataErrorInfo]
-    [Range(0, double.MaxValue, ErrorMessage = "SV limit must be at least 0.")]
+    [Range(0, double.MaxValue, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.Sliderator_Validation_SlideratorSvLimitNonNegative))]
     public partial double VelocityLimit { get; set; } = 10;
 
     /// <summary>Gets or sets whether red source anchors are drawn in the preview.</summary>
@@ -203,7 +222,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     [ObservableProperty]
     [Undoable]
     [NotifyDataErrorInfo]
-    [Range(0, double.MaxValue, ErrorMessage = "New SV must be non-negative.")]
+    [Range(0, double.MaxValue, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.Sliderator_Validation_SlideratorNewSvNonNegative))]
     [NotifyPropertyChangedFor(nameof(ExpectedSegments))]
     public partial double NewVelocity { get; set; } = 1;
 
@@ -211,7 +230,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     [ObservableProperty]
     [Undoable]
     [NotifyDataErrorInfo]
-    [Range(1, 12, ErrorMessage = "Minimum tumour length must be between 1 and 12.")]
+    [Range(1, 12, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.Sliderator_Validation_SlideratorTumourLengthRange))]
     [NotifyPropertyChangedFor(nameof(ExpectedSegments))]
     public partial double MinDendrite { get; set; } = 2;
 
@@ -360,7 +379,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         }
         catch (Exception exception)
         {
-            await ShowMessageAsync(exception.Message);
+            await ShowMessageAsync(ApplicationExceptionText.GetSummary(exception), exception.ToString());
             return;
         }
 
@@ -433,11 +452,9 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         {
             await dialogs.ShowMessageAsync(
                 new MessageDialogRequest<bool>(
-                    "Sliderator",
-                    forward
-                        ? "You've reached the end of the slider list."
-                        : "You've reached the start of the slider list.",
-                    [new DialogChoice<bool>("OK", true, true, true)],
+                    DesktopStrings.Sliderator_ToolTitle,
+                    forward ? DesktopStrings.Sliderator_EndOfList : DesktopStrings.Sliderator_StartOfList,
+                    [new DialogChoice<bool>(DesktopStrings.Shell_UpperOk, true, true, true)],
                     false));
             return;
         }
@@ -485,13 +502,13 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         }
         catch (Exception exception)
         {
-            await ShowMessageAsync(exception.Message);
+            await ShowMessageAsync(ApplicationExceptionText.GetSummary(exception), exception.ToString());
             return;
         }
 
         if (VisibleHitObject is null)
         {
-            await ShowMessageAsync("Import a slider before running Sliderator.");
+            await ShowMessageAsync(DesktopStrings.Sliderator_ImportSliderBeforeRun);
             return;
         }
 
@@ -517,7 +534,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         }
         catch (Exception exception)
         {
-            await ShowMessageAsync(exception.Message);
+            await ShowMessageAsync(ApplicationExceptionText.GetSummary(exception), exception.ToString());
             return;
         }
 
@@ -525,8 +542,8 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         {
             await ShowMessageAsync(
                 ImportModeSetting == HitObjectSelectionMode.Selected
-                    ? "No beatmap is open in osu!."
-                    : "Select a beatmap to import from.");
+                    ? DesktopStrings.Sliderator_NoBeatmapOpen
+                    : DesktopStrings.Sliderator_SelectBeatmapToImport);
             return;
         }
 
@@ -544,7 +561,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
                 .ImportAsync(path, mode, TimeCode, cancellationToken);
             if (result.Sliders.Count == 0)
             {
-                await ShowMessageAsync("Could not find any sliders in imported hit objects.");
+                await ShowMessageAsync(DesktopStrings.Sliderator_NoSlidersFound);
                 return false;
             }
 
@@ -564,7 +581,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         }
         catch (Exception exception)
         {
-            await ShowMessageAsync(exception.Message);
+            await ShowMessageAsync(ApplicationExceptionText.GetSummary(exception), exception.ToString());
             return false;
         }
     }
@@ -591,12 +608,12 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
                         project,
                         sourceSlider,
                         quickRun,
-                        new Progress<double>(value => context.ReportProgress(value, "Sliderating")),
+                        new Progress<double>(value => context.ReportProgress(value, DesktopStrings.Sliderator_Progress)),
                         context.CancellationToken,
                         preferLiveEditor);
                     return new ToolExecutionOutput<SlideratorResult>(
                         result,
-                        "Done!");
+                        DesktopStrings.Sliderator_RunCompleted);
                 }),
             CreateProgress(),
             cancellationToken);
@@ -1141,11 +1158,11 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     {
         bool confirmed = await dialogs.ShowMessageAsync(
             new MessageDialogRequest<bool>(
-                "Confirm deletion",
-                "Clear the graph?",
+                DesktopStrings.Sliderator_ConfirmDeletionTitle,
+                DesktopStrings.Sliderator_ClearGraphConfirmation,
                 [
-                    new DialogChoice<bool>("YES", true, true),
-                    new DialogChoice<bool>("NO", false, IsCancel: true),
+                    new DialogChoice<bool>(DesktopStrings.Sliderator_Yes, true, true),
+                    new DialogChoice<bool>(DesktopStrings.Sliderator_No, false, IsCancel: true),
                 ],
                 false));
         if (!confirmed) return;
@@ -1167,8 +1184,8 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
         var result = await dialogs.ShowValueAsync(
             new ValueDialogRequest<double>(
-                "Scale graph",
-                "Scale graph maximum to:",
+                DesktopStrings.Sliderator_ScaleGraphTitle,
+                DesktopStrings.Sliderator_ScaleGraphMaximumPrompt,
                 1,
                 new InvariantDoubleConverter()));
         if (!result.Accepted || !double.IsFinite(result.Value)) return;
@@ -1182,13 +1199,14 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         SetGraphState(state);
     }
 
-    private async Task ShowMessageAsync(string message)
+    private async Task ShowMessageAsync(string message, string? details = null)
     {
         await dialogs.ShowMessageAsync(
             new MessageDialogRequest<bool>(
-                "Sliderator",
+                DesktopStrings.Sliderator_ToolTitle,
                 message,
-                [new DialogChoice<bool>("OK", true, true, true)],
-                false));
+                [new DialogChoice<bool>(DesktopStrings.Shell_UpperOk, true, true, true)],
+                false,
+                details));
     }
 }

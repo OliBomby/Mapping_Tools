@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.VisualTree;
 using Mapping_Tools.Desktop.Tests.TestHelpers;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Tests.Tools.GeometryDashboard.ViewModels;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.Views;
@@ -24,20 +25,20 @@ public sealed class GeometryDashboardGeneratorSettingsWindowTests
         viewModel.Close = result => window.Close(result);
         using HeadlessViewHost host = HeadlessViewHost.ShowWindow(window);
         Button addPredicate = window.GetVisualDescendants().OfType<Button>()
-            .Single(button => Equals(ToolTip.GetTip(button), "Add a new selection predicate."));
+            .Single(button => Equals(ToolTip.GetTip(button), DesktopStrings.GeometryDashboard_AddPredicateTip));
         Button apply = window.GetVisualDescendants().OfType<Button>()
-            .Single(button => Equals(button.Content, "Apply"));
+            .Single(button => Equals(button.Content, DesktopStrings.GeometryDashboard_Apply));
 
         // Act
         host.Click(addPredicate);
         var predicate = viewModel.InputPredicateRows.Last();
         ListBoxItem needSelected = window.GetVisualDescendants().OfType<ListBoxItem>()
             .Single(item => ReferenceEquals(item.DataContext, predicate)
-                            && Equals(ToolTip.GetTip(item), "Need selected objects."));
+                            && Equals(ToolTip.GetTip(item), DesktopStrings.GeometryDashboard_NeedSelected));
         host.Click(needSelected);
         TextBox minimumRelevancy = window.GetVisualDescendants().OfType<TextBox>()
             .Single(textBox => ReferenceEquals(textBox.DataContext, predicate)
-                               && ToolTip.GetTip(textBox)?.ToString()?.StartsWith("Need objects which", StringComparison.Ordinal) == true);
+                               && Equals(ToolTip.GetTip(textBox), DesktopStrings.GeometryDashboard_MinRelevancyTip));
         host.Click(minimumRelevancy);
         host.PressKey(Key.A, RawInputModifiers.Control, PhysicalKey.A, "a");
         host.TypeText("0.8");

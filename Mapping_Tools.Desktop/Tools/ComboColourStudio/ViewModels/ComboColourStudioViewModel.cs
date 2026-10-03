@@ -13,6 +13,7 @@ using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.ComboColourStudio.Models;
 using Mapping_Tools.Desktop.Services.Dialogs;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.Models;
@@ -20,6 +21,8 @@ using Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels.Adapters;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.Views;
 using Mapping_Tools.Desktop.Utilities;
 using Mapping_Tools.Desktop.ViewModels;
+
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels;
 
@@ -128,7 +131,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
             await notifications.PublishAsync(new UserNotification(
                 UserNotificationSeverity.Warning,
                 Tool.DisplayName,
-                "Open a target beatmap in osu! before using QuickRun."));
+                DesktopStrings.ComboColourStudio_OpenTarget));
             return;
         }
 
@@ -138,10 +141,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
             cancellationToken));
     }
 
-    ProjectDefinition<ComboColourProject> IShellProjectFeature<ComboColourProject>.ProjectDefinition
-    {
-        get;
-    } = new(
+    ProjectDefinition<ComboColourProject> IShellProjectFeature<ComboColourProject>.ProjectDefinition => new(
         "combocolourproject.json",
         "Combo Colour Studio Projects",
         () => new ComboColourProject(),
@@ -214,12 +214,12 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     private Task PublishEditorTimeReadFailureAsync(Exception? exception = null)
     {
         string message = exception is null
-            ? "Open osu! before adding a colour point at the current editor time."
-            : $"Could not read the current osu! editor time: {exception.Message}";
+            ? DesktopStrings.ComboColourStudio_OpenEditorTime
+            : DesktopStrings.ComboColourStudio_ReadEditorTimeFailure;
         return notifications.PublishAsync(
             new UserNotification(
                 UserNotificationSeverity.Error,
-                "Could not read current editor time",
+                DesktopStrings.ComboColourStudio_ReadEditorTimeTitle,
                 message,
                 exception));
     }
@@ -392,14 +392,16 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
             await notifications.PublishAsync(new UserNotification(
                 UserNotificationSeverity.Success,
                 Tool.DisplayName,
-                colourHax ? "Imported colour hax." : "Imported combo colours."));
+                colourHax
+                    ? DesktopStrings.ComboColourStudio_ImportSuccessHax
+                    : DesktopStrings.ComboColourStudio_ImportSuccessColours));
         }
         catch (Exception exception)
         {
             await notifications.PublishAsync(new UserNotification(
                 UserNotificationSeverity.Error,
-                "Combo Colour Studio import failed",
-                exception.Message,
+                DesktopStrings.ComboColourStudio_ImportFailure,
+                DesktopStrings.ComboColourStudio_ImportError,
                 exception));
         }
     }
@@ -459,11 +461,13 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
                         paths,
                         project,
                         quick,
-                        new Progress<double>(value => context.ReportProgress(value, "Exporting colours")),
+                        new Progress<double>(value => context.ReportProgress(value, DesktopStrings.ComboColourStudio_ExportProgress)),
                         context.CancellationToken);
                     return new ToolExecutionOutput<ComboColourStudioRunResult>(
                         result,
-                        $"Successfully exported colours to {result.ProcessedCount} " + $"{(result.ProcessedCount == 1 ? "beatmap" : "beatmaps")}!");
+                        result.ProcessedCount == 1
+                            ? ApplicationText.Format(DesktopStrings.ComboColourStudio_ExportOne, result.ProcessedCount)
+                            : ApplicationText.Format(DesktopStrings.ComboColourStudio_ExportMany, result.ProcessedCount));
                 }),
             CreateProgress(),
             cancellationToken);

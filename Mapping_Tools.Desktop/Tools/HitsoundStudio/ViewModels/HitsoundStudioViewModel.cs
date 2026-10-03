@@ -1,5 +1,8 @@
+using Mapping_Tools.Desktop.Localization;
+using Mapping_Tools.Application.Localization;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Globalization;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -472,9 +475,9 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
 
     IReadOnlyList<ShellProjectMenuItem> IShellExtraProjectMenuFeature.ExtraProjectMenuItems =>
     [
-        new("_Load sample schema", "Load sample schema from a project file.", LoadSampleSchemaCommand, MaterialIconKind.FileMusic),
-        new("_Bulk assign samples",
-            "Bulk assign samples to selected hitsound layers. The file name is expected to be in the following shape: [bank]_[patch]_[key]_[length]_[velocity].[extension]. Leave a value empty to imply any value. Example: 0_39__127.wav",
+        new(DesktopStrings.HitsoundStudio_LoadSchemaMenu, DesktopStrings.HitsoundStudio_LoadSchemaTip, LoadSampleSchemaCommand, MaterialIconKind.FileMusic),
+        new(DesktopStrings.HitsoundStudio_BulkMenu,
+            DesktopStrings.HitsoundStudio_BulkTip,
             BulkAssignSamplesCommand, MaterialIconKind.MusicBoxMultiple),
     ];
 
@@ -511,7 +514,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         try
         {
             var request = await ShowImportDialogAsync(
-                $"Layer {Layers.Count + 1}");
+                ApplicationText.Format(DesktopStrings.HitsoundStudio_NewLayerName, Layers.Count + 1));
             if (request is null) return;
             var imported = await service.ImportAsync(request);
             foreach (var layer in imported)
@@ -524,22 +527,22 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
             NotifyLayerStateChanged();
             await PublishNotificationAsync(
                 UserNotificationSeverity.Success,
-                "Hitsound Studio import",
-                $"Imported {imported.Count} layer{(imported.Count == 1 ? string.Empty : "s")}.");
+                DesktopStrings.HitsoundStudio_ImportTitle,
+                imported.Count == 1 ? DesktopStrings.HitsoundStudio_ImportedOne : ApplicationText.Format(DesktopStrings.HitsoundStudio_ImportedMany, imported.Count));
         }
         catch (OperationCanceledException)
         {
             await PublishNotificationAsync(
                 UserNotificationSeverity.Information,
-                "Hitsound Studio import",
-                "Import canceled.");
+                DesktopStrings.HitsoundStudio_ImportTitle,
+                DesktopStrings.HitsoundStudio_ImportCanceled);
         }
         catch (Exception exception)
         {
             await PublishNotificationAsync(
                 UserNotificationSeverity.Error,
-                "Hitsound Studio import failed",
-                exception.Message,
+                DesktopStrings.HitsoundStudio_ImportFailed,
+                ApplicationExceptionText.GetSummary(exception),
                 exception);
         }
     }
@@ -551,13 +554,13 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         using var edit = UndoHistory?.BeginEdit();
         if (SelectedLayers.Count == 0) return;
         bool confirmed = await messageDialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
-            "Confirm deletion",
+            DesktopStrings.HitsoundStudio_DeleteTitle,
             SelectedLayers.Count == 1
-                ? "Are you sure you want to delete the selected layer?"
-                : $"Are you sure you want to delete the {SelectedLayers.Count} selected layers?",
+                ? DesktopStrings.HitsoundStudio_DeleteOne
+                : ApplicationText.Format(DesktopStrings.HitsoundStudio_DeleteMany, SelectedLayers.Count),
             [
-                new DialogChoice<bool>("Yes", true, true),
-                new DialogChoice<bool>("No", false, IsCancel: true),
+                new DialogChoice<bool>(DesktopStrings.Shell_Yes, true, true),
+                new DialogChoice<bool>(DesktopStrings.Shell_No, false, IsCancel: true),
             ],
             false));
         if (!confirmed) return;
@@ -582,8 +585,8 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         {
             await PublishNotificationAsync(
                 UserNotificationSeverity.Warning,
-                "Reload layers",
-                "Select at least one imported layer.");
+                DesktopStrings.HitsoundStudio_ReloadTitle,
+                DesktopStrings.HitsoundStudio_ReloadSelect);
             return;
         }
 
@@ -595,22 +598,22 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
             RefreshEditorFromSelection();
             await PublishNotificationAsync(
                 UserNotificationSeverity.Success,
-                "Reload layers",
-                "Reloaded selected layers.");
+                DesktopStrings.HitsoundStudio_ReloadTitle,
+                DesktopStrings.HitsoundStudio_Reloaded);
         }
         catch (OperationCanceledException)
         {
             await PublishNotificationAsync(
                 UserNotificationSeverity.Information,
-                "Reload layers",
-                "Reload canceled.");
+                DesktopStrings.HitsoundStudio_ReloadTitle,
+                DesktopStrings.HitsoundStudio_ReloadCanceled);
         }
         catch (Exception exception)
         {
             await PublishNotificationAsync(
                 UserNotificationSeverity.Error,
-                "Reload layers failed",
-                exception.Message,
+                DesktopStrings.HitsoundStudio_ReloadFailed,
+                ApplicationExceptionText.GetSummary(exception),
                 exception);
         }
     }
@@ -624,8 +627,8 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         {
             await PublishNotificationAsync(
                 UserNotificationSeverity.Warning,
-                "Preview layer",
-                "Select a layer to preview.");
+                DesktopStrings.HitsoundStudio_PreviewTitle,
+                DesktopStrings.HitsoundStudio_PreviewSelect);
             return;
         }
 
@@ -656,8 +659,8 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
             if (previousSession is not null) await previousSession.StopAsync();
             await PublishNotificationAsync(
                 UserNotificationSeverity.Information,
-                "Preview layer",
-                "Playing selected layer.");
+                DesktopStrings.HitsoundStudio_PreviewTitle,
+                DesktopStrings.HitsoundStudio_Playing);
         }
         catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
         {
@@ -667,24 +670,24 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
             if (!cancellation.IsCancellationRequested)
                 await PublishNotificationAsync(
                     UserNotificationSeverity.Error,
-                    "Preview layer failed",
-                    "Could not find the specified sample.");
+                    DesktopStrings.HitsoundStudio_PreviewFailed,
+                    DesktopStrings.HitsoundStudio_SampleMissing);
         }
         catch (DirectoryNotFoundException)
         {
             if (!cancellation.IsCancellationRequested)
                 await PublishNotificationAsync(
                     UserNotificationSeverity.Error,
-                    "Preview layer failed",
-                    "Could not find the specified sample's directory.");
+                    DesktopStrings.HitsoundStudio_PreviewFailed,
+                    DesktopStrings.HitsoundStudio_SampleFolderMissing);
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
             if (!cancellation.IsCancellationRequested)
                 await PublishNotificationAsync(
                     UserNotificationSeverity.Error,
-                    "Preview layer failed",
-                    exception.Message,
+                    DesktopStrings.HitsoundStudio_PreviewFailed,
+                    ApplicationExceptionText.GetSummary(exception),
                     exception);
         }
         finally
@@ -719,7 +722,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
                 Layers.Select(layer => layer.SampleArgs.Snapshot()).ToArray());
             if (failures.Count == 0)
             {
-                await ShowSampleValidationMessageAsync("All samples are valid!");
+                await ShowSampleValidationMessageAsync(DesktopStrings.HitsoundStudio_AllValid);
                 return;
             }
 
@@ -732,7 +735,8 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
 
             string message = FormatSampleValidationMessage(invalidLayers);
             string? details = invalidLayers.Count > 0
-                ? invalidLayers[0].Exception.ToString()
+                ? string.Join(Environment.NewLine + Environment.NewLine,
+                    invalidLayers.Select(item => item.Layer.Name + Environment.NewLine + item.Exception))
                 : null;
             await ShowSampleValidationMessageAsync(message, details);
         }
@@ -740,15 +744,15 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         {
             await PublishNotificationAsync(
                 UserNotificationSeverity.Information,
-                "Validate samples",
-                "Sample validation canceled.");
+                DesktopStrings.HitsoundStudio_ValidateTitle,
+                DesktopStrings.HitsoundStudio_ValidateCanceled);
         }
         catch (Exception exception)
         {
             await PublishNotificationAsync(
                 UserNotificationSeverity.Error,
-                "Sample validation failed",
-                exception.Message,
+                DesktopStrings.HitsoundStudio_ValidateFailed,
+                ApplicationExceptionText.GetSummary(exception),
                 exception);
         }
     }
@@ -757,9 +761,9 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     {
         return messageDialogs.ShowMessageAsync(
             new MessageDialogRequest<bool>(
-                "Validate samples",
+                DesktopStrings.HitsoundStudio_ValidateTitle,
                 message,
-                [new DialogChoice<bool>("OK", true, true, true)],
+                [new DialogChoice<bool>(DesktopStrings.Shell_UpperOk, true, true, true)],
                 true,
                 details));
     }
@@ -770,22 +774,22 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         List<string> sections = [];
         AddSection(
             sections,
-            "Could not find the following samples:",
+            DesktopStrings.HitsoundStudio_MissingHeading,
             invalidLayers
                 .Where(item => item.Exception is FileNotFoundException)
                 .Select(item => item.Layer.Name));
         AddSection(
             sections,
-            "The following samples have an invalid extension:",
+            DesktopStrings.HitsoundStudio_ExtensionHeading,
             invalidLayers
                 .Where(item => item.Exception is InvalidDataException)
                 .Select(item => item.Layer.Name));
         AddSection(
             sections,
-            "Could not load the following samples because of an exception:",
+            DesktopStrings.HitsoundStudio_FailureHeading,
             invalidLayers
                 .Where(item => item.Exception is not FileNotFoundException and not InvalidDataException)
-                .Select(item => $"{item.Layer.Name}: {item.Exception.Message}"));
+                .Select(item => ApplicationText.Format(DesktopStrings.HitsoundStudio_LayerFailure, item.Layer.Name, ApplicationExceptionText.GetSummary(item.Exception))));
 
         return string.Join(Environment.NewLine + Environment.NewLine, sections);
     }
@@ -807,7 +811,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     {
         var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
-            Title = "Choose base beatmap",
+            Title = DesktopStrings.HitsoundStudio_PickBase,
             SuggestedStartLocation = workspace.GetBeatmapPickerStartLocation(
                 Path.GetDirectoryName(BaseBeatmap)),
             AllowMultiple = false,
@@ -831,7 +835,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         using var edit = UndoHistory?.BeginEdit();
         var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
-            Title = "Choose default sample",
+            Title = DesktopStrings.HitsoundStudio_PickDefault,
             AllowMultiple = false,
             Filters = [CommonFilePickerFilters.SampleFiles],
         });
@@ -844,7 +848,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     {
         var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
-            Title = "Choose layer sample",
+            Title = DesktopStrings.HitsoundStudio_PickLayer,
             AllowMultiple = false,
             Filters = [CommonFilePickerFilters.SampleFiles],
         });
@@ -857,7 +861,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     {
         var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
-            Title = "Choose import source",
+            Title = DesktopStrings.HitsoundStudio_PickSource,
             AllowMultiple = false,
             Filters = [],
         });
@@ -878,7 +882,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     {
         var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
-            Title = "Choose imported sample",
+            Title = DesktopStrings.HitsoundStudio_PickImportedSample,
             AllowMultiple = false,
             Filters = [CommonFilePickerFilters.SampleFiles],
         });
@@ -891,7 +895,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     {
         var paths = await filePicker.PickFoldersAsync(new OpenFolderPickerRequest
         {
-            Title = "Choose Hitsound Studio export folder",
+            Title = DesktopStrings.HitsoundStudio_PickExport,
             AllowMultiple = false,
         });
         if (paths.Count > 0) ExportFolder = paths[0];
@@ -904,17 +908,17 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         using var edit = UndoHistory?.BeginEdit();
         var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
-            Title = "Load sample schema",
+            Title = DesktopStrings.HitsoundStudio_LoadSchema,
             AllowMultiple = false,
-            Filters = [new FilePickerFilter("JSON files", ["*.json"])],
+            Filters = [new FilePickerFilter(DesktopStrings.HitsoundStudio_JsonFiles, ["*.json"])],
         });
         if (paths.Count == 0) return;
         PreviousSampleSchema = await projectStore.LoadAsync<SampleSchema>(paths[0]);
         UsePreviousSampleSchema = true;
         await PublishNotificationAsync(
             UserNotificationSeverity.Success,
-            "Load sample schema",
-            "Loaded previous sample schema.");
+            DesktopStrings.HitsoundStudio_LoadSchema,
+            DesktopStrings.HitsoundStudio_SchemaLoaded);
     }
 
     /// <summary>
@@ -927,9 +931,9 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         using var edit = UndoHistory?.BeginEdit();
         var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
-            Title = "Bulk assign samples",
+            Title = DesktopStrings.HitsoundStudio_BulkTitle,
             AllowMultiple = true,
-            Filters = [new FilePickerFilter("Audio files", ["*.wav", "*.ogg"])],
+            Filters = [new FilePickerFilter(DesktopStrings.HitsoundStudio_AudioFiles, ["*.wav", "*.ogg"])],
         });
         int assigned = 0;
         foreach (string path in paths)
@@ -956,8 +960,8 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
 
         await PublishNotificationAsync(
             UserNotificationSeverity.Success,
-            "Bulk assign samples",
-            $"Assigned {assigned} sample{(assigned == 1 ? string.Empty : "s")}.");
+            DesktopStrings.HitsoundStudio_BulkTitle,
+            assigned == 1 ? DesktopStrings.HitsoundStudio_AssignedOne : ApplicationText.Format(DesktopStrings.HitsoundStudio_AssignedMany, assigned));
     }
 
     partial void OnSingleSampleExportFormatChanged(HitsoundStudioSampleExportFormat value)
@@ -1304,9 +1308,9 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         if (chosen is { UsePreviousSampleSchema: true, PreviousSampleSchema: null })
         {
             await messageDialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
-                "Previous sample schema not found",
-                "Load a previous sample schema before enabling this option.",
-                [new DialogChoice<bool>("OK", true, true)],
+                DesktopStrings.HitsoundStudio_SchemaMissing,
+                DesktopStrings.HitsoundStudio_LoadSchemaFirst,
+                [new DialogChoice<bool>(DesktopStrings.Shell_UpperOk, true, true)],
                 true));
             return;
         }
@@ -1314,11 +1318,11 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         if (!files.DirectoryExists(chosen.ExportFolder))
         {
             bool create = await messageDialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
-                "Export path not found",
-                $"Folder at path \"{chosen.ExportFolder}\" does not exist. Create a new folder?",
+                DesktopStrings.HitsoundStudio_ExportMissing,
+                ApplicationText.Format(DesktopStrings.HitsoundStudio_CreateExportFolder, chosen.ExportFolder),
                 [
-                    new DialogChoice<bool>("Yes", true, true),
-                    new DialogChoice<bool>("No", false, IsCancel: true),
+                    new DialogChoice<bool>(DesktopStrings.Shell_Yes, true, true),
+                    new DialogChoice<bool>(DesktopStrings.Shell_No, false, IsCancel: true),
                 ],
                 false));
             if (!create) return;
@@ -1334,11 +1338,11 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
                 {
                     var output = await service.ExportAsync(
                         snapshot,
-                        new Progress<double>(value => context.ReportProgress(value, "Exporting hitsounds")),
+                        new Progress<double>(value => context.ReportProgress(value, DesktopStrings.HitsoundStudio_Exporting)),
                         context.CancellationToken);
                     return new ToolExecutionOutput<HitsoundStudioExportResult>(
                         output,
-                        snapshot.ShowResults ? null : "Hitsound Studio export complete.");
+                        snapshot.ShowResults ? null : DesktopStrings.HitsoundStudio_ExportComplete);
                 }),
             CreateProgress(),
             cancellationToken);
@@ -1347,9 +1351,9 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
             if (HitsoundExportModeSetting != HitsoundStudioExportMode.Midi) PreviousSampleSchema = result.Value.Schema;
             if (snapshot.ShowResults)
                 await messageDialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
-                    "Hitsound Studio export",
+                    DesktopStrings.HitsoundStudio_ExportTitle,
                     result.Value.DetailedSummary,
-                    [new DialogChoice<bool>("OK", true, true, true)],
+                    [new DialogChoice<bool>(DesktopStrings.Shell_UpperOk, true, true, true)],
                     true));
         }
     }
@@ -1448,6 +1452,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     /// </summary>
     /// <param name="direction">-1 to raise or 1 to lower.</param>
     /// <param name="repeat">Whether to apply the WPF Shift-click ten-step move.</param>
+    [Localizable(false)] // Invalid directions indicate a programming error rather than a user-facing choice.
     public void MoveSelectedLayers(int direction, bool repeat = false)
     {
         if (direction is not (-1 or 1)) throw new ArgumentOutOfRangeException(nameof(direction), "Direction must be -1 or 1.");

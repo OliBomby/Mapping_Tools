@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.QuickRun.Models;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Tools.SliderMerger;
 
@@ -11,5 +12,7 @@ public static class SliderMergerToolDefinition
         "Slider Merger",
         "Merge selected sliders and circles into one connected slider.",
         ["slider", "merge", "bezier", "connection", "circles"],
-        QuickRunTargets.MultipleSelection);
+        QuickRunTargets.MultipleSelection,
+        static () => ApplicationStrings.SliderMerger_Description,
+        static () => ApplicationStrings.SliderMerger_SearchTerms);
 }

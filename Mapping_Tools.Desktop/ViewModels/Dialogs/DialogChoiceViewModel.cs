@@ -1,5 +1,5 @@
+using Mapping_Tools.Desktop.Localization;
 using System.Windows.Input;
-using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace Mapping_Tools.Desktop.ViewModels.Dialogs;
@@ -7,7 +7,7 @@ namespace Mapping_Tools.Desktop.ViewModels.Dialogs;
 /// <summary>
 ///     Exposes one message-dialog action with its keyboard role and close command.
 /// </summary>
-public sealed class DialogChoiceViewModel : ObservableObject
+public sealed class DialogChoiceViewModel : LocalizedObservableObject
 {
     /// <summary>
     ///     Creates an action that invokes the supplied close callback once per execution.

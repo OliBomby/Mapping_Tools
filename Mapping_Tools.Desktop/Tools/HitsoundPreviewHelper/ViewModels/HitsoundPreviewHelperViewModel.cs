@@ -12,6 +12,7 @@ using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Services.Undo;
@@ -20,6 +21,8 @@ using Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.ViewModels.Adapters;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.Services;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.ViewModels;
 using Mapping_Tools.Desktop.ViewModels;
+
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.ViewModels;
 
@@ -84,6 +87,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
             static () => new HitsoundPreviewHelperProject(),
             "hitsound-preview-project.json",
             ToolConfigSchema.ForTool(HitsoundPreviewHelperToolDefinition.Definition.Id));
+
     }
 
     /// <summary>Gets or sets the zones edited by the tool.</summary>
@@ -192,8 +196,8 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
         {
             await notifications.PublishAsync(new UserNotification(
                 UserNotificationSeverity.Error,
-                "Could not read selection",
-                "The selected editor coordinates could not be read.",
+                DesktopStrings.HitsoundPreviewHelper_ReadSelectionTitle,
+                DesktopStrings.HitsoundPreviewHelper_ReadSelectionError,
                 exception));
         }
     }
@@ -234,7 +238,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
             await notifications.PublishAsync(new UserNotification(
                 UserNotificationSeverity.Warning,
                 Tool.DisplayName,
-                "Select at least one beatmap or open one in osu! before running Hitsound Preview Helper."));
+                DesktopStrings.HitsoundPreviewHelper_SelectBeatmap));
             return;
         }
 
@@ -254,11 +258,11 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
                         quick,
                         new Progress<double>(progress => context.ReportProgress(
                             progress,
-                            "Placing preview hitsounds")),
+                            DesktopStrings.HitsoundPreviewHelper_Progress)),
                         context.CancellationToken);
                     return new ToolExecutionOutput<HitsoundPreviewHelperResult>(
                         applied,
-                        $"Placed {applied.UpdatedEventCount} preview hitsounds.");
+                        ApplicationText.Format(DesktopStrings.HitsoundPreviewHelper_Result, applied.UpdatedEventCount));
                 }),
             CreateProgress(),
             cancellationToken);
@@ -268,7 +272,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     {
         return notifications.PublishAsync(new UserNotification(
             UserNotificationSeverity.Warning,
-            "No selected hit objects",
-            "Please select a hit object to fetch the coordinates."));
+            DesktopStrings.HitsoundPreviewHelper_NoSelectionTitle,
+            DesktopStrings.HitsoundPreviewHelper_NoSelectionError));
     }
 }

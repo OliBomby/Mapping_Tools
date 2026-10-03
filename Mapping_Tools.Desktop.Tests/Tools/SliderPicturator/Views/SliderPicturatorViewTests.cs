@@ -11,6 +11,7 @@ using Mapping_Tools.Application.Tools.SliderPicturator;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Images;
 using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Services.Undo;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
@@ -62,7 +63,7 @@ public sealed class SliderPicturatorViewTests
         SliderPicturatorView view = new() { DataContext = viewModel };
         using HeadlessViewHost host = HeadlessViewHost.Show(view, height: 1200);
         CheckBox useMapColors = view.GetVisualDescendants().OfType<CheckBox>()
-            .Single(checkBox => checkBox.Content?.ToString() == "Use Map Combo Colors");
+            .Single(checkBox => checkBox.Content?.ToString() == DesktopStrings.SliderPicturator_UseMapComboColors);
 
         // Act
         host.Click(useMapColors, new Point(8, useMapColors.Bounds.Height / 2));
@@ -237,7 +238,7 @@ public sealed class SliderPicturatorViewTests
             new Point(quality.Bounds.Width - 8, quality.Bounds.Height / 2));
         double editedQuality = quality.Value;
         string visibleSegmentCount = view.GetVisualDescendants().OfType<TextBlock>()
-            .Single(block => block.Text?.StartsWith("Segment Count:", StringComparison.Ordinal) == true).Text!;
+            .Single(block => block.Text == viewModel.SegmentCountLabel).Text!;
         host.Click(view.GetVisualDescendants().OfType<Button>().First());
         host.PressKey(Key.Z, RawInputModifiers.Control, PhysicalKey.Z, "z");
 
@@ -246,7 +247,7 @@ public sealed class SliderPicturatorViewTests
         viewModel.Quality.Should().Be(1);
         viewModel.SegmentCount.Should().Be(42);
         view.GetVisualDescendants().OfType<TextBlock>()
-            .Single(block => block.Text?.StartsWith("Segment Count:", StringComparison.Ordinal) == true).Text
+            .Single(block => block.Text == viewModel.SegmentCountLabel).Text
             .Should().Be(visibleSegmentCount);
     }
 
