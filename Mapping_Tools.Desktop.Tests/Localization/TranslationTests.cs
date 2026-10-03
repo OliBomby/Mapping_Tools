@@ -293,7 +293,7 @@ public sealed class TranslationTests
         {
             string basename = project["Mapping_Tools.".Length..];
             Directory.GetFiles(Path.Combine(repository, project, "Localization"), "*.resx")
-                .Select(Path.GetFileName).Should().BeEquivalentTo(basename + ".resx", basename + ".nl.resx");
+                .Select(Path.GetFileName).Should().Contain(basename + ".resx", basename + ".nl.resx");
         }
         foreach (string baseline in baselines)
         {

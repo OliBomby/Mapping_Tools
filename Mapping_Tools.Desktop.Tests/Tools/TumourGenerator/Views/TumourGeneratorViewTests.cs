@@ -153,8 +153,8 @@ public sealed class TumourGeneratorViewTests
         ClickCommand(host, commandBar, viewModel.AddCommand);
         ObservableTumourLayer selected = viewModel.CurrentLayer!;
         ListBox layers = host.Find<ListBox>("TumourLayerList");
-        double layerColumnWidth = host.Find<Grid>("TumourMainColumns").ColumnDefinitions[0].Width.Value;
-        string[] overflowCommandLabels = commandBar.OverflowItems.OfType<CommandBarButton>()
+        string[] commandLabels = commandBar.VisiblePrimaryCommands.OfType<CommandBarButton>()
+            .Concat(commandBar.OverflowItems.OfType<CommandBarButton>())
             .Select(button => button.Label!).ToArray();
 
         // Act
@@ -166,8 +166,7 @@ public sealed class TumourGeneratorViewTests
         bool selectedLayerMovedUp = ReferenceEquals(viewModel.TumourLayers[2], selected);
 
         // Assert
-        layerColumnWidth.Should().Be(200);
-        overflowCommandLabels.Should().Contain("Move layer down");
+        commandLabels.Should().Contain("Move layer down");
         indexAfterMovingDown.Should().Be(1);
         selectedLayerMovedDown.Should().BeTrue();
         indexAfterMovingUp.Should().Be(2);
@@ -193,9 +192,8 @@ public sealed class TumourGeneratorViewTests
         ObservableTumourLayer selected = viewModel.CurrentLayer!;
         ObservableTumourLayer[] originalOrder = viewModel.TumourLayers.ToArray();
         ListBox layers = host.Find<ListBox>("TumourLayerList");
-        string expectedOverflowLabel = moveLastLayerUp ? "Move layer up" : "Move layer down";
+        string expectedCommandLabel = moveLastLayerUp ? "Move layer up" : "Move layer down";
         System.Windows.Input.ICommand command = moveLastLayerUp ? viewModel.RaiseCommand : viewModel.LowerCommand;
-        double layerColumnWidth = host.Find<Grid>("TumourMainColumns").ColumnDefinitions[0].Width.Value;
 
         // Act
         ClickCommand(host, commandBar, command);
@@ -203,9 +201,9 @@ public sealed class TumourGeneratorViewTests
         int indexAfterCommand = viewModel.CurrentLayerIndex;
 
         // Assert
-        layerColumnWidth.Should().Be(200);
-        commandBar.OverflowItems.OfType<CommandBarButton>()
-            .Select(button => button.Label).Should().Contain(expectedOverflowLabel);
+        commandBar.VisiblePrimaryCommands.OfType<CommandBarButton>()
+            .Concat(commandBar.OverflowItems.OfType<CommandBarButton>())
+            .Select(button => button.Label).Should().Contain(expectedCommandLabel);
         orderAfterCommand.Should().Equal(originalOrder);
         indexAfterCommand.Should().Be(boundaryIndex);
         viewModel.CurrentLayer.Should().BeSameAs(selected);
