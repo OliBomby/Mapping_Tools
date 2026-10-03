@@ -4,9 +4,15 @@ on:
   push:
     tags:
       - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Three-part version to package for this dry run (for example 1.2.3)
+        required: true
+        type: string
 
 permissions:
-  contents: write
+  contents: read
 
 # A single tagged release is assembled by one publisher job. This prevents the
 # six target jobs from racing while they update the same GitHub Release.
@@ -55,12 +61,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Determine version from tag
+      - name: Determine package version
+        env:
+          DRY_RUN_VERSION: ${{ inputs.version }}
+          IS_DRY_RUN: ${{ github.event_name == 'workflow_dispatch' }}
         shell: pwsh
         run: |
-          $version = "${env:GITHUB_REF_NAME}".TrimStart('v')
+          $version = if ($env:IS_DRY_RUN -eq 'true') {
+            $env:DRY_RUN_VERSION
+          }
+          else {
+            "${env:GITHUB_REF_NAME}".TrimStart('v')
+          }
+
           if ($version -notmatch '^\d+\.\d+\.\d+$') {
-            throw "The release tag must contain a stable three-part version after the leading v: $version"
+            throw "The package version must be a stable three-part version with no prefix: $version"
           }
 
           "VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
@@ -378,8 +393,11 @@ jobs:
 
   publish:
     name: Publish tagged GitHub Release
+    if: github.event_name == 'push'
     needs: package
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout
@@ -475,6 +493,7 @@ jobs:
 
   publish-nuget:
     name: Publish NuGet packages
+    if: github.event_name == 'push'
     needs: publish
     runs-on: ubuntu-latest
     permissions:
