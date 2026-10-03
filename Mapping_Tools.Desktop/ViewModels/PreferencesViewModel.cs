@@ -84,22 +84,22 @@ public sealed partial class PreferencesViewModel : LocalizedObservableValidator,
         UndoHistory.Dispose();
     }
 
-    /// <summary>Gets supported text languages in their native spelling, preceded by the system default.</summary>
+    /// <summary>Gets supported text languages in native spelling, ordered to match osu!lazer after the system default.</summary>
     public IReadOnlyList<LanguageOption> Languages { get; } =
     [
         new(null, string.Empty),
         new("en", "English"),
+        new("de", "Deutsch"),
+        new("es", "Español"),
+        new("fr", "Français"),
+        new("id", "Bahasa Indonesia"),
+        new("ja", "日本語"),
+        new("ko", "한국어"),
         new("nl", "Nederlands"),
+        new("pl", "Polski"),
         new("ru", "Русский"),
         new("zh-Hans", "简体中文"),
-        new("ja", "日本語"),
-        new("es", "Español"),
         new("zh-Hant", "繁體中文"),
-        new("id", "Bahasa Indonesia"),
-        new("pl", "Polski"),
-        new("de", "Deutsch"),
-        new("fr", "Français"),
-        new("ko", "한국어"),
     ];
 
     /// <summary>Gets or sets the live interface language without changing date, number or expression syntax.</summary>
@@ -107,7 +107,8 @@ public sealed partial class PreferencesViewModel : LocalizedObservableValidator,
     {
         get => settings.Language is null
             ? Languages[0]
-            : Languages.FirstOrDefault(option => string.Equals(option.Code, settings.Language, StringComparison.OrdinalIgnoreCase)) ?? Languages[1];
+            : Languages.FirstOrDefault(option => string.Equals(option.Code, settings.Language, StringComparison.OrdinalIgnoreCase))
+                ?? Languages.First(option => option.Code == "en");
         set
         {
             if (SetProperty(settings.Language, value.Code, settings, static (document, code) => document.Language = code, false))
