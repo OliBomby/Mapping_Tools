@@ -101,7 +101,7 @@
             </Grid>
 
             <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                <ComboBox Width="220"
+                <ComboBox MinWidth="150"
                           HorizontalAlignment="Left"
                           ItemsSource="{Binding CurrentBeatmapFetchingModes}"
                           SelectedItem="{Binding CurrentBeatmapFetching, Mode=TwoWay}"
@@ -113,7 +113,7 @@
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
-                <ComboBox Width="220"
+                <ComboBox MinWidth="150"
                           Margin="15 0 0 0"
                           HorizontalAlignment="Left"
                           ItemsSource="{Binding BeatmapLiveStateReadingModes}"
@@ -126,7 +126,7 @@
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
-                <ComboBox Width="220"
+                <ComboBox MinWidth="150"
                           Margin="15 0 0 0"
                           HorizontalAlignment="Left"
                           ItemsSource="{Binding EditorReloadModes}"
@@ -141,7 +141,7 @@
                 </ComboBox>
             </StackPanel>
 
-            <TextBox MaxWidth="240"
+            <TextBox MinWidth="150"
                      Margin="0,10,0,0"
                      HorizontalAlignment="Left"
                      materialAssists:TextFieldAssist.Label="{loc:Tr Shell_MaxBackupFiles}"
@@ -161,7 +161,7 @@
                               Content="{loc:Tr Shell_MakePeriodicBackups}"
                               IsChecked="{Binding MakePeriodicBackups, Mode=TwoWay}"
                               ToolTip.Tip="{loc:Tr Shell_PeriodicallyMakeAutomaticBackupsWhenTheEditorIsOpenThisIsUsefulIfYouForgetToSaveOftenOrAccidentallyD}" />
-                    <TextBox MaxWidth="220"
+                    <TextBox MinWidth="100"
                              Margin="20,0,0,0"
                              HorizontalAlignment="Left"
                              IsVisible="{Binding MakePeriodicBackups}"
@@ -190,94 +190,91 @@
                           ToolTip.Tip="{loc:Tr Shell_SelectTheBeatmapInAnActiveOsuLazerExternalEditFolderAndUseItForCurrentBeatmapActionsUntilTheFolderCl}" />
             </StackPanel>
 
-            <StackPanel Margin="5,10,0,0">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Width="220"
+            <Grid Margin="5,10,0,0" RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto,Auto,Auto,Auto">
+                <TextBlock Grid.Row="0" Grid.Column="0" MinWidth="120"
+                           Margin="0,0,5,0"
+                           VerticalAlignment="Center"
+                           Text="{loc:Tr Shell_QuickrunHotkey}"
+                           ToolTip.Tip="{loc:Tr Shell_QuickrunLetsYouQuicklyRunAToolOnTheBeatmapYouHaveOpenInTheEditor}" />
+                <controls:HotkeyEditor Grid.Row="0" Grid.Column="1" Width="150"
+                                       Classes="compact"
+                                       Hotkey="{Binding QuickRunHotkey, Mode=TwoWay}" />
+
+                <CheckBox Grid.Row="0" Grid.Column="2" Margin="15,0,0,0"
+                          VerticalAlignment="Center"
+                          IsChecked="{Binding SmartQuickRunEnabled, Mode=TwoWay}"
+                          ToolTip.Tip="{loc:Tr Shell_EnableSmartquickrunToModifyTheBehaviorOfQuickrunBasedOnTheNumberOfObjectsCurrentlySelectedOnTheEdito}" />
+
+                <StackPanel Grid.Row="0" Grid.Column="3" Orientation="Horizontal"
+                            IsEnabled="{Binding SmartQuickRunEnabled}">
+                    <TextBlock Margin="10,0"
+                               Classes="togglable"
                                VerticalAlignment="Center"
-                               Text="{loc:Tr Shell_QuickrunHotkey}"
-                               ToolTip.Tip="{loc:Tr Shell_QuickrunLetsYouQuicklyRunAToolOnTheBeatmapYouHaveOpenInTheEditor}" />
-                    <controls:HotkeyEditor Width="150"
-                                           Classes="compact"
-                                           Hotkey="{Binding QuickRunHotkey, Mode=TwoWay}" />
-
-                    <CheckBox Margin="15,0,0,0"
-                              VerticalAlignment="Center"
-                              IsChecked="{Binding SmartQuickRunEnabled, Mode=TwoWay}"
-                              ToolTip.Tip="{loc:Tr Shell_EnableSmartquickrunToModifyTheBehaviorOfQuickrunBasedOnTheNumberOfObjectsCurrentlySelectedOnTheEdito}" />
-
-                    <StackPanel Orientation="Horizontal"
-                                IsEnabled="{Binding SmartQuickRunEnabled}">
-                        <TextBlock Margin="15,0"
-                                   Classes="togglable"
-                                   VerticalAlignment="Center"
-                                   Text="{loc:Tr Shell_None}"
-                                   ToolTip.Tip="{loc:Tr Shell_ThisToolGetsQuickrunIfYouHaveNoObjectsSelectedInTheEditor}" />
-                        <ComboBox Width="120"
-                                  Classes="compact"
-                                  ItemsSource="{Binding NoneQuickRunTools}"
-                                  SelectedItem="{Binding NoneQuickRunTool, Mode=TwoWay}"
-                                  ToolTip.Tip="{loc:Tr Shell_ThisToolGetsQuickrunIfYouHaveNoObjectsSelectedInTheEditor}">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                        <TextBlock Margin="15,0"
-                                   Classes="togglable"
-                                   VerticalAlignment="Center"
-                                   Text="{loc:Tr Shell_Single}"
-                                   ToolTip.Tip="{loc:Tr Shell_ThisToolGetsQuickrunIfYouHaveOneObjectSelectedInTheEditor}" />
-                        <ComboBox Width="120"
-                                  Classes="compact"
-                                  ItemsSource="{Binding SingleQuickRunTools}"
-                                  SelectedItem="{Binding SingleQuickRunTool, Mode=TwoWay}"
-                                  ToolTip.Tip="{loc:Tr Shell_ThisToolGetsQuickrunIfYouHaveOneObjectSelectedInTheEditor}">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                        <TextBlock Margin="15,0"
-                                   Classes="togglable"
-                                   VerticalAlignment="Center"
-                                   Text="{loc:Tr Shell_Multiple}"
-                                   ToolTip.Tip="{loc:Tr Shell_ThisToolGetsQuickrunIfYouHaveMultipleObjectsSelectedInTheEditor}" />
-                        <ComboBox Width="120"
-                                  Classes="compact"
-                                  ItemsSource="{Binding MultipleQuickRunTools}"
-                                  SelectedItem="{Binding MultipleQuickRunTool, Mode=TwoWay}"
-                                  ToolTip.Tip="{loc:Tr Shell_ThisToolGetsQuickrunIfYouHaveMultipleObjectsSelectedInTheEditor}">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                    </StackPanel>
+                               Text="{loc:Tr Shell_None}"
+                               ToolTip.Tip="{loc:Tr Shell_ThisToolGetsQuickrunIfYouHaveNoObjectsSelectedInTheEditor}" />
+                    <ComboBox MinWidth="120"
+                              Classes="compact"
+                              ItemsSource="{Binding NoneQuickRunTools}"
+                              SelectedItem="{Binding NoneQuickRunTool, Mode=TwoWay}"
+                              ToolTip.Tip="{loc:Tr Shell_ThisToolGetsQuickrunIfYouHaveNoObjectsSelectedInTheEditor}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <TextBlock Margin="10,0"
+                               Classes="togglable"
+                               VerticalAlignment="Center"
+                               Text="{loc:Tr Shell_Single}"
+                               ToolTip.Tip="{loc:Tr Shell_ThisToolGetsQuickrunIfYouHaveOneObjectSelectedInTheEditor}" />
+                    <ComboBox MinWidth="120"
+                              Classes="compact"
+                              ItemsSource="{Binding SingleQuickRunTools}"
+                              SelectedItem="{Binding SingleQuickRunTool, Mode=TwoWay}"
+                              ToolTip.Tip="{loc:Tr Shell_ThisToolGetsQuickrunIfYouHaveOneObjectSelectedInTheEditor}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <TextBlock Margin="10,0"
+                               Classes="togglable"
+                               VerticalAlignment="Center"
+                               Text="{loc:Tr Shell_Multiple}"
+                               ToolTip.Tip="{loc:Tr Shell_ThisToolGetsQuickrunIfYouHaveMultipleObjectsSelectedInTheEditor}" />
+                    <ComboBox MinWidth="120"
+                              Classes="compact"
+                              ItemsSource="{Binding MultipleQuickRunTools}"
+                              SelectedItem="{Binding MultipleQuickRunTool, Mode=TwoWay}"
+                              ToolTip.Tip="{loc:Tr Shell_ThisToolGetsQuickrunIfYouHaveMultipleObjectsSelectedInTheEditor}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
                 </StackPanel>
 
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Width="220"
-                               VerticalAlignment="Center"
-                               Text="{loc:Tr Shell_QuickundoHotkey}"
-                               ToolTip.Tip="{loc:Tr Shell_QuicklyLoadsTheLatestBackupIntoTheBeatmapCurrentlyOpenInTheEditor}" />
-                    <controls:HotkeyEditor Width="150"
-                                           Classes="compact"
-                                           Hotkey="{Binding QuickUndoHotkey, Mode=TwoWay}" />
-                </StackPanel>
+                <TextBlock Grid.Row="1" Grid.Column="0" MinWidth="120"
+                           Margin="0,0,5,0"
+                           VerticalAlignment="Center"
+                           Text="{loc:Tr Shell_QuickundoHotkey}"
+                           ToolTip.Tip="{loc:Tr Shell_QuicklyLoadsTheLatestBackupIntoTheBeatmapCurrentlyOpenInTheEditor}" />
+                <controls:HotkeyEditor Grid.Row="1" Grid.Column="1" Width="150"
+                                       Classes="compact"
+                                       Hotkey="{Binding QuickUndoHotkey, Mode=TwoWay}" />
 
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Width="220"
-                               VerticalAlignment="Center"
-                               Text="{loc:Tr Shell_BettersaveHotkey}"
-                               ToolTip.Tip="{loc:Tr Shell_BettersaveSavesTheCurrentMapWithProperRoundingInsteadOfTruncatingValues}" />
-                    <controls:HotkeyEditor Width="150"
-                                           Classes="compact"
-                                           Hotkey="{Binding BetterSaveHotkey, Mode=TwoWay}" />
-                </StackPanel>
-            </StackPanel>
+                <TextBlock Grid.Row="2" Grid.Column="0" MinWidth="120"
+                           Margin="0,0,5,0"
+                           VerticalAlignment="Center"
+                           Text="{loc:Tr Shell_BettersaveHotkey}"
+                           ToolTip.Tip="{loc:Tr Shell_BettersaveSavesTheCurrentMapWithProperRoundingInsteadOfTruncatingValues}" />
+                <controls:HotkeyEditor Grid.Row="2" Grid.Column="1" Width="150"
+                                       Classes="compact"
+                                       Hotkey="{Binding BetterSaveHotkey, Mode=TwoWay}" />
+            </Grid>
 
             <ComboBox Margin="0,10,0,0"
                       MinWidth="220"
