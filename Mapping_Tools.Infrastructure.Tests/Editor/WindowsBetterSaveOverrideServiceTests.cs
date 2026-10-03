@@ -55,6 +55,9 @@ public sealed class WindowsBetterSaveOverrideServiceTests
     public async Task Configure_WhileEditorStillHoldsFile_WaitsForCompletedSave()
     {
         // Arrange
+        if (!OperatingSystem.IsWindows())
+            Assert.Inconclusive("The test relies on Windows file sharing locks.");
+
         using SaveFixture fixture = new();
         fixture.Service.Configure(fixture.DirectoryPath, true);
         int savesWhileLocked;

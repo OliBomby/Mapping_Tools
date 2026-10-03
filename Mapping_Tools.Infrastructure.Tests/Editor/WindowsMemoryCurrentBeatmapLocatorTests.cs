@@ -27,7 +27,7 @@ public sealed class WindowsMemoryCurrentBeatmapLocatorTests
         string result = await sut.FindCurrentBeatmapAsync();
 
         // Assert
-        result.Should().Be(expected_path);
+        result.Should().Be(Path.GetFullPath(expected_path));
         memoryReadCount.Should().Be(1);
     }
 

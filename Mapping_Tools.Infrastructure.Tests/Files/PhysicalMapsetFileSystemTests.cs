@@ -81,7 +81,8 @@ public sealed class PhysicalBeatmapsetFileSystemTests : IDisposable
         var act = () => transaction.CommitAsync();
 
         // Assert
-        await act.Should().ThrowAsync<IOException>();
+        var exception = await act.Should().ThrowAsync<Exception>();
+        (exception.Which is IOException or UnauthorizedAccessException).Should().BeTrue();
         (await File.ReadAllTextAsync(original)).Should().Be("original");
         Directory.Exists(Path.Combine(export, "new-directory")).Should().BeFalse();
         Directory.Exists(Path.Combine(export, "failure.txt")).Should().BeTrue();

@@ -48,10 +48,10 @@ public sealed class EditorReaderSnapshotConverterTests
             snapshot.HitObjects[0];
 
         // Assert
-        snapshot.Path.Should().Be(Path.Combine(
+        snapshot.Path.Should().Be(Path.GetFullPath(Path.Combine(
             @"C:\osu!\Songs",
             "123 Artist - Title",
-            "map.osu"));
+            "map.osu")));
         snapshot.EditorTime.Should().Be(2222);
         snapshot.ApproachRate.Should().Be(9);
         snapshot.CircleSize.Should().Be(4);

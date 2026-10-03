@@ -192,7 +192,7 @@ public sealed class PatternGalleryFileService : IPatternGalleryFileService
         if (Path.IsPathRooted(value)
             || value is "." or ".."
             || value.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0
-            || value.IndexOfAny([Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar]) >= 0)
+            || value.IndexOfAny(['/', '\\']) >= 0)
             throw new ArgumentException("The collection name must be one relative directory name.", parameterName);
     }
 }
