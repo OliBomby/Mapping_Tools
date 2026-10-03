@@ -44,7 +44,7 @@
                         <TextBox Grid.Row="0" Grid.Column="4" Classes="compact" MinWidth="120"
                                  Text="{Binding TimingpointOffsetOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
 
-                        <TextBlock Grid.Row="1" Text="{loc:Tr PropertyTransformer_Bpm}" Margin="0,0,8,0" />
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="{loc:Tr PropertyTransformer_Bpm}" Margin="0,0,8,0" />
                         <TextBlock Grid.Row="1" Grid.Column="1" Text="x " />
                         <TextBox Grid.Row="1" Grid.Column="2" Classes="compact" MinWidth="120"
                                  Text="{Binding TimingpointBpmMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
@@ -52,7 +52,7 @@
                         <TextBox Grid.Row="1" Grid.Column="4" Classes="compact" MinWidth="120"
                                  Text="{Binding TimingpointBpmOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
 
-                        <TextBlock Grid.Row="2" Text="{loc:Tr PropertyTransformer_SliderVelocity}" Margin="0,0,8,0" />
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Tr PropertyTransformer_SliderVelocity}" Margin="0,0,8,0" />
                         <TextBlock Grid.Row="2" Grid.Column="1" Text="x " />
                         <TextBox Grid.Row="2" Grid.Column="2" Classes="compact" MinWidth="120"
                                  Text="{Binding TimingpointSvMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
@@ -60,7 +60,7 @@
                         <TextBox Grid.Row="2" Grid.Column="4" Classes="compact" MinWidth="120"
                                  Text="{Binding TimingpointSvOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
 
-                        <TextBlock Grid.Row="3" Text="{loc:Tr PropertyTransformer_CustomIndex}" Margin="0,0,8,0" />
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="{loc:Tr PropertyTransformer_CustomIndex}" Margin="0,0,8,0" />
                         <TextBlock Grid.Row="3" Grid.Column="1" Text="x " />
                         <TextBox Grid.Row="3" Grid.Column="2" Classes="compact" MinWidth="120"
                                  Text="{Binding TimingpointIndexMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
@@ -68,7 +68,7 @@
                         <TextBox Grid.Row="3" Grid.Column="4" Classes="compact" MinWidth="120"
                                  Text="{Binding TimingpointIndexOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
 
-                        <TextBlock Grid.Row="4" Text="{loc:Tr PropertyTransformer_Volume}" Margin="0,0,8,0" />
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="{loc:Tr PropertyTransformer_Volume}" Margin="0,0,8,0" />
                         <TextBlock Grid.Row="4" Grid.Column="1" Text="x " />
                         <TextBox Grid.Row="4" Grid.Column="2" Classes="compact" MinWidth="120"
                                  Text="{Binding TimingpointVolumeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
@@ -96,7 +96,7 @@
                         <TextBox Grid.Row="0" Grid.Column="4" Classes="compact" MinWidth="120"
                                  Text="{Binding SbEventTimeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
 
-                        <TextBlock Grid.Row="1" Text="{loc:Tr PropertyTransformer_SampleTime}" Margin="0,0,8,0" />
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="{loc:Tr PropertyTransformer_SampleTime}" Margin="0,0,8,0" />
                         <TextBlock Grid.Row="1" Grid.Column="1" Text="x " />
                         <TextBox Grid.Row="1" Grid.Column="2" Classes="compact" MinWidth="120"
                                  Text="{Binding SbSampleTimeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
@@ -104,7 +104,7 @@
                         <TextBox Grid.Row="1" Grid.Column="4" Classes="compact" MinWidth="120"
                                  Text="{Binding SbSampleTimeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
 
-                        <TextBlock Grid.Row="2" Text="{loc:Tr PropertyTransformer_SampleVolume}" Margin="0,0,8,0" />
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Tr PropertyTransformer_SampleVolume}" Margin="0,0,8,0" />
                         <TextBlock Grid.Row="2" Grid.Column="1" Text="x " />
                         <TextBox Grid.Row="2" Grid.Column="2" Classes="compact" MinWidth="120"
                                  Text="{Binding SbSampleVolumeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
@@ -132,7 +132,7 @@
                         <TextBox Grid.Row="0" Grid.Column="4" Classes="compact" MinWidth="120"
                                  Text="{Binding HitObjectTimeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
 
-                        <TextBlock Grid.Row="1" Text="{loc:Tr PropertyTransformer_HitObjectVolume}" Margin="0,0,8,0" />
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="{loc:Tr PropertyTransformer_HitObjectVolume}" Margin="0,0,8,0" />
                         <TextBlock Grid.Row="1" Grid.Column="1" Text="x " />
                         <TextBox Grid.Row="1" Grid.Column="2" Classes="compact" MinWidth="120"
                                  Text="{Binding HitObjectVolumeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
@@ -140,7 +140,7 @@
                         <TextBox Grid.Row="1" Grid.Column="4" Classes="compact" MinWidth="120"
                                  Text="{Binding HitObjectVolumeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
 
-                        <TextBlock Grid.Row="2" Text="{loc:Tr PropertyTransformer_BookmarkTime}" Margin="0,0,8,0" />
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Tr PropertyTransformer_BookmarkTime}" Margin="0,0,8,0" />
                         <TextBlock Grid.Row="2" Grid.Column="1" Text="x " />
                         <TextBox Grid.Row="2" Grid.Column="2" Classes="compact" MinWidth="120"
                                  Text="{Binding BookmarkTimeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
@@ -148,7 +148,7 @@
                         <TextBox Grid.Row="2" Grid.Column="4" Classes="compact" MinWidth="120"
                                  Text="{Binding BookmarkTimeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
 
-                        <TextBlock Grid.Row="3" Text="{loc:Tr PropertyTransformer_BreakTime}" Margin="0,0,8,0" />
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="{loc:Tr PropertyTransformer_BreakTime}" Margin="0,0,8,0" />
                         <TextBlock Grid.Row="3" Grid.Column="1" Text="x " />
                         <TextBox Grid.Row="3" Grid.Column="2" Classes="compact" MinWidth="120"
                                  Text="{Binding BreakTimeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
@@ -156,7 +156,7 @@
                         <TextBox Grid.Row="3" Grid.Column="4" Classes="compact" MinWidth="120"
                                  Text="{Binding BreakTimeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
 
-                        <TextBlock Grid.Row="4" Text="{loc:Tr PropertyTransformer_VideoTime}" Margin="0,0,8,0" />
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="{loc:Tr PropertyTransformer_VideoTime}" Margin="0,0,8,0" />
                         <TextBlock Grid.Row="4" Grid.Column="1" Text="x " />
                         <TextBox Grid.Row="4" Grid.Column="2" Classes="compact" MinWidth="120"
                                  Text="{Binding VideoTimeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
@@ -164,7 +164,7 @@
                         <TextBox Grid.Row="4" Grid.Column="4" Classes="compact" MinWidth="120"
                                  Text="{Binding VideoTimeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
 
-                        <TextBlock Grid.Row="5" Text="{loc:Tr PropertyTransformer_PreviewTime}" Margin="0,0,8,0" />
+                        <TextBlock Grid.Row="5" Grid.Column="0" Text="{loc:Tr PropertyTransformer_PreviewTime}" Margin="0,0,8,0" />
                         <TextBlock Grid.Row="5" Grid.Column="1" Text="x " />
                         <TextBox Grid.Row="5" Grid.Column="2" Classes="compact" MinWidth="120"
                                  Text="{Binding PreviewTimeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
