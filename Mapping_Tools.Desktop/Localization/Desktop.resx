@@ -2834,7 +2834,7 @@ Start by adding a combo colour with the plus button at the bottom left, or impor
     <value>Ascending</value>
   </data>
   <data name="Common_BeatDivisorsLabel" xml:space="preserve">
-    <comment>Label for the editable comma-separated list of beat snap divisors.</comment>
+    <comment>Label for the editable comma-separated list of osu! beat divisors. These are mapping snap divisions, distinct from musical time signatures.</comment>
     <value>Beat divisors</value>
   </data>
   <data name="Common_BeatDivisorsTip" xml:space="preserve">
@@ -2934,11 +2934,11 @@ Start by adding a combo colour with the plus button at the bottom left, or impor
     <comment>Error title shown when the platform file picker cannot provide local beatmap paths.</comment>
   </data>
   <data name="Common_Signatures" xml:space="preserve">
-    <comment>Label used by beat snap divisor editors in mapping tools. Here “signatures” means snap divisions such as 1/4 and 1/12, not musical time signatures.</comment>
-    <value>Signatures</value>
+    <comment>Heading on Timing Helper, Timing Copier, and Map Cleaner for musical time signatures (for example, 4/4). Distinguish this term from osu! beat divisors, which are configured in the adjacent field.</comment>
+    <value>Time signatures</value>
   </data>
   <data name="Common_SignaturesTip" xml:space="preserve">
-    <comment>Tooltip for the beat snap divisor field. Divisors determine the beat subdivisions used when resnapping objects.</comment>
+    <comment>Tooltip shown from the Signatures heading in Timing Helper and Timing Copier; describes the adjacent osu! beat-divisor setting used to resnap objects.</comment>
     <value>Beat snap divisors for resnapping.</value>
   </data>
   <data name="Common_TimeCodeLabel" xml:space="preserve">
@@ -4083,10 +4083,6 @@ This supports a specific workflow: place circles in different screen areas and t
     <value>Analyze the samples used by the beatmap to optimize greenlines further. Disable this if the beatmap uses custom hitsounds whose sample files have not been added yet.</value>
     <comment>Tooltip for Analyze samples. Inspecting samples helps remove redundant greenlines; turn this off when custom hitsounds refer to sample files that are not yet present. Preserve the distinction between hitsounds and their sample files.</comment>
   </data>
-  <data name="MapCleaner_BeatDivisors" xml:space="preserve">
-    <value>Beat divisors</value>
-    <comment>Label for a comma-separated list of beat fractions used as snap divisions. Values can include fractions and decimals.</comment>
-  </data>
   <data name="MapCleaner_BeatDivisorsTip" xml:space="preserve">
     <value>Enter any number of beat divisors separated by commas. Examples: 1/4, 1/12, 1/7, 4/5, 0.13435622499.</value>
     <comment>Tooltip for Beat divisors. The field accepts a comma-separated list with any number of rational fractions or decimal divisors; preserve the sample syntax and exact example values.</comment>
@@ -4181,13 +4177,9 @@ To clean greenlines, Map Cleaner first records how each timing point affects the
     <value>Resnap hit objects and slider ends.</value>
     <comment>Tooltip for Resnap objects. The operation adjusts hit-object and slider-end timing to the selected beat-divisor grid.</comment>
   </data>
-  <data name="MapCleaner_Signatures" xml:space="preserve">
-    <value>Signatures</value>
-    <comment>Section heading for the beat divisors used when snapping objects and bookmarks to a beat grid.</comment>
-  </data>
   <data name="MapCleaner_SignaturesTip" xml:space="preserve">
     <value>Choose the beat divisors to snap to.</value>
-    <comment>Tooltip for the Signatures section. It refers to the selectable beat-grid divisions used to resnap timing, not a time signature.</comment>
+    <comment>Tooltip shown from Map Cleaner's Signatures heading; describes the adjacent osu! beat-divisor setting used to resnap objects.</comment>
   </data>
   <data name="MapCleaner_SummaryAddedMany" xml:space="preserve">
     <value>Successfully added {0} greenlines</value>

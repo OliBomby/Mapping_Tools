@@ -2834,7 +2834,7 @@ osu! 편집기의 타이밍 포인트처럼 색상이 적용되는 구간을 지
     <value>오름차순</value>
   </data>
   <data name="Common_BeatDivisorsLabel" xml:space="preserve">
-    <comment>Label for the editable comma-separated list of beat snap divisors.</comment>
+    <comment>Label for the editable comma-separated list of osu! beat divisors. These are mapping snap divisions, distinct from musical time signatures.</comment>
     <value>박자 분할값</value>
   </data>
   <data name="Common_BeatDivisorsTip" xml:space="preserve">
@@ -2934,11 +2934,11 @@ osu! 편집기의 타이밍 포인트처럼 색상이 적용되는 구간을 지
     <comment>Error title shown when the platform file picker cannot provide local beatmap paths.</comment>
   </data>
   <data name="Common_Signatures" xml:space="preserve">
-    <comment>Label used by beat snap divisor editors in mapping tools. Here “signatures” means snap divisions such as 1/4 and 1/12, not musical time signatures.</comment>
-    <value>박자 분할</value>
+    <comment>Heading on Timing Helper, Timing Copier, and Map Cleaner for musical time signatures (for example, 4/4). Distinguish this term from osu! beat divisors, which are configured in the adjacent field.</comment>
+    <value>박자표</value>
   </data>
   <data name="Common_SignaturesTip" xml:space="preserve">
-    <comment>Tooltip for the beat snap divisor field. Divisors determine the beat subdivisions used when resnapping objects.</comment>
+    <comment>Tooltip shown from the Signatures heading in Timing Helper and Timing Copier; describes the adjacent osu! beat-divisor setting used to resnap objects.</comment>
     <value>다시 스냅할 때 사용할 박자 분할값입니다.</value>
   </data>
   <data name="Common_TimeCodeLabel" xml:space="preserve">
@@ -4083,10 +4083,6 @@ osu! 편집기의 타이밍 포인트처럼 색상이 적용되는 구간을 지
     <value>비트맵에서 사용한 샘플을 분석해 그린라인을 추가로 최적화합니다. 아직 샘플 파일이 추가되지 않은 사용자 지정 히트사운드가 비트맵에 있다면 이 옵션을 끄세요.</value>
     <comment>Tooltip for Analyze samples. Inspecting samples helps remove redundant greenlines; turn this off when custom hitsounds refer to sample files that are not yet present. Preserve the distinction between hitsounds and their sample files.</comment>
   </data>
-  <data name="MapCleaner_BeatDivisors" xml:space="preserve">
-    <value>박자 분할값</value>
-    <comment>Label for a comma-separated list of beat fractions used as snap divisions. Values can include fractions and decimals.</comment>
-  </data>
   <data name="MapCleaner_BeatDivisorsTip" xml:space="preserve">
     <value>박자 분할값을 원하는 만큼 쉼표로 구분해 입력하세요. 예: 1/4, 1/12, 1/7, 4/5, 0.13435622499.</value>
     <comment>Tooltip for Beat divisors. The field accepts a comma-separated list with any number of rational fractions or decimal divisors; preserve the sample syntax and exact example values.</comment>
@@ -4181,13 +4177,9 @@ osu! 편집기의 타이밍 포인트처럼 색상이 적용되는 구간을 지
     <value>히트 오브젝트와 슬라이더 끝을 다시 스냅합니다.</value>
     <comment>Tooltip for Resnap objects. The operation adjusts hit-object and slider-end timing to the selected beat-divisor grid.</comment>
   </data>
-  <data name="MapCleaner_Signatures" xml:space="preserve">
-    <value>박자 분할</value>
-    <comment>Section heading for the beat divisors used when snapping objects and bookmarks to a beat grid.</comment>
-  </data>
   <data name="MapCleaner_SignaturesTip" xml:space="preserve">
     <value>스냅할 박자 분할값을 선택합니다.</value>
-    <comment>Tooltip for the Signatures section. It refers to the selectable beat-grid divisions used to resnap timing, not a time signature.</comment>
+    <comment>Tooltip shown from Map Cleaner's Signatures heading; describes the adjacent osu! beat-divisor setting used to resnap objects.</comment>
   </data>
   <data name="MapCleaner_SummaryAddedMany" xml:space="preserve">
     <value>그린라인 {0}개를 추가했습니다</value>

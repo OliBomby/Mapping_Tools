@@ -2834,7 +2834,7 @@
     <value>По возрастанию</value>
   </data>
   <data name="Common_BeatDivisorsLabel" xml:space="preserve">
-    <comment>Label for the editable comma-separated list of beat snap divisors.</comment>
+    <comment>Label for the editable comma-separated list of osu! beat divisors. These are mapping snap divisions, distinct from musical time signatures.</comment>
     <value>Делители доли</value>
   </data>
   <data name="Common_BeatDivisorsTip" xml:space="preserve">
@@ -2934,11 +2934,11 @@
     <comment>Error title shown when the platform file picker cannot provide local beatmap paths.</comment>
   </data>
   <data name="Common_Signatures" xml:space="preserve">
-    <comment>Label used by beat snap divisor editors in mapping tools. Here “signatures” means snap divisions such as 1/4 and 1/12, not musical time signatures.</comment>
-    <value>Делители доли</value>
+    <comment>Heading on Timing Helper, Timing Copier, and Map Cleaner for musical time signatures (for example, 4/4). Distinguish this term from osu! beat divisors, which are configured in the adjacent field.</comment>
+    <value>Тактовые размеры</value>
   </data>
   <data name="Common_SignaturesTip" xml:space="preserve">
-    <comment>Tooltip for the beat snap divisor field. Divisors determine the beat subdivisions used when resnapping objects.</comment>
+    <comment>Tooltip shown from the Signatures heading in Timing Helper and Timing Copier; describes the adjacent osu! beat-divisor setting used to resnap objects.</comment>
     <value>Делители привязки к долям для повторной привязки.</value>
   </data>
   <data name="Common_TimeCodeLabel" xml:space="preserve">
@@ -4083,10 +4083,6 @@
     <value>Анализировать сэмплы, используемые картой, чтобы лучше оптимизировать зелёные линии. Отключите эту настройку, если на карте используются пользовательские хитсаунды, файлы сэмплов которых ещё не добавлены.</value>
     <comment>Tooltip for Analyze samples. Inspecting samples helps remove redundant greenlines; turn this off when custom hitsounds refer to sample files that are not yet present. Preserve the distinction between hitsounds and their sample files.</comment>
   </data>
-  <data name="MapCleaner_BeatDivisors" xml:space="preserve">
-    <value>Делители доли</value>
-    <comment>Label for a comma-separated list of beat fractions used as snap divisions. Values can include fractions and decimals.</comment>
-  </data>
   <data name="MapCleaner_BeatDivisorsTip" xml:space="preserve">
     <value>Введите через запятую любые делители доли. Примеры: 1/4, 1/12, 1/7, 4/5, 0.13435622499.</value>
     <comment>Tooltip for Beat divisors. The field accepts a comma-separated list with any number of rational fractions or decimal divisors; preserve the sample syntax and exact example values.</comment>
@@ -4181,13 +4177,9 @@
     <value>Заново привязать объекты и концы слайдеров к сетке.</value>
     <comment>Tooltip for Resnap objects. The operation adjusts hit-object and slider-end timing to the selected beat-divisor grid.</comment>
   </data>
-  <data name="MapCleaner_Signatures" xml:space="preserve">
-    <value>Делители доли</value>
-    <comment>Section heading for the beat divisors used when snapping objects and bookmarks to a beat grid.</comment>
-  </data>
   <data name="MapCleaner_SignaturesTip" xml:space="preserve">
     <value>Выберите делители доли, к которым нужно привязать объекты.</value>
-    <comment>Tooltip for the Signatures section. It refers to the selectable beat-grid divisions used to resnap timing, not a time signature.</comment>
+    <comment>Tooltip shown from Map Cleaner's Signatures heading; describes the adjacent osu! beat-divisor setting used to resnap objects.</comment>
   </data>
   <data name="MapCleaner_SummaryAddedMany" xml:space="preserve">
     <value>Успешно добавлено зелёных линий: {0}</value>

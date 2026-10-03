@@ -44,10 +44,10 @@
                           IsChecked="{Binding VolumeSpinners}"
                           ToolTip.Tip="{loc:Tr MapCleaner_PreserveSpinnerVolumeTip}" />
 
-                <TextBlock Margin="0,20,0,0" FontSize="14" FontWeight="Bold" Text="{loc:Tr MapCleaner_Signatures}"
+                <TextBlock Margin="0,20,0,0" FontSize="14" FontWeight="Bold" Text="{loc:Tr Common_Signatures}"
                            ToolTip.Tip="{loc:Tr MapCleaner_SignaturesTip}" />
                 <TextBox MinWidth="100" HorizontalAlignment="Left" FontSize="14" Cursor="Hand"
-                         materialAssists:TextFieldAssist.Label="{loc:Tr MapCleaner_BeatDivisors}"
+                         materialAssists:TextFieldAssist.Label="{loc:Tr Common_BeatDivisorsLabel}"
                          Text="{ReflectionBinding BeatDivisors, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource BeatDivisorArrayToStringConverter}}"
                          ToolTip.Tip="{loc:Tr MapCleaner_BeatDivisorsTip}" />
             </StackPanel>
