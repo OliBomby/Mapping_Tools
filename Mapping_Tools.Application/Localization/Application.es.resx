@@ -13,7 +13,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms</value>
   </resheader>
   <data name="AutoFailDetector_Description" xml:space="preserve">
-    <value>Detectar la colocación incorrecta de objetos en patrones superpuestos.</value>
+    <value>Detectar la carga incorrecta de objetos en patrones superpuestos.</value>
     <comment>Tool catalog description for Auto-fail Detector. Explain that it detects overlapping hit-object patterns which can cause incorrect object loading. Keep the tool name and hit-object mapping terminology unchanged.</comment>
   </data>
   <data name="AutoFailDetector_SearchTerms" xml:space="preserve">

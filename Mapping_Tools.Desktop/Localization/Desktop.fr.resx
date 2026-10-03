@@ -1394,7 +1394,7 @@ Actuelle : {1}</value>
     <comment>Accessible name of the main window display listing the shell's selected beatmaps.</comment>
   </data>
   <data xml:space="preserve" name="Shell_CurrentTool">
-    <value>&lt;Current Tool&gt;</value>
+    <value>&lt;Outil actuel&gt;</value>
     <comment>Display label for SmartQuickRun's sentinel selecting the active tool. Persist the original English sentinel; translate only its presentation.</comment>
   </data>
   <data xml:space="preserve" name="Shell_Dark">

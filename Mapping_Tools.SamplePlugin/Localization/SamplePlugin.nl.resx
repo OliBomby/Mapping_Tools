@@ -13,7 +13,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms</value>
   </resheader>
   <data xml:space="preserve" name="Sample_Description">
-    <value>Een tool die een tag toevoegt aan geselecteerde beatmaps.</value>
+    <value>Een eenmalig te gebruiken tool die een tag toevoegt aan geselecteerde beatmaps.</value>
     <comment>Sample Plugin catalog description; the tool edits beatmap metadata tags. Keep the tool name Sample Plugin unchanged.</comment>
   </data>
   <data xml:space="preserve" name="Sample_SearchTerms">

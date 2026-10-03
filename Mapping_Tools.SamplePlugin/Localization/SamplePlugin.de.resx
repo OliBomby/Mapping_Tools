@@ -21,7 +21,7 @@
     <comment>Additional Sample Plugin discovery keywords; vertical bars separate searchable terms, and canonical English keywords are retained separately.</comment>
   </data>
   <data xml:space="preserve" name="Sample_Help">
-    <value>Fügt den ausgewählten Beatmaps das konfigurierte Tag hinzu. QuickRun verwendet die aktuelle Beatmap der Shell und lädt osu! nach einer erfolgreichen Änderung neu.</value>
+    <value>Fügt den in Mapping Tools ausgewählten Beatmaps das konfigurierte Tag hinzu. QuickRun verwendet die aktuelle Beatmap der Shell und lädt osu! nach einer erfolgreichen Änderung neu.</value>
     <comment>Tool-header explanation for the sample metadata-tagging plugin. Preserve Mapping Tools, QuickRun and osu!; distinguish shell-selected maps from the editor map.</comment>
   </data>
   <data xml:space="preserve" name="Sample_Tag">

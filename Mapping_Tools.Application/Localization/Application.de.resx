@@ -281,7 +281,7 @@
     <comment>Native restore-picker filter label for backup copies of .osu or .osb files. Preserve osu!.</comment>
   </data>
   <data xml:space="preserve" name="Picker_MappingToolsProjects">
-    <value>Mapping-Tools-Projekt</value>
+    <value>Projekt von Mapping Tools</value>
     <comment>Native file-picker filter label for JSON tool-configuration projects, distinct from .osu beatmaps. Preserve Mapping Tools.</comment>
   </data>
   <data xml:space="preserve" name="Picker_OsuConfiguration">

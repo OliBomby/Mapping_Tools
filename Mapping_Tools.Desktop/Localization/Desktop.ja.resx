@@ -5601,7 +5601,7 @@ osu! エディターのタイミングポイントと同じように色付きの
 最も重要なのは位置と速度のグラフです。ここで、スライダーの動きを指定します。下にあるアクセントカラーのボタンをクリックすると、位置モードと速度モードを切り替えられます。
 アンカーを右クリックして追加、削除、編集します。左クリックでドラッグすると項目を移動できます。ドラッグ中に Shift を押すと水平方向、Ctrl を押すと垂直方向に範囲を制限でき、Alt を押すとスナップを無効にできます。
 
-速度を一定にして Sliderator を実行すると、元のスライダーがそのまま出力されます。SV を下げ、タモアの長さを増やしてスライダーを最適化することもできます。
+速度を一定にして Sliderator を実行すると、元のスライダーがそのまま出力されます。SV を下げ、腫瘍の長さを増やしてスライダーを最適化することもできます。
 
 各オプションも確認してください。ツールチップに詳しい説明があります。</value>
   </data>
@@ -5642,11 +5642,11 @@ osu! エディターのタイミングポイントと同じように色付きの
     <comment>Tooltip for manual SV selection. Sliderator is a product/tool name and must remain unchanged.</comment>
   </data>
   <data name="Sliderator_MinTumourTip" xml:space="preserve">
-    <value>スライダーボールを減速させるタモアの最小長。タモアを長くすると動作は軽くなりますが、ボールの動きが不安定になります。</value>
+    <value>スライダーボールを減速させる腫瘍の最小長。腫瘍を長くすると動作は軽くなりますが、ボールの動きが不安定になります。</value>
     <comment>Tooltip for the minimum tumour length. Tumours are generated path segments that slow the sliderball; increasing their length trades smoother performance for shakier movement.</comment>
   </data>
   <data name="Sliderator_MinimumTumourLengthLabel" xml:space="preserve">
-    <value>タモアの最小長</value>
+    <value>腫瘍の最小長</value>
     <comment>Label for the minimum length of generated tumours that slow the sliderball.</comment>
   </data>
   <data name="Sliderator_NewSvLabel" xml:space="preserve">
@@ -5920,7 +5920,7 @@ Timing Helper は BPM を調整したり赤線を追加したりして、すべ�
     <comment>Command-bar label for creating a new tumour layer.</comment>
   </data>
   <data name="TumourGenerator_AddLayerTip" xml:space="preserve">
-    <value>新しいタモアレイヤーを追加します。</value>
+    <value>新しい腫瘍レイヤーを追加します。</value>
     <comment>Tooltip for adding a layer to the generated tumour pattern.</comment>
   </data>
   <data name="TumourGenerator_Advanced" xml:space="preserve">
@@ -5936,7 +5936,7 @@ Timing Helper は BPM を調整したり赤線を追加したりして、すべ�
     <comment>Label for the tumour rotation relative to the slider direction. The value is in degrees; positive values rotate the tumour around the path.</comment>
   </data>
   <data name="TumourGenerator_AngleTip" xml:space="preserve">
-    <value>タモアの角度は、スライダーに対する向きを指定します。</value>
+    <value>腫瘍の角度は、スライダーに対する向きを指定します。</value>
     <comment>Tooltip for the direction in which the tumour points relative to the slider.</comment>
   </data>
   <data name="TumourGenerator_CircleSizeTip" xml:space="preserve">
@@ -5952,7 +5952,7 @@ Timing Helper は BPM を調整したり赤線を追加したりして、すべ�
     <comment>Command-bar label for duplicating the selected tumour layer.</comment>
   </data>
   <data name="TumourGenerator_CopyLayerTip" xml:space="preserve">
-    <value>選択したタモアレイヤーをコピーします。</value>
+    <value>選択した腫瘍レイヤーをコピーします。</value>
     <comment>Tooltip for duplicating the selected layer.</comment>
   </data>
   <data name="TumourGenerator_Count" xml:space="preserve">
@@ -5960,7 +5960,7 @@ Timing Helper は BPM を調整したり赤線を追加したりして、すべ�
     <comment>Label for the number of tumours to place.</comment>
   </data>
   <data name="TumourGenerator_CountTip" xml:space="preserve">
-    <value>スライダー上に配置するタモアの数。0 の場合は、距離とスライダーの長さから個数を決定します。</value>
+    <value>スライダー上に配置する腫瘍の数。0 の場合は、距離とスライダーの長さから個数を決定します。</value>
     <comment>Tooltip for the tumour count. A value of zero enables automatic calculation from spacing and slider length.</comment>
   </data>
   <data name="TumourGenerator_DebugConstruction" xml:space="preserve">
@@ -5988,7 +5988,7 @@ Timing Helper は BPM を調整したり赤線を追加したりして、すべ�
     <comment>Label for spacing between tumour centres.</comment>
   </data>
   <data name="TumourGenerator_DistanceTip" xml:space="preserve">
-    <value>タモアの距離は、それぞれの中心間の間隔を決定します。</value>
+    <value>腫瘍の距離は、それぞれの中心間の間隔を決定します。</value>
     <comment>Tooltip for centre-to-centre spacing of generated tumours.</comment>
   </data>
   <data name="TumourGenerator_End" xml:space="preserve">
@@ -5996,7 +5996,7 @@ Timing Helper は BPM を調整したり赤線を追加したりして、すべ�
     <comment>Label for the end position, along a slider, of a tumour layer.</comment>
   </data>
   <data name="TumourGenerator_EndTip" xml:space="preserve">
-    <value>タモアの配置を終了するスライダー上の位置。0 はスライダーの始点、1 は終点です。「絶対範囲」を有効にした場合、値の単位は osu! ピクセルです。</value>
+    <value>腫瘍の配置を終了するスライダー上の位置。0 はスライダーの始点、1 は終点です。「絶対範囲」を有効にした場合、値の単位は osu! ピクセルです。</value>
     <comment>Tooltip for the end progression of tumour placement. The normalized range is 0 at the slider head to 1 at the tail; Absolute range changes the unit to osu! pixels.</comment>
   </data>
   <data name="TumourGenerator_FixSv" xml:space="preserve">
@@ -6004,16 +6004,16 @@ Timing Helper は BPM を調整したり赤線を追加したりして、すべ�
     <comment>Checkbox label to adjust slider velocity so a slider keeps its duration after tumours are added.</comment>
   </data>
   <data name="TumourGenerator_FixSvTip" xml:space="preserve">
-    <value>タモアを追加した後もスライダーの長さが変わらないよう、SV を自動調整します。</value>
+    <value>腫瘍を追加した後もスライダーの長さが変わらないよう、SV を自動調整します。</value>
     <comment>Tooltip for maintaining slider duration by compensating for the added tumour path.</comment>
   </data>
   <data name="TumourGenerator_Help" xml:space="preserve">
     <comment>Help text explaining layered tumour generation on sliders, shape/size/placement controls, advanced time-varying parameters, arrow-key fine adjustment, and preview/run workflow. Preserve “Preview slider” as the button caption when translating elsewhere.</comment>
-    <value>Tumour Generator 2 は、スライダー上に大量のタモアを生成します。
-タモアの形状や大きさを調整し、パス上の配置位置を選べます。
-タモアを複数のレイヤーに分けて生成することもできます。各レイヤーのタモアは、前のレイヤーのタモアと結合するか、その上に重ねて配置できます。
+    <value>Tumour Generator 2 は、スライダー上に大量の腫瘍を生成します。
+腫瘍の形状や大きさを調整し、パス上の配置位置を選べます。
+腫瘍を複数のレイヤーに分けて生成することもできます。各レイヤーの腫瘍は、前のレイヤーの腫瘍と結合するか、その上に重ねて配置できます。
 「上級」を有効にして [...] ボタンをクリックすると、時間経過に伴うパラメーターの変化を編集できます。スライダー上で矢印キーを使うと細かく調整できます。
-ビートマップでスライダーを選択し、「スライダーをプレビュー」をクリックして変更を確認するか、実行ボタンをクリックして選択したスライダーにタモアをすぐ生成してください。</value>
+ビートマップでスライダーを選択し、「スライダーをプレビュー」をクリックして変更を確認するか、実行ボタンをクリックして選択したスライダーに腫瘍をすぐ生成してください。</value>
   </data>
   <data name="TumourGenerator_ImportMode" xml:space="preserve">
     <value>インポートモード</value>
@@ -6024,7 +6024,7 @@ Timing Helper は BPM を調整したり赤線を追加したりして、すべ�
     <comment>Tooltip for importing target sliders into the preview.</comment>
   </data>
   <data name="TumourGenerator_LayerTip" xml:space="preserve">
-    <value>設定を編集するタモアレイヤーを選択します。</value>
+    <value>設定を編集する腫瘍レイヤーを選択します。</value>
     <comment>Tooltip for selecting a tumour layer in Tumour Generator.</comment>
   </data>
   <data name="TumourGenerator_Length" xml:space="preserve">
@@ -6032,7 +6032,7 @@ Timing Helper は BPM を調整したり赤線を追加したりして、すべ�
     <comment>Label for the length of each generated tumour along the slider path. It is a slider-relative proportion by default and an osu! pixel distance when Absolute range is enabled.</comment>
   </data>
   <data name="TumourGenerator_LengthTip" xml:space="preserve">
-    <value>タモアの長さは、スライダー上でタモアが占める範囲を決定します。</value>
+    <value>腫瘍の長さは、スライダー上で腫瘍が占める範囲を決定します。</value>
     <comment>Tooltip for the portion of the slider occupied by a tumour.</comment>
   </data>
   <data name="TumourGenerator_MadeBy" xml:space="preserve">
@@ -6044,7 +6044,7 @@ Timing Helper は BPM を調整したり赤線を追加したりして、すべ�
     <comment>Checkbox label that constructs a path using only the middle anchors of all tumours.</comment>
   </data>
   <data name="TumourGenerator_MiddleAnchorsTip" xml:space="preserve">
-    <value>すべてのタモアの中央のアンカーのみを使ってパスを構築します。</value>
+    <value>すべての腫瘍の中央のアンカーのみを使ってパスを構築します。</value>
     <comment>Tooltip for the middle-anchors-only path construction option.</comment>
   </data>
   <data name="TumourGenerator_MoveLayerDown" xml:space="preserve">
@@ -6064,7 +6064,7 @@ Timing Helper は BPM を調整したり赤線を追加したりして、すべ�
     <comment>Tooltip for moving the selected layer up in the layer order.</comment>
   </data>
   <data name="TumourGenerator_NameTip" xml:space="preserve">
-    <value>このタモアレイヤーに表示する名前。</value>
+    <value>この腫瘍レイヤーに表示する名前。</value>
     <comment>Tooltip for the editable display name of a tumour layer.</comment>
   </data>
   <data name="TumourGenerator_NoBeatmapOpen" xml:space="preserve">
@@ -6080,11 +6080,11 @@ Timing Helper は BPM を調整したり赤線を追加したりして、すべ�
     <comment>Label for the numeric shape parameter of the selected tumour template. Its meaning depends on the template (for example, Triangle or Circle), so do not add a unit unless the selected template defines one.</comment>
   </data>
   <data name="TumourGenerator_ParameterTip" xml:space="preserve">
-    <value>この特殊なパラメーターは、選択したタモアテンプレートの形状を変更します。</value>
+    <value>この特殊なパラメーターは、選択した腫瘍テンプレートの形状を変更します。</value>
     <comment>Tooltip for the numeric parameter whose effect depends on the selected tumour template; changing it alters the generated shape. It has no universal unit across templates.</comment>
   </data>
   <data name="TumourGenerator_Progress" xml:space="preserve">
-    <value>タモアを生成中</value>
+    <value>腫瘍を生成中</value>
     <comment>Progress label shown while Tumour Generator 2 creates tumour paths.</comment>
   </data>
   <data name="TumourGenerator_RandomSeed" xml:space="preserve">
@@ -6100,7 +6100,7 @@ Timing Helper は BPM を調整したり赤線を追加したりして、すべ�
     <comment>Checkbox label to recalculate the slider’s distances and angles before applying this layer.</comment>
   </data>
   <data name="TumourGenerator_RecalculateTip" xml:space="preserve">
-    <value>このレイヤーを適用する前にスライダーの距離と角度を再計算します。有効にすると、前のレイヤーのタモアをスライダーの一部として扱い、その上にタモアを配置します。タモア同士は結合されません。</value>
+    <value>このレイヤーを適用する前にスライダーの距離と角度を再計算します。有効にすると、前のレイヤーの腫瘍をスライダーの一部として扱い、その上に腫瘍を配置します。腫瘍同士は結合されません。</value>
     <comment>Tooltip for the layer recalculation option. It controls whether prior-layer tumours are treated as part of the path for later placement.</comment>
   </data>
   <data name="TumourGenerator_RemoveLayer" xml:space="preserve">
@@ -6108,7 +6108,7 @@ Timing Helper は BPM を調整したり赤線を追加したりして、すべ�
     <comment>Command-bar label for deleting the selected tumour layer.</comment>
   </data>
   <data name="TumourGenerator_RemoveLayerTip" xml:space="preserve">
-    <value>選択したタモアレイヤーを削除します。</value>
+    <value>選択した腫瘍レイヤーを削除します。</value>
     <comment>Tooltip for removing the selected layer.</comment>
   </data>
   <data name="TumourGenerator_RemoveTicks" xml:space="preserve">
@@ -6120,11 +6120,11 @@ Timing Helper は BPM を調整したり赤線を追加したりして、すべ�
     <comment>Tooltip for tick removal. NaN is a technical value and must remain unchanged.</comment>
   </data>
   <data name="TumourGenerator_ResultMany" xml:space="preserve">
-    <value>{0} 個のスライダーにタモアを生成しました。</value>
+    <value>{0} 個のスライダーに腫瘍を生成しました。</value>
     <comment>Success notification for zero or multiple sliders modified by Tumour Generator 2. Placeholder {0} is an integer count.</comment>
   </data>
   <data name="TumourGenerator_ResultOne" xml:space="preserve">
-    <value>{0} 個のスライダーにタモアを生成しました。</value>
+    <value>{0} 個のスライダーに腫瘍を生成しました。</value>
     <comment>Success notification for exactly one slider modified by Tumour Generator 2. Placeholder {0} is an integer count.</comment>
   </data>
   <data name="TumourGenerator_ResultPreview" xml:space="preserve">
@@ -6136,15 +6136,15 @@ Timing Helper は BPM を調整したり赤線を追加したりして、すべ�
     <comment>Label for the tumour protrusion scale.</comment>
   </data>
   <data name="TumourGenerator_ScaleDetailTip" xml:space="preserve">
-    <value>タモアの倍率は、スライダーからどれだけ突き出すかを決定します。</value>
+    <value>腫瘍の倍率は、スライダーからどれだけ突き出すかを決定します。</value>
     <comment>Tooltip for the per-tumour scale graph, which sets how far each generated tumour protrudes from the slider path; graph values are dimensionless multipliers.</comment>
   </data>
   <data name="TumourGenerator_ScaleTip" xml:space="preserve">
-    <value>タモアの倍率</value>
+    <value>腫瘍の倍率</value>
     <comment>Tooltip for the layer-wide multiplier applied to the scale graph of every tumour generated by Tumour Generator. The product name remains unchanged.</comment>
   </data>
   <data name="TumourGenerator_SeedTip" xml:space="preserve">
-    <value>このレイヤーのタモアを配置する側の順序を決める乱数シード。</value>
+    <value>このレイヤーの腫瘍を配置する側の順序を決める乱数シード。</value>
     <comment>Tooltip for the random seed controlling side selection for tumours in this layer.</comment>
   </data>
   <data name="TumourGenerator_SelectBeatmap" xml:space="preserve">
@@ -6160,7 +6160,7 @@ Timing Helper は BPM を調整したり赤線を追加したりして、すべ�
     <comment>Label for selecting the side of the slider on which tumours are placed.</comment>
   </data>
   <data name="TumourGenerator_SidednessTip" xml:space="preserve">
-    <value>タモアをスライダーのどちら側に配置するかを指定します。</value>
+    <value>腫瘍をスライダーのどちら側に配置するかを指定します。</value>
     <comment>Tooltip for tumour placement side relative to the slider.</comment>
   </data>
   <data name="TumourGenerator_SliderSelectionTip" xml:space="preserve">
@@ -6172,7 +6172,7 @@ Timing Helper は BPM を調整したり赤線を追加したりして、すべ�
     <comment>Label for the start position, along a slider, of a tumour layer.</comment>
   </data>
   <data name="TumourGenerator_StartTip" xml:space="preserve">
-    <value>タモアの配置を開始するスライダー上の位置。0 はスライダーの始点、1 は終点です。「絶対範囲」を有効にした場合、値の単位は osu! ピクセルです。</value>
+    <value>腫瘍の配置を開始するスライダー上の位置。0 はスライダーの始点、1 は終点です。「絶対範囲」を有効にした場合、値の単位は osu! ピクセルです。</value>
     <comment>Tooltip for the start progression of tumour placement. The normalized range is 0 at the slider head to 1 at the tail; Absolute range changes the unit to osu! pixels.</comment>
   </data>
   <data name="TumourGenerator_Template" xml:space="preserve">
@@ -6180,7 +6180,7 @@ Timing Helper は BPM を調整したり赤線を追加したりして、すべ�
     <comment>Label for choosing the tumour shape template.</comment>
   </data>
   <data name="TumourGenerator_TemplateTip" xml:space="preserve">
-    <value>タモアの形状を決めるテンプレート。</value>
+    <value>腫瘍の形状を決めるテンプレート。</value>
     <comment>Tooltip for the template selection that determines tumour shape.</comment>
   </data>
   <data name="TumourGenerator_TimeCode" xml:space="preserve">
@@ -6200,7 +6200,7 @@ Timing Helper は BPM を調整したり赤線を追加したりして、すべ�
     <comment>Label for how generated tumour geometry is oriented relative to the source slider path; the options are Simple, Wrap, and Absolute.</comment>
   </data>
   <data name="TumourGenerator_WrappingTip" xml:space="preserve">
-    <value>折り返しモードでは、タモアがスライダーの形状に沿う方法を指定します。</value>
+    <value>折り返しモードでは、腫瘍がスライダーの形状に沿う方法を指定します。</value>
     <comment>Tooltip for the orientation rule for generated tumour geometry: Simple uses the straight direction between tumour endpoints, Wrap follows the slider path's local direction, and Absolute uses the path point's original angle without an added offset. These are modes, not numeric values.</comment>
   </data>
   <data name="MetadataManager_Validation_ArtistMaxLength" xml:space="preserve">
@@ -6281,7 +6281,7 @@ Timing Helper は BPM を調整したり赤線を追加したりして、すべ�
   </data>
   <data name="Sliderator_Validation_SlideratorTumourLengthRange" xml:space="preserve">
     <comment>Validation error for minimum tumour length; allowed integer values range from 1 through 12.</comment>
-    <value>タモアの最小長は 1 から 12 の範囲にしてください。</value>
+    <value>腫瘍の最小長は 1 から 12 の範囲にしてください。</value>
   </data>
   <data name="MetadataManager_Validation_SourceMaxLength" xml:space="preserve">
     <comment>Validation error when beatmap source metadata exceeds its 81-character limit.</comment>

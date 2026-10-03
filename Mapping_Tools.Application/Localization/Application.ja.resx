@@ -61,7 +61,7 @@
     <comment>Additional search terms for Hitsound Studio. Separate terms with |. MIDI and SoundFont are technical proper names and must remain unchanged; include the canonical English concepts.</comment>
   </data>
   <data name="MapCleaner_Description" xml:space="preserve">
-    <value>不要な緑線を再構築し、必要に応じてマップの内容を再スナップします。</value>
+    <value>有用な緑線を再構築し、必要に応じてマップの内容を再スナップします。</value>
     <comment>Tool catalog description for Map Cleaner. Greenlines are inherited timing points that change slider velocity; resnapping realigns map content to timing or distance snap. Preserve osu! community terms greenline and resnap.</comment>
   </data>
   <data name="MapCleaner_SearchTerms" xml:space="preserve">
@@ -157,11 +157,11 @@
     <comment>Additional search terms for Timing Helper. Separate terms with |. BPM means beats per minute and redline means uninherited timing point; keep the existing canonical English terms searchable.</comment>
   </data>
   <data name="TumourGenerator_Description" xml:space="preserve">
-    <value>スライダー上に大量のタモアを生成します。</value>
+    <value>スライダー上に大量の腫瘍を生成します。</value>
     <comment>Tool catalog description for Tumour Generator 2. Tumours is the tool's playful name for dense layers of repeated slider shapes; retain this wording and the proper tool name exactly.</comment>
   </data>
   <data name="TumourGenerator_SearchTerms" xml:space="preserve">
-    <value>tumour|tumor|slider|layers|graph|templates|タモア|スライダー|レイヤー|グラフ|テンプレート</value>
+    <value>tumour|tumor|slider|layers|graph|templates|腫瘍|スライダー|レイヤー|グラフ|テンプレート</value>
     <comment>Additional search terms for Tumour Generator 2. Separate terms with |. Include British and American spelling of tumour/tumor and slider-layer concepts; do not translate the tool name.</comment>
   </data>
   <data name="HitsoundStudio_ExportSummary" xml:space="preserve">

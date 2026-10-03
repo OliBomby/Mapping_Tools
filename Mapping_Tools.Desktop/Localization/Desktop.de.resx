@@ -1670,7 +1670,7 @@ Aktuell: {1}</value>
     <comment>Preferences checkbox enabling timer-driven beatmap backups while the editor is open.</comment>
   </data>
   <data xml:space="preserve" name="Shell_MappingToolsFolder">
-    <value>Mapping-Tools-Ordner</value>
+    <value>Ordner von Mapping Tools</value>
     <comment>Name of the application data directory inserted into the folder-reveal message; preserve Mapping Tools.</comment>
   </data>
   <data xml:space="preserve" name="Shell_MappingToolsUpdater">
@@ -1750,7 +1750,7 @@ Aktuell: {1}</value>
     <comment>Menu action selects the beatmap currently open in osu!'s editor. Underscore is an access key.</comment>
   </data>
   <data xml:space="preserve" name="Shell_MenuOpenMappingToolsFolder">
-    <value>_Mapping-Tools-Ordner öffnen</value>
+    <value>_Ordner von Mapping Tools öffnen</value>
     <comment>Menu action revealing application data in the operating system's file manager. Keep Mapping Tools; underscore is an access key.</comment>
   </data>
   <data xml:space="preserve" name="Shell_MenuOpenProject">
@@ -1846,11 +1846,11 @@ Aktuell: {1}</value>
     <comment>Tooltip for revealing the backup directory in the operating system's file manager.</comment>
   </data>
   <data xml:space="preserve" name="Shell_OpenTheMappingToolsFolder">
-    <value>Den Mapping-Tools-Ordner öffnen.</value>
+    <value>Den Ordner von Mapping Tools öffnen.</value>
     <comment>Tooltip for revealing the application data directory, rather than a beatmapset. Keep Mapping Tools.</comment>
   </data>
   <data xml:space="preserve" name="Shell_OpenTheOfficialMappingToolsWebsiteInYourBrowser">
-    <value>Die offizielle Mapping-Tools-Website im Browser öffnen.</value>
+    <value>Die offizielle Website von Mapping Tools im Browser öffnen.</value>
     <comment>Tooltip for the project's public website. Keep Mapping Tools unchanged.</comment>
   </data>
   <data xml:space="preserve" name="Shell_OsuConfiguration">

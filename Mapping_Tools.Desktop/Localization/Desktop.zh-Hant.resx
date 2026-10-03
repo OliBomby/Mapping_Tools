@@ -73,7 +73,7 @@
     <comment>Validation message shown when the appearance color field is not a six- or eight-digit hexadecimal color.</comment>
   </data>
   <data name="GeometryDashboard_Complexity" xml:space="preserve">
-    <value>復雜度</value>
+    <value>複雜度</value>
     <comment>Label for the number of virtual-object generation layers used by Geometry Dashboard.</comment>
   </data>
   <data name="GeometryDashboard_ComplexityTip" xml:space="preserve">
@@ -141,15 +141,15 @@
     <comment>Preference section for which virtual-object layers are visible while the snap hotkey is held.</comment>
   </data>
   <data name="GeometryDashboard_Duplicate" xml:space="preserve">
-    <value>復制</value>
+    <value>複製</value>
     <comment>Context-menu action that duplicates the selected generator predicates or savestate entries.</comment>
   </data>
   <data name="GeometryDashboard_DuplicatePredicateTip" xml:space="preserve">
-    <value>復制所選選擇條件。</value>
+    <value>複製所選選擇條件。</value>
     <comment>Tooltip for duplicating selected input-selection predicates in generator settings.</comment>
   </data>
   <data name="GeometryDashboard_DuplicateSavesTip" xml:space="preserve">
-    <value>復制所選儲存狀態。</value>
+    <value>複製所選儲存狀態。</value>
     <comment>Tooltip for duplicating selected Geometry Dashboard savestate entries.</comment>
   </data>
   <data name="GeometryDashboard_Everything" xml:space="preserve">
@@ -169,7 +169,7 @@
     <comment>Display name in the Geometry Dashboard generator list for AnchorPointGenerator. Function: Points on Slider Anchors. Preserve geometric distinctions and any type number.</comment>
   </data>
   <data name="GeometryDashboard_Generator_AngleBisectorGenerator_Description" xml:space="preserve">
-    <value>獲取一對虛擬線，并在它們的交點處生成夾角的角平分線。</value>
+    <value>獲取一對虛擬線，並在它們的交點處生成夾角的角平分線。</value>
     <comment>Tooltip description for the Bisectors of Angles generator (AngleBisectorGenerator). Explain its geometry output and required inputs: Takes a pair of virtual lines and generates the bisector of the angle between them at their intersection.</comment>
   </data>
   <data name="GeometryDashboard_Generator_AngleBisectorGenerator_Name" xml:space="preserve">
@@ -177,7 +177,7 @@
     <comment>Display name in the Geometry Dashboard generator list for AngleBisectorGenerator. Function: Bisectors of Angles. Preserve geometric distinctions and any type number.</comment>
   </data>
   <data name="GeometryDashboard_Generator_AveragePointGenerator2_Description" xml:space="preserve">
-    <value>獲取一對虛擬點并計算它們的中點。</value>
+    <value>獲取一對虛擬點並計算它們的中點。</value>
     <comment>Tooltip description for the Average of Two Points generator (AveragePointGenerator2). Explain its geometry output and required inputs: Takes a pair of virtual points and calculates their average.</comment>
   </data>
   <data name="GeometryDashboard_Generator_AveragePointGenerator2_Name" xml:space="preserve">
@@ -185,7 +185,7 @@
     <comment>Display name in the Geometry Dashboard generator list for AveragePointGenerator2. Function: Average of Two Points. Preserve geometric distinctions and any type number.</comment>
   </data>
   <data name="GeometryDashboard_Generator_AveragePointGenerator3_Description" xml:space="preserve">
-    <value>獲取三個虛擬點并計算它們的中心點。</value>
+    <value>獲取三個虛擬點並計算它們的中心點。</value>
     <comment>Tooltip description for the Average of Three Points generator (AveragePointGenerator3). Explain its geometry output and required inputs: Takes three virtual points and calculates their average.</comment>
   </data>
   <data name="GeometryDashboard_Generator_AveragePointGenerator3_Name" xml:space="preserve">
@@ -193,7 +193,7 @@
     <comment>Display name in the Geometry Dashboard generator list for AveragePointGenerator3. Function: Average of Three Points. Preserve geometric distinctions and any type number.</comment>
   </data>
   <data name="GeometryDashboard_Generator_CircleTangentGenerator_Description" xml:space="preserve">
-    <value>獲取一個虛擬圓和一個虛擬點，然后生成經過該點且與圓相切的直線。</value>
+    <value>獲取一個虛擬圓和一個虛擬點，然後生成經過該點且與圓相切的直線。</value>
     <comment>Tooltip description for the Tangent Lines on Circle generator (CircleTangentGenerator). Explain its geometry output and required inputs: Takes a virtual circle and a virtual point, then generates lines tangent to the circle that pass through the point.</comment>
   </data>
   <data name="GeometryDashboard_Generator_CircleTangentGenerator_Name" xml:space="preserve">
@@ -201,7 +201,7 @@
     <comment>Display name in the Geometry Dashboard generator list for CircleTangentGenerator. Function: Tangent Lines on Circle. Preserve geometric distinctions and any type number.</comment>
   </data>
   <data name="GeometryDashboard_Generator_EqualSpacingGenerator_Description" xml:space="preserve">
-    <value>獲取兩個虛擬點，并在每個點處生成一個圓，其半徑等于兩點間距。</value>
+    <value>獲取兩個虛擬點，並在每個點處生成一個圓，其半徑等於兩點間距。</value>
     <comment>Tooltip description for the Circles by Two Points generator (EqualSpacingGenerator). Explain its geometry output and required inputs: Takes two virtual points and generates a circle at each point whose radius equals the distance between the points.</comment>
   </data>
   <data name="GeometryDashboard_Generator_EqualSpacingGenerator_Name" xml:space="preserve">
@@ -209,7 +209,7 @@
     <comment>Display name in the Geometry Dashboard generator list for EqualSpacingGenerator. Function: Circles by Two Points. Preserve geometric distinctions and any type number.</comment>
   </data>
   <data name="GeometryDashboard_Generator_IntersectionGenerator_Description" xml:space="preserve">
-    <value>獲取兩條虛擬線或兩個虛擬圓，并在每個交點處生成一個虛擬點。</value>
+    <value>獲取兩條虛擬線或兩個虛擬圓，並在每個交點處生成一個虛擬點。</value>
     <comment>Tooltip description for the Intersection Points generator (IntersectionGenerator). Explain its geometry output and required inputs: Takes two virtual lines or circles and generates a virtual point at each intersection.</comment>
   </data>
   <data name="GeometryDashboard_Generator_IntersectionGenerator_Name" xml:space="preserve">
@@ -225,7 +225,7 @@
     <comment>Display name in the Geometry Dashboard generator list for LastAnchorGenerator. Function: Points on Last Anchors. Preserve geometric distinctions and any type number.</comment>
   </data>
   <data name="GeometryDashboard_Generator_LineGenerator_Description" xml:space="preserve">
-    <value>獲取兩個虛擬點并生成連接它們的虛擬線。</value>
+    <value>獲取兩個虛擬點並生成連接它們的虛擬線。</value>
     <comment>Tooltip description for the Lines by Two Points generator (LineGenerator). Explain its geometry output and required inputs: Takes two virtual points and generates a virtual line connecting them.</comment>
   </data>
   <data name="GeometryDashboard_Generator_LineGenerator_Name" xml:space="preserve">
@@ -233,7 +233,7 @@
     <comment>Display name in the Geometry Dashboard generator list for LineGenerator. Function: Lines by Two Points. Preserve geometric distinctions and any type number.</comment>
   </data>
   <data name="GeometryDashboard_Generator_LinearLineGenerator_Description" xml:space="preserve">
-    <value>獲取一條直線滑條，并生成一條路徑與之相符的虛擬線。</value>
+    <value>獲取一條直線滑條，並生成一條路徑與之相符的虛擬線。</value>
     <comment>Tooltip description for the Lines on Linear Sliders generator (LinearLineGenerator). Explain its geometry output and required inputs: Takes a linear slider and generates a virtual line that matches its path.</comment>
   </data>
   <data name="GeometryDashboard_Generator_LinearLineGenerator_Name" xml:space="preserve">
@@ -241,7 +241,7 @@
     <comment>Display name in the Geometry Dashboard generator list for LinearLineGenerator. Function: Lines on Linear Sliders. Preserve geometric distinctions and any type number.</comment>
   </data>
   <data name="GeometryDashboard_Generator_ParallelismGenerator_Description" xml:space="preserve">
-    <value>獲取一條虛擬線和一個虛擬點，然后生成一條經過該點的平行線。</value>
+    <value>獲取一條虛擬線和一個虛擬點，然後生成一條經過該點的平行線。</value>
     <comment>Tooltip description for the Parallel Lines generator (ParallelismGenerator). Explain its geometry output and required inputs: Takes a virtual line and a virtual point, then generates a parallel line through the point.</comment>
   </data>
   <data name="GeometryDashboard_Generator_ParallelismGenerator_Name" xml:space="preserve">
@@ -265,7 +265,7 @@
     <comment>Display name in the Geometry Dashboard generator list for PerfectCircleGenerator. Function: Circles on 3-Point Sliders. Preserve geometric distinctions and any type number.</comment>
   </data>
   <data name="GeometryDashboard_Generator_PerpendicularGenerator_Description" xml:space="preserve">
-    <value>獲取一條虛擬線和一個虛擬點，然后生成一條經過該點的垂線。</value>
+    <value>獲取一條虛擬線和一個虛擬點，然後生成一條經過該點的垂線。</value>
     <comment>Tooltip description for the Perpendicular Lines generator (PerpendicularGenerator). Explain its geometry output and required inputs: Takes a virtual line and a virtual point, then generates a perpendicular line through the point.</comment>
   </data>
   <data name="GeometryDashboard_Generator_PerpendicularGenerator_Name" xml:space="preserve">
@@ -273,7 +273,7 @@
     <comment>Display name in the Geometry Dashboard generator list for PerpendicularGenerator. Function: Perpendicular Lines. Preserve geometric distinctions and any type number.</comment>
   </data>
   <data name="GeometryDashboard_Generator_PointBisectorGenerator_Description" xml:space="preserve">
-    <value>獲取兩個虛擬點并生成它們的垂直平分線。</value>
+    <value>獲取兩個虛擬點並生成它們的垂直平分線。</value>
     <comment>Tooltip description for the Bisector of Two Points generator (PointBisectorGenerator). Explain its geometry output and required inputs: Takes two virtual points and generates their perpendicular bisector.</comment>
   </data>
   <data name="GeometryDashboard_Generator_PointBisectorGenerator_Name" xml:space="preserve">
@@ -281,39 +281,39 @@
     <comment>Display name in the Geometry Dashboard generator list for PointBisectorGenerator. Function: Bisector of Two Points. Preserve geometric distinctions and any type number.</comment>
   </data>
   <data name="GeometryDashboard_Generator_SameTransformGenerator2_Description" xml:space="preserve">
-    <value>獲取兩個虛擬點，并按照相同的速度計算下一個虛擬點。</value>
+    <value>獲取兩個虛擬點，並按照相同的速度計算下一個虛擬點。</value>
     <comment>Tooltip description for the Successor of 2 Points generator (SameTransformGenerator2). Explain its geometry output and required inputs: Takes two virtual points and calculates the next virtual point using the same velocity.</comment>
   </data>
   <data name="GeometryDashboard_Generator_SameTransformGenerator2_Name" xml:space="preserve">
-    <value>兩點后繼點</value>
+    <value>兩點後繼點</value>
     <comment>Display name in the Geometry Dashboard generator list for SameTransformGenerator2. Function: Successor of 2 Points. Preserve geometric distinctions and any type number.</comment>
   </data>
   <data name="GeometryDashboard_Generator_SameTransformGenerator3Reversed_Description" xml:space="preserve">
-    <value>獲取三個虛擬點，并按照相同的速度變化和相反的角度計算下一個虛擬點。</value>
+    <value>獲取三個虛擬點，並按照相同的速度變化和相反的角度計算下一個虛擬點。</value>
     <comment>Tooltip description for the Successor of 3 Points Reversed generator (SameTransformGenerator3Reversed). Explain its geometry output and required inputs: Takes three virtual points and calculates the next virtual point using the same velocity change and opposite angle.</comment>
   </data>
   <data name="GeometryDashboard_Generator_SameTransformGenerator3Reversed_Name" xml:space="preserve">
-    <value>三點反向后繼點</value>
+    <value>三點反向後繼點</value>
     <comment>Display name in the Geometry Dashboard generator list for SameTransformGenerator3Reversed. Function: Successor of 3 Points Reversed. Preserve geometric distinctions and any type number.</comment>
   </data>
   <data name="GeometryDashboard_Generator_SameTransformGenerator3_Description" xml:space="preserve">
-    <value>獲取三個虛擬點，并按照相同的角度和速度變化計算下一個虛擬點。</value>
+    <value>獲取三個虛擬點，並按照相同的角度和速度變化計算下一個虛擬點。</value>
     <comment>Tooltip description for the Successor of 3 Points generator (SameTransformGenerator3). Explain its geometry output and required inputs: Takes three virtual points and calculates the next virtual point using the same angle and velocity change.</comment>
   </data>
   <data name="GeometryDashboard_Generator_SameTransformGenerator3_Name" xml:space="preserve">
-    <value>三點后繼點</value>
+    <value>三點後繼點</value>
     <comment>Display name in the Geometry Dashboard generator list for SameTransformGenerator3. Function: Successor of 3 Points. Preserve geometric distinctions and any type number.</comment>
   </data>
   <data name="GeometryDashboard_Generator_SameTransformGenerator4_Description" xml:space="preserve">
-    <value>獲取四個虛擬點，并按照相同的角度、角度變化、速度變化和速度變化量變化計算下一個虛擬點。</value>
+    <value>獲取四個虛擬點，並按照相同的角度、角度變化、速度變化和速度變化量變化計算下一個虛擬點。</value>
     <comment>Tooltip description for the Successor of 4 Points generator (SameTransformGenerator4). Explain its geometry output and required inputs: Takes four virtual points and calculates the next virtual point using the same angle, angle change, velocity change, and change of velocity change.</comment>
   </data>
   <data name="GeometryDashboard_Generator_SameTransformGenerator4_Name" xml:space="preserve">
-    <value>四點后繼點</value>
+    <value>四點後繼點</value>
     <comment>Display name in the Geometry Dashboard generator list for SameTransformGenerator4. Function: Successor of 4 Points. Preserve geometric distinctions and any type number.</comment>
   </data>
   <data name="GeometryDashboard_Generator_ScaleRotateGenerator_Description" xml:space="preserve">
-    <value>圍繞固定點按指定角度和比例縮放、旋轉虛擬物件。設定還可添加用于選擇固定點的規則。</value>
+    <value>圍繞固定點按指定角度和比例縮放、旋轉虛擬物件。設定還可添加用於選擇固定點的規則。</value>
     <comment>Tooltip description for the Scale &amp; Rotate around a Fixed Point generator (ScaleRotateGenerator). Explain its geometry output and required inputs: Scales and rotates virtual objects around a fixed point by a specified angle and factor. Settings also let you add rules for selecting the fixed point.</comment>
   </data>
   <data name="GeometryDashboard_Generator_ScaleRotateGenerator_Name" xml:space="preserve">
@@ -345,7 +345,7 @@
     <comment>Display name in the Geometry Dashboard generator list for SliderPathGenerator. Function: Points on Slider Paths. Preserve geometric distinctions and any type number.</comment>
   </data>
   <data name="GeometryDashboard_Generator_SquareGenerator2_Description" xml:space="preserve">
-    <value>獲取兩個虛擬點，并在每一側各生成兩個虛擬點，從而構成兩個正方形。</value>
+    <value>獲取兩個虛擬點，並在每一側各生成兩個虛擬點，從而構成兩個正方形。</value>
     <comment>Tooltip description for the Square from Two Points (Type II) generator (SquareGenerator2). Explain its geometry output and required inputs: Takes two virtual points and generates two virtual points on each side to form two squares.</comment>
   </data>
   <data name="GeometryDashboard_Generator_SquareGenerator2_Name" xml:space="preserve">
@@ -353,7 +353,7 @@
     <comment>Display name in the Geometry Dashboard generator list for SquareGenerator2. Function: Square from Two Points (Type II). Preserve geometric distinctions and any type number.</comment>
   </data>
   <data name="GeometryDashboard_Generator_SquareGenerator_Description" xml:space="preserve">
-    <value>獲取兩個虛擬點，并在每一側各生成一個虛擬點，從而構成一個正方形。</value>
+    <value>獲取兩個虛擬點，並在每一側各生成一個虛擬點，從而構成一個正方形。</value>
     <comment>Tooltip description for the Square from Two Points (Type I) generator (SquareGenerator). Explain its geometry output and required inputs: Takes two virtual points and generates one virtual point on each side to form a square.</comment>
   </data>
   <data name="GeometryDashboard_Generator_SquareGenerator_Name" xml:space="preserve">
@@ -369,15 +369,15 @@
     <comment>Display name in the Geometry Dashboard generator list for StartPointGenerator. Function: Points on Circles and Slider Heads. Preserve geometric distinctions and any type number.</comment>
   </data>
   <data name="GeometryDashboard_Generator_SymmetryGenerator_Description" xml:space="preserve">
-    <value>將虛擬物件關于一條虛擬線鏡像。設定可添加用于選擇對稱軸的規則。</value>
+    <value>將虛擬物件關於一條虛擬線鏡像。設定可添加用於選擇對稱軸的規則。</value>
     <comment>Tooltip description for the Reflection across a Line generator (SymmetryGenerator). Explain its geometry output and required inputs: Mirrors virtual objects across a virtual line. Settings let you add rules for selecting the symmetry axis.</comment>
   </data>
   <data name="GeometryDashboard_Generator_SymmetryGenerator_Name" xml:space="preserve">
-    <value>關于直線反射</value>
+    <value>關於直線反射</value>
     <comment>Display name in the Geometry Dashboard generator list for SymmetryGenerator. Function: Reflection across a Line. Preserve geometric distinctions and any type number.</comment>
   </data>
   <data name="GeometryDashboard_Generator_TangentCircleGenerator_Description" xml:space="preserve">
-    <value>獲取一個虛擬圓和兩個點，然后生成與原圓恰好相切于一點的圓。</value>
+    <value>獲取一個虛擬圓和兩個點，然後生成與原圓恰好相切於一點的圓。</value>
     <comment>Tooltip description for the Tangent Circles on Circle generator (TangentCircleGenerator). Explain its geometry output and required inputs: Takes a virtual circle and two points, then generates circles that touch the original circle at exactly one point.</comment>
   </data>
   <data name="GeometryDashboard_Generator_TangentCircleGenerator_Name" xml:space="preserve">
@@ -385,7 +385,7 @@
     <comment>Display name in the Geometry Dashboard generator list for TangentCircleGenerator. Function: Tangent Circles on Circle. Preserve geometric distinctions and any type number.</comment>
   </data>
   <data name="GeometryDashboard_Generator_TriangleGenerator2_Description" xml:space="preserve">
-    <value>獲取兩個虛擬點，并在每一側生成一個點，從而構成兩個等邊三角形。</value>
+    <value>獲取兩個虛擬點，並在每一側生成一個點，從而構成兩個等邊三角形。</value>
     <comment>Tooltip description for the Equilateral Triangle from Two Points (Type II) generator (TriangleGenerator2). Explain its geometry output and required inputs: Takes two virtual points and generates a point on either side to form two equilateral triangles.</comment>
   </data>
   <data name="GeometryDashboard_Generator_TriangleGenerator2_Name" xml:space="preserve">
@@ -393,7 +393,7 @@
     <comment>Display name in the Geometry Dashboard generator list for TriangleGenerator2. Function: Equilateral Triangle from Two Points (Type II). Preserve geometric distinctions and any type number.</comment>
   </data>
   <data name="GeometryDashboard_Generator_TriangleGenerator_Description" xml:space="preserve">
-    <value>獲取兩個虛擬點，并在每一側生成一個點，從而構成一個等邊三角形。</value>
+    <value>獲取兩個虛擬點，並在每一側生成一個點，從而構成一個等邊三角形。</value>
     <comment>Tooltip description for the Equilateral Triangle from Two Points (Type I) generator (TriangleGenerator). Explain its geometry output and required inputs: Takes two virtual points and generates a point on either side to form two equilateral triangles.</comment>
   </data>
   <data name="GeometryDashboard_Generator_TriangleGenerator_Name" xml:space="preserve">
@@ -421,11 +421,11 @@
     <comment>Heading for generators that derive geometry from other generated virtual objects.</comment>
   </data>
   <data name="GeometryDashboard_HelpText" xml:space="preserve">
-    <value>此工具會根據編輯器中的打擊物件推匯出虛擬點、虛擬線和虛擬圓，并將它們疊加顯示在編輯器中。制圖時可使用快捷鍵將光標吸附到這些幾何圖形上。快捷鍵還可用于選擇、鎖定虛擬物件，以及控制生成器能否使用這些物件。在首選項中配置快捷鍵和其他選項。將鼠標懸停在標簽上可查看更多資訊。
+    <value>此工具會根據編輯器中的打擊物件推匯出虛擬點、虛擬線和虛擬圓，並將它們疊加顯示在編輯器中。制圖時可使用快捷鍵將光標吸附到這些幾何圖形上。快捷鍵還可用於選擇、鎖定虛擬物件，以及控制生成器能否使用這些物件。在首選項中配置快捷鍵和其他選項。將鼠標懸停在標籤上可查看更多資訊。
 
-虛擬物件按層生成：第一層包含編輯器中的打擊物件；之后每一層都包含根據上一層推匯出的虛擬物件。在首選項中設定層數。增加層數可能會生成更多虛擬物件。
+虛擬物件按層生成：第一層包含編輯器中的打擊物件；之後每一層都包含根據上一層推匯出的虛擬物件。在首選項中設定層數。增加層數可能會生成更多虛擬物件。
 
-下方的生成器清單可根據打擊物件或其他虛擬物件創建虛擬物件。基礎生成器以打擊物件為輸入，并立即顯示結果。高級生成器以虛擬物件為輸入，因此必須先啟用至少一個基礎生成器。選擇生成器上的“配置”可更改其輸入選擇或輸出設定。
+下方的生成器清單可根據打擊物件或其他虛擬物件創建虛擬物件。基礎生成器以打擊物件為輸入，並立即顯示結果。高級生成器以虛擬物件為輸入，因此必須先啟用至少一個基礎生成器。選擇生成器上的“配置”可更改其輸入選擇或輸出設定。
 
 Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用首選項旁邊的按鈕打開 Savestates。
 
@@ -517,7 +517,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Preference controlling the minimum geometric difference before two similar virtual objects are kept separate.</comment>
   </data>
   <data name="GeometryDashboard_MinimalDiffTip" xml:space="preserve">
-    <value>相似的虛擬物件會合并，以減少雜亂。此項設定兩個物件要保持分離所需的最小差異。</value>
+    <value>相似的虛擬物件會合並，以減少雜亂。此項設定兩個物件要保持分離所需的最小差異。</value>
     <comment>Tooltip explaining that similar virtual objects are merged unless their geometric difference reaches this threshold.</comment>
   </data>
   <data name="GeometryDashboard_MinimalDifference" xml:space="preserve">
@@ -561,15 +561,15 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Label for manual overlay-position offsets in the Geometry Dashboard preferences.</comment>
   </data>
   <data name="GeometryDashboard_OffsetBottomTip" xml:space="preserve">
-    <value>調整疊加層底邊相對于 osu! 像素坐標的位置。</value>
+    <value>調整疊加層底邊相對於 osu! 像素坐標的位置。</value>
     <comment>Tooltip for the bottom overlay offset field. osu! pixels are the coordinate unit; preserve osu! and keep numbers invariant.</comment>
   </data>
   <data name="GeometryDashboard_OffsetLeftTip" xml:space="preserve">
-    <value>調整疊加層左邊相對于 osu! 像素坐標的位置。</value>
+    <value>調整疊加層左邊相對於 osu! 像素坐標的位置。</value>
     <comment>Tooltip for the left overlay offset field. osu! pixels are the coordinate unit; preserve osu! and keep numbers invariant.</comment>
   </data>
   <data name="GeometryDashboard_OffsetRightTip" xml:space="preserve">
-    <value>調整疊加層右邊相對于 osu! 像素坐標的位置。</value>
+    <value>調整疊加層右邊相對於 osu! 像素坐標的位置。</value>
     <comment>Tooltip for the right overlay offset field. osu! pixels are the coordinate unit; preserve osu! and keep numbers invariant.</comment>
   </data>
   <data name="GeometryDashboard_OffsetTip" xml:space="preserve">
@@ -577,7 +577,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Tooltip for the four manual overlay offsets. Describe the fallback used when automatic editor-bound detection is inaccurate.</comment>
   </data>
   <data name="GeometryDashboard_OffsetTopTip" xml:space="preserve">
-    <value>調整疊加層頂邊相對于 osu! 像素坐標的位置。</value>
+    <value>調整疊加層頂邊相對於 osu! 像素坐標的位置。</value>
     <comment>Tooltip for the top overlay offset field. osu! pixels are the coordinate unit; preserve osu! and keep numbers invariant.</comment>
   </data>
   <data name="GeometryDashboard_OneItem" xml:space="preserve">
@@ -629,7 +629,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Column heading for the multiplier applied to a generated object's relevance.</comment>
   </data>
   <data name="GeometryDashboard_RelevancyMultiplier" xml:space="preserve">
-    <value>應用于生成物件的相關度乘數。</value>
+    <value>應用於生成物件的相關度乘數。</value>
     <comment>Tooltip explaining that this numeric setting scales the relevance inherited by generated virtual objects. Keep number formatting invariant.</comment>
   </data>
   <data name="GeometryDashboard_Remove" xml:space="preserve">
@@ -637,7 +637,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Context-menu action that removes the selected generator predicates or savestate entries.</comment>
   </data>
   <data name="GeometryDashboard_RemovePredicateTip" xml:space="preserve">
-    <value>移除所有選中的選擇條件；如果沒有選中項，則移除最后一項。</value>
+    <value>移除所有選中的選擇條件；如果沒有選中項，則移除最後一項。</value>
     <comment>Tooltip for removing selected input-selection predicates, or the final predicate if none is selected.</comment>
   </data>
   <data name="GeometryDashboard_RemovePredicatesTip" xml:space="preserve">
@@ -645,7 +645,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Tooltip for removing selected input-selection predicates in generator settings.</comment>
   </data>
   <data name="GeometryDashboard_RemoveSaveTip" xml:space="preserve">
-    <value>移除所有選中的儲存槽；如果沒有選中項，則移除最后一個儲存槽。</value>
+    <value>移除所有選中的儲存槽；如果沒有選中項，則移除最後一個儲存槽。</value>
     <comment>Tooltip for removing selected savestate slots, or the final slot if none is selected.</comment>
   </data>
   <data name="GeometryDashboard_RemoveSavesTip" xml:space="preserve">
@@ -733,7 +733,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Preference section that chooses which editor hit objects are generator inputs.</comment>
   </data>
   <data name="GeometryDashboard_SelectionTip" xml:space="preserve">
-    <value>選擇用于生成虛擬物件的打擊物件。</value>
+    <value>選擇用於生成虛擬物件的打擊物件。</value>
     <comment>Tooltip for the preference controlling which editor hit objects feed the geometry generators.</comment>
   </data>
   <data name="GeometryDashboard_Sequential" xml:space="preserve">
@@ -817,7 +817,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Tooltip explaining that the Downkey view options control visible virtual-object layers while the snap hotkey is held.</comment>
   </data>
   <data name="GeometryDashboard_StatusConfigurationUnavailable" xml:space="preserve">
-    <value>無法運行：疊加層配置不可用。請檢查配置后重試。</value>
+    <value>無法運行：疊加層配置不可用。請檢查配置後重試。</value>
     <comment>Actionable status shown when osu! overlay configuration prevents the dashboard from running; technical details appear in the diagnostic tooltip.</comment>
   </data>
   <data name="GeometryDashboard_StatusEnableReading" xml:space="preserve">
@@ -993,7 +993,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Pattern Gallery file-import optional upper timestamp bound; excludes later hit objects. Input syntax remains invariant.</comment>
   </data>
   <data name="PatternGallery_EndTip" xml:space="preserve">
-    <value>可選的時間上限。此時間之后的所有物件都將被忽略。</value>
+    <value>可選的時間上限。此時間之後的所有物件都將被忽略。</value>
     <comment>Pattern Gallery file-import end-time tooltip describing exclusion of hit objects after the bound; no effect when the field is empty.</comment>
   </data>
   <data name="PatternGallery_FetchTip" xml:space="preserve">
@@ -1025,7 +1025,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Pattern Gallery export option tooltip for adjusting inherited timing-point slider velocity to a different global slider multiplier. Greenlines are inherited timing points; retain SV abbreviation.</comment>
   </data>
   <data name="PatternGallery_HitsoundsTip" xml:space="preserve">
-    <value>匯出模式，并保留模式時間點的打擊音效效果。</value>
+    <value>匯出模式，並保留模式時間點的打擊音效效果。</value>
     <comment>Pattern Gallery option tooltip for retaining hitsound-related effects from the pattern’s timing points.</comment>
   </data>
   <data name="PatternGallery_ImportNameTip" xml:space="preserve">
@@ -1033,7 +1033,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Pattern Gallery file-import/name dialog tooltip for the new pattern’s user-authored display name.</comment>
   </data>
   <data name="PatternGallery_KiaiTip" xml:space="preserve">
-    <value>匯出模式，并保留模式的 kiai 狀態。</value>
+    <value>匯出模式，並保留模式的 kiai 狀態。</value>
     <comment>Pattern Gallery export option tooltip for retaining the pattern’s kiai sections. Kiai is the established osu! effect name, retained in Dutch.</comment>
   </data>
   <data name="PatternGallery_LastUsed" xml:space="preserve">
@@ -1101,7 +1101,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Pattern Gallery export setting for the minimum temporal gap in beats that separates a pattern into smaller parts.</comment>
   </data>
   <data name="PatternGallery_PartingTip" xml:space="preserve">
-    <value>間隔必須至少包含的拍數；達到此值后，模式會拆分為更小的部分。</value>
+    <value>間隔必須至少包含的拍數；達到此值後，模式會拆分為更小的部分。</value>
     <comment>Pattern Gallery parting-distance tooltip. Distance means a temporal gap measured in musical beats, not osu! pixels.</comment>
   </data>
   <data name="PatternGallery_Path" xml:space="preserve">
@@ -1129,7 +1129,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Pattern Gallery spatial scaling factor for hit-object coordinates; separate from scaling the pattern in time.</comment>
   </data>
   <data name="PatternGallery_ScaleTip" xml:space="preserve">
-    <value>用于更改模式大小的比例因子。</value>
+    <value>用於更改模式大小的比例因子。</value>
     <comment>Pattern Gallery spatial scale tooltip; scales hit-object positions and slider geometry, not time intervals.</comment>
   </data>
   <data name="PatternGallery_SelectedImportTip" xml:space="preserve">
@@ -1169,7 +1169,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Pattern Gallery export mode combining destination and pattern timing points; distinct from replacing hit objects.</comment>
   </data>
   <data name="PatternGallery_TimingOverwriteTip" xml:space="preserve">
-    <value>確定如何合并原譜面的時間設定和模式的時間設定。</value>
+    <value>確定如何合並原譜面的時間設定和模式的時間設定。</value>
     <comment>Pattern Gallery timing-overwrite mode tooltip. Original source has a spelling typo; do not reproduce it. Timing means beatmap timing points.</comment>
   </data>
   <data name="PatternGallery_Ungrouped" xml:space="preserve">
@@ -1197,7 +1197,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Preferences checkbox observing lazer's external-edit directory. Preserve osu!lazer.</comment>
   </data>
   <data xml:space="preserve" name="Shell_AutomaticallyBettersaveAfterEveryOsuSaveAsASideEffectThisWillAlsoOverwriteManualOsuChangesIfYouHaveT">
-    <value>每次儲存 osu! 后自動運行 BetterSave™。副作用是，如果編輯器仍處于打開狀態，這也會覆蓋對 .osu 檔案所做的手動更改。</value>
+    <value>每次儲存 osu! 後自動運行 BetterSave™。副作用是，如果編輯器仍處於打開狀態，這也會覆蓋對 .osu 檔案所做的手動更改。</value>
     <comment>Preferences tooltip including a real data-overwrite consequence; retain this consequence and preserve BetterSave, osu! and .osu.</comment>
   </data>
   <data xml:space="preserve" name="Shell_AutomaticallyMakeABackupWheneverYouRunAMappingTool">
@@ -1217,7 +1217,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Success-notification title after restoring a safety copy.</comment>
   </data>
   <data xml:space="preserve" name="Shell_BackupMany">
-    <value>已將 {0} 個選定譜面復制到備份檔案夾。</value>
+    <value>已將 {0} 個選定譜面複製到備份檔案夾。</value>
     <comment>Explicit-backup result for more than one map. {0} is an integer map count.</comment>
   </data>
   <data xml:space="preserve" name="Shell_BackupMismatch">
@@ -1242,7 +1242,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Validation for a malformed rhythmic subdivision. {0} is the verbatim entered token; do not translate or normalize its decimal/fraction syntax.</comment>
   </data>
   <data xml:space="preserve" name="Shell_BeatDivisorMustBeGreaterThanZero">
-    <value>拍子細分值必須大于零。</value>
+    <value>拍子細分值必須大於零。</value>
     <comment>Validation for zero, negative or nonfinite rhythmic subdivisions; keep the positivity requirement.</comment>
   </data>
   <data xml:space="preserve" name="Shell_BeatmapLiveStateReading">
@@ -1262,19 +1262,19 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Accessible name of the backup-directory picker button.</comment>
   </data>
   <data xml:space="preserve" name="Shell_BrowseForTheBackupsFolder">
-    <value>瀏覽并選擇備份檔案夾。</value>
+    <value>瀏覽並選擇備份檔案夾。</value>
     <comment>Preferences tooltip for the backup-directory picker.</comment>
   </data>
   <data xml:space="preserve" name="Shell_BrowseForTheOsuFolder">
-    <value>瀏覽并選擇 osu! 檔案夾。</value>
+    <value>瀏覽並選擇 osu! 檔案夾。</value>
     <comment>Preferences tooltip for the game installation folder picker. Preserve osu!.</comment>
   </data>
   <data xml:space="preserve" name="Shell_BrowseForTheOsuUserConfigurationFile">
-    <value>瀏覽并選擇 osu! 用戶配置檔案。</value>
+    <value>瀏覽並選擇 osu! 用戶配置檔案。</value>
     <comment>Tooltip for opening the .cfg file picker. Preserve osu!.</comment>
   </data>
   <data xml:space="preserve" name="Shell_BrowseForTheSongsFolder">
-    <value>瀏覽并選擇 Songs 檔案夾。</value>
+    <value>瀏覽並選擇 Songs 檔案夾。</value>
     <comment>Preferences folder-picker tooltip; Songs is the actual library directory name.</comment>
   </data>
   <data xml:space="preserve" name="Shell_BrowseOsuConfiguration">
@@ -1314,7 +1314,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Preferences tooltip for reading live editor data. Preserve Mapping Tools; editor is the osu! beatmap editor.</comment>
   </data>
   <data xml:space="preserve" name="Shell_ChooseHowTheOsuEditorIsReloadedAfterQuickrun">
-    <value>選擇 QuickRun 之后重新加載 osu! 編輯器的方式。</value>
+    <value>選擇 QuickRun 之後重新加載 osu! 編輯器的方式。</value>
     <comment>Preferences tooltip for editor refresh. Preserve osu! and QuickRun.</comment>
   </data>
   <data xml:space="preserve" name="Shell_ChooseTheInterfaceLanguageDatesAndNumbersKeepTheirExistingFormat">
@@ -1430,15 +1430,15 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Preferences selector label for refreshing osu!'s editor after external beatmap changes.</comment>
   </data>
   <data xml:space="preserve" name="Shell_EnableSmartquickrunToModifyTheBehaviorOfQuickrunBasedOnTheNumberOfObjectsCurrentlySelectedOnTheEdito">
-    <value>啟用 SmartQuickRun 后，QuickRun 會根據編輯器中當前選中的物件數量調整行為。</value>
+    <value>啟用 SmartQuickRun 後，QuickRun 會根據編輯器中當前選中的物件數量調整行為。</value>
     <comment>Preferences tooltip for selection-count-dependent routing; preserve SmartQuickRun and QuickRun.</comment>
   </data>
   <data xml:space="preserve" name="Shell_EnableThisToGetTheCurrentBeatmapFolderAsTheDefaultFolderWheneverYouOpenAFileExplorerInAToolWhichDoes">
-    <value>啟用此選項后，在不使用當前譜面的工具（例如 Hitsound Copier）中打開檔案資源管理器時，會預設打開當前譜面檔案夾。否則會預設打開上次使用的檔案夾。</value>
+    <value>啟用此選項後，在不使用當前譜面的工具（例如 Hitsound Copier）中打開檔案資源管理器時，會預設打開當前譜面檔案夾。否則會預設打開上次使用的檔案夾。</value>
     <comment>Preferences tooltip for picker start directory. Preserve tool name Hitsound Copier; current beatmap means the map open in osu!.</comment>
   </data>
   <data xml:space="preserve" name="Shell_EnableThisToUseQuickrunEvenWhenYouPressTheButtonToRunNormally">
-    <value>啟用此選項后，即使按下常規運行按鈕，也會使用 QuickRun。</value>
+    <value>啟用此選項後，即使按下常規運行按鈕，也會使用 QuickRun。</value>
     <comment>Preferences tooltip for overriding ordinary Run behavior. Preserve QuickRun.</comment>
   </data>
   <data xml:space="preserve" name="Shell_EnterANumberOrAtLeastTwoGraphAnchors">
@@ -1570,7 +1570,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Title of the application's About dialog.</comment>
   </data>
   <data xml:space="preserve" name="Shell_InstallAfterClosing">
-    <value>關閉后安裝</value>
+    <value>關閉後安裝</value>
     <comment>Updater action schedules installation when Mapping Tools closes, rather than immediately.</comment>
   </data>
   <data xml:space="preserve" name="Shell_InstallNow">
@@ -1602,11 +1602,11 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Onboarding step starting the selected tool via its Run button, rather than launching Mapping Tools. Preserve step number.</comment>
   </data>
   <data xml:space="preserve" name="Shell_Intro6">
-    <value>6. 不儲存譜面即可重新加載：離開編輯器后重新進入，或按 Ctrl+L，然后按 Enter。</value>
+    <value>6. 不儲存譜面即可重新加載：離開編輯器後重新進入，或按 Ctrl+L，然後按 Enter。</value>
     <comment>Critical onboarding step after external map modification: saving first would overwrite changes. Preserve emphasis, step number and actual Ctrl+L / Enter shortcuts.</comment>
   </data>
   <data xml:space="preserve" name="Shell_Intro7">
-    <value>7. 如果遇到問題，請前往 [關于] -&gt; [網站] 查看常見問題。</value>
+    <value>7. 如果遇到問題，請前往 [關於] -&gt; [網站] 查看常見問題。</value>
     <comment>Final onboarding step linking to project FAQ. Bracketed menu names must match translated UI labels. Preserve step number and arrow.</comment>
   </data>
   <data xml:space="preserve" name="Shell_IssueTracker">
@@ -1634,7 +1634,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Browser-launch warning. {0} is the translated destination noun phrase: website, source repository, issue tracker or donation page.</comment>
   </data>
   <data xml:space="preserve" name="Shell_LoadABackupFromTheBackupsFolderIntoTheCurrentBeatmap">
-    <value>從備份檔案夾加載備份，并將其應用到當前譜面。</value>
+    <value>從備份檔案夾加載備份，並將其應用到當前譜面。</value>
     <comment>Tooltip for the backup picker and restore action; restoring replaces map contents.</comment>
   </data>
   <data xml:space="preserve" name="Shell_LoadAnyway">
@@ -1698,7 +1698,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Preferences selector option reading data directly from the osu! process memory.</comment>
   </data>
   <data xml:space="preserve" name="Shell_MenuAbout">
-    <value>_關于</value>
+    <value>_關於</value>
     <comment>Main menu or action presenting application information and support links. Underscore is an access key.</comment>
   </data>
   <data xml:space="preserve" name="Shell_MenuBettersaveCurrentBeatmap">
@@ -1786,7 +1786,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Menu action opening the project's website in a browser. Underscore is an access key.</comment>
   </data>
   <data xml:space="preserve" name="Shell_MigrationSummary">
-    <value>已將 {0} 個自動儲存檔案和 {1} 個項目檔案復制到當前布局中。</value>
+    <value>已將 {0} 個自動儲存檔案和 {1} 個項目檔案複製到當前布局中。</value>
     <comment>Startup migration result. {0} is an integer autosave-file count; {1} is an integer project-file count. Either can be zero.</comment>
   </data>
   <data xml:space="preserve" name="Shell_Minimize">
@@ -1974,7 +1974,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Validation error for an empty required game, Songs, config or backup path; the field identifies the destination.</comment>
   </data>
   <data xml:space="preserve" name="Shell_SelectTheBeatmapInAnActiveOsuLazerExternalEditFolderAndUseItForCurrentBeatmapActionsUntilTheFolderCl">
-    <value>選擇 osu!lazer 外部編輯檔案夾中正在編輯的譜面，并在該檔案夾關閉前將其用于當前譜面操作。</value>
+    <value>選擇 osu!lazer 外部編輯檔案夾中正在編輯的譜面，並在該檔案夾關閉前將其用於當前譜面操作。</value>
     <comment>Preferences tooltip explaining the lifetime of an externally edited map selection. Preserve osu!lazer.</comment>
   </data>
   <data xml:space="preserve" name="Shell_SelectTheCurrentBeatmapWithFileExplorer">
@@ -2058,7 +2058,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Language option follows the system UI language detected at startup, with English fallback.</comment>
   </data>
   <data xml:space="preserve" name="Shell_TheBackupBelongsToADifferentBeatmapLoadItAnyway">
-    <value>此備份屬于其他譜面。仍要加載嗎？</value>
+    <value>此備份屬於其他譜面。仍要加載嗎？</value>
     <comment>Confirmation before overriding a backup identity mismatch; continuing replaces current map contents.</comment>
   </data>
   <data xml:space="preserve" name="Shell_TheLegacyFilesWereNotRemovedMigrationMayBeIncompleteYouCanTryAgainTheNextTimeMappingToolsStarts">
@@ -2070,7 +2070,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Success message after backup restore; preserve the replacement meaning.</comment>
   </data>
   <data xml:space="preserve" name="Shell_TheSelectedBeatmapWasCopiedToTheBackupsFolder">
-    <value>已將選定譜面復制到備份檔案夾。</value>
+    <value>已將選定譜面複製到備份檔案夾。</value>
     <comment>Success message for backing up exactly one shell-selected beatmap.</comment>
   </data>
   <data xml:space="preserve" name="Shell_TheTimeBetweenEachAutomaticPeriodicBackupWhileTheEditorIsOpen">
@@ -2322,7 +2322,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Heading above a newline-separated list of user layer names whose source file extensions cannot be loaded. Appended layer names remain unchanged.</comment>
   </data>
   <data name="HitsoundStudio_FailureHeading" xml:space="preserve">
-    <value>由于發生異常，無法加載以下樣本：</value>
+    <value>由於發生異常，無法加載以下樣本：</value>
     <comment>Heading above user layer names and localized error summaries for other sample-loading failures. Original technical exceptions are available in dialog details.</comment>
   </data>
   <data name="HitsoundStudio_FormatDefault" xml:space="preserve">
@@ -2526,7 +2526,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Label for the numeric approach-rate override field used when Auto-fail Detector determines which hit objects load. Keep the osu! abbreviation AR unchanged.</comment>
   </data>
   <data name="AutoFailDetector_ArOverrideTip" xml:space="preserve">
-    <value>覆蓋用于確定哪些打擊物件會加載的 approach rate。輸入 -1 可禁用此覆蓋值。</value>
+    <value>覆蓋用於確定哪些打擊物件會加載的 approach rate。輸入 -1 可禁用此覆蓋值。</value>
     <comment>Tooltip for Auto-fail Detector's AR field. The numeric value replaces approach rate for object-loading analysis; the exact sentinel -1 means no override and must remain unchanged.</comment>
   </data>
   <data name="AutoFailDetector_AutoInsertSpinners" xml:space="preserve">
@@ -2540,7 +2540,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
   <data name="AutoFailDetector_Help" xml:space="preserve">
     <value>檢測譜面中打擊物件加載錯誤的情況，避免 osu! 無法正確計算分數。
 
-自動失敗最常見的原因是在滑條運行期間放置其他打擊物件，導致多個物件同時處于活動狀態；這類排列也稱為“2B”模式。
+自動失敗最常見的原因是在滑條運行期間放置其他打擊物件，導致多個物件同時處於活動狀態；這類排列也稱為“2B”模式。
 
 使用 AR 和 OD 覆蓋值查看 Hard Rock 模組對譜面的影響。</value>
     <comment>Help text shown at the top of the Auto-fail Detector. Explain that the tool detects incorrect hit-object loading that can break scoring, that overlapping objects during sliders can create so-called 2B patterns, and that AR/OD overrides let the mapper inspect Hard Rock mod behavior. Keep osu!, AR, OD, Hard Rock, and the quoted pattern label 2B unchanged. "Sliders" is osu! mapping vocabulary.</comment>
@@ -2570,7 +2570,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Checkbox that asks Auto-fail Detector to produce a guide showing where additional hit objects can be placed to prevent auto-fail.</comment>
   </data>
   <data name="AutoFailDetector_GetFixGuideTip" xml:space="preserve">
-    <value>獲取指南，查看應在哪里放置額外打擊物件以避免自動失敗。</value>
+    <value>獲取指南，查看應在哪裡放置額外打擊物件以避免自動失敗。</value>
     <comment>Tooltip for the fix-guide checkbox in Auto-fail Detector. The guide recommends positions for additional hit objects so the map no longer auto-fails.</comment>
   </data>
   <data name="AutoFailDetector_OdOverride" xml:space="preserve">
@@ -2578,7 +2578,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Label for the numeric overall-difficulty override used by Auto-fail Detector when checking incorrect hit-object unloading. Keep the osu! abbreviation OD unchanged.</comment>
   </data>
   <data name="AutoFailDetector_OdOverrideTip" xml:space="preserve">
-    <value>覆蓋用于查找錯誤卸載打擊物件的整體難度值。輸入 -1 可禁用此覆蓋值。</value>
+    <value>覆蓋用於查找錯誤卸載打擊物件的整體難度值。輸入 -1 可禁用此覆蓋值。</value>
     <comment>Tooltip for Auto-fail Detector's OD field. The numeric value changes the overall difficulty used for unloading analysis; the exact sentinel -1 means no override.</comment>
   </data>
   <data name="AutoFailDetector_PhysicsLeniency" xml:space="preserve">
@@ -2618,7 +2618,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Checkbox that displays hit objects which may unload and cause auto-fail when the number of objects changes. This is a possibility, unlike the confirmed unloading objects option.</comment>
   </data>
   <data name="AutoFailDetector_ShowPotentialUnloadingTip" xml:space="preserve">
-    <value>顯示可能卸載并導致自動失敗的物件開始時間，具體取決于物件數量。它們會在時間軸上以綠色顯示。</value>
+    <value>顯示可能卸載並導致自動失敗的物件開始時間，具體取決於物件數量。它們會在時間軸上以綠色顯示。</value>
     <comment>Tooltip for the potential-unloading checkbox in Auto-fail Detector. The condition depends on object count, and these possible cases appear in green at their start times.</comment>
   </data>
   <data name="AutoFailDetector_ShowUnloading" xml:space="preserve">
@@ -2650,7 +2650,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Run result when no definite auto-fail was detected but possible unloading objects remain. Placeholder {0} is their integer count; preserve it once.</comment>
   </data>
   <data name="AutoFailDetector_TimelineTip" xml:space="preserve">
-    <value>此時間軸顯示自動失敗發生的位置。紅線標記卸載并導致自動失敗的物件；綠線標記在物件數量變化時可能卸載的物件；紫線標記可能導致其他物件卸載的物件。點擊線條可跳轉到對應時間。</value>
+    <value>此時間軸顯示自動失敗發生的位置。紅線標記卸載並導致自動失敗的物件；綠線標記在物件數量變化時可能卸載的物件；紫線標記可能導致其他物件卸載的物件。點擊線條可跳轉到對應時間。</value>
     <comment>Tooltip for the Auto-fail Detector timeline. Define red as confirmed unloading objects, green as possible unloading objects affected by object count, and purple as objects that disrupt others. Clicking a line navigates the editor to that time.</comment>
   </data>
   <data name="ComboColourStudio_Accept" xml:space="preserve">
@@ -2718,7 +2718,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Button that analyzes an existing beatmap's colour haxing and derives combo-colour points.</comment>
   </data>
   <data name="ComboColourStudio_ImportHaxTip" xml:space="preserve">
-    <value>從譜面匯入顏色花活，并據此創建顏色點。</value>
+    <value>從譜面匯入顏色花活，並據此創建顏色點。</value>
     <comment>Tooltip for Import colour hax. It infers timed colour points from a beatmap's existing colour haxing; preserve the community term colour haxing.</comment>
   </data>
   <data name="ComboColourStudio_ImportPath" xml:space="preserve">
@@ -2774,15 +2774,15 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Error notification title shown when the current osu! editor time cannot be read for colour-point insertion.</comment>
   </data>
   <data name="ComboColourStudio_RemoveLastFromSequence" xml:space="preserve">
-    <value>從此序列中移除最后一種顏色。</value>
+    <value>從此序列中移除最後一種顏色。</value>
     <comment>Tooltip for the minus button that removes the final colour from the current colour-point sequence.</comment>
   </data>
   <data name="ComboColourStudio_RemoveLastPaletteColour" xml:space="preserve">
-    <value>移除最后一種連擊顏色。</value>
+    <value>移除最後一種連擊顏色。</value>
     <comment>Tooltip for the minus button that removes the final entry from the global combo-colour palette.</comment>
   </data>
   <data name="ComboColourStudio_RemovePoints" xml:space="preserve">
-    <value>移除選中的顏色點；如果沒有選中項，則移除最后一個顏色點。</value>
+    <value>移除選中的顏色點；如果沒有選中項，則移除最後一個顏色點。</value>
     <comment>Tooltip for the minus button that removes selected colour points, or removes the final point when there is no selection.</comment>
   </data>
   <data name="ComboColourStudio_RemoveSequenceEntry" xml:space="preserve">
@@ -2804,7 +2804,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
   <data name="ComboColourStudio_StudioHelp" xml:space="preserve">
     <value>自定義譜面的連擊顏色，這也稱為顏色花活。
 
-像在 osu! 編輯器中設定時間點一樣，定義不同的顏色區域。添加顏色點并選擇其連擊顏色序列。你還可以創建僅影響一個連擊的爆發顏色點，以便用顏色強調特定排列。
+像在 osu! 編輯器中設定時間點一樣，定義不同的顏色區域。添加顏色點並選擇其連擊顏色序列。你還可以創建僅影響一個連擊的爆發顏色點，以便用顏色強調特定排列。
 
 點擊左下角的加號按鈕添加連擊顏色，也可以從其他譜面匯入連擊顏色。點擊彩色圓點可進行編輯。點擊右下角的加號按鈕添加顏色點；雙擊顏色序列單元格可編輯序列。</value>
     <comment>Help text for Combo Colour Studio. Explain that it edits beatmap combo colours through timed colour points, ordered colour sequences, and burst points that affect one combo. Describe the two plus-button locations and how to edit palette colours versus a point's sequence. Preserve the tool name Combo Colour Studio, osu!, and the community term colour haxing.</comment>
@@ -2939,7 +2939,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
   </data>
   <data name="Common_SignaturesTip" xml:space="preserve">
     <comment>Tooltip for the beat snap divisor field. Divisors determine the beat subdivisions used when resnapping objects.</comment>
-    <value>用于重新吸附的節拍吸附細分值。</value>
+    <value>用於重新吸附的節拍吸附細分值。</value>
   </data>
   <data name="Common_TimeCodeLabel" xml:space="preserve">
     <comment>Label for a mapping-tool time-code input. Time codes use the fixed osu! timestamp syntax; keep “Time code” as the term for that input.</comment>
@@ -3047,7 +3047,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
   </data>
   <data name="PatternGallery_TimingOverwriteMode_InPatternRelativeTiming" xml:space="preserve">
     <comment>Pattern Gallery timing option that combines pattern-relative timing with the destination beatmap's timing.</comment>
-    <value>使用相對于模式的時間</value>
+    <value>使用相對於模式的時間</value>
   </data>
   <data name="PatternGallery_TimingOverwriteMode_OriginalTimingOnly" xml:space="preserve">
     <comment>Pattern Gallery timing option that preserves only the destination beatmap's original timing information.</comment>
@@ -3130,75 +3130,75 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Tooltip for the button that opens a file picker to select source or target beatmap files.</comment>
   </data>
   <data name="HitsoundCopier_BrowseSource" xml:space="preserve">
-    <value>復制打擊音效的來源</value>
+    <value>複製打擊音效的來源</value>
     <comment>Title of the source-file picker opened by the source path's Browse button.</comment>
   </data>
   <data name="HitsoundCopier_BrowseTarget" xml:space="preserve">
-    <value>復制打擊音效的目標</value>
+    <value>複製打擊音效的目標</value>
     <comment>Title of the multi-file target picker opened by the destination path's Browse button.</comment>
   </data>
   <data name="HitsoundCopier_CopyBodyHitsounds" xml:space="preserve">
-    <value>復制滑條主體音效</value>
+    <value>複製滑條主體音效</value>
     <comment>Option to copy hitsounds assigned along slider bodies, in addition to head, repeat, and end hitsounds.</comment>
   </data>
   <data name="HitsoundCopier_CopyBodyHitsoundsTip" xml:space="preserve">
-    <value>復制滑條主體上的打擊音效。</value>
+    <value>複製滑條主體上的打擊音效。</value>
     <comment>Tooltip for Copy slider-body hitsounds. It refers only to events along slider bodies.</comment>
   </data>
   <data name="HitsoundCopier_CopyHitsounds" xml:space="preserve">
-    <value>復制打擊音效</value>
+    <value>複製打擊音效</value>
     <comment>Option to copy hitsounds from hit circles, slider heads/repeats/ends, spinner ends, and hold-note heads.</comment>
   </data>
   <data name="HitsoundCopier_CopyHitsoundsTip" xml:space="preserve">
-    <value>復制打擊圈、滑條頭部、滑條重復段和尾端、轉盤尾端以及長按物件頭部上的打擊音效。</value>
+    <value>複製打擊圈、滑條頭部、滑條重複段和尾端、轉盤尾端以及長按物件頭部上的打擊音效。</value>
     <comment>Tooltip for Copy hitsounds. Enumerate all supported hit-object events: circles, slider heads/repeats/ends, spinner ends, and hold-note heads.</comment>
   </data>
   <data name="HitsoundCopier_CopyMode" xml:space="preserve">
-    <value>復制模式</value>
+    <value>複製模式</value>
     <comment>Label for the selector choosing whether to overwrite every target hitsound or only those defined in the source.</comment>
   </data>
   <data name="HitsoundCopier_CopyModeTip" xml:space="preserve">
-    <value>“全部覆蓋”的行為與傳統打擊音效復制工具相同。“僅覆蓋已定義內容”會復制來源打擊音效，同時保留來源譜面中不存在的目標打擊音效。</value>
+    <value>“全部覆蓋”的行為與傳統打擊音效複製工具相同。“僅覆蓋已定義內容”會複製來源打擊音效，同時保留來源譜面中不存在的目標打擊音效。</value>
     <comment>Tooltip for the Hitsound Copier mode selector. Preserve the two mode labels exactly because they also appear as selector values; explain the difference in what happens to target-only hitsounds.</comment>
   </data>
   <data name="HitsoundCopier_CopySampleSets" xml:space="preserve">
-    <value>復制采樣組</value>
+    <value>複製採樣組</value>
     <comment>Option to copy sample-set choices, including custom sample indices, from source to target.</comment>
   </data>
   <data name="HitsoundCopier_CopySampleSetsTip" xml:space="preserve">
-    <value>復制采樣組。</value>
+    <value>複製採樣組。</value>
     <comment>Tooltip for Copy sample sets. The option copies sample-set assignments from source objects to their matched target objects.</comment>
   </data>
   <data name="HitsoundCopier_CopySlides" xml:space="preserve">
-    <value>復制到滑條滑行段</value>
+    <value>複製到滑條滑行段</value>
     <comment>Option to place otherwise-unmatched custom samples on slider slides when using Overwrite only defined mode.</comment>
   </data>
   <data name="HitsoundCopier_CopySlidesTip" xml:space="preserve">
-    <value>啟用后，如果目標位置沒有其他物件，Hitsound Copier 會為滑條滑行段分配自定義采樣。它會生成新的采樣檔案，你必須將這些檔案放入譜面組檔案夾。此功能僅適用于“僅覆蓋已定義內容”模式。</value>
+    <value>啟用後，如果目標位置沒有其他物件，Hitsound Copier 會為滑條滑行段分配自定義採樣。它會生成新的採樣檔案，你必須將這些檔案放入譜面組檔案夾。此功能僅適用於“僅覆蓋已定義內容”模式。</value>
     <comment>Tooltip for Copy to slider slides. Describe the fallback assignment for unmatched custom samples, generated files that must be added to the mapset folder, and the restriction to Overwrite only defined mode. Keep Hitsound Copier and the mode label unchanged.</comment>
   </data>
   <data name="HitsoundCopier_CopyStoryboardSamples" xml:space="preserve">
-    <value>復制故事板采樣</value>
+    <value>複製故事板採樣</value>
     <comment>Option to copy sound sample events from the storyboard rather than only hitsound data attached to hit objects.</comment>
   </data>
   <data name="HitsoundCopier_CopyStoryboardSamplesTip" xml:space="preserve">
-    <value>復制故事板中的聲音采樣事件。</value>
+    <value>複製故事板中的聲音採樣事件。</value>
     <comment>Tooltip for Copy storyboard samples. The source data consists of storyboard sample events.</comment>
   </data>
   <data name="HitsoundCopier_CopyTicks" xml:space="preserve">
-    <value>復制到滑條刻線</value>
+    <value>複製到滑條刻線</value>
     <comment>Option to place otherwise-unmatched custom samples on slider ticks when using Overwrite only defined mode.</comment>
   </data>
   <data name="HitsoundCopier_CopyTicksTip" xml:space="preserve">
-    <value>啟用后，如果目標位置沒有其他物件，Hitsound Copier 會為滑條刻線分配自定義采樣。它會生成新的采樣檔案，你必須將這些檔案放入譜面組檔案夾。此功能僅適用于“僅覆蓋已定義內容”模式。</value>
+    <value>啟用後，如果目標位置沒有其他物件，Hitsound Copier 會為滑條刻線分配自定義採樣。它會生成新的採樣檔案，你必須將這些檔案放入譜面組檔案夾。此功能僅適用於“僅覆蓋已定義內容”模式。</value>
     <comment>Tooltip for Copy to slider ticks. Describe the fallback assignment for unmatched custom samples, generated files that must be added to the mapset folder, and the restriction to Overwrite only defined mode. Keep Hitsound Copier and the mode label unchanged.</comment>
   </data>
   <data name="HitsoundCopier_CopyVolumes" xml:space="preserve">
-    <value>復制音量</value>
+    <value>複製音量</value>
     <comment>Option to copy volume values associated with timing points or hitsound events.</comment>
   </data>
   <data name="HitsoundCopier_CopyVolumesTip" xml:space="preserve">
-    <value>復制音量。</value>
+    <value>複製音量。</value>
     <comment>Tooltip for Copy volumes. This copies volume settings with the hitsound data.</comment>
   </data>
   <data name="HitsoundCopier_FetchBeatmap" xml:space="preserve">
@@ -3210,27 +3210,27 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Subheading for the settings that determine which slider ends qualify for muting.</comment>
   </data>
   <data name="HitsoundCopier_Help" xml:space="preserve">
-    <value>將一個譜面的打擊音效復制到另一個譜面。
+    <value>將一個譜面的打擊音效複製到另一個譜面。
 
-共有兩種模式。“全部覆蓋”會先移除目標譜面的所有打擊音效，再復制來源打擊音效。
+共有兩種模式。“全部覆蓋”會先移除目標譜面的所有打擊音效，再複製來源打擊音效。
 
-“僅覆蓋已定義內容”只會復制來源譜面中存在的打擊音效。來源中未定義的目標打擊音效將保持不變，因此例如滑條靜音尾端仍會保持靜音。</value>
+“僅覆蓋已定義內容”只會複製來源譜面中存在的打擊音效。來源中未定義的目標打擊音效將保持不變，因此例如滑條靜音尾端仍會保持靜音。</value>
     <comment>Help text for Hitsound Copier. Explain the two copy modes and their effect on the target: Overwrite everything clears it first, while Overwrite only defined changes only events present in the source and preserves target-only hitsounds such as muted slider ends. Preserve the two mode labels exactly as they appear in the UI and keep Hitsound Copier unchanged as the tool name.</comment>
   </data>
   <data name="HitsoundCopier_IgnoreAnyHitsound" xml:space="preserve">
-    <value>存在打擊音效時忽略采樣</value>
+    <value>存在打擊音效時忽略採樣</value>
     <comment>Nested option that skips copying a storyboard sample whenever any hitsound is played at that time, even if it is a different sound.</comment>
   </data>
   <data name="HitsoundCopier_IgnoreAnyHitsoundTip" xml:space="preserve">
-    <value>任意打擊音效播放時，不復制故事板采樣。如果故事板需要補充缺失的打擊音效，且可能與已有打擊音效混合使用，請啟用此選項。</value>
+    <value>任意打擊音效播放時，不複製故事板採樣。如果故事板需要補充缺失的打擊音效，且可能與已有打擊音效混合使用，請啟用此選項。</value>
     <comment>Tooltip for the option that suppresses storyboard samples whenever any hitsound is present. Unlike the satisfied-sample option, the hitsound need not be the same sound.</comment>
   </data>
   <data name="HitsoundCopier_IgnoreSatisfiedSamples" xml:space="preserve">
-    <value>忽略已有打擊音效覆蓋的采樣</value>
+    <value>忽略已有打擊音效覆蓋的採樣</value>
     <comment>Nested option that skips copying a storyboard sample when a hitsound already plays the same sound at that event.</comment>
   </data>
   <data name="HitsoundCopier_IgnoreSatisfiedSamplesTip" xml:space="preserve">
-    <value>不復制已由打擊音效播放的故事板采樣。如果故事板需要補充缺失的打擊音效，請啟用此選項。</value>
+    <value>不複製已由打擊音效播放的故事板採樣。如果故事板需要補充缺失的打擊音效，請啟用此選項。</value>
     <comment>Tooltip for the option that treats a matching hitsound as satisfying a storyboard sample. It is useful when storyboard samples should fill gaps; keep the distinction between storyboard samples and hitsounds.</comment>
   </data>
   <data name="HitsoundCopier_InvalidSettings" xml:space="preserve">
@@ -3286,7 +3286,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Tooltip for the muted slider-end custom index. The exact sentinel value -1 means the current custom index is not changed.</comment>
   </data>
   <data name="HitsoundCopier_MutedSampleSetTip" xml:space="preserve">
-    <value>靜音滑條尾端使用的采樣組。</value>
+    <value>靜音滑條尾端使用的採樣組。</value>
     <comment>Tooltip for the selector choosing which sample set is used by muted slider ends.</comment>
   </data>
   <data name="HitsoundCopier_NonnegativeValue" xml:space="preserve">
@@ -3318,23 +3318,23 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Tooltip for preserving muted target values. Preserve the exact 5% threshold and explain that those target objects stay at 5% volume.</comment>
   </data>
   <data name="HitsoundCopier_Progress" xml:space="preserve">
-    <value>正在復制打擊音效</value>
+    <value>正在複製打擊音效</value>
     <comment>Progress status shown while Hitsound Copier copies events between beatmaps.</comment>
   </data>
   <data name="HitsoundCopier_ResultMany" xml:space="preserve">
-    <value>已成功將打擊音效復制到 {0} 個譜面！</value>
+    <value>已成功將打擊音效複製到 {0} 個譜面！</value>
     <comment>Success result when multiple target beatmaps were processed. Placeholder {0} is the integer processed-beatmap count; keep it once and do not localize or reformat it.</comment>
   </data>
   <data name="HitsoundCopier_ResultOne" xml:space="preserve">
-    <value>已成功將打擊音效復制到 {0} 個譜面！</value>
+    <value>已成功將打擊音效複製到 {0} 個譜面！</value>
     <comment>Success result when exactly one target beatmap was processed. Placeholder {0} is the integer processed-beatmap count; keep it once and do not localize or reformat it.</comment>
   </data>
   <data name="HitsoundCopier_SourcePath" xml:space="preserve">
-    <value>復制打擊音效的來源</value>
+    <value>複製打擊音效的來源</value>
     <comment>Field label for the source beatmap path whose hitsounds will be copied.</comment>
   </data>
   <data name="HitsoundCopier_SourceTip" xml:space="preserve">
-    <value>從此譜面復制打擊音效。</value>
+    <value>從此譜面複製打擊音效。</value>
     <comment>Tooltip for the source beatmap path field in Hitsound Copier.</comment>
   </data>
   <data name="HitsoundCopier_StartIndex" xml:space="preserve">
@@ -3342,15 +3342,15 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Field label for the first custom sample-set index allocated to newly generated slider-tick or slider-slide samples.</comment>
   </data>
   <data name="HitsoundCopier_StartIndexTip" xml:space="preserve">
-    <value>生成滑條刻線和滑條滑行段采樣時使用的起始采樣組索引。</value>
+    <value>生成滑條刻線和滑條滑行段採樣時使用的起始採樣組索引。</value>
     <comment>Tooltip for Start index. This integer determines the first custom sample index for generated slider-tick and slider-slide sound files.</comment>
   </data>
   <data name="HitsoundCopier_TargetPath" xml:space="preserve">
-    <value>復制打擊音效的目標</value>
+    <value>複製打擊音效的目標</value>
     <comment>Field label for one or more target beatmap paths that will receive copied hitsounds.</comment>
   </data>
   <data name="HitsoundCopier_TargetTip" xml:space="preserve">
-    <value>打擊音效將復制到這些譜面。輸入多個以“|”分隔的路徑。</value>
+    <value>打擊音效將複製到這些譜面。輸入多個以“|”分隔的路徑。</value>
     <comment>Tooltip for the target path field. It accepts multiple beatmap paths separated by the literal vertical bar character |; preserve this delimiter exactly.</comment>
   </data>
   <data name="HitsoundCopier_TemporalLeniency" xml:space="preserve">
@@ -3362,7 +3362,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Tooltip for the matching tolerance. Its numeric value is a duration in milliseconds, not a beat fraction.</comment>
   </data>
   <data name="HitsoundPreviewHelper_CopyZones" xml:space="preserve">
-    <value>復制選中的打擊音效區域。</value>
+    <value>複製選中的打擊音效區域。</value>
     <comment>Tooltip for the button that duplicates all selected hitsound zones in the table.</comment>
   </data>
   <data name="HitsoundPreviewHelper_CustomIndex" xml:space="preserve">
@@ -3378,9 +3378,9 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Tooltip for the button that opens or generates the rhythm guide for configuring hitsound zones.</comment>
   </data>
   <data name="HitsoundPreviewHelper_Help" xml:space="preserve">
-    <value>Hitsound Preview Helper 會根據當前譜面中每個物件的位置，為所有物件放置打擊音效。這樣制圖時無需手動分配音效也能試聽，之后還可將它們匯入 Hitsound Studio。
+    <value>Hitsound Preview Helper 會根據當前譜面中每個物件的位置，為所有物件放置打擊音效。這樣制圖時無需手動分配音效也能試聽，之後還可將它們匯入 Hitsound Studio。
 
-此工具適用于一種特定工作流程：在屏幕的不同區域放置打擊圈，并將每個區域作為單獨的打擊音效圖層。例如，在 mania 譜面中，每一列可代表不同的聲音。</value>
+此工具適用於一種特定工作流程：在屏幕的不同區域放置打擊圈，並將每個區域作為單獨的打擊音效圖層。例如，在 mania 譜面中，每一列可代表不同的聲音。</value>
     <comment>Help text for the Hitsound Preview Helper. Explain that object positions determine preview hitsounds so the mapper can audition them while mapping, then import the result into the product named Hitsound Studio. The intended workflow uses screen regions as sound layers, such as one mania column per sound. Preserve both tool names and the osu! mode name mania.</comment>
   </data>
   <data name="HitsoundPreviewHelper_NoSelectionError" xml:space="preserve">
@@ -3416,7 +3416,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Tooltip for the button that deletes the selected hitsound zones.</comment>
   </data>
   <data name="HitsoundPreviewHelper_SampleSet" xml:space="preserve">
-    <value>采樣組</value>
+    <value>採樣組</value>
     <comment>Editable table-column heading for the sample set assigned to a hitsound zone. The field selects an osu! sample set value.</comment>
   </data>
   <data name="HitsoundStudio_Accept" xml:space="preserve">
@@ -3440,7 +3440,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Checkbox for coinciding export that adds regular whistle, clap, finish, and sample-set sounds in addition to filename-based hitsounding.</comment>
   </data>
   <data name="HitsoundStudio_AddRegularHitsoundsTip" xml:space="preserve">
-    <value>在按檔名匹配的打擊音效（用于重合匯出）之外，同時添加 Whistle、Clap、Finish 和采樣組。</value>
+    <value>在按檔名匹配的打擊音效（用於重合匯出）之外，同時添加 Whistle、Clap、Finish 和採樣組。</value>
     <comment>Tooltip for Add regular hitsounds. These standard hitsound components are added on top of filename-based hitsounding in coinciding export.</comment>
   </data>
   <data name="HitsoundStudio_AllowSchemaGrowth" xml:space="preserve">
@@ -3480,7 +3480,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Tooltip for duplicate-sample detection during beatmap hitsound import. Identical audio files in the source mapset are canonicalized to one shared sample.</comment>
   </data>
   <data name="HitsoundStudio_ChooseBaseBeatmapTip" xml:space="preserve">
-    <value>選擇用于匯出和 MIDI 時間的基礎譜面。</value>
+    <value>選擇用於匯出和 MIDI 時間的基礎譜面。</value>
     <comment>Tooltip for controls that open a file picker or edit the base beatmap path. The chosen beatmap supplies both the export baseline and MIDI timing.</comment>
   </data>
   <data name="HitsoundStudio_ChooseDefaultSampleTip" xml:space="preserve">
@@ -3512,7 +3512,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Label for the ordinary sample added to generated packages that contain additions only.</comment>
   </data>
   <data name="HitsoundStudio_DefaultSampleSetTip" xml:space="preserve">
-    <value>預設 Normal 樣本使用的采樣組。</value>
+    <value>預設 Normal 樣本使用的採樣組。</value>
     <comment>Tooltip for the sample-set selector associated with the default normal sample.</comment>
   </data>
   <data name="HitsoundStudio_DefaultSampleTip" xml:space="preserve">
@@ -3532,11 +3532,11 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Tooltip warning what the delete option does: existing files in the selected export folder are removed before generated output is written.</comment>
   </data>
   <data name="HitsoundStudio_DetectDuplicateSamples" xml:space="preserve">
-    <value>檢測重復樣本</value>
+    <value>檢測重複樣本</value>
     <comment>Checkbox that detects imported layers which render to exactly the same sound and merges them.</comment>
   </data>
   <data name="HitsoundStudio_DetectDuplicateSamplesTip" xml:space="preserve">
-    <value>合并產生完全相同聲音的打擊音效圖層。</value>
+    <value>合並產生完全相同聲音的打擊音效圖層。</value>
     <comment>Tooltip for Detect duplicate samples. The comparison is based on the produced sound, and matching layers are merged.</comment>
   </data>
   <data name="HitsoundStudio_DiscriminateInstruments" xml:space="preserve">
@@ -3604,7 +3604,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Checkbox that writes a beatmap copy with the generated hitsounds.</comment>
   </data>
   <data name="HitsoundStudio_ExportHitsoundMapTip" xml:space="preserve">
-    <value>將基礎譜面復制一份，并在副本中添加打擊音效。</value>
+    <value>將基礎譜面複製一份，並在副本中添加打擊音效。</value>
     <comment>Tooltip for exporting the beatmap. The output is based on the selected base beatmap and has the generated hitsounds applied.</comment>
   </data>
   <data name="HitsoundStudio_ExportHitsoundSamples" xml:space="preserve">
@@ -3612,7 +3612,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Checkbox that generates and writes the audio sample files used by the exported hitsounds.</comment>
   </data>
   <data name="HitsoundStudio_ExportHitsoundSamplesTip" xml:space="preserve">
-    <value>生成并寫入來源樣本。</value>
+    <value>生成並寫入來源樣本。</value>
     <comment>Tooltip for exporting samples. This writes generated audio sample files alongside the beatmap output.</comment>
   </data>
   <data name="HitsoundStudio_ExportMode" xml:space="preserve">
@@ -3620,7 +3620,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Label for the selector of the hitsound export strategy. The options include standard custom indices, coinciding samples, storyboard output, and MIDI output.</comment>
   </data>
   <data name="HitsoundStudio_ExportModeTip" xml:space="preserve">
-    <value>選擇標準自定義索引、重合采樣、故事板或 MIDI 匯出。</value>
+    <value>選擇標準自定義索引、重合採樣、故事板或 MIDI 匯出。</value>
     <comment>Tooltip for Export mode describing the available strategies. Standard uses custom indices; other choices include coinciding samples, storyboard, or MIDI export.</comment>
   </data>
   <data name="HitsoundStudio_FetchSelectedBeatmap" xml:space="preserve">
@@ -3640,7 +3640,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Section heading for common hitsound-layer properties such as name, sample set, hitsound, and playback times.</comment>
   </data>
   <data name="HitsoundStudio_Help" xml:space="preserve">
-    <value>編輯和合并打擊音效圖層，從譜面或 MIDI 匯入聲音，然后匯出結果。</value>
+    <value>編輯和合並打擊音效圖層，從譜面或 MIDI 匯入聲音，然後匯出結果。</value>
     <comment>Help text shown in the Hitsound Studio header. Describe its main workflow: edit/combine layers, import source material, and export the resulting hitsounds.</comment>
   </data>
   <data name="HitsoundStudio_Hitsound" xml:space="preserve">
@@ -3720,11 +3720,11 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Tooltip for Sample path when importing a sample from a beatmap. The path identifies the specific source sample associated with this layer.</comment>
   </data>
   <data name="HitsoundStudio_IncludeStoryboardSamples" xml:space="preserve">
-    <value>包含故事板采樣</value>
+    <value>包含故事板採樣</value>
     <comment>Checkbox that includes sample events from the beatmap storyboard when importing hitsounds.</comment>
   </data>
   <data name="HitsoundStudio_IncludeStoryboardSamplesTip" xml:space="preserve">
-    <value>在打擊音效匯入中包含故事板采樣事件。</value>
+    <value>在打擊音效匯入中包含故事板採樣事件。</value>
     <comment>Tooltip for Include storyboard samples. This adds sample events authored in the storyboard to the hitsound import.</comment>
   </data>
   <data name="HitsoundStudio_Instrument" xml:space="preserve">
@@ -3804,7 +3804,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Tooltip for the hitsound selector when creating a layer through the import dialog.</comment>
   </data>
   <data name="HitsoundStudio_NewLayerSampleSetTip" xml:space="preserve">
-    <value>新圖層使用的采樣組。</value>
+    <value>新圖層使用的採樣組。</value>
     <comment>Tooltip for the sample-set selector when creating a layer through the import dialog.</comment>
   </data>
   <data name="HitsoundStudio_NewLayerSampleTip" xml:space="preserve">
@@ -3812,11 +3812,11 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Tooltip for the sample field when creating a simple layer. Keep SoundFont as the format/product term.</comment>
   </data>
   <data name="HitsoundStudio_NoteGroupingLeniency" xml:space="preserve">
-    <value>音符合并容差</value>
+    <value>音符合並容差</value>
     <comment>Label for the maximum timestamp distance used to group or combine notes/layers in standard export.</comment>
   </data>
   <data name="HitsoundStudio_NoteGroupingLeniencyTip" xml:space="preserve">
-    <value>合并圖層時允許的最大時間戳差值。</value>
+    <value>合並圖層時允許的最大時間戳差值。</value>
     <comment>Tooltip for note grouping tolerance. Its value is the maximum allowed distance between event timestamps when layers are combined.</comment>
   </data>
   <data name="HitsoundStudio_Offset" xml:space="preserve">
@@ -3824,7 +3824,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Label for the time offset applied to imported MIDI events, measured in milliseconds.</comment>
   </data>
   <data name="HitsoundStudio_OffsetTip" xml:space="preserve">
-    <value>應用于匯入事件的時間偏移量，單位為毫秒。</value>
+    <value>應用於匯入事件的時間偏移量，單位為毫秒。</value>
     <comment>Tooltip for Offset in MIDI import settings. The value is a signed millisecond adjustment to imported event times.</comment>
   </data>
   <data name="HitsoundStudio_Panning" xml:space="preserve">
@@ -3872,27 +3872,27 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Tooltip for Reload from source. It reapplies the stored import settings to the selected layers.</comment>
   </data>
   <data name="HitsoundStudio_RemoveDuplicateHitsounds" xml:space="preserve">
-    <value>移除重復的打擊音效</value>
+    <value>移除重複的打擊音效</value>
     <comment>Checkbox that removes repeated hitsound events occurring at the same millisecond during beatmap import.</comment>
   </data>
   <data name="HitsoundStudio_RemoveDuplicateHitsoundsTip" xml:space="preserve">
-    <value>移除發生在同一毫秒內的重復事件。</value>
+    <value>移除發生在同一毫秒內的重複事件。</value>
     <comment>Tooltip for Remove duplicate hitsounds. Events at an identical millisecond are deduplicated during import.</comment>
   </data>
   <data name="HitsoundStudio_RemoveDuplicateSamples" xml:space="preserve">
-    <value>移除重復樣本</value>
+    <value>移除重複樣本</value>
     <comment>Checkbox on Import storyboard that removes repeated sample-time values from imported layers.</comment>
   </data>
   <data name="HitsoundStudio_RemoveDuplicateTimesTip" xml:space="preserve">
-    <value>移除匯入時間清單中的重復值。</value>
+    <value>移除匯入時間清單中的重複值。</value>
     <comment>Tooltip for Remove duplicate samples on Import storyboard. It removes repeated time values, not duplicate audio files.</comment>
   </data>
   <data name="HitsoundStudio_RemoveDuplicates" xml:space="preserve">
-    <value>移除重復項</value>
+    <value>移除重複項</value>
     <comment>Checkbox that removes repeated entries from the imported layer's Times list.</comment>
   </data>
   <data name="HitsoundStudio_RemoveDuplicatesTip" xml:space="preserve">
-    <value>移除 Times 字段中的重復值。</value>
+    <value>移除 Times 字段中的重複值。</value>
     <comment>Tooltip for Remove duplicates in sample import settings. It de-duplicates time values, not files or hitsound layers.</comment>
   </data>
   <data name="HitsoundStudio_RemoveLayersTip" xml:space="preserve">
@@ -3920,11 +3920,11 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Tooltip for the sample path field. It accepts an audio file or SoundFont source; file paths and extensions must remain unchanged.</comment>
   </data>
   <data name="HitsoundStudio_SampleSet" xml:space="preserve">
-    <value>采樣組</value>
+    <value>採樣組</value>
     <comment>Field label or column header for the osu! sample set assigned to a layer. Keep the domain meaning of sample set.</comment>
   </data>
   <data name="HitsoundStudio_SampleSetTip" xml:space="preserve">
-    <value>分配給此圖層的采樣組。</value>
+    <value>分配給此圖層的採樣組。</value>
     <comment>Tooltip for the sample-set selector on a hitsound layer.</comment>
   </data>
   <data name="HitsoundStudio_SelectBeatmapFile" xml:space="preserve">
@@ -3944,7 +3944,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Checkbox that displays the export summary after processing.</comment>
   </data>
   <data name="HitsoundStudio_ShowResultsTip" xml:space="preserve">
-    <value>在匯出后顯示索引、樣本和綠線的數量。</value>
+    <value>在匯出後顯示索引、樣本和綠線的數量。</value>
     <comment>Tooltip for Show results. The summary reports counts of sample indices, generated samples, and greenlines.</comment>
   </data>
   <data name="HitsoundStudio_ShowTimes" xml:space="preserve">
@@ -3972,7 +3972,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Label for the file path or source identifier from which the layer is imported. The path value is user data and must remain unchanged.</comment>
   </data>
   <data name="HitsoundStudio_SourcePathTip" xml:space="preserve">
-    <value>用于匯入此打擊音效圖層的來源。</value>
+    <value>用於匯入此打擊音效圖層的來源。</value>
     <comment>Tooltip for the source path field in a layer's retained import settings.</comment>
   </data>
   <data name="HitsoundStudio_StackCoordinateTip" xml:space="preserve">
@@ -3988,7 +3988,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Tooltip for the source beatmap path on the Import layer stack tab.</comment>
   </data>
   <data name="HitsoundStudio_StoryboardSourceBeatmapTip" xml:space="preserve">
-    <value>匯入故事板采樣所用的譜面。</value>
+    <value>匯入故事板採樣所用的譜面。</value>
     <comment>Tooltip for the source beatmap path on Import storyboard.</comment>
   </data>
   <data name="HitsoundStudio_Times" xml:space="preserve">
@@ -4012,7 +4012,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Button that checks every referenced sample source for missing or unreadable files.</comment>
   </data>
   <data name="HitsoundStudio_ValidateSamplesTip" xml:space="preserve">
-    <value>檢查每個樣本來源，并報告缺失或無法讀取的檔案。</value>
+    <value>檢查每個樣本來源，並報告缺失或無法讀取的檔案。</value>
     <comment>Tooltip for Validate samples. The check covers all sample sources referenced by the current project and reports missing or unreadable files.</comment>
   </data>
   <data name="HitsoundStudio_Velocity" xml:space="preserve">
@@ -4032,7 +4032,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Tooltip for Velocity tolerance. It controls how MIDI velocities are quantized into groups during import.</comment>
   </data>
   <data name="HitsoundStudio_VelocityTip" xml:space="preserve">
-    <value>用于播放此樣本的 MIDI 力度。</value>
+    <value>用於播放此樣本的 MIDI 力度。</value>
     <comment>Tooltip for the SoundFont MIDI note velocity field, which controls the note's attack level.</comment>
   </data>
   <data name="HitsoundStudio_Volume" xml:space="preserve">
@@ -4100,9 +4100,9 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Warning shown when Map Cleaner is run without a selected beatmap and no beatmap is open in osu!. Preserve the tool name and osu! product name.</comment>
   </data>
   <data name="MapCleaner_Help" xml:space="preserve">
-    <value>清理當前譜面，移除不必要的綠線，并提供多個適用于整個譜面的清理選項。
+    <value>清理當前譜面，移除不必要的綠線，並提供多個適用於整個譜面的清理選項。
 
-要清理綠線，Map Cleaner 會先記錄每個時間點對譜面的影響，隨后移除這些時間點并以一致的方式重新構建。這樣會自動將綠線重新吸附到使用它們的物件上。</value>
+要清理綠線，Map Cleaner 會先記錄每個時間點對譜面的影響，隨後移除這些時間點並以一致的方式重新構建。這樣會自動將綠線重新吸附到使用它們的物件上。</value>
     <comment>Help text for Map Cleaner. Explain its cleanup options and the greenline rebuild process: preserve each timing point's influence, rebuild the points consistently, and thereby resnap greenlines to the objects that use them. Keep the feature term greenline recognizable and use osu! timing-point terminology.</comment>
   </data>
   <data name="MapCleaner_MapInfo" xml:space="preserve">
@@ -4114,15 +4114,15 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Option that mutes slider-end, slider-repeat, and spinner-end hitsounds because those events cannot be clicked directly.</comment>
   </data>
   <data name="MapCleaner_MuteUnclickableHitsoundsTip" xml:space="preserve">
-    <value>將所有滑條尾端、滑條重復段和轉盤尾端的打擊音效靜音。</value>
+    <value>將所有滑條尾端、滑條重複段和轉盤尾端的打擊音效靜音。</value>
     <comment>Tooltip for Mute unclickable hitsounds. Name all affected events: slider ends, slider repeats, and spinner ends.</comment>
   </data>
   <data name="MapCleaner_PreserveSliderSampleSet" xml:space="preserve">
-    <value>譜面在滑條中使用了采樣組更改</value>
+    <value>譜面在滑條中使用了採樣組更改</value>
     <comment>Option declaring that sample-set changes in sliders are intentional and must be preserved during greenline cleanup.</comment>
   </data>
   <data name="MapCleaner_PreserveSliderSampleSetTip" xml:space="preserve">
-    <value>將滑條采樣組更改標記為有用資訊，避免移除。</value>
+    <value>將滑條採樣組更改標記為有用資訊，避免移除。</value>
     <comment>Tooltip for preserving slider sample-set changes. These changes are treated as meaningful timing information during cleanup.</comment>
   </data>
   <data name="MapCleaner_PreserveSliderVolume" xml:space="preserve">
@@ -4206,19 +4206,19 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>First clause of Map Cleaner's result when exactly one timing line was removed. It is concatenated with optional object/sample clauses; omit final punctuation and keep greenline as the feature term.</comment>
   </data>
   <data name="MapCleaner_SummaryRemovedSampleMany" xml:space="preserve">
-    <value>并移除了 {0} 個未使用的樣本</value>
+    <value>並移除了 {0} 個未使用的樣本</value>
     <comment>Optional result clause appended when multiple unused sound sample files were removed. Placeholder {0} is the integer sample count; keep it once without localization or numeric reformatting.</comment>
   </data>
   <data name="MapCleaner_SummaryRemovedSampleOne" xml:space="preserve">
-    <value>并移除了 1 個未使用的樣本</value>
+    <value>並移除了 1 個未使用的樣本</value>
     <comment>Optional result clause appended when one unused sound sample file was removed. It follows earlier result clauses; preserve that the sample was unused.</comment>
   </data>
   <data name="MapCleaner_SummaryResnappedMany" xml:space="preserve">
-    <value>并重新吸附了 {0} 個物件</value>
+    <value>並重新吸附了 {0} 個物件</value>
     <comment>Optional result clause appended when multiple hit objects were resnapped. Placeholder {0} is the integer object count; keep it once without localization or numeric reformatting.</comment>
   </data>
   <data name="MapCleaner_SummaryResnappedOne" xml:space="preserve">
-    <value>并重新吸附了 1 個物件</value>
+    <value>並重新吸附了 1 個物件</value>
     <comment>Optional result clause appended when one hit object was resnapped. It follows the greenline result clause; preserve the singular quantity.</comment>
   </data>
   <data name="MapCleaner_TimelineTip" xml:space="preserve">
@@ -4254,7 +4254,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Data-validation error for the required Export path field in Mapset Merger. This appears beside the field and directs the user to choose the output folder.</comment>
   </data>
   <data name="MapsetMerger_ExportPathTip" xml:space="preserve">
-    <value>合并后的譜面組檔案將放入此檔案夾。</value>
+    <value>合並後的譜面組檔案將放入此檔案夾。</value>
     <comment>Tooltip for the Mapset Merger destination-folder field. It identifies where the output files from the merge will be written.</comment>
   </data>
   <data name="MapsetMerger_ExportPickerError" xml:space="preserve">
@@ -4262,19 +4262,19 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Error notification body shown when the export-folder picker fails to return a folder. Keep raw exception text separate from user-facing text.</comment>
   </data>
   <data name="MapsetMerger_Help" xml:space="preserve">
-    <value>將多個譜面組合并為一個，并自動解決檔案沖突。</value>
+    <value>將多個譜面組合並為一個，並自動解決檔案沖突。</value>
     <comment>Short help description shown under the Mapset Merger tool name. It combines source mapsets into one destination mapset and resolves conflicting files automatically. Keep Mapset Merger unchanged as the product tool name.</comment>
   </data>
   <data name="MapsetMerger_MergeProgress" xml:space="preserve">
-    <value>正在合并譜面組</value>
+    <value>正在合並譜面組</value>
     <comment>Progress status displayed while Mapset Merger combines source mapsets. This is a short ongoing-action phrase.</comment>
   </data>
   <data name="MapsetMerger_MergedMany" xml:space="preserve">
-    <value>已成功合并 {0} 個譜面組！</value>
+    <value>已成功合並 {0} 個譜面組！</value>
     <comment>Success result message when more than one mapset was merged. Placeholder {0} is the integer count of merged mapsets; keep it once and do not localize or reformat it.</comment>
   </data>
   <data name="MapsetMerger_MergedOne" xml:space="preserve">
-    <value>已成功合并 {0} 個譜面組！</value>
+    <value>已成功合並 {0} 個譜面組！</value>
     <comment>Success result message when exactly one mapset was merged. Placeholder {0} is the integer count of merged mapsets; keep it once and do not localize or reformat it.</comment>
   </data>
   <data name="MapsetMerger_MoveStoryboard" xml:space="preserve">
@@ -4282,7 +4282,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Checkbox that embeds storyboard content in beatmap files during merging. Preserve the .osu file extension exactly.</comment>
   </data>
   <data name="MapsetMerger_MoveStoryboardTip" xml:space="preserve">
-    <value>將任意 .osb 檔案的內容移入 .osu 檔案，從而創建僅適用于特定譜面的故事板。</value>
+    <value>將任意 .osb 檔案的內容移入 .osu 檔案，從而創建僅適用於特定譜面的故事板。</value>
     <comment>Tooltip for the storyboard-migration checkbox. It transfers the contents of .osb storyboard files into the .osu beatmap file so the storyboard applies to that beatmap. Preserve both file extensions exactly.</comment>
   </data>
   <data name="MapsetMerger_Name" xml:space="preserve">
@@ -4298,7 +4298,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Table-column heading for the filesystem path of a source mapset directory. The path value itself is user data and must not be translated.</comment>
   </data>
   <data name="MapsetMerger_RemoveMapset" xml:space="preserve">
-    <value>移除所選譜面組；如果沒有選中項，則移除最后一個譜面組。</value>
+    <value>移除所選譜面組；如果沒有選中項，則移除最後一個譜面組。</value>
     <comment>Tooltip for the remove-mapset button. It removes all selected source rows, and when there is no selection it removes the final row.</comment>
   </data>
   <data name="MapsetMerger_SelectBeatmap" xml:space="preserve">
@@ -4335,7 +4335,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
   </data>
   <data name="MetadataManager_ComboColoursTip" xml:space="preserve">
     <comment>Tooltip for enabling export of shared combo colours. Disabling it lets each target beatmap keep its own colours.</comment>
-    <value>選擇是否匯出連擊顏色。禁用此選項后，不同譜面可以使用不同顏色。</value>
+    <value>選擇是否匯出連擊顏色。禁用此選項後，不同譜面可以使用不同顏色。</value>
   </data>
   <data name="MetadataManager_Creator" xml:space="preserve">
     <comment>Beatmap metadata field naming the mapper (the person who created the beatmap), not the track artist.</comment>
@@ -4367,7 +4367,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
   </data>
   <data name="MetadataManager_ExportTip" xml:space="preserve">
     <comment>Tooltip for the destination path field. Multiple beatmap paths are allowed and the vertical bar character | separates them; preserve this separator literally.</comment>
-    <value>要匯出元資料的譜面。可輸入多個譜面路徑，并用“|”分隔。</value>
+    <value>要匯出元資料的譜面。可輸入多個譜面路徑，並用“|”分隔。</value>
   </data>
   <data name="MetadataManager_Exporting" xml:space="preserve">
     <value>正在匯出元資料</value>
@@ -4379,11 +4379,11 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
   </data>
   <data name="MetadataManager_Help" xml:space="preserve">
     <comment>Help text explaining that metadata can be edited once and copied to multiple difficulties, imported from another beatmap, and saved or loaded as a reusable configuration. Preserve the paragraph breaks.</comment>
-    <value>通過此工具編輯元資料，可免去逐個編輯每個難度的時間；之后隨時可以將元資料復制到多個難度。
+    <value>通過此工具編輯元資料，可免去逐個編輯每個難度的時間；之後隨時可以將元資料複製到多個難度。
 
-你也可以從譜面匯入元資料，將其從一個譜面復制到另一個譜面。
+你也可以從譜面匯入元資料，將其從一個譜面複製到另一個譜面。
 
-儲存并加載元資料配置，即可輕松處理多個譜面組。</value>
+儲存並加載元資料配置，即可輕松處理多個譜面組。</value>
   </data>
   <data name="MetadataManager_ImportButton" xml:space="preserve">
     <comment>Caption of the action button that imports metadata from the source beatmap.</comment>
@@ -4427,15 +4427,15 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
   </data>
   <data name="MetadataManager_RemoveComboColourTip" xml:space="preserve">
     <comment>Tooltip for removing the last combo colour entry.</comment>
-    <value>移除最后一種連擊顏色。</value>
+    <value>移除最後一種連擊顏色。</value>
   </data>
   <data name="MetadataManager_RemoveDuplicateTags" xml:space="preserve">
     <comment>Checkbox that removes repeated entries from the tags when exporting metadata.</comment>
-    <value>移除重復標簽</value>
+    <value>移除重複標籤</value>
   </data>
   <data name="MetadataManager_RemoveSpecialColourTip" xml:space="preserve">
     <comment>Tooltip for removing the last special-colour entry.</comment>
-    <value>移除最后一種特殊顏色。</value>
+    <value>移除最後一種特殊顏色。</value>
   </data>
   <data name="MetadataManager_ResetIds" xml:space="preserve">
     <comment>Checkbox that resets the numeric BeatmapID and BeatmapSetID values when applying metadata, which can help when submitting maps owned by another account.</comment>
@@ -4443,7 +4443,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
   </data>
   <data name="MetadataManager_ResetIdsTip" xml:space="preserve">
     <comment>Tooltip for resetting BeatmapID and BeatmapSetID on every target beatmap. The quoted submission warning is the game's wording; translate it naturally rather than treating it as an identifier.</comment>
-    <value>重置所有譜面的 BeatmapID 和 BeatmapSetID。這可能會修復“你嘗試提交的譜面并非由你創建！”問題。</value>
+    <value>重置所有譜面的 BeatmapID 和 BeatmapSetID。這可能會修復“你嘗試提交的譜面並非由你創建！”問題。</value>
   </data>
   <data name="MetadataManager_RomanisedArtist" xml:space="preserve">
     <comment>Beatmap metadata field for the artist name written in Latin characters. Keep the distinction from the original Artist field.</comment>
@@ -4463,11 +4463,11 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
   </data>
   <data name="MetadataManager_Tags" xml:space="preserve">
     <comment>Beatmap metadata field containing searchable tags.</comment>
-    <value>標簽</value>
+    <value>標籤</value>
   </data>
   <data name="MetadataManager_TagsOverflow" xml:space="preserve">
     <comment>Validation message shown when tags exceed either limit: at most 100 words and at most 1024 characters.</comment>
-    <value>標簽最多可包含 100 個詞和 1024 個字符。</value>
+    <value>標籤最多可包含 100 個詞和 1024 個字符。</value>
   </data>
   <data name="MetadataManager_Title" xml:space="preserve">
     <comment>Visible title of the tool. “Metadata Manager” is the fixed mapping-tool name; keep it exactly as written.</comment>
@@ -4551,14 +4551,14 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
   </data>
   <data name="PatternGallery_EndTimeTip" xml:space="preserve">
     <comment>Tooltip for the optional upper time bound when importing hit objects. Objects later than this time are excluded.</comment>
-    <value>可選的時間上限。此時間之后的所有物件都將被忽略。</value>
+    <value>可選的時間上限。此時間之後的所有物件都將被忽略。</value>
   </data>
   <data name="PatternGallery_ExportCollectionMenu" xml:space="preserve">
     <value>_匯出合集</value>
     <comment>Project menu command to export the current collection.</comment>
   </data>
   <data name="PatternGallery_ExportCollectionMenuTip" xml:space="preserve">
-    <value>將此合集匯出到 Exports 檔案夾。之后可以通過匯入菜單匯入匯出的檔案。</value>
+    <value>將此合集匯出到 Exports 檔案夾。之後可以通過匯入菜單匯入匯出的檔案。</value>
     <comment>Tooltip for exporting the collection. Exports is the application’s directory name.</comment>
   </data>
   <data name="PatternGallery_ExportedCollection" xml:space="preserve">
@@ -4611,9 +4611,9 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
   </data>
   <data name="PatternGallery_Help" xml:space="preserve">
     <comment>Help text describing importing/exporting patterns from osu! beatmaps, managing shareable collections, selecting patterns to export, double-click QuickRun, export options, and the Project menu. Preserve “QuickRun” as a product feature name and keep paragraph boundaries.</comment>
-    <value>從 osu! 譜面匯入和匯出模式，并創建可與朋友分享的模式合集。
+    <value>從 osu! 譜面匯入和匯出模式，並創建可與朋友分享的模式合集。
 你可以使用底部的按鈕添加或移除模式。
-要將模式匯出到當前譜面，只需選中一個或多個模式并點擊運行按鈕。也可以雙擊模式立即匯出。
+要將模式匯出到當前譜面，只需選中一個或多個模式並點擊運行按鈕。也可以雙擊模式立即匯出。
 右側是匯出選項，可在匯出時對模式進行進一步處理。
 使用“項目”菜單可儲存、加載、重命名、匯入和匯出模式合集。</value>
   </data>
@@ -4670,15 +4670,15 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <value>手動解除堆疊</value>
   </data>
   <data name="PatternGallery_Merge" xml:space="preserve">
-    <value>合并</value>
+    <value>合並</value>
     <comment>Dialog choice that merges imported patterns into the current collection.</comment>
   </data>
   <data name="PatternGallery_MergeQuestion" xml:space="preserve">
-    <value>要將匯入的模式合并到當前合集嗎？</value>
+    <value>要將匯入的模式合並到當前合集嗎？</value>
     <comment>Question asking whether imported patterns should be merged into the active collection.</comment>
   </data>
   <data name="PatternGallery_MergedCollection" xml:space="preserve">
-    <value>已合并 Pattern Gallery 合集。</value>
+    <value>已合並 Pattern Gallery 合集。</value>
     <comment>Success notification after merging an imported collection into the current collection.</comment>
   </data>
   <data name="PatternGallery_CodeImportNameTip" xml:space="preserve">
@@ -4746,11 +4746,11 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Project menu command to rebuild the collection index from its pattern files.</comment>
   </data>
   <data name="PatternGallery_RestoreCollectionMenuTip" xml:space="preserve">
-    <value>從模式檔案目錄還原合集：移除檔案缺失的模式，并索引尚未列出的檔案。請先備份合集。</value>
+    <value>從模式檔案目錄還原合集：移除檔案缺失的模式，並索引尚未列出的檔案。請先備份合集。</value>
     <comment>Tooltip for restoring a collection index from source files. It removes missing-file entries and adds unindexed files.</comment>
   </data>
   <data name="PatternGallery_RestoreQuestion" xml:space="preserve">
-    <value>要移除檔案缺失的模式，并添加尚未編入索引的模式檔案嗎？</value>
+    <value>要移除檔案缺失的模式，並添加尚未編入索引的模式檔案嗎？</value>
     <comment>Question describing the restore operation: remove entries whose files are missing and index files not already listed.</comment>
   </data>
   <data name="PatternGallery_RestoredSummary" xml:space="preserve">
@@ -4860,7 +4860,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
   <data name="PropertyTransformer_Help" xml:space="preserve">
     <comment>Help text explaining that the tool multiplies then offsets timing-point, hit-object, bookmark, and storyboard sample properties on the current beatmap, rounding results when integer values are required. Preserve the operation order.</comment>
     <value>對當前譜面的所有時間點、打擊物件、書簽和故事板樣本屬性進行乘法和加法運算。
-新值等于舊值乘以乘數再加上偏移量。乘數位于左側文本框，偏移量位于右側文本框。先進行乘法運算。
+新值等於舊值乘以乘數再加上偏移量。乘數位於左側文本框，偏移量位於右側文本框。先進行乘法運算。
 結果值若必須為整數，則會進行四舍五入。</value>
   </data>
   <data name="PropertyTransformer_HelpText" xml:space="preserve">
@@ -4965,19 +4965,19 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
   </data>
   <data name="RhythmGuide_CopyFrom" xml:space="preserve">
     <comment>Label for the source beatmap path(s) whose rhythm is used to generate guide circles.</comment>
-    <value>復制節奏來源</value>
+    <value>複製節奏來源</value>
   </data>
   <data name="RhythmGuide_CopyRhythmFrom" xml:space="preserve">
-    <value>復制節奏來源</value>
+    <value>複製節奏來源</value>
     <comment>Title of the source beatmap picker for Rhythm Guide.</comment>
   </data>
   <data name="RhythmGuide_CopyRhythmTo" xml:space="preserve">
-    <value>復制節奏目標</value>
+    <value>複製節奏目標</value>
     <comment>Title of the destination beatmap picker for Rhythm Guide.</comment>
   </data>
   <data name="RhythmGuide_CopyTo" xml:space="preserve">
     <comment>Label for the output location where the generated rhythm guide beatmap will be saved or added.</comment>
-    <value>復制節奏目標</value>
+    <value>複製節奏目標</value>
   </data>
   <data name="RhythmGuide_DestinationTip" xml:space="preserve">
     <comment>Tooltip explaining that the destination may be a path for a new rhythm guide beatmap or an existing beatmap to modify.</comment>
@@ -4989,7 +4989,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
   </data>
   <data name="RhythmGuide_DifficultyNameTip" xml:space="preserve">
     <comment>Tooltip noting that the difficulty name applies only when Export mode creates a new map.</comment>
-    <value>節奏指南的難度名稱。僅適用于 NewMap 模式。</value>
+    <value>節奏指南的難度名稱。僅適用於 NewMap 模式。</value>
   </data>
   <data name="RhythmGuide_ExportMode" xml:space="preserve">
     <comment>Label for choosing whether to create a new beatmap or add guide circles to the existing destination beatmap.</comment>
@@ -5005,7 +5005,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
   </data>
   <data name="RhythmGuide_GameModeTip" xml:space="preserve">
     <comment>Tooltip noting that the selected game mode applies only when Export mode creates a new map.</comment>
-    <value>節奏指南使用的游戲模式。僅適用于 NewMap 模式。</value>
+    <value>節奏指南使用的游戲模式。僅適用於 NewMap 模式。</value>
   </data>
   <data name="RhythmGuide_Help" xml:space="preserve">
     <comment>Help text explaining that the tool creates circles from rhythms in multiple beatmaps for hitsounding reference, either in an existing map or a new one, and that Browse supports selecting multiple beatmaps.</comment>
@@ -5045,7 +5045,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
   </data>
   <data name="RhythmGuide_SourceTip" xml:space="preserve">
     <comment>Tooltip explaining that one or more source beatmap paths provide the rhythms to copy. The literal vertical bar | separates multiple paths.</comment>
-    <value>要匯入節奏的譜面。可輸入多個譜面路徑，并用“|”分隔。</value>
+    <value>要匯入節奏的譜面。可輸入多個譜面路徑，並用“|”分隔。</value>
   </data>
   <data name="RhythmGuide_Title" xml:space="preserve">
     <comment>Visible title of this mapping tool. “Rhythm Guide” is the fixed tool name and must remain unchanged.</comment>
@@ -5094,7 +5094,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
   </data>
   <data name="SliderCompletionator_LengthTip" xml:space="preserve">
     <comment>Tooltip explaining that slider length is a fraction of the full anchor-defined path and that 1 ends exactly at the last anchor. Preserve the numeric example 1.</comment>
-    <value>期望的滑條長度。此值是錨點定義的完整路徑所占比例；輸入 '1' 可使滑條恰好結束于最后一個錨點。</value>
+    <value>期望的滑條長度。此值是錨點定義的完整路徑所占比例；輸入 '1' 可使滑條恰好結束於最後一個錨點。</value>
   </data>
   <data name="SliderCompletionator_MadeBy" xml:space="preserve">
     <comment>Credit line naming the original author. Keep “OliBomby” unchanged.</comment>
@@ -5106,7 +5106,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
   </data>
   <data name="SliderCompletionator_MoveAnchorsTip" xml:space="preserve">
     <comment>Tooltip explaining anchor repositioning: the final anchor is placed exactly on the slider end, similar to using Ctrl+G twice in the osu! editor.</comment>
-    <value>移動錨點，使最后一個錨點恰好位于滑條末端。與在編輯器中使用 Ctrl+G 兩次類似，但效果更好。</value>
+    <value>移動錨點，使最後一個錨點恰好位於滑條末端。與在編輯器中使用 Ctrl+G 兩次類似，但效果更好。</value>
   </data>
   <data name="SliderCompletionator_ObjectSelectionLabel" xml:space="preserve">
     <comment>Label for the selector that determines which sliders are selected for completion.</comment>
@@ -5146,7 +5146,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
   </data>
   <data name="SliderCompletionator_UseEndTimeTip" xml:space="preserve">
     <comment>Tooltip explaining that enabling this replaces the duration field with a field for the slider's end time.</comment>
-    <value>輸入滑條結束時間，而不是時長。啟用后會以結束時間字段替換時長字段。</value>
+    <value>輸入滑條結束時間，而不是時長。啟用後會以結束時間字段替換時長字段。</value>
   </data>
   <data name="SliderCompletionator_VelocityLabel" xml:space="preserve">
     <comment>Label for the slider velocity multiplier relative to the inherited timing point.</comment>
@@ -5162,26 +5162,26 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
   </data>
   <data name="SliderMerger_ConnectionModeTip" xml:space="preserve">
     <comment>Tooltip for connection mode, which determines what happens to space gaps between hit objects that are merged.</comment>
-    <value>選擇如何處理要合并的打擊物件之間的空隙。</value>
+    <value>選擇如何處理要合並的打擊物件之間的空隙。</value>
   </data>
   <data name="SliderMerger_Help" xml:space="preserve">
     <comment>Help text describing merging two or more sliders and circles into one slider. Existing slider curve types are converted to Bezier for merging; circles use linear connections. The maximum object distance is governed by leniency measured in osu! pixels.</comment>
-    <value>將兩個或更多滑條和打擊圈合并為一條大滑條。
-合并時，此程式會自動將任何類型的滑條轉換為貝塞爾滑條。
-打擊圈也可以合并，并且始終使用直線連接模式。
+    <value>將兩個或更多滑條和打擊圈合並為一條大滑條。
+合並時，此程式會自動將任何類型的滑條轉換為貝塞爾滑條。
+打擊圈也可以合並，並且始終使用直線連接模式。
 
-兩個要合并的打擊物件之間允許的最大距離，以 osu! 像素為單位，由連接寬容度控制。</value>
+兩個要合並的打擊物件之間允許的最大距離，以 osu! 像素為單位，由連接寬容度控制。</value>
   </data>
   <data name="SliderMerger_LeniencyLabel" xml:space="preserve">
     <comment>Label for the maximum allowed distance between two hit objects that Slider Merger can join; the distance is measured in osu! pixels.</comment>
-    <value>合并連接寬容度</value>
+    <value>合並連接寬容度</value>
   </data>
   <data name="SliderMerger_LeniencyTip" xml:space="preserve">
     <comment>Tooltip for connection leniency, the maximum distance in osu! pixels between two hit objects for them to be eligible for merging.</comment>
-    <value>兩個要合并的打擊物件之間允許的最大距離，以 osu! 像素為單位。</value>
+    <value>兩個要合並的打擊物件之間允許的最大距離，以 osu! 像素為單位。</value>
   </data>
   <data name="SliderMerger_LinearCurve" xml:space="preserve">
-    <value>如果合并方式完全為直線，則使用直線曲線類型</value>
+    <value>如果合並方式完全為直線，則使用直線曲線類型</value>
     <comment>Checkbox label: when the resulting merged slider can be linear, use a linear curve type and omit red anchors.</comment>
   </data>
   <data name="SliderMerger_LinearCurveTip" xml:space="preserve">
@@ -5190,7 +5190,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
   </data>
   <data name="SliderMerger_LinearMerge" xml:space="preserve">
     <comment>Checkbox asking Slider Merger to produce a linear curve without red anchors when the complete merge is linear.</comment>
-    <value>完全以直線合并時使用直線曲線類型</value>
+    <value>完全以直線合並時使用直線曲線類型</value>
   </data>
   <data name="SliderMerger_LinearMergeTip" xml:space="preserve">
     <comment>Tooltip explaining that a fully linear merge can be represented as a linear curve type with no red anchors.</comment>
@@ -5198,22 +5198,22 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
   </data>
   <data name="SliderMerger_MergeOnEnd" xml:space="preserve">
     <comment>Checkbox that connects the next path at the slider endpoint instead of its last anchor.</comment>
-    <value>在滑條尾端合并</value>
+    <value>在滑條尾端合並</value>
   </data>
   <data name="SliderMerger_MergeOnEndTip" xml:space="preserve">
     <comment>Tooltip explaining that the join point is the slider end, rather than its final anchor.</comment>
-    <value>在滑條尾端而非最后一個錨點處合并。</value>
+    <value>在滑條尾端而非最後一個錨點處合並。</value>
   </data>
   <data name="SliderMerger_MergeOnSliderEnd" xml:space="preserve">
-    <value>在滑條尾端合并</value>
+    <value>在滑條尾端合並</value>
     <comment>Checkbox label: use the slider end as the merge point instead of the slider’s last anchor.</comment>
   </data>
   <data name="SliderMerger_MergeOnSliderEndTip" xml:space="preserve">
-    <value>在滑條尾端而非最后一個錨點處合并。</value>
+    <value>在滑條尾端而非最後一個錨點處合並。</value>
     <comment>Tooltip for Merge on slider end. It changes which point on an input slider is used for merging.</comment>
   </data>
   <data name="SliderMerger_Merging" xml:space="preserve">
-    <value>正在合并滑條</value>
+    <value>正在合並滑條</value>
     <comment>Progress label shown while Slider Merger connects hit objects.</comment>
   </data>
   <data name="SliderMerger_ObjectSelectionLabel" xml:space="preserve">
@@ -5222,14 +5222,14 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
   </data>
   <data name="SliderMerger_ObjectSelectionTip" xml:space="preserve">
     <comment>Tooltip explaining selection modes and that selected objects are only merged if each pair remains within the connection distance leniency.</comment>
-    <value>選擇要合并的打擊物件。Slider Merger 不一定會合并所有指定物件，因為每一對物件之間的距離仍須在連接距離寬容度范圍內。</value>
+    <value>選擇要合並的打擊物件。Slider Merger 不一定會合並所有指定物件，因為每一對物件之間的距離仍須在連接距離寬容度范圍內。</value>
   </data>
   <data name="SliderMerger_ResultMany" xml:space="preserve">
-    <value>已成功合并 {0} 個滑條！</value>
+    <value>已成功合並 {0} 個滑條！</value>
     <comment>Success notification for zero or multiple merged sliders. Placeholder {0} is an integer count.</comment>
   </data>
   <data name="SliderMerger_ResultOne" xml:space="preserve">
-    <value>已成功合并 {0} 個滑條！</value>
+    <value>已成功合並 {0} 個滑條！</value>
     <comment>Success notification for exactly one merged slider. Placeholder {0} is an integer count.</comment>
   </data>
   <data name="SliderMerger_SelectionModeTip" xml:space="preserve">
@@ -5286,7 +5286,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
   </data>
   <data name="SliderPicturator_Help" xml:space="preserve">
     <comment>Help text explaining that importing an image distorts a slider into that image; users browse for an image, tune colors/options, then export at a chosen time and position. QuickRun is a fixed feature name and remains unchanged.</comment>
-    <value>匯入圖像后，此程式會讓滑條變形以貼合圖像！要開始使用，請點擊“瀏覽”按鈕選擇圖像，然后調整顏色和選項，直到效果滿意。點擊運行按鈕，即可在指定時間和位置匯出滑條圖案。
+    <value>匯入圖像後，此程式會讓滑條變形以貼合圖像！要開始使用，請點擊“瀏覽”按鈕選擇圖像，然後調整顏色和選項，直到效果滿意。點擊運行按鈕，即可在指定時間和位置匯出滑條圖案。
 
 此工具兼容 QuickRun！</value>
   </data>
@@ -5359,7 +5359,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Button that removes the imported slider used as the sliderball path.</comment>
   </data>
   <data name="SliderPicturator_RemoveSliderTip" xml:space="preserve">
-    <value>移除用于獲取滑條球路徑的滑條。</value>
+    <value>移除用於獲取滑條球路徑的滑條。</value>
     <comment>Tooltip for removing the imported slider used to define sliderball movement.</comment>
   </data>
   <data name="SliderPicturator_RunFailureTitle" xml:space="preserve">
@@ -5535,7 +5535,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Checkbox label: derive the generated slider velocity from BPM instead of greenline SV.</comment>
   </data>
   <data name="Sliderator_DelegateSvTip" xml:space="preserve">
-    <value>根據 BPM 而非綠線 SV 確定生成滑條的速度。這樣可以使用高于 10× 的 SV。</value>
+    <value>根據 BPM 而非綠線 SV 確定生成滑條的速度。這樣可以使用高於 10× 的 SV。</value>
     <comment>Tooltip for delegating SV to BPM. This permits slider velocities above osu!’s usual 10× SV limit.</comment>
   </data>
   <data name="Sliderator_ExpectedSegments" xml:space="preserve">
@@ -5592,7 +5592,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
   </data>
   <data name="Sliderator_Help" xml:space="preserve">
     <comment>Help text explaining variable-velocity sliders/streams, graph editing, mouse and modifier-key interactions, importing sliders, previewing, and optimizing SV/tumour length. Preserve exact key names Shift, Ctrl, and Alt; Sliderator remains unchanged as the tool name.</comment>
-    <value>Sliderator 用于制作速度可變的滑條，也就是在動畫過程中會變速的滑條。你也可以用它制作變速串流。
+    <value>Sliderator 用於制作速度可變的滑條，也就是在動畫過程中會變速的滑條。你也可以用它制作變速串流。
 
 界面包括滑條匯入區、若干選項、位置/速度圖表和滑條預覽。
 
@@ -5746,24 +5746,24 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Tooltip for the optional SV limit. This is a user-defined cap; 10× is the usual osu! velocity limit.</comment>
   </data>
   <data name="TimingCopier_CopyFrom" xml:space="preserve">
-    <value>復制時間來源</value>
+    <value>複製時間來源</value>
     <comment>Title of the source beatmap picker in Timing Copier.</comment>
   </data>
   <data name="TimingCopier_CopyTo" xml:space="preserve">
-    <value>復制時間目標</value>
+    <value>複製時間目標</value>
     <comment>Title of the destination beatmap picker in Timing Copier.</comment>
   </data>
   <data name="TimingCopier_Copying" xml:space="preserve">
-    <value>正在復制時間設定</value>
+    <value>正在複製時間設定</value>
     <comment>Progress label shown while timing points are copied to destination beatmaps.</comment>
   </data>
   <data name="TimingCopier_ExportLabel" xml:space="preserve">
     <comment>Label for the destination beatmap path(s) that receive copied timing data.</comment>
-    <value>復制時間至</value>
+    <value>複製時間至</value>
   </data>
   <data name="TimingCopier_ExportPathTip" xml:space="preserve">
     <comment>Tooltip for destination beatmap paths. Multiple paths are allowed and are separated by the literal vertical bar |.</comment>
-    <value>要復制時間設定的譜面。可輸入多個譜面路徑，并用“|”分隔。</value>
+    <value>要複製時間設定的譜面。可輸入多個譜面路徑，並用“|”分隔。</value>
   </data>
   <data name="TimingCopier_ExportPathsTip" xml:space="preserve">
     <comment>Tooltip explaining the path separator for multiple destination beatmaps. Preserve the literal | character.</comment>
@@ -5771,19 +5771,19 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
   </data>
   <data name="TimingCopier_Help" xml:space="preserve">
     <comment>Help text describing copying timing from source A to destination B and the three object-placement modes. Preserve each quoted mode phrase exactly as it appears in the UI; explain that resnapping does not affect bookmarks.</comment>
-    <value>將譜面 A 的時間設定復制到譜面 B。
-共有三種模式，用于決定如何將物件（打擊物件/時間點/書簽）調整到新的時間設定：
-“保持物件間的拍數不變”會移動物件，使物件之間的拍數保持不變。之后還會按照指定的吸附細分值重新吸附。請確保所有物件都已吸附到網格；如果新的時間設定需要改變物件間的拍數，請勿使用此模式。
+    <value>將譜面 A 的時間設定複製到譜面 B。
+共有三種模式，用於決定如何將物件（打擊物件/時間點/書簽）調整到新的時間設定：
+“保持物件間的拍數不變”會移動物件，使物件之間的拍數保持不變。之後還會按照指定的吸附細分值重新吸附。請確保所有物件都已吸附到網格；如果新的時間設定需要改變物件間的拍數，請勿使用此模式。
 “僅重新吸附”會根據指定的吸附細分值，將物件吸附到新的時間設定。此模式不會重新吸附書簽。
 “不移動物件”則完全不移動物件。</value>
   </data>
   <data name="TimingCopier_ImportLabel" xml:space="preserve">
     <comment>Label for the source beatmap path whose timing data is copied.</comment>
-    <value>復制時間來源</value>
+    <value>複製時間來源</value>
   </data>
   <data name="TimingCopier_ImportPathTip" xml:space="preserve">
     <comment>Tooltip for the source beatmap file path, the beatmap whose timing will be copied.</comment>
-    <value>要從中復制時間設定的譜面路徑。</value>
+    <value>要從中複製時間設定的譜面路徑。</value>
   </data>
   <data name="TimingCopier_MadeBy" xml:space="preserve">
     <comment>Credit line naming the original author. Keep “OliBomby” unchanged.</comment>
@@ -5810,11 +5810,11 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <value>選擇如何將打擊物件調整到新的時間設定。</value>
   </data>
   <data name="TimingCopier_ResultMany" xml:space="preserve">
-    <value>已成功將時間設定復制到 {0} 個譜面！</value>
+    <value>已成功將時間設定複製到 {0} 個譜面！</value>
     <comment>Success notification for zero or multiple destination beatmaps. Placeholder {0} is an integer count.</comment>
   </data>
   <data name="TimingCopier_ResultOne" xml:space="preserve">
-    <value>已成功將時間設定復制到 {0} 個譜面！</value>
+    <value>已成功將時間設定複製到 {0} 個譜面！</value>
     <comment>Success notification for exactly one destination beatmap. Placeholder {0} is an integer count.</comment>
   </data>
   <data name="TimingCopier_Title" xml:space="preserve">
@@ -5831,7 +5831,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
   </data>
   <data name="TimingHelper_BeatsBetweenTip" xml:space="preserve">
     <comment>Tooltip for the target beat count between consecutive markers. A value of -1 disables this constraint. Preserve -1 literally.</comment>
-    <value>Timing Helper 會調整時間設定，使每個標記之間的拍數等于此值。輸入 -1 則不進行調整。</value>
+    <value>Timing Helper 會調整時間設定，使每個標記之間的拍數等於此值。輸入 -1 則不進行調整。</value>
   </data>
   <data name="TimingHelper_CoverBookmarks" xml:space="preserve">
     <comment>Checkbox enabling beatmap bookmarks to count as timing markers.</comment>
@@ -5869,7 +5869,7 @@ Savestates 可讓你通過快捷鍵切換偏好設定和生成器配置。使用
     <comment>Help text explaining that the tool places redlines by adjusting timing so selected markers (hit objects, bookmarks, greenlines, and redlines) land on valid beat snaps. Preserve quoted marker terminology where possible.</comment>
     <value>Timing Helper 可自動放置紅線，幫助你更快完成時間設定。你只需準確標出所有聲音的位置。
 將“標記”準確放置在聲音對應的時間上。標記可以是打擊物件、書簽、綠線或紅線。
-Timing Helper 隨后會調整 BPM 和/或添加紅線，使每個標記都能吸附到網格。</value>
+Timing Helper 隨後會調整 BPM 和/或添加紅線，使每個標記都能吸附到網格。</value>
   </data>
   <data name="TimingHelper_LeniencyLabel" xml:space="preserve">
     <comment>Label for the maximum allowed timing error. The value in parentheses is the unit, milliseconds; preserve the abbreviation “ms”.</comment>
@@ -5877,7 +5877,7 @@ Timing Helper 隨后會調整 BPM 和/或添加紅線，使每個標記都能吸
   </data>
   <data name="TimingHelper_LeniencyTip" xml:space="preserve">
     <comment>Tooltip for timing leniency, measured in milliseconds. It is the maximum permitted offset between generated timing and the markers, allowing user imprecision and more natural BPM values.</comment>
-    <value>Timing Helper 生成的時間設定與標記之間允許的最大誤差，單位為毫秒。此項可用于彌補標記時間的不準確，并獲得更自然的 BPM 值。</value>
+    <value>Timing Helper 生成的時間設定與標記之間允許的最大誤差，單位為毫秒。此項可用於彌補標記時間的不準確，並獲得更自然的 BPM 值。</value>
   </data>
   <data name="TimingHelper_OmitBarline" xml:space="preserve">
     <comment>Checkbox that omits the first barline when creating new redlines.</comment>
@@ -5936,7 +5936,7 @@ Timing Helper 隨后會調整 BPM 和/或添加紅線，使每個標記都能吸
     <comment>Label for the tumour rotation relative to the slider direction. The value is in degrees; positive values rotate the tumour around the path.</comment>
   </data>
   <data name="TumourGenerator_AngleTip" xml:space="preserve">
-    <value>腫瘤角度決定了腫瘤相對于滑條的方向。</value>
+    <value>腫瘤角度決定了腫瘤相對於滑條的方向。</value>
     <comment>Tooltip for the direction in which the tumour points relative to the slider.</comment>
   </data>
   <data name="TumourGenerator_CircleSizeTip" xml:space="preserve">
@@ -5948,11 +5948,11 @@ Timing Helper 隨后會調整 BPM 和/或添加紅線，使每個標記都能吸
     <comment>Suggested name for a duplicate tumour layer. Placeholder {0} is the existing user-defined layer name and must be preserved.</comment>
   </data>
   <data name="TumourGenerator_CopyLayer" xml:space="preserve">
-    <value>復制圖層</value>
+    <value>複製圖層</value>
     <comment>Command-bar label for duplicating the selected tumour layer.</comment>
   </data>
   <data name="TumourGenerator_CopyLayerTip" xml:space="preserve">
-    <value>復制選中的腫瘤圖層。</value>
+    <value>複製選中的腫瘤圖層。</value>
     <comment>Tooltip for duplicating the selected layer.</comment>
   </data>
   <data name="TumourGenerator_Count" xml:space="preserve">
@@ -5996,7 +5996,7 @@ Timing Helper 隨后會調整 BPM 和/或添加紅線，使每個標記都能吸
     <comment>Label for the end position, along a slider, of a tumour layer.</comment>
   </data>
   <data name="TumourGenerator_EndTip" xml:space="preserve">
-    <value>沿滑條放置腫瘤的終點。0 表示滑條頭部，1 表示滑條尾端。啟用絕對范圍后，單位為 osu! 像素。</value>
+    <value>沿滑條放置腫瘤的終點。0 表示滑條頭部，1 表示滑條尾端。啟用絕對范圍後，單位為 osu! 像素。</value>
     <comment>Tooltip for the end progression of tumour placement. The normalized range is 0 at the slider head to 1 at the tail; Absolute range changes the unit to osu! pixels.</comment>
   </data>
   <data name="TumourGenerator_FixSv" xml:space="preserve">
@@ -6004,16 +6004,16 @@ Timing Helper 隨后會調整 BPM 和/或添加紅線，使每個標記都能吸
     <comment>Checkbox label to adjust slider velocity so a slider keeps its duration after tumours are added.</comment>
   </data>
   <data name="TumourGenerator_FixSvTip" xml:space="preserve">
-    <value>添加腫瘤后自動調整 SV，以保持滑條時長不變。</value>
+    <value>添加腫瘤後自動調整 SV，以保持滑條時長不變。</value>
     <comment>Tooltip for maintaining slider duration by compensating for the added tumour path.</comment>
   </data>
   <data name="TumourGenerator_Help" xml:space="preserve">
     <comment>Help text explaining layered tumour generation on sliders, shape/size/placement controls, advanced time-varying parameters, arrow-key fine adjustment, and preview/run workflow. Preserve “Preview slider” as the button caption when translating elsewhere.</comment>
     <value>Tumour Generator 2 可在滑條上生成大量腫瘤。
-你可以調整腫瘤的形狀和大小，并選擇沿路徑放置腫瘤的位置。
-你也可以生成多個腫瘤圖層。圖層可以將腫瘤與上一圖層的腫瘤合并，或將腫瘤放置在上一圖層的腫瘤上方。
-啟用“高級”開關并點擊 ... 按鈕，可編輯參數隨時間的變化方式。使用滑塊上的方向鍵進行微調。
-要開始使用，請在譜面中選中一個滑條，然后點擊“預覽滑條”預覽更改，或點擊運行按鈕立即在所選滑條上生成腫瘤。</value>
+你可以調整腫瘤的形狀和大小，並選擇沿路徑放置腫瘤的位置。
+你也可以生成多個腫瘤圖層。圖層可以將腫瘤與上一圖層的腫瘤合並，或將腫瘤放置在上一圖層的腫瘤上方。
+啟用“高級”開關並點擊 ... 按鈕，可編輯參數隨時間的變化方式。使用滑塊上的方向鍵進行微調。
+要開始使用，請在譜面中選中一個滑條，然後點擊“預覽滑條”預覽更改，或點擊運行按鈕立即在所選滑條上生成腫瘤。</value>
   </data>
   <data name="TumourGenerator_ImportMode" xml:space="preserve">
     <value>匯入模式</value>
@@ -6100,7 +6100,7 @@ Timing Helper 隨后會調整 BPM 和/或添加紅線，使每個標記都能吸
     <comment>Checkbox label to recalculate the slider’s distances and angles before applying this layer.</comment>
   </data>
   <data name="TumourGenerator_RecalculateTip" xml:space="preserve">
-    <value>套用此圖層前，重新計算滑條距離和角度。啟用后，腫瘤會放置在前面圖層的腫瘤上方，并將它們視作滑條的一部分，而不是與其合并。</value>
+    <value>套用此圖層前，重新計算滑條距離和角度。啟用後，腫瘤會放置在前面圖層的腫瘤上方，並將它們視作滑條的一部分，而不是與其合並。</value>
     <comment>Tooltip for the layer recalculation option. It controls whether prior-layer tumours are treated as part of the path for later placement.</comment>
   </data>
   <data name="TumourGenerator_RemoveLayer" xml:space="preserve">
@@ -6172,7 +6172,7 @@ Timing Helper 隨后會調整 BPM 和/或添加紅線，使每個標記都能吸
     <comment>Label for the start position, along a slider, of a tumour layer.</comment>
   </data>
   <data name="TumourGenerator_StartTip" xml:space="preserve">
-    <value>沿滑條放置腫瘤的起點。0 表示滑條頭部，1 表示滑條尾端。啟用絕對范圍后，單位為 osu! 像素。</value>
+    <value>沿滑條放置腫瘤的起點。0 表示滑條頭部，1 表示滑條尾端。啟用絕對范圍後，單位為 osu! 像素。</value>
     <comment>Tooltip for the start progression of tumour placement. The normalized range is 0 at the slider head to 1 at the tail; Absolute range changes the unit to osu! pixels.</comment>
   </data>
   <data name="TumourGenerator_Template" xml:space="preserve">
@@ -6241,11 +6241,11 @@ Timing Helper 隨后會調整 BPM 和/或添加紅線，使每個標記都能吸
   </data>
   <data name="PatternGallery_Validation_PaddingNonNegative" xml:space="preserve">
     <comment>Validation error for Pattern Gallery padding, measured in milliseconds; padding cannot be negative.</comment>
-    <value>填充量必須大于或等于零。</value>
+    <value>填充量必須大於或等於零。</value>
   </data>
   <data name="PatternGallery_Validation_PartingDistanceNonNegative" xml:space="preserve">
     <comment>Validation error for the minimum beat gap that splits a pattern into parts; this value cannot be negative.</comment>
-    <value>分段間距必須大于或等于零。</value>
+    <value>分段間距必須大於或等於零。</value>
   </data>
   <data name="PatternGallery_Validation_PatternFileRequired" xml:space="preserve">
     <comment>Validation error shown when importing a pattern without specifying the source pattern file path.</comment>
@@ -6257,19 +6257,19 @@ Timing Helper 隨后會調整 BPM 和/或添加紅線，使每個標記都能吸
   </data>
   <data name="Sliderator_Validation_SlideratorBeatLengthRange" xml:space="preserve">
     <comment>Validation error for beat length in milliseconds; valid bounds are 0 through 10000 inclusive.</comment>
-    <value>拍長必須介于 0 和 10000 之間。</value>
+    <value>拍長必須介於 0 和 10000 之間。</value>
   </data>
   <data name="Sliderator_Validation_SlideratorBeatSnapRange" xml:space="preserve">
     <comment>Validation error for a beat snap divisor; the allowed integer range is 1 through 16 inclusive.</comment>
-    <value>拍子吸附細分值必須介于 1 和 16 之間。</value>
+    <value>拍子吸附細分值必須介於 1 和 16 之間。</value>
   </data>
   <data name="Sliderator_Validation_SlideratorBpmPositive" xml:space="preserve">
     <comment>Validation error for BPM, which must be greater than zero.</comment>
-    <value>BPM 必須大于零。</value>
+    <value>BPM 必須大於零。</value>
   </data>
   <data name="Sliderator_Validation_SlideratorGlobalSvRange" xml:space="preserve">
     <comment>Validation error for the global slider velocity multiplier; valid bounds are 0.4 through 3.6 inclusive.</comment>
-    <value>全局 SV 必須介于 0.4 和 3.6 之間。</value>
+    <value>全局 SV 必須介於 0.4 和 3.6 之間。</value>
   </data>
   <data name="Sliderator_Validation_SlideratorNewSvNonNegative" xml:space="preserve">
     <comment>Validation error for the new slider velocity value; it cannot be negative.</comment>
@@ -6277,11 +6277,11 @@ Timing Helper 隨后會調整 BPM 和/或添加紅線，使每個標記都能吸
   </data>
   <data name="Sliderator_Validation_SlideratorSvLimitNonNegative" xml:space="preserve">
     <comment>Validation error for the self-imposed slider velocity limit; it cannot be negative.</comment>
-    <value>SV 上限必須大于或等于 0。</value>
+    <value>SV 上限必須大於或等於 0。</value>
   </data>
   <data name="Sliderator_Validation_SlideratorTumourLengthRange" xml:space="preserve">
     <comment>Validation error for minimum tumour length; allowed integer values range from 1 through 12.</comment>
-    <value>最短腫瘤長度必須介于 1 和 12 之間。</value>
+    <value>最短腫瘤長度必須介於 1 和 12 之間。</value>
   </data>
   <data name="MetadataManager_Validation_SourceMaxLength" xml:space="preserve">
     <comment>Validation error when beatmap source metadata exceeds its 81-character limit.</comment>
@@ -6289,7 +6289,7 @@ Timing Helper 隨后會調整 BPM 和/或添加紅線，使每個標記都能吸
   </data>
   <data name="MetadataManager_Validation_TagsMaxLength" xml:space="preserve">
     <comment>Validation error when the Tags metadata field exceeds the 1000-character editor limit.</comment>
-    <value>標簽不得超過 1000 個字符。</value>
+    <value>標籤不得超過 1000 個字符。</value>
   </data>
   <data name="TimingHelper_Validation_TimingLeniencyNonNegative" xml:space="preserve">
     <comment>Validation error for Timing Helper leniency in milliseconds; it must be finite and non-negative.</comment>
