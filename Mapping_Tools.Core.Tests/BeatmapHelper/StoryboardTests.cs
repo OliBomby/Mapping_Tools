@@ -11,7 +11,7 @@ public class StoryboardTests
     public void DecodeAndEncode_StoryboardFixture_PreservesNormalizedContent()
     {
         // Arrange
-        const string path = "Resources\\TestStoryboard.osb";
+        string path = Path.Combine("Resources", "TestStoryboard.osb");
         string expectedContent = File.ReadAllText(path);
         var storyboard = new StoryboardDecoder().Decode(expectedContent);
 

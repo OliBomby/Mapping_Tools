@@ -185,7 +185,7 @@ public class SampleGeneratingArgs : IEquatable<SampleGeneratingArgs>
     /// <summary>Returns a string that represents the current object and can be used as a filename.</summary>
     public string GetFilename()
     {
-        string filename = System.IO.Path.GetFileNameWithoutExtension(Path);
+        string filename = System.IO.Path.GetFileNameWithoutExtension(Path.Replace('\\', '/'));
         return GetExtension().ToLower() == ".sf2"
             ? Math.Abs(Panning) < Precision.DOUBLE_EPSILON && Math.Abs(PitchShift) < Precision.DOUBLE_EPSILON
                 ? $"{filename}-{Bank}-{Patch}-{Instrument}-{Key}-{(int)Length}-{Velocity}"
