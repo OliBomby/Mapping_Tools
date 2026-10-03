@@ -54,6 +54,14 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
+      - name: Cache ReSharper analysis
+        uses: actions/cache@v4
+        with:
+          path: artifacts/resharper/cache
+          key: resharper-${{ runner.os }}-${{ github.sha }}-${{ hashFiles('.config/dotnet-tools.json', 'Mapping_Tools.slnx', 'Mapping_Tools.sln.DotSettings', '**/*.csproj', '**/*.props', '**/*.targets') }}
+          restore-keys: |
+            resharper-${{ runner.os }}-
+
       - name: Restore
         run: |
           dotnet restore Mapping_Tools.slnx
@@ -62,6 +70,10 @@ jobs:
       - name: Measure test coverage
         shell: pwsh
         run: ./tools/measure-coverage.ps1
+
+      - name: Check ReSharper warnings
+        shell: pwsh
+        run: ./.agents/skills/fix-resharper-warnings/scripts/inspect-code.ps1 -FailOnWarnings
 
       - name: Publish job summary
         if: always()
@@ -81,4 +93,5 @@ jobs:
           path: |
             coverage-report/merged
             coverage-report/*-summary.md
+            artifacts/resharper/*/warnings.sarif
           if-no-files-found: warn

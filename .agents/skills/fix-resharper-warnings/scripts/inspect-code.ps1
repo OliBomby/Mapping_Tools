@@ -1,5 +1,7 @@
 [CmdletBinding()]
-param()
+param(
+    [switch]$FailOnWarnings
+)
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../../..'))
@@ -64,8 +66,12 @@ try {
         if ($report.runs[0].invocations[0].executionSuccessful -ne $true) {
             throw "InspectCode did not finish successfully. Logs: $runDirectory"
         }
+        $findings = @($report.runs[0].results)
         Write-Output ('Completed in {0:N1}s; findings: {1}; report: {2}' -f
-            $timer.Elapsed.TotalSeconds, $report.runs[0].results.Count, $reportPath)
+            $timer.Elapsed.TotalSeconds, $findings.Count, $reportPath)
+        if ($FailOnWarnings -and $findings.Count -gt 0) {
+            throw "InspectCode reported $($findings.Count) warning(s). Report: $reportPath"
+        }
     }
     finally {
         $cacheLock.Dispose()
