@@ -41,9 +41,10 @@ jobs:
       - name: Desktop tests
         run: dotnet test Mapping_Tools.Desktop.Tests/Mapping_Tools.Desktop.Tests.csproj --configuration Release --no-build
 
-  quality-metrics:
+  code-quality:
+    name: Code quality
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 30
     permissions:
       contents: read
 
@@ -58,40 +59,18 @@ jobs:
         uses: actions/cache@v4
         with:
           path: artifacts/resharper/cache
-          key: resharper-${{ runner.os }}-${{ github.sha }}-${{ hashFiles('.config/dotnet-tools.json', 'Mapping_Tools.slnx', 'Mapping_Tools.sln.DotSettings', '**/*.csproj', '**/*.props', '**/*.targets') }}
+          key: resharper-${{ runner.os }}-${{ hashFiles('.config/dotnet-tools.json', 'Mapping_Tools.slnx', 'Mapping_Tools.sln.DotSettings', '**/*.csproj', '**/*.props', '**/*.targets') }}-${{ github.sha }}
           restore-keys: |
-            resharper-${{ runner.os }}-
-
-      - name: Restore
-        run: |
-          dotnet restore Mapping_Tools.slnx
-          dotnet tool restore
-
-      - name: Measure test coverage
-        shell: pwsh
-        run: ./tools/measure-coverage.ps1
+            resharper-${{ runner.os }}-${{ hashFiles('.config/dotnet-tools.json', 'Mapping_Tools.slnx', 'Mapping_Tools.sln.DotSettings', '**/*.csproj', '**/*.props', '**/*.targets') }}-
 
       - name: Check ReSharper warnings
         shell: pwsh
         run: ./.agents/skills/fix-resharper-warnings/scripts/inspect-code.ps1 -FailOnWarnings
 
-      - name: Publish job summary
-        if: always()
-        shell: pwsh
-        run: |
-          foreach ($file in @('coverage-report/coverage-summary.md')) {
-            if (Test-Path $file) {
-              Get-Content $file -Raw | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
-            }
-          }
-
-      - name: Upload detailed reports
+      - name: Upload ReSharper report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: quality-reports
-          path: |
-            coverage-report/merged
-            coverage-report/*-summary.md
-            artifacts/resharper/*/warnings.sarif
+          name: resharper-report
+          path: artifacts/resharper/*/warnings.sarif
           if-no-files-found: warn

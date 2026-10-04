@@ -7,7 +7,15 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../../..'))
 $manifest = Get-Content -LiteralPath (Join-Path $repoRoot '.config/dotnet-tools.json') -Raw | ConvertFrom-Json
 $toolVersion = $manifest.tools.'jetbrains.resharper.globaltools'.version
-$packageRoot = if ($env:NUGET_PACKAGES) { $env:NUGET_PACKAGES } else { Join-Path $env:USERPROFILE '.nuget/packages' }
+$packageRoot = if ($env:NUGET_PACKAGES) {
+    $env:NUGET_PACKAGES
+}
+elseif ($env:USERPROFILE) {
+    Join-Path $env:USERPROFILE '.nuget/packages'
+}
+else {
+    Join-Path $HOME '.nuget/packages'
+}
 $toolPath = Join-Path $packageRoot "jetbrains.resharper.globaltools/$toolVersion/tools/net8.0/any/inspectcode.exe"
 
 Push-Location $repoRoot
