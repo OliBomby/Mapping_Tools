@@ -41,6 +41,17 @@ try {
         $runDirectory = Join-Path $repoRoot "artifacts/resharper/$runId"
         [IO.Directory]::CreateDirectory($runDirectory) | Out-Null
         $reportPath = Join-Path $runDirectory 'warnings.sarif'
+        $logDirectory = Join-Path $runDirectory 'logs'
+        [IO.Directory]::CreateDirectory($logDirectory) | Out-Null
+        $timer = [Diagnostics.Stopwatch]::StartNew()
+
+        $buildLogPath = Join-Path $logDirectory 'build.log'
+        $buildOutput = & dotnet build Mapping_Tools.slnx --configuration Debug '--property:BaseOutputPath=bin/agent/' --verbosity:minimal 2>&1
+        $buildExitCode = $LASTEXITCODE
+        $buildOutput | Set-Content -LiteralPath $buildLogPath
+        $buildOutput | Write-Output
+        if ($buildExitCode -ne 0) { throw "Solution build failed with exit code $buildExitCode. Log: $buildLogPath" }
+
         $inspectArguments = @(
             'Mapping_Tools.slnx'
             "--output=$reportPath"
@@ -54,10 +65,9 @@ try {
             '--no-updates'
             '--verbosity=WARN'
             '--LogLevel=VERBOSE'
-            "--LogFolder=$(Join-Path $runDirectory 'logs')"
+            "--LogFolder=$logDirectory"
         )
         Write-Output "InspectCode $toolVersion / .NET $($runtime.Groups['major'].Value); cache: $cacheHome"
-        $timer = [Diagnostics.Stopwatch]::StartNew()
         & dotnet $toolPath @inspectArguments
         $inspectExitCode = $LASTEXITCODE
         $timer.Stop()
@@ -71,7 +81,7 @@ try {
         Write-Output ('Completed in {0:N1}s; findings: {1}; report: {2}' -f
             $timer.Elapsed.TotalSeconds, $findings.Count, $reportPath)
         if ($FailOnWarnings -and $findings.Count -gt 0) {
-            throw "InspectCode reported $($findings.Count) warning(s). Report: $reportPath"
+            throw "InspectCode reported $($findings.Count) finding(s). Report: $reportPath"
         }
     }
     finally {

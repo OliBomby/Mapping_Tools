@@ -20,7 +20,7 @@ The helper uses the version pinned in `.config/resharper/dotnet-tools.json`, res
 
 On this Codex Windows host, run the helper with `sandbox_permissions: require_escalated`. InspectCode also writes global JetBrains shell/shared caches outside the repository; `--caches-home` alone does not make a sandboxed run reliable. A sandbox cache-access failure is an environment failure, not a reason to discard the solution cache.
 
-The helper retains full-solution SWEA, the explicit `.DotSettings`, `BaseOutputPath=bin/agent/`, and the build required for generated code. It stores reports/logs in unique run directories, but reuses `artifacts/resharper/cache/<tool-version>-dotnet<runtime-major>` across tasks. Its file lock prevents concurrent runs from opening extra cold cache slots. If another run owns the lock, do independent work and retry after it finishes; do not create a separate cache to bypass it.
+The helper builds the solution before InspectCode so generated resource sources exist when the solution model loads. It retains full-solution SWEA, the explicit `.DotSettings`, `BaseOutputPath=bin/agent/`, and InspectCode's build. It stores reports/logs in unique run directories, but reuses `artifacts/resharper/cache/<tool-version>-dotnet<runtime-major>` across tasks. Its file lock prevents concurrent runs from opening extra cold cache slots. If another run owns the lock, do independent work and retry after it finishes; do not create a separate cache to bypass it.
 
 Keep the cache for normal source edits and warning fixes. Do not put it in a timestamped report directory or clear it after each task. The tool/runtime profile automatically separates incompatible launch environments.
 

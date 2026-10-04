@@ -72,5 +72,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: resharper-report
-          path: artifacts/resharper/*/warnings.sarif
+          path: |
+            artifacts/resharper/*/warnings.sarif
+            artifacts/resharper/*/logs/**
           if-no-files-found: warn
