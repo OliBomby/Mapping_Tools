@@ -5,23 +5,16 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../../..'))
-$manifest = Get-Content -LiteralPath (Join-Path $repoRoot '.config/dotnet-tools.json') -Raw | ConvertFrom-Json
+$toolManifest = Join-Path $repoRoot '.config/resharper/dotnet-tools.json'
+$manifest = Get-Content -LiteralPath $toolManifest -Raw | ConvertFrom-Json
 $toolVersion = $manifest.tools.'jetbrains.resharper.globaltools'.version
-$packageRoot = if ($env:NUGET_PACKAGES) {
-    $env:NUGET_PACKAGES
-}
-elseif ($env:USERPROFILE) {
-    Join-Path $env:USERPROFILE '.nuget/packages'
-}
-else {
-    Join-Path $HOME '.nuget/packages'
-}
+$packageRoot = if ($env:NUGET_PACKAGES) { $env:NUGET_PACKAGES } else { Join-Path $env:USERPROFILE '.nuget/packages' }
 $toolPath = Join-Path $packageRoot "jetbrains.resharper.globaltools/$toolVersion/tools/net8.0/any/inspectcode.exe"
 
 Push-Location $repoRoot
 try {
     if (-not (Test-Path -LiteralPath $toolPath)) {
-        & dotnet tool restore
+        & dotnet tool restore --tool-manifest $toolManifest
         if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $toolPath)) {
             throw "Could not locate the pinned InspectCode $toolVersion package."
         }

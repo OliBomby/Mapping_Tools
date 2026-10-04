@@ -43,7 +43,7 @@ jobs:
 
   code-quality:
     name: Code quality
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     timeout-minutes: 30
     permissions:
       contents: read
@@ -59,9 +59,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: artifacts/resharper/cache
-          key: resharper-${{ runner.os }}-${{ hashFiles('.config/dotnet-tools.json', 'Mapping_Tools.slnx', 'Mapping_Tools.sln.DotSettings', '**/*.csproj', '**/*.props', '**/*.targets') }}-${{ github.sha }}
+          key: resharper-${{ runner.os }}-${{ hashFiles('.config/resharper/dotnet-tools.json', 'Mapping_Tools.slnx', 'Mapping_Tools.sln.DotSettings', '**/*.csproj', '**/*.props', '**/*.targets') }}-${{ github.sha }}
           restore-keys: |
-            resharper-${{ runner.os }}-${{ hashFiles('.config/dotnet-tools.json', 'Mapping_Tools.slnx', 'Mapping_Tools.sln.DotSettings', '**/*.csproj', '**/*.props', '**/*.targets') }}-
+            resharper-${{ runner.os }}-${{ hashFiles('.config/resharper/dotnet-tools.json', 'Mapping_Tools.slnx', 'Mapping_Tools.sln.DotSettings', '**/*.csproj', '**/*.props', '**/*.targets') }}-
 
       - name: Check ReSharper warnings
         shell: pwsh

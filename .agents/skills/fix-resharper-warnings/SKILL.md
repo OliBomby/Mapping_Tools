@@ -16,7 +16,7 @@ Run the helper from the repository root:
 powershell -NoProfile -File .agents/skills/fix-resharper-warnings/scripts/inspect-code.ps1
 ```
 
-The helper uses the version pinned in `.config/dotnet-tools.json`, restores it only if its package is missing, and runs the cached executable **through `dotnet`**. On Windows, launching `inspectcode.exe` directly starts .NET Framework instead of the .NET host used by `dotnet jb`; do not use that fallback.
+The helper uses the version pinned in `.config/resharper/dotnet-tools.json`, restores only that manifest if its package is missing, and runs the cached executable **through `dotnet`**. On Windows, launching `inspectcode.exe` directly starts .NET Framework instead of the .NET host used by `dotnet jb`; do not use that fallback.
 
 On this Codex Windows host, run the helper with `sandbox_permissions: require_escalated`. InspectCode also writes global JetBrains shell/shared caches outside the repository; `--caches-home` alone does not make a sandboxed run reliable. A sandbox cache-access failure is an environment failure, not a reason to discard the solution cache.
 
