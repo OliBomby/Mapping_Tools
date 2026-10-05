@@ -7,6 +7,7 @@ using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.SliderCompletionator;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Tools.SliderCompletionator;
 
@@ -46,7 +47,7 @@ public sealed class SliderCompletionatorService : ISliderCompletionatorService
     {
         ArgumentNullException.ThrowIfNull(paths);
         Validate(options);
-        if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace)) throw new ArgumentException("Select at least one beatmap.", nameof(paths));
+        if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace)) throw new ArgumentException(ApplicationStrings.Tools_AtLeastOneBeatmapRequired, nameof(paths));
         logger.LogInformation("Started for {Count} beatmaps; selection {Mode}", paths.Count, options.ImportModeSetting);
 
         List<string> processedPaths = [];
@@ -120,7 +121,7 @@ public sealed class SliderCompletionatorService : ISliderCompletionatorService
         ArgumentNullException.ThrowIfNull(options);
         if (!Enum.IsDefined(options.ImportModeSetting))
             throw new ArgumentException(
-                "Slider Completionator contains an unknown selection mode.",
+                ApplicationStrings.SliderCompletionator_UnknownSelectionMode,
                 nameof(options));
         SliderCompletionatorEngine.Validate(options);
     }

@@ -9,6 +9,7 @@ using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Validation;
 using Mapping_Tools.Desktop.ViewModels.Dialogs;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Mapping_Tools.Desktop.Localization;
 
 namespace Mapping_Tools.Desktop.Tests.ViewModels.Dialogs;
 
@@ -196,7 +197,7 @@ public sealed class DialogAndValidationTests
         // Arrange
         ValidationAttribute validator = new InclusiveRangeAttribute<int>(1, 60)
         {
-            ErrorMessage = "Use 1 through 60.",
+            ErrorMessage = DesktopStrings.Test_InclusiveRangeMessage,
         };
 
         // Act
@@ -313,7 +314,7 @@ public sealed class DialogAndValidationTests
         var viewModel = CreateValueViewModel(
             value => (int)value! <= 60
                 ? ValidationResult.Success
-                : new ValidationResult("Use 1 through 60."),
+                : new ValidationResult(DesktopStrings.Test_InclusiveRangeMessage),
             _ => acceptCount++);
 
         // Act
@@ -327,7 +328,7 @@ public sealed class DialogAndValidationTests
             .Cast<ValidationResult>()
             .Select(result => result.ErrorMessage)
             .Should()
-            .Equal("Use 1 through 60.");
+            .Equal(DesktopStrings.Test_InclusiveRangeMessage);
         acceptCount.Should().Be(0);
     }
 

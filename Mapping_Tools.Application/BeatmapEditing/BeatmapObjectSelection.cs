@@ -1,5 +1,6 @@
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.BeatmapEditing;
 
@@ -26,7 +27,7 @@ internal static class BeatmapObjectSelection
             HitObjectSelectionMode.Bookmarked => session.Beatmap.GetBookmarkedObjects(),
             HitObjectSelectionMode.Time => session.Beatmap.QueryTimeCode(timeCode ?? string.Empty).ToList(),
             HitObjectSelectionMode.Everything => session.Beatmap.HitObjects,
-            _ => throw new ArgumentException("Unknown hit-object selection mode.", nameof(mode)),
+            _ => throw new ArgumentException(ApplicationStrings.BeatmapObjectSelection_UnknownHitObjectMode, nameof(mode)),
         };
     }
 }

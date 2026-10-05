@@ -1,4 +1,5 @@
 using Mapping_Tools.Core.HitsoundStuff;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Audio.Models;
 
@@ -10,7 +11,7 @@ public sealed class SoundFontNoteRequest
     public SoundFontNoteRequest(SampleGeneratingArgs sample)
     {
         ArgumentNullException.ThrowIfNull(sample);
-        if (!sample.UsesSoundFont) throw new ArgumentException("The sample specification must point to an .sf2 file.", nameof(sample));
+        if (!sample.UsesSoundFont) throw new ArgumentException(ApplicationStrings.SoundFontNoteRequest_SampleMustUseSf2File, nameof(sample));
 
         Sample = sample.Copy();
     }

@@ -6,6 +6,7 @@ using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.MetadataManager;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Tools.MetadataManager;
 
@@ -58,7 +59,7 @@ public sealed class MetadataManagerService : IMetadataManagerService
             .Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         if (paths.Length == 0)
             throw new ArgumentException(
-                "Select at least one target beatmap.",
+                ApplicationStrings.Tools_TargetBeatmapRequired,
                 nameof(options));
         logger.LogInformation("Export started for {Count} beatmaps", paths.Length);
 

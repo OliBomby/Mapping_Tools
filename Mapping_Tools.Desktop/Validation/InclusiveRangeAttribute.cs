@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Mapping_Tools.Desktop.Localization;
 
 namespace Mapping_Tools.Desktop.Validation;
 
@@ -21,7 +22,7 @@ public sealed class InclusiveRangeAttribute<T> : ValidationAttribute
     {
         if (minimum.CompareTo(maximum) > 0)
             throw new ArgumentException(
-                "The minimum cannot be greater than the maximum.",
+                DesktopStrings.InclusiveRange_MinimumCannotExceedMaximum,
                 nameof(minimum));
 
         Minimum = minimum;

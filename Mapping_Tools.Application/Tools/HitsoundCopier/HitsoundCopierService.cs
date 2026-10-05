@@ -10,6 +10,7 @@ using Mapping_Tools.Core.Tools.HitsoundCopier;
 using Mapping_Tools.Core.Tools.HitsoundCopier.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Tools.HitsoundCopier;
 
@@ -173,7 +174,7 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
                 .Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
                 .Length
             == 0)
-            throw new ArgumentException("Select at least one target beatmap.", nameof(options));
+            throw new ArgumentException(ApplicationStrings.Tools_TargetBeatmapRequired, nameof(options));
 
         HitsoundCopierEngine.Validate(options);
     }

@@ -1,5 +1,6 @@
 using Avalonia.Platform.Storage;
 using Mapping_Tools.Application.Platform;
+using Mapping_Tools.Desktop.Localization;
 
 namespace Mapping_Tools.Desktop.Services.Platform;
 
@@ -25,7 +26,7 @@ public sealed class AvaloniaPlatformLauncher : IPlatformLauncher
     public async Task<bool> OpenUriAsync(Uri uri, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(uri);
-        if (!uri.IsAbsoluteUri) throw new ArgumentException("The URI must be absolute.", nameof(uri));
+        if (!uri.IsAbsoluteUri) throw new ArgumentException(DesktopStrings.AvaloniaPlatformLauncher_UriMustBeAbsolute, nameof(uri));
 
         cancellationToken.ThrowIfCancellationRequested();
         bool launched = await GetLauncher().LaunchUriAsync(uri);

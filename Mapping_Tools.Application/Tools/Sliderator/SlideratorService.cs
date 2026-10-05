@@ -9,6 +9,7 @@ using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.Sliderator;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Tools.Sliderator;
 
@@ -44,7 +45,7 @@ public sealed class SlideratorService : ISlideratorService
         CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
-        if (!Enum.IsDefined(mode)) throw new ArgumentException("Sliderator contains an unknown import mode.", nameof(mode));
+        if (!Enum.IsDefined(mode)) throw new ArgumentException(ApplicationStrings.Sliderator_UnknownImportMode, nameof(mode));
 
         var preference = mode == HitObjectSelectionMode.Selected
             ? LiveBeatmapPreference.RequireLive

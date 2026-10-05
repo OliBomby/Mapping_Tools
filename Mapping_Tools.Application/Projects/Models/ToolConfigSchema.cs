@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.Projects.Contracts;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Projects.Models;
 
@@ -35,14 +36,14 @@ public sealed class ToolConfigSchema
 
         if (configuredMigrations.Any(migration => migration.ToVersion <= initial_version))
             throw new ArgumentException(
-                $"Configuration migrations must target a version greater than {initial_version}.",
+                ApplicationText.Format(ApplicationStrings.ToolConfigSchema_MigrationAfterInitialVersion, initial_version),
                 nameof(migrations));
 
         if (configuredMigrations
             .GroupBy(migration => migration.ToVersion)
             .Any(group => group.Count() > 1))
             throw new ArgumentException(
-                "Configuration migrations cannot target the same version more than once.",
+                ApplicationStrings.ToolConfigSchema_MigrationVersionsUnique,
                 nameof(migrations));
 
         int currentVersion = configuredMigrations.Count == 0
@@ -52,7 +53,7 @@ public sealed class ToolConfigSchema
             .Except(configuredMigrations.Select(migration => migration.ToVersion))
             .Any())
             throw new ArgumentException(
-                "Configuration migration target versions must be contiguous.",
+                ApplicationStrings.ToolConfigSchema_MigrationVersionsContiguous,
                 nameof(migrations));
 
         Id = id;

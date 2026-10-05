@@ -6291,4 +6291,69 @@ Timing Helper 隨後會調整 BPM 和/或添加紅線，使每個標記都能吸
     <comment>Validation error for either title metadata field when its text exceeds the osu! metadata limit of 81 characters.</comment>
     <value>標題不得超過 81 個字符。</value>
   </data>
+  <data name="ShellFeatureRegistry_DuplicateFeatureId" xml:space="preserve">
+    <value>功能 ID「{0}」已重複註冊。</value>
+    <comment>Diagnostic when desktop composition registers the same shell feature identifier more than once. Placeholder {0} is a stable feature ID and must remain unchanged.</comment>
+  </data>
+
+  <data name="DesktopStartup_UpdateFileOptionRequiresPath" xml:space="preserve">
+    <value>選項 {0} 需要檔案路徑。</value>
+    <comment>Command-line diagnostic for the desktop startup option that loads a local update package. Placeholder {0} is the literal option syntax, such as --update-file; preserve it unchanged.</comment>
+  </data>
+
+  <data name="DesktopStartup_UpdateFileOptionOnlyOnce" xml:space="preserve">
+    <value>選項 {0} 只能指定一次。</value>
+    <comment>Command-line diagnostic for duplicate use of the local update-package startup option. Placeholder {0} is the literal option syntax, such as --update-file; preserve it unchanged.</comment>
+  </data>
+
+  <data name="MessageDialogRequest_AtLeastOneChoice" xml:space="preserve">
+    <value>對話方塊至少需要一個選項。</value>
+    <comment>Invariant check for a desktop message-dialog request. A choice is a selectable dialog action such as OK or Cancel.</comment>
+  </data>
+
+  <data name="MessageDialogRequest_ExactlyOneCancelChoice" xml:space="preserve">
+    <value>對話方塊必須且只能有一個取消選項。</value>
+    <comment>Invariant check for a desktop message-dialog request. Exactly one choice must be marked as Cancel.</comment>
+  </data>
+
+  <data name="MessageDialogRequest_ExactlyOneDefaultChoice" xml:space="preserve">
+    <value>對話方塊必須且只能有一個預設選項。</value>
+    <comment>Invariant check for a desktop message-dialog request. Exactly one choice must be marked as the default action.</comment>
+  </data>
+
+  <data name="MessageDialogRequest_ChoiceLabelsCannotBeEmpty" xml:space="preserve">
+    <value>對話方塊選項標籤不可為空白。</value>
+    <comment>Invariant check for a desktop message-dialog request. Each displayed dialog action must have a non-empty label.</comment>
+  </data>
+
+  <data name="ShellFeatureRegistry_AtLeastOneFeature" xml:space="preserve">
+    <value>必須註冊至少一個 shell 功能。</value>
+    <comment>Invariant check during desktop shell startup. The shell must register at least one shell feature.</comment>
+  </data>
+
+  <data name="AvaloniaPlatformLauncher_UriMustBeAbsolute" xml:space="preserve">
+    <value>URI 必須是絕對 URI。</value>
+    <comment>Validation diagnostic when the desktop platform launcher is given a relative URI. URI is a technical identifier; keep the acronym unchanged.</comment>
+  </data>
+
+  <data name="InclusiveRange_MinimumCannotExceedMaximum" xml:space="preserve">
+    <value>最小值不可大於最大值。</value>
+    <comment>Default validation message for InclusiveRangeAttribute when its configured minimum exceeds its maximum. The minimum and maximum are the allowed value boundaries.</comment>
+  </data>
+
+  <data name="Test_ColorPickerInvalidColor" xml:space="preserve">
+    <value>「{0}」不是有效的色彩。</value>
+    <comment>Diagnostic from the desktop color-picker test driver when a test supplies invalid hexadecimal color text. Placeholder {0} is the original test input.</comment>
+  </data>
+
+  <data name="Test_HeadlessViewTimeoutMustBePositive" xml:space="preserve">
+    <value>等待逾時時間必須為正數。</value>
+    <comment>Diagnostic from the headless desktop test host when a test supplies a non-positive wait timeout. This is test-runner detail, not user-interface text.</comment>
+  </data>
+
+  <data name="Test_InclusiveRangeMessage" xml:space="preserve">
+    <value>請使用 1 到 60 之間的值。</value>
+    <comment>Validation message supplied by the InclusiveRangeAttribute test for the inclusive values 1 through 60. Preserve both numbers and their endpoints.</comment>
+  </data>
+
 </root>

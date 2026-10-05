@@ -7,6 +7,7 @@ using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.HitsoundPreviewHelper;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Tools.HitsoundPreviewHelper;
 
@@ -44,7 +45,7 @@ public sealed class HitsoundPreviewHelperService : IHitsoundPreviewHelperService
     {
         ArgumentNullException.ThrowIfNull(paths);
         Validate(options);
-        if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace)) throw new ArgumentException("Select at least one beatmap.", nameof(paths));
+        if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace)) throw new ArgumentException(ApplicationStrings.Tools_AtLeastOneBeatmapRequired, nameof(paths));
         logger.LogInformation("Started for {Count} beatmaps with {ItemCount} items", paths.Count, options.Items.Count);
 
         List<string> processedPaths = [];

@@ -300,4 +300,124 @@
     <value>Ouvrir un projet</value>
     <comment>Native Open dialog title for loading a saved tool configuration project.</comment>
   </data>
+  <data name="BeatmapObjectSelection_UnknownHitObjectMode" xml:space="preserve">
+    <value>Mode de sélection d’objets hit inconnu.</value>
+    <comment>Diagnostic raised when a beatmap-editing operation receives an unsupported hit-object selection mode. Hit objects are osu! circles, sliders, and spinners.</comment>
+  </data>
+
+  <data name="ToolConfigSchema_MigrationAfterInitialVersion" xml:space="preserve">
+    <value>Les migrations de configuration doivent cibler une version supérieure à {0}.</value>
+    <comment>Diagnostic from tool-project configuration schema validation. Placeholder {0} is the initial integer schema version; preserve the number and its meaning.</comment>
+  </data>
+
+  <data name="ToolConfigSchema_MigrationVersionsUnique" xml:space="preserve">
+    <value>Les migrations de configuration ne peuvent pas cibler plusieurs fois la même version.</value>
+    <comment>Diagnostic from tool-project configuration schema validation when two migrations target the same integer version.</comment>
+  </data>
+
+  <data name="ToolConfigSchema_MigrationVersionsContiguous" xml:space="preserve">
+    <value>Les versions cibles des migrations de configuration doivent se suivre sans interruption.</value>
+    <comment>Diagnostic from tool-project configuration schema validation. Target versions must form an uninterrupted integer sequence.</comment>
+  </data>
+
+  <data name="TumourGenerator_UnknownImportMode" xml:space="preserve">
+    <value>Tumour Generator contient un mode d’importation inconnu.</value>
+    <comment>Diagnostic from Tumour Generator when a saved or supplied import mode is not supported. Keep the tool name unchanged.</comment>
+  </data>
+
+  <data name="TumourGenerator_BeatmapPathRequired" xml:space="preserve">
+    <value>Au moins un chemin de beatmap est requis.</value>
+    <comment>Validation diagnostic from Tumour Generator when no beatmap file path is supplied. Keep beatmap as the established mapping term.</comment>
+  </data>
+
+  <data name="FilePicker_PatternRequired" xml:space="preserve">
+    <value>Au moins un motif de fichier est requis.</value>
+    <comment>Validation diagnostic for an invalid file-picker filter. A file pattern is a filename glob, not a beatmap pattern.</comment>
+  </data>
+
+  <data name="QuickRun_ToolTargetsNotDeclared" xml:space="preserve">
+    <value>La définition de l’outil ne déclare aucune cible QuickRun.</value>
+    <comment>Diagnostic when a QuickRun tool definition does not declare the selection targets it supports. Keep QuickRun unchanged.</comment>
+  </data>
+
+  <data name="QuickRun_SelectionTargetRequired" xml:space="preserve">
+    <value>Au moins une cible de sélection SmartQuickRun connue est requise.</value>
+    <comment>Validation diagnostic when SmartQuickRun has no known selection-size target for a registered command. Keep SmartQuickRun unchanged.</comment>
+  </data>
+
+  <data name="QuickRun_ExactlyOneSelectionSizeTargetRequired" xml:space="preserve">
+    <value>Une seule cible correspondant à la taille de la sélection actuelle est requise.</value>
+    <comment>Diagnostic when SmartQuickRun receives a selection target that is not exactly one supported selection-size value. Keep QuickRun unchanged.</comment>
+  </data>
+
+  <data name="BeatmapBackup_EmptySourcePath" xml:space="preserve">
+    <value>Les chemins source des sauvegardes ne peuvent pas contenir de valeur vide.</value>
+    <comment>Validation diagnostic when a beatmap backup request contains an empty source path. The path is a filesystem path.</comment>
+  </data>
+
+  <data name="Tools_AtLeastOneBeatmapRequired" xml:space="preserve">
+    <value>Sélectionnez au moins une beatmap.</value>
+    <comment>Validation diagnostic used by mapping-tool services when the operation requires at least one selected beatmap path.</comment>
+  </data>
+
+  <data name="Tools_AtLeastOneBeatmapOrStoryboardRequired" xml:space="preserve">
+    <value>Sélectionnez au moins une beatmap ou un storyboard.</value>
+    <comment>Validation diagnostic for Property Transformer when the user must select at least one beatmap or storyboard file.</comment>
+  </data>
+
+  <data name="RhythmGuide_SourceBeatmapRequired" xml:space="preserve">
+    <value>Sélectionnez au moins une beatmap source.</value>
+    <comment>Validation diagnostic for Rhythm Guide when it needs at least one source beatmap. Keep Rhythm Guide unchanged.</comment>
+  </data>
+
+  <data name="Tools_TargetBeatmapRequired" xml:space="preserve">
+    <value>Sélectionnez au moins une beatmap cible.</value>
+    <comment>Validation diagnostic for operations that write to target beatmaps. Keep target distinct from source beatmaps.</comment>
+  </data>
+
+  <data name="RhythmGuide_SourceBeatmapPathsCannotBeBlank" xml:space="preserve">
+    <value>Les chemins des beatmaps source ne peuvent pas être vides.</value>
+    <comment>Validation diagnostic for Rhythm Guide source paths. A blank path is a whitespace-only filesystem path.</comment>
+  </data>
+
+  <data name="RhythmGuide_UnknownExportMode" xml:space="preserve">
+    <value>Mode d’exportation de Rhythm Guide inconnu.</value>
+    <comment>Diagnostic for an unsupported Rhythm Guide export-mode enum value. Keep Rhythm Guide unchanged.</comment>
+  </data>
+
+  <data name="SliderCompletionator_UnknownSelectionMode" xml:space="preserve">
+    <value>Slider Completionator contient un mode de sélection inconnu.</value>
+    <comment>Diagnostic for an unsupported Slider Completionator selection-mode enum value. Keep the tool name unchanged.</comment>
+  </data>
+
+  <data name="SliderMerger_UnknownImportMode" xml:space="preserve">
+    <value>Slider Merger contient un mode d’importation inconnu.</value>
+    <comment>Diagnostic for an unsupported Slider Merger import-mode enum value. Keep the tool name unchanged.</comment>
+  </data>
+
+  <data name="Sliderator_UnknownImportMode" xml:space="preserve">
+    <value>Sliderator contient un mode d’importation inconnu.</value>
+    <comment>Diagnostic for an unsupported Sliderator import-mode enum value. Keep the tool name unchanged.</comment>
+  </data>
+
+  <data name="PatternGallery_FileMustBelongToRecordedCollection" xml:space="preserve">
+    <value>Le fichier doit appartenir à une collection enregistrée.</value>
+    <comment>Diagnostic when Pattern Gallery edits a file that is not part of the selected saved collection. A collection is a recorded set of patterns.</comment>
+  </data>
+
+  <data name="SoundFontNoteRequest_SampleMustUseSf2File" xml:space="preserve">
+    <value>La spécification de l’échantillon doit désigner un fichier .sf2.</value>
+    <comment>Diagnostic when a sound-font note request refers to a sample that is not an .sf2 SoundFont file. Preserve the extension .sf2.</comment>
+  </data>
+
+  <data name="ProjectDefinition_SingleRelativePathSegment" xml:space="preserve">
+    <value>La valeur doit être un seul segment de chemin relatif.</value>
+    <comment>Diagnostic for a tool-project path value. A path segment is one relative name, not a path containing directory separators.</comment>
+  </data>
+
+  <data name="ToolExecutionProgress_MustBeFiniteBetweenZeroAndOne" xml:space="preserve">
+    <value>La progression de l’outil doit être une valeur finie comprise entre 0 et 1.</value>
+    <comment>Diagnostic for invalid tool-execution progress. The numeric value is a fraction in the inclusive range 0–1.</comment>
+  </data>
+
 </root>

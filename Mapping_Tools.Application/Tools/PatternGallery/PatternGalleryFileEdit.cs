@@ -1,5 +1,6 @@
 using Mapping_Tools.Application.Tools.PatternGallery.Contracts;
 using Mapping_Tools.Application.Tools.PatternGallery.Models;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Tools.PatternGallery;
 
@@ -34,7 +35,7 @@ public sealed class PatternGalleryFileEdit : IDisposable
         var comparison = OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
         var collection = collections.FirstOrDefault(collection => absolutePath.StartsWith(
             Path.TrimEndingDirectorySeparator(Path.GetFullPath(collection.Paths.Collection)) + Path.DirectorySeparatorChar,
-            comparison)) ?? throw new ArgumentException("The file must belong to a recorded collection.", nameof(path));
+            comparison)) ?? throw new ArgumentException(ApplicationStrings.PatternGallery_FileMustBelongToRecordedCollection, nameof(path));
 
         string relativePath = Path.GetRelativePath(collection.Paths.Collection, absolutePath);
         if (!collection.Files.ContainsKey(relativePath))

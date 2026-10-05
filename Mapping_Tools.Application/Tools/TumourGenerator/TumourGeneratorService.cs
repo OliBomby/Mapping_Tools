@@ -11,6 +11,7 @@ using Mapping_Tools.Core.Tools.TumourGenerator;
 using Mapping_Tools.Core.Tools.TumourGenerator.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Tools.TumourGenerator;
 
@@ -46,7 +47,7 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
         CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
-        if (!Enum.IsDefined(mode)) throw new ArgumentException("Tumour Generator contains an unknown import mode.", nameof(mode));
+        if (!Enum.IsDefined(mode)) throw new ArgumentException(ApplicationStrings.TumourGenerator_UnknownImportMode, nameof(mode));
 
         var session = await editingGateway.OpenBeatmapAsync(
                 path,
@@ -73,7 +74,7 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
     {
         ArgumentNullException.ThrowIfNull(paths);
         ArgumentNullException.ThrowIfNull(project);
-        if (paths.Count == 0) throw new ArgumentException("At least one beatmap path is required.", nameof(paths));
+        if (paths.Count == 0) throw new ArgumentException(ApplicationStrings.TumourGenerator_BeatmapPathRequired, nameof(paths));
         Validate(project);
         logger.LogInformation("Started for {Count} beatmaps; selection {Mode}", paths.Count, project.ImportModeSetting);
 
@@ -156,7 +157,7 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
     {
         ArgumentNullException.ThrowIfNull(project);
         if (!Enum.IsDefined(project.ImportModeSetting))
-            throw new ArgumentException("Tumour Generator contains an unknown import mode.", nameof(project));
+            throw new ArgumentException(ApplicationStrings.TumourGenerator_UnknownImportMode, nameof(project));
         TumourGeneratorEngine.Validate(project);
     }
 }

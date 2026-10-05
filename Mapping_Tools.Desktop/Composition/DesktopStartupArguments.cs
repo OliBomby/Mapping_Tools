@@ -1,3 +1,6 @@
+using Mapping_Tools.Application.Localization;
+using Mapping_Tools.Desktop.Localization;
+
 namespace Mapping_Tools.Desktop.Composition;
 
 internal static class DesktopStartupArguments
@@ -17,7 +20,7 @@ internal static class DesktopStartupArguments
             {
                 if (++index >= arguments.Count || string.IsNullOrWhiteSpace(arguments[index]))
                     throw new ArgumentException(
-                        $"The {local_update_file_option} option requires a file path.",
+                        ApplicationText.Format(DesktopStrings.DesktopStartup_UpdateFileOptionRequiresPath, local_update_file_option),
                         nameof(arguments));
 
                 value = arguments[index];
@@ -29,14 +32,14 @@ internal static class DesktopStartupArguments
                 value = argument[(local_update_file_option.Length + 1)..];
                 if (string.IsNullOrWhiteSpace(value))
                     throw new ArgumentException(
-                        $"The {local_update_file_option} option requires a file path.",
+                        ApplicationText.Format(DesktopStrings.DesktopStartup_UpdateFileOptionRequiresPath, local_update_file_option),
                         nameof(arguments));
             }
 
             if (value is null) continue;
             if (packagePath is not null)
                 throw new ArgumentException(
-                    $"The {local_update_file_option} option may only be specified once.",
+                    ApplicationText.Format(DesktopStrings.DesktopStartup_UpdateFileOptionOnlyOnce, local_update_file_option),
                     nameof(arguments));
 
             packagePath = Path.GetFullPath(value);

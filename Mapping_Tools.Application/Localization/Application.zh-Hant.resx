@@ -300,4 +300,124 @@
     <value>打開項目</value>
     <comment>Native Open dialog title for loading a saved tool configuration project.</comment>
   </data>
+  <data name="BeatmapObjectSelection_UnknownHitObjectMode" xml:space="preserve">
+    <value>未知的打擊物件選擇模式。</value>
+    <comment>Diagnostic raised when a beatmap-editing operation receives an unsupported hit-object selection mode. Hit objects are osu! circles, sliders, and spinners.</comment>
+  </data>
+
+  <data name="ToolConfigSchema_MigrationAfterInitialVersion" xml:space="preserve">
+    <value>設定遷移的目標版本必須大於 {0}。</value>
+    <comment>Diagnostic from tool-project configuration schema validation. Placeholder {0} is the initial integer schema version; preserve the number and its meaning.</comment>
+  </data>
+
+  <data name="ToolConfigSchema_MigrationVersionsUnique" xml:space="preserve">
+    <value>設定遷移不能多次以相同版本為目標。</value>
+    <comment>Diagnostic from tool-project configuration schema validation when two migrations target the same integer version.</comment>
+  </data>
+
+  <data name="ToolConfigSchema_MigrationVersionsContiguous" xml:space="preserve">
+    <value>設定遷移的目標版本必須連續。</value>
+    <comment>Diagnostic from tool-project configuration schema validation. Target versions must form an uninterrupted integer sequence.</comment>
+  </data>
+
+  <data name="TumourGenerator_UnknownImportMode" xml:space="preserve">
+    <value>Tumour Generator 中包含未知的匯入模式。</value>
+    <comment>Diagnostic from Tumour Generator when a saved or supplied import mode is not supported. Keep the tool name unchanged.</comment>
+  </data>
+
+  <data name="TumourGenerator_BeatmapPathRequired" xml:space="preserve">
+    <value>至少需要一個譜面路徑。</value>
+    <comment>Validation diagnostic from Tumour Generator when no beatmap file path is supplied. Keep beatmap as the established mapping term.</comment>
+  </data>
+
+  <data name="FilePicker_PatternRequired" xml:space="preserve">
+    <value>至少需要一個檔案模式。</value>
+    <comment>Validation diagnostic for an invalid file-picker filter. A file pattern is a filename glob, not a beatmap pattern.</comment>
+  </data>
+
+  <data name="QuickRun_ToolTargetsNotDeclared" xml:space="preserve">
+    <value>工具定義未宣告 QuickRun 目標。</value>
+    <comment>Diagnostic when a QuickRun tool definition does not declare the selection targets it supports. Keep QuickRun unchanged.</comment>
+  </data>
+
+  <data name="QuickRun_SelectionTargetRequired" xml:space="preserve">
+    <value>至少需要一個已知的 SmartQuickRun 選取目標。</value>
+    <comment>Validation diagnostic when SmartQuickRun has no known selection-size target for a registered command. Keep SmartQuickRun unchanged.</comment>
+  </data>
+
+  <data name="QuickRun_ExactlyOneSelectionSizeTargetRequired" xml:space="preserve">
+    <value>目前選取大小必須且只能對應一個目標。</value>
+    <comment>Diagnostic when SmartQuickRun receives a selection target that is not exactly one supported selection-size value. Keep QuickRun unchanged.</comment>
+  </data>
+
+  <data name="BeatmapBackup_EmptySourcePath" xml:space="preserve">
+    <value>備份來源路徑不可包含空值。</value>
+    <comment>Validation diagnostic when a beatmap backup request contains an empty source path. The path is a filesystem path.</comment>
+  </data>
+
+  <data name="Tools_AtLeastOneBeatmapRequired" xml:space="preserve">
+    <value>請至少選擇一個譜面。</value>
+    <comment>Validation diagnostic used by mapping-tool services when the operation requires at least one selected beatmap path.</comment>
+  </data>
+
+  <data name="Tools_AtLeastOneBeatmapOrStoryboardRequired" xml:space="preserve">
+    <value>請至少選擇一個譜面或故事板。</value>
+    <comment>Validation diagnostic for Property Transformer when the user must select at least one beatmap or storyboard file.</comment>
+  </data>
+
+  <data name="RhythmGuide_SourceBeatmapRequired" xml:space="preserve">
+    <value>請至少選擇一個來源譜面。</value>
+    <comment>Validation diagnostic for Rhythm Guide when it needs at least one source beatmap. Keep Rhythm Guide unchanged.</comment>
+  </data>
+
+  <data name="Tools_TargetBeatmapRequired" xml:space="preserve">
+    <value>請至少選擇一個目標譜面。</value>
+    <comment>Validation diagnostic for operations that write to target beatmaps. Keep target distinct from source beatmaps.</comment>
+  </data>
+
+  <data name="RhythmGuide_SourceBeatmapPathsCannotBeBlank" xml:space="preserve">
+    <value>來源譜面路徑不可為空白。</value>
+    <comment>Validation diagnostic for Rhythm Guide source paths. A blank path is a whitespace-only filesystem path.</comment>
+  </data>
+
+  <data name="RhythmGuide_UnknownExportMode" xml:space="preserve">
+    <value>未知的 Rhythm Guide 匯出模式。</value>
+    <comment>Diagnostic for an unsupported Rhythm Guide export-mode enum value. Keep Rhythm Guide unchanged.</comment>
+  </data>
+
+  <data name="SliderCompletionator_UnknownSelectionMode" xml:space="preserve">
+    <value>Slider Completionator 中包含未知的選取模式。</value>
+    <comment>Diagnostic for an unsupported Slider Completionator selection-mode enum value. Keep the tool name unchanged.</comment>
+  </data>
+
+  <data name="SliderMerger_UnknownImportMode" xml:space="preserve">
+    <value>Slider Merger 中包含未知的匯入模式。</value>
+    <comment>Diagnostic for an unsupported Slider Merger import-mode enum value. Keep the tool name unchanged.</comment>
+  </data>
+
+  <data name="Sliderator_UnknownImportMode" xml:space="preserve">
+    <value>Sliderator 中包含未知的匯入模式。</value>
+    <comment>Diagnostic for an unsupported Sliderator import-mode enum value. Keep the tool name unchanged.</comment>
+  </data>
+
+  <data name="PatternGallery_FileMustBelongToRecordedCollection" xml:space="preserve">
+    <value>該檔案必須屬於已記錄的集合。</value>
+    <comment>Diagnostic when Pattern Gallery edits a file that is not part of the selected saved collection. A collection is a recorded set of patterns.</comment>
+  </data>
+
+  <data name="SoundFontNoteRequest_SampleMustUseSf2File" xml:space="preserve">
+    <value>取樣規格必須指向 .sf2 檔案。</value>
+    <comment>Diagnostic when a sound-font note request refers to a sample that is not an .sf2 SoundFont file. Preserve the extension .sf2.</comment>
+  </data>
+
+  <data name="ProjectDefinition_SingleRelativePathSegment" xml:space="preserve">
+    <value>此值必須是單一相對路徑區段。</value>
+    <comment>Diagnostic for a tool-project path value. A path segment is one relative name, not a path containing directory separators.</comment>
+  </data>
+
+  <data name="ToolExecutionProgress_MustBeFiniteBetweenZeroAndOne" xml:space="preserve">
+    <value>工具進度必須是 0 到 1 之間的有限值。</value>
+    <comment>Diagnostic for invalid tool-execution progress. The numeric value is a fraction in the inclusive range 0–1.</comment>
+  </data>
+
 </root>

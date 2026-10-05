@@ -10,6 +10,7 @@ using Mapping_Tools.Core.Tools.RhythmGuide;
 using Mapping_Tools.Core.Tools.RhythmGuide.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Tools.RhythmGuide;
 
@@ -135,10 +136,10 @@ public sealed class RhythmGuideService : IRhythmGuideService
     private static void Validate(RhythmGuideServiceOptions.RhythmGuideRunOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
-        if (options.Paths is null || options.Paths.Length == 0) throw new ArgumentException("Select at least one source beatmap.", nameof(options));
-        if (options.Paths.Any(string.IsNullOrWhiteSpace)) throw new ArgumentException("Source beatmap paths cannot be blank.", nameof(options));
+        if (options.Paths is null || options.Paths.Length == 0) throw new ArgumentException(ApplicationStrings.RhythmGuide_SourceBeatmapRequired, nameof(options));
+        if (options.Paths.Any(string.IsNullOrWhiteSpace)) throw new ArgumentException(ApplicationStrings.RhythmGuide_SourceBeatmapPathsCannotBeBlank, nameof(options));
         ArgumentException.ThrowIfNullOrWhiteSpace(options.ExportPath);
-        if (!Enum.IsDefined(options.ExportMode)) throw new ArgumentException("Unknown Rhythm Guide export mode.", nameof(options));
+        if (!Enum.IsDefined(options.ExportMode)) throw new ArgumentException(ApplicationStrings.RhythmGuide_UnknownExportMode, nameof(options));
         RhythmGuideGenerator.Validate(options);
     }
 }

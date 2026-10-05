@@ -1,3 +1,5 @@
+using Mapping_Tools.Desktop.Localization;
+
 namespace Mapping_Tools.Desktop.Services.Dialogs;
 
 /// <summary>
@@ -28,13 +30,13 @@ public sealed class MessageDialogRequest<TResult>
         ArgumentException.ThrowIfNullOrWhiteSpace(title);
         ArgumentException.ThrowIfNullOrWhiteSpace(message);
         ArgumentNullException.ThrowIfNull(choices);
-        if (choices.Count == 0) throw new ArgumentException("A dialog requires at least one choice.", nameof(choices));
+        if (choices.Count == 0) throw new ArgumentException(DesktopStrings.MessageDialogRequest_AtLeastOneChoice, nameof(choices));
 
-        if (choices.Any(choice => string.IsNullOrWhiteSpace(choice.Label))) throw new ArgumentException("Dialog choice labels cannot be empty.", nameof(choices));
+        if (choices.Any(choice => string.IsNullOrWhiteSpace(choice.Label))) throw new ArgumentException(DesktopStrings.MessageDialogRequest_ChoiceLabelsCannotBeEmpty, nameof(choices));
 
-        if (choices.Count(choice => choice.IsDefault) != 1) throw new ArgumentException("A dialog requires exactly one default choice.", nameof(choices));
+        if (choices.Count(choice => choice.IsDefault) != 1) throw new ArgumentException(DesktopStrings.MessageDialogRequest_ExactlyOneDefaultChoice, nameof(choices));
 
-        if (choices.Count(choice => choice.IsCancel) != 1) throw new ArgumentException("A dialog requires exactly one cancel choice.", nameof(choices));
+        if (choices.Count(choice => choice.IsCancel) != 1) throw new ArgumentException(DesktopStrings.MessageDialogRequest_ExactlyOneCancelChoice, nameof(choices));
 
         Title = title;
         Message = message;

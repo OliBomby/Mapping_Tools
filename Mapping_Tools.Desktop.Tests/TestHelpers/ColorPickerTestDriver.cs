@@ -4,6 +4,8 @@ using Avalonia.Headless;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.VisualTree;
+using Mapping_Tools.Application.Localization;
+using Mapping_Tools.Desktop.Localization;
 
 namespace Mapping_Tools.Desktop.Tests.TestHelpers;
 
@@ -22,7 +24,7 @@ internal static class ColorPickerTestDriver
         }
         catch (FormatException exception)
         {
-            throw new ArgumentException($"'{hexColor}' is not a valid color.", nameof(hexColor), exception);
+            throw new ArgumentException(ApplicationText.Format(DesktopStrings.Test_ColorPickerInvalidColor, hexColor), nameof(hexColor), exception);
         }
 
         host.Click(picker, new Point(picker.Bounds.Width - 8, picker.Bounds.Height / 2));

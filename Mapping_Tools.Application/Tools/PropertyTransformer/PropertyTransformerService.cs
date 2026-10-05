@@ -6,6 +6,7 @@ using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.PropertyTransformer;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Tools.PropertyTransformer;
 
@@ -47,7 +48,7 @@ public sealed class PropertyTransformerService : IPropertyTransformerService
         ArgumentNullException.ThrowIfNull(options);
         if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace))
             throw new ArgumentException(
-                "Select at least one beatmap or storyboard.",
+                ApplicationStrings.Tools_AtLeastOneBeatmapOrStoryboardRequired,
                 nameof(paths));
         PropertyTransformerEngine.Validate(options);
         logger.LogInformation("Started for {Count} documents", paths.Count);

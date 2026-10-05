@@ -1,3 +1,5 @@
+using Mapping_Tools.Application.Localization;
+
 namespace Mapping_Tools.Application.Platform.FilePicker;
 
 /// <summary>
@@ -24,7 +26,7 @@ public sealed class FilePickerFilter
         ArgumentNullException.ThrowIfNull(patterns);
 
         string[] patternArray = CleanValues(patterns);
-        if (patternArray.Length == 0) throw new ArgumentException("At least one file pattern is required.", nameof(patterns));
+        if (patternArray.Length == 0) throw new ArgumentException(ApplicationStrings.FilePicker_PatternRequired, nameof(patterns));
 
         Name = name.Trim();
         Patterns = patternArray;

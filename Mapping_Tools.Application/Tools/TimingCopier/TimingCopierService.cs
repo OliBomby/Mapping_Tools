@@ -4,6 +4,7 @@ using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.TimingCopier;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Tools.TimingCopier;
 
@@ -39,7 +40,7 @@ public sealed class TimingCopierService : ITimingCopierService
             .Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         if (targetPaths.Length == 0)
             throw new ArgumentException(
-                "Select at least one target beatmap.",
+                ApplicationStrings.Tools_TargetBeatmapRequired,
                 nameof(options));
         logger.LogInformation("Started from {SourcePath} for {TargetCount} targets", options.ImportPath, targetPaths.Length);
 

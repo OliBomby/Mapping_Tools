@@ -6291,4 +6291,69 @@ Pour commencer, sélectionnez un slider dans votre beatmap et cliquez sur « Pr�
     <comment>Validation error for either title metadata field when its text exceeds the osu! metadata limit of 81 characters.</comment>
     <value>Les titres ne peuvent pas dépasser 81 caractères.</value>
   </data>
+  <data name="ShellFeatureRegistry_DuplicateFeatureId" xml:space="preserve">
+    <value>L’identifiant de fonctionnalité « {0} » est enregistré plusieurs fois.</value>
+    <comment>Diagnostic when desktop composition registers the same shell feature identifier more than once. Placeholder {0} is a stable feature ID and must remain unchanged.</comment>
+  </data>
+
+  <data name="DesktopStartup_UpdateFileOptionRequiresPath" xml:space="preserve">
+    <value>L’option {0} nécessite un chemin de fichier.</value>
+    <comment>Command-line diagnostic for the desktop startup option that loads a local update package. Placeholder {0} is the literal option syntax, such as --update-file; preserve it unchanged.</comment>
+  </data>
+
+  <data name="DesktopStartup_UpdateFileOptionOnlyOnce" xml:space="preserve">
+    <value>L’option {0} ne peut être indiquée qu’une seule fois.</value>
+    <comment>Command-line diagnostic for duplicate use of the local update-package startup option. Placeholder {0} is the literal option syntax, such as --update-file; preserve it unchanged.</comment>
+  </data>
+
+  <data name="MessageDialogRequest_AtLeastOneChoice" xml:space="preserve">
+    <value>Une boîte de dialogue doit proposer au moins un choix.</value>
+    <comment>Invariant check for a desktop message-dialog request. A choice is a selectable dialog action such as OK or Cancel.</comment>
+  </data>
+
+  <data name="MessageDialogRequest_ExactlyOneCancelChoice" xml:space="preserve">
+    <value>Une boîte de dialogue doit proposer exactement un choix d’annulation.</value>
+    <comment>Invariant check for a desktop message-dialog request. Exactly one choice must be marked as Cancel.</comment>
+  </data>
+
+  <data name="MessageDialogRequest_ExactlyOneDefaultChoice" xml:space="preserve">
+    <value>Une boîte de dialogue doit proposer exactement un choix par défaut.</value>
+    <comment>Invariant check for a desktop message-dialog request. Exactly one choice must be marked as the default action.</comment>
+  </data>
+
+  <data name="MessageDialogRequest_ChoiceLabelsCannotBeEmpty" xml:space="preserve">
+    <value>Les libellés des choix ne peuvent pas être vides.</value>
+    <comment>Invariant check for a desktop message-dialog request. Each displayed dialog action must have a non-empty label.</comment>
+  </data>
+
+  <data name="ShellFeatureRegistry_AtLeastOneFeature" xml:space="preserve">
+    <value>Au moins une fonctionnalité du shell doit être enregistrée.</value>
+    <comment>Invariant check during desktop shell startup. The shell must register at least one shell feature.</comment>
+  </data>
+
+  <data name="AvaloniaPlatformLauncher_UriMustBeAbsolute" xml:space="preserve">
+    <value>L’URI doit être absolue.</value>
+    <comment>Validation diagnostic when the desktop platform launcher is given a relative URI. URI is a technical identifier; keep the acronym unchanged.</comment>
+  </data>
+
+  <data name="InclusiveRange_MinimumCannotExceedMaximum" xml:space="preserve">
+    <value>Le minimum ne peut pas être supérieur au maximum.</value>
+    <comment>Default validation message for InclusiveRangeAttribute when its configured minimum exceeds its maximum. The minimum and maximum are the allowed value boundaries.</comment>
+  </data>
+
+  <data name="Test_ColorPickerInvalidColor" xml:space="preserve">
+    <value>« {0} » n’est pas une couleur valide.</value>
+    <comment>Diagnostic from the desktop color-picker test driver when a test supplies invalid hexadecimal color text. Placeholder {0} is the original test input.</comment>
+  </data>
+
+  <data name="Test_HeadlessViewTimeoutMustBePositive" xml:space="preserve">
+    <value>Le délai d’attente doit être positif.</value>
+    <comment>Diagnostic from the headless desktop test host when a test supplies a non-positive wait timeout. This is test-runner detail, not user-interface text.</comment>
+  </data>
+
+  <data name="Test_InclusiveRangeMessage" xml:space="preserve">
+    <value>Utilisez une valeur de 1 à 60.</value>
+    <comment>Validation message supplied by the InclusiveRangeAttribute test for the inclusive values 1 through 60. Preserve both numbers and their endpoints.</comment>
+  </data>
+
 </root>

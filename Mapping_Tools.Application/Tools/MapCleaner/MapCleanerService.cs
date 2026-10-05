@@ -8,6 +8,7 @@ using Mapping_Tools.Core.Tools.MapCleaner;
 using Mapping_Tools.Core.Tools.MapCleaner.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Tools.MapCleaner;
 
@@ -50,7 +51,7 @@ public sealed class MapCleanerService : IMapCleanerService
     {
         ArgumentNullException.ThrowIfNull(paths);
         ArgumentNullException.ThrowIfNull(options);
-        if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace)) throw new ArgumentException("Select at least one beatmap.", nameof(paths));
+        if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace)) throw new ArgumentException(ApplicationStrings.Tools_AtLeastOneBeatmapRequired, nameof(paths));
         MapCleanerEngine.Validate(options);
         logger.LogInformation("Started for {Count} beatmaps; analyze samples {AnalyzeSamples}; remove unused samples {RemoveUnusedSamples}",
             paths.Count, options.AnalyzeSamples, options.RemoveUnusedSamples);

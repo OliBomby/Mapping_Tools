@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.Tools;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.QuickRun.Models;
 
@@ -23,7 +24,7 @@ public sealed class QuickRunCommand
             definition.DisplayName,
             definition.QuickRunTargets
             ?? throw new ArgumentException(
-                "The tool definition does not declare QuickRun targets.",
+                ApplicationStrings.QuickRun_ToolTargetsNotDeclared,
                 nameof(definition)),
             execute)
     {
@@ -49,7 +50,7 @@ public sealed class QuickRunCommand
             throw new ArgumentOutOfRangeException(
                 nameof(targets),
                 targets,
-                "At least one known Smart QuickRun selection target is required.");
+                ApplicationStrings.QuickRun_SelectionTargetRequired);
 
         Id = id;
         DisplayName = displayName;

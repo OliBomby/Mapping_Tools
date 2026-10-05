@@ -10,6 +10,7 @@ using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Backups;
 
@@ -271,7 +272,7 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
             reason, paths.Length, string.Join(" | ", paths), force);
         if (paths.Any(string.IsNullOrWhiteSpace))
             throw new ArgumentException(
-                "Backup source paths cannot contain an empty value.",
+                ApplicationStrings.BeatmapBackup_EmptySourcePath,
                 nameof(sourcePaths));
 
         cancellationToken.ThrowIfCancellationRequested();

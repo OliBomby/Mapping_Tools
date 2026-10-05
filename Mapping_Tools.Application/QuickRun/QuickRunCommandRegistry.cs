@@ -1,5 +1,6 @@
 using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.QuickRun.Models;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.QuickRun;
 
@@ -96,7 +97,7 @@ public sealed class QuickRunCommandRegistry : IQuickRunCommandRegistry
             throw new ArgumentOutOfRangeException(
                 nameof(target),
                 target,
-                "Exactly one live selection-size target is required.");
+                ApplicationStrings.QuickRun_ExactlyOneSelectionSizeTargetRequired);
 
         lock (gate)
         {

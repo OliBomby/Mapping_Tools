@@ -1,3 +1,5 @@
+using Mapping_Tools.Application.Localization;
+
 namespace Mapping_Tools.Application.Projects.Models;
 
 /// <summary>
@@ -91,7 +93,7 @@ public sealed class ProjectDefinition<TProject>
                 [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar])
             >= 0)
             throw new ArgumentException(
-                "The value must be a single relative path segment.",
+                ApplicationStrings.ProjectDefinition_SingleRelativePathSegment,
                 parameterName);
 
         return value;

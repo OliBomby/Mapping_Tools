@@ -7,6 +7,7 @@ using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.SliderMerger;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Tools.SliderMerger;
 
@@ -41,7 +42,7 @@ public sealed class SliderMergerService : ISliderMergerService
     {
         ArgumentNullException.ThrowIfNull(paths);
         Validate(options);
-        if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace)) throw new ArgumentException("Select at least one beatmap.", nameof(paths));
+        if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace)) throw new ArgumentException(ApplicationStrings.Tools_AtLeastOneBeatmapRequired, nameof(paths));
         logger.LogInformation("Started for {Count} beatmaps; selection {Mode}", paths.Count, options.ImportModeSetting);
 
         List<string> processedPaths = [];
@@ -94,7 +95,7 @@ public sealed class SliderMergerService : ISliderMergerService
     {
         ArgumentNullException.ThrowIfNull(options);
         if (!Enum.IsDefined(options.ImportModeSetting))
-            throw new ArgumentException("Slider Merger contains an unknown import mode.", nameof(options));
+            throw new ArgumentException(ApplicationStrings.SliderMerger_UnknownImportMode, nameof(options));
         SliderMergerEngine.Validate(options);
     }
 }

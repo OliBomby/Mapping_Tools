@@ -5,6 +5,7 @@ using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using System.Diagnostics;
+using Mapping_Tools.Desktop.Localization;
 
 namespace Mapping_Tools.Desktop.Tests.TestHelpers;
 
@@ -126,7 +127,7 @@ internal sealed class HeadlessViewHost : IDisposable
         ArgumentNullException.ThrowIfNull(completed);
         TimeSpan maximumWait = timeout ?? TimeSpan.FromSeconds(5);
         if (maximumWait <= TimeSpan.Zero)
-            throw new ArgumentOutOfRangeException(nameof(timeout), "The wait timeout must be positive.");
+            throw new ArgumentOutOfRangeException(nameof(timeout), DesktopStrings.Test_HeadlessViewTimeoutMustBePositive);
 
         Stopwatch elapsed = Stopwatch.StartNew();
         while (true)
@@ -145,7 +146,7 @@ internal sealed class HeadlessViewHost : IDisposable
         ArgumentNullException.ThrowIfNull(completed);
         TimeSpan maximumWait = timeout ?? TimeSpan.FromSeconds(5);
         if (maximumWait <= TimeSpan.Zero)
-            throw new ArgumentOutOfRangeException(nameof(timeout), "The wait timeout must be positive.");
+            throw new ArgumentOutOfRangeException(nameof(timeout), DesktopStrings.Test_HeadlessViewTimeoutMustBePositive);
 
         CancellationTokenSource cancellation = new(maximumWait);
         DispatcherTimer timer = new(DispatcherPriority.Background)

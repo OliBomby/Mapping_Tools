@@ -6,6 +6,7 @@ using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.TimingHelper;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Tools.TimingHelper;
 
@@ -46,7 +47,7 @@ public sealed class TimingHelperService : ITimingHelperService
     {
         ArgumentNullException.ThrowIfNull(paths);
         ArgumentNullException.ThrowIfNull(options);
-        if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace)) throw new ArgumentException("Select at least one beatmap.", nameof(paths));
+        if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace)) throw new ArgumentException(ApplicationStrings.Tools_AtLeastOneBeatmapRequired, nameof(paths));
         TimingHelperEngine.Validate(options);
         logger.LogInformation("Started for {Count} beatmaps", paths.Count);
 

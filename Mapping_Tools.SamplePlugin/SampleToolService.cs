@@ -3,6 +3,7 @@ using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.SamplePlugin;
 
@@ -37,7 +38,7 @@ public sealed class SampleToolService
         ArgumentNullException.ThrowIfNull(paths);
         ArgumentException.ThrowIfNullOrWhiteSpace(tag);
         if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace))
-            throw new ArgumentException("Select at least one beatmap.", nameof(paths));
+            throw new ArgumentException(ApplicationStrings.Tools_AtLeastOneBeatmapRequired, nameof(paths));
 
         int changedCount = 0;
         for (int index = 0; index < paths.Count; index++)

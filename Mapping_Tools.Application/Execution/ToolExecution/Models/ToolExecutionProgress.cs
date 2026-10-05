@@ -1,3 +1,5 @@
+using Mapping_Tools.Application.Localization;
+
 namespace Mapping_Tools.Application.Execution.ToolExecution.Models;
 
 /// <summary>
@@ -17,7 +19,7 @@ public sealed record ToolExecutionProgress
             throw new ArgumentOutOfRangeException(
                 nameof(progress),
                 progress,
-                "Tool progress must be a finite value from 0 through 1.");
+                ApplicationStrings.ToolExecutionProgress_MustBeFiniteBetweenZeroAndOne);
 
         Progress = progress;
         Stage = string.IsNullOrWhiteSpace(stage) ? null : stage;

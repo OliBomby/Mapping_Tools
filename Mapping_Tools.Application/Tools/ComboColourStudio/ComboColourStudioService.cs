@@ -7,6 +7,7 @@ using Mapping_Tools.Core.Tools.ComboColourStudio;
 using Mapping_Tools.Core.Tools.ComboColourStudio.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Mapping_Tools.Application.Localization;
 
 namespace Mapping_Tools.Application.Tools.ComboColourStudio;
 
@@ -73,7 +74,7 @@ public sealed class ComboColourStudioService : IComboColourStudioService
     {
         ArgumentNullException.ThrowIfNull(paths);
         ArgumentNullException.ThrowIfNull(project);
-        if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace)) throw new ArgumentException("Select at least one beatmap.", nameof(paths));
+        if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace)) throw new ArgumentException(ApplicationStrings.Tools_AtLeastOneBeatmapRequired, nameof(paths));
         ComboColourStudioEngine.Validate(project);
         logger.LogInformation("Started for {Count} beatmaps", paths.Count);
 

@@ -1,3 +1,6 @@
+using Mapping_Tools.Application.Localization;
+using Mapping_Tools.Desktop.Localization;
+
 namespace Mapping_Tools.Desktop.Shell;
 
 /// <summary>
@@ -19,10 +22,10 @@ public sealed class ShellFeatureRegistry : IShellFeatureRegistry
         foreach (var feature in Features)
             if (!byId.TryAdd(feature.Id, feature))
                 throw new ArgumentException(
-                    $"Feature id '{feature.Id}' is registered more than once.",
+                    ApplicationText.Format(DesktopStrings.ShellFeatureRegistry_DuplicateFeatureId, feature.Id),
                     nameof(features));
 
-        if (Features.Count == 0) throw new ArgumentException("At least one shell feature must be registered.", nameof(features));
+        if (Features.Count == 0) throw new ArgumentException(DesktopStrings.ShellFeatureRegistry_AtLeastOneFeature, nameof(features));
     }
 
     /// <inheritdoc />
