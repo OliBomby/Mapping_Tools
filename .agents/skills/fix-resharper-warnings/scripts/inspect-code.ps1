@@ -26,7 +26,10 @@ try {
     $runtime = [regex]::Match(($toolInfo -join "`n"), '\.NET (?<major>\d+)\.')
     if (-not $runtime.Success) { throw "Unexpected InspectCode runtime: $toolInfo" }
 
-    $cacheHome = Join-Path $repoRoot "artifacts/resharper/cache/$toolVersion-dotnet$($runtime.Groups['major'].Value)"
+    $sdkVersion = (& dotnet --version).Trim()
+    if ($LASTEXITCODE -ne 0 -or -not $sdkVersion) { throw 'Could not determine the active .NET SDK version.' }
+
+    $cacheHome = Join-Path $repoRoot "artifacts/resharper/cache/$toolVersion-dotnet$($runtime.Groups['major'].Value)-sdk$sdkVersion"
     [IO.Directory]::CreateDirectory($cacheHome) | Out-Null
     try {
         $cacheLock = [IO.File]::Open((Join-Path $cacheHome 'analysis.lock'),
@@ -67,7 +70,7 @@ try {
             '--LogLevel=VERBOSE'
             "--LogFolder=$logDirectory"
         )
-        Write-Output "InspectCode $toolVersion / .NET $($runtime.Groups['major'].Value); cache: $cacheHome"
+        Write-Output "InspectCode $toolVersion / .NET $($runtime.Groups['major'].Value), SDK $sdkVersion; cache: $cacheHome"
         & dotnet $toolPath @inspectArguments
         $inspectExitCode = $LASTEXITCODE
         $timer.Stop()
