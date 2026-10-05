@@ -43,7 +43,7 @@ jobs:
 
   code-quality:
     name: Code quality
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
       contents: read
@@ -57,9 +57,9 @@ jobs:
 
       - name: Resolve .NET SDK version
         id: dotnet-sdk
-        shell: pwsh
+        shell: bash
         run: |
-          "version=$(dotnet --version)" >> $env:GITHUB_OUTPUT
+          echo "version=$(dotnet --version)" >> "$GITHUB_OUTPUT"
 
       - name: Cache ReSharper analysis
         uses: actions/cache@v5

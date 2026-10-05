@@ -8,12 +8,14 @@ $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../../..'))
 $toolManifest = Join-Path $repoRoot '.config/resharper/dotnet-tools.json'
 $manifest = Get-Content -LiteralPath $toolManifest -Raw | ConvertFrom-Json
 $toolVersion = $manifest.tools.'jetbrains.resharper.globaltools'.version
-$packageRoot = if ($env:NUGET_PACKAGES) { $env:NUGET_PACKAGES } else { Join-Path $env:USERPROFILE '.nuget/packages' }
+$isWindows = $env:OS -eq 'Windows_NT'
+$userProfile = [Environment]::GetFolderPath([Environment+SpecialFolder]::UserProfile)
+$packageRoot = if ($env:NUGET_PACKAGES) { $env:NUGET_PACKAGES } else { Join-Path $userProfile '.nuget/packages' }
 $toolPath = Join-Path $packageRoot "jetbrains.resharper.globaltools/$toolVersion/tools/net8.0/any/inspectcode.exe"
 
 Push-Location $repoRoot
 try {
-    if (-not (Test-Path -LiteralPath $toolPath)) {
+    if (-not $isWindows -or -not (Test-Path -LiteralPath $toolPath)) {
         & dotnet tool restore --tool-manifest $toolManifest
         if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $toolPath)) {
             throw "Could not locate the pinned InspectCode $toolVersion package."
@@ -21,7 +23,12 @@ try {
     }
 
     # The same executable starts .NET Framework when launched without dotnet.
-    $toolInfo = & dotnet $toolPath --version
+    $toolInfo = if ($isWindows) {
+        & dotnet $toolPath --version
+    }
+    else {
+        & dotnet jb inspectcode --version
+    }
     if ($LASTEXITCODE -ne 0) { throw 'Could not start InspectCode through dotnet.' }
     $runtime = [regex]::Match(($toolInfo -join "`n"), '\.NET (?<major>\d+)\.')
     if (-not $runtime.Success) { throw "Unexpected InspectCode runtime: $toolInfo" }
@@ -50,10 +57,13 @@ try {
 
         $buildLogPath = Join-Path $logDirectory 'build.log'
         # Match InspectCode's .NET 10 Windows build host so it does not regenerate resource designers differently.
-        $vswherePath = Join-Path ([Environment]::GetFolderPath('ProgramFilesX86')) 'Microsoft Visual Studio/Installer/vswhere.exe'
-        $msbuildPath = if (Test-Path -LiteralPath $vswherePath) {
-            & $vswherePath -latest -products '*' -version '[18.0,)' -requires Microsoft.Component.MSBuild -find 'MSBuild\Current\Bin\amd64\MSBuild.exe' |
-                Select-Object -First 1
+        $msbuildPath = $null
+        if ($isWindows) {
+            $vswherePath = Join-Path ([Environment]::GetFolderPath('ProgramFilesX86')) 'Microsoft Visual Studio/Installer/vswhere.exe'
+            if (Test-Path -LiteralPath $vswherePath) {
+                $msbuildPath = & $vswherePath -latest -products '*' -version '[18.0,)' -requires Microsoft.Component.MSBuild -find 'MSBuild\Current\Bin\amd64\MSBuild.exe' |
+                    Select-Object -First 1
+            }
         }
 
         if ($msbuildPath -and (Test-Path -LiteralPath $msbuildPath)) {
@@ -87,7 +97,12 @@ try {
             "--LogFolder=$logDirectory"
         )
         Write-Output "InspectCode $toolVersion / .NET $($runtime.Groups['major'].Value), SDK $sdkVersion; cache: $cacheHome"
-        & dotnet $toolPath @inspectArguments
+        if ($isWindows) {
+            & dotnet $toolPath @inspectArguments
+        }
+        else {
+            & dotnet jb inspectcode @inspectArguments
+        }
         $inspectExitCode = $LASTEXITCODE
         $timer.Stop()
         if ($inspectExitCode -ne 0) { throw "InspectCode failed with exit code $inspectExitCode. Logs: $runDirectory" }
