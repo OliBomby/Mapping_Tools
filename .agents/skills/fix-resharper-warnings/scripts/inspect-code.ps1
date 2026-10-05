@@ -49,9 +49,25 @@ try {
         $timer = [Diagnostics.Stopwatch]::StartNew()
 
         $buildLogPath = Join-Path $logDirectory 'build.log'
-        $buildOutput = & dotnet build Mapping_Tools.slnx --configuration Debug '--property:BaseOutputPath=bin/agent/' --verbosity:minimal 2>&1
+        # Match InspectCode's .NET 10 Windows build host so it does not regenerate resource designers differently.
+        $vswherePath = Join-Path ([Environment]::GetFolderPath('ProgramFilesX86')) 'Microsoft Visual Studio/Installer/vswhere.exe'
+        $msbuildPath = if (Test-Path -LiteralPath $vswherePath) {
+            & $vswherePath -latest -products '*' -version '[18.0,)' -requires Microsoft.Component.MSBuild -find 'MSBuild\Current\Bin\amd64\MSBuild.exe' |
+                Select-Object -First 1
+        }
+
+        if ($msbuildPath -and (Test-Path -LiteralPath $msbuildPath)) {
+            $buildOutput = & $msbuildPath Mapping_Tools.slnx /restore /t:Build '/property:Configuration=Debug' '/property:BaseOutputPath=bin/agent/' /verbosity:minimal /nologo 2>&1
+            $buildCommand = "Prebuild with Visual Studio MSBuild: $msbuildPath"
+        }
+        else {
+            $buildOutput = & dotnet build Mapping_Tools.slnx --configuration Debug '--property:BaseOutputPath=bin/agent/' --verbosity:minimal 2>&1
+            $buildCommand = 'Prebuild with dotnet MSBuild'
+        }
+
         $buildExitCode = $LASTEXITCODE
-        $buildOutput | Set-Content -LiteralPath $buildLogPath
+        @($buildCommand) + @($buildOutput) | Set-Content -LiteralPath $buildLogPath
+        Write-Output $buildCommand
         $buildOutput | Write-Output
         if ($buildExitCode -ne 0) { throw "Solution build failed with exit code $buildExitCode. Log: $buildLogPath" }
 
