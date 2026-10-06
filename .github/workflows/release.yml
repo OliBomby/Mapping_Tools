@@ -210,7 +210,7 @@ jobs:
         run: |
           set -euo pipefail
           rm -rf "$APP_DIR"
-          mkdir -p "$APP_DIR/Contents/MacOS"
+          mkdir -p "$APP_DIR/Contents/MacOS" "$APP_DIR/Contents/Resources"
           cp -R "$PUBLISH_DIR"/. "$APP_DIR/Contents/MacOS/"
           chmod +x "$APP_DIR/Contents/MacOS/Mapping Tools"
           cat > "$APP_DIR/Contents/Info.plist" <<EOF
