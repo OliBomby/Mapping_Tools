@@ -50,7 +50,7 @@ jobs:
     env:
       RID: ${{ matrix.rid }}
       CHANNEL: ${{ matrix.rid }}
-      PACK_ID: MappingTools-${{ matrix.rid }}
+      PACK_ID: MappingTools
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
