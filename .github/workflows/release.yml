@@ -251,7 +251,7 @@ jobs:
         if: startsWith(matrix.rid, 'osx-')
         shell: bash
         env:
-          RCODESIGN_VERSION: '0.29.0'
+          APPLE_CODESIGN_VERSION: '0.29.0'
         run: |
           set -euo pipefail
           case "$(uname -m)" in
@@ -260,8 +260,8 @@ jobs:
             *) echo "No rcodesign build for $(uname -m)" >&2; exit 1 ;;
           esac
 
-          name="apple-codesign-${RCODESIGN_VERSION}-${target}"
-          base="https://github.com/indygreg/apple-platform-rs/releases/download/apple-codesign%2F${RCODESIGN_VERSION}"
+          name="apple-codesign-${APPLE_CODESIGN_VERSION}-${target}"
+          base="https://github.com/indygreg/apple-platform-rs/releases/download/apple-codesign%2F${APPLE_CODESIGN_VERSION}"
           archive="$RUNNER_TEMP/rcodesign.tar.gz"
           checksum="$RUNNER_TEMP/rcodesign.tar.gz.sha256"
           install_directory="$RUNNER_TEMP/$name"
@@ -400,7 +400,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tar -C "$ARTIFACT_DIR" -cf "$RUNNER_TEMP/velopack-$RID.tar" .
+          artifact_directory="$ARTIFACT_DIR"
+          archive_path="$RUNNER_TEMP/velopack-$RID.tar"
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            artifact_directory="$(cygpath --unix "$artifact_directory")"
+            archive_path="$(cygpath --unix "$archive_path")"
+          fi
+          tar -C "$artifact_directory" -cf "$archive_path" .
 
       - name: Upload Velopack artifact
         uses: actions/upload-artifact@v6
