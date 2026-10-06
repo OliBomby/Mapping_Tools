@@ -31,7 +31,7 @@ try {
                 $appImage = Join-Path $directory "MappingTools-$rid.AppImage"
                 New-FixtureFile $appImage
                 if (-not $IsWindows) {
-                    & chmod +x -- $appImage
+                    & chmod +x $appImage
                     if ($LASTEXITCODE -ne 0) {
                         throw "Could not mark Linux AppImage fixture executable: $appImage"
                     }
