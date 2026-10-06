@@ -158,9 +158,17 @@ jobs:
             throw "The pinned vpk executable was not found at $commandPath"
           }
 
-          $reportedVersion = (& $commandPath --version | Out-String).Trim()
-          if ($LASTEXITCODE -ne 0 -or $reportedVersion -notmatch [regex]::Escape($env:VPK_VERSION)) {
-            throw "vpk reported '$reportedVersion' instead of version $env:VPK_VERSION"
+          $toolList = (& dotnet tool list --tool-path $toolDirectory vpk | Out-String)
+          if ($LASTEXITCODE -ne 0) {
+            throw "Could not inspect the installed vpk tool: $toolList"
+          }
+
+          if ($toolList -notmatch '(?m)^\s*vpk\s+(\S+)\s+') {
+            throw "The vpk tool was not listed among tools installed at $toolDirectory."
+          }
+          $installedVersion = $Matches[1]
+          if ($installedVersion -ne $env:VPK_VERSION) {
+            throw "Installed vpk version '$installedVersion' does not match the pinned version $env:VPK_VERSION."
           }
 
           "VPK_COMMAND=$commandPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
