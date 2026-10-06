@@ -52,14 +52,24 @@ jobs:
       CHANNEL: ${{ matrix.rid }}
       PACK_ID: MappingTools-${{ matrix.rid }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      PUBLISH_DIR: ${{ runner.temp }}/mapping-tools-publish
-      RELEASE_DIR: ${{ runner.temp }}/mapping-tools-velopack
-      ARTIFACT_DIR: ${{ runner.temp }}/mapping-tools-velopack-artifact
-      APP_DIR: ${{ runner.temp }}/Mapping Tools.app
 
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+
+      - name: Configure package directories
+        shell: pwsh
+        run: |
+          $paths = @{
+            PUBLISH_DIR = Join-Path $env:RUNNER_TEMP 'mapping-tools-publish'
+            RELEASE_DIR = Join-Path $env:RUNNER_TEMP 'mapping-tools-velopack'
+            ARTIFACT_DIR = Join-Path $env:RUNNER_TEMP 'mapping-tools-velopack-artifact'
+            APP_DIR = Join-Path $env:RUNNER_TEMP 'Mapping Tools.app'
+          }
+
+          foreach ($name in $paths.Keys) {
+            "$name=$($paths[$name])" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          }
 
       - name: Determine package version
         env:
