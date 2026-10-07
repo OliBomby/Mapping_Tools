@@ -53,6 +53,28 @@ public class BeatmapTests
     }
 
     [DataTestMethod]
+    [DataRow("aspire-2608566-wangleline-doinkus.osu")]
+    [DataRow("aspire-2608542-frums-19zz.osu")]
+    [DataRow("aspire-2607762-billiummoto-amethyst-aurora.osu")]
+    [DataRow("aspire-2608578-camellia-fm-synthesis-experiment.osu")]
+    public void DecodeAndEncode_AspireFixture_PreservesNormalizedDocument(string filename)
+    {
+        // Arrange
+        string resourceDirectory = Path.Combine(AppContext.BaseDirectory, "Resources");
+        string fixturePath = Path.Combine(resourceDirectory, filename);
+        string[] expectedLines = File.ReadAllLines(fixturePath);
+
+        // Act
+        var beatmap = new BeatmapDecoder().Decode(File.ReadAllText(fixturePath));
+        string actual = new BeatmapEncoder().Encode(beatmap);
+        string[] actualLines = actual.TrimEnd('\r', '\n').Split("\r\n");
+
+        // Assert
+        actualLines.Should().Equal(expectedLines);
+        actual.Replace("\r\n", "").Should().NotContain("\n");
+    }
+
+    [DataTestMethod]
     [DataRow("catch.osu", 2)]
     [DataRow("mania.osu", 3)]
     [DataRow("taiko.osu", 1)]

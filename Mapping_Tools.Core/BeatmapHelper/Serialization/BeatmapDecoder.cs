@@ -27,10 +27,7 @@ public sealed class BeatmapDecoder : IBeatmapDecoder
         // The source header determines version-specific slider syntax and numeric precision.
         beatmap.Version = TryParseInt(lines[0][17..].Trim(), out int version) ? version : 14;
 
-        // Normalize beatmaps older than the oldest format this parser supports.
-        if (beatmap.Version < 14)
-            beatmap.Version = 14;
-
+        // Preserve the declared version so encoding keeps the source format.
         // Collect each section before building the objects that depend on it.
         var generalLines = GetCategoryLines(lines, "[General]");
         var editorLines = GetCategoryLines(lines, "[Editor]");

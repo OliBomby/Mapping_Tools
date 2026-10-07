@@ -1,0 +1,204 @@
+osu file format v14
+
+[General]
+AudioFilename: audio.mp3
+AudioLeadIn: 0
+PreviewTime: -1
+Countdown: 0
+SampleSet: Soft
+StackLeniency: 0.7
+Mode: 3
+LetterboxInBreaks: 0
+SpecialStyle: 0
+WidescreenStoryboard: 1
+
+[Editor]
+Bookmarks: 312,17176,26257,35338,39878,44419,48959,53500,72310,91769,110580,113822,118362,122903,127443,131984,141065,146254,151443,156632,173497,175443
+DistanceSpacing: 1.5
+BeatDivisor: 4
+GridSize: 4
+TimelineZoom: 1.5
+
+[Metadata]
+Title:Amethyst Aurora
+TitleUnicode:Amethyst Aurora
+Artist:BilliumMoto
+ArtistUnicode:BilliumMoto
+Creator:DraterTD
+Version:Brilliance Maestro
+Source:
+Tags:aspire 6 aspire6 fa featured artist owc2023gfnm5 grandfinals grand finals electronic instrumental intensity owc 2023 gf nm5 funtime original
+BeatmapID:5896293
+BeatmapSetID:2607762
+
+[Difficulty]
+HPDrainRate:5
+CircleSize:4
+OverallDifficulty:5
+ApproachRate:5
+SliderMultiplier:1.4
+SliderTickRate:1
+
+[Events]
+//Background and Video events
+0,0,"background.jpg",0,0
+//Break Periods
+2,514,175702
+//Storyboard Layer 0 (Background)
+//Storyboard Layer 1 (Fail)
+//Storyboard Layer 2 (Pass)
+//Storyboard Layer 3 (Foreground)
+//Storyboard Layer 4 (Overlay)
+//Storyboard Sound Samples
+Sample,39878,0,"cymbalshort.wav",100
+Sample,44257,0,"kick.wav",100
+Sample,48959,0,"cymbalshort.wav",100
+Sample,74337,0,"kick.wav",100
+Sample,75553,0,"kick.wav",100
+Sample,76283,0,"kick.wav",100
+Sample,77337,0,"Pluto_G6.ogg",100
+Sample,79526,0,"kick.wav",100
+Sample,80742,0,"kick.wav",100
+Sample,82364,0,"Pluto_C7Short.ogg",100
+Sample,82364,0,"snare.wav",100
+Sample,82418,0,"Pluto_C7Short.ogg",100
+Sample,82472,0,"Pluto_C7Short.ogg",100
+Sample,82526,0,"Pluto_C7Short.ogg",100
+Sample,82580,0,"Pluto_C7Short.ogg",100
+Sample,82634,0,"Pluto_C7Short.ogg",100
+Sample,84715,0,"kick.wav",100
+Sample,85931,0,"kick.wav",100
+Sample,86661,0,"kick.wav",100
+Sample,87715,0,"Pluto_G6.ogg",100
+Sample,89337,0,"kick.wav",100
+Sample,89418,0,"kick.wav",100
+Sample,89661,0,"kick.wav",100
+Sample,118362,0,"cymbalshort.wav",100
+Sample,122740,0,"kick.wav",100
+Sample,127443,0,"cymbalshort.wav",100
+Sample,131335,0,"kick.wav",100
+Sample,135227,0,"click.wav",100
+Sample,135308,0,"click.wav",100
+Sample,135389,0,"click.wav",100
+Sample,135470,0,"click.wav",100
+Sample,139767,0,"click.wav",100
+Sample,139849,0,"click.wav",100
+Sample,139930,0,"click.wav",100
+Sample,140011,0,"click.wav",100
+Sample,151605,0,"Pluto_B6.ogg",100
+Sample,151767,0,"Pluto_E6.ogg",100
+Sample,152254,0,"Pluto_B6.ogg",100
+Sample,152416,0,"Pluto_B6.ogg",100
+Sample,152740,0,"Pluto_D6.ogg",100
+Sample,153065,0,"Pluto_B6.ogg",100
+Sample,153227,0,"Pluto_B6.ogg",100
+Sample,153389,0,"Pluto_E6.ogg",100
+Sample,153551,0,"Pluto_D6.ogg",100
+Sample,153875,0,"Pluto_B6.ogg",100
+Sample,154200,0,"Pluto_B6.ogg",100
+Sample,154362,0,"Pluto_E6.ogg",100
+Sample,154524,0,"Pluto_D6.ogg",100
+Sample,154848,0,"Pluto_B6.ogg",100
+Sample,155010,0,"Pluto_B6.ogg",100
+Sample,155173,0,"Pluto_E6.ogg",100
+Sample,155335,0,"Pluto_D6.ogg",100
+Sample,155497,0,"Pluto_B5.ogg",100
+Sample,155659,0,"Pluto_D6.ogg",100
+Sample,155821,0,"Pluto_B5.ogg",100
+Sample,155983,0,"Pluto_D6.ogg",100
+Sample,156146,0,"Pluto_F#6.ogg",100
+Sample,156308,0,"Pluto_E6.ogg",100
+Sample,156389,0,"snare.wav",50
+Sample,156470,0,"Pluto_G6.ogg",100
+Sample,156470,0,"snare.wav",50
+Sample,156510,0,"snare.wav",50
+Sample,156551,0,"snare.wav",50
+Sample,158659,0,"kick.wav",100
+Sample,159875,0,"kick.wav",100
+Sample,160686,0,"kick.wav",100
+Sample,161010,0,"kick.wav",100
+Sample,161335,0,"kick.wav",100
+Sample,161497,0,"snare.wav",100
+Sample,161497,0,"Pluto_C7Short.ogg",100
+Sample,161551,0,"Pluto_C7Short.ogg",100
+Sample,161605,0,"Pluto_C7Short.ogg",100
+Sample,161659,0,"Pluto_C7Short.ogg",100
+Sample,161713,0,"Pluto_C7Short.ogg",100
+Sample,161767,0,"Pluto_C7Short.ogg",100
+Sample,162146,0,"Zakrium_C7.ogg",100
+Sample,162308,0,"Zakrium_B6.ogg",100
+Sample,162956,0,"Zakrium_C7.ogg",100
+Sample,163767,0,"Zakrium_C7.ogg",100
+Sample,163848,0,"kick.wav",100
+Sample,163929,0,"Zakrium_B6.ogg",100
+Sample,164740,0,"Pluto_E6.ogg",100
+Sample,165064,0,"kick.wav",100
+Sample,165794,0,"kick.wav",100
+Sample,165875,0,"Zakrium_G6.ogg",100
+Sample,166200,0,"Zakrium_G6.ogg",100
+Sample,166524,0,"Zakrium_D7.ogg",100
+Sample,166848,0,"Zakrium_E7.ogg",100
+Sample,166848,0,"Pluto_G6.ogg",100
+Sample,167335,0,"Zakrium_C7.ogg",100
+Sample,167497,0,"Zakrium_B6.ogg",100
+Sample,168146,0,"Zakrium_C7.ogg",100
+Sample,168956,0,"Pluto_E6.ogg",100
+Sample,169037,0,"kick.wav",100
+Sample,169119,0,"Pluto_D6.ogg",100
+Sample,169929,0,"Zakrium_C7.ogg",100
+Sample,170254,0,"kick.wav",100
+Sample,170902,0,"Zakrium_B6.ogg",100
+Sample,171875,0,"Pluto_C7Short.ogg",100
+Sample,171875,0,"Zakrium_A7Short.ogg",100
+Sample,171875,0,"snare.wav",100
+Sample,171929,0,"Zakrium_A7Short.ogg",100
+Sample,171929,0,"Pluto_C7Short.ogg",100
+Sample,171983,0,"Zakrium_A7Short.ogg",100
+Sample,171983,0,"Pluto_C7Short.ogg",100
+Sample,172037,0,"Zakrium_A7Short.ogg",100
+Sample,172037,0,"Pluto_C7Short.ogg",100
+Sample,172092,0,"Zakrium_A7Short.ogg",100
+Sample,172092,0,"Pluto_C7Short.ogg",100
+Sample,172146,0,"Zakrium_A7Short.ogg",100
+Sample,172146,0,"Pluto_C7Short.ogg",100
+Sample,172200,0,"Zakrium_B7.ogg",100
+Sample,172362,0,"Zakrium_B7.ogg",100
+Sample,172524,0,"Zakrium_E7.ogg",100
+Sample,172686,0,"Zakrium_D7.ogg",100
+Sample,173010,0,"Zakrium_B7.ogg",100
+Sample,173173,0,"Zakrium_B7.ogg",100
+Sample,173335,0,"Zakrium_E7.ogg",100
+Sample,175442,0,"Pluto_D6Short.ogg",100
+Sample,175442,0,"Zakrium_D7Short.ogg",100
+Sample,175497,0,"Zakrium_D7Short.ogg",100
+Sample,175551,0,"Zakrium_D7Short.ogg",100
+Sample,175605,0,"Zakrium_D7Short.ogg",100
+Sample,175659,0,"Zakrium_D7Short.ogg",100
+Sample,175713,0,"Zakrium_D7Short.ogg",100
+Sample,175767,0,"Zakrium_D7Short.ogg",100
+Sample,175821,0,"Zakrium_D7Short.ogg",100
+Sample,175875,0,"Zakrium_D7Short.ogg",100
+Sample,175929,0,"Zakrium_D7Short.ogg",100
+Sample,175983,0,"Zakrium_D7Short.ogg",100
+Sample,176037,0,"Zakrium_D7Short.ogg",100
+Sample,176091,0,"Zakrium_D7Short.ogg",100
+Sample,176145,0,"Zakrium_D7Short.ogg",100
+Sample,176199,0,"Zakrium_D7Short.ogg",100
+Sample,176253,0,"Zakrium_D7Short.ogg",100
+Sample,176307,0,"Zakrium_D7Short.ogg",100
+Sample,176361,0,"Zakrium_D7Short.ogg",100
+
+[TimingPoints]
+-248769.081081081,81.0810810810811,12,2,1,20,1,0
+-1200,-153.846153846154,1,2,1,20,0,8
+318,0.00390625,1,2,1,20,1,8
+17501,600000000,9999,2,1,80,1,8
+176903,81.0810810810811,9999,2,1,80,1,8
+
+
+[HitObjects]
+192,192,636,5,0,0:0:0:0:
+448,192,53500,128,0,54473:0:0:0:100:kick.wav
+448,192,123551,1,0,0:0:0:100:Lead_G5toA5Glide_1-8.ogg
+64,192,177870,128,0,447000:0:0:0:0:
+64,192,177870,128,0,150748:0:0:0:0:

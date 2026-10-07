@@ -39,6 +39,19 @@ public class TimingTests
     }
 
     [TestMethod]
+    public void TimingPoint_InfinityGlyph_ThrowsParsingException()
+    {
+        // Arrange
+        const string line = "1000,∞,4,2,3,75,1,0";
+
+        // Act
+        Action act = () => BeatmapTestData.DecodeTimingPoint(line);
+
+        // Assert
+        act.Should().Throw<BeatmapParsingException>();
+    }
+
+    [TestMethod]
     public void Timing_SortsAndResnapsAgainstActiveRedline()
     {
         // Arrange
