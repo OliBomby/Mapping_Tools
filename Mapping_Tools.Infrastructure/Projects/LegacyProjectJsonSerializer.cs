@@ -417,6 +417,22 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
 
         public Type BindToType(string? assemblyName, string typeName)
         {
+            const string snapping_tools_prefix = "Mapping_Tools.Classes.Tools.SnappingTools.";
+            if (IsLegacyAssembly(assemblyName) && typeName.StartsWith(snapping_tools_prefix, StringComparison.Ordinal))
+            {
+                // Snapping Tools preceded the Geometry Dashboard rename. Route
+                // nested settings and dictionary keys through the same aliases.
+                string suffix = typeName[snapping_tools_prefix.Length..] switch
+                {
+                    "Serialization.SnappingToolsProject" => "Serialization.GeometryDashboardEngineOptions",
+                    "Serialization.SnappingToolsEngineOptions" => "Serialization.GeometryDashboardEngineOptions",
+                    "Serialization.SnappingToolsPreferences" => "Serialization.GeometryDashboardPreferences",
+                    "Serialization.SnappingToolsSaveSlot" => "Serialization.GeometryDashboardSaveSlot",
+                    var name => name,
+                };
+                typeName = "Mapping_Tools.Classes.Tools.GeometryDashboard." + suffix;
+            }
+
             if (typeName.StartsWith("System.Collections.Generic.Dictionary`2", StringComparison.Ordinal)
                 && typeName.Contains("RelevantObjectPreferences", StringComparison.Ordinal))
                 return typeof(Dictionary<string, RelevantObjectPreferences>);

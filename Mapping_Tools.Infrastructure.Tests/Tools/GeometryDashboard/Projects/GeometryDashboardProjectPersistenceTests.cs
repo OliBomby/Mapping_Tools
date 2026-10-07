@@ -13,6 +13,51 @@ namespace Mapping_Tools.Infrastructure.Tests.Tools.GeometryDashboard.Projects;
 public sealed class GeometryDashboardProjectPersistenceTests
 {
     [TestMethod]
+    public void Deserialize_SnappingToolsAutosave_PreservesPreferencesAndGeneratorSettings()
+    {
+        // Arrange
+        string fixture = Path.Combine(AppContext.BaseDirectory, "Fixtures", "Projects", "snappingtoolsproject.json");
+        LegacyProjectJsonSerializer serializer = new();
+
+        // Act
+        var project = serializer.Deserialize<GeometryDashboardEngineOptions>(File.ReadAllText(fixture));
+
+        // Assert
+        project.CurrentPreferences.InceptionLevel.Should().Be(5);
+        project.CurrentPreferences.AcceptableDifference.Should().Be(2);
+        project.CurrentPreferences.RelevantObjectPreferences.Should().HaveCount(3);
+        project.CurrentPreferences.RelevantObjectPreferences[RelevantPoint.PreferencesNameStatic].Color
+            .Should().Be(RgbaColour.FromArgb(255, 0, 255, 255));
+        project.CurrentPreferences.GeneratorSettings.Should().ContainKey(typeof(AnchorPointGenerator));
+        project.CurrentPreferences.GeneratorSettings[typeof(SymmetryGenerator)]
+            .Should().BeOfType<SymmetryGeneratorSettings>();
+        project.CurrentPreferences.SnapHotkey!.Key.Should().Be(56);
+        project.SaveSlots.Should().BeEmpty();
+    }
+
+    [TestMethod]
+    [DataRow("SnappingToolsProject")]
+    [DataRow("SnappingToolsEngineOptions")]
+    public void Deserialize_SnappingToolsProjectWithSaveSlots_PreservesSavedPreferences(string projectTypeName)
+    {
+        // Arrange
+        string fixture = Path.Combine(AppContext.BaseDirectory, "Fixtures", "Projects", "geometrydashboardproject.json");
+        string json = File.ReadAllText(fixture)
+            .Replace("GeometryDashboard", "SnappingTools", StringComparison.Ordinal)
+            .Replace("Serialization.SnappingToolsEngineOptions", $"Serialization.{projectTypeName}", StringComparison.Ordinal);
+        LegacyProjectJsonSerializer serializer = new();
+
+        // Act
+        var project = serializer.Deserialize<GeometryDashboardEngineOptions>(json);
+
+        // Assert
+        project.SaveSlots.Should().ContainSingle(slot => slot.Name == "Save 1");
+        project.SaveSlots.Single(slot => slot.Name == "Save 1").Preferences.GeneratorSettings
+            .Should().ContainKey(typeof(SymmetryGenerator));
+        project.CurrentPreferences.UpdateMode.Should().Be(UpdateMode.HotkeyDown);
+    }
+
+    [TestMethod]
     public void DeserializeAndSerialize_LegacyGeometryDashboardProject_PreservesSettingsAndTypeNames()
     {
         // Arrange
