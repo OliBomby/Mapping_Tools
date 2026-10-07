@@ -484,6 +484,13 @@ public sealed partial class MainViewModel : LocalizedObservableObject, IDisposab
         message.AppendLine("pizzafanboy");
         message.AppendLine("ZEduards");
         message.AppendLine("Dcs");
+        message.AppendLine("Omekyu");
+        message.AppendLine("downpour");
+        message.AppendLine("ZyMaa");
+        message.AppendLine("phazzi");
+        message.AppendLine("JeffFuchsional");
+        message.AppendLine("onlyatroller");
+        message.AppendLine("GreatMCGamer");
         message.AppendLine();
         message.AppendLine(DesktopStrings.Shell_Contributors);
         message.AppendLine("Potoofu");
