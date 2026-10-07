@@ -4,6 +4,7 @@ using Mapping_Tools.Application.Settings.Contracts;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.Settings.Models;
 using Mapping_Tools.Infrastructure.Files;
+using Mapping_Tools.Infrastructure.Migration;
 using Mapping_Tools.Infrastructure.Settings;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -37,7 +38,7 @@ public sealed class SettingsServiceTests
     }
 
     [TestMethod]
-    public void Load_WithLegacySettings_DoesNotWritePreferencesOrChangeConfiguration()
+    public void Load_WithLegacySettings_DoesNotChangeConfiguration()
     {
         // Arrange
         using var test = TestDirectory.FromFixture("legacy-config.json");
@@ -50,13 +51,12 @@ public sealed class SettingsServiceTests
         // Assert
         settings.RecentMaps.Should().HaveCount(20);
         settings.MainWindowRestoreBounds.Should().Be(new WindowBounds(440, 256, 1407, 855));
-        File.Exists(test.Directories.PreferencesFile).Should().BeFalse();
         File.ReadAllText(test.Directories.ConfigurationFile).Should().Be(legacyJson);
         File.Exists(test.Directories.ConfigurationFile + ".bak").Should().BeFalse();
     }
 
     [TestMethod]
-    public void Load_WithVersionedConfigurationInLegacyLocation_DoesNotWritePreferences()
+    public void Load_WithVersionedConfiguration_RewritesCanonicalConfiguration()
     {
         // Arrange
         using var test = TestDirectory.Empty();
@@ -70,7 +70,26 @@ public sealed class SettingsServiceTests
         _ = store.Load();
 
         // Assert
-        File.Exists(test.Directories.PreferencesFile).Should().BeFalse();
+        using JsonDocument document = JsonDocument.Parse(File.ReadAllText(test.Directories.ConfigurationFile));
+        document.RootElement.GetProperty("$version").GetInt32().Should().Be(2);
+    }
+
+    [TestMethod]
+    public void Exists_WithPreferencesFileOnly_ReturnsFalse()
+    {
+        // Arrange
+        using var test = TestDirectory.Empty();
+        test.Directories.EnsureCreated();
+        File.WriteAllText(
+            Path.Combine(test.Directories.ApplicationData, "preferences.json"),
+            "{\"$schema\":\"mapping-tools.settings\",\"$version\":1}");
+        JsonSettingsStore store = new(test.Directories);
+
+        // Act
+        bool exists = store.Exists;
+
+        // Assert
+        exists.Should().BeFalse();
     }
 
     [TestMethod]
@@ -88,13 +107,13 @@ public sealed class SettingsServiceTests
     }
 
     [TestMethod]
-    public void Load_WithFutureVersion_ThrowsWithoutWritingLegacyConfiguration()
+    public void Load_WithFutureVersion_ThrowsWithoutChangingConfiguration()
     {
         // Arrange
         using var test = TestDirectory.Empty();
         test.Directories.EnsureCreated();
         File.WriteAllText(
-            test.Directories.PreferencesFile,
+            test.Directories.ConfigurationFile,
             "{\"$schema\":\"mapping-tools.settings\",\"$version\":99}");
         JsonSettingsStore store = new(test.Directories);
 
@@ -103,9 +122,42 @@ public sealed class SettingsServiceTests
 
         // Assert
         act.Should().Throw<JsonException>();
-        File.ReadAllText(test.Directories.PreferencesFile)
+        File.ReadAllText(test.Directories.ConfigurationFile)
             .Should().Be("{\"$schema\":\"mapping-tools.settings\",\"$version\":99}");
-        File.Exists(test.Directories.ConfigurationFile).Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void LoadOrCreate_WhenLegacyConfigurationExists_MigratesBeforeCreatingCurrentSettings()
+    {
+        // Arrange
+        using var test = TestDirectory.Empty();
+        ApplicationDirectories directories = new(
+            Path.Combine(test.Root, "Roaming"),
+            legacyApplicationDataRoot: Path.Combine(test.Root, "Local"));
+        directories.EnsureCreated();
+        Directory.CreateDirectory(directories.LegacyApplicationData);
+        File.Copy(
+            Path.Combine(AppContext.BaseDirectory, "Fixtures", "Settings", "legacy-config.json"),
+            Path.Combine(directories.LegacyApplicationData, "config.json"));
+        JsonSettingsStore store = new(directories, typeof(TestApplicationSettings));
+        SettingsPathService paths = new(directories, new FakeSettingsPathEnvironment());
+        ApplicationDataMigrationService migrationService = new(directories);
+        SettingsService service = new(
+            store,
+            paths,
+            static () => new TestApplicationSettings(),
+            migrationService);
+
+        // Act
+        SettingsLoadResult result = service.LoadOrCreate();
+
+        // Assert
+        result.WasCreated.Should().BeFalse();
+        ((TestApplicationSettings)result.Settings).FavoriteTools.Should().HaveCount(7);
+        result.Settings.RecentMaps.Should().HaveCount(20);
+        migrationService.LastMigrationResult.Should().NotBeNull();
+        File.Exists(directories.ConfigurationFile).Should().BeTrue();
+        File.Exists(Path.Combine(directories.LegacyApplicationData, "config.json")).Should().BeTrue();
     }
 
     [TestMethod]
@@ -128,6 +180,7 @@ public sealed class SettingsServiceTests
         result.Settings.BackupsPath.Should().Be(Path.Combine(test.Directories.ApplicationData, "Backups"));
         result.Settings.SongsPath.Should().Be(Path.Combine(result.Settings.OsuPath, "Custom Songs"));
         environment.CreatedDirectories.Contains(result.Settings.BackupsPath).Should().BeTrue();
+        File.Exists(test.Directories.ConfigurationFile).Should().BeTrue();
 
         var persistedDefaults = store.Load();
         persistedDefaults.OsuPath.Should().Be("");

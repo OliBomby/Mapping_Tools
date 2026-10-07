@@ -20,7 +20,6 @@ using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.QuickRun.Models;
-using Mapping_Tools.Application.Settings.Contracts;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.Settings.Models;
 using Mapping_Tools.Application.Workspace.Models;
@@ -1179,26 +1178,23 @@ public sealed class DesktopShellTests
     }
 
     [TestMethod]
-    public async Task MainViewModel_InitializeAsync_WithLegacyData_CopiesBeforeActivationWithoutDialog()
+    public async Task MainViewModel_InitializeAsync_WithPendingLegacyMigration_DoesNotTriggerMigration()
     {
         // Arrange
         StubFeatureViewModel feature = new();
         TestDialogService dialogs = new() { BooleanResult = true };
         RecordingMigrationService migration = new();
-        RecordingSettingsService settingsService = new();
         await using var viewModel = CreateMainViewModel(
             [Registration("first", "First", () => feature)],
             dialogs: dialogs,
             migrationService: migration,
-            settingsService: settingsService,
             initialize: false);
 
         // Act
         await viewModel.InitializeAsync();
 
         // Assert
-        migration.CopyCount.Should().Be(1);
-        settingsService.SaveCount.Should().Be(1);
+        migration.CopyCount.Should().Be(0);
         dialogs.MessageCount.Should().Be(0);
         viewModel.CurrentFeature.Should().BeSameAs(feature);
     }
@@ -1488,7 +1484,6 @@ public sealed class DesktopShellTests
         IProjectSerializer? projectSerializer = null,
         IUiDispatcher? dispatcher = null,
         IApplicationDataMigrationService? migrationService = null,
-        ISettingsService? settingsService = null,
         ICurrentBeatmapDialogService? currentBeatmapDialog = null,
         TestBeatmapWorkspace? beatmapWorkspace = null,
         bool initialize = true)
@@ -1528,8 +1523,7 @@ public sealed class DesktopShellTests
                 serializer: projectSerializer),
             dispatcher ?? workspaceDispatcher,
             null,
-            migrationService,
-            settingsService);
+            migrationService);
         if (initialize) viewModel.InitializeAsync().GetAwaiter().GetResult();
         return viewModel;
     }
@@ -1748,27 +1742,15 @@ public sealed class DesktopShellTests
     {
         public int CopyCount { get; private set; }
         public bool RequiresMigration => true;
+        public ApplicationDataMigrationResult? LastMigrationResult { get; set; }
 
         public Task<ApplicationDataMigrationResult> CopyLegacyDataAsync(
             CancellationToken cancellationToken = default)
         {
             CopyCount++;
-            return Task.FromResult(new ApplicationDataMigrationResult(1, 2, 0));
-        }
-    }
-
-    private sealed class RecordingSettingsService : ISettingsService
-    {
-        public int SaveCount { get; private set; }
-
-        public SettingsLoadResult LoadOrCreate()
-        {
-            return new SettingsLoadResult(new ApplicationSettings(), false, false);
-        }
-
-        public void Save(ApplicationSettings settings)
-        {
-            SaveCount++;
+            ApplicationDataMigrationResult result = new(1, 2, 0);
+            LastMigrationResult = result;
+            return Task.FromResult(result);
         }
     }
 }

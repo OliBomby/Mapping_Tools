@@ -16,7 +16,7 @@ public sealed class SettingsLiveStateMigrationTests
         var directories = new ApplicationDirectories(root);
         directories.EnsureCreated();
         File.WriteAllText(
-            directories.PreferencesFile,
+            directories.ConfigurationFile,
             "{\"$schema\":\"mapping-tools.settings\",\"$version\":1,\"UseEditorReader\":false,\"AutoReload\":false}");
         JsonSettingsStore store = new(directories);
 

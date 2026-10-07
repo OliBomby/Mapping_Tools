@@ -8,9 +8,14 @@ namespace Mapping_Tools.Application.Migration.Contracts;
 public interface IApplicationDataMigrationService
 {
     /// <summary>
-    ///     Gets whether legacy configuration exists without a current preferences document.
+    ///     Gets whether a configuration document can be migrated into the current location.
     /// </summary>
     bool RequiresMigration { get; }
+
+    /// <summary>
+    ///     Gets the result of a migration already completed during this process, if any.
+    /// </summary>
+    ApplicationDataMigrationResult? LastMigrationResult { get; }
 
     /// <summary>
     ///     Copies legacy autosaves and project files into the current application-data layout.

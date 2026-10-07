@@ -25,10 +25,9 @@ public sealed class JsonSettingsStore : ISettingsStore
     private const string schema = "mapping-tools.settings";
 
     /// <summary>
-    ///     Creates a store for the preferences and legacy configuration paths
-    ///     supplied by the application layout.
+    ///     Creates a store for the configuration path supplied by the application layout.
     /// </summary>
-    /// <param name="directories">Provides both settings paths and required parent directories.</param>
+    /// <param name="directories">Provides the settings path and required parent directories.</param>
     public JsonSettingsStore(IApplicationDirectories directories)
         : this(directories, typeof(ApplicationSettings))
     {
@@ -71,8 +70,7 @@ public sealed class JsonSettingsStore : ISettingsStore
     }
 
     /// <inheritdoc />
-    public bool Exists => File.Exists(directories.PreferencesFile)
-                          || File.Exists(directories.ConfigurationFile);
+    public bool Exists => File.Exists(directories.ConfigurationFile);
 
     /// <inheritdoc />
     /// <exception cref="JsonException">
@@ -81,11 +79,7 @@ public sealed class JsonSettingsStore : ISettingsStore
     /// </exception>
     public ApplicationSettings Load()
     {
-        bool hasPreferences = File.Exists(directories.PreferencesFile);
-        string sourcePath = hasPreferences
-            ? directories.PreferencesFile
-            : directories.ConfigurationFile;
-        string json = File.ReadAllText(sourcePath);
+        string json = File.ReadAllText(directories.ConfigurationFile);
         JsonObject document = ParseObject(json);
         if (!TryReadVersion(document, out int version))
         {
@@ -121,14 +115,14 @@ public sealed class JsonSettingsStore : ISettingsStore
         }
 
         ApplicationSettings settings = Deserialize(document.ToJsonString(), canonicalOptions);
-        if (requiresRewrite && hasPreferences) Save(settings);
+        if (requiresRewrite) Save(settings);
         return settings;
     }
 
     /// <inheritdoc />
     /// <remarks>
     ///     Serialization first targets a sibling <c>.tmp</c> file, which is moved
-    ///     over <c>preferences.json</c> only after the complete JSON has been written.
+    ///     over <c>config.json</c> only after the complete JSON has been written.
     /// </remarks>
     public void Save(ApplicationSettings settings)
     {
@@ -146,7 +140,7 @@ public sealed class JsonSettingsStore : ISettingsStore
 
         string json = document.ToJsonString(canonicalOptions);
         PhysicalAtomicFileWriter.WriteText(
-            directories.PreferencesFile,
+            directories.ConfigurationFile,
             json,
             PhysicalAtomicFileWriter.Utf8WithoutBom);
     }

@@ -4,8 +4,8 @@ namespace Mapping_Tools.Application.Settings.Models;
 
 /// <summary>
 ///     Contains the application state and behavior preferences persisted in the
-///     current <c>preferences.json</c> document. The legacy <c>config.json</c>
-///     document remains a read-only startup fallback.
+///     current <c>config.json</c> document. Legacy documents are converted during
+///     application-data migration.
 /// </summary>
 public class ApplicationSettings
 {

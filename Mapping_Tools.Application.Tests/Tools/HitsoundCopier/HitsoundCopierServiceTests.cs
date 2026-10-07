@@ -204,13 +204,13 @@ public sealed class HitsoundCopierServiceTests
     {
         public string LocalApplicationData => @"C:\MappingToolsTests";
 
+        public string LegacyApplicationData => ApplicationData;
+
         public string ApplicationData => @"C:\MappingToolsTests\Mapping Tools";
 
         public string Exports => @"C:\MappingToolsTests\Mapping Tools\Exports";
 
         public string ConfigurationFile => Path.Combine(ApplicationData, "config.json");
-
-        public string PreferencesFile => Path.Combine(ApplicationData, "preferences.json");
 
         public void EnsureCreated()
         {

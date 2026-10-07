@@ -6,12 +6,17 @@ namespace Mapping_Tools.Application.Platform;
 public interface IApplicationDirectories
 {
     /// <summary>
-    ///     Gets the operating-system local application-data root used to derive app paths.
+    ///     Gets the operating-system local application-data root used by platform integrations.
     /// </summary>
     string LocalApplicationData { get; }
 
     /// <summary>
-    ///     Gets the Mapping Tools data directory.
+    ///     Gets the legacy Mapping Tools data directory used as a migration source.
+    /// </summary>
+    string LegacyApplicationData { get; }
+
+    /// <summary>
+    ///     Gets the current Mapping Tools data directory beneath the platform's application-data root.
     /// </summary>
     string ApplicationData { get; }
 
@@ -21,14 +26,9 @@ public interface IApplicationDirectories
     string Exports { get; }
 
     /// <summary>
-    ///     Gets the full path of the legacy configuration JSON file.
+    ///     Gets the full path of the current Mapping Tools configuration JSON file.
     /// </summary>
     string ConfigurationFile { get; }
-
-    /// <summary>
-    ///     Gets the full path of the current Mapping Tools preferences JSON file.
-    /// </summary>
-    string PreferencesFile { get; }
 
     /// <summary>
     ///     Creates the application-owned directories required for normal operation.

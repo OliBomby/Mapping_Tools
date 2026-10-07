@@ -239,13 +239,13 @@ public sealed class ProjectServiceTests
     {
         public string LocalApplicationData => applicationData;
 
+        public string LegacyApplicationData => applicationData;
+
         public string ApplicationData => applicationData;
 
         public string Exports => Path.Combine(applicationData, "Exports");
 
         public string ConfigurationFile => Path.Combine(applicationData, "config.json");
-
-        public string PreferencesFile => Path.Combine(applicationData, "preferences.json");
 
         public void EnsureCreated()
         {
