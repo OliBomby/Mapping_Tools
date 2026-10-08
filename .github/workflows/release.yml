@@ -316,13 +316,21 @@ jobs:
           Remove-Item -LiteralPath $bridgeDirectory -Recurse -Force -ErrorAction SilentlyContinue
           New-Item -ItemType Directory -Path $bridgeDirectory -Force | Out-Null
 
-          # Onova restarts the legacy executable after applying this archive. Give it the
-          # Velopack installer under the old executable name so the next launch performs the
-          # one-time migration without leaving a legacy application binary behind.
-          Copy-Item -LiteralPath $setup.FullName -Destination (Join-Path $bridgeDirectory 'Mapping Tools.exe')
+          # Onova restarts this executable in the old installation directory. The bridge
+          # installs Velopack, uninstalls Inno Setup, launches the new app, and cleans up.
+          dotnet publish tools/LegacyMigrationBridge.cs -c Release -r $env:RID `
+            --self-contained false -o $bridgeDirectory `
+            "-p:Version=$env:VERSION" "-p:AssemblyVersion=$env:VERSION" "-p:FileVersion=$env:VERSION"
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+          Copy-Item -LiteralPath $setup.FullName -Destination (Join-Path $bridgeDirectory 'MappingTools-Setup.exe')
 
           $legacyAssetName = if ($env:RID -eq 'win-x86') { 'release.zip' } else { 'release_x64.zip' }
-          Compress-Archive -Path (Join-Path $bridgeDirectory '*') `
+          Compress-Archive -LiteralPath @(
+            (Join-Path $bridgeDirectory 'Mapping Tools.exe'),
+            (Join-Path $bridgeDirectory 'MappingTools-Setup.exe')
+          ) `
             -DestinationPath (Join-Path $env:RELEASE_DIR $legacyAssetName) -Force
 
       - name: Stage current Velopack assets

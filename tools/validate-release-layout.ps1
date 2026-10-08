@@ -139,11 +139,15 @@ if ($RequireLegacyBridge) {
     $bridgeEntries = [System.Collections.Generic.HashSet[string]]::new(
         [System.StringComparer]::OrdinalIgnoreCase)
     foreach ($entry in Get-ZipEntryNames $bridgePath) {
-        [void]$bridgeEntries.Add($entry)
+        if (-not $bridgeEntries.Add($entry)) {
+            throw "Legacy migration bridge '$bridgePath' contains a duplicate ZIP entry '$entry'."
+        }
     }
 
-    if ($bridgeEntries.Count -ne 1 -or -not $bridgeEntries.Contains('Mapping Tools.exe')) {
-        throw "Legacy migration bridge '$bridgePath' must contain only the Velopack installer named 'Mapping Tools.exe'."
+    if ($bridgeEntries.Count -ne 2 -or
+        -not $bridgeEntries.Contains('Mapping Tools.exe') -or
+        -not $bridgeEntries.Contains('MappingTools-Setup.exe')) {
+        throw "Legacy migration bridge '$bridgePath' must contain only 'Mapping Tools.exe' and 'MappingTools-Setup.exe'."
     }
 }
 

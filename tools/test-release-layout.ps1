@@ -76,6 +76,7 @@ try {
             $bridgeDirectory = Join-Path $testRoot "bridge-$rid"
             New-Item -ItemType Directory -Path $bridgeDirectory -Force | Out-Null
             New-FixtureFile (Join-Path $bridgeDirectory 'Mapping Tools.exe')
+            New-FixtureFile (Join-Path $bridgeDirectory 'MappingTools-Setup.exe')
             $bridgeName = if ($rid -eq 'win-x86') { 'release.zip' } else { 'release_x64.zip' }
             Compress-Archive -Path (Join-Path $bridgeDirectory '*') `
                 -DestinationPath (Join-Path $directory $bridgeName) -Force
@@ -87,6 +88,38 @@ try {
             -ExpectedVersion $version `
             -ReleaseDirectory $directory `
             -RequireLegacyBridge:($rid -like 'win-*')
+    }
+
+    # A legacy installer renamed to Mapping Tools.exe is no longer a complete bridge.
+    $windowsDirectory = Join-Path $testRoot 'velopack-win-x64'
+    $bridgePath = Join-Path $windowsDirectory 'release_x64.zip'
+    $bridgeContents = Join-Path $testRoot 'bridge-win-x64'
+    Remove-Item -LiteralPath (Join-Path $bridgeContents 'MappingTools-Setup.exe')
+    Compress-Archive -Path (Join-Path $bridgeContents '*') -DestinationPath $bridgePath -Force
+    try {
+        & $validator -Channel 'win-x64' -RuntimeIdentifier 'win-x64' -ExpectedVersion $version `
+            -ReleaseDirectory $windowsDirectory -RequireLegacyBridge
+        throw 'Validator accepted a bridge without its installer.'
+    }
+    catch {
+        if ($_.Exception.Message -eq 'Validator accepted a bridge without its installer.') { throw }
+        if ($_.Exception.Message -notlike "*must contain only 'Mapping Tools.exe' and 'MappingTools-Setup.exe'*") { throw }
+    }
+
+    # Reject duplicate paths, even though a set of names would hide the duplicate.
+    New-FixtureFile (Join-Path $bridgeContents 'MappingTools-Setup.exe')
+    Compress-Archive -Path (Join-Path $bridgeContents '*') -DestinationPath $bridgePath -Force
+    $zip = [IO.Compression.ZipFile]::Open($bridgePath, [IO.Compression.ZipArchiveMode]::Update)
+    try { [void]$zip.CreateEntry('Mapping Tools.exe') }
+    finally { $zip.Dispose() }
+    try {
+        & $validator -Channel 'win-x64' -RuntimeIdentifier 'win-x64' -ExpectedVersion $version `
+            -ReleaseDirectory $windowsDirectory -RequireLegacyBridge
+        throw 'Validator accepted duplicate bridge entries.'
+    }
+    catch {
+        if ($_.Exception.Message -eq 'Validator accepted duplicate bridge entries.') { throw }
+        if ($_.Exception.Message -notlike '*duplicate ZIP entry*') { throw }
     }
 
     $invalidDirectory = Join-Path $testRoot 'velopack-invalid'
