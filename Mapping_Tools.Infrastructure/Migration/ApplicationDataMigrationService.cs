@@ -47,7 +47,7 @@ public sealed class ApplicationDataMigrationService : IApplicationDataMigrationS
     {
         ApplicationDataMigrationResult result = await Task.Run(
             () => CopyLegacyData(cancellationToken),
-            cancellationToken);
+            cancellationToken).ConfigureAwait(false);
         LastMigrationResult = result;
         return result;
     }

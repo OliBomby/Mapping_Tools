@@ -1,3 +1,4 @@
+using Mapping_Tools.Application.Migration.Models;
 using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Infrastructure.Migration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -7,6 +8,37 @@ namespace Mapping_Tools.Infrastructure.Tests.Migration;
 [TestClass]
 public sealed class ApplicationDataMigrationServiceTests
 {
+    [TestMethod]
+    public void CopyLegacyDataAsync_WhenStartupBlocksSynchronizationContext_CompletesAndRemembersResult()
+    {
+        // Arrange
+        using var test = TestDirectory.Create();
+        File.WriteAllText(
+            Path.Combine(test.Directories.LegacyApplicationData, "config.json"),
+            "legacy configuration");
+        ApplicationDataMigrationService service = new(test.Directories);
+        SynchronizationContext? previousContext = SynchronizationContext.Current;
+        bool completed;
+        Task<ApplicationDataMigrationResult> migration;
+
+        // Act
+        SynchronizationContext.SetSynchronizationContext(new NonPumpingSynchronizationContext());
+        try
+        {
+            migration = service.CopyLegacyDataAsync();
+            completed = migration.Wait(TimeSpan.FromSeconds(5));
+        }
+        finally
+        {
+            SynchronizationContext.SetSynchronizationContext(previousContext);
+        }
+
+        // Assert
+        completed.Should().BeTrue("startup must finish migration while the UI thread is waiting");
+        service.LastMigrationResult.Should().Be(migration.Result);
+        File.ReadAllText(test.Directories.ConfigurationFile).Should().Be("legacy configuration");
+    }
+
     [TestMethod]
     public async Task CopyLegacyDataAsync_WhenLegacyFilesExist_CopiesConfigAutosavesAndProjectsWithoutRemovingLegacyFiles()
     {
@@ -135,6 +167,14 @@ public sealed class ApplicationDataMigrationServiceTests
 
         // Assert
         requiresMigration.Should().BeFalse();
+    }
+
+    private sealed class NonPumpingSynchronizationContext : SynchronizationContext
+    {
+        public override void Post(SendOrPostCallback callback, object? state)
+        {
+            // Startup synchronously waits for migration, so UI callbacks cannot run yet.
+        }
     }
 
     private sealed class TestDirectory : IDisposable

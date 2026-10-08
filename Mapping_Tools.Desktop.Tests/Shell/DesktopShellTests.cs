@@ -1200,6 +1200,31 @@ public sealed class DesktopShellTests
     }
 
     [TestMethod]
+    public async Task InitializeAsync_WithCompletedLegacyMigration_PublishesSuccessOnce()
+    {
+        // Arrange
+        UserNotificationService notifications = new();
+        List<UserNotification> published = [];
+        notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
+        RecordingMigrationService migration = new() { LastMigrationResult = new(1, 2, 0) };
+        await using var viewModel = CreateMainViewModel(
+            notifications: notifications,
+            migrationService: migration,
+            initialize: false);
+
+        // Act
+        await viewModel.InitializeAsync();
+        await viewModel.InitializeAsync();
+
+        // Assert
+        published.Should().ContainSingle();
+        published[0].Severity.Should().Be(UserNotificationSeverity.Success);
+        published[0].Title.Should().Be(DesktopStrings.Shell_LegacyDataMigrated);
+        published[0].Message.Should().Be(ApplicationText.Format(DesktopStrings.Shell_MigrationSummary, 1, 2));
+        migration.CopyCount.Should().Be(0);
+    }
+
+    [TestMethod]
     public async Task MainViewModel_SwitchingBetweenProjectFeatures_PreservesMenuVisibilityWhileLoading()
     {
         // Arrange

@@ -12,6 +12,30 @@ namespace Mapping_Tools.Desktop.Tests.Views;
 public sealed class MainWindowNotificationSurfaceTests
 {
     [TestMethod]
+    public async Task ShowSnackbar_NotificationPublishedOnOpened_RendersMessageInMainWindow()
+    {
+        // Arrange
+        MainWindow window = new();
+        INotificationSurface surface = window;
+        UserNotification notification = new(
+            UserNotificationSeverity.Success,
+            "Legacy data migrated",
+            "Copied 1 autosave and 2 project files.");
+        window.Opened += (_, _) => surface.ShowSnackbar(notification);
+
+        // Act
+        using HeadlessViewHost host = HeadlessViewHost.ShowWindow(window);
+        await HeadlessViewHost.DrainAsync(() => window.GetVisualDescendants().OfType<TextBlock>()
+            .Any(textBlock => textBlock.IsEffectivelyVisible
+                              && textBlock.Text == "Legacy data migrated: Copied 1 autosave and 2 project files."));
+
+        // Assert
+        window.GetVisualDescendants().OfType<TextBlock>()
+            .Should().Contain(textBlock => textBlock.IsEffectivelyVisible
+                                           && textBlock.Text == "Legacy data migrated: Copied 1 autosave and 2 project files.");
+    }
+
+    [TestMethod]
     public async Task ShowSnackbar_InformationNotification_RendersMessageInMainWindow()
     {
         // Arrange
