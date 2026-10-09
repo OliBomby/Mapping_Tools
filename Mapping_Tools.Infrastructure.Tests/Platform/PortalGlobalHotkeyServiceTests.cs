@@ -11,24 +11,6 @@ public sealed class PortalGlobalHotkeyServiceTests
 {
     private static readonly TimeSpan timeout = TimeSpan.FromSeconds(5);
 
-    [DataTestMethod]
-    [DataRow("wayland", null, true)]
-    [DataRow("WAYLAND", "wayland-0", true)]
-    [DataRow(null, "wayland-0", true)]
-    [DataRow("", "wayland-0", true)]
-    [DataRow("x11", "wayland-0", false)]
-    [DataRow(null, null, false)]
-    public void IsWaylandSession_WithSessionEnvironment_SelectsExpectedBackend(
-        string? sessionType, string? display, bool expected)
-    {
-        // Arrange
-        // Act
-        bool result = PortalGlobalHotkeyService.IsWaylandSession(sessionType, display);
-
-        // Assert
-        result.Should().Be(expected);
-    }
-
     [TestMethod]
     public async Task Start_WithConfiguredBindings_RegistersTogetherAndDispatchesById()
     {
@@ -54,16 +36,17 @@ public sealed class PortalGlobalHotkeyServiceTests
             sut.Start();
             Registration registration = await portal.NextAsync();
             registration.Activated("unknown");
-            registration.Activated("quick-run:44:2");
+            registration.Activated("quick-run");
             await invoked.Task.WaitAsync(timeout);
 
             // Assert
             registration.Shortcuts.Should().BeEquivalentTo(new Dictionary<string, string?>
             {
-                ["quick-run:44:2"] = "CTRL+a",
-                ["quick-undo:69:2"] = "CTRL+z",
+                ["quick-run"] = "CTRL+a",
+                ["quick-undo"] = "CTRL+z",
             });
             unrelatedCalls.Should().Be(0);
+            registration.Updates.Should().BeEmpty();
         }
         finally
         {
@@ -89,9 +72,11 @@ public sealed class PortalGlobalHotkeyServiceTests
 
             // Assert
             previous.Exited.Task.IsCompletedSuccessfully.Should().BeTrue();
+            replacement.Updates.Should().ContainSingle().Which.Should().Be(
+                new KeyValuePair<string, HotkeySettings>("quick-run", new HotkeySettings(45, 3)));
             replacement.Shortcuts.Should().BeEquivalentTo(new Dictionary<string, string?>
             {
-                ["quick-run:45:3"] = "CTRL+ALT+b",
+                ["quick-run"] = "CTRL+ALT+b",
             });
         }
         finally
@@ -125,7 +110,7 @@ public sealed class PortalGlobalHotkeyServiceTests
                 invoked.TrySetResult();
                 return Task.CompletedTask;
             });
-            registration.Activated("quick-run:44:2");
+            registration.Activated("quick-run");
             await invoked.Task.WaitAsync(timeout);
 
             // Assert
@@ -155,13 +140,13 @@ public sealed class PortalGlobalHotkeyServiceTests
         });
         sut.Start();
         Registration registration = await portal.NextAsync();
-        registration.Activated("quick-run:44:2");
+        registration.Activated("quick-run");
         CancellationToken callbackToken = await invoked.Task.WaitAsync(timeout);
 
         // Act
         sut.Stop();
         await registration.Exited.Task.WaitAsync(timeout);
-        registration.Activated("quick-run:44:2");
+        registration.Activated("quick-run");
 
         // Assert
         callbackToken.IsCancellationRequested.Should().BeTrue();
@@ -169,7 +154,7 @@ public sealed class PortalGlobalHotkeyServiceTests
     }
 
     [TestMethod]
-    public async Task SetBinding_WithLastBindingDisabled_ClosesPermissionRequest()
+    public async Task SetBinding_WithLastBindingDisabled_ClosesSessionAndClearsDesktopRegistration()
     {
         // Arrange
         RecordingPortal portal = new();
@@ -182,10 +167,12 @@ public sealed class PortalGlobalHotkeyServiceTests
         {
             // Act
             sut.SetBinding("quick-run", new HotkeySettings(0, 0), _ => Task.CompletedTask);
+            Registration replacement = await portal.NextAsync();
             await registration.Exited.Task.WaitAsync(timeout);
 
             // Assert
-            portal.HasPendingRegistration.Should().BeFalse();
+            replacement.Shortcuts.Should().BeEmpty();
+            replacement.Updates.Should().ContainKey("quick-run");
         }
         finally
         {
@@ -206,7 +193,7 @@ public sealed class PortalGlobalHotkeyServiceTests
         try
         {
             // Act
-            registration.Assignments["quick-run:44:2"] = new HotkeySettings(97, 8);
+            registration.Assignments["quick-run"] = new HotkeySettings(97, 8);
             var shortcuts = await sut.GetRegisteredShortcutsAsync(CancellationToken.None);
 
             // Assert
@@ -240,7 +227,7 @@ public sealed class PortalGlobalHotkeyServiceTests
 
             // Assert
             await refreshOldSession.Should().ThrowAsync<OperationCanceledException>();
-            (await portal.NextAsync()).Shortcuts.Should().ContainKey("quick-run:45:2");
+            (await portal.NextAsync()).Shortcuts.Should().ContainKey("quick-run");
         }
         finally
         {
@@ -257,7 +244,7 @@ public sealed class PortalGlobalHotkeyServiceTests
         sut.SetBinding("quick-run", new HotkeySettings(44, 2), _ => Task.CompletedTask);
         sut.Start();
         Registration registration = await portal.NextAsync();
-        registration.Assignments["quick-run:44:2"] = new HotkeySettings(97, 8);
+        registration.Assignments["quick-run"] = new HotkeySettings(97, 8);
         var actual = await sut.GetRegisteredShortcutsAsync(CancellationToken.None);
         TaskCompletionSource invoked = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
@@ -270,7 +257,7 @@ public sealed class PortalGlobalHotkeyServiceTests
                 return Task.CompletedTask;
             });
             var refreshed = await sut.GetRegisteredShortcutsAsync(CancellationToken.None);
-            registration.Activated("quick-run:44:2");
+            registration.Activated("quick-run");
             await invoked.Task.WaitAsync(timeout);
 
             // Assert
@@ -304,9 +291,9 @@ public sealed class PortalGlobalHotkeyServiceTests
             var missing = await sut.GetRegisteredShortcutsAsync(CancellationToken.None);
             await sut.GetRegisteredShortcutsAsync(CancellationToken.None);
             int warningsBeforeRecovery = warnings.Count;
-            registration.Assignments["quick-run:44:2"] = new HotkeySettings(44, 2);
+            registration.Assignments["quick-run"] = new HotkeySettings(44, 2);
             await sut.GetRegisteredShortcutsAsync(CancellationToken.None);
-            registration.Assignments["quick-run:44:2"] = new HotkeySettings(0, 0);
+            registration.Assignments["quick-run"] = new HotkeySettings(0, 0);
             await sut.GetRegisteredShortcutsAsync(CancellationToken.None);
 
             // Assert
@@ -392,12 +379,13 @@ public sealed class PortalGlobalHotkeyServiceTests
 
         public async Task RunAsync(
             IReadOnlyDictionary<string, string?> shortcuts,
+            IReadOnlyDictionary<string, HotkeySettings> updates,
             Action<string> activated,
             Action<Dictionary<string, HotkeySettings>, Func<CancellationToken, Task<Dictionary<string, HotkeySettings>>>> registered,
             CancellationToken cancellationToken)
         {
             if (Failure is not null) throw Failure;
-            Registration registration = new(shortcuts, activated, registered);
+            Registration registration = new(shortcuts, updates, activated, registered);
             if (RegisterAutomatically) registration.Register();
             await registrations.Writer.WriteAsync(registration, cancellationToken);
             try
@@ -416,7 +404,8 @@ public sealed class PortalGlobalHotkeyServiceTests
         }
     }
 
-    private sealed record Registration(IReadOnlyDictionary<string, string?> Shortcuts, Action<string> Activated,
+    private sealed record Registration(IReadOnlyDictionary<string, string?> Shortcuts,
+        IReadOnlyDictionary<string, HotkeySettings> Updates, Action<string> Activated,
         Action<Dictionary<string, HotkeySettings>, Func<CancellationToken, Task<Dictionary<string, HotkeySettings>>>> Registered)
     {
         public TaskCompletionSource Exited { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);

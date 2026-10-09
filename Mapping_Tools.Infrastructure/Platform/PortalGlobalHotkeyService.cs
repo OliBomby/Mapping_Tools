@@ -1,19 +1,22 @@
 using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Core.Settings.Models;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Mapping_Tools.Infrastructure.Platform;
 
 /// <summary>
-///     Registers Wayland shortcuts through the desktop's GlobalShortcuts portal,
+///     Registers Linux shortcuts through the desktop's GlobalShortcuts portal,
 ///     without requiring access to raw input devices.
 /// </summary>
 public sealed class PortalGlobalHotkeyService : IGlobalHotkeyService, IGlobalHotkeyRegistration
 {
     private readonly Lock gate = new();
     private readonly Dictionary<string, Binding> bindings = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, HotkeySettings> pendingUpdates = new(StringComparer.Ordinal);
     private readonly IGlobalShortcutPortal portal;
     private readonly ILogger<PortalGlobalHotkeyService> logger;
+    private readonly bool useStableIds;
     private CancellationTokenSource? listener;
     private Task worker = Task.CompletedTask;
     private bool started;
@@ -24,34 +27,29 @@ public sealed class PortalGlobalHotkeyService : IGlobalHotkeyService, IGlobalHot
     public event EventHandler<Exception>? RegistrationFailed;
 
     /// <summary>Creates a listener for the current user's desktop portal.</summary>
-    /// <param name="logger">Records portal availability, permission, and callback failures.</param>
-    public PortalGlobalHotkeyService(ILogger<PortalGlobalHotkeyService> logger)
-        : this(new XdgGlobalShortcutPortal(), logger)
+    /// <param name="logger">Optionally records portal availability, permission, and callback failures.</param>
+    public PortalGlobalHotkeyService(ILogger<PortalGlobalHotkeyService>? logger = null)
+        : this(new XdgGlobalShortcutPortal(), logger ?? NullLogger<PortalGlobalHotkeyService>.Instance,
+            XdgGlobalShortcutPortal.IsKdeHost)
     {
     }
 
     internal PortalGlobalHotkeyService(
         IGlobalShortcutPortal portal,
-        ILogger<PortalGlobalHotkeyService> logger)
+        ILogger<PortalGlobalHotkeyService> logger,
+        bool useStableIds = true)
     {
         this.portal = portal ?? throw new ArgumentNullException(nameof(portal));
         this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        this.useStableIds = useStableIds;
     }
 
-    /// <summary>Determines whether the current Linux desktop session uses Wayland.</summary>
-    /// <returns>Whether the portal should be used instead of a raw keyboard hook.</returns>
-    public static bool IsWaylandSession()
+    /// <summary>Checks whether the Linux desktop provides the GlobalShortcuts portal.</summary>
+    /// <returns>Whether the portal is available, allowing up to two seconds for the desktop to respond.</returns>
+    public static bool IsAvailable()
     {
-        return OperatingSystem.IsLinux() && IsWaylandSession(
-            Environment.GetEnvironmentVariable("XDG_SESSION_TYPE"),
-            Environment.GetEnvironmentVariable("WAYLAND_DISPLAY"));
-    }
-
-    internal static bool IsWaylandSession(string? sessionType, string? waylandDisplay)
-    {
-        // An explicit X11 session takes priority over an inherited display variable.
-        return string.Equals(sessionType, "wayland", StringComparison.OrdinalIgnoreCase) ||
-               (string.IsNullOrEmpty(sessionType) && !string.IsNullOrEmpty(waylandDisplay));
+        return OperatingSystem.IsLinux() && XdgGlobalShortcutPortal.IsAvailableAsync(
+            Tmds.DBus.Protocol.DBusAddress.Session, TimeSpan.FromSeconds(2)).GetAwaiter().GetResult();
     }
 
     /// <inheritdoc />
@@ -61,7 +59,8 @@ public sealed class PortalGlobalHotkeyService : IGlobalHotkeyService, IGlobalHot
         ArgumentNullException.ThrowIfNull(callback);
         Binding? binding = hotkey is null || hotkey.Key == 0
             ? null
-            : new Binding(hotkey, $"{id}:{hotkey.Key}:{hotkey.Modifiers}", XdgShortcutTrigger.Convert(hotkey), callback);
+            : new Binding(hotkey, useStableIds ? id : $"{id}:{hotkey.Key}:{hotkey.Modifiers}",
+                XdgShortcutTrigger.Convert(hotkey), callback);
 
         lock (gate)
         {
@@ -70,6 +69,9 @@ public sealed class PortalGlobalHotkeyService : IGlobalHotkeyService, IGlobalHot
                 binding = binding with { PortalId = previous.PortalId };
             if (binding is null) bindings.Remove(id);
             else bindings[id] = binding;
+
+            if (started && useStableIds && previous?.Hotkey != binding?.Hotkey)
+                pendingUpdates[id] = hotkey ?? new HotkeySettings(0, 0);
 
             if (started && (previous?.Hotkey != binding?.Hotkey || listener is null)) RestartListener();
         }
@@ -92,6 +94,7 @@ public sealed class PortalGlobalHotkeyService : IGlobalHotkeyService, IGlobalHot
         lock (gate)
         {
             started = false;
+            pendingUpdates.Clear();
             listener?.Cancel();
             listener = null;
             registration?.TrySetResult(null);
@@ -157,7 +160,7 @@ public sealed class PortalGlobalHotkeyService : IGlobalHotkeyService, IGlobalHot
         registration?.TrySetResult(null);
         registration = null;
         warningReported = false;
-        if (bindings.Count == 0) return;
+        if (bindings.Count == 0 && pendingUpdates.Count == 0) return;
 
         CancellationTokenSource current = new();
         CancellationToken token = current.Token;
@@ -165,9 +168,10 @@ public sealed class PortalGlobalHotkeyService : IGlobalHotkeyService, IGlobalHot
         TaskCompletionSource<Func<CancellationToken, Task<Dictionary<string, HotkeySettings>>>?> ready =
             new(TaskCreationOptions.RunContinuationsAsynchronously);
         registration = ready;
-        // Portals retain user-selected triggers for existing IDs. A changed setting
-        // needs a new ID so its preferred trigger is offered in the permission dialog.
+        // KDE can update stable action IDs. Other portals need a new ID to offer
+        // a changed preferred trigger rather than restore the previous assignment.
         var shortcuts = bindings.Values.ToDictionary(binding => binding.PortalId, binding => binding.Trigger);
+        var updates = new Dictionary<string, HotkeySettings>(pendingUpdates);
         var owners = bindings.ToDictionary(pair => pair.Value.PortalId, pair => pair.Key);
         Task previous = worker;
         worker = Task.Run(async () =>
@@ -178,11 +182,15 @@ public sealed class PortalGlobalHotkeyService : IGlobalHotkeyService, IGlobalHot
             try
             {
                 token.ThrowIfCancellationRequested();
-                await portal.RunAsync(shortcuts, id =>
+                await portal.RunAsync(shortcuts, updates, id =>
                 {
                     if (owners.TryGetValue(id, out string? owner)) OnActivated(owner, token);
                 }, (descriptions, read) =>
                 {
+                    lock (gate)
+                    {
+                        if (listener?.Token == token) pendingUpdates.Clear();
+                    }
                     CheckAssignments(descriptions, owners.Keys, token);
                     ready.TrySetResult(read);
                 }, token).ConfigureAwait(false);

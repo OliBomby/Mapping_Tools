@@ -32,7 +32,46 @@ public sealed class LinuxDesktopEntryTests
         // Assert
         string contents = File.ReadAllText(Path.Combine(root, "applications", "MappingTools.desktop"));
         contents.Should().Contain("Name=Mapping Tools");
+        contents.Should().Contain("Icon=MappingTools");
         contents.Should().Contain("Exec=\"/home/mapper/Mapping Tools.AppImage\"");
+    }
+
+    [TestMethod]
+    public void EnsureInstalled_WithBundledIcon_InstallsIconInUserThemeDirectory()
+    {
+        // Arrange
+        Directory.CreateDirectory(root);
+        string source = Path.Combine(root, "bundled-icon.png");
+        byte[] image = [137, 80, 78, 71];
+        File.WriteAllBytes(source, image);
+
+        // Act
+        LinuxDesktopEntry.EnsureInstalled([root], "/app/MappingTools.AppImage", null, source);
+
+        // Assert
+        File.ReadAllBytes(Path.Combine(root, "icons", "hicolor", "256x256", "apps", "MappingTools.png"))
+            .Should().Equal(image);
+        File.ReadAllText(Path.Combine(root, "applications", "MappingTools.desktop"))
+            .Should().Contain("Icon=MappingTools");
+    }
+
+    [TestMethod]
+    public void EnsureInstalled_WithChangedIconAndUnchangedLauncher_UpdatesInstalledIcon()
+    {
+        // Arrange
+        Directory.CreateDirectory(root);
+        string source = Path.Combine(root, "bundled-icon.png");
+        File.WriteAllBytes(source, [1, 2, 3]);
+        LinuxDesktopEntry.EnsureInstalled([root], "/app/MappingTools.AppImage", null, source);
+        byte[] updated = [4, 5, 6];
+        File.WriteAllBytes(source, updated);
+
+        // Act
+        LinuxDesktopEntry.EnsureInstalled([root], "/app/MappingTools.AppImage", null, source);
+
+        // Assert
+        File.ReadAllBytes(Path.Combine(root, "icons", "hicolor", "256x256", "apps", "MappingTools.png"))
+            .Should().Equal(updated);
     }
 
     [TestMethod]

@@ -10,8 +10,47 @@ internal sealed class XdgGlobalShortcutPortal : IGlobalShortcutPortal
     private const string desktop_path = "/org/freedesktop/portal/desktop";
     private const string shortcuts_interface = "org.freedesktop.portal.GlobalShortcuts";
 
+    internal static bool IsKdeHost =>
+        string.IsNullOrEmpty(Environment.GetEnvironmentVariable("FLATPAK_ID")) &&
+        string.IsNullOrEmpty(Environment.GetEnvironmentVariable("SNAP")) &&
+        Environment.GetEnvironmentVariable("XDG_CURRENT_DESKTOP")?.Split(':')
+            .Contains("KDE", StringComparer.OrdinalIgnoreCase) == true;
+
+    internal static async Task<bool> IsAvailableAsync(string? busAddress, TimeSpan timeout)
+    {
+        if (string.IsNullOrEmpty(busAddress)) return false;
+
+        try
+        {
+            using CancellationTokenSource cancellation = new(timeout);
+            using DBusConnection connection = new(busAddress);
+            using CancellationTokenRegistration registration = cancellation.Token.Register(connection.Dispose);
+            await connection.ConnectAsync().AsTask().WaitAsync(cancellation.Token).ConfigureAwait(false);
+            MessageBuffer call;
+            {
+                using var writer = connection.GetMessageWriter();
+                writer.WriteMethodCallHeader(destination, desktop_path, "org.freedesktop.DBus.Properties", "Get", "ss");
+                writer.WriteString(shortcuts_interface);
+                writer.WriteString("version");
+                call = writer.CreateMessage();
+            }
+
+            uint version = await connection.CallMethodAsync(call,
+                static (message, _) => message.GetBodyReader().ReadVariantValue().GetUInt32())
+                .WaitAsync(cancellation.Token).ConfigureAwait(false);
+            return version >= 1;
+        }
+        catch (Exception)
+        {
+            // Missing interfaces, an unreachable session bus, or a stalled portal
+            // mean the caller should use the keyboard hook instead.
+            return false;
+        }
+    }
+
     public async Task RunAsync(
         IReadOnlyDictionary<string, string?> shortcuts,
+        IReadOnlyDictionary<string, HotkeySettings> updates,
         Action<string> activated,
         Action<Dictionary<string, HotkeySettings>, Func<CancellationToken, Task<Dictionary<string, HotkeySettings>>>> registered,
         CancellationToken cancellationToken)
@@ -21,6 +60,8 @@ internal sealed class XdgGlobalShortcutPortal : IGlobalShortcutPortal
         using CancellationTokenRegistration cancellation = cancellationToken.Register(connection.Dispose);
         await connection.ConnectAsync().ConfigureAwait(false);
         await RegisterApplicationAsync(connection).ConfigureAwait(false);
+        if (IsKdeHost)
+            await KdeGlobalShortcuts.PrepareAsync(connection, shortcuts.Keys, updates).ConfigureAwait(false);
 
         var created = await RequestAsync(connection, "CreateSession", "a{sv}", null, shortcuts, cancellationToken)
             .ConfigureAwait(false);
@@ -123,7 +164,8 @@ internal sealed class XdgGlobalShortcutPortal : IGlobalShortcutPortal
             ? Assembly.GetEntryAssembly()?.Location
             : null;
         LinuxDesktopEntry.EnsureInstalled(
-            new[] { dataHome }.Concat(dataDirs.Split(':', StringSplitOptions.RemoveEmptyEntries)), executable, assembly);
+            new[] { dataHome }.Concat(dataDirs.Split(':', StringSplitOptions.RemoveEmptyEntries)), executable, assembly,
+            Path.Combine(AppContext.BaseDirectory, "Assets", "mt_logo_256.png"));
     }
 
     private static async Task<Dictionary<string, VariantValue>> RequestAsync(
@@ -207,7 +249,7 @@ internal sealed class XdgGlobalShortcutPortal : IGlobalShortcutPortal
                 writer.WriteString(id);
                 Dictionary<string, VariantValue> properties = new()
                 {
-                    ["description"] = id.Split(':')[0].Replace('-', ' '),
+                    ["description"] = GetDescription(id),
                 };
                 if (trigger is not null) properties["preferred_trigger"] = trigger;
                 writer.WriteDictionary(properties);
@@ -218,5 +260,16 @@ internal sealed class XdgGlobalShortcutPortal : IGlobalShortcutPortal
 
         writer.WriteDictionary(options);
         return writer.CreateMessage();
+    }
+
+    internal static string GetDescription(string id)
+    {
+        return id.Split(':')[0] switch
+        {
+            "quick-run" => "QuickRun",
+            "quick-undo" => "QuickUndo",
+            "better-save" => "BetterSave",
+            _ => id,
+        };
     }
 }

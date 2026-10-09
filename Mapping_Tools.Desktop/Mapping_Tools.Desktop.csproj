@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <AvaloniaResource Include="Assets\**"/>
+    <Content Include="Assets\mt_logo_256.png" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest"/>
   </ItemGroup>
 
   <ItemGroup>

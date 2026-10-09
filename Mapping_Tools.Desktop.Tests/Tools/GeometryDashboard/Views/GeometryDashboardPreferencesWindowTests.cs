@@ -18,7 +18,7 @@ namespace Mapping_Tools.Desktop.Tests.Tools.GeometryDashboard.Views;
 public sealed class GeometryDashboardPreferencesWindowTests
 {
     [TestMethod]
-    public void SnapHotkey_EditorCapturesGesture_UpdatesSettings()
+    public void SnapHotkey_EditorLosesFocus_UpdatesSettings()
     {
         // Arrange
         GeometryDashboardPreferencesDialogViewModel viewModel = new(new GeometryDashboardPreferences(), false);
@@ -28,6 +28,7 @@ public sealed class GeometryDashboardPreferencesWindowTests
 
         // Act
         editor.ApplyKey(Key.B, KeyModifiers.Control);
+        editor.RaiseEvent(new FocusChangedEventArgs(InputElement.LostFocusEvent) { Source = editor });
 
         // Assert
         viewModel.Preferences.SnapHotkey.Should().Be(new HotkeySettings(45, 2));

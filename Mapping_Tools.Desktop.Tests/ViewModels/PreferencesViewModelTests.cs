@@ -28,7 +28,7 @@ namespace Mapping_Tools.Desktop.Tests.ViewModels;
 public sealed class PreferencesViewModelTests
 {
     [TestMethod]
-    public async Task QuickRunHotkey_EditorCapturesGestureAfterPortalRefresh_UpdatesSettingsAndCurrentValue()
+    public async Task QuickRunHotkey_EditorLosesFocusAfterPortalRefresh_UpdatesSettingsAndCurrentValue()
     {
         // Arrange
         var settings = CreateSettings();
@@ -40,14 +40,17 @@ public sealed class PreferencesViewModelTests
         };
         using var viewModel = CreateViewModel(settings, hotkeyBindings: bindings);
         HotkeyEditor editor = new() { DataContext = viewModel };
-        editor.Bind(HotkeyEditor.HotkeyProperty, new Binding(nameof(PreferencesViewModel.QuickRunHotkey)) { Mode = BindingMode.TwoWay });
+        editor.Bind(HotkeyEditor.HotkeyProperty, new Binding(nameof(PreferencesViewModel.QuickRunHotkey)) { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.LostFocus });
         viewModel.Activate();
         await viewModel.HotkeyRefresh;
 
         // Act
         editor.ApplyKey(Key.B, KeyModifiers.Control);
+        HotkeySettings? beforeFocusLoss = settings.QuickRunHotkey;
+        editor.RaiseEvent(new FocusChangedEventArgs(InputElement.LostFocusEvent) { Source = editor });
 
         // Assert
+        beforeFocusLoss.Should().Be(new HotkeySettings(97, 8));
         settings.QuickRunHotkey.Should().Be(new HotkeySettings(45, 2));
         bindings.QuickRun.Should().Be(settings.QuickRunHotkey);
         editor.Hotkey.Should().BeSameAs(viewModel.QuickRunHotkey);
@@ -68,10 +71,11 @@ public sealed class PreferencesViewModelTests
         };
         using var viewModel = CreateViewModel(settings, hotkeyBindings: bindings);
         HotkeyEditor editor = new() { DataContext = viewModel };
-        editor.Bind(HotkeyEditor.HotkeyProperty, new Binding(nameof(PreferencesViewModel.QuickRunHotkey)) { Mode = BindingMode.TwoWay });
+        editor.Bind(HotkeyEditor.HotkeyProperty, new Binding(nameof(PreferencesViewModel.QuickRunHotkey)) { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.LostFocus });
         viewModel.Activate();
         await viewModel.HotkeyRefresh;
         editor.ApplyKey(Key.Escape, KeyModifiers.None);
+        editor.RaiseEvent(new FocusChangedEventArgs(InputElement.LostFocusEvent) { Source = editor });
 
         // Act
         viewModel.UndoHistory.Undo();

@@ -54,6 +54,12 @@ public sealed class HotkeyEditor : TextBox
     /// <param name="eventArgs">The key and modifier state reported by Avalonia.</param>
     protected override void OnKeyDown(KeyEventArgs eventArgs)
     {
+        if (eventArgs.Key == Key.Tab && eventArgs.KeyModifiers is KeyModifiers.None or KeyModifiers.Shift)
+        {
+            base.OnKeyDown(eventArgs);
+            return;
+        }
+
         eventArgs.Handled = true;
         ApplyKey(eventArgs.Key, eventArgs.KeyModifiers);
     }
@@ -69,7 +75,6 @@ public sealed class HotkeyEditor : TextBox
         if (modifiers == 0 && key is Key.Delete or Key.Back or Key.Escape)
         {
             SetCurrentValue(HotkeyProperty, null);
-            UpdateText();
             return;
         }
 

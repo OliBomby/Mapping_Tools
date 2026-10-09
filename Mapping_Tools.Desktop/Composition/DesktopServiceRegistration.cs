@@ -159,7 +159,7 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<QuickRunService>();
         services.AddSingleton<IQuickRunService>(provider =>
             provider.GetRequiredService<QuickRunService>());
-        if (PortalGlobalHotkeyService.IsWaylandSession())
+        if (PortalGlobalHotkeyService.IsAvailable())
         {
             services.AddSingleton<PortalGlobalHotkeyService>();
             services.AddSingleton<IGlobalHotkeyService>(provider => provider.GetRequiredService<PortalGlobalHotkeyService>());

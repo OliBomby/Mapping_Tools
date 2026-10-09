@@ -53,7 +53,7 @@
                                                    Margin="5, 0"
                                                    Classes="compact"
                                                    HorizontalAlignment="Center"
-                                                   Hotkey="{Binding ProjectHotkey, Mode=TwoWay}" />
+                                                   Hotkey="{Binding ProjectHotkey, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
                         </DataTemplate>
                     </TableViewColumn.CellTemplate>
                 </TableViewColumn>
