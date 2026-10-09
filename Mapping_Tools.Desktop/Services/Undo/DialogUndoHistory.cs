@@ -72,6 +72,12 @@ public sealed class DialogUndoHistory : IProjectUndoHistory, IDisposable
         return new Scope(() => suspendedDepth--);
     }
 
+    /// <summary>Updates the current undo snapshot after externally refreshed values, without adding an edit.</summary>
+    public void RefreshCurrentState()
+    {
+        states[cursor] = ReadState();
+    }
+
     /// <inheritdoc />
     public void Capture()
     {

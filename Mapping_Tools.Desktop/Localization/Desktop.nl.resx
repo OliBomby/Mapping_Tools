@@ -6356,4 +6356,12 @@ Selecteer een slider in je beatmap en klik op 'Preview slider' om wijzigingen te
     <comment>Validation message supplied by the InclusiveRangeAttribute test for the inclusive values 1 through 60. Preserve both numbers and their endpoints.</comment>
   </data>
 
+  <data name="Shell_GlobalShortcuts" xml:space="preserve">
+    <value>Globale sneltoetsen</value>
+    <comment>Snackbar heading for desktop portal shortcut registration or Preferences refresh failures.</comment>
+  </data>
+  <data name="Shell_GlobalShortcutsUnavailable" xml:space="preserve">
+    <value>Sommige globale sneltoetsen zijn niet beschikbaar. Schakel de sneltoetsen van Mapping Tools in bij de sneltoetsinstellingen van je desktop. Ontbreken ze, controleer dan je GlobalShortcuts-portaalbackend (KDE: xdg-desktop-portal-kde) en herstart Mapping Tools.</value>
+    <comment>Snackbar guidance when desktop portal registration fails or requested shortcuts are unassigned. Preserve Mapping Tools, GlobalShortcuts, KDE and the package name xdg-desktop-portal-kde. No placeholders.</comment>
+  </data>
 </root>

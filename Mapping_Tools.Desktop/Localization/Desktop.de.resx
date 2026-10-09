@@ -6356,4 +6356,12 @@ Wähle zunächst einen Slider in deiner Beatmap aus und klicke auf „Slider-Vor
     <comment>Validation message supplied by the InclusiveRangeAttribute test for the inclusive values 1 through 60. Preserve both numbers and their endpoints.</comment>
   </data>
 
+  <data name="Shell_GlobalShortcuts" xml:space="preserve">
+    <value>Globale Tastenkürzel</value>
+    <comment>Snackbar heading for desktop portal shortcut registration or Preferences refresh failures.</comment>
+  </data>
+  <data name="Shell_GlobalShortcutsUnavailable" xml:space="preserve">
+    <value>Einige globale Tastenkürzel sind nicht verfügbar. Aktiviere die Mapping Tools-Tastenkürzel in den Tastenkürzel-Einstellungen deines Desktops. Falls sie fehlen, prüfe dein GlobalShortcuts-Portal-Backend (KDE: xdg-desktop-portal-kde) und starte Mapping Tools neu.</value>
+    <comment>Snackbar guidance when desktop portal registration fails or requested shortcuts are unassigned. Preserve Mapping Tools, GlobalShortcuts, KDE and the package name xdg-desktop-portal-kde. No placeholders.</comment>
+  </data>
 </root>

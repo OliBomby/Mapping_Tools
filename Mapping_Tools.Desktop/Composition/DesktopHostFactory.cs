@@ -31,9 +31,9 @@ internal static class DesktopHostFactory
         services.AddHostedService<ToolExecutionHostedService>();
         services.AddHostedService<PeriodicBackupHostedService>();
         services.AddHostedService<BetterSaveOverrideHostedService>();
+        services.AddHostedService<NotificationPresenter>();
         services.AddSingleton<IHostedService>(provider =>
             provider.GetRequiredService<GlobalHotkeyHostedService>());
-        services.AddHostedService<NotificationPresenter>();
         return services;
     }
 }

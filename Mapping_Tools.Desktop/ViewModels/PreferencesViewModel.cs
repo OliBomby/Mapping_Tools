@@ -29,11 +29,15 @@ public sealed partial class PreferencesViewModel : LocalizedObservableValidator,
     private readonly IBetterSaveOverrideService betterSaveOverride;
     private readonly IFilePicker filePicker;
     private readonly IHotkeyBindingCoordinator hotkeyBindings;
+    private readonly IGlobalHotkeyRegistration? hotkeyRegistration;
     private readonly IUserNotificationService notifications;
     private readonly IQuickRunCommandRegistry quickRunRegistry;
 
     private readonly DesktopApplicationSettings settings;
     private readonly IApplicationThemeService themeService;
+    private CancellationTokenSource? hotkeyRefreshCancellation;
+
+    internal Task HotkeyRefresh { get; private set; } = Task.CompletedTask;
 
     /// <summary>
     ///     Creates an editor over the process-lifetime settings document.
@@ -45,6 +49,7 @@ public sealed partial class PreferencesViewModel : LocalizedObservableValidator,
     /// <param name="quickRunRegistry">Supplies explicit Smart QuickRun target choices.</param>
     /// <param name="hotkeyBindings">Applies shortcut changes to the running global listener.</param>
     /// <param name="betterSaveOverride">Reconfigures automatic save observation immediately.</param>
+    /// <param name="hotkeyRegistration">Reads desktop-owned assignments when the active platform exposes them.</param>
     public PreferencesViewModel(
         DesktopApplicationSettings settings,
         IFilePicker filePicker,
@@ -52,7 +57,8 @@ public sealed partial class PreferencesViewModel : LocalizedObservableValidator,
         IUserNotificationService notifications,
         IQuickRunCommandRegistry quickRunRegistry,
         IHotkeyBindingCoordinator hotkeyBindings,
-        IBetterSaveOverrideService betterSaveOverride)
+        IBetterSaveOverrideService betterSaveOverride,
+        IGlobalHotkeyRegistration? hotkeyRegistration = null)
     {
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
@@ -60,6 +66,7 @@ public sealed partial class PreferencesViewModel : LocalizedObservableValidator,
         this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
         this.quickRunRegistry = quickRunRegistry ?? throw new ArgumentNullException(nameof(quickRunRegistry));
         this.hotkeyBindings = hotkeyBindings ?? throw new ArgumentNullException(nameof(hotkeyBindings));
+        this.hotkeyRegistration = hotkeyRegistration;
         this.betterSaveOverride = betterSaveOverride ?? throw new ArgumentNullException(nameof(betterSaveOverride));
         OsuPath = settings.OsuPath;
         SongsPath = settings.SongsPath;
@@ -80,6 +87,7 @@ public sealed partial class PreferencesViewModel : LocalizedObservableValidator,
     /// <inheritdoc />
     public void Dispose()
     {
+        CancelHotkeyRefresh();
         TranslationManager.LanguageChanged -= OnLanguageChanged;
         UndoHistory.Dispose();
     }
@@ -419,11 +427,54 @@ public sealed partial class PreferencesViewModel : LocalizedObservableValidator,
     public void Activate()
     {
         RefreshQuickRunTools();
+        CancelHotkeyRefresh();
+        hotkeyRefreshCancellation = new CancellationTokenSource();
+        HotkeyRefresh = RefreshHotkeysAsync(hotkeyRefreshCancellation.Token);
     }
 
     /// <inheritdoc />
     public void Deactivate()
     {
+        CancelHotkeyRefresh();
+    }
+
+    private async Task RefreshHotkeysAsync(CancellationToken cancellationToken)
+    {
+        if (hotkeyRegistration is null) return;
+
+        try
+        {
+            var shortcuts = await hotkeyRegistration.GetRegisteredShortcutsAsync(cancellationToken);
+            if (cancellationToken.IsCancellationRequested) return;
+
+            using (UndoHistory.SuspendRecording())
+            {
+                settings.QuickRunHotkey = shortcuts.GetValueOrDefault("quick-run");
+                settings.QuickUndoHotkey = shortcuts.GetValueOrDefault("quick-undo");
+                settings.BetterSaveHotkey = shortcuts.GetValueOrDefault("better-save");
+                OnPropertyChanged(nameof(QuickRunHotkey));
+                OnPropertyChanged(nameof(QuickUndoHotkey));
+                OnPropertyChanged(nameof(BetterSaveHotkey));
+                UndoHistory.RefreshCurrentState();
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception exception)
+        {
+            if (cancellationToken.IsCancellationRequested || !(QuickRunHotkey is { Key: not 0 } ||
+                QuickUndoHotkey is { Key: not 0 } || BetterSaveHotkey is { Key: not 0 })) return;
+            await notifications.PublishAsync(new UserNotification(UserNotificationSeverity.Warning,
+                DesktopStrings.Shell_GlobalShortcuts, DesktopStrings.Shell_GlobalShortcutsUnavailable, exception));
+        }
+    }
+
+    private void CancelHotkeyRefresh()
+    {
+        hotkeyRefreshCancellation?.Cancel();
+        hotkeyRefreshCancellation?.Dispose();
+        hotkeyRefreshCancellation = null;
     }
 
     partial void OnOsuPathChanged(string value)
@@ -589,6 +640,7 @@ public sealed partial class PreferencesViewModel : LocalizedObservableValidator,
         Action<HotkeySettings?> applyBinding,
         [CallerMemberName] string propertyName = "")
     {
+        CancelHotkeyRefresh();
         if (SetProperty(current, value, settings, apply, false, propertyName)) applyBinding(value);
     }
 

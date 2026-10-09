@@ -33,6 +33,7 @@ public partial class MainWindow : Window, INotificationSurface
 {
     private static readonly WindowBounds defaultBounds = new(80, 60, 1500, 800);
     private static readonly TimeSpan snackbarDuration = TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan warningSnackbarDuration = TimeSpan.FromSeconds(15);
     private readonly DesktopApplicationSettings settings;
     private readonly ILogger<MainWindow> logger;
     private readonly SettingsPersistenceHostedService? settingsPersistence;
@@ -111,7 +112,8 @@ public partial class MainWindow : Window, INotificationSurface
     {
         Dispatcher.UIThread.Post(
             () => SnackbarHost.Post(
-                new SnackbarModel($"{notification.Title}: {notification.Message}", snackbarDuration),
+                new SnackbarModel($"{notification.Title}: {notification.Message}",
+                    notification.Severity == UserNotificationSeverity.Warning ? warningSnackbarDuration : snackbarDuration),
                 "Root",
                 DispatcherPriority.Normal),
             DispatcherPriority.Normal);

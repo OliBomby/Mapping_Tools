@@ -38,13 +38,13 @@
                                            ToolTip.Tip="{loc:Tr GeometryDashboard_SnapKeyTip}" />
                                 <controls:HotkeyEditor Grid.Column="1" Width="150" VerticalAlignment="Bottom"
                                                        Classes="compact"
-                                                       Hotkey="{Binding Preferences.SnapHotkey, Mode=TwoWay}"
+                                                       Hotkey="{Binding Preferences.SnapHotkey, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                                        ToolTip.Tip="{loc:Tr GeometryDashboard_SnapKeyTip}" />
                                 <TextBlock Grid.Column="2" Text="{loc:Tr GeometryDashboard_SelectKey}" VerticalAlignment="Bottom" Margin="10,0,5,6"
                                            ToolTip.Tip="{loc:Tr GeometryDashboard_SelectKeyTip}" />
                                 <controls:HotkeyEditor Grid.Column="3" Width="150" VerticalAlignment="Bottom"
                                                        Classes="compact"
-                                                       Hotkey="{Binding Preferences.SelectHotkey, Mode=TwoWay}"
+                                                       Hotkey="{Binding Preferences.SelectHotkey, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                                        ToolTip.Tip="{loc:Tr GeometryDashboard_SelectKeyTip}" />
                             </Grid>
 
@@ -59,14 +59,14 @@
                                            ToolTip.Tip="{loc:Tr GeometryDashboard_LockKeyTip}" />
                                 <controls:HotkeyEditor Grid.Column="1" Width="150" VerticalAlignment="Bottom"
                                                        Classes="compact"
-                                                       Hotkey="{Binding Preferences.LockHotkey, Mode=TwoWay}"
+                                                       Hotkey="{Binding Preferences.LockHotkey, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                                        ToolTip.Tip="{loc:Tr GeometryDashboard_LockKeyTip}" />
                                 <TextBlock Grid.Column="2" Text="{loc:Tr GeometryDashboard_UsabilityKey}" VerticalAlignment="Bottom"
                                            Margin="10,0,5,6"
                                            ToolTip.Tip="{loc:Tr GeometryDashboard_UsabilityKeyTip}" />
                                 <controls:HotkeyEditor Grid.Column="3" Width="150" VerticalAlignment="Bottom"
                                                        Classes="compact"
-                                                       Hotkey="{Binding Preferences.InheritHotkey, Mode=TwoWay}"
+                                                       Hotkey="{Binding Preferences.InheritHotkey, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                                        ToolTip.Tip="{loc:Tr GeometryDashboard_UsabilityKeyTip}" />
                             </Grid>
 
@@ -79,7 +79,7 @@
                                            ToolTip.Tip="{loc:Tr GeometryDashboard_RefreshKeyTip}" />
                                 <controls:HotkeyEditor Grid.Column="1" Width="150" VerticalAlignment="Bottom"
                                                        Classes="compact"
-                                                       Hotkey="{Binding Preferences.RefreshHotkey, Mode=TwoWay}"
+                                                       Hotkey="{Binding Preferences.RefreshHotkey, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                                        ToolTip.Tip="{loc:Tr GeometryDashboard_RefreshKeyTip}" />
                             </Grid>
 

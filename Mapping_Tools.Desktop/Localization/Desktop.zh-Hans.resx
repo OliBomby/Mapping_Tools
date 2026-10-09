@@ -6356,4 +6356,12 @@ Timing Helper 随后会调整 BPM 和/或添加红线，使每个标记都能吸
     <comment>Validation message supplied by the InclusiveRangeAttribute test for the inclusive values 1 through 60. Preserve both numbers and their endpoints.</comment>
   </data>
 
+  <data name="Shell_GlobalShortcuts" xml:space="preserve">
+    <value>全局快捷键</value>
+    <comment>Snackbar heading for desktop portal shortcut registration or Preferences refresh failures.</comment>
+  </data>
+  <data name="Shell_GlobalShortcutsUnavailable" xml:space="preserve">
+    <value>部分全局快捷键不可用。请在桌面的快捷键设置中启用 Mapping Tools 快捷键。如果未显示，请检查 GlobalShortcuts 门户后端（KDE：xdg-desktop-portal-kde），然后重启 Mapping Tools。</value>
+    <comment>Snackbar guidance when desktop portal registration fails or requested shortcuts are unassigned. Preserve Mapping Tools, GlobalShortcuts, KDE and the package name xdg-desktop-portal-kde. No placeholders.</comment>
+  </data>
 </root>

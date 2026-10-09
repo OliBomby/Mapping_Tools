@@ -198,7 +198,7 @@
                            ToolTip.Tip="{loc:Tr Shell_QuickrunLetsYouQuicklyRunAToolOnTheBeatmapYouHaveOpenInTheEditor}" />
                 <controls:HotkeyEditor Grid.Row="0" Grid.Column="1" Width="150"
                                        Classes="compact"
-                                       Hotkey="{Binding QuickRunHotkey, Mode=TwoWay}" />
+                                       Hotkey="{Binding QuickRunHotkey, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
 
                 <CheckBox Grid.Row="0" Grid.Column="2" Margin="15,0,0,0"
                           VerticalAlignment="Center"
@@ -264,7 +264,7 @@
                            ToolTip.Tip="{loc:Tr Shell_QuicklyLoadsTheLatestBackupIntoTheBeatmapCurrentlyOpenInTheEditor}" />
                 <controls:HotkeyEditor Grid.Row="1" Grid.Column="1" Width="150"
                                        Classes="compact"
-                                       Hotkey="{Binding QuickUndoHotkey, Mode=TwoWay}" />
+                                       Hotkey="{Binding QuickUndoHotkey, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
 
                 <TextBlock Grid.Row="2" Grid.Column="0" MinWidth="120"
                            Margin="0,0,5,0"
@@ -273,7 +273,7 @@
                            ToolTip.Tip="{loc:Tr Shell_BettersaveSavesTheCurrentMapWithProperRoundingInsteadOfTruncatingValues}" />
                 <controls:HotkeyEditor Grid.Row="2" Grid.Column="1" Width="150"
                                        Classes="compact"
-                                       Hotkey="{Binding BetterSaveHotkey, Mode=TwoWay}" />
+                                       Hotkey="{Binding BetterSaveHotkey, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
             </Grid>
 
             <ComboBox Margin="0,10,0,0"

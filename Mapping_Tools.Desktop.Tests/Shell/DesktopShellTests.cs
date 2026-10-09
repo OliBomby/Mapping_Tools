@@ -56,7 +56,7 @@ public sealed class DesktopShellTests
     [DataRow(1)]
     [DataRow(2)]
     [SuppressMessage("ReSharper", "AccessToDisposedClosure", Justification = "The feature factory is used only before the Preferences view model is disposed.")]
-    public async Task MainWindow_WithFocusedPreferencesHotkey_UndoesEachGestureAndUpdatesInput(int inputIndex)
+    public async Task MainWindow_AfterPreferencesHotkeyLosesFocus_UndoesEachCommittedGestureAndUpdatesInput(int inputIndex)
     {
         // Arrange
         DesktopApplicationSettings settings = new();
@@ -69,13 +69,18 @@ public sealed class DesktopShellTests
         MainWindow window = new() { DataContext = viewModel };
         using HeadlessViewHost host = HeadlessViewHost.ShowWindow(window);
         HotkeyEditor input = window.GetVisualDescendants().OfType<HotkeyEditor>().ElementAt(inputIndex);
+        HotkeyEditor otherInput = window.GetVisualDescendants().OfType<HotkeyEditor>().ElementAt((inputIndex + 1) % 3);
         input.Focus();
 
         // Act
         host.PressKey(Key.B, RawInputModifiers.Alt, PhysicalKey.B, "b");
         window.KeyRelease(Key.B, RawInputModifiers.Alt, PhysicalKey.B, "b");
+        otherInput.Focus();
+        input.Focus();
         host.PressKey(Key.C, RawInputModifiers.Alt, PhysicalKey.C, "c");
         window.KeyRelease(Key.C, RawInputModifiers.Alt, PhysicalKey.C, "c");
+        otherInput.Focus();
+        input.Focus();
         host.PressKey(Key.Z, RawInputModifiers.Control, PhysicalKey.Z, "z");
         HotkeySettings? undone = input.Hotkey;
         string? undoneText = input.Text;

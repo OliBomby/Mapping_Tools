@@ -6356,4 +6356,12 @@ Timing Helper は BPM を調整したり赤線を追加したりして、すべ�
     <comment>Validation message supplied by the InclusiveRangeAttribute test for the inclusive values 1 through 60. Preserve both numbers and their endpoints.</comment>
   </data>
 
+  <data name="Shell_GlobalShortcuts" xml:space="preserve">
+    <value>グローバルショートカット</value>
+    <comment>Snackbar heading for desktop portal shortcut registration or Preferences refresh failures.</comment>
+  </data>
+  <data name="Shell_GlobalShortcutsUnavailable" xml:space="preserve">
+    <value>一部のグローバルショートカットが利用できません。デスクトップのショートカット設定で Mapping Tools のショートカットを有効にしてください。表示されない場合は、GlobalShortcuts ポータルのバックエンド（KDE: xdg-desktop-portal-kde）を確認し、Mapping Tools を再起動してください。</value>
+    <comment>Snackbar guidance when desktop portal registration fails or requested shortcuts are unassigned. Preserve Mapping Tools, GlobalShortcuts, KDE and the package name xdg-desktop-portal-kde. No placeholders.</comment>
+  </data>
 </root>

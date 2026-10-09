@@ -1,9 +1,12 @@
 using Avalonia.Controls;
 using Avalonia;
+using Avalonia.Input;
 using Avalonia.VisualTree;
 using Mapping_Tools.Application.Localization;
 using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 using Mapping_Tools.Desktop.Tests.TestHelpers;
+using Mapping_Tools.Desktop.Controls;
+using Mapping_Tools.Core.Settings.Models;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.Views;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -14,6 +17,25 @@ namespace Mapping_Tools.Desktop.Tests.Tools.GeometryDashboard.Views;
 [DoNotParallelize]
 public sealed class GeometryDashboardPreferencesWindowTests
 {
+    [TestMethod]
+    public void SnapHotkey_EditorLosesFocus_UpdatesSettings()
+    {
+        // Arrange
+        GeometryDashboardPreferencesDialogViewModel viewModel = new(new GeometryDashboardPreferences(), false);
+        GeometryDashboardPreferencesWindow window = new() { DataContext = viewModel };
+        using HeadlessViewHost host = HeadlessViewHost.ShowWindow(window);
+        HotkeyEditor editor = window.GetVisualDescendants().OfType<HotkeyEditor>().First();
+
+        // Act
+        editor.ApplyKey(Key.B, KeyModifiers.Control);
+        editor.RaiseEvent(new FocusChangedEventArgs(InputElement.LostFocusEvent) { Source = editor });
+
+        // Assert
+        viewModel.Preferences.SnapHotkey.Should().Be(new HotkeySettings(45, 2));
+        editor.Hotkey.Should().Be(viewModel.Preferences.SnapHotkey);
+        editor.Text.Should().Be("Ctrl + B");
+    }
+
     [TestMethod]
     public void Show_DutchPreferenceLabel_DisplaysTextWithoutClipping()
     {

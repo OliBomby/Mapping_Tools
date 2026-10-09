@@ -6356,4 +6356,12 @@ osu! 픽셀 단위로 지정하는 연결 허용 거리가 병합할 두 히트 
     <comment>Validation message supplied by the InclusiveRangeAttribute test for the inclusive values 1 through 60. Preserve both numbers and their endpoints.</comment>
   </data>
 
+  <data name="Shell_GlobalShortcuts" xml:space="preserve">
+    <value>전역 단축키</value>
+    <comment>Snackbar heading for desktop portal shortcut registration or Preferences refresh failures.</comment>
+  </data>
+  <data name="Shell_GlobalShortcutsUnavailable" xml:space="preserve">
+    <value>일부 전역 단축키를 사용할 수 없습니다. 데스크톱의 단축키 설정에서 Mapping Tools 단축키를 활성화하세요. 표시되지 않으면 GlobalShortcuts 포털 백엔드(KDE: xdg-desktop-portal-kde)를 확인한 후 Mapping Tools를 다시 시작하세요.</value>
+    <comment>Snackbar guidance when desktop portal registration fails or requested shortcuts are unassigned. Preserve Mapping Tools, GlobalShortcuts, KDE and the package name xdg-desktop-portal-kde. No placeholders.</comment>
+  </data>
 </root>

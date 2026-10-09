@@ -2,6 +2,9 @@ using Mapping_Tools.Application.Backups.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Core.Settings.Models;
+using Mapping_Tools.Application.Execution.UserNotification;
+using Mapping_Tools.Application.Execution.UserNotification.Models;
+using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Models;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -20,6 +23,7 @@ internal sealed class GlobalHotkeyHostedService : IHostedService, IHotkeyBinding
     private readonly IQuickRunService quickRun;
     private readonly IQuickUndoCommandService quickUndo;
     private readonly DesktopApplicationSettings settings;
+    private readonly IUserNotificationService? notifications;
 
     public GlobalHotkeyHostedService(
         IGlobalHotkeyService hotkeys,
@@ -27,7 +31,8 @@ internal sealed class GlobalHotkeyHostedService : IHostedService, IHotkeyBinding
         IQuickUndoCommandService quickUndo,
         IBetterSaveService betterSave,
         DesktopApplicationSettings settings,
-        ILogger<GlobalHotkeyHostedService>? logger = null)
+        ILogger<GlobalHotkeyHostedService>? logger = null,
+        IUserNotificationService? notifications = null)
     {
         this.hotkeys = hotkeys ?? throw new ArgumentNullException(nameof(hotkeys));
         this.quickRun = quickRun ?? throw new ArgumentNullException(nameof(quickRun));
@@ -35,11 +40,13 @@ internal sealed class GlobalHotkeyHostedService : IHostedService, IHotkeyBinding
         this.betterSave = betterSave ?? throw new ArgumentNullException(nameof(betterSave));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         this.logger = logger ?? NullLogger<GlobalHotkeyHostedService>.Instance;
+        this.notifications = notifications;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        if (hotkeys is IGlobalHotkeyRegistration registration) registration.RegistrationFailed += OnRegistrationFailed;
         ApplyQuickRun(settings.QuickRunHotkey);
         ApplyQuickUndo(settings.QuickUndoHotkey);
         ApplyBetterSave(settings.BetterSaveHotkey);
@@ -51,8 +58,24 @@ internal sealed class GlobalHotkeyHostedService : IHostedService, IHotkeyBinding
     public Task StopAsync(CancellationToken cancellationToken)
     {
         hotkeys.Stop();
+        if (hotkeys is IGlobalHotkeyRegistration registration) registration.RegistrationFailed -= OnRegistrationFailed;
         logger.LogInformation("Global hotkey listener stopped");
         return Task.CompletedTask;
+    }
+
+    private async void OnRegistrationFailed(object? sender, Exception exception)
+    {
+        if (notifications is null || !(settings.QuickRunHotkey is { Key: not 0 } ||
+            settings.QuickUndoHotkey is { Key: not 0 } || settings.BetterSaveHotkey is { Key: not 0 })) return;
+        try
+        {
+            await notifications.PublishAsync(new UserNotification(UserNotificationSeverity.Warning,
+                DesktopStrings.Shell_GlobalShortcuts, DesktopStrings.Shell_GlobalShortcutsUnavailable, exception));
+        }
+        catch (Exception notificationException)
+        {
+            logger.LogWarning(notificationException, "Could not display the global shortcut warning");
+        }
     }
 
     public void ApplyQuickRun(HotkeySettings? hotkey)
