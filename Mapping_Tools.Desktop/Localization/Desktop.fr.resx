@@ -6356,4 +6356,12 @@ Pour commencer, sélectionnez un slider dans votre beatmap et cliquez sur « Pr�
     <comment>Validation message supplied by the InclusiveRangeAttribute test for the inclusive values 1 through 60. Preserve both numbers and their endpoints.</comment>
   </data>
 
+  <data name="Shell_GlobalShortcuts" xml:space="preserve">
+    <value>Raccourcis globaux</value>
+    <comment>Snackbar heading for desktop portal shortcut registration or Preferences refresh failures.</comment>
+  </data>
+  <data name="Shell_GlobalShortcutsUnavailable" xml:space="preserve">
+    <value>Certains raccourcis globaux sont indisponibles. Activez les raccourcis de Mapping Tools dans les paramètres de raccourcis du bureau. S’ils n’apparaissent pas, vérifiez le backend du portail GlobalShortcuts (KDE : xdg-desktop-portal-kde), puis redémarrez Mapping Tools.</value>
+    <comment>Snackbar guidance when desktop portal registration fails or requested shortcuts are unassigned. Preserve Mapping Tools, GlobalShortcuts, KDE and the package name xdg-desktop-portal-kde. No placeholders.</comment>
+  </data>
 </root>

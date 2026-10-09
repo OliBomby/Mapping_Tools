@@ -6356,4 +6356,12 @@ Aby rozpocząć, zaznacz slider na beatmapie i kliknij „Podgląd slidera”, b
     <comment>Validation message supplied by the InclusiveRangeAttribute test for the inclusive values 1 through 60. Preserve both numbers and their endpoints.</comment>
   </data>
 
+  <data name="Shell_GlobalShortcuts" xml:space="preserve">
+    <value>Globalne skróty klawiszowe</value>
+    <comment>Snackbar heading for desktop portal shortcut registration or Preferences refresh failures.</comment>
+  </data>
+  <data name="Shell_GlobalShortcutsUnavailable" xml:space="preserve">
+    <value>Niektóre globalne skróty są niedostępne. Włącz skróty Mapping Tools w ustawieniach skrótów pulpitu. Jeśli ich brakuje, sprawdź backend portalu GlobalShortcuts (KDE: xdg-desktop-portal-kde), a następnie uruchom Mapping Tools ponownie.</value>
+    <comment>Snackbar guidance when desktop portal registration fails or requested shortcuts are unassigned. Preserve Mapping Tools, GlobalShortcuts, KDE and the package name xdg-desktop-portal-kde. No placeholders.</comment>
+  </data>
 </root>

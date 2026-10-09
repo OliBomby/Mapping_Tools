@@ -31,6 +31,7 @@
     <PackageReference Include="OggVorbisEncoder" Version="1.2.0"/>
     <PackageReference Include="OsuMemoryDataProvider" Version="0.10.3"/>
     <PackageReference Include="SharpHook" Version="8.0.0"/>
+    <PackageReference Include="Tmds.DBus.Protocol" Version="0.94.1"/>
     <PackageReference Include="Velopack" Version="1.2.0"/>
   </ItemGroup>
 

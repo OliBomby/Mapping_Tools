@@ -6356,4 +6356,12 @@ Untuk memulai, pilih slider pada beatmap, lalu klik 'Pratinjau slider' untuk mel
     <comment>Validation message supplied by the InclusiveRangeAttribute test for the inclusive values 1 through 60. Preserve both numbers and their endpoints.</comment>
   </data>
 
+  <data name="Shell_GlobalShortcuts" xml:space="preserve">
+    <value>Pintasan global</value>
+    <comment>Snackbar heading for desktop portal shortcut registration or Preferences refresh failures.</comment>
+  </data>
+  <data name="Shell_GlobalShortcutsUnavailable" xml:space="preserve">
+    <value>Beberapa pintasan global tidak tersedia. Aktifkan pintasan Mapping Tools di pengaturan pintasan desktop. Jika tidak muncul, periksa backend portal GlobalShortcuts (KDE: xdg-desktop-portal-kde), lalu mulai ulang Mapping Tools.</value>
+    <comment>Snackbar guidance when desktop portal registration fails or requested shortcuts are unassigned. Preserve Mapping Tools, GlobalShortcuts, KDE and the package name xdg-desktop-portal-kde. No placeholders.</comment>
+  </data>
 </root>

@@ -1,6 +1,9 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
+using Avalonia.Data;
+using Avalonia.Input;
+using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Application.Localization;
 using Mapping_Tools.Desktop.Localization;
 using CommunityToolkit.Mvvm.Input;
@@ -24,6 +27,201 @@ namespace Mapping_Tools.Desktop.Tests.ViewModels;
 [DoNotParallelize]
 public sealed class PreferencesViewModelTests
 {
+    [TestMethod]
+    public async Task QuickRunHotkey_EditorCapturesGestureAfterPortalRefresh_UpdatesSettingsAndCurrentValue()
+    {
+        // Arrange
+        var settings = CreateSettings();
+        settings.QuickRunHotkey = new HotkeySettings(44, 2);
+        TestHotkeyBindingCoordinator bindings = new()
+        {
+            ReadShortcuts = _ => Task.FromResult(
+                new Dictionary<string, HotkeySettings> { ["quick-run"] = new(97, 8) }),
+        };
+        using var viewModel = CreateViewModel(settings, hotkeyBindings: bindings);
+        HotkeyEditor editor = new() { DataContext = viewModel };
+        editor.Bind(HotkeyEditor.HotkeyProperty, new Binding(nameof(PreferencesViewModel.QuickRunHotkey)) { Mode = BindingMode.TwoWay });
+        viewModel.Activate();
+        await viewModel.HotkeyRefresh;
+
+        // Act
+        editor.ApplyKey(Key.B, KeyModifiers.Control);
+
+        // Assert
+        settings.QuickRunHotkey.Should().Be(new HotkeySettings(45, 2));
+        bindings.QuickRun.Should().Be(settings.QuickRunHotkey);
+        editor.Hotkey.Should().BeSameAs(viewModel.QuickRunHotkey);
+        editor.Hotkey.Should().Be(settings.QuickRunHotkey);
+        editor.Text.Should().Be("Ctrl + B");
+    }
+
+    [TestMethod]
+    public async Task Undo_EditorClearsPortalAssignment_RestoresDesktopAssignment()
+    {
+        // Arrange
+        var settings = CreateSettings();
+        settings.QuickRunHotkey = new HotkeySettings(44, 2);
+        TestHotkeyBindingCoordinator bindings = new()
+        {
+            ReadShortcuts = _ => Task.FromResult(
+                new Dictionary<string, HotkeySettings> { ["quick-run"] = new(97, 8) }),
+        };
+        using var viewModel = CreateViewModel(settings, hotkeyBindings: bindings);
+        HotkeyEditor editor = new() { DataContext = viewModel };
+        editor.Bind(HotkeyEditor.HotkeyProperty, new Binding(nameof(PreferencesViewModel.QuickRunHotkey)) { Mode = BindingMode.TwoWay });
+        viewModel.Activate();
+        await viewModel.HotkeyRefresh;
+        editor.ApplyKey(Key.Escape, KeyModifiers.None);
+
+        // Act
+        viewModel.UndoHistory.Undo();
+
+        // Assert
+        settings.QuickRunHotkey.Should().Be(new HotkeySettings(97, 8));
+        editor.Hotkey.Should().Be(settings.QuickRunHotkey);
+        editor.Text.Should().Be("Win + F8");
+        bindings.QuickRun.Should().Be(settings.QuickRunHotkey);
+    }
+
+    [DataTestMethod]
+    [DataRow(0, 0)]
+    [DataRow(44, 1)]
+    public async Task Activate_DesktopRefreshFails_WarnsOnlyWhenShortcutIsConfigured(int key, int expectedWarnings)
+    {
+        // Arrange
+        var settings = CreateSettings();
+        settings.QuickRunHotkey = new HotkeySettings(key, 2);
+        UserNotificationService notifications = new();
+        List<UserNotification> published = [];
+        notifications.Published += (_, args) => published.Add(args.Notification);
+        TestHotkeyBindingCoordinator bindings = new() { ReadShortcuts = _ => throw new IOException("Desktop is unavailable") };
+        using var viewModel = CreateViewModel(settings, hotkeyBindings: bindings, notifications: notifications);
+
+        // Act
+        viewModel.Activate();
+        await viewModel.HotkeyRefresh;
+
+        // Assert
+        published.Should().HaveCount(expectedWarnings);
+        published.Should().OnlyContain(notification => notification.Severity == UserNotificationSeverity.Warning
+            && notification.Message == DesktopStrings.Shell_GlobalShortcutsUnavailable);
+    }
+
+    [TestMethod]
+    public async Task Activate_SameDesktopGestureReentered_ReloadsAssignmentWithoutRegisteringAgain()
+    {
+        // Arrange
+        var settings = CreateSettings();
+        settings.QuickRunHotkey = new HotkeySettings(44, 2);
+        TestHotkeyBindingCoordinator bindings = new()
+        {
+            ReadShortcuts = _ => Task.FromResult(
+                new Dictionary<string, HotkeySettings> { ["quick-run"] = new(97, 8) }),
+        };
+        using var viewModel = CreateViewModel(settings, hotkeyBindings: bindings);
+        viewModel.Activate();
+        await viewModel.HotkeyRefresh;
+        viewModel.QuickRunHotkey = new HotkeySettings(97, 8);
+        viewModel.Deactivate();
+
+        // Act
+        viewModel.Activate();
+        await viewModel.HotkeyRefresh;
+
+        // Assert
+        viewModel.QuickRunHotkey.Should().Be(new HotkeySettings(97, 8));
+        bindings.QuickRun.Should().BeNull();
+        viewModel.UndoHistory.CanUndo.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public async Task Activate_DesktopShortcutsChanged_RefreshesSettingsWithoutRebindingOrRecordingUndo()
+    {
+        // Arrange
+        var settings = CreateSettings();
+        settings.QuickRunHotkey = new HotkeySettings(44, 2);
+        Dictionary<string, HotkeySettings> assignments = new() { ["quick-run"] = new(97, 8), ["quick-undo"] = new(69, 2) };
+        int reads = 0;
+        TestHotkeyBindingCoordinator bindings = new()
+        {
+            ReadShortcuts = _ =>
+            {
+                reads++;
+                return Task.FromResult(assignments);
+            },
+        };
+        using var viewModel = CreateViewModel(settings, hotkeyBindings: bindings);
+        viewModel.Activate();
+        await viewModel.HotkeyRefresh;
+        viewModel.Deactivate();
+        assignments["quick-run"] = new(98, 1);
+
+        // Act
+        viewModel.Activate();
+        await viewModel.HotkeyRefresh;
+
+        // Assert
+        viewModel.QuickRunHotkey.Should().Be(new HotkeySettings(98, 1));
+        viewModel.QuickUndoHotkey.Should().Be(new HotkeySettings(69, 2));
+        viewModel.BetterSaveHotkey.Should().BeNull();
+        settings.QuickRunHotkey.Should().Be(new HotkeySettings(98, 1));
+        viewModel.UndoHistory.CanUndo.Should().BeFalse();
+        bindings.QuickRun.Should().BeNull();
+        reads.Should().Be(2);
+    }
+
+    [TestMethod]
+    public async Task Activate_HotkeyEditedDuringRefresh_DiscardsLateDesktopResponse()
+    {
+        // Arrange
+        var settings = CreateSettings();
+        TaskCompletionSource<Dictionary<string, HotkeySettings>> response = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        TestHotkeyBindingCoordinator bindings = new() { ReadShortcuts = _ => response.Task };
+        using var viewModel = CreateViewModel(settings, hotkeyBindings: bindings);
+        viewModel.Activate();
+
+        // Act
+        viewModel.QuickRunHotkey = new HotkeySettings(45, 2);
+        response.SetResult(new Dictionary<string, HotkeySettings> { ["quick-run"] = new(44, 2) });
+        await viewModel.HotkeyRefresh;
+
+        // Assert
+        viewModel.QuickRunHotkey.Should().Be(new HotkeySettings(45, 2));
+        settings.QuickRunHotkey.Should().Be(new HotkeySettings(45, 2));
+        bindings.QuickRun.Should().Be(new HotkeySettings(45, 2));
+    }
+
+    [TestMethod]
+    public async Task Deactivate_PendingDesktopRefresh_CancelsRefreshWithoutWarning()
+    {
+        // Arrange
+        var settings = CreateSettings();
+        UserNotificationService notifications = new();
+        List<UserNotification> published = [];
+        notifications.Published += (_, args) => published.Add(args.Notification);
+        CancellationToken receivedToken = default;
+        TestHotkeyBindingCoordinator bindings = new()
+        {
+            ReadShortcuts = async token =>
+            {
+                receivedToken = token;
+                await Task.Delay(Timeout.InfiniteTimeSpan, token);
+                return [];
+            },
+        };
+        using var viewModel = CreateViewModel(settings, hotkeyBindings: bindings, notifications: notifications);
+        viewModel.Activate();
+
+        // Act
+        viewModel.Deactivate();
+        await viewModel.HotkeyRefresh;
+
+        // Assert
+        receivedToken.IsCancellationRequested.Should().BeTrue();
+        published.Should().BeEmpty();
+        viewModel.QuickRunHotkey.Should().BeNull();
+    }
+
     [TestMethod]
     public void SelectedLanguage_Dutch_UpdatesLiveTextAndSerializesTheLanguageChoice()
     {
@@ -627,7 +825,8 @@ public sealed class PreferencesViewModelTests
             notifications ?? new UserNotificationService(),
             quickRunRegistry ?? new QuickRunCommandRegistry(),
             hotkeyBindings ?? new TestHotkeyBindingCoordinator(),
-            betterSaveOverride ?? new TestBetterSaveOverrideService());
+            betterSaveOverride ?? new TestBetterSaveOverrideService(),
+            hotkeyBindings as IGlobalHotkeyRegistration);
     }
 
     private static Task ExecuteAsync(IAsyncRelayCommand command)

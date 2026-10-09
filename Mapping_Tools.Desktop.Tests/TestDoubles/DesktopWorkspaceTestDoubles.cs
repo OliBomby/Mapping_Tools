@@ -26,8 +26,22 @@ internal sealed class TestBetterSaveService : IBetterSaveService
     }
 }
 
-internal sealed class TestHotkeyBindingCoordinator : IHotkeyBindingCoordinator
+internal sealed class TestHotkeyBindingCoordinator : IHotkeyBindingCoordinator, IGlobalHotkeyRegistration
 {
+    public event EventHandler<Exception>? RegistrationFailed
+    {
+        add { }
+        remove { }
+    }
+
+    public Func<CancellationToken, Task<Dictionary<string, HotkeySettings>>> ReadShortcuts { get; set; } =
+        _ => Task.FromException<Dictionary<string, HotkeySettings>>(new OperationCanceledException());
+
+    public Task<Dictionary<string, HotkeySettings>> GetRegisteredShortcutsAsync(CancellationToken cancellationToken)
+    {
+        return ReadShortcuts(cancellationToken);
+    }
+
     public HotkeySettings? QuickRun { get; private set; }
 
     public HotkeySettings? QuickUndo { get; private set; }

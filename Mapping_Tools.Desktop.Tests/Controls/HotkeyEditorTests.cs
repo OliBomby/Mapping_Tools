@@ -9,6 +9,48 @@ namespace Mapping_Tools.Desktop.Tests.Controls;
 public sealed class HotkeyEditorTests
 {
     [TestMethod]
+    public void Hotkey_DesktopAssignmentChanges_DisplaysCurrentGesture()
+    {
+        // Arrange
+        HotkeyEditor editor = new() { Hotkey = new HotkeySettings(44, 2) };
+
+        // Act
+        editor.Hotkey = new HotkeySettings(97, 8);
+
+        // Assert
+        editor.Text.Should().Be("Win + F8");
+        editor.Hotkey.Should().Be(new HotkeySettings(97, 8));
+    }
+
+    [TestMethod]
+    public void Hotkey_UnassignedDesktopShortcut_ShowsNotSetWithoutRetainingRequestedGesture()
+    {
+        // Arrange
+        HotkeyEditor editor = new() { Hotkey = new HotkeySettings(44, 2) };
+
+        // Act
+        editor.Hotkey = new HotkeySettings(0, 0);
+
+        // Assert
+        editor.Text.Should().Be("< not set >");
+        editor.Hotkey!.Key.Should().Be(0);
+    }
+
+    [TestMethod]
+    public void ApplyKey_WithDesktopAssignment_ReplacesValueWithCapturedGesture()
+    {
+        // Arrange
+        HotkeyEditor editor = new() { Hotkey = new HotkeySettings(97, 8) };
+
+        // Act
+        editor.ApplyKey("B", KeyModifiers.Control);
+
+        // Assert
+        editor.Text.Should().Be("Ctrl + B");
+        editor.Hotkey.Should().Be(new HotkeySettings(45, 2));
+    }
+
+    [TestMethod]
     public void TryGetKey_WithSupportedAvaloniaNames_ReturnsAvaloniaKeyValues()
     {
         // Arrange

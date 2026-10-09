@@ -1,5 +1,7 @@
 using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Core.Settings.Models;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using SharpHook;
 using SharpHook.Data;
 
@@ -106,19 +108,24 @@ public sealed class SharpHookGlobalHotkeyService : IGlobalHotkeyService
 
     private readonly Lock gate = new();
     private readonly Func<bool> isSupported;
+    private readonly ILogger<SharpHookGlobalHotkeyService> logger;
     private IGlobalHook? hook;
     private bool started;
     private CancellationTokenSource stopping = new();
 
     /// <summary>Creates the global hotkey adapter using the current platform guard.</summary>
-    public SharpHookGlobalHotkeyService()
-        : this(IsSupportedPlatform)
+    /// <param name="logger">Records native keyboard-hook startup failures.</param>
+    public SharpHookGlobalHotkeyService(ILogger<SharpHookGlobalHotkeyService>? logger = null)
+        : this(IsSupportedPlatform, logger)
     {
     }
 
-    internal SharpHookGlobalHotkeyService(Func<bool> isSupported)
+    internal SharpHookGlobalHotkeyService(
+        Func<bool> isSupported,
+        ILogger<SharpHookGlobalHotkeyService>? logger = null)
     {
         this.isSupported = isSupported ?? throw new ArgumentNullException(nameof(isSupported));
+        this.logger = logger ?? NullLogger<SharpHookGlobalHotkeyService>.Instance;
     }
 
     /// <inheritdoc />
@@ -199,8 +206,9 @@ public sealed class SharpHookGlobalHotkeyService : IGlobalHotkeyService
                 TaskContinuationOptions.OnlyOnFaulted,
                 TaskScheduler.Default);
         }
-        catch
+        catch (Exception exception)
         {
+            logger.LogWarning(exception, "The global keyboard hook could not start");
             OnHookStopped(currentHook, null);
         }
     }
@@ -408,7 +416,8 @@ public sealed class SharpHookGlobalHotkeyService : IGlobalHotkeyService
 
     private void OnHookStopped(IGlobalHook currentHook, Task? task)
     {
-        _ = task?.Exception;
+        if (task?.Exception is { } exception)
+            logger.LogWarning(exception, "The global keyboard hook stopped unexpectedly");
         lock (gate)
         {
             if (!ReferenceEquals(hook, currentHook)) return;
