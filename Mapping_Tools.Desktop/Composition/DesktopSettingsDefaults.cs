@@ -5,12 +5,12 @@ namespace Mapping_Tools.Desktop.Composition;
 
 internal static class DesktopSettingsDefaults
 {
-    internal static DesktopApplicationSettings Create(bool isWindows)
+    internal static DesktopApplicationSettings Create(bool isWindows, bool isLinux = false)
     {
         DesktopApplicationSettings settings = new();
         if (isWindows) return settings;
 
-        settings.BeatmapLiveStateReading = BeatmapLiveStateReadingMode.Disabled;
+        if (!isLinux) settings.BeatmapLiveStateReading = BeatmapLiveStateReadingMode.Disabled;
         settings.EditorReload = EditorReloadMode.Disabled;
         return settings;
     }

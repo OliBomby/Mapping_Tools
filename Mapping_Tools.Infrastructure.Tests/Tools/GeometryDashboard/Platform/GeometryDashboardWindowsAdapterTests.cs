@@ -59,7 +59,7 @@ public sealed class GeometryDashboardWindowsAdapterTests
     public async Task ReadAsync_WhenPlatformIsUnavailable_ReturnsNoSnapshot()
     {
         // Arrange
-        WindowsEditorReaderAdapter sut = new(
+        StableMemoryLiveBeatmapReader sut = new(
             new ApplicationSettings(),
             new ApplicationDirectories(Path.Combine(Path.GetTempPath(), "Mapping Tools Tests")),
             () => false);

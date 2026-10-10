@@ -14,11 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="EditorReader">
-      <HintPath>..\lib\EditorReader.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
-    <None Include="..\lib\EditorReader.dll" Pack="true" PackagePath="runtimes/win/lib/net10.0/"/>
+    <None Update="Editor\Memory\EditorReader.LICENSE.txt" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="contentFiles/any/any/Editor/Memory/"/>
   </ItemGroup>
 
   <ItemGroup>

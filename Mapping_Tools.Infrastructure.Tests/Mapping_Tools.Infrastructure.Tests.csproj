@@ -21,13 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="EditorReader">
-      <HintPath>..\lib\EditorReader.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="Fixtures\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
