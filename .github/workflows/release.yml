@@ -560,7 +560,9 @@ jobs:
               --configuration Release \
               --no-restore \
               --output "$package_dir" \
-              -p:Version="$VERSION"
+              -p:Version="$VERSION" \
+              -p:AssemblyVersion="$VERSION" \
+              -p:FileVersion="$VERSION"
 
             test -f "$package_dir/Mapping_Tools.$project.$VERSION.nupkg"
           done
