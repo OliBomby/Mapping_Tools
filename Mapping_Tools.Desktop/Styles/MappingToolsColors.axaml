@@ -4,7 +4,6 @@
          specific to Mapping Tools' custom desktop chrome. -->
     <SolidColorBrush x:Key="MappingToolsDialogOverlayBrush"
                      Color="#99000000" />
-    <SolidColorBrush x:Key="MappingToolsHelpBadgeBrush" Color="#B2FF00" />
     <SolidColorBrush x:Key="MappingToolsQuickRunBadgeBrush" Color="#81D4FA" />
     <SolidColorBrush x:Key="MappingToolsTimelineLineBrush" Color="#FFD6D6D6" />
     <SolidColorBrush x:Key="MappingToolsTimelineNeutralOuterBrush" Color="#FF787878" />

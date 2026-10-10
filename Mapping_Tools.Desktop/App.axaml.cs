@@ -62,6 +62,13 @@ public partial class App : Avalonia.Application
                 host.Services
                     .GetRequiredService<IApplicationThemeService>()
                     .Apply(settings.Theme);
+                host.Services
+                    .GetRequiredService<IApplicationThemeService>()
+                    .ApplyColors(
+                        Avalonia.Media.Color.TryParse(settings.PrimaryColor, out var primaryColor)
+                            ? primaryColor : Avalonia.Media.Color.Parse("#2196F3"),
+                        Avalonia.Media.Color.TryParse(settings.AccentColor, out var accentColor)
+                            ? accentColor : Avalonia.Media.Color.Parse("#AEEA00"));
                 var mainWindow =
                     host.Services.GetRequiredService<MainWindow>();
                 mainWindow.DataContext =

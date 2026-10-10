@@ -53,6 +53,12 @@ public sealed class DesktopApplicationSettings : ApplicationSettings
     /// </summary>
     public ApplicationTheme Theme { get; set; } = ApplicationTheme.Dark;
 
+    /// <summary>Defines the primary interface color as an opaque hexadecimal RGB value.</summary>
+    public string PrimaryColor { get; set; } = "#2196F3";
+
+    /// <summary>Defines the accent interface color as an opaque hexadecimal RGB value.</summary>
+    public string AccentColor { get; set; } = "#AEEA00";
+
     /// <summary>
     ///     Defines the desktop-wide key combination assigned to QuickUndo.
     /// </summary>

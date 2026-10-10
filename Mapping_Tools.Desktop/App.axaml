@@ -35,9 +35,9 @@
     <Application.Styles>
         <!-- Supplies templates for Avalonia controls not currently covered by Material.Avalonia. -->
         <fluent:FluentTheme />
-        <material:MaterialTheme BaseTheme="Dark"
-                                PrimaryColor="Blue"
-                                SecondaryColor="Lime" />
+        <material:CustomMaterialTheme BaseTheme="Dark"
+                                      PrimaryColor="#2196F3"
+                                      SecondaryColor="#AEEA00" />
         <dialogHost:DialogHostStyles />
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.v2.xaml" />
         <materialIcons:MaterialIconStyles />

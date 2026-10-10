@@ -6371,4 +6371,16 @@ Pour commencer, sélectionnez un slider dans votre beatmap et cliquez sur « Pr�
     <value>Certains raccourcis globaux sont indisponibles. Activez les raccourcis de Mapping Tools dans les paramètres de raccourcis du bureau. S’ils n’apparaissent pas, vérifiez le backend du portail GlobalShortcuts (KDE : xdg-desktop-portal-kde), puis redémarrez Mapping Tools.</value>
     <comment>Snackbar guidance when desktop portal registration fails or requested shortcuts are unassigned. Preserve Mapping Tools, GlobalShortcuts, KDE and the package name xdg-desktop-portal-kde. No placeholders.</comment>
   </data>
+  <data xml:space="preserve" name="Shell_Theme">
+    <value>Thème :</value>
+    <comment>Preferences label before the primary and accent color pickers and light/dark toggle.</comment>
+  </data>
+  <data xml:space="preserve" name="Shell_PrimaryColor">
+    <value>Couleur principale</value>
+    <comment>Preferences tooltip and accessible name for the primary interface color picker.</comment>
+  </data>
+  <data xml:space="preserve" name="Shell_AccentColor">
+    <value>Couleur d’accent</value>
+    <comment>Preferences tooltip and accessible name for the accent interface color picker; also colors the dark-mode switch.</comment>
+  </data>
 </root>

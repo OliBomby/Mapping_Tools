@@ -6371,4 +6371,16 @@
     <value>Некоторые глобальные сочетания клавиш недоступны. Включите сочетания Mapping Tools в настройках сочетаний клавиш рабочего стола. Если их нет, проверьте бэкенд портала GlobalShortcuts (KDE: xdg-desktop-portal-kde) и перезапустите Mapping Tools.</value>
     <comment>Snackbar guidance when desktop portal registration fails or requested shortcuts are unassigned. Preserve Mapping Tools, GlobalShortcuts, KDE and the package name xdg-desktop-portal-kde. No placeholders.</comment>
   </data>
+  <data xml:space="preserve" name="Shell_Theme">
+    <value>Тема:</value>
+    <comment>Preferences label before the primary and accent color pickers and light/dark toggle.</comment>
+  </data>
+  <data xml:space="preserve" name="Shell_PrimaryColor">
+    <value>Основной цвет</value>
+    <comment>Preferences tooltip and accessible name for the primary interface color picker.</comment>
+  </data>
+  <data xml:space="preserve" name="Shell_AccentColor">
+    <value>Акцентный цвет</value>
+    <comment>Preferences tooltip and accessible name for the accent interface color picker; also colors the dark-mode switch.</comment>
+  </data>
 </root>

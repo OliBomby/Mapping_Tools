@@ -39,7 +39,7 @@
                 ToolTip.Tip="{loc:Tr Shell_ClickMe}">
             <materialIcons:MaterialIcon Width="24"
                                         Height="24"
-                                        Foreground="{DynamicResource MappingToolsHelpBadgeBrush}"
+                                        Foreground="{DynamicResource MaterialSecondaryMidBrush}"
                                         Kind="HelpCircle" />
             <Button.Flyout>
                 <Flyout Placement="BottomEdgeAlignedLeft"

@@ -6371,4 +6371,16 @@ Timing Helper 隨後會調整 BPM 和/或添加紅線，使每個標記都能吸
     <value>部分全域快捷鍵無法使用。請在桌面的快捷鍵設定中啟用 Mapping Tools 快捷鍵。如果未顯示，請檢查 GlobalShortcuts 入口網站後端（KDE：xdg-desktop-portal-kde），然後重新啟動 Mapping Tools。</value>
     <comment>Snackbar guidance when desktop portal registration fails or requested shortcuts are unassigned. Preserve Mapping Tools, GlobalShortcuts, KDE and the package name xdg-desktop-portal-kde. No placeholders.</comment>
   </data>
+  <data xml:space="preserve" name="Shell_Theme">
+    <value>主題：</value>
+    <comment>Preferences label before the primary and accent color pickers and light/dark toggle.</comment>
+  </data>
+  <data xml:space="preserve" name="Shell_PrimaryColor">
+    <value>主色</value>
+    <comment>Preferences tooltip and accessible name for the primary interface color picker.</comment>
+  </data>
+  <data xml:space="preserve" name="Shell_AccentColor">
+    <value>強調色</value>
+    <comment>Preferences tooltip and accessible name for the accent interface color picker; also colors the dark-mode switch.</comment>
+  </data>
 </root>

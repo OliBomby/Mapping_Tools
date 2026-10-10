@@ -292,14 +292,31 @@
 
             <StackPanel Margin="0,15,0,0"
                         Orientation="Horizontal">
-                <TextBlock Text="{loc:Tr Shell_Light}" />
+                <TextBlock Margin="0,0,10,0" VerticalAlignment="Center"
+                           Text="{loc:Tr Shell_Theme}" />
+                <ColorPicker Margin="0,0,10,0"
+                             Palette="{x:Static controls:MaterialThemeColorPalette.Primary}"
+                             Color="{Binding PrimaryColor, Mode=TwoWay}"
+                             IsAlphaEnabled="False"
+                             IsAlphaVisible="False"
+                             AutomationProperties.Name="{loc:Tr Shell_PrimaryColor}"
+                             ToolTip.Tip="{loc:Tr Shell_PrimaryColor}" />
+                <ColorPicker Margin="0,0,20,0"
+                             Palette="{x:Static controls:MaterialThemeColorPalette.Accent}"
+                             Color="{Binding AccentColor, Mode=TwoWay}"
+                             IsAlphaEnabled="False"
+                             IsAlphaVisible="False"
+                             AutomationProperties.Name="{loc:Tr Shell_AccentColor}"
+                             ToolTip.Tip="{loc:Tr Shell_AccentColor}" />
+                <TextBlock VerticalAlignment="Center" Text="{loc:Tr Shell_Light}" />
                 <ToggleSwitch Margin="10,0"
+                              Classes="accent"
                               AutomationProperties.Name="{loc:Tr Shell_DarkTheme}"
                               IsChecked="{Binding Theme,
                                                   Mode=TwoWay,
                                                   Converter={StaticResource DarkThemeConverter}}"
                               ToolTip.Tip="{loc:Tr Shell_ChangeTheThemeOfMappingTools}" />
-                <TextBlock Text="{loc:Tr Shell_Dark}" />
+                <TextBlock VerticalAlignment="Center" Text="{loc:Tr Shell_Dark}" />
             </StackPanel>
         </StackPanel>
     </Grid>

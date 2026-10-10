@@ -6371,4 +6371,16 @@ To get started, select a slider in your beatmap and click 'Preview slider' to pr
     <value>Some global shortcuts are unavailable. Enable the Mapping Tools shortcuts in your desktop’s shortcut settings. If they are missing, check your GlobalShortcuts portal backend (KDE: xdg-desktop-portal-kde), then restart Mapping Tools.</value>
     <comment>Snackbar guidance when desktop portal registration fails or requested shortcuts are unassigned. Preserve Mapping Tools, GlobalShortcuts, KDE and the package name xdg-desktop-portal-kde. No placeholders.</comment>
   </data>
+  <data xml:space="preserve" name="Shell_Theme">
+    <value>Theme:</value>
+    <comment>Preferences label before the primary and accent color pickers and light/dark toggle.</comment>
+  </data>
+  <data xml:space="preserve" name="Shell_PrimaryColor">
+    <value>Primary color</value>
+    <comment>Preferences tooltip and accessible name for the primary interface color picker.</comment>
+  </data>
+  <data xml:space="preserve" name="Shell_AccentColor">
+    <value>Accent color</value>
+    <comment>Preferences tooltip and accessible name for the accent interface color picker; also colors the dark-mode switch.</comment>
+  </data>
 </root>

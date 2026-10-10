@@ -6371,4 +6371,16 @@ osu! 픽셀 단위로 지정하는 연결 허용 거리가 병합할 두 히트 
     <value>일부 전역 단축키를 사용할 수 없습니다. 데스크톱의 단축키 설정에서 Mapping Tools 단축키를 활성화하세요. 표시되지 않으면 GlobalShortcuts 포털 백엔드(KDE: xdg-desktop-portal-kde)를 확인한 후 Mapping Tools를 다시 시작하세요.</value>
     <comment>Snackbar guidance when desktop portal registration fails or requested shortcuts are unassigned. Preserve Mapping Tools, GlobalShortcuts, KDE and the package name xdg-desktop-portal-kde. No placeholders.</comment>
   </data>
+  <data xml:space="preserve" name="Shell_Theme">
+    <value>테마:</value>
+    <comment>Preferences label before the primary and accent color pickers and light/dark toggle.</comment>
+  </data>
+  <data xml:space="preserve" name="Shell_PrimaryColor">
+    <value>기본 색상</value>
+    <comment>Preferences tooltip and accessible name for the primary interface color picker.</comment>
+  </data>
+  <data xml:space="preserve" name="Shell_AccentColor">
+    <value>강조 색상</value>
+    <comment>Preferences tooltip and accessible name for the accent interface color picker; also colors the dark-mode switch.</comment>
+  </data>
 </root>

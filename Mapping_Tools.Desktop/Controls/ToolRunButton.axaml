@@ -7,6 +7,6 @@
     </Style>
     <Style Selector="controls|ToolRunButton materialControls|FloatingButton">
         <Setter Property="Background" Value="{DynamicResource MaterialPrimaryMidBrush}" />
-        <Setter Property="Foreground" Value="{DynamicResource MaterialDarkForegroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialPrimaryForegroundBrush}" />
     </Style>
 </Styles>

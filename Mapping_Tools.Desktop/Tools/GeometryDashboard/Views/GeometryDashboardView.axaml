@@ -67,12 +67,12 @@
                             <materialIcons:MaterialIcon Kind="Pizza" Width="22" Height="22" />
                         </materialDesign:FloatingButton>
                         <materialDesign:FloatingButton Classes="mini no-transitions" Margin="0,0,8,0"
-                                                       Foreground="{DynamicResource MaterialDarkForegroundBrush}"
+                                                       Foreground="{DynamicResource MaterialPrimaryForegroundBrush}"
                                                        ToolTip.Tip="{loc:Tr GeometryDashboard_Savestates}" Click="ShowProjects">
                             <materialIcons:MaterialIcon Kind="ContentSaveAll" Width="22" Height="22" />
                         </materialDesign:FloatingButton>
                         <materialDesign:FloatingButton Classes="mini no-transitions" ToolTip.Tip="{loc:Tr GeometryDashboard_Preferences}"
-                                                       Foreground="{DynamicResource MaterialDarkForegroundBrush}"
+                                                       Foreground="{DynamicResource MaterialPrimaryForegroundBrush}"
                                                        Click="ShowPreferences">
                             <materialIcons:MaterialIcon Kind="SettingsOutline" Width="22" Height="22" />
                         </materialDesign:FloatingButton>

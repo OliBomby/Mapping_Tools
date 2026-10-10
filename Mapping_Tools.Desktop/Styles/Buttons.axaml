@@ -20,11 +20,11 @@
     </Style>
     <Style Selector="materialControls|FloatingButton.dark">
         <Setter Property="Background" Value="{DynamicResource MaterialPrimaryDarkBrush}" />
-        <Setter Property="Foreground" Value="{DynamicResource MaterialDarkForegroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialPrimaryForegroundBrush}" />
     </Style>
 
     <Style Selector="Button:not(.light):not(.primary):not(.outline)">
-        <Setter Property="Foreground" Value="{DynamicResource MaterialDarkForegroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialPrimaryForegroundBrush}" />
     </Style>
 
     <Style Selector="Button.path-picker">

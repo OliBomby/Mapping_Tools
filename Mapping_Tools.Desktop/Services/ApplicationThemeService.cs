@@ -1,4 +1,5 @@
 using Avalonia.Styling;
+using Avalonia.Media;
 using Mapping_Tools.Application.Settings.Models;
 using Material.Styles.Themes;
 using Material.Styles.Themes.Base;
@@ -23,10 +24,21 @@ public sealed class ApplicationThemeService : IApplicationThemeService
             ? ThemeVariant.Light
             : ThemeVariant.Dark;
         var materialTheme = application.Styles
-            .OfType<MaterialTheme>()
+            .OfType<CustomMaterialTheme>()
             .Single();
         materialTheme.BaseTheme = theme == ApplicationTheme.Light
             ? BaseThemeMode.Light
             : BaseThemeMode.Dark;
+    }
+
+    /// <inheritdoc />
+    public void ApplyColors(Color primaryColor, Color accentColor)
+    {
+        var application = Avalonia.Application.Current
+                          ?? throw new InvalidOperationException(
+                              "The application theme cannot be changed before Avalonia initializes.");
+        var materialTheme = application.Styles.OfType<CustomMaterialTheme>().Single();
+        materialTheme.PrimaryColor = primaryColor;
+        materialTheme.SecondaryColor = accentColor;
     }
 }

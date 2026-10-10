@@ -6371,4 +6371,16 @@ Para empezar, selecciona un slider en tu beatmap y haz clic en «Preview slider�
     <value>Algunos atajos globales no están disponibles. Activa los atajos de Mapping Tools en la configuración de atajos del escritorio. Si no aparecen, comprueba el backend del portal GlobalShortcuts (KDE: xdg-desktop-portal-kde) y reinicia Mapping Tools.</value>
     <comment>Snackbar guidance when desktop portal registration fails or requested shortcuts are unassigned. Preserve Mapping Tools, GlobalShortcuts, KDE and the package name xdg-desktop-portal-kde. No placeholders.</comment>
   </data>
+  <data xml:space="preserve" name="Shell_Theme">
+    <value>Tema:</value>
+    <comment>Preferences label before the primary and accent color pickers and light/dark toggle.</comment>
+  </data>
+  <data xml:space="preserve" name="Shell_PrimaryColor">
+    <value>Color primario</value>
+    <comment>Preferences tooltip and accessible name for the primary interface color picker.</comment>
+  </data>
+  <data xml:space="preserve" name="Shell_AccentColor">
+    <value>Color de acento</value>
+    <comment>Preferences tooltip and accessible name for the accent interface color picker; also colors the dark-mode switch.</comment>
+  </data>
 </root>

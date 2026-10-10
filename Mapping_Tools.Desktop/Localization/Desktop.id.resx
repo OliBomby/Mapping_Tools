@@ -6371,4 +6371,16 @@ Untuk memulai, pilih slider pada beatmap, lalu klik 'Pratinjau slider' untuk mel
     <value>Beberapa pintasan global tidak tersedia. Aktifkan pintasan Mapping Tools di pengaturan pintasan desktop. Jika tidak muncul, periksa backend portal GlobalShortcuts (KDE: xdg-desktop-portal-kde), lalu mulai ulang Mapping Tools.</value>
     <comment>Snackbar guidance when desktop portal registration fails or requested shortcuts are unassigned. Preserve Mapping Tools, GlobalShortcuts, KDE and the package name xdg-desktop-portal-kde. No placeholders.</comment>
   </data>
+  <data xml:space="preserve" name="Shell_Theme">
+    <value>Tema:</value>
+    <comment>Preferences label before the primary and accent color pickers and light/dark toggle.</comment>
+  </data>
+  <data xml:space="preserve" name="Shell_PrimaryColor">
+    <value>Warna utama</value>
+    <comment>Preferences tooltip and accessible name for the primary interface color picker.</comment>
+  </data>
+  <data xml:space="preserve" name="Shell_AccentColor">
+    <value>Warna aksen</value>
+    <comment>Preferences tooltip and accessible name for the accent interface color picker; also colors the dark-mode switch.</comment>
+  </data>
 </root>

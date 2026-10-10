@@ -1621,6 +1621,10 @@ public sealed class DesktopShellTests
 
     private sealed class StubThemeService : IApplicationThemeService
     {
+        public void ApplyColors(Avalonia.Media.Color primaryColor, Avalonia.Media.Color accentColor)
+        {
+        }
+
         public void Apply(ApplicationTheme theme)
         {
         }

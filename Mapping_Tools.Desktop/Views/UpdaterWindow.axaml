@@ -96,7 +96,7 @@
                         <TextBlock FontSize="15"
                                    Text="{loc:Tr Shell_DownloadingNewUpdate}"
                                    HorizontalAlignment="Center"
-                                   Foreground="{DynamicResource MaterialDarkForegroundBrush}"
+                                   Foreground="{DynamicResource MaterialPrimaryForegroundBrush}"
                                    FontWeight="Normal" />
                     </StackPanel>
                 </Grid>

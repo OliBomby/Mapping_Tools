@@ -28,7 +28,7 @@
         <TabbedPage Grid.Row="1"
                     TabPlacement="Left"
                     SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}"
-                    Foreground="{DynamicResource MaterialDarkForegroundBrush}">
+                    Foreground="{DynamicResource MaterialPrimaryForegroundBrush}">
             <ContentPage Header="{loc:Tr HitsoundStudio_SimpleLayer}">
                 <ScrollViewer HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Auto">

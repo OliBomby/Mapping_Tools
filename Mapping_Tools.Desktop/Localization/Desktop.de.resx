@@ -6371,4 +6371,16 @@ Wähle zunächst einen Slider in deiner Beatmap aus und klicke auf „Slider-Vor
     <value>Einige globale Tastenkürzel sind nicht verfügbar. Aktiviere die Mapping Tools-Tastenkürzel in den Tastenkürzel-Einstellungen deines Desktops. Falls sie fehlen, prüfe dein GlobalShortcuts-Portal-Backend (KDE: xdg-desktop-portal-kde) und starte Mapping Tools neu.</value>
     <comment>Snackbar guidance when desktop portal registration fails or requested shortcuts are unassigned. Preserve Mapping Tools, GlobalShortcuts, KDE and the package name xdg-desktop-portal-kde. No placeholders.</comment>
   </data>
+  <data xml:space="preserve" name="Shell_Theme">
+    <value>Design:</value>
+    <comment>Preferences label before the primary and accent color pickers and light/dark toggle.</comment>
+  </data>
+  <data xml:space="preserve" name="Shell_PrimaryColor">
+    <value>Primärfarbe</value>
+    <comment>Preferences tooltip and accessible name for the primary interface color picker.</comment>
+  </data>
+  <data xml:space="preserve" name="Shell_AccentColor">
+    <value>Akzentfarbe</value>
+    <comment>Preferences tooltip and accessible name for the accent interface color picker; also colors the dark-mode switch.</comment>
+  </data>
 </root>

@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using Avalonia.Data;
 using Avalonia.Input;
+using Avalonia.Media;
 using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Application.Localization;
 using Mapping_Tools.Desktop.Localization;
@@ -599,6 +600,64 @@ public sealed class PreferencesViewModelTests
     }
 
     [TestMethod]
+    public void PrimaryColor_WhenChanged_PersistsAndAppliesBothColors()
+    {
+        // Arrange
+        var settings = CreateSettings();
+        RecordingThemeService themes = new();
+        using var viewModel = CreateViewModel(settings, themeService: themes);
+
+        // Act
+        viewModel.PrimaryColor = Colors.Coral;
+
+        // Assert
+        Color.Parse(settings.PrimaryColor).Should().Be(Colors.Coral);
+        themes.AppliedColors.Should().Equal((Colors.Coral, Color.Parse(settings.AccentColor)));
+        var restored = JsonSerializer.Deserialize<DesktopApplicationSettings>(JsonSerializer.Serialize(settings));
+        restored!.PrimaryColor.Should().Be(settings.PrimaryColor);
+    }
+
+    [TestMethod]
+    public void CreateSettings_WithDefaultColors_MatchesOriginalMaterialPalette()
+    {
+        // Arrange
+        var originalPrimary = Material.Colors.SwatchHelper.Lookup[
+            (Material.Colors.MaterialColor)Material.Colors.PrimaryColor.Blue];
+        var originalAccent = Material.Colors.SwatchHelper.Lookup[
+            (Material.Colors.MaterialColor)Material.Colors.SecondaryColor.Lime];
+
+        // Act
+        var settings = new DesktopApplicationSettings();
+
+        // Assert
+        Color.Parse(settings.PrimaryColor).Should().Be(originalPrimary);
+        Color.Parse(settings.AccentColor).Should().Be(originalAccent);
+    }
+
+    [TestMethod]
+    public void AccentColor_WhenUndoneAndRedone_RestoresLivePalette()
+    {
+        // Arrange
+        var settings = CreateSettings();
+        RecordingThemeService themes = new();
+        using var viewModel = CreateViewModel(settings, themeService: themes);
+        var original = viewModel.AccentColor;
+        using (viewModel.UndoHistory.BeginEdit())
+            viewModel.AccentColor = Colors.Magenta;
+
+        // Act
+        viewModel.UndoHistory.Undo();
+        viewModel.UndoHistory.Redo();
+
+        // Assert
+        Color.Parse(settings.AccentColor).Should().Be(Colors.Magenta);
+        themes.AppliedColors.Should().Equal(
+            (viewModel.PrimaryColor, Colors.Magenta),
+            (viewModel.PrimaryColor, original),
+            (viewModel.PrimaryColor, Colors.Magenta));
+    }
+
+    [TestMethod]
     public void MakePeriodicBackups_WhenChanged_UpdatesLivePolicyInMemory()
     {
         // Arrange
@@ -841,6 +900,13 @@ public sealed class PreferencesViewModelTests
     private sealed class RecordingThemeService : IApplicationThemeService
     {
         public List<ApplicationTheme> AppliedThemes { get; } = [];
+
+        public List<(Color Primary, Color Accent)> AppliedColors { get; } = [];
+
+        public void ApplyColors(Color primaryColor, Color accentColor)
+        {
+            AppliedColors.Add((primaryColor, accentColor));
+        }
 
         public void Apply(ApplicationTheme theme)
         {

@@ -1,4 +1,5 @@
 using Mapping_Tools.Desktop.Localization;
+using Avalonia.Media;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.CompilerServices;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -420,6 +421,34 @@ public sealed partial class PreferencesViewModel : LocalizedObservableValidator,
                     static (settings, theme) => settings.Theme = theme,
                     false))
                 themeService.Apply(value);
+        }
+    }
+
+    /// <summary>Gets or sets the primary interface color, applying changes immediately.</summary>
+    [Undoable]
+    public Color PrimaryColor
+    {
+        get => Color.TryParse(settings.PrimaryColor, out var color) ? color : Color.Parse("#2196F3");
+        set
+        {
+            var color = Color.FromRgb(value.R, value.G, value.B);
+            if (SetProperty(PrimaryColor, color, settings,
+                    static (document, selected) => document.PrimaryColor = selected.ToString(), false))
+                themeService.ApplyColors(color, AccentColor);
+        }
+    }
+
+    /// <summary>Gets or sets the accent interface color, applying changes immediately.</summary>
+    [Undoable]
+    public Color AccentColor
+    {
+        get => Color.TryParse(settings.AccentColor, out var color) ? color : Color.Parse("#AEEA00");
+        set
+        {
+            var color = Color.FromRgb(value.R, value.G, value.B);
+            if (SetProperty(AccentColor, color, settings,
+                    static (document, selected) => document.AccentColor = selected.ToString(), false))
+                themeService.ApplyColors(PrimaryColor, color);
         }
     }
 
