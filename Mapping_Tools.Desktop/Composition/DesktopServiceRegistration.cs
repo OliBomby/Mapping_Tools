@@ -187,11 +187,11 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<LazerExternalEditBeatmapLocator>();
         services.AddHostedService<LazerExternalEditSelectionHostedService>();
         services.AddSingleton<MtipcEditorReloadService>();
+        services.AddSingleton<StableMemoryCurrentBeatmapLocator>();
 
         if (OperatingSystem.IsWindows())
         {
             services.AddSingleton<WindowsEditorReaderAdapter>();
-            services.AddSingleton<WindowsMemoryCurrentBeatmapLocator>();
             services.AddSingleton<WindowsOsuEditorReloadService>();
             services.AddSingleton<ILiveBeatmapReader>(provider =>
                 new ConfiguredLiveBeatmapReader(
@@ -201,7 +201,7 @@ internal static class DesktopServiceRegistration
             services.AddSingleton<ICurrentBeatmapLocator>(provider =>
                 new ConfiguredCurrentBeatmapLocator(
                     provider.GetRequiredService<ApplicationSettings>(),
-                    provider.GetRequiredService<WindowsMemoryCurrentBeatmapLocator>(),
+                    provider.GetRequiredService<StableMemoryCurrentBeatmapLocator>(),
                     provider.GetRequiredService<MtipcCurrentBeatmapLocator>(),
                     provider.GetRequiredService<GosumemoryCurrentBeatmapLocator>(),
                     provider.GetRequiredService<LazerExternalEditBeatmapLocator>()));
@@ -221,7 +221,7 @@ internal static class DesktopServiceRegistration
             services.AddSingleton<ICurrentBeatmapLocator>(provider =>
                 new ConfiguredCurrentBeatmapLocator(
                     provider.GetRequiredService<ApplicationSettings>(),
-                    new UnsupportedPlatformCurrentBeatmapLocator(),
+                    provider.GetRequiredService<StableMemoryCurrentBeatmapLocator>(),
                     provider.GetRequiredService<MtipcCurrentBeatmapLocator>(),
                     provider.GetRequiredService<GosumemoryCurrentBeatmapLocator>(),
                     provider.GetRequiredService<LazerExternalEditBeatmapLocator>()));

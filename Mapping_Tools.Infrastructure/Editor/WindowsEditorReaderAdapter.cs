@@ -10,9 +10,6 @@ using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Infrastructure.Tools.GeometryDashboard;
-using OsuMemoryDataProvider;
-using OsuMemoryDataProvider.OsuMemoryModels;
-using OsuMemoryDataProvider.OsuMemoryModels.Direct;
 using HitObject = Editor_Reader.HitObject;
 
 namespace Mapping_Tools.Infrastructure.Editor;
@@ -203,46 +200,6 @@ public sealed class WindowsEditorReaderAdapter :
                ?? [],
         ];
         File.WriteAllLines(path, lines);
-    }
-}
-
-internal static class CurrentBeatmapMemoryReader
-{
-    private static readonly StructuredOsuMemoryReader structuredReader =
-        StructuredOsuMemoryReader.Instance;
-
-    private static readonly OsuBaseAddresses osuBaseAddresses = new();
-    private static readonly object readerGate = new();
-
-    internal static string? TryRead(Process process, string songsPath)
-    {
-        ArgumentNullException.ThrowIfNull(process);
-        if (string.IsNullOrWhiteSpace(songsPath)) return null;
-
-        lock (readerGate)
-        {
-            string? folder = ReadString(
-                osuBaseAddresses.Beatmap,
-                nameof(CurrentBeatmap.FolderName));
-            string? filename = ReadString(
-                osuBaseAddresses.Beatmap,
-                nameof(CurrentBeatmap.OsuFileName));
-            if (string.IsNullOrWhiteSpace(folder)
-                || string.IsNullOrWhiteSpace(filename))
-                return null;
-
-            return Path.Combine(songsPath, folder, filename);
-        }
-    }
-
-    private static string? ReadString(object readObject, string propertyName)
-    {
-        return structuredReader.TryReadProperty(
-            readObject,
-            propertyName,
-            out object readResult)
-            ? readResult as string
-            : null;
     }
 }
 
