@@ -10,7 +10,6 @@ internal static class DesktopSettingsDefaults
         DesktopApplicationSettings settings = new();
         if (isWindows) return settings;
 
-        settings.CurrentBeatmapFetching = CurrentBeatmapFetchingMode.Gosumemory;
         settings.BeatmapLiveStateReading = BeatmapLiveStateReadingMode.Disabled;
         settings.EditorReload = EditorReloadMode.Disabled;
         return settings;

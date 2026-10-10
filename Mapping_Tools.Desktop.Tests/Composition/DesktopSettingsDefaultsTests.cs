@@ -26,7 +26,7 @@ public sealed class DesktopSettingsDefaultsTests
     }
 
     [TestMethod]
-    public void Create_OnNonWindows_SelectsMtipcAdapters()
+    public void Create_OnNonWindows_DefaultsToMemoryFetchingWithLiveStateAndReloadDisabled()
     {
         // Arrange
         const bool is_windows = false;
@@ -35,7 +35,7 @@ public sealed class DesktopSettingsDefaultsTests
         DesktopApplicationSettings settings = DesktopSettingsDefaults.Create(is_windows);
 
         // Assert
-        settings.CurrentBeatmapFetching.Should().Be(CurrentBeatmapFetchingMode.Gosumemory);
+        settings.CurrentBeatmapFetching.Should().Be(CurrentBeatmapFetchingMode.MemoryRead);
         settings.BeatmapLiveStateReading.Should().Be(BeatmapLiveStateReadingMode.Disabled);
         settings.EditorReload.Should().Be(EditorReloadMode.Disabled);
     }
@@ -53,7 +53,7 @@ public sealed class DesktopSettingsDefaultsTests
 
         // Assert
         result.WasCreated.Should().BeTrue();
-        result.Settings.CurrentBeatmapFetching.Should().Be(CurrentBeatmapFetchingMode.Gosumemory);
+        result.Settings.CurrentBeatmapFetching.Should().Be(CurrentBeatmapFetchingMode.MemoryRead);
         store.Load().Should().BeSameAs(result.Settings);
         store.SaveCount.Should().Be(1);
     }
