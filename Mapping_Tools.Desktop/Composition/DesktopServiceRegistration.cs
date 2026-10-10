@@ -126,7 +126,7 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<ISettingsPathEnvironment, PortableSettingsPathEnvironment>();
         services.AddSingleton<ISettingsPathService, SettingsPathService>();
         services.AddSingleton<Func<ApplicationSettings>>(static _ =>
-            static () => DesktopSettingsDefaults.Create(OperatingSystem.IsWindows()));
+            static () => DesktopSettingsDefaults.Create(OperatingSystem.IsWindows(), OperatingSystem.IsLinux()));
         services.AddSingleton<ISettingsService, SettingsService>();
         services.AddSingleton<DesktopApplicationSettings>(provider =>
             (DesktopApplicationSettings)provider
@@ -188,16 +188,16 @@ internal static class DesktopServiceRegistration
         services.AddHostedService<LazerExternalEditSelectionHostedService>();
         services.AddSingleton<MtipcEditorReloadService>();
         services.AddSingleton<StableMemoryCurrentBeatmapLocator>();
+        services.AddSingleton<StableMemoryLiveBeatmapReader>();
+        services.AddSingleton<ILiveBeatmapReader>(provider =>
+            new ConfiguredLiveBeatmapReader(
+                provider.GetRequiredService<ApplicationSettings>(),
+                provider.GetRequiredService<StableMemoryLiveBeatmapReader>(),
+                provider.GetRequiredService<MtipcLiveBeatmapReader>()));
 
         if (OperatingSystem.IsWindows())
         {
-            services.AddSingleton<WindowsEditorReaderAdapter>();
             services.AddSingleton<WindowsOsuEditorReloadService>();
-            services.AddSingleton<ILiveBeatmapReader>(provider =>
-                new ConfiguredLiveBeatmapReader(
-                    provider.GetRequiredService<ApplicationSettings>(),
-                    provider.GetRequiredService<WindowsEditorReaderAdapter>(),
-                    provider.GetRequiredService<MtipcLiveBeatmapReader>()));
             services.AddSingleton<ICurrentBeatmapLocator>(provider =>
                 new ConfiguredCurrentBeatmapLocator(
                     provider.GetRequiredService<ApplicationSettings>(),
@@ -213,11 +213,6 @@ internal static class DesktopServiceRegistration
         }
         else
         {
-            services.AddSingleton<ILiveBeatmapReader>(provider =>
-                new ConfiguredLiveBeatmapReader(
-                    provider.GetRequiredService<ApplicationSettings>(),
-                    new UnsupportedPlatformLiveBeatmapReader(),
-                    provider.GetRequiredService<MtipcLiveBeatmapReader>()));
             services.AddSingleton<ICurrentBeatmapLocator>(provider =>
                 new ConfiguredCurrentBeatmapLocator(
                     provider.GetRequiredService<ApplicationSettings>(),

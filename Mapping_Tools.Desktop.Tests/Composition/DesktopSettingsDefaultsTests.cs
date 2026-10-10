@@ -26,7 +26,7 @@ public sealed class DesktopSettingsDefaultsTests
     }
 
     [TestMethod]
-    public void Create_OnNonWindows_DefaultsToMemoryFetchingWithLiveStateAndReloadDisabled()
+    public void Create_OnUnsupportedPlatform_DefaultsToMemoryFetchingWithLiveStateAndReloadDisabled()
     {
         // Arrange
         const bool is_windows = false;
@@ -37,6 +37,22 @@ public sealed class DesktopSettingsDefaultsTests
         // Assert
         settings.CurrentBeatmapFetching.Should().Be(CurrentBeatmapFetchingMode.MemoryRead);
         settings.BeatmapLiveStateReading.Should().Be(BeatmapLiveStateReadingMode.Disabled);
+        settings.EditorReload.Should().Be(EditorReloadMode.Disabled);
+    }
+
+    [TestMethod]
+    public void Create_OnLinux_EnablesLiveMemoryReadingWithReloadDisabled()
+    {
+        // Arrange
+        const bool is_windows = false;
+        const bool is_linux = true;
+
+        // Act
+        DesktopApplicationSettings settings = DesktopSettingsDefaults.Create(is_windows, is_linux);
+
+        // Assert
+        settings.CurrentBeatmapFetching.Should().Be(CurrentBeatmapFetchingMode.MemoryRead);
+        settings.BeatmapLiveStateReading.Should().Be(BeatmapLiveStateReadingMode.EditorReader);
         settings.EditorReload.Should().Be(EditorReloadMode.Disabled);
     }
 
