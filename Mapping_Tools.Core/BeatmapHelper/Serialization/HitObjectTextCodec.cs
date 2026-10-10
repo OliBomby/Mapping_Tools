@@ -82,38 +82,35 @@ internal static class HitObjectTextCodec
                 pendingType = null;
             }
 
-            // Older formats represent path-type boundaries as repeated anchors. Fold those markers into the path types.
-            if (formatVersion < 128)
+            // Repeated anchors mark implicit segment boundaries in both stable and lazer files.
+            var normalized = new List<PathControlPoint>();
+            PathType activeType = points[0].Type ?? firstType;
+
+            for (int index = 0; index < points.Count; index++)
             {
-                var normalized = new List<PathControlPoint>();
-                PathType activeType = points[0].Type ?? firstType;
+                var point = points[index];
+                if (point.Type.HasValue)
+                    activeType = point.Type.Value;
 
-                for (int index = 0; index < points.Count; index++)
+                // Stable Catmull paths only support an implicit boundary at the slider head.
+                bool supportsImplicitBoundary = formatVersion >= 128 || activeType != PathType.Catmull || index == 1;
+                if (supportsImplicitBoundary && index > 0 && index < points.Count - 1 &&
+                    normalized[^1].Position == point.Position && !normalized[^1].Type.HasValue)
                 {
-                    var point = points[index];
-                    if (point.Type.HasValue)
-                        activeType = point.Type.Value;
-
-                    if (index > 0 && index < points.Count - 1 && normalized[^1].Position == point.Position &&
-                        !normalized[^1].Type.HasValue)
-                    {
-                        normalized[^1].Type = activeType;
-                        continue;
-                    }
-
-                    if (index < points.Count - 1 && normalized.Count > 0 &&
-                        normalized[^1].Position == point.Position)
-                    {
-                        point.Type ??= activeType;
-                    }
-
-                    normalized.Add(point);
+                    normalized[^1].Type = activeType;
+                    continue;
                 }
 
-                points = normalized;
+                if (supportsImplicitBoundary && index < points.Count - 1 && normalized.Count > 0 &&
+                    normalized[^1].Position == point.Position)
+                {
+                    point.Type ??= activeType;
+                }
+
+                normalized.Add(point);
             }
 
-            hitObject.ControlPoints = points;
+            hitObject.ControlPoints = normalized;
 
             if (TryParseInt(values[6], out int repeat))
                 hitObject.Repeat = repeat;
@@ -215,6 +212,9 @@ internal static class HitObjectTextCodec
             var builder = new StringBuilder();
             bool mixedTypes = hitObject.ControlPoints.Any(
                 point => point.Type.HasValue && point.Type != hitObject.ControlPoints[0].Type);
+            // Keep ordinary Bezier red anchors readable by stable even when the source header is v128.
+            bool repeatedBoundaries = formatVersion < 128 ||
+                                      !mixedTypes && hitObject.ControlPoints[0].Type == PathType.Bezier;
 
             if (formatVersion < 128 && (mixedTypes || hitObject.ControlPoints[0].Type == PathType.BSpline))
             {
@@ -241,14 +241,14 @@ internal static class HitObjectTextCodec
                     var point = hitObject.ControlPoints[index];
                     Vector2 position = point.Position + hitObject.Pos;
 
-                    if (point.Type.HasValue && formatVersion >= 128)
+                    if (point.Type.HasValue && !repeatedBoundaries)
                         builder.Append('|').Append(GetPathTypeString(point.Type.Value));
 
                     builder.Append($"|{coordinate(position.X)}:{coordinate(position.Y)}");
 
                     bool previousTypedAtSamePosition = hitObject.ControlPoints[index - 1].Type.HasValue &&
                         hitObject.ControlPoints[index - 1].Position == point.Position;
-                    if (point.Type.HasValue && formatVersion < 128 &&
+                    if (point.Type.HasValue && repeatedBoundaries &&
                         index < hitObject.ControlPoints.Count - 1 && !previousTypedAtSamePosition)
                     {
                         builder.Append($"|{coordinate(position.X)}:{coordinate(position.Y)}");
