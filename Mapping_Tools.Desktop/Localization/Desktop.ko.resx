@@ -5081,12 +5081,19 @@ osu! 편집기의 타이밍 포인트처럼 색상이 적용되는 구간을 지
 추가 기능에 관한 내용은 툴팁을 확인하세요.</value>
   </data>
   <data name="SliderCompletionator_LengthLabel" xml:space="preserve">
-    <comment>Label for slider length as a fraction of the complete path defined by its anchors.</comment>
-    <value>길이(전체 경로 비율)</value>
+    <comment>Slider Completionator length field label. The input multiplies the complete curve length from the first anchor to the last, rather than counting anchors or dividing by the input.</comment>
+    <value>길이 (전체 경로 배율)</value>
   </data>
   <data name="SliderCompletionator_LengthTip" xml:space="preserve">
-    <comment>Tooltip explaining that slider length is a fraction of the full anchor-defined path and that 1 ends exactly at the last anchor. Preserve the numeric example 1.</comment>
-    <value>원하는 슬라이더 길이입니다. 이 값은 앵커가 정의하는 전체 경로 중 차지하는 비율입니다. 따라서 &apos;1&apos;을 입력하면 슬라이더가 마지막 앵커에서 끝납니다.</value>
+    <comment>Slider Completionator length tooltip. Full path means the complete anchor-defined curve, independent of the current slider endpoint. Preserve input syntax 0.5, 1, 2 and -1; these mean half, full, double and unchanged length. Percentages explain the multipliers. The current length is the reference only when its endpoint coincides with the last anchor.</comment>
+    <value>슬라이더 길이를 전체 경로 길이에 이 값을 곱한 길이로 설정합니다. 전체 경로는 현재 슬라이더가 끝나는 위치와 관계없이 첫 앵커부터 마지막 앵커까지의 곡선입니다. 이 값은 앵커 개수가 아닙니다.
+
+0.5 = 전체 경로 길이의 절반 (50%).
+1 = 전체 경로 길이 (100%). 마지막 앵커에서 끝납니다.
+2 = 전체 경로 길이의 두 배 (200%). 마지막 앵커 너머로 연장됩니다.
+-1 = 현재 슬라이더 길이를 유지합니다.
+
+슬라이더가 이미 마지막 앵커에서 끝나는 경우에만 현재 길이에 대한 비율이 됩니다.</value>
   </data>
   <data name="SliderCompletionator_MadeBy" xml:space="preserve">
     <comment>Credit line naming the original author. Keep “OliBomby” unchanged.</comment>

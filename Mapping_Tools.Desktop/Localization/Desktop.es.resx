@@ -5081,12 +5081,19 @@ Por ejemplo, una duración de 1 y una longitud de -1 cambiarán la duración a 1
  Consulta las descripciones emergentes para obtener más información sobre funciones adicionales.</value>
   </data>
   <data name="SliderCompletionator_LengthLabel" xml:space="preserve">
-    <comment>Label for slider length as a fraction of the complete path defined by its anchors.</comment>
-    <value>Longitud (fracción del recorrido completo)</value>
+    <comment>Slider Completionator length field label. The input multiplies the complete curve length from the first anchor to the last, rather than counting anchors or dividing by the input.</comment>
+    <value>Longitud (factor del recorrido)</value>
   </data>
   <data name="SliderCompletionator_LengthTip" xml:space="preserve">
-    <comment>Tooltip explaining that slider length is a fraction of the full anchor-defined path and that 1 ends exactly at the last anchor. Preserve the numeric example 1.</comment>
-    <value>Longitud deseada del slider. Este valor representa una fracción del recorrido completo definido por los puntos de anclaje; por tanto, &apos;1&apos; hace que el final del slider coincida exactamente con el último punto de anclaje.</value>
+    <comment>Slider Completionator length tooltip. Full path means the complete anchor-defined curve, independent of the current slider endpoint. Preserve input syntax 0.5, 1, 2 and -1; these mean half, full, double and unchanged length. Percentages explain the multipliers. The current length is the reference only when its endpoint coincides with the last anchor.</comment>
+    <value>Establece la longitud del slider multiplicando la longitud del recorrido completo por este valor. El recorrido completo es la curva desde el primer punto de anclaje hasta el último, independientemente de dónde termine actualmente el slider; este valor no cuenta puntos de anclaje.
+
+0.5 = la mitad del recorrido completo (50%).
+1 = el recorrido completo (100%), hasta el último punto de anclaje.
+2 = el doble del recorrido completo (200%), más allá del último punto de anclaje.
+-1 = conservar la longitud actual del slider.
+
+Solo es una fracción de la longitud actual si el slider ya termina en el último punto de anclaje.</value>
   </data>
   <data name="SliderCompletionator_MadeBy" xml:space="preserve">
     <comment>Credit line naming the original author. Keep “OliBomby” unchanged.</comment>

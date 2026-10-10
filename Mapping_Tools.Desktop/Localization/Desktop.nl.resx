@@ -5081,12 +5081,19 @@ Bekijk de tooltips voor meer informatie over extra functies.</value>
     <comment>Help text explaining that selected sliders can have length and duration adjusted while velocity is calculated automatically. The value -1 means “leave this variable unchanged”; preserve that numeric sentinel and the example where duration is 1 beat and length is unchanged.</comment>
   </data>
   <data name="SliderCompletionator_LengthLabel" xml:space="preserve">
-    <value>Lengte (fractie van volledig pad)</value>
-    <comment>Label for slider length as a fraction of the complete path defined by its anchors.</comment>
+    <value>Lengte (factor voor volledig pad)</value>
+    <comment>Slider Completionator length field label. The input multiplies the complete curve length from the first anchor to the last, rather than counting anchors or dividing by the input.</comment>
   </data>
   <data name="SliderCompletionator_LengthTip" xml:space="preserve">
-    <value>Gewenste lengte van de slider. Dit is een fractie van het volledige pad dat door de anchors wordt bepaald. Bij '1' eindigt de slider precies op de laatste anchor.</value>
-    <comment>Tooltip explaining that slider length is a fraction of the full anchor-defined path and that 1 ends exactly at the last anchor. Preserve the numeric example 1.</comment>
+    <value>Stelt de sliderlengte in op de volledige padlengte vermenigvuldigd met deze waarde. Het volledige pad is de curve van de eerste tot de laatste anchor, ongeacht waar de slider nu eindigt; deze waarde telt geen anchors.
+
+0.5 = de helft van de volledige padlengte (50%).
+1 = de volledige padlengte (100%), tot de laatste anchor.
+2 = tweemaal de volledige padlengte (200%), voorbij de laatste anchor.
+-1 = de huidige sliderlengte behouden.
+
+Dit is alleen een fractie van de huidige sliderlengte als de slider al bij de laatste anchor eindigt.</value>
+    <comment>Slider Completionator length tooltip. Full path means the complete anchor-defined curve, independent of the current slider endpoint. Preserve input syntax 0.5, 1, 2 and -1; these mean half, full, double and unchanged length. Percentages explain the multipliers. The current length is the reference only when its endpoint coincides with the last anchor.</comment>
   </data>
   <data name="SliderCompletionator_MadeBy" xml:space="preserve">
     <value>Gemaakt door OliBomby</value>

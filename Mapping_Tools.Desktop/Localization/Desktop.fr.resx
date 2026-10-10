@@ -5081,12 +5081,19 @@ Par exemple, saisir 1 pour la durée et -1 pour la longueur définira la durée 
 Consultez les infobulles pour en savoir plus sur les fonctions supplémentaires.</value>
   </data>
   <data name="SliderCompletionator_LengthLabel" xml:space="preserve">
-    <comment>Label for slider length as a fraction of the complete path defined by its anchors.</comment>
-    <value>Longueur (fraction du parcours complet)</value>
+    <comment>Slider Completionator length field label. The input multiplies the complete curve length from the first anchor to the last, rather than counting anchors or dividing by the input.</comment>
+    <value>Longueur (facteur du tracé)</value>
   </data>
   <data name="SliderCompletionator_LengthTip" xml:space="preserve">
-    <comment>Tooltip explaining that slider length is a fraction of the full anchor-defined path and that 1 ends exactly at the last anchor. Preserve the numeric example 1.</comment>
-    <value>Longueur souhaitée du slider. Cette valeur représente une fraction du parcours complet défini par les points d'ancrage ; avec « 1 », l'extrémité du slider se trouve exactement sur le dernier point d'ancrage.</value>
+    <comment>Slider Completionator length tooltip. Full path means the complete anchor-defined curve, independent of the current slider endpoint. Preserve input syntax 0.5, 1, 2 and -1; these mean half, full, double and unchanged length. Percentages explain the multipliers. The current length is the reference only when its endpoint coincides with the last anchor.</comment>
+    <value>Définit la longueur du slider en multipliant la longueur du tracé complet par cette valeur. Le tracé complet est la courbe du premier au dernier point de contrôle, quel que soit le point où le slider se termine actuellement ; cette valeur ne compte pas les points de contrôle.
+
+0.5 = la moitié du tracé complet (50 %).
+1 = le tracé complet (100 %), jusqu’au dernier point de contrôle.
+2 = deux fois le tracé complet (200 %), au-delà du dernier point de contrôle.
+-1 = conserver la longueur actuelle du slider.
+
+Il s’agit d’une fraction de la longueur actuelle uniquement si le slider se termine déjà au dernier point de contrôle.</value>
   </data>
   <data name="SliderCompletionator_MadeBy" xml:space="preserve">
     <comment>Credit line naming the original author. Keep “OliBomby” unchanged.</comment>

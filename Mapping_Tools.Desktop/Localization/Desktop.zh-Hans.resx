@@ -5081,12 +5081,19 @@ Savestates 可让你通过快捷键切换偏好设置和生成器配置。使用
 查看工具提示，了解其他功能的详细信息。</value>
   </data>
   <data name="SliderCompletionator_LengthLabel" xml:space="preserve">
-    <comment>Label for slider length as a fraction of the complete path defined by its anchors.</comment>
-    <value>长度（完整路径的比例）</value>
+    <comment>Slider Completionator length field label. The input multiplies the complete curve length from the first anchor to the last, rather than counting anchors or dividing by the input.</comment>
+    <value>长度（完整路径的倍数）</value>
   </data>
   <data name="SliderCompletionator_LengthTip" xml:space="preserve">
-    <comment>Tooltip explaining that slider length is a fraction of the full anchor-defined path and that 1 ends exactly at the last anchor. Preserve the numeric example 1.</comment>
-    <value>期望的滑条长度。此值是锚点定义的完整路径所占比例；输入 &apos;1&apos; 可使滑条恰好结束于最后一个锚点。</value>
+    <comment>Slider Completionator length tooltip. Full path means the complete anchor-defined curve, independent of the current slider endpoint. Preserve input syntax 0.5, 1, 2 and -1; these mean half, full, double and unchanged length. Percentages explain the multipliers. The current length is the reference only when its endpoint coincides with the last anchor.</comment>
+    <value>将滑条长度设为完整路径长度乘以此值。完整路径是从第一个锚点到最后一个锚点的曲线，与滑条当前的结束位置无关；此值不是锚点数量。
+
+0.5 = 完整路径长度的一半（50%）。
+1 = 完整路径长度（100%），结束于最后一个锚点。
+2 = 完整路径长度的两倍（200%），延伸到最后一个锚点之外。
+-1 = 保持当前滑条长度。
+
+只有当滑条已经结束于最后一个锚点时，此值才是当前滑条长度的比例。</value>
   </data>
   <data name="SliderCompletionator_MadeBy" xml:space="preserve">
     <comment>Credit line naming the original author. Keep “OliBomby” unchanged.</comment>

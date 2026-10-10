@@ -5081,12 +5081,19 @@ osu! エディターのタイミングポイントと同じように色付きの
 追加機能についてはツールチップをご覧ください。</value>
   </data>
   <data name="SliderCompletionator_LengthLabel" xml:space="preserve">
-    <comment>Label for slider length as a fraction of the complete path defined by its anchors.</comment>
-    <value>距離（パス全体に対する割合）</value>
+    <comment>Slider Completionator length field label. The input multiplies the complete curve length from the first anchor to the last, rather than counting anchors or dividing by the input.</comment>
+    <value>長さ（全経路の倍率）</value>
   </data>
   <data name="SliderCompletionator_LengthTip" xml:space="preserve">
-    <comment>Tooltip explaining that slider length is a fraction of the full anchor-defined path and that 1 ends exactly at the last anchor. Preserve the numeric example 1.</comment>
-    <value>スライダーの希望する距離を指定します。アンカーで定義されたパス全体に対する割合で、'1' にするとスライダーの終点が最後のアンカーと一致します。</value>
+    <comment>Slider Completionator length tooltip. Full path means the complete anchor-defined curve, independent of the current slider endpoint. Preserve input syntax 0.5, 1, 2 and -1; these mean half, full, double and unchanged length. Percentages explain the multipliers. The current length is the reference only when its endpoint coincides with the last anchor.</comment>
+    <value>スライダーの長さを、全経路の長さにこの値を掛けた長さに設定します。全経路とは、現在のスライダーの終点に関係なく、最初のアンカーから最後のアンカーまでの曲線です。この値はアンカーの個数ではありません。
+
+0.5 = 全経路の半分の長さ（50%）。
+1 = 全経路の長さ（100%）。最後のアンカーで終わります。
+2 = 全経路の2倍の長さ（200%）。最後のアンカーを越えて延長します。
+-1 = 現在のスライダーの長さを維持します。
+
+現在の長さに対する割合になるのは、スライダーがすでに最後のアンカーで終わっている場合だけです。</value>
   </data>
   <data name="SliderCompletionator_MadeBy" xml:space="preserve">
     <comment>Credit line naming the original author. Keep “OliBomby” unchanged.</comment>
