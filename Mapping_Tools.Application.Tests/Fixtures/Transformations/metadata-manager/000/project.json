@@ -1,0 +1,31 @@
+{
+  "$type": "Mapping_Tools.Viewmodels.MetadataManagerVm, Mapping Tools",
+  "ImportPath": "{fixtureRoot}\\Beatmaps\\standard-feature-rich.osu",
+  "ExportPath": "{fixtureRoot}\\Beatmaps\\ComplicatedTestMap.osu",
+  "Artist": "E2E Fixture Artist",
+  "RomanisedArtist": "E2E Fixture Artist",
+  "Title": "E2E Metadata Fixture",
+  "RomanisedTitle": "E2E Metadata Fixture",
+  "BeatmapCreator": "Fixture Mapper",
+  "Source": "E2E Fixture",
+  "Tags": "e2e fixture e2e",
+  "DoRemoveDuplicateTags": true,
+  "ResetIds": true,
+  "PreviewTime": 12345.0,
+  "UseComboColours": true,
+  "ComboColours": [
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.ComboColour, Mapping Tools",
+      "Color": "#FFFF3366"
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.ComboColour, Mapping Tools",
+      "Color": "#FF33CCFF"
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.ComboColour, Mapping Tools",
+      "Color": "#FFFFCC33"
+    }
+  ],
+  "SpecialColours": []
+}

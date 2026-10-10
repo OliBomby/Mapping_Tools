@@ -1,0 +1,63 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
+             xmlns:vm="using:Mapping_Tools.Desktop.Tools.TimingHelper.ViewModels"
+             xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             x:Class="Mapping_Tools.Desktop.Tools.TimingHelper.Views.TimingHelperView"
+             x:DataType="vm:TimingHelperViewModel">
+    <Grid RowDefinitions="*,Auto">
+        <Grid>
+            <StackPanel>
+                <controls:ToolViewHeader
+                    Title="{loc:Tr TimingHelper_Title}"
+                    IsQuickRunSupported="True"
+                    HelpText="{loc:Tr TimingHelper_Help}" />
+
+                <CheckBox Margin="0,20,0,0" Content="{loc:Tr TimingHelper_CoverObjects}" IsChecked="{Binding Objects}"
+                          ToolTip.Tip="{loc:Tr TimingHelper_CoverObjectsTip}" />
+                <CheckBox Content="{loc:Tr TimingHelper_CoverBookmarks}" IsChecked="{Binding Bookmarks}"
+                          ToolTip.Tip="{loc:Tr TimingHelper_CoverBookmarksTip}" />
+                <CheckBox Content="{loc:Tr TimingHelper_CoverGreenlines}" IsChecked="{Binding Greenlines}"
+                          ToolTip.Tip="{loc:Tr TimingHelper_CoverGreenlinesTip}" />
+                <CheckBox Content="{loc:Tr TimingHelper_CoverRedlines}" IsChecked="{Binding Redlines}"
+                          ToolTip.Tip="{loc:Tr TimingHelper_CoverRedlinesTip}" />
+                <CheckBox Content="{loc:Tr TimingHelper_OmitBarline}" IsChecked="{Binding OmitBarline}"
+                          ToolTip.Tip="{loc:Tr TimingHelper_OmitBarlineTip}" />
+
+                <TextBox Width="400" HorizontalAlignment="Left" Margin="0,20,0,0"
+                         materialAssists:TextFieldAssist.Label="{loc:Tr TimingHelper_LeniencyLabel}"
+                         Text="{Binding Leniency, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}"
+                         ToolTip.Tip="{loc:Tr TimingHelper_LeniencyTip}" />
+                <TextBox Width="400" HorizontalAlignment="Left" Margin="0,10,0,0"
+                         materialAssists:TextFieldAssist.Label="{loc:Tr TimingHelper_BeatsBetweenLabel}"
+                         Text="{Binding BeatsBetween, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}"
+                         ToolTip.Tip="{loc:Tr TimingHelper_BeatsBetweenTip}" />
+
+                <TextBlock Margin="0,20,0,0" FontSize="14" FontWeight="Bold"
+                           Text="{loc:Tr Common_Signatures}" ToolTip.Tip="{loc:Tr Common_SignaturesTip}" />
+                <TextBox HorizontalAlignment="Left" MinWidth="100" FontSize="14" Cursor="Hand"
+                         materialAssists:TextFieldAssist.Label="{loc:Tr Common_BeatDivisorsLabel}"
+                         Text="{Binding BeatDivisors, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource BeatDivisorArrayToStringConverter}}"
+                         ToolTip.Tip="{loc:Tr Common_BeatDivisorsTip}" />
+            </StackPanel>
+
+            <controls:ToolRunButton Margin="10" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                    RunCommand="{Binding RunCommand}" />
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap" FontWeight="Bold" Opacity="0.58"
+                               Text="{loc:Tr Common_MadeByOliBomby}" />
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <controls:ToolProgressBar Height="20" Margin="20,0,20,0"
+                                          Background="{x:Null}" BorderBrush="{x:Null}"
+                                          Maximum="100" Value="{Binding Progress}" />
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

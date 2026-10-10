@@ -1,0 +1,169 @@
+using Mapping_Tools.Application.Backups.Models;
+using Mapping_Tools.Application.Execution.UserNotification;
+using Mapping_Tools.Application.Execution.UserNotification.Models;
+using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Application.Workspace.Models;
+using Mapping_Tools.Desktop.Tests.TestDoubles;
+using Mapping_Tools.Desktop.ViewModels;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace Mapping_Tools.Desktop.Tests.ViewModels;
+
+[TestClass]
+public sealed class BeatmapWorkspaceViewModelTests
+{
+    [TestMethod]
+    public void Constructor_WithRecentMap_RestoresSelectionAndFormatsShellState()
+    {
+        // Arrange
+        TestBeatmapWorkspace workspace = new();
+        string mapPath = Path.Combine("Songs", "Mapset", "Artist - Title [Hard].osu");
+        workspace.SetRecentMaps(new RecentBeatmap(
+            mapPath,
+            "today"));
+
+        // Act
+        using var viewModel = CreateViewModel(workspace);
+
+        // Assert
+        workspace.LastSelectionSource.Should().Be(BeatmapSelectionSource.Startup);
+        viewModel.SelectedMapNames.Should().Be("Artist - Title [Hard].osu");
+        viewModel.SelectedMapToolTip.Should().Be(mapPath);
+        viewModel.SelectedMapCountText.Should().Be("(1) map total");
+        viewModel.HasSingleSelection.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public void SetDroppedPaths_WithMultipleFiles_PreservesOrderAndSource()
+    {
+        // Arrange
+        TestBeatmapWorkspace workspace = new();
+        using var viewModel = CreateViewModel(workspace);
+        string firstPath = Path.Combine("Songs", "one.osu");
+        string secondPath = Path.Combine("Songs", "two.osu");
+
+        // Act
+        viewModel.SetDroppedPaths([firstPath, secondPath]);
+
+        // Assert
+        workspace.SelectedPaths.Should().Equal(firstPath, secondPath);
+        workspace.LastSelectionSource.Should().Be(BeatmapSelectionSource.DragAndDrop);
+        viewModel.SelectedMapNames.Should().Be("one.osu|two.osu");
+        viewModel.SelectedMapCountText.Should().Be("(2) maps total");
+    }
+
+    [TestMethod]
+    public async Task CreateBackupCommand_WithSelection_ForcesUserBackupAndPublishesSuccess()
+    {
+        // Arrange
+        TestBeatmapWorkspace workspace = new();
+        workspace.SetSelection([@"C:\map.osu"]);
+        TestBeatmapBackupService backups = new();
+        UserNotificationService notifications = new();
+        List<UserNotification> published = [];
+        notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
+        using var viewModel = CreateViewModel(
+            workspace,
+            backups,
+            notifications: notifications);
+
+        // Act
+        await viewModel.CreateBackupCommand.ExecuteAsync(null);
+
+        // Assert
+        backups.CreateRequests.Should().ContainSingle();
+        backups.CreateRequests[0].Paths.Should().Equal(@"C:\map.osu");
+        backups.CreateRequests[0].Reason.Should().Be(BeatmapBackupReason.User);
+        backups.CreateRequests[0].Force.Should().BeTrue();
+        published.Should().ContainSingle(notification =>
+            notification.Severity == UserNotificationSeverity.Success && notification.Title == "Backup created");
+    }
+
+    [TestMethod]
+    public async Task RestoreBackupCommand_WithMetadataMismatchAndOverride_DoesNotReloadEditor()
+    {
+        // Arrange
+        TestBeatmapWorkspace workspace = new();
+        workspace.SetSelection([@"C:\current.osu"]);
+        TestBeatmapBackupService backups = new()
+        {
+            RejectFirstRestoreAsIncompatible = true,
+        };
+        TestFilePicker picker = new()
+        {
+            OpenFiles = [@"C:\Backups\chosen.osu"],
+        };
+        TestDialogService dialogs = new() { BooleanResult = true };
+        using var viewModel = CreateViewModel(
+            workspace,
+            backups,
+            picker,
+            dialogs,
+            autoReload: true);
+
+        // Act
+        await viewModel.RestoreBackupCommand.ExecuteAsync(null);
+
+        // Assert
+        dialogs.MessageCount.Should().Be(1);
+        backups.RestoreRequests.Should().HaveCount(2);
+        backups.RestoreRequests.Select(request => request.AllowDifferentFilename)
+            .Should().Equal(false, true);
+        backups.RestoreRequests.Select(request => request.ReloadEditor)
+            .Should().Equal(false, false);
+        backups.RestoreRequests.Should().OnlyContain(request =>
+            request.Backup == @"C:\Backups\chosen.osu" && request.Destination == @"C:\current.osu");
+    }
+
+    [TestMethod]
+    public async Task OpenCurrentBeatmapCommand_WhenLookupSucceeds_SetsCurrentSelection()
+    {
+        // Arrange
+        TestBeatmapWorkspace workspace = new();
+        TestCurrentBeatmapDialogService currentBeatmap = new()
+        {
+            Path = "current.osu",
+        };
+        TestDialogService dialogs = new();
+        using var viewModel = CreateViewModel(
+            workspace,
+            currentBeatmap: currentBeatmap,
+            dialogs: dialogs);
+
+        // Act
+        await viewModel.OpenCurrentBeatmapCommand.ExecuteAsync(null);
+
+        // Assert
+        workspace.SelectedPaths.Should().Equal("current.osu");
+        workspace.LastSelectionSource.Should().Be(BeatmapSelectionSource.CurrentEditor);
+        dialogs.MessageCount.Should().Be(0);
+    }
+
+    private static BeatmapWorkspaceViewModel CreateViewModel(
+        TestBeatmapWorkspace workspace,
+        TestBeatmapBackupService? backups = null,
+        TestFilePicker? picker = null,
+        TestDialogService? dialogs = null,
+        IUserNotificationService? notifications = null,
+        bool autoReload = false,
+        TestCurrentBeatmapDialogService? currentBeatmap = null)
+    {
+        ApplicationSettings settings = new()
+        {
+            BackupsPath = @"C:\Backups",
+            EditorReload = autoReload ? EditorReloadMode.SimulatedKeypress : EditorReloadMode.Disabled,
+        };
+        return new BeatmapWorkspaceViewModel(
+            workspace,
+            backups ?? new TestBeatmapBackupService(),
+            new TestQuickUndoCommandService(),
+            picker ?? new TestFilePicker(),
+            new TestFileRevealService(),
+            new TestApplicationDirectories(),
+            settings,
+            dialogs ?? new TestDialogService(),
+            notifications ?? new UserNotificationService(),
+            new ImmediateTestDispatcher(),
+            currentBeatmap ?? new TestCurrentBeatmapDialogService());
+    }
+}

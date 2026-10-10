@@ -1,0 +1,105 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+        xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+        xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+        xmlns:geometryDashboard="clr-namespace:Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels"
+        xmlns:loc="using:Mapping_Tools.Desktop.Localization"
+        xmlns:model="clr-namespace:Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;assembly=Mapping_Tools.Core"
+        x:Class="Mapping_Tools.Desktop.Tools.GeometryDashboard.Views.GeometryDashboardSavestatesWindow"
+        x:DataType="geometryDashboard:GeometryDashboardSavestatesViewModel"
+        Title="{loc:Tr GeometryDashboard_SavestatesWindowTitle}" Width="570" Height="500" MinWidth="575" MinHeight="360"
+        CanResize="True" WindowStartupLocation="CenterScreen" WindowDecorations="BorderOnly"
+        ExtendClientAreaToDecorationsHint="True" ExtendClientAreaTitleBarHeightHint="35"
+        Background="{DynamicResource MaterialPaperBrush}" Foreground="{DynamicResource MaterialBodyBrush}">
+    <Grid RowDefinitions="Auto,*,Auto,Auto">
+        <controls:WindowChrome Grid.Row="0"
+                               Title="{loc:Tr GeometryDashboard_SavestatesTitle}" />
+
+        <controls:MaterialGridListView x:Name="SaveSlotsGrid"
+                                       Grid.Row="1" Grid.RowSpan="2"
+                                       ItemsSource="{Binding SaveSlots}"
+                                       SelectionMode="Multiple"
+                                       SelectedItem="{Binding SelectedSlot, Mode=OneWayToSource}"
+                                       SelectionChanged="SaveSlotsSelectionChanged"
+                                       CanUserResizeColumns="True"
+                                       ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                       ScrollViewer.HorizontalScrollBarVisibility="Auto">
+            <controls:MaterialGridListView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="{loc:Tr GeometryDashboard_Duplicate}" Command="{Binding DuplicateCommand}"
+                              ToolTip.Tip="{loc:Tr GeometryDashboard_DuplicateSavesTip}" />
+                    <MenuItem Header="{loc:Tr GeometryDashboard_Remove}" Command="{Binding RemoveCommand}"
+                              ToolTip.Tip="{loc:Tr GeometryDashboard_RemoveSavesTip}" />
+                </ContextMenu>
+            </controls:MaterialGridListView.ContextMenu>
+
+            <controls:MaterialGridListView.Columns>
+                <TableViewColumn Header="{loc:Tr GeometryDashboard_NameColumn}" Width="150" HorizontalContentAlignment="Stretch">
+                    <TableViewColumn.CellTemplate>
+                        <DataTemplate x:DataType="model:GeometryDashboardSaveSlot">
+                            <TextBox HorizontalAlignment="Stretch"
+                                     Margin="5, 0"
+                                     Classes="compact"
+                                     Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+                        </DataTemplate>
+                    </TableViewColumn.CellTemplate>
+                </TableViewColumn>
+
+                <TableViewColumn Header="{loc:Tr GeometryDashboard_HotkeyColumn}" Width="130" HorizontalContentAlignment="Center">
+                    <TableViewColumn.CellTemplate>
+                        <DataTemplate x:DataType="model:GeometryDashboardSaveSlot">
+                            <controls:HotkeyEditor Width="130"
+                                                   Margin="5, 0"
+                                                   Classes="compact"
+                                                   HorizontalAlignment="Center"
+                                                   Hotkey="{Binding ProjectHotkey, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+                        </DataTemplate>
+                    </TableViewColumn.CellTemplate>
+                </TableViewColumn>
+
+                <TableViewColumn Width="Auto" HorizontalContentAlignment="Left">
+                    <TableViewColumn.CellTemplate>
+                        <DataTemplate x:DataType="model:GeometryDashboardSaveSlot">
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="{loc:Tr GeometryDashboard_Save}"
+                                        MinWidth="60"
+                                        Padding="12,6"
+                                        CornerRadius="7"
+                                        Command="{Binding $parent[Window].((geometryDashboard:GeometryDashboardSavestatesViewModel)DataContext).SaveCommand}"
+                                        CommandParameter="{Binding}"
+                                        Margin="0,0,8,0"
+                                        ToolTip.Tip="{loc:Tr GeometryDashboard_SaveCurrentTip}" />
+                                <Button Content="{loc:Tr GeometryDashboard_Load}"
+                                        MinWidth="60"
+                                        Padding="12,6"
+                                        CornerRadius="7"
+                                        Command="{Binding $parent[Window].((geometryDashboard:GeometryDashboardSavestatesViewModel)DataContext).LoadCommand}"
+                                        CommandParameter="{Binding}"
+                                        Margin="0,0,8,0"
+                                        ToolTip.Tip="{loc:Tr GeometryDashboard_LoadSlotTip}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </TableViewColumn.CellTemplate>
+                </TableViewColumn>
+            </controls:MaterialGridListView.Columns>
+        </controls:MaterialGridListView>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,10">
+            <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="0,0,8,0"
+                                           ToolTip.Tip="{loc:Tr GeometryDashboard_RefreshHotkeysTip}"
+                                           Command="{Binding RefreshHotkeysCommand}">
+                <materialIcons:MaterialIcon Kind="Reload" Width="22" Height="22" />
+            </materialDesign:FloatingButton>
+            <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="0,0,8,0"
+                                           ToolTip.Tip="{loc:Tr GeometryDashboard_AddSaveTip}" Command="{Binding AddCommand}">
+                <materialIcons:MaterialIcon Kind="Plus" Width="22" Height="22" />
+            </materialDesign:FloatingButton>
+            <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="0,0,8,0"
+                                           ToolTip.Tip="{loc:Tr GeometryDashboard_RemoveSaveTip}"
+                                           Command="{Binding RemoveCommand}">
+                <materialIcons:MaterialIcon Kind="Minus" Width="22" Height="22" />
+            </materialDesign:FloatingButton>
+        </StackPanel>
+    </Grid>
+</Window>

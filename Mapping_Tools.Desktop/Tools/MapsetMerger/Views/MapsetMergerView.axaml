@@ -1,0 +1,145 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Mapping_Tools.Desktop.Tools.MapsetMerger.ViewModels"
+             xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:materialIcons="using:Material.Icons.Avalonia"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
+             x:Class="Mapping_Tools.Desktop.Tools.MapsetMerger.Views.MapsetMergerView"
+             x:DataType="vm:MapsetMergerViewModel">
+    <Grid RowDefinitions="*,Auto">
+        <Grid Grid.Row="0" RowDefinitions="Auto,*,Auto">
+            <controls:ToolViewHeader
+                Title="Mapset Merger"
+                HelpText="{loc:Tr MapsetMerger_Help}" />
+
+            <Grid Grid.Row="1" RowDefinitions="*,Auto">
+                <DataGrid Grid.Row="0"
+                          ItemsSource="{Binding Mapsets}"
+                          AutoGenerateColumns="False"
+                          CanUserSortColumns="True"
+                          CanUserAddRows="False"
+                          SelectionMode="Extended"
+                          IsReadOnly="False"
+                          EditTriggers="CellClick"
+                          UseLogicalScrollable="True"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <DataGrid.Styles>
+                        <Style Selector="DataGridRow">
+                            <Setter Property="IsSelected"
+                                    Value="{ReflectionBinding IsSelected, Mode=TwoWay}" />
+                        </Style>
+                    </DataGrid.Styles>
+                    <DataGrid.Columns>
+                        <controls:CompactDataGridTextColumn Header="{loc:Tr MapsetMerger_Name}"
+                                                            Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+                        <DataGridTemplateColumn Header="{loc:Tr MapsetMerger_Path}" Width="Auto">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="vm:MapsetMergerItemViewModel">
+                                    <TextBlock Text="{Binding Path}"
+                                               VerticalAlignment="Center" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                            <DataGridTemplateColumn.CellEditingTemplate>
+                                <DataTemplate x:DataType="vm:MapsetMergerItemViewModel">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBox Text="{Binding Path, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                                 Classes="compact"
+                                                 VerticalAlignment="Center"
+                                                 MinWidth="200" />
+                                        <materialDesign:FloatingButton Grid.Column="1" Classes="mini light no-transitions"
+                                                                       Margin="10,0,5,0"
+                                                                       VerticalAlignment="Center"
+                                                                       Command="{Binding BrowseCommand}"
+                                                                       ToolTip.Tip="{loc:Tr MapsetMerger_Browse}">
+                                            <materialIcons:MaterialIcon Kind="Folder"
+                                                                        Width="24"
+                                                                        Height="24" />
+                                        </materialDesign:FloatingButton>
+                                    </Grid>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellEditingTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+
+            <Grid Grid.Row="2" ColumnDefinitions="*,Auto">
+                <Grid Grid.Column="0" RowDefinitions="Auto,Auto">
+                    <Grid Grid.Row="1">
+                        <materialDesign:Card VerticalAlignment="Bottom"
+                                             HorizontalAlignment="Stretch"
+                                             Padding="10,5,10,10"
+                                             Margin="0,10,5,5">
+                            <Grid ColumnDefinitions="*,Auto,Auto">
+                                <TextBox Margin="0,0,10,0"
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr MapsetMerger_ExportPath}"
+                                         Text="{Binding ExportPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                         ToolTip.Tip="{loc:Tr MapsetMerger_ExportPathTip}" />
+                                <Button Grid.Column="1"
+                                        Classes="flat path-picker"
+                                        VerticalAlignment="Bottom"
+                                        Command="{Binding BrowseExportPathCommand}"
+                                        ToolTip.Tip="{loc:Tr MapsetMerger_BrowseExportPath}">
+                                    <materialIcons:MaterialIcon Width="30"
+                                                                Height="30"
+                                                                Kind="Folder" />
+                                </Button>
+                                <CheckBox Grid.Column="2"
+                                          Content="{loc:Tr MapsetMerger_MoveStoryboard}"
+                                          Margin="10,0,5,0"
+                                          IsChecked="{Binding MoveSbToBeatmap}"
+                                          ToolTip.Tip="{loc:Tr MapsetMerger_MoveStoryboardTip}" />
+                            </Grid>
+                        </materialDesign:Card>
+                    </Grid>
+
+                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="1"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    Orientation="Horizontal">
+                            <materialDesign:FloatingButton Classes="mini light no-transitions"
+                                                           Margin="5"
+                                                           x:Name="AddMapsetButton"
+                                                           Click="AddMapsetButtonClick"
+                                                           ToolTip.Tip="{loc:Tr MapsetMerger_AddMapset}">
+                                <materialIcons:MaterialIcon Kind="Plus" Width="24" Height="24" />
+                            </materialDesign:FloatingButton>
+                            <materialDesign:FloatingButton Classes="mini light no-transitions"
+                                                           Margin="5"
+                                                           Command="{Binding RemoveMapsetCommand}"
+                                                           ToolTip.Tip="{loc:Tr MapsetMerger_RemoveMapset}">
+                                <materialIcons:MaterialIcon Kind="Minus" Width="24" Height="24" />
+                            </materialDesign:FloatingButton>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+
+                <controls:ToolRunButton Grid.Column="1"
+                                        Margin="10"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Bottom"
+                                        RunCommand="{Binding RunCommand}" />
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap"
+                               Text="{loc:Tr Common_FooterMadeBy}"
+                               FontWeight="Bold"
+                               Opacity="0.58" />
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <controls:ToolProgressBar Height="20"
+                                          Margin="20,0,20,0"
+                                          Maximum="100"
+                                          Value="{Binding Progress}" />
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

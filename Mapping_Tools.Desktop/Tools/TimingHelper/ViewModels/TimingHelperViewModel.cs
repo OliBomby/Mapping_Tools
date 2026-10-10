@@ -1,0 +1,207 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using Mapping_Tools.Application.Execution.ToolExecution;
+using Mapping_Tools.Application.Execution.ToolExecution.Models;
+using Mapping_Tools.Application.Projects.Models;
+using Mapping_Tools.Application.Tools.TimingHelper;
+using Mapping_Tools.Application.Workspace.Contracts;
+using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
+using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Services.Undo;
+using Mapping_Tools.Desktop.Localization;
+using Mapping_Tools.Desktop.Tools.TimingHelper.Models;
+using Mapping_Tools.Desktop.Validation;
+using Mapping_Tools.Desktop.ViewModels;
+
+using Mapping_Tools.Application.Localization;
+
+namespace Mapping_Tools.Desktop.Tools.TimingHelper.ViewModels;
+
+/// <summary>
+///     Owns Timing Helper form state, project persistence, ordinary execution, and QuickRun.
+/// </summary>
+public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
+    IQuickRun,
+    IShellProjectFeature<TimingHelperProject>
+{
+    /// <inheritdoc />
+    public IProjectUndoHistory? UndoHistory { get; set; }
+
+    private readonly DesktopApplicationSettings settings;
+
+    private readonly ITimingHelperService timingHelper;
+    private readonly IBeatmapWorkspace workspace;
+
+    /// <summary>
+    ///     Creates a Timing Helper presentation model.
+    /// </summary>
+    /// <param name="timingHelper">Runs the framework-independent timing transformation.</param>
+    /// <param name="execution">Coordinates background execution, cancellation, and notifications.</param>
+    /// <param name="workspace">Supplies the shell's selected beatmap paths.</param>
+    /// <param name="settings">Supplies QuickRun and automatic-reload preferences.</param>
+    public TimingHelperViewModel(
+        ITimingHelperService timingHelper,
+        IToolExecutionService execution,
+        IBeatmapWorkspace workspace,
+        DesktopApplicationSettings settings)
+        : base(execution, TimingHelperToolDefinition.Definition)
+    {
+        this.timingHelper = timingHelper ?? throw new ArgumentNullException(nameof(timingHelper));
+        this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+    }
+
+    /// <summary>Gets or sets whether hit objects are counted as timing markers.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool Objects { get; set; } = true;
+
+    /// <summary>Gets or sets whether bookmarks are counted as timing markers.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool Bookmarks { get; set; } = true;
+
+    /// <summary>Gets or sets whether greenlines are counted as timing markers.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool Greenlines { get; set; } = true;
+
+    /// <summary>Gets or sets whether redlines are counted as timing markers and retained.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool Redlines { get; set; } = true;
+
+    /// <summary>Gets or sets whether inserted redlines omit their first barline.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool OmitBarline { get; set; }
+
+    /// <summary>Gets or sets the tolerated marker error in milliseconds.</summary>
+    [ObservableProperty]
+    [Undoable]
+    [NotifyDataErrorInfo]
+    [InclusiveRange<double>(0, double.MaxValue, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.TimingHelper_Validation_TimingLeniencyNonNegative))]
+    public partial double Leniency { get; set; } = 3;
+
+    /// <summary>
+    ///     Gets or sets the number of beats requested between markers, or <c>-1</c>
+    ///     to infer the spacing.
+    /// </summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial double BeatsBetween { get; set; } = -1;
+
+    /// <summary>Gets or sets the beat divisors used to resnap marker times.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial IBeatDivisor[] BeatDivisors { get; set; } =
+        RationalBeatDivisor.GetDefaultBeatDivisors();
+
+    /// <summary>Runs Timing Helper against the current editor beatmap or shell selection.</summary>
+    /// <param name="cancellationToken">Cancels beatmap discovery or timing adjustment.</param>
+    /// <returns>A task that completes after QuickRun reaches a terminal state.</returns>
+    public async Task RunQuickAsync(CancellationToken cancellationToken)
+    {
+        string path = await workspace
+            .ResolveQuickRunBeatmapAsync(cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+
+        await RunWithStateAsync(() => RunPathsAsync(
+            string.IsNullOrWhiteSpace(path) ? [] : [path],
+            true,
+            cancellationToken));
+    }
+
+    ProjectDefinition<TimingHelperProject> IShellProjectFeature<TimingHelperProject>.ProjectDefinition { get; } = new(
+        "timinghelperproject.json",
+        "Timing Helper Projects",
+        static () => new TimingHelperProject(),
+        "timing-helper-project.json",
+        ToolConfigSchema.ForTool(TimingHelperToolDefinition.Definition.Id));
+
+    TimingHelperProject IShellProjectFeature<TimingHelperProject>.Snapshot()
+    {
+        return Snapshot();
+    }
+
+    void IShellProjectFeature<TimingHelperProject>.Install(TimingHelperProject project)
+    {
+        Install(project);
+    }
+
+    /// <inheritdoc />
+    protected override async Task RunCoreAsync()
+    {
+        if (settings.AlwaysQuickRun)
+        {
+            string path = await workspace.ResolveQuickRunBeatmapAsync();
+            await RunPathsAsync(
+                string.IsNullOrWhiteSpace(path) ? [] : [path],
+                true,
+                CancellationToken.None);
+            return;
+        }
+
+        await RunPathsAsync(workspace.SelectedPaths, false, CancellationToken.None);
+    }
+
+    private async Task RunPathsAsync(
+        IReadOnlyList<string> paths,
+        bool quick,
+        CancellationToken cancellationToken)
+    {
+        if (paths.Count == 0) return;
+
+        var options = Snapshot();
+        await Execution.ExecuteAsync(
+                new ToolExecutionRequest<TimingHelperResult>(
+                    Tool.Id,
+                    Tool.DisplayName,
+                    async context =>
+                    {
+                        Progress<double> progress = new(value =>
+                            context.ReportProgress(value, DesktopStrings.TimingHelper_Adjusting));
+                        var result = await timingHelper.AdjustAsync(
+                            paths,
+                            options,
+                            quick,
+                            progress,
+                            context.CancellationToken);
+                        return new ToolExecutionOutput<TimingHelperResult>(
+                            result,
+                            result.RedlinesAdded == 1
+                                ? ApplicationText.Format(DesktopStrings.TimingHelper_ResultOne, result.RedlinesAdded)
+                                : ApplicationText.Format(DesktopStrings.TimingHelper_ResultMany, result.RedlinesAdded));
+                    }),
+                CreateProgress(),
+                cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    private TimingHelperProject Snapshot()
+    {
+        return new TimingHelperProject
+        {
+            Objects = Objects,
+            Bookmarks = Bookmarks,
+            Greenlines = Greenlines,
+            Redlines = Redlines,
+            OmitBarline = OmitBarline,
+            Leniency = Leniency,
+            BeatsBetween = BeatsBetween,
+            BeatDivisors = BeatDivisors.ToArray(),
+        };
+    }
+
+    private void Install(TimingHelperProject project)
+    {
+        Objects = project.Objects;
+        Bookmarks = project.Bookmarks;
+        Greenlines = project.Greenlines;
+        Redlines = project.Redlines;
+        OmitBarline = project.OmitBarline;
+        Leniency = project.Leniency;
+        BeatsBetween = project.BeatsBetween;
+        BeatDivisors = project.BeatDivisors.ToArray();
+    }
+}

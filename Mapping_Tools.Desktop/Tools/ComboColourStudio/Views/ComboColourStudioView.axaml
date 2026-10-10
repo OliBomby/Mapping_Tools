@@ -1,0 +1,211 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels"
+             xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:adapter="using:Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels.Adapters"
+             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:materialIcons="using:Material.Icons.Avalonia"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
+             x:Class="Mapping_Tools.Desktop.Tools.ComboColourStudio.Views.ComboColourStudioView"
+             x:Name="Root"
+             x:DataType="vm:ComboColourStudioViewModel">
+    <Grid RowDefinitions="*,Auto">
+        <Grid Grid.Row="0" RowDefinitions="Auto,*,Auto">
+            <controls:ToolViewHeader
+                Title="Combo Colour Studio"
+                IsQuickRunSupported="True"
+                HelpText="{loc:Tr ComboColourStudio_StudioHelp}" />
+
+            <Grid Grid.Row="1" RowDefinitions="*,Auto">
+                <DataGrid Grid.Row="0" ItemsSource="{Binding ColourPoints}"
+                          SelectedItem="{Binding SelectedColourPoint, Mode=TwoWay}"
+                          SelectionChanged="ColourPointsSelectionChanged"
+                          AutoGenerateColumns="False"
+                          CanUserSortColumns="True"
+                          SelectionMode="Extended" IsReadOnly="False"
+                          EditTriggers="CellClick"
+                          CanUserAddRows="False"
+                          UseLogicalScrollable="True"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <DataGrid.Columns>
+                        <controls:CompactDataGridTextColumn Header="{loc:Tr ComboColourStudio_Offset}"
+                                                            Binding="{Binding Time, Mode=TwoWay, Converter={StaticResource TimeToStringConverter}}" />
+                        <DataGridTemplateColumn Header="{loc:Tr ComboColourStudio_Mode}" SortMemberPath="Mode">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="adapter:ObservableColourPoint">
+                                    <TextBlock Text="{loc:TranslatedBinding Mode, Converter={x:Static loc:ToolChoiceConverter.Instance}}"
+                                               VerticalAlignment="Center" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                            <DataGridTemplateColumn.CellEditingTemplate>
+                                <DataTemplate x:DataType="adapter:ObservableColourPoint">
+                                    <ComboBox Classes="compact" ItemsSource="{Binding ColourPointModes}"
+                                              SelectedItem="{Binding Mode, Mode=TwoWay}">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellEditingTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="{loc:Tr ComboColourStudio_Sequence}">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="adapter:ObservableColourPoint">
+                                    <ItemsControl ItemsSource="{Binding ColourSequence}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="adapter:ObservableSpecialColour">
+                                                <Border Width="24" Height="24" CornerRadius="12" Margin="2"
+                                                        Background="{Binding Color, Converter={StaticResource RgbaColourToAvaloniaBrushConverter}}"
+                                                        ToolTip.Tip="{Binding Name}" />
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                            <DataGridTemplateColumn.CellEditingTemplate>
+                                <DataTemplate x:DataType="adapter:ObservableColourPoint">
+                                    <StackPanel Orientation="Horizontal">
+                                        <ListBox ItemsSource="{Binding ColourSequence}">
+                                            <ListBox.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel Orientation="Horizontal" />
+                                                </ItemsPanelTemplate>
+                                            </ListBox.ItemsPanel>
+                                            <ListBox.ItemContainerTheme>
+                                                <ControlTheme TargetType="ListBoxItem">
+                                                    <Setter Property="Padding" Value="5" />
+                                                </ControlTheme>
+                                            </ListBox.ItemContainerTheme>
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate x:DataType="adapter:ObservableSpecialColour">
+                                                    <materialDesign:Card CornerRadius="16" Height="32">
+                                                        <StackPanel Orientation="Horizontal" Spacing="5">
+                                                            <Border Width="32" Height="32" CornerRadius="16"
+                                                                    Background="{Binding Color, Converter={StaticResource RgbaColourToAvaloniaBrushConverter}}"
+                                                                    VerticalAlignment="Center"
+                                                                    ToolTip.Tip="{Binding Name}" />
+                                                            <Button Classes="flat" Tag="{Binding}"
+                                                                    Width="32" Height="32" Padding="0"
+                                                                    CornerRadius="16" ClipToBounds="True"
+                                                                    Click="RemoveSequenceColour_OnClick"
+                                                                    ToolTip.Tip="{loc:Tr ComboColourStudio_RemoveSequenceEntry}">
+                                                                <materialIcons:MaterialIcon Kind="Close" Width="18"
+                                                                        Height="18" />
+                                                            </Button>
+                                                        </StackPanel>
+                                                    </materialDesign:Card>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
+                                        <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="5,0"
+                                                                       Click="AddSequenceColourButtonClick"
+                                                                       ToolTip.Tip="{loc:Tr ComboColourStudio_AddToSequence}">
+                                            <materialIcons:MaterialIcon Kind="Plus" Width="22" Height="22" />
+                                        </materialDesign:FloatingButton>
+                                        <materialDesign:FloatingButton Classes="mini light no-transitions"
+                                                                       Command="{Binding $parent[DataGrid].((vm:ComboColourStudioViewModel)DataContext)?.RemoveSequenceColourCommand}"
+                                                                       ToolTip.Tip="{loc:Tr ComboColourStudio_RemoveLastFromSequence}">
+                                            <materialIcons:MaterialIcon Kind="Minus" Width="22" Height="22" />
+                                        </materialDesign:FloatingButton>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellEditingTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+
+            <Grid Grid.Row="2" ColumnDefinitions="*,Auto">
+                <Grid Grid.Column="0" RowDefinitions="Auto,Auto">
+                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top"
+                                    Orientation="Horizontal">
+                            <materialDesign:Card>
+                                <ListBox ItemsSource="{Binding ComboColours}">
+                                    <ListBox.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal" />
+                                        </ItemsPanelTemplate>
+                                    </ListBox.ItemsPanel>
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate x:DataType="adapter:ObservableSpecialColour">
+                                            <ColorPicker
+                                                Color="{Binding Color, Mode=TwoWay, Converter={StaticResource RgbaColourToAvaloniaColorConverter}}"
+                                                ToolTip.Tip="{Binding Name}" />
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </materialDesign:Card>
+                            <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="10,5,5,5"
+                                                           Command="{Binding AddComboColourCommand}"
+                                                           ToolTip.Tip="{loc:Tr ComboColourStudio_AddPaletteColour}">
+                                <materialIcons:MaterialIcon Kind="Plus" Width="24" Height="24" />
+                            </materialDesign:FloatingButton>
+                            <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="5"
+                                                           Command="{Binding RemoveComboColourCommand}"
+                                                           ToolTip.Tip="{loc:Tr ComboColourStudio_RemoveLastPaletteColour}">
+                                <materialIcons:MaterialIcon Kind="Minus" Width="24" Height="24" />
+                            </materialDesign:FloatingButton>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                    Orientation="Horizontal">
+                            <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="5"
+                                                           x:Name="AddColourPointButton"
+                                                           Click="AddColourPointButtonClick"
+                                                           ToolTip.Tip="{loc:Tr ComboColourStudio_AddPoint}">
+                                <materialIcons:MaterialIcon Kind="Plus" Width="24" Height="24" />
+                            </materialDesign:FloatingButton>
+                            <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="5"
+                                                           Command="{Binding RemoveColourPointCommand}"
+                                                           ToolTip.Tip="{loc:Tr ComboColourStudio_RemovePoints}">
+                                <materialIcons:MaterialIcon Kind="Minus" Width="24" Height="24" />
+                            </materialDesign:FloatingButton>
+                        </StackPanel>
+                    </Grid>
+
+                    <materialDesign:Card Grid.Row="1" Padding="2" Margin="0,10,5,5"
+                                         HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="{loc:Tr ComboColourStudio_ImportColours}" Margin="5"
+                                    Command="{Binding ImportColoursCommand}"
+                                    ToolTip.Tip="{loc:Tr ComboColourStudio_ImportColoursTip}" />
+                            <Button Content="{loc:Tr ComboColourStudio_ImportHax}" Margin="5"
+                                    Command="{Binding ImportColourHaxCommand}"
+                                    ToolTip.Tip="{loc:Tr ComboColourStudio_ImportHaxTip}" />
+                            <TextBox Width="190" Margin="25,0,10,5"
+                                     materialAssists:TextFieldAssist.Label="{loc:Tr ComboColourStudio_MaxBurstLength}"
+                                     Text="{Binding Project.MaxBurstLength, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantInt32Converter}}"
+                                     ToolTip.Tip="{loc:Tr ComboColourStudio_MaxBurstLengthTip}" />
+                        </StackPanel>
+                    </materialDesign:Card>
+                </Grid>
+
+                <controls:ToolRunButton Grid.Column="1" Margin="10"
+                                        HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                        RunCommand="{Binding RunCommand}" />
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap" FontWeight="Bold" Opacity="0.58"
+                               Text="{loc:Tr Common_FooterMadeBy}" />
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <controls:ToolProgressBar Height="20" Margin="20,0,20,0" Maximum="100"
+                                          Value="{Binding Progress}" />
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

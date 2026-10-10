@@ -1,0 +1,207 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:geometryDashboard="clr-namespace:Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
+             x:Class="Mapping_Tools.Desktop.Tools.GeometryDashboard.Views.GeometryDashboardView"
+             x:DataType="geometryDashboard:GeometryDashboardViewModel"
+             x:CompileBindings="True">
+    <Grid RowDefinitions="*,Auto">
+        <Grid Grid.Row="0" RowDefinitions="Auto,*,Auto" MinHeight="0">
+            <StackPanel Grid.Row="0">
+                <controls:ToolViewHeader Title="Geometry Dashboard"
+                                         HelpText="{loc:Tr GeometryDashboard_HelpText}" />
+
+                <Grid Margin="0,0,0,10" ColumnDefinitions="*,Auto,Auto,Auto">
+                    <Grid Grid.Column="0" ColumnDefinitions="Auto,*"
+                          VerticalAlignment="Center">
+                        <Grid Width="18" Height="18" VerticalAlignment="Center">
+                            <materialIcons:MaterialIcon Kind="CircleMedium" Width="18" Height="18"
+                                                        Foreground="{DynamicResource MappingToolsStatusWaitingBrush}"
+                                                        IsVisible="{Binding StatusIndicatorState, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Waiting}" />
+                            <materialIcons:MaterialIcon Kind="CircleMedium" Width="18" Height="18"
+                                                        Foreground="{DynamicResource MappingToolsStatusRunningBrush}"
+                                                        IsVisible="{Binding StatusIndicatorState, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Running}" />
+                            <materialIcons:MaterialIcon Kind="CircleMedium" Width="18" Height="18"
+                                                        Foreground="{DynamicResource MappingToolsStatusErrorBrush}"
+                                                        IsVisible="{Binding StatusIndicatorState, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Error}" />
+                        </Grid>
+                        <SelectableTextBlock Grid.Column="1" Margin="5,0,0,0"
+                                             Text="{Binding Status}" TextTrimming="CharacterEllipsis"
+                                             TextWrapping="NoWrap" VerticalAlignment="Center"
+                                             ToolTip.Tip="{Binding DiagnosticStatus}" />
+                    </Grid>
+
+                    <materialIcons:MaterialIcon Grid.Column="1"
+                                                Kind="Search"
+                                                Width="24"
+                                                Height="24"
+                                                Margin="5" />
+                    <TextBox Grid.Column="2" Margin="0,0,20,0"
+                             Width="120"
+                             Classes="compact clearButton"
+                             VerticalAlignment="Center"
+                             PlaceholderText="{loc:Tr GeometryDashboard_Search}"
+                             Text="{Binding Filter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             ToolTip.Tip="{loc:Tr GeometryDashboard_SearchGenerator}" />
+
+                    <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+                        <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="0,0,8,0"
+                                                       ToolTip.Tip="{loc:Tr GeometryDashboard_ToggleSelection}"
+                                                       x:Name="ToggleSelectedButton"
+                                                       Click="ToggleSelectedClick">
+                            <materialIcons:MaterialIcon Kind="SelectAll" Width="22" Height="22" />
+                        </materialDesign:FloatingButton>
+                        <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="0,0,8,0"
+                                                       ToolTip.Tip="{loc:Tr GeometryDashboard_ToggleLocked}"
+                                                       x:Name="ToggleLockedButton"
+                                                       Click="ToggleLockedClick">
+                            <materialIcons:MaterialIcon Kind="Lock" Width="22" Height="22" />
+                        </materialDesign:FloatingButton>
+                        <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="0,0,28,0"
+                                                       ToolTip.Tip="{loc:Tr GeometryDashboard_ToggleUsability}"
+                                                       x:Name="ToggleInheritableButton"
+                                                       Click="ToggleInheritableClick">
+                            <materialIcons:MaterialIcon Kind="Pizza" Width="22" Height="22" />
+                        </materialDesign:FloatingButton>
+                        <materialDesign:FloatingButton Classes="mini no-transitions" Margin="0,0,8,0"
+                                                       Foreground="{DynamicResource MaterialDarkForegroundBrush}"
+                                                       ToolTip.Tip="{loc:Tr GeometryDashboard_Savestates}" Click="ShowProjects">
+                            <materialIcons:MaterialIcon Kind="ContentSaveAll" Width="22" Height="22" />
+                        </materialDesign:FloatingButton>
+                        <materialDesign:FloatingButton Classes="mini no-transitions" ToolTip.Tip="{loc:Tr GeometryDashboard_Preferences}"
+                                                       Foreground="{DynamicResource MaterialDarkForegroundBrush}"
+                                                       Click="ShowPreferences">
+                            <materialIcons:MaterialIcon Kind="SettingsOutline" Width="22" Height="22" />
+                        </materialDesign:FloatingButton>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+
+            <Grid Grid.Row="1" RowDefinitions="Auto,*" MinHeight="0" Grid.IsSharedSizeScope="True">
+                <Grid Grid.Row="0" Margin="16,0,16,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="70" />
+                        <ColumnDefinition Width="Auto" MinWidth="110" SharedSizeGroup="GeneratorSettings" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" MinWidth="100" SharedSizeGroup="GeneratorSequence" />
+                        <ColumnDefinition Width="100" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{loc:Tr GeometryDashboard_Active}" />
+                    <TextBlock Grid.Column="1" Text="{loc:Tr GeometryDashboard_Settings}" />
+                    <TextBlock Grid.Column="2" Text="{loc:Tr GeometryDashboard_Name}" />
+                    <TextBlock Grid.Column="3" Text="{loc:Tr GeometryDashboard_Sequential}" Margin="0,0,5,0" />
+                    <TextBlock Grid.Column="4" Text="{loc:Tr GeometryDashboard_Relevancy}" TextWrapping="Wrap" />
+                </Grid>
+                <ScrollViewer Grid.Row="1" x:Name="GeneratorsScrollViewer"
+                              VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                              AllowAutoHide="False"
+                              HorizontalContentAlignment="Stretch"
+                              ScrollChanged="GeneratorsScrollChanged" PointerPressed="GeneratorsPointerPressed"
+                              PointerWheelChanged="GeneratorsPointerWheelChanged">
+                    <ItemsControl ItemsSource="{Binding GeneratorGroups}"
+                                  Margin="0,0,16,0"
+                                  HorizontalAlignment="Stretch"
+                                  ClipToBounds="False">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="geometryDashboard:GeometryDashboardGeneratorGroupViewModel">
+                                <Expander IsExpanded="True" Margin="0,0,0,5"
+                                          HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                                    <Expander.Header>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding Name}" FontSize="22" FontWeight="Bold"
+                                                       Foreground="Gray"
+                                                       VerticalAlignment="Bottom" />
+                                            <TextBlock Text="{Binding ItemCount}" FontSize="22" FontWeight="Bold"
+                                                       FontStyle="Italic" Foreground="Green"
+                                                       Margin="10,0,0,0"
+                                                       VerticalAlignment="Bottom" />
+                                            <TextBlock Text="{Binding ItemCountLabel}" FontSize="22" FontStyle="Italic"
+                                                       Foreground="Silver" VerticalAlignment="Bottom" />
+                                        </StackPanel>
+                                    </Expander.Header>
+                                    <ListBox ItemsSource="{Binding Generators}"
+                                             HorizontalAlignment="Stretch"
+                                             SelectionMode="Single"
+                                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                             ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                                        <ListBox.Styles>
+                                            <Style Selector="ListBoxItem">
+                                                <Setter Property="Padding" Value="8, 2" />
+                                                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                                            </Style>
+                                            <Style
+                                                Selector="ListBoxItem /template/ Border#PART_RootBorder:not(:nothing)">
+                                                <Setter Property="BorderThickness" Value="0, 0, 0, 1" />
+                                                <Setter Property="BorderBrush"
+                                                        Value="{DynamicResource MaterialDividerBrush}" />
+                                            </Style>
+                                        </ListBox.Styles>
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate
+                                                x:DataType="geometryDashboard:GeometryDashboardGeneratorViewModel">
+                                                <Grid HorizontalAlignment="Stretch"
+                                                      Margin="0,2">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="70" />
+                                                        <ColumnDefinition Width="Auto" MinWidth="110" SharedSizeGroup="GeneratorSettings" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" MinWidth="100" SharedSizeGroup="GeneratorSequence" />
+                                                        <ColumnDefinition Width="100" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <ToggleSwitch IsChecked="{Binding IsActive, Mode=TwoWay}"
+                                                                  OnContent="" OffContent=""
+                                                                  VerticalAlignment="Center"
+                                                                  Cursor="Hand" />
+                                                    <Button Grid.Column="1" Content="{loc:Tr GeometryDashboard_Configure}"
+                                                            Margin="0,2,20,2"
+                                                            Padding="10, 6"
+                                                            VerticalAlignment="Center"
+                                                            CornerRadius="7"
+                                                            Command="{Binding OpenSettingsCommand}"
+                                                            ToolTip.Tip="{loc:Tr GeometryDashboard_GeneratorSettings}" />
+                                                    <TextBlock Grid.Column="2" Text="{Binding Name}"
+                                                               VerticalAlignment="Center"
+                                                               TextTrimming="CharacterEllipsis"
+                                                               ToolTip.Tip="{Binding Tooltip}" />
+                                                    <ToggleSwitch Grid.Column="3"
+                                                                  IsChecked="{Binding IsSequential, Mode=TwoWay}"
+                                                                  OnContent="" OffContent=""
+                                                                  VerticalAlignment="Center"
+                                                                  Cursor="Hand" />
+                                                    <TextBox Grid.Column="4" Classes="compact" Width="60"
+                                                             VerticalAlignment="Center"
+                                                             Text="{Binding RelevancyRatio, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
+                                                             Cursor="Hand"
+                                                             ToolTip.Tip="{loc:Tr GeometryDashboard_RelevancyMultiplier}" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </Expander>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap" FontWeight="Bold" Opacity="0.58"
+                               Text="{Binding MadeByLabel}" />
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <controls:ToolProgressBar Height="20" Margin="20,0,20,0"
+                                          Background="{x:Null}" BorderBrush="{x:Null}"
+                                          Maximum="100" Value="0" />
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

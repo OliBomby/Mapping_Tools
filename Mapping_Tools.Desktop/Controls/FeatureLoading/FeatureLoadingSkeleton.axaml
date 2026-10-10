@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Mapping_Tools.Desktop.Controls.FeatureLoading.FeatureLoadingSkeleton">
+    <StackPanel Spacing="20"
+                Margin="0 0 120 0"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Top">
+        <Border Height="38"
+                Width="200"
+                HorizontalAlignment="Left"
+                Background="{DynamicResource MaterialDividerBrush}"
+                CornerRadius="4"
+                Opacity="0.8" />
+        <Border Height="50"
+                Background="{DynamicResource MaterialDividerBrush}"
+                CornerRadius="4"
+                Opacity="0.45" />
+        <Border Height="50"
+                Background="{DynamicResource MaterialDividerBrush}"
+                CornerRadius="4"
+                Opacity="0.45" />
+        <Border Height="220"
+                Width="300"
+                HorizontalAlignment="Left"
+                Background="{DynamicResource MaterialDividerBrush}"
+                CornerRadius="4"
+                Opacity="0.25" />
+    </StackPanel>
+</UserControl>

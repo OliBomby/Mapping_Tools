@@ -1,0 +1,137 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:hitsoundStudio="clr-namespace:Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels"
+             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:materialIcons="using:Material.Icons.Avalonia"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="Mapping_Tools.Desktop.Tools.HitsoundStudio.Views.HitsoundStudioExportDialog"
+             x:DataType="hitsoundStudio:HitsoundStudioExportDialogViewModel"
+             d:DesignWidth="800"
+             d:DesignHeight="450">
+    <Grid Margin="8" RowDefinitions="*,Auto">
+        <StackPanel Grid.Row="0" Margin="0,6,0,0">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBox MinWidth="220" Margin="0,0,5,0"
+                         Text="{Binding ExportFolder, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_ExportFolder}"
+                         ToolTip.Tip="{loc:Tr HitsoundStudio_ExportFolderTip}" />
+                <Button Grid.Column="1"
+                        Classes="flat path-picker"
+                        Cursor="Hand"
+                        VerticalAlignment="Bottom"
+                        Command="{Binding PickFolderCommand}"
+                        ToolTip.Tip="{loc:Tr HitsoundStudio_ChooseExportFolderTip}">
+                    <materialIcons:MaterialIcon Width="30" Height="30" Kind="Folder" />
+                </Button>
+            </Grid>
+            <TextBox Margin="0,0,5,0"
+                     Text="{Binding HitsoundDiffName, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                     materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_HitsoundMapName}"
+                     ToolTip.Tip="{loc:Tr HitsoundStudio_HitsoundMapNameTip}" />
+            <CheckBox Margin="0,15,0,0"
+                      Content="{loc:Tr HitsoundStudio_ExportHitsoundMap}"
+                      IsChecked="{Binding ExportMap, Mode=TwoWay}"
+                      ToolTip.Tip="{loc:Tr HitsoundStudio_ExportHitsoundMapTip}" />
+            <CheckBox IsVisible="{Binding SampleExportSettingsVisible}"
+                      Content="{loc:Tr HitsoundStudio_ExportHitsoundSamples}"
+                      IsChecked="{Binding ExportSamples, Mode=TwoWay}"
+                      ToolTip.Tip="{loc:Tr HitsoundStudio_ExportHitsoundSamplesTip}" />
+            <CheckBox Content="{loc:Tr HitsoundStudio_ShowResults}"
+                      IsChecked="{Binding ShowResults, Mode=TwoWay}"
+                      ToolTip.Tip="{loc:Tr HitsoundStudio_ShowResultsTip}" />
+            <CheckBox Content="{loc:Tr HitsoundStudio_DeleteExportFolderFiles}"
+                      IsChecked="{Binding DeleteAllInExportFirst, Mode=TwoWay}"
+                      ToolTip.Tip="{loc:Tr HitsoundStudio_DeleteExportFolderFilesTip}" />
+            <CheckBox IsVisible="{Binding SampleExportSettingsVisible}"
+                      Content="{loc:Tr HitsoundStudio_UsePreviousSchema}"
+                      IsChecked="{Binding UsePreviousSampleSchema, Mode=TwoWay}"
+                      ToolTip.Tip="{loc:Tr HitsoundStudio_UsePreviousSchemaTip}" />
+            <CheckBox IsVisible="{Binding SampleExportSettingsVisible}"
+                      IsEnabled="{Binding UsePreviousSampleSchema}"
+                      Content="{loc:Tr HitsoundStudio_AllowSchemaGrowth}"
+                      IsChecked="{Binding AllowGrowthPreviousSampleSchema, Mode=TwoWay}"
+                      ToolTip.Tip="{loc:Tr HitsoundStudio_AllowSchemaGrowthTip}" />
+            <ComboBox Margin="0,20,0,0"
+                      ItemsSource="{Binding ExportModes}"
+                      SelectedItem="{Binding HitsoundExportModeSetting, Mode=TwoWay}"
+                      materialAssists:ComboBoxAssist.Label="{loc:Tr HitsoundStudio_ExportMode}"
+                      ToolTip.Tip="{loc:Tr HitsoundStudio_ExportModeTip}">
+                <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" /></DataTemplate></ComboBox.ItemTemplate>
+            </ComboBox>
+            <TextBox Margin="0,5,0,0"
+                     IsVisible="{Binding StandardExtraSettingsVisible}"
+                     Text="{Binding ZipLayersLeniency, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                     materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_NoteGroupingLeniency}"
+                     ToolTip.Tip="{loc:Tr HitsoundStudio_NoteGroupingLeniencyTip}" />
+            <TextBox Margin="0,5,5,0"
+                     IsVisible="{Binding StandardExtraSettingsVisible}"
+                     Text="{Binding FirstCustomIndex, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                     materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_FirstCustomIndex}"
+                     ToolTip.Tip="{loc:Tr HitsoundStudio_FirstCustomIndexTip}" />
+            <CheckBox Margin="0,5,0,0"
+                      IsVisible="{Binding CoincidingExtraSettingsVisible}"
+                      Content="{loc:Tr HitsoundStudio_AddRegularHitsounds}"
+                      IsChecked="{Binding AddCoincidingRegularHitsounds, Mode=TwoWay}"
+                      ToolTip.Tip="{loc:Tr HitsoundStudio_AddRegularHitsoundsTip}" />
+            <CheckBox Margin="0,5,0,0"
+                      IsVisible="{Binding MidiExtraSettingsVisible}"
+                      Content="{loc:Tr HitsoundStudio_AddGreenLineVolume}"
+                      IsChecked="{Binding AddGreenLineVolumeToMidi, Mode=TwoWay}"
+                      ToolTip.Tip="{loc:Tr HitsoundStudio_AddGreenLineVolumeTip}" />
+            <ComboBox Margin="0,10,0,0"
+                      IsVisible="{Binding GameModeVisible}"
+                      ItemsSource="{Binding GameModes}"
+                      SelectedItem="{Binding HitsoundExportGameMode, Mode=TwoWay}"
+                      materialAssists:ComboBoxAssist.Label="{loc:Tr HitsoundStudio_ExportGameMode}"
+                      ToolTip.Tip="{loc:Tr HitsoundStudio_ExportGameModeTip}">
+                <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" /></DataTemplate></ComboBox.ItemTemplate>
+            </ComboBox>
+            <ComboBox Margin="0,15,0,0"
+                      IsVisible="{Binding SampleExportSettingsVisible}"
+                      ItemsSource="{Binding SampleExportFormats}"
+                      SelectedItem="{Binding SingleSampleExportFormat, Mode=TwoWay}"
+                      materialAssists:ComboBoxAssist.Label="{loc:Tr HitsoundStudio_SampleFileFormat}"
+                      ToolTip.Tip="{loc:Tr HitsoundStudio_SampleFileFormatTip}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock
+                            Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <ComboBox Margin="0,5,0,0"
+                      IsVisible="{Binding SampleExportSettingsVisible}"
+                      ItemsSource="{Binding SampleExportFormats}"
+                      SelectedItem="{Binding MixedSampleExportFormat, Mode=TwoWay}"
+                      materialAssists:ComboBoxAssist.Label="{loc:Tr HitsoundStudio_MixedSampleFileFormat}"
+                      ToolTip.Tip="{loc:Tr HitsoundStudio_MixedSampleFileFormatTip}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock
+                            Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <TextBlock Foreground="OrangeRed" Text="{Binding Error}" TextWrapping="Wrap" />
+        </StackPanel>
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    Margin="0,16,0,0">
+            <Button Classes="dialog-action primary"
+                    Theme="{StaticResource MaterialFlatButton}"
+                    Content="{loc:Tr HitsoundStudio_Accept}"
+                    Command="{Binding AcceptCommand}"
+                    IsDefault="True" />
+            <Button Classes="dialog-action primary"
+                    Theme="{StaticResource MaterialFlatButton}"
+                    Content="{loc:Tr HitsoundStudio_Cancel}"
+                    Command="{Binding CancelCommand}"
+                    Margin="8,0,0,0"
+                    IsCancel="True" />
+        </StackPanel>
+    </Grid>
+</UserControl>

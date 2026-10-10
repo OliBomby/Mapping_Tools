@@ -1,0 +1,87 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Mapping_Tools.Desktop.Tools.MapCleaner.ViewModels"
+             xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:timeline="using:Mapping_Tools.Desktop.Controls.Timeline"
+             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
+             x:Class="Mapping_Tools.Desktop.Tools.MapCleaner.Views.MapCleanerView"
+             x:DataType="vm:MapCleanerViewModel">
+    <Grid RowDefinitions="*,Auto,Auto">
+        <Grid Grid.Row="0">
+            <StackPanel>
+                <controls:ToolViewHeader
+                    Title="Map Cleaner"
+                    IsQuickRunSupported="True"
+                    HelpText="{loc:Tr MapCleaner_Help}" />
+
+                <CheckBox Margin="0,10,0,0" FontSize="14" Cursor="Hand" Content="{loc:Tr MapCleaner_AnalyzeSamples}"
+                          IsChecked="{Binding AnalyzeSamples}"
+                          ToolTip.Tip="{loc:Tr MapCleaner_AnalyzeSamplesTip}" />
+                <CheckBox FontSize="14" Cursor="Hand" Content="{loc:Tr MapCleaner_ResnapObjects}" IsChecked="{Binding ResnapObjects}"
+                          ToolTip.Tip="{loc:Tr MapCleaner_ResnapObjectsTip}" />
+                <CheckBox FontSize="14" Cursor="Hand" Content="{loc:Tr MapCleaner_ResnapBookmarks}" IsChecked="{Binding ResnapBookmarks}"
+                          ToolTip.Tip="{loc:Tr MapCleaner_ResnapBookmarksTip}" />
+                <CheckBox FontSize="14" Cursor="Hand" Content="{loc:Tr MapCleaner_RemoveHitsounds}" IsChecked="{Binding RemoveHitsounds}"
+                          ToolTip.Tip="{loc:Tr MapCleaner_RemoveHitsoundsTip}" />
+                <CheckBox FontSize="14" Cursor="Hand" Content="{loc:Tr MapCleaner_RemoveUnusedSamples}"
+                          IsChecked="{Binding RemoveUnusedSamples}"
+                          ToolTip.Tip="{loc:Tr MapCleaner_RemoveUnusedSamplesTip}" />
+                <CheckBox FontSize="14" Cursor="Hand" Content="{loc:Tr MapCleaner_RemoveMuting}" IsChecked="{Binding RemoveMuting}"
+                          ToolTip.Tip="{loc:Tr MapCleaner_RemoveMutingTip}" />
+                <CheckBox FontSize="14" Cursor="Hand" Content="{loc:Tr MapCleaner_MuteUnclickableHitsounds}"
+                          IsChecked="{Binding RemoveUnclickableHitsounds}"
+                          ToolTip.Tip="{loc:Tr MapCleaner_MuteUnclickableHitsoundsTip}" />
+
+                <TextBlock Margin="0,20,0,0" FontSize="14" FontWeight="Bold" Text="{loc:Tr MapCleaner_MapInfo}" />
+                <CheckBox FontSize="14" Cursor="Hand" Content="{loc:Tr MapCleaner_PreserveSliderVolume}"
+                          IsChecked="{Binding VolumeSliders}"
+                          ToolTip.Tip="{loc:Tr MapCleaner_PreserveSliderVolumeTip}" />
+                <CheckBox FontSize="14" Cursor="Hand" Content="{loc:Tr MapCleaner_PreserveSliderSampleSet}"
+                          IsChecked="{Binding SampleSetSliders}"
+                          ToolTip.Tip="{loc:Tr MapCleaner_PreserveSliderSampleSetTip}" />
+                <CheckBox FontSize="14" Cursor="Hand" Content="{loc:Tr MapCleaner_PreserveSpinnerVolume}"
+                          IsChecked="{Binding VolumeSpinners}"
+                          ToolTip.Tip="{loc:Tr MapCleaner_PreserveSpinnerVolumeTip}" />
+
+                <TextBlock Margin="0,20,0,0" FontSize="14" FontWeight="Bold" Text="{loc:Tr Common_Signatures}"
+                           ToolTip.Tip="{loc:Tr MapCleaner_SignaturesTip}" />
+                <TextBox MinWidth="100" HorizontalAlignment="Left" FontSize="14" Cursor="Hand"
+                         materialAssists:TextFieldAssist.Label="{loc:Tr Common_BeatDivisorsLabel}"
+                         Text="{ReflectionBinding BeatDivisors, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource BeatDivisorArrayToStringConverter}}"
+                         ToolTip.Tip="{loc:Tr MapCleaner_BeatDivisorsTip}" />
+            </StackPanel>
+
+            <controls:ToolRunButton Margin="10" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                    RunCommand="{Binding RunCommand}" />
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap" FontWeight="Bold" Opacity="0.58"
+                               Text="{loc:Tr Common_FooterMadeBy}" />
+                </WrapPanel>
+            </Grid>
+
+            <Grid Grid.Column="1">
+                <controls:ToolProgressBar Height="20" Margin="20,0,20,0"
+                                          Background="{x:Null}" BorderBrush="{x:Null}"
+                                          Maximum="100" Value="{Binding Progress}" />
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Row="2">
+            <StackPanel IsVisible="{Binding HasRun}"
+                        ToolTip.Tip="{loc:Tr MapCleaner_TimelineTip}">
+                <timeline:TimelineControl Height="66" StartTime="0" EndTime="{Binding EndTime}"
+                                          Markers="{Binding Markers}" NavigateCommand="{Binding NavigateCommand}" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

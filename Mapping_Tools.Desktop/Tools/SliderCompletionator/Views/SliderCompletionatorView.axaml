@@ -1,0 +1,103 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
+             xmlns:vm="using:Mapping_Tools.Desktop.Tools.SliderCompletionator.ViewModels"
+             xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             x:Class="Mapping_Tools.Desktop.Tools.SliderCompletionator.Views.SliderCompletionatorView"
+             x:DataType="vm:SliderCompletionatorViewModel">
+    <Grid RowDefinitions="*,Auto">
+        <Grid>
+            <StackPanel>
+                <controls:ToolViewHeader
+                    Title="{loc:Tr SliderCompletionator_Title}"
+                    IsQuickRunSupported="True"
+                    HelpText="{loc:Tr SliderCompletionator_Help}" />
+
+                <StackPanel Width="531" HorizontalAlignment="Left">
+                    <StackPanel Orientation="Horizontal" Margin="0,26,0,0" HorizontalAlignment="Left">
+                        <ComboBox Width="258"
+                                  ItemsSource="{Binding ImportModes}"
+                                  SelectedItem="{Binding ImportModeSetting}"
+                                  materialAssists:ComboBoxAssist.Label="{loc:Tr SliderCompletionator_ObjectSelectionLabel}"
+                                  ToolTip.Tip="{loc:Tr SliderCompletionator_ObjectSelectionTip}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <TextBox Margin="15,0,0,0" Width="258"
+                                 IsVisible="{Binding TimeCodeVisible}"
+                                 Text="{Binding TimeCode, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                 materialAssists:TextFieldAssist.Label="{loc:Tr Common_TimeCodeLabel}"
+                                 ToolTip.Tip="{loc:Tr Common_TimeCodeTip}" />
+                    </StackPanel>
+
+                    <CheckBox Margin="0,20,0,0" Content="{loc:Tr SliderCompletionator_MoveAnchors}"
+                              IsChecked="{Binding MoveAnchors}"
+                              ToolTip.Tip="{loc:Tr SliderCompletionator_MoveAnchorsTip}" />
+                    <CheckBox Content="{loc:Tr SliderCompletionator_UseEndTime}" IsChecked="{Binding UseEndTime, Mode=TwoWay}"
+                              ToolTip.Tip="{loc:Tr SliderCompletionator_UseEndTimeTip}" />
+                    <CheckBox Content="{loc:Tr SliderCompletionator_UseEditorTime}" IsEnabled="{Binding UseEndTime, Mode=OneWay}"
+                              IsChecked="{Binding UseCurrentEditorTime, Mode=TwoWay}"
+                              ToolTip.Tip="{loc:Tr SliderCompletionator_UseEditorTimeTip}" />
+                    <CheckBox Content="{loc:Tr Common_DelegateSvToBpm}" IsChecked="{Binding DelegateToBpm}"
+                              ToolTip.Tip="{loc:Tr Common_DelegateSvToBpmTip}" />
+                    <CheckBox Content="{loc:Tr Common_RemoveSliderTicks}" IsEnabled="{Binding DelegateToBpm}"
+                              IsChecked="{Binding RemoveSliderTicks}"
+                              ToolTip.Tip="{loc:Tr Common_RemoveSliderTicksTip}" />
+                    <Separator Margin="0,20" />
+                </StackPanel>
+
+                <StackPanel Width="258" HorizontalAlignment="Left">
+                    <ComboBox Theme="{StaticResource MaterialOutlineComboBox}"
+                              Classes="outline"
+                              ItemsSource="{Binding FreeVariables}"
+                              SelectedItem="{Binding FreeVariableSetting}"
+                              materialAssists:ComboBoxAssist.Label="{loc:Tr SliderCompletionator_FreeVariableLabel}"
+                              ToolTip.Tip="{loc:Tr SliderCompletionator_FreeVariableTip}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <TextBox Margin="0,20,0,0" IsVisible="{Binding DurationVisible, Mode=OneWay}"
+                             Text="{Binding Duration, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}"
+                             materialAssists:TextFieldAssist.Label="{loc:Tr SliderCompletionator_DurationLabel}"
+                             ToolTip.Tip="{loc:Tr SliderCompletionator_DurationTip}" />
+                    <TextBox Margin="0,20,0,0" IsVisible="{Binding EndTimeVisible, Mode=OneWay}"
+                             Text="{Binding EndTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource TimeToStringConverter}, ConverterParameter=-1}"
+                             materialAssists:TextFieldAssist.Label="{loc:Tr SliderCompletionator_EndTimeLabel}"
+                             ToolTip.Tip="{loc:Tr SliderCompletionator_EndTimeTip}" />
+                    <TextBox Margin="0,20,0,0" IsVisible="{Binding LengthVisible}"
+                             Text="{Binding Length, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}"
+                             materialAssists:TextFieldAssist.Label="{loc:Tr SliderCompletionator_LengthLabel}"
+                             ToolTip.Tip="{loc:Tr SliderCompletionator_LengthTip}" />
+                    <TextBox Margin="0,20,0,0" IsVisible="{Binding VelocityVisible}"
+                             Text="{Binding SliderVelocity, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}"
+                             materialAssists:TextFieldAssist.Label="{loc:Tr SliderCompletionator_VelocityLabel}"
+                             ToolTip.Tip="{loc:Tr SliderCompletionator_VelocityTip}" />
+                </StackPanel>
+            </StackPanel>
+
+            <controls:ToolRunButton Margin="10" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                    RunCommand="{Binding RunCommand}" />
+        </Grid>
+
+        <Grid Grid.Row="1" Grid.Column="0" ColumnDefinitions="Auto,*">
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap" FontWeight="Bold" Opacity="0.58"
+                               Text="{loc:Tr SliderCompletionator_MadeBy}" />
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <controls:ToolProgressBar Height="20" Margin="20,0,20,0"
+                                          Background="{x:Null}" BorderBrush="{x:Null}"
+                                          Maximum="100" Value="{Binding Progress}" />
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

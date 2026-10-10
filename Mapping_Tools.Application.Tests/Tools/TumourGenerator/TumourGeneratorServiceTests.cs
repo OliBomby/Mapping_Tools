@@ -1,0 +1,251 @@
+using System.Diagnostics.CodeAnalysis;
+using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Application.Tests.TestDoubles;
+using Mapping_Tools.Application.Tools.TumourGenerator;
+using Mapping_Tools.Application.Tools.TumourGenerator.Models;
+using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace Mapping_Tools.Application.Tests.Tools.TumourGenerator;
+
+[TestClass]
+[SuppressMessage("ReSharper", "AccessToDisposedClosure")]
+public sealed class TumourGeneratorServiceTests
+{
+    [TestMethod]
+    public async Task ImportAsync_WithSelectedMode_RequiresLiveEditorAndReturnsSelectedSliders()
+    {
+        // Arrange
+        RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.LiveEditor));
+        TumourGeneratorService service = new(gateway, new ApplicationSettings());
+
+        // Act
+        var result = await service.ImportAsync(
+            "map.osu",
+            HitObjectSelectionMode.Selected,
+            null);
+
+        // Assert
+        gateway.OpenRequests[^1].Preference.Should().Be(LiveBeatmapPreference.RequireLive);
+        result.UsedLiveEditor.Should().BeTrue();
+        result.Sliders.Should().ContainSingle(item => item.IsSlider);
+    }
+
+    [DataTestMethod]
+    [DataRow(HitObjectSelectionMode.Bookmarked)]
+    [DataRow(HitObjectSelectionMode.Time)]
+    [DataRow(HitObjectSelectionMode.Everything)]
+    public async Task ImportAsync_WithNonSelectedMode_UsesPreferLiveAndReturnsSliders(
+        HitObjectSelectionMode mode)
+    {
+        // Arrange
+        RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.Disk));
+        gateway.Session!.Beatmap.Bookmarks = [0];
+        TumourGeneratorService service = new(gateway, new ApplicationSettings());
+
+        // Act
+        var result = await service.ImportAsync(
+            "map.osu",
+            mode,
+            mode == HitObjectSelectionMode.Time ? "00:00:000" : null);
+
+        // Assert
+        gateway.OpenRequests.Should().ContainSingle()
+            .Which.Preference.Should().Be(LiveBeatmapPreference.PreferLive);
+        result.Sliders.Should().ContainSingle(item => item.IsSlider);
+    }
+
+    [TestMethod]
+    public async Task ImportAsync_WhenSelectionContainsNoSliders_ReturnsEmptyState()
+    {
+        // Arrange
+        RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.LiveEditor, false));
+        TumourGeneratorService service = new(gateway, new ApplicationSettings());
+
+        // Act
+        var result = await service.ImportAsync(
+            "map.osu",
+            HitObjectSelectionMode.Selected,
+            null);
+
+        // Assert
+        result.Sliders.Should().BeEmpty();
+    }
+
+    [TestMethod]
+    public async Task RunAsync_WithLiveSession_SavesAndRequestsEditorReloadWithProgress()
+    {
+        // Arrange
+        RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.LiveEditor));
+        TumourGeneratorService service = new(gateway, new ApplicationSettings());
+        TumourGeneratorServiceOptions project = new();
+        project.TumourLayers[0].TumourCount = 1;
+        RecordingProgress<double> progress = new();
+
+        // Act
+        var result = await service.RunAsync(
+            ["map.osu"],
+            project,
+            true,
+            progress);
+
+        // Assert
+        result.Paths.Should().Equal("map.osu");
+        result.SlidersTumourated.Should().Be(1);
+        result.EditorReloaded.Should().BeTrue();
+        gateway.SessionSaveRequests.Select(request => request.ReloadEditor)
+            .Should().ContainSingle().Which.Should().BeTrue();
+        progress.Values.Should().Contain(1);
+    }
+
+    [DataTestMethod]
+    [DataRow(HitObjectSelectionMode.Bookmarked)]
+    [DataRow(HitObjectSelectionMode.Time)]
+    [DataRow(HitObjectSelectionMode.Everything)]
+    public async Task RunAsync_WithNonSelectedMode_UsesPreferLive(
+        HitObjectSelectionMode mode)
+    {
+        // Arrange
+        RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.Disk));
+        gateway.Session!.Beatmap.Bookmarks = [0];
+        TumourGeneratorService service = new(gateway, new ApplicationSettings());
+        TumourGeneratorServiceOptions project = new()
+        {
+            ImportModeSetting = mode,
+            TimeCode = mode == HitObjectSelectionMode.Time ? "00:00:000" : string.Empty,
+        };
+        project.TumourLayers[0].TumourCount = 1;
+
+        // Act
+        await service.RunAsync(
+            ["map.osu"],
+            project,
+            false,
+            cancellationToken: CancellationToken.None);
+
+        // Assert
+        gateway.OpenRequests.Should().ContainSingle()
+            .Which.Preference.Should().Be(LiveBeatmapPreference.PreferLive);
+    }
+
+    [TestMethod]
+    public async Task RunAsync_WithLiveSessionAndOrdinaryExecution_SavesWithoutEditorReload()
+    {
+        // Arrange
+        RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.LiveEditor));
+        TumourGeneratorService service = new(gateway, new ApplicationSettings());
+
+        // Act
+        var result = await service.RunAsync(
+            ["map.osu"],
+            new TumourGeneratorServiceOptions(),
+            false);
+
+        // Assert
+        result.EditorReloaded.Should().BeFalse();
+        gateway.SessionSaveRequests.Select(request => request.ReloadEditor)
+            .Should().ContainSingle().Which.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public async Task RunAsync_WithLiveSessionAndDisabledAutoReload_SavesWithoutEditorReload()
+    {
+        // Arrange
+        RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.LiveEditor));
+        TumourGeneratorService service = new(
+            gateway,
+            new ApplicationSettings { EditorReload = EditorReloadMode.Disabled });
+
+        // Act
+        var result = await service.RunAsync(
+            ["map.osu"],
+            new TumourGeneratorServiceOptions(),
+            true);
+
+        // Assert
+        result.EditorReloaded.Should().BeFalse();
+        gateway.SessionSaveRequests.Select(request => request.ReloadEditor)
+            .Should().ContainSingle().Which.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public async Task RunAsync_WithDiskSession_SavesWithoutEditorReload()
+    {
+        // Arrange
+        RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.Disk));
+        TumourGeneratorService service = new(gateway, new ApplicationSettings());
+
+        // Act
+        var result = await service.RunAsync(
+            ["map.osu"],
+            new TumourGeneratorServiceOptions(),
+            true);
+
+        // Assert
+        result.EditorReloaded.Should().BeFalse();
+        gateway.SessionSaveRequests.Select(request => request.ReloadEditor)
+            .Should().ContainSingle().Which.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public async Task RunAsync_WhenCancelledBeforeOpening_StopsWithoutSaving()
+    {
+        // Arrange
+        RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.Disk));
+        TumourGeneratorService service = new(gateway, new ApplicationSettings());
+        using CancellationTokenSource cancellation = new();
+        await cancellation.CancelAsync();
+
+        // Act
+        Func<Task> act = () => service.RunAsync(
+            ["map.osu"],
+            new TumourGeneratorServiceOptions(),
+            false,
+            cancellationToken: cancellation.Token);
+
+        // Assert
+        await act.Should().ThrowAsync<OperationCanceledException>();
+        gateway.SessionSaveRequests.Should().BeEmpty();
+    }
+
+    private static BeatmapEditingSession CreateSession(
+        BeatmapEditingSource source,
+        bool selectedSlider = true)
+    {
+        List<string> lines =
+        [
+            "osu file format v14",
+            "",
+            "[General]",
+            "Mode:0",
+            "StackLeniency:0.7",
+            "",
+            "[Metadata]",
+            "Version:Test",
+            "",
+            "[Difficulty]",
+            "CircleSize:4",
+            "SliderMultiplier:1.4",
+            "SliderTickRate:1",
+            "",
+            "[TimingPoints]",
+            "0,500,4,2,1,100,1,0",
+            "",
+            "[HitObjects]",
+            "64,64,0,2,0,L|164:64,1,100",
+            "128,128,500,1,0,0:0:0:0:",
+        ];
+        Beatmap beatmap = BeatmapEditingSessionTestFactory.DecodeText(string.Join("\r\n", lines));
+        var slider = beatmap.HitObjects[0];
+        IReadOnlyList<HitObject> selected = selectedSlider ? [slider] : [beatmap.HitObjects[1]];
+        return BeatmapEditingSessionTestFactory.FromModel(
+            beatmap,
+            "",
+            new NoOpTextFileStore(),
+            source,
+            selected);
+    }
+}

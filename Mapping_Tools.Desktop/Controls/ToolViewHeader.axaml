@@ -1,0 +1,74 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:converters="using:Avalonia.Data.Converters"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:Class="Mapping_Tools.Desktop.Controls.ToolViewHeader"
+             x:Name="Root"
+             x:DataType="controls:ToolViewHeader">
+    <UserControl.Resources>
+        <ControlTheme x:Key="ToolHelpFlyoutPresenterTheme"
+                      TargetType="FlyoutPresenter"
+                      BasedOn="{StaticResource MaterialFlyoutPresenter}">
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
+        </ControlTheme>
+    </UserControl.Resources>
+    <UserControl.Styles>
+        <Style Selector="Button.tool-info-badge">
+            <Setter Property="Width" Value="32" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="MinWidth" Value="32" />
+            <Setter Property="MinHeight" Value="32" />
+            <Setter Property="Margin" Value="5,5,0,0" />
+            <Setter Property="Padding" Value="4" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+    </UserControl.Styles>
+    <StackPanel Orientation="Horizontal">
+        <TextBlock VerticalAlignment="Center"
+                   FontSize="32"
+                   FontWeight="Bold"
+                   Foreground="{DynamicResource MaterialPrimaryMidBrush}"
+                   Text="{Binding Title, ElementName=Root}" />
+
+        <Button Classes="flat tool-info-badge"
+                IsVisible="{Binding HelpText, ElementName=Root, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}"
+                AutomationProperties.Name="{loc:Tr Shell_ToolInformation}"
+                ToolTip.Tip="{loc:Tr Shell_ClickMe}">
+            <materialIcons:MaterialIcon Width="24"
+                                        Height="24"
+                                        Foreground="{DynamicResource MappingToolsHelpBadgeBrush}"
+                                        Kind="HelpCircle" />
+            <Button.Flyout>
+                <Flyout Placement="BottomEdgeAlignedLeft"
+                        FlyoutPresenterTheme="{StaticResource ToolHelpFlyoutPresenterTheme}">
+                    <TextBlock MaxWidth="600"
+                               Padding="5"
+                               Text="{Binding HelpText, ElementName=Root}"
+                               TextWrapping="Wrap" />
+                </Flyout>
+            </Button.Flyout>
+        </Button>
+
+        <Button Classes="flat tool-info-badge"
+                IsVisible="{Binding IsQuickRunSupported, ElementName=Root}"
+                AutomationProperties.Name="{loc:Tr Shell_QuickrunInformation}"
+                ToolTip.Tip="{loc:Tr Shell_ClickMe}">
+            <materialIcons:MaterialIcon Width="24"
+                                        Height="24"
+                                        Foreground="{DynamicResource MappingToolsQuickRunBadgeBrush}"
+                                        Kind="LightningBoltCircle" />
+            <Button.Flyout>
+                <Flyout Placement="BottomEdgeAlignedLeft"
+                        FlyoutPresenterTheme="{StaticResource ToolHelpFlyoutPresenterTheme}">
+                    <TextBlock MaxWidth="600"
+                               Padding="5"
+                               Text="{loc:Tr Shell_ThisToolIsCompatibleWithQuickrun}"
+                               TextWrapping="Wrap" />
+                </Flyout>
+            </Button.Flyout>
+        </Button>
+    </StackPanel>
+</UserControl>

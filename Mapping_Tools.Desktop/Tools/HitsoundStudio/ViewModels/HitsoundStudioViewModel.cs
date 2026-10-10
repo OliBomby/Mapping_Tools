@@ -1,0 +1,1495 @@
+using Mapping_Tools.Desktop.Localization;
+using Mapping_Tools.Application.Localization;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Globalization;
+using Avalonia.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Mapping_Tools.Application.Abstractions;
+using Mapping_Tools.Application.Audio.Contracts;
+using Mapping_Tools.Application.Audio.Models;
+using Mapping_Tools.Application.Execution.ToolExecution;
+using Mapping_Tools.Application.Execution.ToolExecution.Models;
+using Mapping_Tools.Application.Execution.UserNotification;
+using Mapping_Tools.Application.Execution.UserNotification.Models;
+using Mapping_Tools.Application.Platform;
+using Mapping_Tools.Application.Platform.FilePicker;
+using Mapping_Tools.Application.Projects.Contracts;
+using Mapping_Tools.Application.Projects.Models;
+using Mapping_Tools.Application.Tools.HitsoundStudio;
+using Mapping_Tools.Application.Tools.HitsoundStudio.Contracts;
+using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
+using Mapping_Tools.Application.Workspace.Contracts;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.HitsoundStuff;
+using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Services.Dialogs;
+using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Services.Undo;
+using Mapping_Tools.Desktop.Tools.HitsoundStudio.Models;
+using Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels.Adapters;
+using Mapping_Tools.Desktop.Tools.HitsoundStudio.Views;
+using Mapping_Tools.Desktop.Utilities;
+using Mapping_Tools.Desktop.ViewModels;
+using Material.Icons;
+
+namespace Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels;
+
+/// <summary>
+///     Owns Hitsound Studio's editable layer list, project snapshot, source
+///     interactions, preview lifetime, and export execution state.
+/// </summary>
+public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
+    IQuickRun,
+    IShellProjectFeature<HitsoundStudioProject>,
+    IShellExtraProjectMenuFeature,
+    IAsyncDisposable,
+    IDisposable
+{
+    /// <inheritdoc />
+    public IProjectUndoHistory? UndoHistory { get; set; }
+
+    private readonly IAudioGenerator audioGenerator;
+    private readonly ICurrentBeatmapDialogService currentBeatmapService;
+    private readonly ProjectDefinition<HitsoundStudioProject> definition;
+    private readonly IFilePicker filePicker;
+    private readonly IBeatmapsetFileSystem files;
+    private readonly IDialogService messageDialogs;
+    private readonly IUserNotificationService notifications;
+    private readonly Func<Window> owner;
+    private readonly IAudioPlaybackService playback;
+    private readonly SemaphoreSlim previewGate = new(1, 1);
+    private readonly IProjectStore projectStore;
+
+    private readonly IHitsoundStudioService service;
+    private readonly DesktopApplicationSettings settings;
+    private readonly IBeatmapWorkspace workspace;
+    private CancellationTokenSource? previewCancellation;
+    private IAudioPlaybackSession? previewSession;
+    private bool syncingEditor;
+    private bool syncingSelection;
+
+    /// <summary>
+    ///     Creates the Hitsound Studio presentation model and binds its persisted
+    ///     state to the legacy autosave filename.
+    /// </summary>
+    /// <param name="service">Runs imports, validation, and export.</param>
+    /// <param name="audioGenerator">Generates audio clips for the UI preview.</param>
+    /// <param name="playback">Starts and owns the UI preview playback session.</param>
+    /// <param name="messageDialogs">Shows typed confirmations and diagnostics.</param>
+    /// <param name="notifications">Publishes user-visible operation outcomes.</param>
+    /// <param name="execution">Coordinates keyed cancellation and completion.</param>
+    /// <param name="currentBeatmapService">Fetches the current beatmap and presents lookup feedback.</param>
+    /// <param name="workspace">Provides ordinary selected beatmaps.</param>
+    /// <param name="filePicker">Presents source and folder pickers.</param>
+    /// <param name="files">Checks the export directory before the legacy create prompt.</param>
+    /// <param name="projectStore">Loads standalone sample schemas.</param>
+    /// <param name="settings">Supplies QuickRun preferences.</param>
+    /// <param name="directories">Provides the default application export directory.</param>
+    /// <param name="owner">Returns the shell window that owns the import dialog.</param>
+    public HitsoundStudioViewModel(
+        IHitsoundStudioService service,
+        IAudioGenerator audioGenerator,
+        IAudioPlaybackService playback,
+        IDialogService messageDialogs,
+        IUserNotificationService notifications,
+        IToolExecutionService execution,
+        ICurrentBeatmapDialogService currentBeatmapService,
+        IBeatmapWorkspace workspace,
+        IFilePicker filePicker,
+        IBeatmapsetFileSystem files,
+        IProjectStore projectStore,
+        DesktopApplicationSettings settings,
+        IApplicationDirectories directories,
+        Func<Window> owner)
+        : base(execution, HitsoundStudioToolDefinition.Definition)
+    {
+        this.service = service ?? throw new ArgumentNullException(nameof(service));
+        this.audioGenerator = audioGenerator ?? throw new ArgumentNullException(nameof(audioGenerator));
+        this.playback = playback ?? throw new ArgumentNullException(nameof(playback));
+        this.messageDialogs = messageDialogs ?? throw new ArgumentNullException(nameof(messageDialogs));
+        this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
+        this.currentBeatmapService = currentBeatmapService
+                                     ?? throw new ArgumentNullException(nameof(currentBeatmapService));
+        this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
+        this.files = files ?? throw new ArgumentNullException(nameof(files));
+        this.projectStore = projectStore ?? throw new ArgumentNullException(nameof(projectStore));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.owner = owner ?? throw new ArgumentNullException(nameof(owner));
+        directories = directories ?? throw new ArgumentNullException(nameof(directories));
+        ExportFolder = directories.Exports;
+        definition = new ProjectDefinition<HitsoundStudioProject>(
+            "hsstudioproject.json",
+            "Hitsound Studio Projects",
+            () => new HitsoundStudioProject { ExportFolder = directories.Exports },
+            configSchema: ToolConfigSchema.ForTool(HitsoundStudioToolDefinition.Definition.Id));
+        SelectedLayers.CollectionChanged += SelectedLayersCollectionChanged;
+    }
+
+    /// <summary>Gets or sets the beatmap used as the export baseline.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial string BaseBeatmap { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets the default sample.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial ObservableSample DefaultSample { get; set; } =
+        new(new Sample
+        {
+            Priority = int.MaxValue,
+            SampleSet = SampleSet.None,
+            SampleArgs = new SampleGeneratingArgs { Volume = -0.01 },
+        });
+
+    /// <summary>Gets or sets the export directory.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial string ExportFolder { get; set; }
+
+    /// <summary>Gets or sets the editable layer collection.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial ObservableCollection<ObservableHitsoundLayer> Layers { get; set; } = [];
+
+    /// <summary>Gets or sets the timestamps common to the selected layers in milliseconds.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial double[] EditTimes { get; set; } = [];
+
+    /// <summary>Gets or sets whether the potentially long timestamp list is shown.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool ShowTimes { get; set; }
+
+    /// <summary>Gets or sets the selected layers' shared display name.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial string EditName { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets the selected layers' shared sample family.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial SampleSet? EditSampleSet { get; set; } = SampleSet.Normal;
+
+    /// <summary>Gets or sets the selected layers' shared hitsound.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial Hitsound? EditHitsound { get; set; } = Hitsound.Normal;
+
+    /// <summary>Gets or sets the selected layers' shared source path.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial string EditSamplePath { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets the selected source volume as a linear gain.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial double EditSampleVolume { get; set; } = 1;
+
+    /// <summary>Gets or sets the selected source panning.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial double EditSamplePanning { get; set; }
+
+    /// <summary>Gets or sets the selected source pitch shift.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial double EditSamplePitchShift { get; set; }
+
+    /// <summary>Gets or sets the selected SoundFont bank.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial string EditSampleBank { get; set; } = "-1";
+
+    /// <summary>Gets or sets the selected SoundFont patch.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial string EditSamplePatch { get; set; } = "-1";
+
+    /// <summary>Gets or sets the selected SoundFont instrument.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial string EditSampleInstrument { get; set; } = "-1";
+
+    /// <summary>Gets or sets the selected MIDI key.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial string EditSampleKey { get; set; } = "-1";
+
+    /// <summary>Gets or sets the selected SoundFont note length.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial double EditSampleLength { get; set; } = -1;
+
+    /// <summary>Gets or sets the selected MIDI velocity.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial string EditSampleVelocity { get; set; } = "127";
+
+    /// <summary>Gets or sets the selected import kind.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial ImportType? EditImportType { get; set; } = ImportType.None;
+
+    /// <summary>Gets or sets the selected import source path.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial string EditImportPath { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets the selected stack X coordinate.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial double EditImportX { get; set; } = -1;
+
+    /// <summary>Gets or sets the selected stack Y coordinate.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial double EditImportY { get; set; } = -1;
+
+    /// <summary>Gets or sets the selected imported sample path.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial string EditImportSamplePath { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets whether imported volume creates distinct layers.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool EditImportDiscriminateVolumes { get; set; }
+
+    /// <summary>Gets or sets whether duplicate sample files are canonicalized.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool EditImportDetectDuplicates { get; set; }
+
+    /// <summary>Gets or sets whether duplicate import times are removed.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool EditImportRemoveDuplicates { get; set; }
+
+    /// <summary>Gets or sets the selected SoundFont import bank filter.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial string EditImportBank { get; set; } = "-1";
+
+    /// <summary>Gets or sets the selected SoundFont import patch filter.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial string EditImportPatch { get; set; } = "-1";
+
+    /// <summary>Gets or sets the selected SoundFont import key filter.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial string EditImportKey { get; set; } = "-1";
+
+    /// <summary>Gets or sets the selected MIDI length filter.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial double EditImportLength { get; set; } = -1;
+
+    /// <summary>Gets or sets the selected MIDI length rounding roughness.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial double EditImportLengthRoughness { get; set; } = 1;
+
+    /// <summary>Gets or sets the selected MIDI velocity filter.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial string EditImportVelocity { get; set; } = "-1";
+
+    /// <summary>Gets or sets the selected MIDI velocity rounding roughness.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial double EditImportVelocityRoughness { get; set; } = 1;
+
+    /// <summary>Gets or sets the selected MIDI start offset.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial double EditImportOffset { get; set; }
+
+    /// <summary>Gets the layer selection supplied by the Avalonia list.</summary>
+    public ObservableCollection<ObservableHitsoundLayer> SelectedLayers { get; } = [];
+
+    /// <summary>Gets whether the layer editor has a selected layer to edit.</summary>
+    public bool HasSelectedLayer => SelectedLayers.Count > 0;
+
+    /// <summary>Gets whether the layer editor has any layer to edit.</summary>
+    public bool HasLayers => Layers.Count > 0;
+
+    /// <summary>Gets the width of the layer editor column based on whether layers exist.</summary>
+    public GridLength EditorColumnWidth => HasLayers ? GridLength.Star : new GridLength(0);
+
+    /// <summary>Gets whether the selected layer can be reloaded from a source.</summary>
+    public bool HasImport => SelectedLayers.Any(layer => layer.ImportArgs.ImportType != ImportType.None);
+
+    /// <summary>Gets whether stack-specific import fields apply to the selection.</summary>
+    public bool IsStackImport => SelectedLayers.Any(layer => layer.ImportArgs.ImportType == ImportType.Stack);
+
+    /// <summary>Gets whether hitsound-import fields apply to the selection.</summary>
+    public bool IsHitsoundsImport => SelectedLayers.Any(layer => layer.ImportArgs.ImportType == ImportType.Hitsounds);
+
+    /// <summary>Gets whether storyboard-import fields apply to the selection.</summary>
+    public bool IsStoryboardImport => SelectedLayers.Any(layer => layer.ImportArgs.ImportType == ImportType.Storyboard);
+
+    /// <summary>Gets whether imported sample fields apply to the selection.</summary>
+    public bool IsSampleImport => IsHitsoundsImport || IsStoryboardImport;
+
+    /// <summary>Gets whether MIDI-import fields apply to the selection.</summary>
+    public bool IsMidiImport => SelectedLayers.Any(layer => layer.ImportArgs.ImportType == ImportType.MIDI);
+
+    /// <summary>Gets whether SoundFont fields apply to the selection.</summary>
+    public bool IsSoundFontSample => SelectedLayers.Any(layer =>
+        layer.SampleArgs.UsesSoundFont || string.IsNullOrEmpty(layer.SampleArgs.GetExtension()));
+
+    /// <summary>Gets every supported layer import kind.</summary>
+    public IReadOnlyList<ImportType> ImportTypes { get; } = Enum.GetValues<ImportType>();
+
+    /// <summary>Gets every supported osu! sample family.</summary>
+    public IReadOnlyList<SampleSet> SampleSets { get; } =
+        Enum.GetValues<SampleSet>().Where(sampleSet => sampleSet != SampleSet.None).ToArray();
+
+    /// <summary>Gets the default-sample choices, including the osu! automatic option.</summary>
+    public IReadOnlyList<SampleSet> DefaultSampleSets { get; } = Enum.GetValues<SampleSet>();
+
+    /// <summary>Gets every supported hitsound layer.</summary>
+    public IReadOnlyList<Hitsound> Hitsounds { get; } = Enum.GetValues<Hitsound>();
+
+    /// <summary>Gets or sets whether the next export uses the previous schema.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool UsePreviousSampleSchema { get; set; }
+
+    /// <summary>Gets or sets the currently loaded schema.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial SampleSchema? PreviousSampleSchema { get; set; }
+
+    /// <summary>Gets or sets whether a previous schema may grow.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool AllowGrowthPreviousSampleSchema { get; set; }
+
+    /// <summary>Gets or sets the export mode used by the dialog.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial HitsoundStudioExportMode HitsoundExportModeSetting { get; set; }
+        = HitsoundStudioExportMode.Standard;
+
+    /// <summary>Gets or sets the output osu! game mode.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial GameMode HitsoundExportGameMode { get; set; } = GameMode.Standard;
+
+    /// <summary>Gets or sets the map version name.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial string HitsoundDiffName { get; set; } = "Hitsounds";
+
+    /// <summary>Gets or sets layer timestamp grouping leniency.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial double ZipLayersLeniency { get; set; } = 15;
+
+    /// <summary>Gets or sets the first new custom index.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial int FirstCustomIndex { get; set; } = 1;
+
+    /// <summary>Gets or sets whether maps and samples are written.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool ExportMap { get; set; } = true;
+
+    /// <summary>Gets or sets whether generated samples are written.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool ExportSamples { get; set; } = true;
+
+    /// <summary>Gets or sets whether the detailed result summary is shown.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool ShowResults { get; set; }
+
+    /// <summary>Gets or sets whether the output directory is cleared.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool DeleteAllInExportFirst { get; set; }
+
+    /// <summary>Gets or sets whether named modes retain regular hitsounds.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool AddCoincidingRegularHitsounds { get; set; } = true;
+
+    /// <summary>Gets or sets whether MIDI receives greenline volume events.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool AddGreenLineVolumeToMidi { get; set; } = true;
+
+    /// <summary>Gets or sets the single-source format.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial HitsoundStudioSampleExportFormat SingleSampleExportFormat { get; set; }
+        = HitsoundStudioSampleExportFormat.Default;
+
+    /// <summary>Gets or sets the mixed-source format.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial HitsoundStudioSampleExportFormat MixedSampleExportFormat { get; set; }
+        = HitsoundStudioSampleExportFormat.Default;
+
+    /// <summary>Gets all export modes for a combo box.</summary>
+    public IReadOnlyList<HitsoundStudioExportMode> ExportModes { get; } = Enum.GetValues<HitsoundStudioExportMode>();
+
+    /// <summary>Gets all game modes for a combo box.</summary>
+    public IReadOnlyList<GameMode> GameModes { get; } = Enum.GetValues<GameMode>();
+
+    /// <summary>Gets all sample export formats for a combo box.</summary>
+    public IReadOnlyList<HitsoundStudioSampleExportFormat> SampleExportFormats { get; } =
+        Enum.GetValues<HitsoundStudioSampleExportFormat>();
+
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
+    {
+        SelectedLayers.CollectionChanged -= SelectedLayersCollectionChanged;
+        await StopPreviewAsync().ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        DisposeAsync().AsTask().GetAwaiter().GetResult();
+    }
+
+    /// <inheritdoc />
+    public async Task RunQuickAsync(CancellationToken cancellationToken)
+    {
+        string path = await workspace.ResolveQuickRunBeatmapAsync(
+            cancellationToken: cancellationToken);
+
+        if (!string.IsNullOrWhiteSpace(path)) BaseBeatmap = path;
+        await RunWithStateAsync(() => RunExportAsync([path], cancellationToken));
+    }
+
+    IReadOnlyList<ShellProjectMenuItem> IShellExtraProjectMenuFeature.ExtraProjectMenuItems =>
+    [
+        new(DesktopStrings.HitsoundStudio_LoadSchemaMenu, DesktopStrings.HitsoundStudio_LoadSchemaTip, LoadSampleSchemaCommand, MaterialIconKind.FileMusic),
+        new(DesktopStrings.HitsoundStudio_BulkMenu,
+            DesktopStrings.HitsoundStudio_BulkTip,
+            BulkAssignSamplesCommand, MaterialIconKind.MusicBoxMultiple),
+    ];
+
+    ProjectDefinition<HitsoundStudioProject> IShellProjectFeature<HitsoundStudioProject>.ProjectDefinition => definition;
+
+    HitsoundStudioProject IShellProjectFeature<HitsoundStudioProject>.Snapshot()
+    {
+        return ToProject().Clone();
+    }
+
+    void IShellProjectFeature<HitsoundStudioProject>.Install(HitsoundStudioProject project)
+    {
+        InstallProject(project);
+    }
+
+    /// <inheritdoc />
+    protected override async Task RunCoreAsync()
+    {
+        var paths = workspace.SelectedPaths;
+        if (settings.AlwaysQuickRun)
+        {
+            string? current = await currentBeatmapService.FetchAsync();
+            paths = current is null ? [] : [current];
+        }
+
+        await RunExportAsync(paths, CancellationToken.None);
+    }
+
+    /// <summary>Opens the complete layer import form and appends its layers.</summary>
+    [RelayCommand]
+    private async Task AddAsync()
+    {
+        using var edit = UndoHistory?.BeginEdit();
+        try
+        {
+            var request = await ShowImportDialogAsync(
+                ApplicationText.Format(DesktopStrings.HitsoundStudio_NewLayerName, Layers.Count + 1));
+            if (request is null) return;
+            var imported = await service.ImportAsync(request);
+            foreach (var layer in imported)
+            {
+                ObservableHitsoundLayer adapter = new(layer) { Priority = Layers.Count };
+                Layers.Add(adapter);
+            }
+
+            SetSelection(Layers.Skip(Math.Max(0, Layers.Count - imported.Count)));
+            NotifyLayerStateChanged();
+            await PublishNotificationAsync(
+                UserNotificationSeverity.Success,
+                DesktopStrings.HitsoundStudio_ImportTitle,
+                imported.Count == 1 ? DesktopStrings.HitsoundStudio_ImportedOne : ApplicationText.Format(DesktopStrings.HitsoundStudio_ImportedMany, imported.Count));
+        }
+        catch (OperationCanceledException)
+        {
+            await PublishNotificationAsync(
+                UserNotificationSeverity.Information,
+                DesktopStrings.HitsoundStudio_ImportTitle,
+                DesktopStrings.HitsoundStudio_ImportCanceled);
+        }
+        catch (Exception exception)
+        {
+            await PublishNotificationAsync(
+                UserNotificationSeverity.Error,
+                DesktopStrings.HitsoundStudio_ImportFailed,
+                ApplicationExceptionText.GetSummary(exception),
+                exception);
+        }
+    }
+
+    /// <summary>Removes the selected layers and recalculates their priorities.</summary>
+    [RelayCommand]
+    private async Task RemoveAsync()
+    {
+        using var edit = UndoHistory?.BeginEdit();
+        if (SelectedLayers.Count == 0) return;
+        bool confirmed = await messageDialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
+            DesktopStrings.HitsoundStudio_DeleteTitle,
+            SelectedLayers.Count == 1
+                ? DesktopStrings.HitsoundStudio_DeleteOne
+                : ApplicationText.Format(DesktopStrings.HitsoundStudio_DeleteMany, SelectedLayers.Count),
+            [
+                new DialogChoice<bool>(DesktopStrings.Shell_Yes, true, true),
+                new DialogChoice<bool>(DesktopStrings.Shell_No, false, IsCancel: true),
+            ],
+            false));
+        if (!confirmed) return;
+
+        int firstSelectedIndex = SelectedLayers
+            .Select(Layers.IndexOf)
+            .Where(index => index >= 0)
+            .DefaultIfEmpty(0)
+            .Min();
+        foreach (var layer in SelectedLayers.ToArray()) Layers.Remove(layer);
+        RecalculatePriorities();
+        SetSelection(Layers.Skip(Math.Max(0, Math.Min(firstSelectedIndex - 1, Layers.Count - 1))).Take(1));
+        NotifyLayerStateChanged();
+    }
+
+    /// <summary>Reloads selected layers from their persisted import source.</summary>
+    [RelayCommand]
+    private async Task ReloadAsync()
+    {
+        using var edit = UndoHistory?.BeginEdit();
+        if (SelectedLayers.Count == 0)
+        {
+            await PublishNotificationAsync(
+                UserNotificationSeverity.Warning,
+                DesktopStrings.HitsoundStudio_ReloadTitle,
+                DesktopStrings.HitsoundStudio_ReloadSelect);
+            return;
+        }
+
+        try
+        {
+            var selectedLayers = SelectedLayers.ToArray();
+            await service.ReloadAsync(selectedLayers.Select(layer => layer.Model).ToArray());
+            foreach (var layer in selectedLayers) layer.RefreshTimes();
+            RefreshEditorFromSelection();
+            await PublishNotificationAsync(
+                UserNotificationSeverity.Success,
+                DesktopStrings.HitsoundStudio_ReloadTitle,
+                DesktopStrings.HitsoundStudio_Reloaded);
+        }
+        catch (OperationCanceledException)
+        {
+            await PublishNotificationAsync(
+                UserNotificationSeverity.Information,
+                DesktopStrings.HitsoundStudio_ReloadTitle,
+                DesktopStrings.HitsoundStudio_ReloadCanceled);
+        }
+        catch (Exception exception)
+        {
+            await PublishNotificationAsync(
+                UserNotificationSeverity.Error,
+                DesktopStrings.HitsoundStudio_ReloadFailed,
+                ApplicationExceptionText.GetSummary(exception),
+                exception);
+        }
+    }
+
+    /// <summary>Previews the selected layer and cancels any older preview request.</summary>
+    [RelayCommand(AllowConcurrentExecutions = true)]
+    private async Task PreviewAsync()
+    {
+        var selectedLayer = SelectedLayers.FirstOrDefault();
+        if (selectedLayer is null)
+        {
+            await PublishNotificationAsync(
+                UserNotificationSeverity.Warning,
+                DesktopStrings.HitsoundStudio_PreviewTitle,
+                DesktopStrings.HitsoundStudio_PreviewSelect);
+            return;
+        }
+
+        var cancellation = new CancellationTokenSource();
+        var previousCancellation = Interlocked.Exchange(ref previewCancellation, cancellation);
+
+        if (previousCancellation is not null)
+            await previousCancellation.CancelAsync();
+        bool gateEntered = false;
+
+        try
+        {
+            await previewGate.WaitAsync(cancellation.Token);
+            gateEntered = true;
+            await StopPreviewSessionAsync();
+            cancellation.Token.ThrowIfCancellationRequested();
+            var clip = await audioGenerator.GenerateAsync(
+                new AudioGenerationRequest(selectedLayer.SampleArgs.Snapshot()),
+                cancellation.Token);
+            var session = await playback.PlayAsync(clip, cancellationToken: cancellation.Token);
+            if (cancellation.IsCancellationRequested)
+            {
+                await session.StopAsync();
+                return;
+            }
+
+            var previousSession = Interlocked.Exchange(ref previewSession, session);
+            if (previousSession is not null) await previousSession.StopAsync();
+            await PublishNotificationAsync(
+                UserNotificationSeverity.Information,
+                DesktopStrings.HitsoundStudio_PreviewTitle,
+                DesktopStrings.HitsoundStudio_Playing);
+        }
+        catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
+        {
+        }
+        catch (FileNotFoundException)
+        {
+            if (!cancellation.IsCancellationRequested)
+                await PublishNotificationAsync(
+                    UserNotificationSeverity.Error,
+                    DesktopStrings.HitsoundStudio_PreviewFailed,
+                    DesktopStrings.HitsoundStudio_SampleMissing);
+        }
+        catch (DirectoryNotFoundException)
+        {
+            if (!cancellation.IsCancellationRequested)
+                await PublishNotificationAsync(
+                    UserNotificationSeverity.Error,
+                    DesktopStrings.HitsoundStudio_PreviewFailed,
+                    DesktopStrings.HitsoundStudio_SampleFolderMissing);
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            if (!cancellation.IsCancellationRequested)
+                await PublishNotificationAsync(
+                    UserNotificationSeverity.Error,
+                    DesktopStrings.HitsoundStudio_PreviewFailed,
+                    ApplicationExceptionText.GetSummary(exception),
+                    exception);
+        }
+        finally
+        {
+            if (gateEntered) previewGate.Release();
+            Interlocked.CompareExchange(ref previewCancellation, null, cancellation);
+            cancellation.Dispose();
+        }
+    }
+
+    /// <summary>Stops and disposes the current audio preview session.</summary>
+    [RelayCommand]
+    private Task StopPreviewAsync()
+    {
+        Interlocked.Exchange(ref previewCancellation, null)?.Cancel();
+        return StopPreviewSessionAsync();
+    }
+
+    private Task StopPreviewSessionAsync()
+    {
+        var session = Interlocked.Exchange(ref previewSession, null);
+        return session is null ? Task.CompletedTask : session.StopAsync().AsTask();
+    }
+
+    /// <summary>Validates every unique layer source through the shared audio generator.</summary>
+    [RelayCommand]
+    private async Task ValidateSamplesAsync()
+    {
+        try
+        {
+            var failures = await service.ValidateSamplesAsync(
+                Layers.Select(layer => layer.SampleArgs.Snapshot()).ToArray());
+            if (failures.Count == 0)
+            {
+                await ShowSampleValidationMessageAsync(DesktopStrings.HitsoundStudio_AllValid);
+                return;
+            }
+
+            Dictionary<SampleGeneratingArgs, Exception> failuresBySample =
+                new(failures, new SampleGeneratingArgsComparer());
+            List<(ObservableHitsoundLayer Layer, Exception Exception)> invalidLayers = [];
+            foreach (var layer in Layers)
+                if (failuresBySample.TryGetValue(layer.SampleArgs.Snapshot(), out var exception))
+                    invalidLayers.Add((layer, exception));
+
+            string message = FormatSampleValidationMessage(invalidLayers);
+            string? details = invalidLayers.Count > 0
+                ? string.Join(Environment.NewLine + Environment.NewLine,
+                    invalidLayers.Select(item => item.Layer.Name + Environment.NewLine + item.Exception))
+                : null;
+            await ShowSampleValidationMessageAsync(message, details);
+        }
+        catch (OperationCanceledException)
+        {
+            await PublishNotificationAsync(
+                UserNotificationSeverity.Information,
+                DesktopStrings.HitsoundStudio_ValidateTitle,
+                DesktopStrings.HitsoundStudio_ValidateCanceled);
+        }
+        catch (Exception exception)
+        {
+            await PublishNotificationAsync(
+                UserNotificationSeverity.Error,
+                DesktopStrings.HitsoundStudio_ValidateFailed,
+                ApplicationExceptionText.GetSummary(exception),
+                exception);
+        }
+    }
+
+    private Task ShowSampleValidationMessageAsync(string message, string? details = null)
+    {
+        return messageDialogs.ShowMessageAsync(
+            new MessageDialogRequest<bool>(
+                DesktopStrings.HitsoundStudio_ValidateTitle,
+                message,
+                [new DialogChoice<bool>(DesktopStrings.Shell_UpperOk, true, true, true)],
+                true,
+                details));
+    }
+
+    private static string FormatSampleValidationMessage(
+        IReadOnlyList<(ObservableHitsoundLayer Layer, Exception Exception)> invalidLayers)
+    {
+        List<string> sections = [];
+        AddSection(
+            sections,
+            DesktopStrings.HitsoundStudio_MissingHeading,
+            invalidLayers
+                .Where(item => item.Exception is FileNotFoundException)
+                .Select(item => item.Layer.Name));
+        AddSection(
+            sections,
+            DesktopStrings.HitsoundStudio_ExtensionHeading,
+            invalidLayers
+                .Where(item => item.Exception is InvalidDataException)
+                .Select(item => item.Layer.Name));
+        AddSection(
+            sections,
+            DesktopStrings.HitsoundStudio_FailureHeading,
+            invalidLayers
+                .Where(item => item.Exception is not FileNotFoundException and not InvalidDataException)
+                .Select(item => ApplicationText.Format(DesktopStrings.HitsoundStudio_LayerFailure, item.Layer.Name, ApplicationExceptionText.GetSummary(item.Exception))));
+
+        return string.Join(Environment.NewLine + Environment.NewLine, sections);
+    }
+
+    private static void AddSection(
+        ICollection<string> sections,
+        string heading,
+        IEnumerable<string> entries)
+    {
+        string[] names = entries.ToArray();
+        if (names.Length == 0) return;
+
+        sections.Add(heading + Environment.NewLine + string.Join(Environment.NewLine, names));
+    }
+
+    /// <summary>Chooses a base beatmap through the standard workspace picker.</summary>
+    [RelayCommand]
+    private async Task PickBaseBeatmapAsync()
+    {
+        var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
+        {
+            Title = DesktopStrings.HitsoundStudio_PickBase,
+            SuggestedStartLocation = workspace.GetBeatmapPickerStartLocation(
+                Path.GetDirectoryName(BaseBeatmap)),
+            AllowMultiple = false,
+            Filters = [CommonFilePickerFilters.BeatmapsAndStoryboards],
+        });
+        if (paths.Count > 0) BaseBeatmap = paths[0];
+    }
+
+    /// <summary>Loads the beatmap currently selected by the osu! client as the export baseline.</summary>
+    [RelayCommand]
+    private async Task LoadBaseBeatmapAsync()
+    {
+        string? path = await currentBeatmapService.FetchAsync();
+        if (path is not null) BaseBeatmap = path;
+    }
+
+    /// <summary>Chooses the fallback sample file.</summary>
+    [RelayCommand]
+    private async Task PickDefaultSampleAsync()
+    {
+        using var edit = UndoHistory?.BeginEdit();
+        var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
+        {
+            Title = DesktopStrings.HitsoundStudio_PickDefault,
+            AllowMultiple = false,
+            Filters = [CommonFilePickerFilters.SampleFiles],
+        });
+        if (paths.Count > 0) DefaultSample.SampleArgs.Path = paths[0];
+    }
+
+    /// <summary>Chooses the selected layers' generated sample source.</summary>
+    [RelayCommand]
+    private async Task PickEditSamplePathAsync()
+    {
+        var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
+        {
+            Title = DesktopStrings.HitsoundStudio_PickLayer,
+            AllowMultiple = false,
+            Filters = [CommonFilePickerFilters.SampleFiles],
+        });
+        if (paths.Count > 0) EditSamplePath = paths[0];
+    }
+
+    /// <summary>Chooses the selected layers' import source.</summary>
+    [RelayCommand]
+    private async Task PickEditImportPathAsync()
+    {
+        var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
+        {
+            Title = DesktopStrings.HitsoundStudio_PickSource,
+            AllowMultiple = false,
+            Filters = [],
+        });
+        if (paths.Count > 0) EditImportPath = paths[0];
+    }
+
+    /// <summary>Loads the beatmap currently selected by the osu! client.</summary>
+    [RelayCommand]
+    private async Task LoadEditImportPathAsync()
+    {
+        string? path = await currentBeatmapService.FetchAsync();
+        if (path is not null) EditImportPath = path;
+    }
+
+    /// <summary>Chooses the selected layers' imported source sample.</summary>
+    [RelayCommand]
+    private async Task PickEditImportSamplePathAsync()
+    {
+        var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
+        {
+            Title = DesktopStrings.HitsoundStudio_PickImportedSample,
+            AllowMultiple = false,
+            Filters = [CommonFilePickerFilters.SampleFiles],
+        });
+        if (paths.Count > 0) EditImportSamplePath = paths[0];
+    }
+
+    /// <summary>Chooses the export folder.</summary>
+    [RelayCommand]
+    private async Task PickExportFolderAsync()
+    {
+        var paths = await filePicker.PickFoldersAsync(new OpenFolderPickerRequest
+        {
+            Title = DesktopStrings.HitsoundStudio_PickExport,
+            AllowMultiple = false,
+        });
+        if (paths.Count > 0) ExportFolder = paths[0];
+    }
+
+    /// <summary>Loads a standalone legacy-compatible sample schema JSON document.</summary>
+    [RelayCommand]
+    private async Task LoadSampleSchemaAsync()
+    {
+        using var edit = UndoHistory?.BeginEdit();
+        var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
+        {
+            Title = DesktopStrings.HitsoundStudio_LoadSchema,
+            AllowMultiple = false,
+            Filters = [new FilePickerFilter(DesktopStrings.HitsoundStudio_JsonFiles, ["*.json"])],
+        });
+        if (paths.Count == 0) return;
+        PreviousSampleSchema = await projectStore.LoadAsync<SampleSchema>(paths[0]);
+        UsePreviousSampleSchema = true;
+        await PublishNotificationAsync(
+            UserNotificationSeverity.Success,
+            DesktopStrings.HitsoundStudio_LoadSchema,
+            DesktopStrings.HitsoundStudio_SchemaLoaded);
+    }
+
+    /// <summary>
+    ///     Assigns selected SoundFont layers from filenames in the legacy
+    ///     <c>[bank]_[patch]_[key]_[length]_[velocity]</c> format.
+    /// </summary>
+    [RelayCommand]
+    private async Task BulkAssignSamplesAsync()
+    {
+        using var edit = UndoHistory?.BeginEdit();
+        var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
+        {
+            Title = DesktopStrings.HitsoundStudio_BulkTitle,
+            AllowMultiple = true,
+            Filters = [new FilePickerFilter(DesktopStrings.HitsoundStudio_AudioFiles, ["*.wav", "*.ogg"])],
+        });
+        int assigned = 0;
+        foreach (string path in paths)
+        {
+            string[] fields = Path.GetFileNameWithoutExtension(path).Split('_');
+            if (fields.Length > 5) continue;
+            int? bank = ParseOptionalInt(fields, 0);
+            int? patch = ParseOptionalInt(fields, 1);
+            int? key = ParseOptionalInt(fields, 2);
+            int? length = ParseOptionalInt(fields, 3);
+            int? velocity = ParseOptionalInt(fields, 4);
+            foreach (var layer in SelectedLayers)
+            {
+                var sample = layer.SampleArgs;
+                if (bank.HasValue && bank.Value != layer.ImportArgs.Bank
+                    || patch.HasValue && patch.Value != layer.ImportArgs.Patch
+                    || key.HasValue && key.Value != layer.ImportArgs.Key
+                    || length.HasValue && length.Value != (int)Math.Round(layer.ImportArgs.Length)
+                    || velocity.HasValue && velocity.Value != layer.ImportArgs.Velocity) continue;
+                sample.Path = path;
+                assigned++;
+            }
+        }
+
+        await PublishNotificationAsync(
+            UserNotificationSeverity.Success,
+            DesktopStrings.HitsoundStudio_BulkTitle,
+            assigned == 1 ? DesktopStrings.HitsoundStudio_AssignedOne : ApplicationText.Format(DesktopStrings.HitsoundStudio_AssignedMany, assigned));
+    }
+
+    partial void OnSingleSampleExportFormatChanged(HitsoundStudioSampleExportFormat value)
+    {
+        if (value == HitsoundStudioSampleExportFormat.MidiChords)
+            MixedSampleExportFormat = value;
+        else if (MixedSampleExportFormat == HitsoundStudioSampleExportFormat.MidiChords) MixedSampleExportFormat = value;
+    }
+
+    partial void OnMixedSampleExportFormatChanged(HitsoundStudioSampleExportFormat value)
+    {
+        if (value == HitsoundStudioSampleExportFormat.MidiChords)
+            SingleSampleExportFormat = value;
+        else if (SingleSampleExportFormat == HitsoundStudioSampleExportFormat.MidiChords) SingleSampleExportFormat = value;
+    }
+
+    /// <summary>Allows the view to update the layer selection after an extended selection change.</summary>
+    /// <param name="selected">The selected layers in list order.</param>
+    public void SetSelection(IEnumerable<ObservableHitsoundLayer> selected)
+    {
+        var selection = selected.ToArray();
+        syncingSelection = true;
+        try
+        {
+            SelectedLayers.Clear();
+            foreach (var layer in selection) SelectedLayers.Add(layer);
+        }
+        finally
+        {
+            syncingSelection = false;
+        }
+
+        RefreshSelectedLayerState();
+    }
+
+    private void SelectedLayersCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (syncingSelection) return;
+        RefreshSelectedLayerState();
+    }
+
+    private void RefreshSelectedLayerState()
+    {
+        OnPropertyChanged(nameof(HasSelectedLayer));
+        RefreshEditorVisibility();
+        RefreshEditorFromSelection();
+    }
+
+    private void RefreshEditorFromSelection()
+    {
+        using var ignored = UndoHistory?.SuspendRecording();
+        var selected = SelectedLayers.ToList();
+        syncingEditor = true;
+        EditTimes = CommonTimes(selected);
+        EditName = selected.AllToStringOrDefault(layer => layer.Name);
+        EditSampleSet = CommonValue(selected, layer => layer.SampleSet);
+        EditHitsound = CommonValue(selected, layer => layer.Hitsound);
+        EditSamplePath = selected.AllToStringOrDefault(layer => layer.SampleArgs.Path);
+        EditSampleVolume = CommonValue(selected, layer => layer.SampleArgs.Volume) ?? 1;
+        EditSamplePanning = CommonValue(selected, layer => layer.SampleArgs.Panning) ?? 0;
+        EditSamplePitchShift = CommonValue(selected, layer => layer.SampleArgs.PitchShift) ?? 0;
+        EditSampleBank = selected.AllToStringOrDefault(layer => layer.SampleArgs.Bank, bank => Format(bank, -1));
+        EditSamplePatch = selected.AllToStringOrDefault(layer => layer.SampleArgs.Patch, patch => Format(patch, -1));
+        EditSampleInstrument = selected.AllToStringOrDefault(layer => layer.SampleArgs.Instrument, instrument => Format(instrument, -1));
+        EditSampleKey = selected.AllToStringOrDefault(layer => layer.SampleArgs.Key, key => Format(key, -1));
+        EditSampleLength = CommonValue(selected, layer => layer.SampleArgs.Length) ?? -1;
+        EditSampleVelocity = selected.AllToStringOrDefault(layer => layer.SampleArgs.Velocity, velocity => Format(velocity, 127));
+        EditImportType = CommonValue(selected, layer => layer.ImportArgs.ImportType);
+        EditImportPath = selected.AllToStringOrDefault(layer => layer.ImportArgs.Path);
+        EditImportX = CommonValue(selected, layer => layer.ImportArgs.X) ?? -1;
+        EditImportY = CommonValue(selected, layer => layer.ImportArgs.Y) ?? -1;
+        EditImportSamplePath = selected.AllToStringOrDefault(layer => layer.ImportArgs.SamplePath);
+        EditImportDiscriminateVolumes = selected.Count > 0 && selected.All(layer => layer.ImportArgs.DiscriminateVolumes);
+        EditImportDetectDuplicates = selected.Count > 0 && selected.All(layer => layer.ImportArgs.DetectDuplicateSamples);
+        EditImportRemoveDuplicates = selected.Count > 0 && selected.All(layer => layer.ImportArgs.RemoveDuplicates);
+        EditImportBank = selected.AllToStringOrDefault(layer => layer.ImportArgs.Bank, bank => Format(bank, -1));
+        EditImportPatch = selected.AllToStringOrDefault(layer => layer.ImportArgs.Patch, patch => Format(patch, -1));
+        EditImportKey = selected.AllToStringOrDefault(layer => layer.ImportArgs.Key, key => Format(key, -1));
+        EditImportLength = CommonValue(selected, layer => layer.ImportArgs.Length) ?? -1;
+        EditImportLengthRoughness = CommonValue(selected, layer => layer.ImportArgs.LengthRoughness) ?? 1;
+        EditImportVelocity = selected.AllToStringOrDefault(layer => layer.ImportArgs.Velocity, velocity => Format(velocity, -1));
+        EditImportVelocityRoughness = CommonValue(selected, layer => layer.ImportArgs.VelocityRoughness) ?? 1;
+        EditImportOffset = CommonValue(selected, layer => layer.ImportArgs.Offset) ?? 0;
+        syncingEditor = false;
+    }
+
+    partial void OnEditTimesChanged(double[] value)
+    {
+        if (syncingEditor)
+            return;
+
+        double[] times = value.Order().ToArray();
+
+        foreach (var layer in SelectedLayers) layer.Times = times.ToList();
+    }
+
+    partial void OnEditNameChanged(string value)
+    {
+        if (syncingEditor) return;
+        foreach (var layer in SelectedLayers) layer.Name = value;
+    }
+
+    partial void OnEditSampleSetChanged(SampleSet? value)
+    {
+        if (syncingEditor || value is null) return;
+        foreach (var layer in SelectedLayers) layer.SampleSet = value.Value;
+    }
+
+    partial void OnEditHitsoundChanged(Hitsound? value)
+    {
+        if (syncingEditor || value is null) return;
+        foreach (var layer in SelectedLayers) layer.Hitsound = value.Value;
+    }
+
+    partial void OnEditSamplePathChanged(string value)
+    {
+        if (syncingEditor) return;
+        foreach (var layer in SelectedLayers) layer.SampleArgs.Path = value;
+        RefreshEditorVisibility();
+    }
+
+    partial void OnEditSampleVolumeChanged(double value)
+    {
+        if (syncingEditor) return;
+        foreach (var layer in SelectedLayers) layer.SampleArgs.Volume = value;
+    }
+
+    partial void OnEditSamplePanningChanged(double value)
+    {
+        if (syncingEditor) return;
+        foreach (var layer in SelectedLayers) layer.SampleArgs.Panning = value;
+    }
+
+    partial void OnEditSamplePitchShiftChanged(double value)
+    {
+        if (syncingEditor) return;
+        foreach (var layer in SelectedLayers) layer.SampleArgs.PitchShift = value;
+    }
+
+    partial void OnEditSampleBankChanged(string value)
+    {
+        SetSampleInt(value, -1, (sample, parsed) => sample.Bank = parsed);
+    }
+
+    partial void OnEditSamplePatchChanged(string value)
+    {
+        SetSampleInt(value, -1, (sample, parsed) => sample.Patch = parsed);
+    }
+
+    partial void OnEditSampleInstrumentChanged(string value)
+    {
+        SetSampleInt(value, -1, (sample, parsed) => sample.Instrument = parsed);
+    }
+
+    partial void OnEditSampleKeyChanged(string value)
+    {
+        SetSampleInt(value, -1, (sample, parsed) => sample.Key = parsed);
+    }
+
+    partial void OnEditSampleLengthChanged(double value)
+    {
+        if (syncingEditor) return;
+        foreach (var layer in SelectedLayers) layer.SampleArgs.Length = value;
+    }
+
+    partial void OnEditSampleVelocityChanged(string value)
+    {
+        if (syncingEditor || !TryInt(value, 127, out int parsed)) return;
+        foreach (var layer in SelectedLayers) layer.SampleArgs.Velocity = parsed;
+    }
+
+    partial void OnEditImportTypeChanged(ImportType? value)
+    {
+        if (syncingEditor || value is null) return;
+        foreach (var layer in SelectedLayers) layer.ImportArgs.ImportType = value.Value;
+        RefreshEditorVisibility();
+    }
+
+    partial void OnEditImportPathChanged(string value)
+    {
+        SetImportString(value, (args, parsed) => args.Path = parsed);
+    }
+
+    partial void OnEditImportSamplePathChanged(string value)
+    {
+        SetImportString(value, (args, parsed) => args.SamplePath = parsed);
+    }
+
+    partial void OnEditImportXChanged(double value)
+    {
+        SetImportDouble(value, (args, parsed) => args.X = parsed);
+    }
+
+    partial void OnEditImportYChanged(double value)
+    {
+        SetImportDouble(value, (args, parsed) => args.Y = parsed);
+    }
+
+    partial void OnEditImportBankChanged(string value)
+    {
+        SetImportInt(value, -1, (args, parsed) => args.Bank = parsed);
+    }
+
+    partial void OnEditImportPatchChanged(string value)
+    {
+        SetImportInt(value, -1, (args, parsed) => args.Patch = parsed);
+    }
+
+    partial void OnEditImportKeyChanged(string value)
+    {
+        SetImportInt(value, -1, (args, parsed) => args.Key = parsed);
+    }
+
+    partial void OnEditImportLengthChanged(double value)
+    {
+        SetImportDouble(value, (args, parsed) => args.Length = parsed);
+    }
+
+    partial void OnEditImportLengthRoughnessChanged(double value)
+    {
+        SetImportDouble(value, (args, parsed) => args.LengthRoughness = parsed);
+    }
+
+    partial void OnEditImportVelocityChanged(string value)
+    {
+        SetImportInt(value, -1, (args, parsed) => args.Velocity = parsed);
+    }
+
+    partial void OnEditImportVelocityRoughnessChanged(double value)
+    {
+        SetImportDouble(value, (args, parsed) => args.VelocityRoughness = parsed);
+    }
+
+    partial void OnEditImportOffsetChanged(double value)
+    {
+        SetImportDouble(value, (args, parsed) => args.Offset = parsed);
+    }
+
+    partial void OnEditImportDiscriminateVolumesChanged(bool value)
+    {
+        SetImportBool(value, (args, parsed) => args.DiscriminateVolumes = parsed);
+    }
+
+    partial void OnEditImportDetectDuplicatesChanged(bool value)
+    {
+        SetImportBool(value, (args, parsed) => args.DetectDuplicateSamples = parsed);
+    }
+
+    partial void OnEditImportRemoveDuplicatesChanged(bool value)
+    {
+        SetImportBool(value, (args, parsed) => args.RemoveDuplicates = parsed);
+    }
+
+    private static TValue? CommonValue<TValue>(
+        IReadOnlyList<ObservableHitsoundLayer> selected,
+        Func<ObservableHitsoundLayer, TValue> selector)
+        where TValue : struct
+    {
+        if (selected.Count == 0) return null;
+
+        var first = selector(selected[0]);
+        return selected.Skip(1).All(layer => EqualityComparer<TValue>.Default.Equals(selector(layer), first))
+            ? first
+            : null;
+    }
+
+    private static double[] CommonTimes(IReadOnlyList<ObservableHitsoundLayer> selected)
+    {
+        if (selected.Count == 0) return [];
+
+        var first = selected[0].Times;
+        return selected.Skip(1).All(layer => layer.Times.SequenceEqual(first))
+            ? first.ToArray()
+            : [];
+    }
+
+    private void RefreshEditorVisibility()
+    {
+        OnPropertyChanged(nameof(HasImport));
+        OnPropertyChanged(nameof(IsStackImport));
+        OnPropertyChanged(nameof(IsHitsoundsImport));
+        OnPropertyChanged(nameof(IsStoryboardImport));
+        OnPropertyChanged(nameof(IsSampleImport));
+        OnPropertyChanged(nameof(IsMidiImport));
+        OnPropertyChanged(nameof(IsSoundFontSample));
+    }
+
+    private void NotifyLayerStateChanged()
+    {
+        OnPropertyChanged(nameof(HasLayers));
+        OnPropertyChanged(nameof(EditorColumnWidth));
+    }
+
+    private void SetSampleInt(string value, int fallback, Action<ObservableSampleGeneratingArgs, int> setter)
+    {
+        if (syncingEditor || !TryInt(value, fallback, out int parsed)) return;
+        foreach (var layer in SelectedLayers) setter(layer.SampleArgs, parsed);
+    }
+
+    private void SetImportString(string value, Action<LayerImportArgs, string> setter)
+    {
+        if (syncingEditor) return;
+        foreach (var layer in SelectedLayers) setter(layer.ImportArgs, value);
+    }
+
+    private void SetImportDouble(double value, Action<LayerImportArgs, double> setter)
+    {
+        if (syncingEditor) return;
+        foreach (var layer in SelectedLayers) setter(layer.ImportArgs, value);
+    }
+
+    private void SetImportInt(string value, int fallback, Action<LayerImportArgs, int> setter)
+    {
+        if (syncingEditor || !TryInt(value, fallback, out int parsed)) return;
+        foreach (var layer in SelectedLayers) setter(layer.ImportArgs, parsed);
+    }
+
+    private void SetImportBool(bool value, Action<LayerImportArgs, bool> setter)
+    {
+        if (syncingEditor) return;
+        foreach (var layer in SelectedLayers) setter(layer.ImportArgs, value);
+    }
+
+    private static bool TryInt(string value, int fallback, out int parsed)
+    {
+        return string.IsNullOrWhiteSpace(value)
+            ? (parsed = fallback) == fallback
+            : int.TryParse(value, NumberStyles.Integer,
+                CultureInfo.InvariantCulture, out parsed);
+    }
+
+    private static string Format<T>(T? value, T fallback) where T : struct
+    {
+        return Convert.ToString(value ?? fallback, CultureInfo.InvariantCulture) ?? string.Empty;
+    }
+
+    private async Task RunExportAsync(IReadOnlyList<string> selectedPaths, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(BaseBeatmap)
+            && selectedPaths.FirstOrDefault(path => path.EndsWith(".osu", StringComparison.OrdinalIgnoreCase)) is { } selected) BaseBeatmap = selected;
+
+        var chosen = await ShowExportDialogAsync(ToProject());
+        if (chosen is null) return;
+        if (chosen is { UsePreviousSampleSchema: true, PreviousSampleSchema: null })
+        {
+            await messageDialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
+                DesktopStrings.HitsoundStudio_SchemaMissing,
+                DesktopStrings.HitsoundStudio_LoadSchemaFirst,
+                [new DialogChoice<bool>(DesktopStrings.Shell_UpperOk, true, true)],
+                true));
+            return;
+        }
+
+        if (!files.DirectoryExists(chosen.ExportFolder))
+        {
+            bool create = await messageDialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
+                DesktopStrings.HitsoundStudio_ExportMissing,
+                ApplicationText.Format(DesktopStrings.HitsoundStudio_CreateExportFolder, chosen.ExportFolder),
+                [
+                    new DialogChoice<bool>(DesktopStrings.Shell_Yes, true, true),
+                    new DialogChoice<bool>(DesktopStrings.Shell_No, false, IsCancel: true),
+                ],
+                false));
+            if (!create) return;
+        }
+
+        InstallProject(chosen);
+        var snapshot = chosen.Clone();
+        var result = await Execution.ExecuteAsync(
+            new ToolExecutionRequest<HitsoundStudioExportResult>(
+                Tool.Id,
+                Tool.DisplayName,
+                async context =>
+                {
+                    var output = await service.ExportAsync(
+                        snapshot,
+                        new Progress<double>(value => context.ReportProgress(value, DesktopStrings.HitsoundStudio_Exporting)),
+                        context.CancellationToken);
+                    return new ToolExecutionOutput<HitsoundStudioExportResult>(
+                        output,
+                        snapshot.ShowResults ? null : DesktopStrings.HitsoundStudio_ExportComplete);
+                }),
+            CreateProgress(),
+            cancellationToken);
+        if (result is { Status: ToolExecutionStatus.Succeeded, Value: not null })
+        {
+            if (HitsoundExportModeSetting != HitsoundStudioExportMode.Midi) PreviousSampleSchema = result.Value.Schema;
+            if (snapshot.ShowResults)
+                await messageDialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
+                    DesktopStrings.HitsoundStudio_ExportTitle,
+                    result.Value.DetailedSummary,
+                    [new DialogChoice<bool>(DesktopStrings.Shell_UpperOk, true, true, true)],
+                    true));
+        }
+    }
+
+    private Task PublishNotificationAsync(
+        UserNotificationSeverity severity,
+        string title,
+        string message,
+        Exception? exception = null)
+    {
+        return notifications.PublishAsync(new UserNotification(severity, title, message, exception));
+    }
+
+    private async Task<HitsoundStudioImportRequest?> ShowImportDialogAsync(string defaultName)
+    {
+        HitsoundStudioImportDialogViewModel viewModel =
+            new(defaultName, currentBeatmapService, workspace, filePicker);
+
+        HitsoundStudioImportDialog dialog = new() { DataContext = viewModel };
+        viewModel.Close = dialog.Close;
+        object? result = await dialog.ShowDialog<object?>(owner());
+        return result as HitsoundStudioImportRequest;
+    }
+
+    private async Task<HitsoundStudioProject?> ShowExportDialogAsync(HitsoundStudioProject project)
+    {
+        ArgumentNullException.ThrowIfNull(project);
+        HitsoundStudioExportDialogViewModel viewModel = new(project, filePicker);
+        HitsoundStudioExportDialog dialog = new() { DataContext = viewModel };
+        viewModel.Close = value => DialogHostInteraction.Close(
+            DialogHostInteraction.ROOT_IDENTIFIER,
+            value);
+        object? result = await DialogHostInteraction.ShowAsync(
+            dialog,
+            DialogHostInteraction.ROOT_IDENTIFIER);
+        return result as HitsoundStudioProject;
+    }
+
+    private HitsoundStudioProject ToProject()
+    {
+        return new HitsoundStudioProject
+        {
+            BaseBeatmap = BaseBeatmap,
+            DefaultSample = DefaultSample.Snapshot(),
+            ExportFolder = ExportFolder,
+            HitsoundDiffName = HitsoundDiffName,
+            ExportMap = ExportMap,
+            ExportSamples = ExportSamples,
+            ShowResults = ShowResults,
+            DeleteAllInExportFirst = DeleteAllInExportFirst,
+            UsePreviousSampleSchema = UsePreviousSampleSchema,
+            AllowGrowthPreviousSampleSchema = AllowGrowthPreviousSampleSchema,
+            AddCoincidingRegularHitsounds = AddCoincidingRegularHitsounds,
+            AddGreenLineVolumeToMidi = AddGreenLineVolumeToMidi,
+            PreviousSampleSchema = PreviousSampleSchema,
+            HitsoundExportModeSetting = HitsoundExportModeSetting,
+            HitsoundExportGameMode = HitsoundExportGameMode,
+            ZipLayersLeniency = ZipLayersLeniency,
+            FirstCustomIndex = FirstCustomIndex,
+            SingleSampleExportFormat = SingleSampleExportFormat,
+            MixedSampleExportFormat = MixedSampleExportFormat,
+            HitsoundLayers = Layers.Select(layer => layer.Snapshot()).ToList(),
+        };
+    }
+
+    private void InstallProject(HitsoundStudioProject project)
+    {
+        var copy = project.Clone();
+        BaseBeatmap = copy.BaseBeatmap;
+        DefaultSample = new ObservableSample(copy.DefaultSample.Copy());
+        ExportFolder = copy.ExportFolder;
+        HitsoundDiffName = copy.HitsoundDiffName;
+        ExportMap = copy.ExportMap;
+        ExportSamples = copy.ExportSamples;
+        ShowResults = copy.ShowResults;
+        DeleteAllInExportFirst = copy.DeleteAllInExportFirst;
+        UsePreviousSampleSchema = copy.UsePreviousSampleSchema;
+        AllowGrowthPreviousSampleSchema = copy.AllowGrowthPreviousSampleSchema;
+        AddCoincidingRegularHitsounds = copy.AddCoincidingRegularHitsounds;
+        AddGreenLineVolumeToMidi = copy.AddGreenLineVolumeToMidi;
+        PreviousSampleSchema = copy.PreviousSampleSchema;
+        HitsoundExportModeSetting = copy.HitsoundExportModeSetting;
+        HitsoundExportGameMode = copy.HitsoundExportGameMode;
+        ZipLayersLeniency = copy.ZipLayersLeniency;
+        FirstCustomIndex = copy.FirstCustomIndex;
+        SingleSampleExportFormat = copy.SingleSampleExportFormat;
+        MixedSampleExportFormat = copy.MixedSampleExportFormat;
+        Layers = new ObservableCollection<ObservableHitsoundLayer>(
+            copy.HitsoundLayers.Select(layer => new ObservableHitsoundLayer(layer)));
+        SetSelection(Layers.Take(1));
+        NotifyLayerStateChanged();
+    }
+
+    /// <summary>
+    ///     Moves selected layers while preserving their relative order.
+    /// </summary>
+    /// <param name="direction">-1 to raise or 1 to lower.</param>
+    /// <param name="repeat">Whether to apply the WPF Shift-click ten-step move.</param>
+    [Localizable(false)] // Invalid directions indicate a programming error rather than a user-facing choice.
+    public void MoveSelectedLayers(int direction, bool repeat = false)
+    {
+        if (direction is not (-1 or 1)) throw new ArgumentOutOfRangeException(nameof(direction), "Direction must be -1 or 1.");
+
+        int repetitions = repeat ? 10 : 1;
+        var selectedLayers = SelectedLayers.ToArray();
+        var indices = SelectedLayers.Select(Layers.IndexOf).Where(index => index >= 0).OrderBy(index => index).ToList();
+        if (indices.Count == 0) return;
+        bool moved = false;
+        for (int repetition = 0; repetition < repetitions; repetition++)
+        {
+            if (direction < 0 && indices[0] == 0) break;
+            if (direction > 0 && indices[^1] == Layers.Count - 1) break;
+            foreach (int index in direction < 0 ? indices : indices.AsEnumerable().Reverse())
+            {
+                Layers.Move(index, index + direction);
+                moved = true;
+            }
+
+            for (int index = 0; index < indices.Count; index++) indices[index] += direction;
+        }
+
+        RecalculatePriorities();
+        if (moved) SetSelection(selectedLayers);
+    }
+
+    private void RecalculatePriorities()
+    {
+        for (int index = 0; index < Layers.Count; index++) Layers[index].Priority = index;
+    }
+
+    private static int? ParseOptionalInt(IReadOnlyList<string> fields, int index)
+    {
+        if (index >= fields.Count || string.IsNullOrWhiteSpace(fields[index])) return null;
+        return int.TryParse(fields[index], NumberStyles.Integer,
+            CultureInfo.InvariantCulture, out int result)
+            ? result
+            : null;
+    }
+}

@@ -1,0 +1,115 @@
+using Mapping_Tools.Desktop.Services.Undo;
+using System.ComponentModel.DataAnnotations;
+using CommunityToolkit.Mvvm.ComponentModel;
+using Mapping_Tools.Desktop.Localization;
+using CommunityToolkit.Mvvm.Input;
+using Mapping_Tools.Application.Platform.FilePicker;
+using Mapping_Tools.Application.Workspace.Contracts;
+using Mapping_Tools.Desktop.Services.Dialogs;
+using Mapping_Tools.Desktop.Tools.PatternGallery.Models;
+
+namespace Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels;
+
+/// <summary>Owns the pattern-file import dialog state and picker actions.</summary>
+public sealed partial class PatternGalleryFileImportViewModel : LocalizedObservableValidator
+{
+    private readonly ICurrentBeatmapDialogService currentBeatmapService;
+    private readonly IFilePicker filePicker;
+    private readonly IBeatmapWorkspace workspace;
+
+    /// <summary>Creates a source-file import form.</summary>
+    /// <param name="defaultName">The suggested display name.</param>
+    /// <param name="defaultPath">The selected source path.</param>
+    /// <param name="filePicker">Presents the native pattern-file picker.</param>
+    /// <param name="currentBeatmapService">Fetches the current beatmap and presents lookup feedback.</param>
+    /// <param name="workspace">Supplies the shared default beatmap picker location.</param>
+    public PatternGalleryFileImportViewModel(
+        string defaultName,
+        string defaultPath,
+        IFilePicker filePicker,
+        ICurrentBeatmapDialogService currentBeatmapService,
+        IBeatmapWorkspace workspace)
+    {
+        this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
+        this.currentBeatmapService = currentBeatmapService
+                                     ?? throw new ArgumentNullException(nameof(currentBeatmapService));
+        this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        Name = defaultName;
+        FilePath = defaultPath;
+        AcceptCommand = new RelayCommand(Accept);
+        CancelCommand = new RelayCommand(() => Close(null));
+        BrowseCommand = new AsyncRelayCommand(BrowseAsync);
+        UseCurrentCommand = new AsyncRelayCommand(UseCurrentAsync);
+    }
+
+    /// <summary>Gets or sets the pattern display name.</summary>
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Required(ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.PatternGallery_Validation_PatternNameRequired))]
+    [Undoable]
+    public partial string Name { get; set; }
+
+    /// <summary>Gets or sets the source pattern file path.</summary>
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Required(ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.PatternGallery_Validation_PatternFileRequired))]
+    [Undoable]
+    public partial string FilePath { get; set; }
+
+    /// <summary>Gets or sets the optional time-code filter.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial string Filter { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets the optional lower time bound in milliseconds.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial double StartTime { get; set; } = -1;
+
+    /// <summary>Gets or sets the optional upper time bound in milliseconds.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial double EndTime { get; set; } = -1;
+
+    /// <summary>Gets the command that validates and accepts the form.</summary>
+    public IRelayCommand AcceptCommand { get; }
+
+    /// <summary>Gets the command that dismisses the form.</summary>
+    public IRelayCommand CancelCommand { get; }
+
+    /// <summary>Gets the command that opens the pattern-file picker.</summary>
+    public IAsyncRelayCommand BrowseCommand { get; }
+
+    /// <summary>Gets the command that fills the path from the current osu! beatmap.</summary>
+    public IAsyncRelayCommand UseCurrentCommand { get; }
+
+    /// <summary>Gets or sets the dialog-close callback installed by the adapter.</summary>
+    internal Action<object?> Close { get; set; } = _ => { };
+
+    private void Accept()
+    {
+        ValidateAllProperties();
+        if (HasErrors) return;
+
+        Close(new PatternGalleryFileInput(Name, FilePath, Filter, StartTime, EndTime));
+    }
+
+    private async Task UseCurrentAsync()
+    {
+        string? path = await currentBeatmapService.FetchAsync();
+        if (path is not null) FilePath = path;
+    }
+
+    private async Task BrowseAsync()
+    {
+        var selected = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
+        {
+            Title = DesktopStrings.PatternGallery_ImportPatternFileTitle,
+            SuggestedStartLocation = workspace.GetBeatmapPickerStartLocation(
+                Path.GetDirectoryName(FilePath)),
+            AllowMultiple = false,
+            Filters = [CommonFilePickerFilters.Beatmaps],
+        });
+        if (selected.Count > 0) FilePath = selected[0];
+    }
+}

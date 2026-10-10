@@ -1,9 +1,7 @@
 # Mapping Tools [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/V7V2HPH5F) [![Github All Releases](https://img.shields.io/github/downloads/OliBomby/Mapping_Tools/total.svg)]()
 
-Mapping Tools is a collection of tools which help you create osu! beatmaps more easily! 
+Mapping Tools is a collection of tools which help you create osu! beatmaps more easily!
 [Website](https://mappingtools.github.io/)
-
-Requires [.NET 5 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/5.0)
 
 <p align="left">
   <img src="https://i.imgur.com/7JqvlNY.png" alt="Mapping Tools logo"/>
@@ -34,17 +32,15 @@ Requires [.NET 5 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/do
 See the [Trello board](https://trello.com/b/iTmmw3eP/mapping-tools).
 
 ## Used libraries
-- [MaterialDesignInXamlToolkit](https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit)
+- [Avalonia](https://github.com/AvaloniaUI/Avalonia)
+- [Material.Avalonia](https://github.com/AvaloniaCommunity/Material.Avalonia)
+- [CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet)
 - [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)
 - [NAudio](https://github.com/naudio/NAudio)
 - [NAudio Vorbis](https://github.com/naudio/Vorbis)
 - [OsuMemoryDataProvider](https://github.com/Piotrekol)
-- [Microsoft Windows API Code Pack](https://github.com/aybe/Windows-API-Code-Pack-1.1)
 - [Editor Reader](https://github.com/Karoo13/EditorReader)
-- [NonInvasiveKeyboardHook](https://github.com/kfirprods/NonInvasiveKeyboardHook)
+- [SharpHook](https://github.com/TolikPylypchuk/SharpHook)
 - [Overlay.NET](https://github.com/lolp1/Overlay.NET)
 - [.NET Ogg Vorbis Encoder](https://github.com/SteveLillis/.NET-Ogg-Vorbis-Encoder)
-- [Onova](https://github.com/Tyrrrz/Onova)
-- [Extended WPF Toolkit](https://github.com/xceedsoftware/wpftoolkit)
-- [VirtualizingWrapPanel](https://github.com/sbaeumlisberger/VirtualizingWrapPanel)
-
+- [Velopack](https://github.com/velopack/velopack)

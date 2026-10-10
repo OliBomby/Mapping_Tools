@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms</value>
+  </resheader>
+  <data xml:space="preserve" name="Sample_Description">
+    <value>Alat sekali jalan untuk menambahkan tag ke beatmap yang dipilih.</value>
+    <comment>Sample Plugin catalog description; the tool edits beatmap metadata tags. Keep the tool name Sample Plugin unchanged.</comment>
+  </data>
+  <data xml:space="preserve" name="Sample_SearchTerms">
+    <value>sample|plugin|example|tag|sampel|plugin|contoh|tag|penanda</value>
+    <comment>Additional Sample Plugin discovery keywords; vertical bars separate searchable terms, and canonical English keywords are retained separately.</comment>
+  </data>
+  <data xml:space="preserve" name="Sample_Help">
+    <value>Menambahkan tag yang dikonfigurasi ke beatmap yang dipilih di Mapping Tools. QuickRun menggunakan beatmap aktif di shell dan memuat ulang osu! setelah pengeditan berhasil.</value>
+    <comment>Tool-header explanation for the sample metadata-tagging plugin. Preserve Mapping Tools, QuickRun and osu!; distinguish shell-selected maps from the editor map.</comment>
+  </data>
+  <data xml:space="preserve" name="Sample_Tag">
+    <value>Tag</value>
+    <comment>Field label for a single metadata search tag appended to selected beatmaps.</comment>
+  </data>
+  <data xml:space="preserve" name="Sample_TagHelp">
+    <value>Tag tanpa spasi untuk ditambahkan ke beatmap yang dipilih.</value>
+    <comment>Tag-field tooltip; whitespace is forbidden because each tag must be one token.</comment>
+  </data>
+  <data xml:space="preserve" name="Sample_TagRequired">
+    <value>Masukkan tag.</value>
+    <comment>Required-field validation for an empty metadata tag.</comment>
+  </data>
+  <data xml:space="preserve" name="Sample_TagWhitespace">
+    <value>Tag tidak boleh berisi spasi.</value>
+    <comment>Validation rejecting whitespace within a metadata tag; actual regular-expression syntax is not translated.</comment>
+  </data>
+  <data xml:space="preserve" name="Sample_UpdatingBeatmaps">
+    <value>Memperbarui beatmap</value>
+    <comment>Progress stage while adding a metadata tag to maps; no filenames or percentages are embedded.</comment>
+  </data>
+  <data xml:space="preserve" name="Sample_AlreadyTaggedOne">
+    <value>Tag '{0}' sudah ada pada beatmap yang dipilih.</value>
+    <comment>No-change result for one selected beatmap. {0} is the user-authored tag and must remain verbatim.</comment>
+  </data>
+  <data xml:space="preserve" name="Sample_AlreadyTaggedMany">
+    <value>Tag '{0}' sudah ada pada beatmap yang dipilih.</value>
+    <comment>No-change result for multiple selected beatmaps. {0} is the user-authored tag and must remain verbatim.</comment>
+  </data>
+  <data xml:space="preserve" name="Sample_TaggedOne">
+    <value>Tag '{0}' ditambahkan ke {1} dari {2} beatmap yang dipilih.</value>
+    <comment>Result for exactly one selected beatmap. {0} is the verbatim user tag; {1} is the integer count changed; {2} is the integer count selected (one).</comment>
+  </data>
+  <data xml:space="preserve" name="Sample_TaggedMany">
+    <value>Tag '{0}' ditambahkan ke {1} dari {2} beatmap yang dipilih.</value>
+    <comment>Result for multiple selected beatmaps. {0} is the verbatim user tag; {1} is the integer count changed; {2} is the integer count selected.</comment>
+  </data>
+</root>

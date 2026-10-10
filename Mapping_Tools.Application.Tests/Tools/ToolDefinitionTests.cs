@@ -1,0 +1,64 @@
+using Mapping_Tools.Application.QuickRun.Models;
+using Mapping_Tools.Application.Tools.MapsetMerger;
+using Mapping_Tools.Application.Tools.TimingHelper;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace Mapping_Tools.Application.Tests.Tools;
+
+[TestClass]
+public sealed class ToolDefinitionTests
+{
+    [TestMethod]
+    public void ToolDefinition_TimingHelper_ExposesCanonicalMetadata()
+    {
+        // Arrange
+
+        // Act
+        var definition = TimingHelperToolDefinition.Definition;
+
+        // Assert
+        definition.Id.Should().Be("timing-helper");
+        definition.DisplayName.Should().Be("Timing Helper");
+        definition.Description.Should().Be(
+            "Adjust BPM and add redlines so selected markers become snapped.");
+        definition.SearchTerms.Should().Equal(
+            "timing",
+            "redlines",
+            "BPM",
+            "markers",
+            "beat divisors",
+            "redline",
+            "marker",
+            "beat divisor",
+            "snap",
+            "timing point");
+        definition.QuickRunTargets.Should().Be(QuickRunTargets.Always);
+    }
+
+    [TestMethod]
+    public void ToolDefinition_MapsetMerger_DeclaresNoQuickRunCommand()
+    {
+        // Arrange
+
+        // Act
+        var definition = MapsetMergerToolDefinition.Definition;
+
+        // Assert
+        definition.QuickRunTargets.Should().BeNull();
+    }
+
+    [TestMethod]
+    public void QuickRunCommand_FromToolDefinition_UsesCanonicalIdentityAndTargets()
+    {
+        // Arrange
+        var definition = TimingHelperToolDefinition.Definition;
+
+        // Act
+        QuickRunCommand command = new(definition, _ => Task.CompletedTask);
+
+        // Assert
+        command.Id.Should().Be(definition.Id);
+        command.DisplayName.Should().Be(definition.DisplayName);
+        command.Targets.Should().Be(definition.QuickRunTargets);
+    }
+}

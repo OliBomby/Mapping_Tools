@@ -1,0 +1,197 @@
+using System.ComponentModel.DataAnnotations;
+using CommunityToolkit.Mvvm.ComponentModel;
+using Mapping_Tools.Application.Execution.ToolExecution;
+using Mapping_Tools.Application.Execution.ToolExecution.Models;
+using Mapping_Tools.Application.Projects.Models;
+using Mapping_Tools.Application.Tools.SliderMerger;
+using Mapping_Tools.Application.Workspace.Contracts;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.Tools.SliderMerger.Models;
+using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Localization;
+using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Services.Undo;
+using Mapping_Tools.Desktop.Tools.SliderMerger.Models;
+using Mapping_Tools.Desktop.ViewModels;
+
+using Mapping_Tools.Application.Localization;
+
+namespace Mapping_Tools.Desktop.Tools.SliderMerger.ViewModels;
+
+/// <summary>
+///     Owns Slider Merger form state, project persistence, ordinary runs, and
+///     current-editor QuickRun routing.
+/// </summary>
+public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
+    IQuickRun,
+    IShellProjectFeature<SliderMergerProject>
+{
+    /// <inheritdoc />
+    public IProjectUndoHistory? UndoHistory { get; set; }
+
+    private readonly ISliderMergerService merger;
+    private readonly DesktopApplicationSettings settings;
+    private readonly IBeatmapWorkspace workspace;
+
+    /// <summary>
+    ///     Creates a Slider Merger presentation model.
+    /// </summary>
+    /// <param name="merger">Runs the framework-independent merge transformation.</param>
+    /// <param name="execution">Coordinates background execution, cancellation, and reload.</param>
+    /// <param name="workspace">Supplies the shell's selected beatmap paths.</param>
+    /// <param name="settings">Supplies the legacy Always QuickRun preference.</param>
+    public SliderMergerViewModel(
+        ISliderMergerService merger,
+        IToolExecutionService execution,
+        IBeatmapWorkspace workspace,
+        DesktopApplicationSettings settings)
+        : base(execution, SliderMergerToolDefinition.Definition)
+    {
+        this.merger = merger ?? throw new ArgumentNullException(nameof(merger));
+        this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+    }
+
+    /// <summary>Gets the import modes in their legacy display order.</summary>
+    public IReadOnlyList<HitObjectSelectionMode> ImportModes { get; } =
+        Enum.GetValues<HitObjectSelectionMode>();
+
+    /// <summary>Gets the path connection modes in display order.</summary>
+    public IReadOnlyList<SliderMergerConnectionMode> ConnectionModes { get; } =
+        Enum.GetValues<SliderMergerConnectionMode>();
+
+    /// <summary>Gets or sets the source-object import mode.</summary>
+    [ObservableProperty]
+    [Undoable]
+    [NotifyPropertyChangedFor(nameof(TimeCodeVisible))]
+    public partial HitObjectSelectionMode ImportModeSetting { get; set; } = HitObjectSelectionMode.Selected;
+
+    /// <summary>Gets or sets the legacy time-code query.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial string TimeCode { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets how adjacent paths are joined.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial SliderMergerConnectionMode ConnectionModeSetting { get; set; } =
+        SliderMergerConnectionMode.Move;
+
+    /// <summary>Gets or sets the non-negative object connection tolerance in osu! pixels.</summary>
+    [ObservableProperty]
+    [Undoable]
+    [NotifyDataErrorInfo]
+    [Range(0, double.MaxValue, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.SliderMerger_Validation_FiniteNonNegativeLeniency))]
+    public partial double Leniency { get; set; } = 256;
+
+    /// <summary>Gets or sets whether a fully linear merge uses the linear path type.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool LinearOnLinear { get; set; }
+
+    /// <summary>Gets or sets whether matching uses a slider's playable end.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool MergeOnSliderEnd { get; set; } = true;
+
+    /// <summary>Gets whether the time-code field is visible for Time import mode.</summary>
+    public bool TimeCodeVisible => ImportModeSetting == HitObjectSelectionMode.Time;
+
+    /// <inheritdoc />
+    public async Task RunQuickAsync(CancellationToken cancellationToken)
+    {
+        string path = await workspace
+            .ResolveQuickRunBeatmapAsync(cancellationToken: cancellationToken);
+        await RunWithStateAsync(() => RunPathsAsync(
+            [path],
+            true,
+            cancellationToken));
+    }
+
+    ProjectDefinition<SliderMergerProject> IShellProjectFeature<SliderMergerProject>.ProjectDefinition { get; } = new(
+        "slidermergerproject.json",
+        "Slider Merger Projects",
+        static () => new SliderMergerProject(),
+        "slider-merger-project.json",
+        ToolConfigSchema.ForTool(SliderMergerToolDefinition.Definition.Id));
+
+    SliderMergerProject IShellProjectFeature<SliderMergerProject>.Snapshot()
+    {
+        return Snapshot();
+    }
+
+    void IShellProjectFeature<SliderMergerProject>.Install(SliderMergerProject project)
+    {
+        Install(project);
+    }
+
+    /// <inheritdoc />
+    protected override async Task RunCoreAsync()
+    {
+        IReadOnlyList<string> paths = ImportModeSetting == HitObjectSelectionMode.Selected
+            ? [await workspace.ResolveQuickRunBeatmapAsync()]
+            : workspace.SelectedPaths;
+        await RunPathsAsync(
+            paths,
+            settings.AlwaysQuickRun,
+            CancellationToken.None);
+    }
+
+    private async Task RunPathsAsync(
+        IReadOnlyList<string> paths,
+        bool quick,
+        CancellationToken cancellationToken)
+    {
+        if (paths.Count == 0) return;
+
+        var options = Snapshot();
+        await Execution.ExecuteAsync(
+                new ToolExecutionRequest<SliderMergerResult>(
+                Tool.Id,
+                Tool.DisplayName,
+                    async context =>
+                    {
+                        var result = await merger.MergeAsync(
+                            paths,
+                            options,
+                            quick,
+                            new Progress<double>(value => context.ReportProgress(
+                                value,
+                                DesktopStrings.SliderMerger_Merging)),
+                            context.CancellationToken);
+                        string message = result.ObjectsMerged == 1
+                            ? ApplicationText.Format(DesktopStrings.SliderMerger_ResultOne, result.ObjectsMerged)
+                            : ApplicationText.Format(DesktopStrings.SliderMerger_ResultMany, result.ObjectsMerged);
+                        return new ToolExecutionOutput<SliderMergerResult>(
+                            result,
+                            message);
+                    }),
+                CreateProgress(),
+                cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    private SliderMergerProject Snapshot()
+    {
+        return new SliderMergerProject
+        {
+            ImportModeSetting = ImportModeSetting,
+            TimeCode = TimeCode,
+            ConnectionModeSetting = ConnectionModeSetting,
+            Leniency = Leniency,
+            LinearOnLinear = LinearOnLinear,
+            MergeOnSliderEnd = MergeOnSliderEnd,
+        };
+    }
+
+    private void Install(SliderMergerProject project)
+    {
+        ArgumentNullException.ThrowIfNull(project);
+        ImportModeSetting = project.ImportModeSetting;
+        TimeCode = project.TimeCode;
+        ConnectionModeSetting = project.ConnectionModeSetting;
+        Leniency = project.Leniency;
+        LinearOnLinear = project.LinearOnLinear;
+        MergeOnSliderEnd = project.MergeOnSliderEnd;
+    }
+}

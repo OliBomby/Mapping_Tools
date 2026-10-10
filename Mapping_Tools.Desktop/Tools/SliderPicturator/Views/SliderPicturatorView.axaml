@@ -1,0 +1,169 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
+             xmlns:vm="using:Mapping_Tools.Desktop.Tools.SliderPicturator.ViewModels"
+             xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             x:Class="Mapping_Tools.Desktop.Tools.SliderPicturator.Views.SliderPicturatorView"
+             x:DataType="vm:SliderPicturatorViewModel">
+    <Grid RowDefinitions="*,Auto">
+        <Grid>
+            <StackPanel>
+                <StackPanel>
+                    <controls:ToolViewHeader
+                    Title="{loc:Tr SliderPicturator_Title}"
+                        IsQuickRunSupported="True"
+                    HelpText="{loc:Tr SliderPicturator_Help}" />
+
+                    <StackPanel Orientation="Horizontal" Width="531" Height="40" HorizontalAlignment="Left">
+                        <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Text="{loc:Tr SliderPicturator_CurrentFile}" />
+                        <TextBlock Margin="5,0,0,0" Width="300" VerticalAlignment="Center" Text="{Binding PictureFile}"
+                                   TextTrimming="CharacterEllipsis" />
+                        <Button Margin="5,0,0,0" MinWidth="100" Height="32" Content="{loc:Tr SliderPicturator_Browse}"
+                                Command="{Binding BrowseCommand}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel MinWidth="350" HorizontalAlignment="Left">
+                        <StackPanel Margin="15,0,0,0" HorizontalAlignment="Left">
+                            <ComboBox MinWidth="100" HorizontalAlignment="Left" Cursor="Hand"
+                                      ItemsSource="{Binding ViewportSizes}" SelectedItem="{Binding ViewportSize}"
+                                      materialAssists:ComboBoxAssist.Label="{loc:Tr SliderPicturator_ViewportSize}"
+                                      ToolTip.Tip="{loc:Tr SliderPicturator_ViewportSizeTip}" />
+
+                            <Grid ColumnDefinitions="Auto,Auto,Auto" Margin="0,10,0,0">
+                                <TextBox Grid.Column="0" MinWidth="75"
+                                         Margin="0, 0, 5, 0"
+                                         Text="{Binding TimeCode, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}"
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr SliderPicturator_Time}"
+                                         ToolTip.Tip="{loc:Tr SliderPicturator_TimeTip}" />
+
+                                <TextBox Grid.Column="1" MinWidth="75"
+                                         Margin="5, 0"
+                                         Text="{Binding Duration, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}"
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr SliderPicturator_Duration}"
+                                         ToolTip.Tip="{loc:Tr SliderPicturator_DurationTip}" />
+
+                                <TextBox Grid.Column="2" MinWidth="75"
+                                         Margin="5, 0"
+                                         Text="{Binding YResolution, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}"
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr SliderPicturator_YResolution}"
+                                         ToolTip.Tip="{loc:Tr SliderPicturator_YResolutionTip}" />
+                            </Grid>
+
+                            <Grid Margin="0,10,0,0" ColumnDefinitions="Auto,Auto,Auto" RowDefinitions="Auto, Auto">
+                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,15,5,0" VerticalAlignment="Center"
+                                           Text="{loc:Tr SliderPicturator_SliderPosition}" />
+                                <TextBox Grid.Row="0" Grid.Column="1" MinWidth="75"
+                                         Margin="5, 0"
+                                         Text="{Binding SliderStartX, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}"
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr SliderPicturator_XPosition}"
+                                         ToolTip.Tip="{loc:Tr SliderPicturator_SliderHeadXTip}" />
+
+                                <TextBox Grid.Row="0" Grid.Column="2" MinWidth="75"
+                                         Margin="5, 0"
+                                         Text="{Binding SliderStartY, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}"
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr SliderPicturator_YPosition}"
+                                         ToolTip.Tip="{loc:Tr SliderPicturator_SliderHeadYTip}" />
+
+                                <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,15,5,0" VerticalAlignment="Center"
+                                           Text="{loc:Tr SliderPicturator_ImagePosition}" />
+                                <TextBox Grid.Row="1" Grid.Column="1" MinWidth="75"
+                                         Margin="5, 0"
+                                         Text="{Binding ImageStartX, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}"
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr SliderPicturator_XPosition}"
+                                         ToolTip.Tip="{loc:Tr SliderPicturator_ImageTopLeftXTip}" />
+
+                                <TextBox Grid.Row="1" Grid.Column="2" MinWidth="75"
+                                         Margin="5, 0"
+                                         Text="{Binding ImageStartY, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}"
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr SliderPicturator_YPosition}"
+                                         ToolTip.Tip="{loc:Tr SliderPicturator_ImageTopLeftYTip}" />
+                            </Grid>
+
+                            <Grid Margin="0,20,0,0" RowDefinitions="Auto,40,40" ColumnDefinitions="Auto,*">
+                                <CheckBox Grid.Row="0" Grid.ColumnSpan="2" Content="{loc:Tr SliderPicturator_UseMapComboColors}"
+                                          Margin="0, 0, 0, 5"
+                                          IsChecked="{Binding UseMapComboColors}"
+                                          ToolTip.Tip="{loc:Tr SliderPicturator_UseMapComboColorsTip}" />
+
+                                <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Text="{loc:Tr SliderPicturator_TrackColor}" />
+                                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal"
+                                            HorizontalAlignment="Left">
+                                    <ComboBox Width="106" Margin="10,0,15,0" Cursor="Hand"
+                                              IsVisible="{Binding ShouldShowCcPicker}"
+                                              ItemsSource="{Binding AvailableColors}"
+                                              SelectedItem="{Binding ComboColor}"
+                                              materialAssists:ComboBoxAssist.Label="{loc:Tr SliderPicturator_TrackColor}"
+                                              ToolTip.Tip="{loc:Tr SliderPicturator_ComboColorTip}" />
+                                    <Rectangle Width="30" Height="30" IsVisible="{Binding ShouldShowCcPicker}"
+                                               Fill="{Binding ComboColor, Converter={StaticResource RgbaColourToAvaloniaBrushConverter}}" />
+                                </StackPanel>
+                                <ColorPicker Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left"
+                                             Margin="10,3,0,3" IsVisible="{Binding ShouldShowPalette}"
+                                             Color="{Binding TrackColorPickerColor, Mode=TwoWay, Converter={StaticResource RgbaColourToAvaloniaColorConverter}}"
+                                             ToolTip.Tip="{loc:Tr SliderPicturator_TrackColorTip}" />
+
+                                <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Text="{loc:Tr SliderPicturator_BorderColor}" />
+                                <ColorPicker Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left"
+                                             Margin="10,3,0,3"
+                                             Color="{Binding BorderColor, Mode=TwoWay, Converter={StaticResource RgbaColourToAvaloniaColorConverter}}"
+                                             ToolTip.Tip="{loc:Tr SliderPicturator_BorderColorTip}" />
+                            </Grid>
+                        </StackPanel>
+
+                        <CheckBox Margin="0,20,0,0" Content="{loc:Tr SliderPicturator_TransparentBlack}" IsChecked="{Binding BlackOn}"
+                                  ToolTip.Tip="{loc:Tr SliderPicturator_TransparentBlackTip}" />
+                        <CheckBox Content="{loc:Tr SliderPicturator_UseBorderColor}" IsChecked="{Binding BorderOn}"
+                                  ToolTip.Tip="{loc:Tr SliderPicturator_UseBorderColorTip}" />
+                        <CheckBox Content="{loc:Tr SliderPicturator_UseImageR}" IsChecked="{Binding RedOn}"
+                                  ToolTip.Tip="{loc:Tr SliderPicturator_UseImageRTip}" />
+                        <CheckBox Content="{loc:Tr SliderPicturator_UseImageG}" IsChecked="{Binding GreenOn}"
+                                  ToolTip.Tip="{loc:Tr SliderPicturator_UseImageGTip}" />
+                        <CheckBox Content="{loc:Tr SliderPicturator_UseImageB}" IsChecked="{Binding BlueOn}"
+                                  ToolTip.Tip="{loc:Tr SliderPicturator_UseImageBTip}" />
+                        <CheckBox Content="{loc:Tr SliderPicturator_UseImageA}" IsChecked="{Binding AlphaOn}"
+                                  ToolTip.Tip="{loc:Tr SliderPicturator_UseImageATip}" />
+                        <CheckBox Content="{loc:Tr SliderPicturator_SetBeatmapColors}" IsChecked="{Binding SetBeatmapColors}"
+                                  ToolTip.Tip="{loc:Tr SliderPicturator_SetBeatmapColorsTip}" />
+                        <Slider Value="{Binding Quality}"
+                                Margin="5,15,15,15" Minimum="1" Maximum="101"
+                                Classes="Discrete"
+                                TickPlacement="BottomRight"
+                                TickFrequency="10" IsSnapToTickEnabled="True" ToolTip.Tip="{loc:Tr SliderPicturator_ImageQuality}" />
+                        <TextBlock Margin="5" Text="{Binding SegmentCountLabel}"
+                                   ToolTip.Tip="{loc:Tr SliderPicturator_SegmentCountTip}" />
+                        <StackPanel Orientation="Horizontal">
+                            <Button Margin="5" Content="{loc:Tr SliderPicturator_RemoveSlider}" Command="{Binding RemoveCommand}"
+                                    ToolTip.Tip="{loc:Tr SliderPicturator_RemoveSliderTip}" />
+                            <Button Margin="5" Content="{loc:Tr SliderPicturator_ImportSlider}" Command="{Binding ImportCommand}"
+                                    ToolTip.Tip="{loc:Tr SliderPicturator_ImportSliderTip}" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel>
+                        <Image Width="440"
+                               Margin="10"
+                               Source="{Binding PreviewImage}" Stretch="Uniform"
+                               HorizontalAlignment="Left" VerticalAlignment="Top"
+                               RenderOptions.BitmapInterpolationMode="None" />
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+            <controls:ToolRunButton Margin="10" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                    RunCommand="{Binding RunCommand}" />
+        </Grid>
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap" FontWeight="Bold" Opacity="0.58" Text="{loc:Tr SliderPicturator_MadeBy}" />
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <controls:ToolProgressBar Height="20" Margin="20,0,20,0" Background="{x:Null}" BorderBrush="{x:Null}"
+                                          Maximum="100" Value="{Binding Progress}" />
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

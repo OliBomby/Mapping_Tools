@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms</value>
+  </resheader>
+  <data xml:space="preserve" name="Sample_Description">
+    <value>선택한 비트맵에 태그를 추가하는 한 번 실행 도구입니다.</value>
+    <comment>Sample Plugin catalog description; the tool edits beatmap metadata tags. Keep the tool name Sample Plugin unchanged.</comment>
+  </data>
+  <data xml:space="preserve" name="Sample_SearchTerms">
+    <value>sample|plugin|example|tag|샘플|플러그인|예시|태그</value>
+    <comment>Additional Sample Plugin discovery keywords; vertical bars separate searchable terms, and canonical English keywords are retained separately.</comment>
+  </data>
+  <data xml:space="preserve" name="Sample_Help">
+    <value>Mapping Tools에서 선택한 비트맵에 설정한 태그를 추가합니다. QuickRun은 셸의 현재 비트맵을 사용하며, 편집이 성공하면 osu!를 다시 불러옵니다.</value>
+    <comment>Tool-header explanation for the sample metadata-tagging plugin. Preserve Mapping Tools, QuickRun and osu!; distinguish shell-selected maps from the editor map.</comment>
+  </data>
+  <data xml:space="preserve" name="Sample_Tag">
+    <value>태그</value>
+    <comment>Field label for a single metadata search tag appended to selected beatmaps.</comment>
+  </data>
+  <data xml:space="preserve" name="Sample_TagHelp">
+    <value>선택한 비트맵에 추가할 공백 없는 태그입니다.</value>
+    <comment>Tag-field tooltip; whitespace is forbidden because each tag must be one token.</comment>
+  </data>
+  <data xml:space="preserve" name="Sample_TagRequired">
+    <value>태그를 입력하세요.</value>
+    <comment>Required-field validation for an empty metadata tag.</comment>
+  </data>
+  <data xml:space="preserve" name="Sample_TagWhitespace">
+    <value>태그에 공백을 포함할 수 없습니다.</value>
+    <comment>Validation rejecting whitespace within a metadata tag; actual regular-expression syntax is not translated.</comment>
+  </data>
+  <data xml:space="preserve" name="Sample_UpdatingBeatmaps">
+    <value>비트맵 업데이트 중</value>
+    <comment>Progress stage while adding a metadata tag to maps; no filenames or percentages are embedded.</comment>
+  </data>
+  <data xml:space="preserve" name="Sample_AlreadyTaggedOne">
+    <value>선택한 비트맵에 &apos;{0}&apos; 태그가 이미 있습니다.</value>
+    <comment>No-change result for one selected beatmap. {0} is the user-authored tag and must remain verbatim.</comment>
+  </data>
+  <data xml:space="preserve" name="Sample_AlreadyTaggedMany">
+    <value>선택한 비트맵에 &apos;{0}&apos; 태그가 이미 있습니다.</value>
+    <comment>No-change result for multiple selected beatmaps. {0} is the user-authored tag and must remain verbatim.</comment>
+  </data>
+  <data xml:space="preserve" name="Sample_TaggedOne">
+    <value>선택한 비트맵 {2}개 중 {1}개에 &apos;{0}&apos; 태그를 추가했습니다.</value>
+    <comment>Result for exactly one selected beatmap. {0} is the verbatim user tag; {1} is the integer count changed; {2} is the integer count selected (one).</comment>
+  </data>
+  <data xml:space="preserve" name="Sample_TaggedMany">
+    <value>선택한 비트맵 {2}개 중 {1}개에 &apos;{0}&apos; 태그를 추가했습니다.</value>
+    <comment>Result for multiple selected beatmaps. {0} is the verbatim user tag; {1} is the integer count changed; {2} is the integer count selected.</comment>
+  </data>
+</root>

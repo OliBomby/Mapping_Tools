@@ -1,0 +1,18 @@
+{
+  "$type": "Mapping_Tools.Viewmodels.TimingCopierVm, Mapping Tools",
+  "ImportPath": "{fixtureRoot}\\Beatmaps\\standard-feature-rich.osu",
+  "ExportPath": "{fixtureRoot}\\Beatmaps\\ComplicatedTestMap.osu",
+  "ResnapMode": "Just resnap",
+  "BeatDivisors": [
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 3
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 4
+    }
+  ]
+}

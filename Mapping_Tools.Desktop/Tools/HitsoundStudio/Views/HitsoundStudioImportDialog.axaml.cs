@@ -1,0 +1,15 @@
+using Avalonia.Controls;
+using Mapping_Tools.Desktop.Services.Undo;
+
+namespace Mapping_Tools.Desktop.Tools.HitsoundStudio.Views;
+
+/// <summary>Hosts the typed Hitsound Studio layer import form in its own window.</summary>
+public sealed partial class HitsoundStudioImportDialog : Window
+{
+    /// <summary>Creates the import form.</summary>
+    public HitsoundStudioImportDialog()
+    {
+        InitializeComponent();
+        ProjectUndoWindowInput.AttachDialog(this);
+    }
+}

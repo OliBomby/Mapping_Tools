@@ -1,0 +1,270 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using Mapping_Tools.Desktop.Services.Undo;
+using Mapping_Tools.Core.Graph;
+using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.Tools.TumourGenerator.Models;
+using Mapping_Tools.Core.Tools.TumourGenerator.Templates;
+using Mapping_Tools.Desktop.Converters;
+
+namespace Mapping_Tools.Desktop.Tools.TumourGenerator.ViewModels.Adapters;
+
+/// <summary>Adapts one plain tumour layer for Desktop editing and preview refresh.</summary>
+public sealed partial class ObservableTumourLayer : ObservableObject
+{
+    /// <summary>Creates an adapter around the supplied plain layer.</summary>
+    /// <param name="model">The domain layer edited by this adapter.</param>
+    public ObservableTumourLayer(TumourLayer model)
+    {
+        Model = model ?? throw new ArgumentNullException(nameof(model));
+        TumourTemplateEnum = model.TumourTemplateEnum;
+        WrappingMode = model.WrappingMode;
+        TumourSidedness = model.TumourSidedness;
+        TumourLength = model.TumourLength;
+        TumourScale = model.TumourScale;
+        TumourRotation = model.TumourRotation;
+        TumourParameter = model.TumourParameter;
+        TumourDistance = model.TumourDistance;
+        TumourCount = model.TumourCount;
+        TumourStart = model.TumourStart;
+        TumourEnd = model.TumourEnd;
+        RandomSeed = model.RandomSeed;
+        Recalculate = model.Recalculate;
+        UseAbsoluteRange = model.UseAbsoluteRange;
+        IsActive = model.IsActive;
+        Name = model.Name;
+    }
+
+    /// <summary>Gets the plain layer represented by this adapter.</summary>
+    public TumourLayer Model { get; }
+
+    /// <summary>Gets or sets the selected geometric template.</summary>
+    [ObservableProperty]
+    [Undoable]
+    [NotifyPropertyChangedFor(nameof(TumourTemplate))]
+    public partial TumourTemplate TumourTemplateEnum { get; set; }
+
+    /// <summary>Gets the configured template instance for the selected enum.</summary>
+    public ITumourTemplate TumourTemplate => Model.TumourTemplate;
+
+    /// <summary>Gets or sets how the tumour follows the slider path.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial WrappingMode WrappingMode { get; set; }
+
+    /// <summary>Gets or sets the side-selection policy.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial TumourSidedness TumourSidedness { get; set; }
+
+    /// <summary>Gets or sets the graph controlling tumour length.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial GraphState TumourLength { get; set; }
+
+    /// <summary>Gets or sets the graph controlling tumour scale.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial GraphState TumourScale { get; set; }
+
+    /// <summary>Gets or sets the graph controlling tumour rotation.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial GraphState TumourRotation { get; set; }
+
+    /// <summary>Gets or sets the graph controlling the template parameter.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial GraphState TumourParameter { get; set; }
+
+    /// <summary>Gets or sets the graph controlling tumour spacing.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial GraphState TumourDistance { get; set; }
+
+    /// <summary>Gets or sets the scalar projection used by the compact scale slider.</summary>
+    public double TumourScaleValue
+    {
+        get => GraphStateToDoubleConverter.GetScalarValue(TumourScale);
+        set
+        {
+            if (!Precision.AlmostEquals(GraphStateToDoubleConverter.GetScalarValue(TumourScale), value))
+                TumourScale = GraphStateTextCodec.CreateConstant(value);
+        }
+    }
+
+    /// <summary>Gets or sets the scalar projection used by the compact length slider.</summary>
+    public double TumourLengthValue
+    {
+        get => GraphStateToDoubleConverter.GetScalarValue(TumourLength);
+        set
+        {
+            if (!Precision.AlmostEquals(GraphStateToDoubleConverter.GetScalarValue(TumourLength), value))
+                TumourLength = GraphStateTextCodec.CreateConstant(value);
+        }
+    }
+
+    /// <summary>Gets or sets the scalar projection used by the compact rotation slider.</summary>
+    public double TumourRotationValue
+    {
+        get => GraphStateToDoubleConverter.GetScalarValue(TumourRotation);
+        set
+        {
+            if (!Precision.AlmostEquals(GraphStateToDoubleConverter.GetScalarValue(TumourRotation), value))
+                TumourRotation = GraphStateTextCodec.CreateConstant(value);
+        }
+    }
+
+    /// <summary>Gets or sets the scalar projection used by the compact parameter slider.</summary>
+    public double TumourParameterValue
+    {
+        get => GraphStateToDoubleConverter.GetScalarValue(TumourParameter);
+        set
+        {
+            if (!Precision.AlmostEquals(GraphStateToDoubleConverter.GetScalarValue(TumourParameter), value))
+                TumourParameter = GraphStateTextCodec.CreateConstant(value);
+        }
+    }
+
+    /// <summary>Gets or sets the scalar projection used by the compact distance slider.</summary>
+    public double TumourDistanceValue
+    {
+        get => GraphStateToDoubleConverter.GetScalarValue(TumourDistance);
+        set
+        {
+            if (!Precision.AlmostEquals(GraphStateToDoubleConverter.GetScalarValue(TumourDistance), value))
+                TumourDistance = GraphStateTextCodec.CreateConstant(value);
+        }
+    }
+
+    /// <summary>Gets or sets the explicit tumour count.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial int TumourCount { get; set; }
+
+    /// <summary>Gets or sets the sequence start.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial double TumourStart { get; set; }
+
+    /// <summary>Gets or sets the sequence end.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial double TumourEnd { get; set; }
+
+    /// <summary>Gets or sets the deterministic random-side seed.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial int RandomSeed { get; set; }
+
+    /// <summary>Gets or sets whether the path is recalculated before placement.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool Recalculate { get; set; }
+
+    /// <summary>Gets or sets whether range and shape values are absolute pixels.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool UseAbsoluteRange { get; set; }
+
+    /// <summary>Gets or sets whether this layer participates in generation.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool IsActive { get; set; }
+
+    /// <summary>Gets or sets the user-facing layer name.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial string Name { get; set; }
+
+    /// <summary>Creates a plain snapshot for an Application service.</summary>
+    /// <returns>An independently mutable copy of this layer.</returns>
+    public TumourLayer Snapshot()
+    {
+        return Model.Copy();
+    }
+
+    partial void OnTumourTemplateEnumChanged(TumourTemplate value)
+    {
+        Model.TumourTemplateEnum = value;
+    }
+
+    partial void OnWrappingModeChanged(WrappingMode value)
+    {
+        Model.WrappingMode = value;
+    }
+
+    partial void OnTumourSidednessChanged(TumourSidedness value)
+    {
+        Model.TumourSidedness = value;
+    }
+
+    partial void OnTumourLengthChanged(GraphState value)
+    {
+        Model.TumourLength = value;
+        OnPropertyChanged(nameof(TumourLengthValue));
+    }
+
+    partial void OnTumourScaleChanged(GraphState value)
+    {
+        Model.TumourScale = value;
+        OnPropertyChanged(nameof(TumourScaleValue));
+    }
+
+    partial void OnTumourRotationChanged(GraphState value)
+    {
+        Model.TumourRotation = value;
+        OnPropertyChanged(nameof(TumourRotationValue));
+    }
+
+    partial void OnTumourParameterChanged(GraphState value)
+    {
+        Model.TumourParameter = value;
+        OnPropertyChanged(nameof(TumourParameterValue));
+    }
+
+    partial void OnTumourDistanceChanged(GraphState value)
+    {
+        Model.TumourDistance = value;
+        OnPropertyChanged(nameof(TumourDistanceValue));
+    }
+
+    partial void OnTumourCountChanged(int value)
+    {
+        Model.TumourCount = value;
+    }
+
+    partial void OnTumourStartChanged(double value)
+    {
+        Model.TumourStart = value;
+    }
+
+    partial void OnTumourEndChanged(double value)
+    {
+        Model.TumourEnd = value;
+    }
+
+    partial void OnRandomSeedChanged(int value)
+    {
+        Model.RandomSeed = value;
+    }
+
+    partial void OnRecalculateChanged(bool value)
+    {
+        Model.Recalculate = value;
+    }
+
+    partial void OnUseAbsoluteRangeChanged(bool value)
+    {
+        Model.UseAbsoluteRange = value;
+    }
+
+    partial void OnIsActiveChanged(bool value)
+    {
+        Model.IsActive = value;
+    }
+
+    partial void OnNameChanged(string value)
+    {
+        Model.Name = value;
+    }
+}

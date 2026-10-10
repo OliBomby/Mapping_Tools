@@ -1,0 +1,170 @@
+using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.Settings.Models;
+using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject;
+using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators;
+
+namespace Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
+
+/// <summary>Stores the persistent appearance and input settings of one dashboard.</summary>
+public sealed class GeometryDashboardPreferences : ICloneable
+{
+    /// <summary>Creates the default Geometry Dashboard settings.</summary>
+    public GeometryDashboardPreferences()
+    {
+        RelevantObjectPreferences = new Dictionary<string, RelevantObjectPreferences>
+        {
+            [RelevantPoint.PreferencesNameStatic] = new()
+            {
+                Color = RgbaColour.FromArgb(255, 0, 255, 255),
+                Dashstyle = DashStylesEnum.Solid,
+                Opacity = 0.8,
+                Size = 5,
+                Thickness = 3,
+            },
+            [RelevantLine.PreferencesNameStatic] = new()
+            {
+                Color = RgbaColour.FromArgb(255, 124, 252, 0),
+                Dashstyle = DashStylesEnum.Dash,
+                Opacity = 0.8,
+                Thickness = 3,
+            },
+            [RelevantCircle.PreferencesNameStatic] = new()
+            {
+                Color = RgbaColour.FromArgb(255, 255, 0, 0),
+                Dashstyle = DashStylesEnum.Dash,
+                Opacity = 0.8,
+                Thickness = 3,
+            },
+        };
+
+        GeneratorSettings = new Dictionary<Type, GeneratorSettings>();
+        SnapHotkey = new HotkeySettings(56, 0);
+        SelectHotkey = new HotkeySettings(57, 0);
+        LockHotkey = new HotkeySettings(57, 4);
+        InheritHotkey = new HotkeySettings(57, 1);
+        RefreshHotkey = new HotkeySettings(45, 0);
+        AcceptableDifference = 2;
+        KeyDownViewMode = ViewMode.Parents;
+        KeyUpViewMode = ViewMode.Everything;
+        SelectedHitObjectMode = SelectedHitObjectMode.AllwaysAllVisible;
+        UpdateMode = UpdateMode.TimeChange;
+        InceptionLevel = 5;
+    }
+
+    /// <summary>Gets or sets appearance settings by stable preference-group name.</summary>
+    public Dictionary<string, RelevantObjectPreferences> RelevantObjectPreferences { get; set; }
+
+    /// <summary>Gets or sets generator settings keyed by concrete generator type.</summary>
+    public Dictionary<Type, GeneratorSettings> GeneratorSettings { get; set; }
+
+    /// <summary>Gets or sets the activation/snap key.</summary>
+    public HotkeySettings? SnapHotkey { get; set; }
+
+    /// <summary>Gets or sets the selection key.</summary>
+    public HotkeySettings? SelectHotkey { get; set; }
+
+    /// <summary>Gets or sets the lock/unlock key.</summary>
+    public HotkeySettings? LockHotkey { get; set; }
+
+    /// <summary>Gets or sets the inheritability key.</summary>
+    public HotkeySettings? InheritHotkey { get; set; }
+
+    /// <summary>Gets or sets the refresh key.</summary>
+    public HotkeySettings? RefreshHotkey { get; set; }
+
+    /// <summary>Gets or sets the left editor-box correction in pixels.</summary>
+    public double OffsetLeft { get; set; }
+
+    /// <summary>Gets or sets the top editor-box correction in pixels.</summary>
+    public double OffsetTop { get; set; }
+
+    /// <summary>Gets or sets the right editor-box correction in pixels.</summary>
+    public double OffsetRight { get; set; }
+
+    /// <summary>Gets or sets the bottom editor-box correction in pixels.</summary>
+    public double OffsetBottom { get; set; }
+
+    /// <summary>Gets the four stored editor-box corrections as a box.</summary>
+    public Box2 OverlayOffset => new(OffsetLeft, OffsetTop, OffsetRight, OffsetBottom);
+
+    /// <summary>Gets or sets the duplicate-distance tolerance in editor pixels.</summary>
+    public double AcceptableDifference { get; set; }
+
+    /// <summary>Gets or sets whether the osu! playfield boundary is displayed.</summary>
+    public bool VisiblePlayfieldBoundary { get; set; }
+
+    /// <summary>Gets or sets whether platform debugging visuals are enabled.</summary>
+    public bool DebugEnabled { get; set; }
+
+    /// <summary>Gets or sets the graph shown while the snap key is down.</summary>
+    public ViewMode KeyDownViewMode { get; set; }
+
+    /// <summary>Gets or sets the graph shown while the snap key is up.</summary>
+    public ViewMode KeyUpViewMode { get; set; }
+
+    /// <summary>Gets or sets the rule for selecting root hit objects.</summary>
+    public SelectedHitObjectMode SelectedHitObjectMode { get; set; }
+
+    /// <summary>Gets or sets the refresh trigger.</summary>
+    public UpdateMode UpdateMode { get; set; }
+
+    /// <summary>Gets or sets the number of generated layers, including the root layer.</summary>
+    public int InceptionLevel { get; set; }
+
+    /// <inheritdoc />
+    public object Clone()
+    {
+        var clone = (GeometryDashboardPreferences)MemberwiseClone();
+        clone.GeneratorSettings = new Dictionary<Type, GeneratorSettings>();
+        foreach (var (key, value) in GeneratorSettings) clone.GeneratorSettings.Add(key, (GeneratorSettings)value.Clone());
+
+        clone.RelevantObjectPreferences = new Dictionary<string, RelevantObjectPreferences>();
+        foreach ((string key, var value) in RelevantObjectPreferences) clone.RelevantObjectPreferences.Add(key, (RelevantObjectPreferences)value.Clone());
+
+        clone.SnapHotkey = CloneHotkey(SnapHotkey);
+        clone.SelectHotkey = CloneHotkey(SelectHotkey);
+        clone.LockHotkey = CloneHotkey(LockHotkey);
+        clone.InheritHotkey = CloneHotkey(InheritHotkey);
+        clone.RefreshHotkey = CloneHotkey(RefreshHotkey);
+
+        return clone;
+    }
+
+    /// <summary>Gets a configured preference group or a new empty fallback.</summary>
+    /// <param name="input">The preference-group name.</param>
+    /// <returns>The stored preferences or a default empty instance.</returns>
+    public RelevantObjectPreferences GetReleventObjectPreferences(string input)
+    {
+        return RelevantObjectPreferences.TryGetValue(input, out var output)
+            ? output
+            : new RelevantObjectPreferences();
+    }
+
+    /// <summary>Copies saved settings into the supplied generator instances.</summary>
+    /// <param name="generators">The live generators to configure.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="generators" /> is <see langword="null" />.</exception>
+    public void ApplyGeneratorSettings(IEnumerable<RelevantObjectsGenerator> generators)
+    {
+        ArgumentNullException.ThrowIfNull(generators);
+
+        foreach (var generator in generators)
+            if (GeneratorSettings.TryGetValue(generator.GetType(), out var settings))
+                settings.CopyTo(generator.Settings);
+    }
+
+    /// <summary>Stores each live generator's settings under its concrete type.</summary>
+    /// <param name="generators">The live generators to snapshot.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="generators" /> is <see langword="null" />.</exception>
+    public void SaveGeneratorSettings(IEnumerable<RelevantObjectsGenerator> generators)
+    {
+        ArgumentNullException.ThrowIfNull(generators);
+
+        foreach (var generator in generators) GeneratorSettings[generator.GetType()] = generator.Settings;
+    }
+
+    private static HotkeySettings? CloneHotkey(HotkeySettings? hotkey)
+    {
+        return hotkey is null ? null : hotkey with { };
+    }
+}

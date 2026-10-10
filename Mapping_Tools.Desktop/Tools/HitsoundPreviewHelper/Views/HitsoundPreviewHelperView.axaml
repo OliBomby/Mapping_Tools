@@ -1,0 +1,134 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.ViewModels"
+             xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
+             x:Name="Root"
+             x:Class="Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.Views.HitsoundPreviewHelperView"
+             x:DataType="vm:HitsoundPreviewHelperViewModel">
+    <UserControl.Resources>
+        <DataTemplate x:Key="TranslatedSampleSetTemplate">
+            <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
+        </DataTemplate>
+    </UserControl.Resources>
+    <Grid RowDefinitions="*,Auto">
+        <Grid>
+            <Grid RowDefinitions="Auto,*,Auto">
+                <controls:ToolViewHeader Grid.Row="0"
+                                         Title="Hitsound Preview Helper"
+                                         IsQuickRunSupported="True"
+                                         HelpText="{loc:Tr HitsoundPreviewHelper_Help}" />
+
+                <DataGrid Grid.Row="1"
+                          Margin="0,18,0,50"
+                          ItemsSource="{Binding Items}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="False"
+                          EditTriggers="CellClick"
+                          CanUserAddRows="False"
+                          CanUserResizeColumns="True"
+                          CanUserSortColumns="True"
+                          SelectionMode="Extended"
+                          PointerReleased="DataGridPointerReleased"
+                          UseLogicalScrollable="True"
+                          GridLinesVisibility="Horizontal"
+                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <DataGrid.Styles>
+                        <Style Selector="DataGridRow">
+                            <Setter Property="IsSelected"
+                                    Value="{ReflectionBinding IsSelected, Mode=TwoWay}" />
+                        </Style>
+                    </DataGrid.Styles>
+                    <DataGrid.Columns>
+                        <controls:CompactDataGridTextColumn Header="{loc:Tr HitsoundPreviewHelper_ZoneName}"
+                                                            Binding="{ReflectionBinding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+                        <controls:CompactDataGridTextColumn Header="{loc:Tr HitsoundPreviewHelper_Filename}"
+                                                            Binding="{ReflectionBinding Filename, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+                        <controls:CompactDataGridTextColumn Header="{loc:Tr HitsoundPreviewHelper_XPosition}"
+                                                            Binding="{ReflectionBinding XPos, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}" />
+                        <controls:CompactDataGridTextColumn Header="{loc:Tr HitsoundPreviewHelper_YPosition}"
+                                                            Binding="{ReflectionBinding YPos, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}" />
+                        <controls:CompactDataGridComboBoxColumn Header="{loc:Tr HitsoundPreviewHelper_Type}"
+                                                                ItemsSource="{Binding Hitsounds}"
+                                                                SelectedItemBinding="{ReflectionBinding Hitsound, Mode=TwoWay}"
+                                                                SortMemberPath="Hitsound"
+                                                                IsReadOnly="False" />
+                        <controls:CompactDataGridComboBoxColumn Header="{loc:Tr HitsoundPreviewHelper_SampleSet}"
+                                                                ItemsSource="{Binding SampleSets}"
+                                                                ItemTemplate="{StaticResource TranslatedSampleSetTemplate}"
+                                                                SelectedItemBinding="{ReflectionBinding SampleSet, Mode=TwoWay}"
+                                                                SortMemberPath="SampleSet"
+                                                                IsReadOnly="False" />
+                        <controls:CompactDataGridComboBoxColumn Header="{loc:Tr HitsoundPreviewHelper_Additions}"
+                                                                ItemsSource="{Binding SampleSets}"
+                                                                ItemTemplate="{StaticResource TranslatedSampleSetTemplate}"
+                                                                SelectedItemBinding="{ReflectionBinding AdditionsSet, Mode=TwoWay}"
+                                                                SortMemberPath="AdditionsSet"
+                                                                IsReadOnly="False" />
+                        <controls:CompactDataGridTextColumn Header="{loc:Tr HitsoundPreviewHelper_CustomIndex}"
+                                                            Binding="{ReflectionBinding CustomIndex, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantInt32Converter}, ConverterParameter=0}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <StackPanel Grid.Row="2"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Bottom"
+                            Margin="5,5,100,5"
+                            Orientation="Horizontal">
+                    <materialDesign:FloatingButton Classes="mini light no-transitions"
+                                                   Margin="5"
+                                                   Command="{Binding OpenRhythmGuideCommand}"
+                                                   ToolTip.Tip="{loc:Tr HitsoundPreviewHelper_GenerateRhythmGuide}">
+                        <materialIcons:MaterialIcon Width="24" Height="24" Kind="AlternatingCurrent" />
+                    </materialDesign:FloatingButton>
+                    <materialDesign:FloatingButton Classes="mini light no-transitions"
+                                                   x:Name="AddButton"
+                                                   Margin="5"
+                                                   Click="AddButtonClick"
+                                                   ToolTip.Tip="{loc:Tr HitsoundPreviewHelper_AddZone}">
+                        <materialIcons:MaterialIcon Width="24" Height="24" Kind="Plus" />
+                    </materialDesign:FloatingButton>
+                    <materialDesign:FloatingButton Classes="mini light no-transitions"
+                                                   Margin="5"
+                                                   Command="{Binding CopyCommand}"
+                                                   ToolTip.Tip="{loc:Tr HitsoundPreviewHelper_CopyZones}">
+                        <materialIcons:MaterialIcon Width="24" Height="24" Kind="ContentCopy" />
+                    </materialDesign:FloatingButton>
+                    <materialDesign:FloatingButton Classes="mini light no-transitions"
+                                                   Margin="5"
+                                                   Command="{Binding RemoveCommand}"
+                                                   ToolTip.Tip="{loc:Tr HitsoundPreviewHelper_RemoveZones}">
+                        <materialIcons:MaterialIcon Width="24" Height="24" Kind="TrashCan" />
+                    </materialDesign:FloatingButton>
+                </StackPanel>
+            </Grid>
+
+            <controls:ToolRunButton Margin="10"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Bottom"
+                                    RunCommand="{Binding RunCommand}" />
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap"
+                               FontWeight="Bold"
+                               Opacity="0.58"
+                               Text="{loc:Tr Common_FooterMadeBy}" />
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <controls:ToolProgressBar Height="20"
+                                          Margin="20,0"
+                                          Maximum="100"
+                                          Background="{x:Null}"
+                                          BorderBrush="{x:Null}"
+                                          Value="{Binding Progress}" />
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -1,0 +1,224 @@
+using Mapping_Tools.Desktop.Localization;
+using Mapping_Tools.Desktop.Services.Undo;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Mapping_Tools.Application.Platform.FilePicker;
+using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Desktop.Tools.HitsoundStudio.Models;
+
+namespace Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels;
+
+/// <summary>Owns the fields of the Hitsound Studio export dialog.</summary>
+public sealed partial class HitsoundStudioExportDialogViewModel : LocalizedObservableObject
+{
+    private readonly IFilePicker filePicker;
+    private readonly HitsoundStudioProject project;
+
+    /// <summary>Creates export options from an independent project snapshot.</summary>
+    /// <param name="project">The current feature state.</param>
+    /// <param name="filePicker">The file picker service.</param>
+    public HitsoundStudioExportDialogViewModel(HitsoundStudioProject project, IFilePicker filePicker)
+    {
+        this.project = project.Clone();
+        this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
+        ExportFolder = this.project.ExportFolder;
+        HitsoundDiffName = this.project.HitsoundDiffName;
+        ExportMap = this.project.ExportMap;
+        ExportSamples = this.project.ExportSamples;
+        ShowResults = this.project.ShowResults;
+        DeleteAllInExportFirst = this.project.DeleteAllInExportFirst;
+        UsePreviousSampleSchema = this.project.UsePreviousSampleSchema;
+        AllowGrowthPreviousSampleSchema = this.project.AllowGrowthPreviousSampleSchema;
+        AddCoincidingRegularHitsounds = this.project.AddCoincidingRegularHitsounds;
+        AddGreenLineVolumeToMidi = this.project.AddGreenLineVolumeToMidi;
+        HitsoundExportModeSetting = this.project.HitsoundExportModeSetting;
+        HitsoundExportGameMode = this.project.HitsoundExportGameMode;
+        ZipLayersLeniency = this.project.ZipLayersLeniency;
+        FirstCustomIndex = this.project.FirstCustomIndex;
+        SingleSampleExportFormat = this.project.SingleSampleExportFormat;
+        MixedSampleExportFormat = this.project.MixedSampleExportFormat;
+        AcceptCommand = new RelayCommand(Accept);
+        CancelCommand = new RelayCommand(() => Close(null));
+    }
+
+    /// <summary>Gets or sets the output folder.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial string ExportFolder { get; set; }
+
+    /// <summary>Gets or sets the map version name.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial string HitsoundDiffName { get; set; }
+
+    /// <summary>Gets or sets whether the map is exported.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool ExportMap { get; set; }
+
+    /// <summary>Gets or sets whether samples are exported.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool ExportSamples { get; set; }
+
+    /// <summary>Gets or sets whether the detailed completion summary is shown.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool ShowResults { get; set; }
+
+    /// <summary>Gets or sets whether the output is cleared.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool DeleteAllInExportFirst { get; set; }
+
+    /// <summary>Gets or sets whether the prior schema is used.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool UsePreviousSampleSchema { get; set; }
+
+    /// <summary>Gets or sets whether the prior schema may grow.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool AllowGrowthPreviousSampleSchema { get; set; }
+
+    /// <summary>Gets or sets whether coinciding modes retain regular hitsounds.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool AddCoincidingRegularHitsounds { get; set; }
+
+    /// <summary>Gets or sets whether MIDI includes greenline volume.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool AddGreenLineVolumeToMidi { get; set; }
+
+    /// <summary>Gets or sets export mode.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SampleExportSettingsVisible))]
+    [NotifyPropertyChangedFor(nameof(StandardExtraSettingsVisible))]
+    [NotifyPropertyChangedFor(nameof(CoincidingExtraSettingsVisible))]
+    [NotifyPropertyChangedFor(nameof(MidiExtraSettingsVisible))]
+    [NotifyPropertyChangedFor(nameof(GameModeVisible))]
+    [Undoable]
+    public partial HitsoundStudioExportMode HitsoundExportModeSetting { get; set; }
+
+    /// <summary>Gets whether sample-specific options apply to the selected mode.</summary>
+    public bool SampleExportSettingsVisible => HitsoundExportModeSetting != HitsoundStudioExportMode.Midi;
+
+    /// <summary>Gets whether standard-mode-only options apply to the selected mode.</summary>
+    public bool StandardExtraSettingsVisible => HitsoundExportModeSetting == HitsoundStudioExportMode.Standard;
+
+    /// <summary>Gets whether coinciding-mode-only options apply to the selected mode.</summary>
+    public bool CoincidingExtraSettingsVisible => HitsoundExportModeSetting == HitsoundStudioExportMode.Coinciding;
+
+    /// <summary>Gets whether MIDI-only options apply to the selected mode.</summary>
+    public bool MidiExtraSettingsVisible => HitsoundExportModeSetting == HitsoundStudioExportMode.Midi;
+
+    /// <summary>Gets whether the map game mode applies to the selected mode.</summary>
+    public bool GameModeVisible => HitsoundExportModeSetting != HitsoundStudioExportMode.Midi;
+
+    /// <summary>Gets or sets the output game mode.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial GameMode HitsoundExportGameMode { get; set; }
+
+    /// <summary>Gets or sets time grouping leniency.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial double ZipLayersLeniency { get; set; }
+
+    /// <summary>Gets or sets the first custom index.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial int FirstCustomIndex { get; set; }
+
+    /// <summary>Gets or sets single-source format.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial HitsoundStudioSampleExportFormat SingleSampleExportFormat { get; set; }
+
+    /// <summary>Gets or sets mixed-source format.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial HitsoundStudioSampleExportFormat MixedSampleExportFormat { get; set; }
+
+    /// <summary>Gets the export modes.</summary>
+    public IReadOnlyList<HitsoundStudioExportMode> ExportModes { get; } = Enum.GetValues<HitsoundStudioExportMode>();
+
+    /// <summary>Gets the game modes.</summary>
+    public IReadOnlyList<GameMode> GameModes { get; } = Enum.GetValues<GameMode>();
+
+    /// <summary>Gets the sample formats.</summary>
+    public IReadOnlyList<HitsoundStudioSampleExportFormat> SampleExportFormats { get; } = Enum.GetValues<HitsoundStudioSampleExportFormat>();
+
+    /// <summary>Gets the validation message.</summary>
+    public string Error => hasError ? DesktopStrings.HitsoundStudio_ExportRequired : string.Empty;
+
+    private bool hasError;
+
+    /// <summary>Gets the accept command.</summary>
+    public IRelayCommand AcceptCommand { get; }
+
+    /// <summary>Gets the cancel command.</summary>
+    public IRelayCommand CancelCommand { get; }
+
+    /// <summary>Gets the export-folder picker command.</summary>
+    public IAsyncRelayCommand PickFolderCommand => field ??= new AsyncRelayCommand(PickFolderAsync);
+
+    /// <summary>Gets or sets the modal close callback.</summary>
+    internal Action<object?> Close { get; set; } = _ => { };
+
+    partial void OnSingleSampleExportFormatChanged(HitsoundStudioSampleExportFormat value)
+    {
+        if (value == HitsoundStudioSampleExportFormat.MidiChords)
+            MixedSampleExportFormat = value;
+        else if (MixedSampleExportFormat == HitsoundStudioSampleExportFormat.MidiChords) MixedSampleExportFormat = value;
+    }
+
+    partial void OnMixedSampleExportFormatChanged(HitsoundStudioSampleExportFormat value)
+    {
+        if (value == HitsoundStudioSampleExportFormat.MidiChords)
+            SingleSampleExportFormat = value;
+        else if (SingleSampleExportFormat == HitsoundStudioSampleExportFormat.MidiChords) SingleSampleExportFormat = value;
+    }
+
+    private async Task PickFolderAsync()
+    {
+        var paths = await filePicker.PickFoldersAsync(new OpenFolderPickerRequest
+        {
+            Title = DesktopStrings.HitsoundStudio_PickExport,
+            AllowMultiple = false,
+        }).ConfigureAwait(false);
+        if (paths.Count > 0) ExportFolder = paths[0];
+    }
+
+    private void Accept()
+    {
+        hasError = false;
+        OnPropertyChanged(nameof(Error));
+        if (string.IsNullOrWhiteSpace(ExportFolder) || string.IsNullOrWhiteSpace(HitsoundDiffName))
+        {
+            hasError = true;
+            OnPropertyChanged(nameof(Error));
+            return;
+        }
+
+        project.ExportFolder = ExportFolder;
+        project.HitsoundDiffName = HitsoundDiffName;
+        project.ExportMap = ExportMap;
+        project.ExportSamples = ExportSamples;
+        project.ShowResults = ShowResults;
+        project.DeleteAllInExportFirst = DeleteAllInExportFirst;
+        project.UsePreviousSampleSchema = UsePreviousSampleSchema;
+        project.AllowGrowthPreviousSampleSchema = AllowGrowthPreviousSampleSchema;
+        project.AddCoincidingRegularHitsounds = AddCoincidingRegularHitsounds;
+        project.AddGreenLineVolumeToMidi = AddGreenLineVolumeToMidi;
+        project.HitsoundExportModeSetting = HitsoundExportModeSetting;
+        project.HitsoundExportGameMode = HitsoundExportGameMode;
+        project.ZipLayersLeniency = ZipLayersLeniency;
+        project.FirstCustomIndex = FirstCustomIndex;
+        project.SingleSampleExportFormat = SingleSampleExportFormat;
+        project.MixedSampleExportFormat = MixedSampleExportFormat;
+        Close(project);
+    }
+}

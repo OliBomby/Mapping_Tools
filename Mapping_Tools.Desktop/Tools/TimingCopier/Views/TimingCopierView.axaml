@@ -1,0 +1,99 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
+             xmlns:vm="using:Mapping_Tools.Desktop.Tools.TimingCopier.ViewModels"
+             xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:Class="Mapping_Tools.Desktop.Tools.TimingCopier.Views.TimingCopierView"
+             x:DataType="vm:TimingCopierViewModel">
+    <Grid RowDefinitions="*,Auto">
+        <Grid>
+            <StackPanel Margin="0,0,120,0">
+                <controls:ToolViewHeader
+                    Title="{loc:Tr TimingCopier_Title}"
+                    HelpText="{loc:Tr TimingCopier_Help}" />
+
+                <Grid Margin="0,20,0,0" ColumnDefinitions="*,Auto,5,Auto">
+                    <TextBox Margin="0,0,5,0"
+                             materialAssists:TextFieldAssist.Label="{loc:Tr TimingCopier_ImportLabel}"
+                             Text="{Binding ImportPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             ToolTip.Tip="{loc:Tr TimingCopier_ImportPathTip}" />
+                    <Button Grid.Column="1" Classes="flat path-picker" Cursor="Hand"
+                            VerticalAlignment="Bottom"
+                            Command="{Binding ImportLoadCommand}"
+                            ToolTip.Tip="{loc:Tr MetadataManager_CurrentBeatmapTip}">
+                        <materialIcons:MaterialIcon Width="30" Height="30" Kind="RestoreFromTrash" />
+                    </Button>
+                    <Button Grid.Column="3" Classes="flat path-picker" Cursor="Hand"
+                            VerticalAlignment="Bottom"
+                            Command="{Binding ImportBrowseCommand}"
+                            ToolTip.Tip="{loc:Tr MetadataManager_BrowseTip}">
+                        <materialIcons:MaterialIcon Width="30" Height="30" Kind="Folder" />
+                    </Button>
+                </Grid>
+
+                <Grid Margin="0,10,0,0" ColumnDefinitions="*,Auto,Auto,5,Auto">
+                    <TextBox Margin="0,0,5,0"
+                             materialAssists:TextFieldAssist.Label="{loc:Tr TimingCopier_ExportLabel}"
+                             Text="{Binding ExportPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             ToolTip.Tip="{loc:Tr TimingCopier_ExportPathTip}" />
+                    <TextBlock Grid.Column="1" Margin="3,15,2,0" Padding="0,0,3,0"
+                               FontStyle="Italic"
+                               ToolTip.Tip="{loc:Tr TimingCopier_ExportPathsTip}"
+                               Text="{Binding ExportMapCountText}" />
+                    <Button Grid.Column="2" Classes="flat path-picker" Cursor="Hand"
+                            VerticalAlignment="Bottom"
+                            Command="{Binding ExportLoadCommand}"
+                            ToolTip.Tip="{loc:Tr MetadataManager_CurrentBeatmapTip}">
+                        <materialIcons:MaterialIcon Width="30" Height="30" Kind="RestoreFromTrash" />
+                    </Button>
+                    <Button Grid.Column="4" Classes="flat path-picker" Cursor="Hand"
+                            VerticalAlignment="Bottom"
+                            Command="{Binding ExportBrowseCommand}"
+                            ToolTip.Tip="{loc:Tr MetadataManager_BrowseTip}">
+                        <materialIcons:MaterialIcon Width="30" Height="30" Kind="Folder" />
+                    </Button>
+                </Grid>
+
+                <ComboBox Margin="0,20,0,0" Cursor="Hand"
+                          ItemsSource="{Binding ResnapModes}"
+                          SelectedItem="{Binding ResnapMode, Mode=TwoWay}"
+                          materialAssists:ComboBoxAssist.Label="{loc:Tr TimingCopier_ModeLabel}"
+                          ToolTip.Tip="{loc:Tr TimingCopier_ModeTip}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <TextBlock Margin="0,20,0,0" FontSize="14" FontWeight="Bold"
+                           Text="{loc:Tr Common_Signatures}" ToolTip.Tip="{loc:Tr Common_SignaturesTip}" />
+                <TextBox HorizontalAlignment="Left" MinWidth="100" FontSize="14" Cursor="Hand"
+                         materialAssists:TextFieldAssist.Label="{loc:Tr Common_BeatDivisorsLabel}"
+                         Text="{Binding BeatDivisors, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource BeatDivisorArrayToStringConverter}}"
+                         ToolTip.Tip="{loc:Tr Common_BeatDivisorsTip}" />
+            </StackPanel>
+
+            <controls:ToolRunButton Margin="10"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Bottom"
+                                    RunCommand="{Binding RunCommand}" />
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap" FontWeight="Bold" Opacity="0.58"
+                               Text="{loc:Tr TimingCopier_MadeBy}" />
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <controls:ToolProgressBar Height="20" Margin="20,0,20,0"
+                                          Background="{x:Null}" BorderBrush="{x:Null}"
+                                          Maximum="100" Value="{Binding Progress}" />
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

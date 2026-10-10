@@ -1,0 +1,7 @@
+{
+  "autoFailDetected": true,
+  "unloadingObjects": 20,
+  "potentialUnloadingObjects": 63,
+  "message": "20 unloading objects detected and 63 potential unloading objects detected!",
+  "negativeControlMessage": "No auto-fail detected."
+}

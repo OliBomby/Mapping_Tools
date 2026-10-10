@@ -1,0 +1,69 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:fluent="clr-namespace:Avalonia.Themes.Fluent;assembly=Avalonia.Themes.Fluent"
+             xmlns:material="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:converters="using:Mapping_Tools.Desktop.Converters"
+             xmlns:local="using:Mapping_Tools.Desktop"
+             x:Class="Mapping_Tools.Desktop.App"
+             RequestedThemeVariant="Default">
+    <!-- "Default" follows the system theme. "Dark" and "Light" force a variant. -->
+
+    <Application.DataTemplates>
+        <local:ViewLocator />
+    </Application.DataTemplates>
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://Mapping_Tools.Desktop/Styles/MappingToolsColors.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <converters:InvariantInt32Converter x:Key="InvariantInt32Converter" />
+            <converters:InvariantDoubleConverter x:Key="InvariantDoubleConverter" />
+            <converters:TimeToStringConverter x:Key="TimeToStringConverter" />
+            <converters:ConstantTimeSpanConverter x:Key="ConstantTimeSpanConverter" />
+            <converters:DarkThemeConverter x:Key="DarkThemeConverter" />
+            <converters:BeatDivisorArrayToStringConverter x:Key="BeatDivisorArrayToStringConverter" />
+            <converters:RgbaColourToAvaloniaColorConverter x:Key="RgbaColourToAvaloniaColorConverter" />
+            <converters:RgbaColourToAvaloniaBrushConverter x:Key="RgbaColourToAvaloniaBrushConverter" />
+            <converters:MaterialIconConverter x:Key="MaterialIconConverter" />
+            <converters:EnumEqualsConverter x:Key="EnumEqualsConverter" />
+        </ResourceDictionary>
+    </Application.Resources>
+
+    <Application.Styles>
+        <!-- Supplies templates for Avalonia controls not currently covered by Material.Avalonia. -->
+        <fluent:FluentTheme />
+        <material:MaterialTheme BaseTheme="Dark"
+                                PrimaryColor="Blue"
+                                SecondaryColor="Lime" />
+        <dialogHost:DialogHostStyles />
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.v2.xaml" />
+        <materialIcons:MaterialIconStyles />
+        <!-- <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" /> -->
+        <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Simple/Simple.xaml" />
+
+        <!-- Application-wide Material compatibility overrides. -->
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/TabbedPages.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/DataGrids.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/Validation.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/TextBlocks.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/TextBoxes.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/Menus.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/ComboBoxes.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/Buttons.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/MaterialListBoxes.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/ColorPickers.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/Cards.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/Expanders.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/Sliders.axaml" />
+
+        <!-- Styles owned by code-only custom controls. -->
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Controls/Timeline/TimelineControl.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Controls/HotkeyEditor.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Controls/ToolRunButton.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Controls/ToolProgressBar.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Controls/MaterialGridListView.axaml" />
+    </Application.Styles>
+</Application>

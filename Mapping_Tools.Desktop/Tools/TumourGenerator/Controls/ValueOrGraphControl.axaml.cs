@@ -1,0 +1,68 @@
+using System.Diagnostics.CodeAnalysis;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Data;
+using Avalonia.Interactivity;
+using Mapping_Tools.Core.Graph;
+using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Desktop.Utilities;
+using Mapping_Tools.Desktop.ViewModels.Dialogs;
+using Mapping_Tools.Desktop.Views.Dialogs;
+
+namespace Mapping_Tools.Desktop.Tools.TumourGenerator.Controls;
+
+/// <summary>Provides the legacy constant-text or modal-graph editing surface.</summary>
+[SuppressMessage("ReSharper", "UnusedMember.Local")]
+[SuppressMessage("ReSharper", "UnusedParameter.Local")]
+public partial class ValueOrGraphControl : UserControl
+{
+    /// <summary>Identifies the graph state edited by this value control.</summary>
+    public static readonly StyledProperty<GraphState?> GraphStateProperty =
+        AvaloniaProperty.Register<ValueOrGraphControl, GraphState?>(
+            nameof(GraphState),
+            defaultBindingMode: BindingMode.TwoWay);
+
+    /// <summary>Loads the compiled value-or-graph view with an independent default graph.</summary>
+    public ValueOrGraphControl()
+    {
+        InitializeComponent();
+        SetCurrentValue(GraphStateProperty, CreateDefaultValueGraphState());
+    }
+
+    /// <summary>Gets or sets the scalar or graph state exposed to the host feature.</summary>
+    public GraphState? GraphState
+    {
+        get => GetValue(GraphStateProperty);
+        set => SetValue(GraphStateProperty, value);
+    }
+
+    private async void OpenGraphEditor(object? sender, RoutedEventArgs eventArgs)
+    {
+        if (TopLevel.GetTopLevel(this) is null) return;
+
+        GraphEditorViewModel viewModel = new(GraphState?.Clone() ?? CreateDefaultValueGraphState());
+        GraphEditorDialog dialog = new(viewModel);
+        dialog.Close = result => DialogHostInteraction.Close(
+            DialogHostInteraction.ROOT_IDENTIFIER,
+            result);
+        object? result = await DialogHostInteraction.ShowAsync(
+            dialog,
+            DialogHostInteraction.ROOT_IDENTIFIER);
+        if (result is true) SetCurrentValue(GraphStateProperty, viewModel.GraphState.Clone());
+
+        eventArgs.Handled = true;
+    }
+
+    private static GraphState CreateDefaultValueGraphState()
+    {
+        return new GraphState(
+            [
+                new GraphAnchor(new Vector2(0, 0)),
+                new GraphAnchor(new Vector2(1, 1)),
+            ],
+            0,
+            0,
+            1,
+            1);
+    }
+}

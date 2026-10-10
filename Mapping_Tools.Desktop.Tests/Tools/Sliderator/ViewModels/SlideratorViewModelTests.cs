@@ -1,0 +1,762 @@
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Data;
+using Avalonia.Headless;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Mapping_Tools.Application.Execution.ToolExecution;
+using Mapping_Tools.Application.Execution.UserNotification;
+using Mapping_Tools.Application.Tools.Sliderator.Contracts;
+using Mapping_Tools.Application.Tools.Sliderator.Models;
+using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.Graph;
+using Mapping_Tools.Core.Graph.Interpolation.Interpolators;
+using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.Tools.Sliderator.Models;
+using Mapping_Tools.Desktop.Controls.Graph;
+using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Services.Dialogs;
+using Mapping_Tools.Desktop.Services.Undo;
+using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Tests.TestDoubles;
+using Mapping_Tools.Desktop.Tests.TestHelpers;
+using Mapping_Tools.Desktop.Tools.Sliderator.Models;
+using Mapping_Tools.Desktop.Tools.Sliderator.ViewModels;
+using Mapping_Tools.Desktop.Localization;
+using Mapping_Tools.Desktop.Tools.Sliderator.Views;
+using Mapping_Tools.Infrastructure.Projects;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace Mapping_Tools.Desktop.Tests.Tools.Sliderator.ViewModels;
+
+[TestClass]
+public sealed class SlideratorViewModelTests
+{
+    [TestMethod]
+    public void Undo_AfterChangingBeatLengthAndBpm_RestoresGraphAndTiming()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        ProjectUndoHistory<SlideratorProject> history = new(viewModel, new VersionedProjectJsonSerializer());
+        viewModel.UndoHistory = history;
+        var original = viewModel.GraphState.Clone();
+
+        // Act
+        using (history.BeginEdit())
+        {
+            viewModel.GraphBeats = 5;
+            viewModel.BeatsPerMinute = 240;
+            viewModel.ExportTime = 1234;
+        }
+        history.Undo();
+
+        // Assert
+        viewModel.GraphBeats.Should().Be(3);
+        viewModel.BeatsPerMinute.Should().Be(180);
+        viewModel.ExportTime.Should().Be(0);
+        viewModel.GraphState.MaxX.Should().Be(original.MaxX);
+        history.CanUndo.Should().BeFalse();
+        history.Redo();
+        viewModel.GraphBeats.Should().Be(5);
+        viewModel.BeatsPerMinute.Should().Be(240);
+        viewModel.ExportTime.Should().Be(1234);
+        viewModel.GraphState.MaxX.Should().Be(5);
+    }
+
+    [TestMethod]
+    public void Undo_ExportRadioGesture_RestoresOriginalChoiceInOneStep()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        ProjectUndoHistory<SlideratorProject> history = new(viewModel, new VersionedProjectJsonSerializer());
+        viewModel.UndoHistory = history;
+
+        // Act
+        using (history.BeginGesture())
+        {
+            viewModel.ExportAsNormal = false;
+            viewModel.ExportAsStream = true;
+        }
+        history.Undo();
+
+        // Assert
+        viewModel.ExportAsNormal.Should().BeTrue();
+        viewModel.ExportAsStream.Should().BeFalse();
+        history.CanUndo.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void Undo_GraphDragGesture_RestoresStartingGraphInOneStep()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        ProjectUndoHistory<SlideratorProject> history = new(viewModel, new VersionedProjectJsonSerializer());
+        viewModel.UndoHistory = history;
+        var startingPoint = viewModel.GraphState.Anchors[1].Pos;
+
+        // Act
+        using (history.BeginGesture())
+        {
+            for (int index = 1; index <= 5; index++)
+            {
+                var state = viewModel.GraphState.Clone();
+                state.Anchors[1].Pos = new Vector2(3, 1 + index * 0.1f);
+                viewModel.GraphState = state;
+            }
+        }
+        history.Undo();
+
+        // Assert
+        viewModel.GraphState.Anchors[1].Pos.Should().Be(startingPoint);
+        history.CanUndo.Should().BeFalse();
+    }
+
+    [DataTestMethod]
+    [DataRow(typeof(HalfSineInterpolator))]
+    [DataRow(typeof(SingleCurveInterpolator3))]
+    [DataRow(typeof(DoubleCurveInterpolator3))]
+    [DataRow(typeof(WaveInterpolator))]
+    public void SetInterpolator_FromGraphControl_RecordsUndoHistory(Type interpolatorType)
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        viewModel.VelocityLimit = 1_000_000;
+        var startingGraph = viewModel.GraphState.Clone();
+        startingGraph.Anchors[1].Tension = 0.5;
+        viewModel.GraphState = startingGraph;
+        ProjectUndoHistory<SlideratorProject> history = new(viewModel, new VersionedProjectJsonSerializer());
+        viewModel.UndoHistory = history;
+        SlideratorView view = new() { DataContext = viewModel };
+        GraphControl graph = view.FindControl<GraphControl>("GraphControlElement")!;
+        Window window = new() { Content = view };
+        ProjectUndoWindowInput.Attach(window, () => history);
+        using HeadlessViewHost host = HeadlessViewHost.ShowWindow(window);
+        Type original = viewModel.GraphState.Anchors[1].Interpolator.GetType();
+
+        // Act
+        graph.SetInterpolator(1, interpolatorType);
+        bool recorded = history.CanUndo;
+        Type edited = viewModel.GraphState.Anchors[1].Interpolator.GetType();
+        history.Undo();
+
+        // Assert
+        edited.Should().Be(interpolatorType);
+        recorded.Should().BeTrue();
+        viewModel.GraphState.Anchors[1].Interpolator.GetType().Should().Be(original);
+        graph.GraphState!.Anchors[1].Interpolator.GetType().Should().Be(original);
+        history.CanUndo.Should().BeFalse();
+    }
+
+    [DataTestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public void EditCompleted_GraphDrag_RecordsOneUndoStep(bool loseCapture)
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        ProjectUndoHistory<SlideratorProject> history = new(viewModel, new VersionedProjectJsonSerializer());
+        viewModel.UndoHistory = history;
+        GraphControl graph = new();
+        graph.Bind(GraphControl.GraphStateProperty, new Binding(nameof(SlideratorViewModel.GraphState))
+        {
+            Mode = BindingMode.TwoWay,
+            Source = viewModel,
+        });
+        GraphState original = viewModel.GraphState.Clone();
+        IPointer? pointer = null;
+        graph.AddHandler(InputElement.PointerPressedEvent, (_, args) => pointer = args.Pointer,
+            RoutingStrategies.Tunnel, true);
+        Window window = new() { Width = 600, Height = 400, Content = graph };
+        ProjectUndoWindowInput.Attach(window, () => history);
+        using HeadlessViewHost host = HeadlessViewHost.ShowWindow(window);
+        Point graphPoint = graph.GetControlPosition(new Vector2(1.5f, 0.3f));
+        Point press = graph.TranslatePoint(graphPoint, window)
+                      ?? throw new InvalidOperationException("Graph has no pointer position.");
+
+        // Act
+        window.MouseDown(press, MouseButton.Right);
+        for (int index = 1; index <= 5; index++)
+            window.MouseMove(press + new Vector(index * 8, -index * 4));
+        if (loseCapture) pointer!.Capture(null);
+        window.MouseUp(press + new Vector(40, -20), MouseButton.Right);
+        bool recorded = history.CanUndo;
+        int editedAnchorCount = viewModel.GraphState.Anchors.Count;
+        history.Undo();
+
+        // Assert
+        recorded.Should().BeTrue();
+        editedAnchorCount.Should().Be(original.Anchors.Count + 1);
+        viewModel.GraphState.Anchors.Should().HaveCount(original.Anchors.Count);
+        graph.GraphState!.Anchors.Should().HaveCount(original.Anchors.Count);
+        history.CanUndo.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public async Task ImportCommand_Undo_RestoresWholePreviousStateInOneStep()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        ProjectUndoHistory<SlideratorProject> history = new(viewModel, new VersionedProjectJsonSerializer());
+        viewModel.UndoHistory = history;
+
+        // Act
+        await viewModel.ImportCommand.ExecuteAsync(null);
+        history.Undo();
+
+        // Assert
+        viewModel.LoadedHitObjects.Should().BeEmpty();
+        viewModel.BeatsPerMinute.Should().Be(180);
+        viewModel.GraphBeats.Should().Be(3);
+        history.CanUndo.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public async Task RunQuickAsync_WithImportedSlider_PreservesEditorReadPreferenceAndPassesPersistedGraphSettings()
+    {
+        // Arrange
+        RecordingSliderator service = new();
+        var viewModel = Create(
+            service,
+            new TestCurrentBeatmapDialogService { Path = "current.osu" });
+        viewModel.BeatSnapDivisor = 8;
+        viewModel.ManualVelocity = true;
+        viewModel.NewVelocity = 1;
+
+        // Act
+        await viewModel.RunQuickAsync(CancellationToken.None);
+
+        // Assert
+        service.ImportPath.Should().Be("current.osu");
+        service.Project.Should().NotBeNull();
+        service.Project!.BeatSnapDivisor.Should().Be(8);
+        viewModel.ManualVelocity.Should().BeTrue();
+        service.QuickRun.Should().BeTrue();
+        service.PreferLiveEditor.Should().BeTrue();
+        viewModel.DoEditorRead.Should().BeTrue();
+        viewModel.IsRunning.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void DefaultGraphState_UsesUnitPositionViewport()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+
+        // Act
+        var state = viewModel.GraphState;
+
+        // Assert
+        state.MinX.Should().Be(0);
+        state.MinY.Should().Be(0);
+        state.MaxX.Should().Be(viewModel.GraphBeats);
+        state.MaxY.Should().Be(1);
+        state.Anchors[0].Pos.Should().Be(new Vector2(0, 0));
+        state.Anchors[^1].Pos.Should().Be(new Vector2((float)viewModel.GraphBeats, 1));
+    }
+
+    [TestMethod]
+    public void GraphState_WhenAnchorExceedsVelocityLimit_ClipsTheAnchor()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        viewModel.VelocityLimit = 0.5;
+        viewModel.GraphState = new GraphState(
+            [
+                new GraphAnchor(new Vector2(0, 0)),
+                new GraphAnchor(new Vector2(1, 0.2f)),
+                new GraphAnchor(new Vector2(2, 0.9f)),
+            ],
+            0,
+            0,
+            2,
+            1);
+        GraphState candidate = viewModel.GraphState.Clone();
+        candidate.Anchors[1].Pos = new Vector2(1, 1);
+
+        // Act
+        viewModel.GraphState = candidate;
+
+        // Assert
+        viewModel.GraphState.Anchors[1].Pos.Y.Should().BeLessThan(1);
+        viewModel.IsGraphWithinVelocityLimit(viewModel.GraphState).Should().BeTrue();
+    }
+
+    [TestMethod]
+    public void GraphState_WhenExistingGraphExceedsVelocityLimit_AllowsEditThatDoesNotIncreaseMaximumSlope()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        viewModel.VelocityLimit = 0.5;
+        viewModel.GraphState = new GraphState(
+            [
+                new GraphAnchor(new Vector2(0, 0)),
+                new GraphAnchor(new Vector2(1, 0.2f)),
+                new GraphAnchor(new Vector2(2, 1)),
+                new GraphAnchor(new Vector2(3, 2)),
+            ],
+            0,
+            0,
+            3,
+            2);
+        GraphState candidate = viewModel.GraphState.Clone();
+        candidate.Anchors[2].Pos = new Vector2(2, 1.1f);
+
+        // Act
+        viewModel.GraphState = candidate;
+
+        // Assert
+        viewModel.GraphState.Anchors[2].Pos.Y.Should().BeApproximately(1.1f, 0.0001f);
+    }
+
+    [TestMethod]
+    public void GraphBeats_WhenChanged_UpdatesGraphStateWidthAndScalesAnchors()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        viewModel.GraphState = new GraphState(
+            [
+                new GraphAnchor(new Vector2(2, 0)),
+                new GraphAnchor(new Vector2(4, 0.5f)),
+                new GraphAnchor(new Vector2(7, 1)),
+            ],
+            2,
+            0,
+            7,
+            1);
+
+        // Act
+        viewModel.GraphBeats = 10;
+
+        // Assert
+        viewModel.GraphState.MaxX.Should().Be(12);
+        viewModel.GraphState.MaxX.Should().Be(viewModel.GraphState.MinX + viewModel.GraphBeats);
+        viewModel.GraphState.Anchors.Select(anchor => anchor.Pos).Should().Equal(
+            new Vector2(2, 0),
+            new Vector2(6, 0.5f),
+            new Vector2(12, 1));
+    }
+
+    [TestMethod]
+    public void GraphState_WhenAssignedWithDifferentWidth_UpdatesGraphBeats()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        GraphState state = new(
+            [
+                new GraphAnchor(new Vector2(1, 0)),
+                new GraphAnchor(new Vector2(6, 1)),
+            ],
+            1,
+            0,
+            6,
+            1);
+
+        // Act
+        viewModel.GraphState = state;
+
+        // Assert
+        viewModel.GraphBeats.Should().Be(5);
+        viewModel.GraphState.MaxX.Should().Be(viewModel.GraphState.MinX + viewModel.GraphBeats);
+    }
+
+    [TestMethod]
+    public void ExpectedSegments_WhenMinDendriteChanges_RaisesPropertyChangedAndRecalculates()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        viewModel.ManualVelocity = true;
+        viewModel.NewVelocity = 10;
+        long initialExpectedSegments = viewModel.ExpectedSegments;
+        List<string?> changedProperties = [];
+        viewModel.PropertyChanged += (_, args) => changedProperties.Add(args.PropertyName);
+
+        // Act
+        viewModel.MinDendrite = 4;
+
+        // Assert
+        viewModel.ExpectedSegments.Should().BeLessThan(initialExpectedSegments);
+        changedProperties.Should().Contain(nameof(viewModel.ExpectedSegments));
+    }
+
+    [TestMethod]
+    public void InstallProject_WithDefaultGraph_UsesProjectGraph()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        viewModel.GraphModeSetting = SlideratorGraphMode.Position;
+        SlideratorProject project = new();
+
+        // Act
+        ((IShellProjectFeature<SlideratorProject>)viewModel).Install(project);
+
+        // Assert
+        viewModel.GraphState.MinX.Should().Be(0);
+        viewModel.GraphState.MaxX.Should().Be(project.GraphBeats);
+        viewModel.GraphState.Anchors.Select(anchor => anchor.Pos).Should().Equal(
+            new Vector2(0, 0),
+            new Vector2((float)project.GraphBeats, 1));
+    }
+
+    [TestMethod]
+    public void InstallProject_WithPersistedLoadedSliders_RestoresListSelectionAndEditorReadState()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        HitObject firstSlider = DecodeHitObject("64,64,0,2,0,L|164:64,1,100");
+        HitObject secondSlider = DecodeHitObject("164,64,1000,2,0,L|264:64,1,100");
+        SlideratorProject project = new()
+        {
+            LoadedHitObjects = [firstSlider, secondSlider],
+            VisibleHitObjectIndex = 1,
+            DoEditorRead = true,
+        };
+
+        // Act
+        ((IShellProjectFeature<SlideratorProject>)viewModel).Install(project);
+
+        // Assert
+        viewModel.LoadedHitObjects.Should().Equal(firstSlider, secondSlider);
+        viewModel.VisibleHitObjectIndex.Should().Be(1);
+        viewModel.VisibleHitObject.Should().BeSameAs(secondSlider);
+        viewModel.DoEditorRead.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public void Snapshot_WithLoadedSliders_PreservesImportedListAndSelection()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        HitObject firstSlider = DecodeHitObject("64,64,0,2,0,L|164:64,1,100");
+        HitObject secondSlider = DecodeHitObject("164,64,1000,2,0,L|264:64,1,100");
+        viewModel.LoadedHitObjects.Add(firstSlider);
+        viewModel.LoadedHitObjects.Add(secondSlider);
+        viewModel.VisibleHitObjectIndex = 1;
+
+        // Act
+        SlideratorProject snapshot = ((IShellProjectFeature<SlideratorProject>)viewModel).Snapshot();
+
+        // Assert
+        snapshot.LoadedHitObjects.Should().Equal(firstSlider, secondSlider);
+        snapshot.VisibleHitObjectIndex.Should().Be(1);
+    }
+
+    [TestMethod]
+    public async Task ClearGraphCommand_ResetsTheGraphToCurrentModeDefaults()
+    {
+        // Arrange
+        TestDialogService dialogs = new() { BooleanResult = true };
+        var viewModel = Create(new RecordingSliderator(), dialogs: dialogs);
+        viewModel.GraphState = new GraphState(
+            [new GraphAnchor(new Vector2(0, 0)), new GraphAnchor(new Vector2(0.25f, 0.9f)), new GraphAnchor(new Vector2(1, 1))],
+            0,
+            0,
+            1,
+            1);
+
+        // Act
+        await viewModel.ClearGraphCommand.ExecuteAsync(null);
+
+        // Assert
+        var request = (MessageDialogRequest<bool>)dialogs.LastMessageRequest!;
+        request.Choices.Select(choice => choice.Label).Should().Equal("YES", "NO");
+        viewModel.GraphState.Anchors.Should().HaveCount(2);
+        viewModel.GraphState.Anchors[0].Pos.Should().Be(new Vector2(0, 0));
+        viewModel.GraphState.Anchors[1].Pos.Should().Be(new Vector2((float)viewModel.GraphBeats, 1));
+    }
+
+    [TestMethod]
+    public async Task ScaleCompleteCommand_InVelocityMode_UsesSliderCompletionConversion()
+    {
+        // Arrange
+        TestDialogService dialogs = new() { ValueResult = 1d };
+        var viewModel = Create(new RecordingSliderator(), dialogs: dialogs);
+        viewModel.GlobalSv = 0.7;
+        viewModel.GraphModeSetting = SlideratorGraphMode.Velocity;
+        viewModel.GraphState = new GraphState(
+            [
+                new GraphAnchor(new Vector2(0, 1)),
+                new GraphAnchor(new Vector2(1, 1)),
+            ],
+            0,
+            -10,
+            1,
+            10);
+
+        // Act
+        await viewModel.ScaleCompleteCommand.ExecuteAsync(null);
+
+        // Assert
+        double completion = viewModel.GraphState.GetIntegral(0, viewModel.GraphBeats) * viewModel.SvGraphMultiplier;
+        completion.Should().BeApproximately(1, 0.000001);
+    }
+
+    [TestMethod]
+    public async Task RunFastPlacementAsync_WithVisibleSlider_DoesNotRequestEditorReload()
+    {
+        // Arrange
+        RecordingSliderator service = new();
+        var viewModel = Create(
+            service,
+            new TestCurrentBeatmapDialogService { Path = "current.osu" });
+        viewModel.LoadedHitObjects.Add(DecodeHitObject("64,64,0,2,0,L|164:64,1,100"));
+
+        // Act
+        bool succeeded = await viewModel.RunFastPlacementAsync();
+
+        // Assert
+        succeeded.Should().BeTrue();
+        service.QuickRun.Should().BeFalse();
+        service.PreferLiveEditor.Should().BeFalse();
+        viewModel.DoEditorRead.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public async Task RunFastPlacementAsync_WithImportedSlider_ClearsEditorReadPreference()
+    {
+        // Arrange
+        RecordingSliderator service = new();
+        var viewModel = Create(
+            service,
+            new TestCurrentBeatmapDialogService { Path = "current.osu" });
+        await viewModel.ImportCommand.ExecuteAsync(null);
+
+        // Act
+        bool succeeded = await viewModel.RunFastPlacementAsync();
+
+        // Assert
+        succeeded.Should().BeTrue();
+        service.PreferLiveEditor.Should().BeTrue();
+        viewModel.DoEditorRead.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public async Task RunCommand_WithDisabledEditorRead_AlwaysPrefersLiveEditorAndRestoresPreference()
+    {
+        // Arrange
+        RecordingSliderator service = new();
+        var viewModel = Create(
+            service,
+            new TestCurrentBeatmapDialogService { Path = "current.osu" });
+        HitObject slider = DecodeHitObject("64,64,0,2,0,L|164:64,1,100");
+        ((IShellProjectFeature<SlideratorProject>)viewModel).Install(
+            new SlideratorProject
+            {
+                LoadedHitObjects = [slider],
+                DoEditorRead = false,
+            });
+
+        // Act
+        await viewModel.RunCommand.ExecuteAsync(null);
+
+        // Assert
+        service.PreferLiveEditor.Should().BeTrue();
+        viewModel.DoEditorRead.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task MoveRightAsync_WhenFastPlacementFails_DoesNotAdvance()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        viewModel.LoadedHitObjects.Add(DecodeHitObject("64,64,0,2,0,L|164:64,1,100"));
+        viewModel.LoadedHitObjects.Add(DecodeHitObject("164,64,1000,2,0,L|264:64,1,100"));
+        viewModel.Interaction = new FailedSlideratorInteraction();
+
+        // Act
+        await viewModel.MoveRightAsync(true);
+
+        // Assert
+        viewModel.VisibleHitObjectIndex.Should().Be(0);
+    }
+
+    [TestMethod]
+    public async Task ImportCommand_WhenNoSlidersAreReturned_ShowsReasonAndPreservesCurrentPreview()
+    {
+        // Arrange
+        RecordingSliderator service = new() { ReturnEmptyImport = true };
+        TestDialogService dialogs = new();
+        var viewModel = Create(
+            service,
+            new TestCurrentBeatmapDialogService { Path = "current.osu" },
+            dialogs);
+        HitObject slider = DecodeHitObject("64,64,0,2,0,L|164:64,1,100");
+        viewModel.LoadedHitObjects.Add(slider);
+
+        // Act
+        await viewModel.ImportCommand.ExecuteAsync(null);
+
+        // Assert
+        viewModel.LoadedHitObjects.Should().ContainSingle().Which.Should().BeSameAs(slider);
+        ((MessageDialogRequest<bool>)dialogs.LastMessageRequest!).Message
+            .Should().Be(DesktopStrings.Sliderator_NoSlidersFound);
+    }
+
+    [TestMethod]
+    public async Task ImportCommand_WithSelectedModeAndUnavailableCurrentBeatmap_ShowsErrorDialogWithoutInvokingService()
+    {
+        // Arrange
+        RecordingSliderator service = new();
+        TestDialogService dialogs = new();
+        var viewModel = Create(
+            service,
+            new TestCurrentBeatmapDialogService(),
+            dialogs);
+
+        // Act
+        await viewModel.ImportCommand.ExecuteAsync(null);
+
+        // Assert
+        service.ImportPath.Should().BeNull();
+        ((MessageDialogRequest<bool>)dialogs.LastMessageRequest!).Message
+            .Should().Be(DesktopStrings.Sliderator_NoBeatmapOpen);
+    }
+
+    [DataTestMethod]
+    [DataRow(HitObjectSelectionMode.Bookmarked)]
+    [DataRow(HitObjectSelectionMode.Time)]
+    [DataRow(HitObjectSelectionMode.Everything)]
+    public async Task ImportCommand_WithNonSelectedMode_UsesWorkspacePathWithoutLookingForLiveEditor(
+        HitObjectSelectionMode mode)
+    {
+        // Arrange
+        RecordingSliderator service = new();
+        TestCurrentBeatmapDialogService currentBeatmap = new();
+        TestBeatmapWorkspace workspace = new();
+        workspace.SetSelection(["selected.osu"]);
+        var viewModel = Create(service, currentBeatmap, workspace: workspace);
+        viewModel.ImportModeSetting = mode;
+
+        // Act
+        await viewModel.ImportCommand.ExecuteAsync(null);
+
+        // Assert
+        service.ImportPath.Should().Be("selected.osu");
+        currentBeatmap.FetchCount.Should().Be(0);
+    }
+
+    [TestMethod]
+    public async Task RunQuickAsync_WhenImportReturnsNoSliders_DoesNotRunPreviousPreview()
+    {
+        // Arrange
+        RecordingSliderator service = new() { ReturnEmptyImport = true };
+        var viewModel = Create(
+            service,
+            new TestCurrentBeatmapDialogService { Path = "current.osu" });
+        viewModel.LoadedHitObjects.Add(DecodeHitObject("64,64,0,2,0,L|164:64,1,100"));
+
+        // Act
+        await viewModel.RunQuickAsync(CancellationToken.None);
+
+        // Assert
+        service.RunCalled.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void EvaluatePreviewProgress_DuringHold_HidesBallAndRepeatsAfterHold()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        double duration = viewModel.GraphDuration;
+
+        // Act
+        double held = viewModel.EvaluatePreviewProgress(duration + 500);
+        double repeated = viewModel.EvaluatePreviewProgress(duration + 1000 + 1);
+
+        // Assert
+        held.Should().Be(-1);
+        repeated.Should().BeGreaterThanOrEqualTo(0);
+    }
+
+    [TestMethod]
+    public void EvaluatePreviewProgress_AfterElapsedTime_AdvancesThroughSlider()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+
+        // Act
+        double initial = viewModel.EvaluatePreviewProgress(1);
+        double later = viewModel.EvaluatePreviewProgress(viewModel.GraphDuration / 2);
+
+        // Assert
+        later.Should().BeGreaterThan(initial);
+    }
+
+    private static SlideratorViewModel Create(
+        RecordingSliderator service,
+        TestCurrentBeatmapDialogService? currentBeatmap = null,
+        TestDialogService? dialogs = null,
+        TestBeatmapWorkspace? workspace = null)
+    {
+        TestCurrentBeatmapDialogService effectiveCurrentBeatmap =
+            currentBeatmap ?? new TestCurrentBeatmapDialogService { Path = "current.osu" };
+        TestBeatmapWorkspace effectiveWorkspace = workspace ?? new TestBeatmapWorkspace();
+        effectiveWorkspace.QuickRunPath = effectiveCurrentBeatmap.Path;
+        return new SlideratorViewModel(
+            service,
+            new ToolExecutionService(
+                new UserNotificationService(),
+                TimeProvider.System),
+            effectiveCurrentBeatmap,
+            effectiveWorkspace,
+            new DesktopApplicationSettings(),
+            dialogs ?? new TestDialogService());
+    }
+
+    private sealed class RecordingSliderator : ISlideratorService
+    {
+        public string? ImportPath { get; private set; }
+
+        public SlideratorServiceOptions? Project { get; private set; }
+
+        public bool QuickRun { get; private set; }
+
+        public bool PreferLiveEditor { get; private set; }
+
+        public bool ReturnEmptyImport { get; init; }
+
+        public bool RunCalled { get; private set; }
+
+        public Task<SlideratorImportResult> ImportAsync(
+            string path,
+            HitObjectSelectionMode mode,
+            string? timeCode,
+            CancellationToken cancellationToken = default)
+        {
+            ImportPath = path;
+            IReadOnlyList<HitObject> sliders = ReturnEmptyImport
+                ? []
+                : [DecodeHitObject("64,64,0,2,0,L|164:64,1,100")];
+            return Task.FromResult(new SlideratorImportResult(sliders, 1.4, true, true));
+        }
+
+        public Task<SlideratorResult> RunAsync(
+            string path,
+            SlideratorServiceOptions project,
+            HitObject sourceSlider,
+            bool quickRun,
+            IProgress<double>? progress = null,
+            CancellationToken cancellationToken = default,
+            bool preferLiveEditor = true)
+        {
+            RunCalled = true;
+            Project = project;
+            QuickRun = quickRun;
+            PreferLiveEditor = preferLiveEditor;
+            progress?.Report(1);
+            return Task.FromResult(
+                new SlideratorResult(
+                    path,
+                    new SlideratorApplyResult(100, 1, false, 1),
+                    quickRun));
+        }
+    }
+
+    private sealed class FailedSlideratorInteraction : ISlideratorInteraction
+    {
+        public Task<bool> RunFastAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(false);
+        }
+    }
+}

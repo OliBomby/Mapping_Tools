@@ -1,0 +1,72 @@
+using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Application.Tests.TestDoubles;
+using Mapping_Tools.Application.Tools.MapCleaner;
+using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace Mapping_Tools.Application.Tests.Tools.MapCleaner;
+
+[TestClass]
+public sealed class MapCleanerServiceTests
+{
+    [TestMethod]
+    public async Task CleanAsync_WithAcceptedFixture_UsesLiveStateAndBackupSaveBoundary()
+    {
+        // Arrange
+        BeatmapEditingSession editor = BeatmapEditingSessionTestFactory.FromText(
+            await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "Fixtures", "Beatmaps", "standard-feature-rich.osu")),
+            @"C:\set\map.osu",
+            new NoOpTextFileStore
+            {
+                ParentFolderResolver = _ => @"C:\set",
+                CombinePathResolver = Path.Combine,
+            });
+        RecordingBeatmapEditingGateway gateway = new(editor);
+        RecordingSamples samples = new();
+        MapCleanerService service = new(
+            gateway,
+            new RecordingBeatmapFileSystem
+            {
+                FileExistsResolver = _ => true,
+                ParentDirectoryResolver = _ => @"C:\set",
+            },
+            samples,
+            new ApplicationSettings());
+        MapCleanerServiceOptions.MapCleanerCleanupOptions options = new()
+        {
+            SampleSetSliders = false,
+            ResnapBookmarks = true,
+            AnalyzeSamples = false,
+            BeatDivisors = [new RationalBeatDivisor(12), new RationalBeatDivisor(16)],
+        };
+
+        // Act
+        var result = await service.CleanAsync([editor.Path], options);
+
+        // Assert
+        result.TimingPointsRemoved.Should().Be(16);
+        result.ObjectsResnapped.Should().Be(20);
+        gateway.OpenRequests.Single().Preference.Should().Be(LiveBeatmapPreference.PreferLive);
+        gateway.SessionSaveRequests.Single().Session.Should().BeSameAs(editor);
+        samples.AnalyzedDirectory.Should().Be(@"C:\set");
+    }
+
+    private sealed class RecordingSamples : IMapCleanerSampleService
+    {
+        public string? AnalyzedDirectory { get; private set; }
+
+        public Task<IReadOnlyDictionary<string, string>> AnalyzeAsync(string directory, bool detectDuplicates, CancellationToken cancellationToken = default)
+        {
+            AnalyzedDirectory = directory;
+            return Task.FromResult<IReadOnlyDictionary<string, string>>(new Dictionary<string, string>());
+        }
+
+        public Task<int> MoveUnusedToRecoveryAsync(string directory, string currentBeatmapPath, Beatmap currentBeatmap, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(0);
+        }
+    }
+}

@@ -1,0 +1,137 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:md="https://github.com/whistyun/Markdown.Avalonia"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:getStarted="clr-namespace:Mapping_Tools.Desktop.ViewModels.GetStarted"
+             mc:Ignorable="d"
+             d:DesignWidth="1040"
+             d:DesignHeight="725"
+             x:Class="Mapping_Tools.Desktop.Views.GetStarted.GetStartedView"
+             x:DataType="getStarted:GetStartedViewModel"
+             Foreground="{DynamicResource MaterialBodyBrush}"
+             FontFamily="avares://Mapping_Tools.Desktop/Assets/Fonts#Roboto">
+    <Grid RowDefinitions="0.5*,Auto,0.3*"
+          ColumnDefinitions="*,Auto,*">
+        <Grid Grid.Row="0"
+              Grid.Column="0"
+              RowDefinitions="Auto,*">
+            <TextBlock Grid.Row="0"
+                       Text="{loc:Tr Shell_GetStarted}"
+                       FontSize="32"
+                       FontWeight="Bold"
+                       Foreground="{DynamicResource MaterialPrimaryMidBrush}" />
+
+            <ListBox Grid.Row="1"
+                     Classes="material-list-view"
+                     HorizontalAlignment="Left"
+                     ScrollViewer.AllowAutoHide="False"
+                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <ListBoxItem Content="{loc:Tr Shell_Intro0}" />
+                <ListBoxItem Content="{loc:Tr Shell_Intro1}" />
+                <ListBoxItem Content="{loc:Tr Shell_Intro2}" />
+                <ListBoxItem Content="{loc:Tr Shell_Intro3}" />
+                <ListBoxItem Content="{loc:Tr Shell_Intro4}" />
+                <ListBoxItem Content="{loc:Tr Shell_Intro5}" />
+                <ListBoxItem Content="{loc:Tr Shell_Intro6}" />
+                <ListBoxItem Content="{loc:Tr Shell_Intro7}" />
+            </ListBox>
+        </Grid>
+
+        <GridSplitter Grid.Row="0"
+                      Grid.Column="1"
+                      Width="1"
+                      Margin="10"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch"
+                      Background="{DynamicResource MaterialDividerBrush}"
+                      ResizeBehavior="PreviousAndNext"
+                      ResizeDirection="Columns" />
+
+        <Grid Grid.Row="0"
+              Grid.Column="2"
+              RowDefinitions="Auto,*">
+            <TextBlock Grid.Row="0"
+                       Text="{loc:Tr Shell_Changelog}"
+                       FontSize="32"
+                       FontWeight="Bold"
+                       Foreground="{DynamicResource MaterialPrimaryMidBrush}" />
+            <ListBox Grid.Row="1"
+                     Classes="material-list-view"
+                     ItemsSource="{Binding Changelog}"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="getStarted:ChangelogEntryViewModel">
+                        <StackPanel>
+                            <TextBlock Text="{Binding Title}"
+                                       FontSize="18"
+                                       FontWeight="Bold"
+                                       TextWrapping="Wrap" />
+                            <md:MarkdownScrollViewer Margin="10,0,0,0"
+                                                     Markdown="{Binding Text}">
+                                <md:MarkdownScrollViewer.Styles>
+                                    <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/Markdown.axaml" />
+                                </md:MarkdownScrollViewer.Styles>
+                            </md:MarkdownScrollViewer>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+
+        <GridSplitter Grid.Row="1" Grid.Column="0"
+                      Grid.ColumnSpan="3"
+                      Height="1"
+                      Margin="10"
+                      HorizontalAlignment="Stretch"
+                      Background="{DynamicResource MaterialDividerBrush}"
+                      ResizeBehavior="PreviousAndNext"
+                      ResizeDirection="Rows" />
+
+        <Grid Grid.Row="2" Grid.Column="0"
+              Grid.ColumnSpan="3"
+              RowDefinitions="Auto,*">
+            <TextBlock Grid.Row="0"
+                       Text="{loc:Tr Shell_Recent}"
+                       FontSize="32"
+                       FontWeight="Bold"
+                       Foreground="{DynamicResource MaterialPrimaryMidBrush}" />
+
+            <controls:MaterialGridListView x:Name="RecentMapsTable"
+                                           Grid.Row="1"
+                                           ItemsSource="{Binding RecentMaps}"
+                                           CanUserResizeColumns="True"
+                                           SelectionMode="Multiple"
+                                           DoubleTapped="SelectRecentMaps"
+                                           ToolTip.Tip="{loc:Tr Shell_DoubleClickAnySelectionOfItemsToSetThemAsTheCurrentBeatmap}">
+                <controls:MaterialGridListView.Columns>
+                    <TableViewColumn x:Name="RecentPathColumn"
+                                     Width="90"
+                                     Binding="{Binding FileName}">
+                        <TableViewColumn.Header>
+                            <TextBlock MinWidth="78"
+                                       Margin="18,0,0,0"
+                                       Text="{loc:Tr Shell_Path}" />
+                        </TableViewColumn.Header>
+                    </TableViewColumn>
+                    <TableViewColumn Width="*"
+                                     Binding="{Binding DisplayDate}">
+                        <TableViewColumn.Header>
+                            <TextBlock Margin="18,0,0,0"
+                                       Text="{loc:Tr Shell_Date}" />
+                        </TableViewColumn.Header>
+                    </TableViewColumn>
+                </controls:MaterialGridListView.Columns>
+            </controls:MaterialGridListView>
+            <TextBlock Grid.Row="1"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       IsVisible="{Binding HasNoRecentMaps}"
+                       Text="{loc:Tr Shell_NoRecentBeatmaps}" />
+        </Grid>
+    </Grid>
+</UserControl>

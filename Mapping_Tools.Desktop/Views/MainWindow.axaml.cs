@@ -1,0 +1,396 @@
+using System.Diagnostics.CodeAnalysis;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Platform;
+using Avalonia.Platform.Storage;
+using Avalonia.Threading;
+using Mapping_Tools.Application.Execution.UserNotification.Models;
+using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Services.Hosted;
+using Mapping_Tools.Desktop.Services.Notifications;
+using Mapping_Tools.Desktop.Services.Undo;
+using Mapping_Tools.Desktop.Services.Updates;
+using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Utilities;
+using Mapping_Tools.Desktop.ViewModels;
+using Material.Icons;
+using Material.Styles.Controls;
+using Material.Styles.Models;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+
+namespace Mapping_Tools.Desktop.Views;
+
+/// <summary>
+///     Hosts registered Avalonia features and captures safe normal-state window geometry.
+/// </summary>
+[SuppressMessage("ReSharper", "UnusedMember.Local")]
+[SuppressMessage("ReSharper", "UnusedParameter.Local")]
+public partial class MainWindow : Window, INotificationSurface
+{
+    private static readonly WindowBounds defaultBounds = new(80, 60, 1500, 800);
+    private static readonly TimeSpan snackbarDuration = TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan warningSnackbarDuration = TimeSpan.FromSeconds(15);
+    private readonly DesktopApplicationSettings settings;
+    private readonly ILogger<MainWindow> logger;
+    private readonly SettingsPersistenceHostedService? settingsPersistence;
+    private readonly IUpdaterInteractionService? updaterInteraction;
+    private bool allowCloseAfterShutdown;
+    private WindowBounds normalBounds = defaultBounds;
+    private bool restored;
+    private bool shutdownCloseInProgress;
+    private bool updateCloseInProgress;
+
+    /// <summary>
+    ///     Loads a standalone shell instance for XAML tooling and deterministic rendering.
+    ///     Runtime composition uses the settings-aware constructor.
+    /// </summary>
+    public MainWindow()
+        : this(new DesktopApplicationSettings(), null, null)
+    {
+    }
+
+    /// <summary>
+    ///     Loads the compiled shell and attaches the shared window-placement state.
+    /// </summary>
+    public MainWindow(
+        DesktopApplicationSettings settings)
+        : this(settings, null, null)
+    {
+    }
+
+    /// <summary>
+    ///     Loads the compiled shell and attaches window placement and shutdown-persistence state.
+    /// </summary>
+    /// <param name="settings">The process-lifetime settings document.</param>
+    /// <param name="settingsPersistence">The orderly-shutdown boundary used by Exit without saving.</param>
+    public MainWindow(
+        DesktopApplicationSettings settings,
+        SettingsPersistenceHostedService? settingsPersistence)
+        : this(settings, settingsPersistence, null)
+    {
+    }
+
+    /// <summary>
+    ///     Loads the compiled shell with persisted placement and updater shutdown coordination.
+    /// </summary>
+    /// <param name="settings">The process-lifetime settings document.</param>
+    /// <param name="settingsPersistence">The orderly-shutdown boundary used by Exit without saving.</param>
+    /// <param name="updaterInteraction">The updater interaction owned by runtime composition.</param>
+    /// <param name="logger">Records window actions and shutdown decisions.</param>
+    public MainWindow(
+        DesktopApplicationSettings settings,
+        SettingsPersistenceHostedService? settingsPersistence,
+        IUpdaterInteractionService? updaterInteraction,
+        ILogger<MainWindow>? logger = null)
+    {
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.settingsPersistence = settingsPersistence;
+        this.updaterInteraction = updaterInteraction;
+        this.logger = logger ?? NullLogger<MainWindow>.Instance;
+        InitializeComponent();
+        AddHandler(KeyDownEvent, HandleWindowKeyDown, RoutingStrategies.Tunnel);
+        ProjectUndoWindowInput.Attach(
+            this,
+            ActiveHistory,
+            ReplayHistory,
+            textBox => DialogHostInteraction.IsDialogOpen || textBox.DataContext is not MainViewModel);
+        AddHandler(Button.ClickEvent, LogButtonClick, RoutingStrategies.Bubble, true);
+        PositionChanged += (_, _) => CaptureNormalBounds();
+        Resized += (_, _) => CaptureNormalBounds();
+        PropertyChanged += (_, eventArgs) =>
+        {
+            if (eventArgs.Property == WindowStateProperty) UpdateWindowChrome();
+        };
+        UpdateWindowChrome();
+    }
+
+    void INotificationSurface.ShowSnackbar(UserNotification notification)
+    {
+        Dispatcher.UIThread.Post(
+            () => SnackbarHost.Post(
+                new SnackbarModel($"{notification.Title}: {notification.Message}",
+                    notification.Severity == UserNotificationSeverity.Warning ? warningSnackbarDuration : snackbarDuration),
+                "Root",
+                DispatcherPriority.Normal),
+            DispatcherPriority.Normal);
+    }
+
+    /// <inheritdoc />
+    protected override void OnOpened(EventArgs eventArgs)
+    {
+        base.OnOpened(eventArgs);
+        logger.LogInformation("Main window opened");
+        RestoreWindowPlacement();
+        if (DataContext is MainViewModel viewModel) _ = InitializeAndCheckForUpdatesAsync(viewModel);
+    }
+
+    private static async Task InitializeAndCheckForUpdatesAsync(MainViewModel viewModel)
+    {
+        await viewModel.InitializeAsync();
+        await viewModel.CheckForUpdatesOnStartupAsync();
+    }
+
+    /// <inheritdoc />
+    protected override void OnClosing(WindowClosingEventArgs eventArgs)
+    {
+        logger.LogInformation("Main window close requested; update={Update}; shutdown={Shutdown}; programmatic={Programmatic}",
+            updaterInteraction?.ShouldUpdateOnClose == true, shutdownCloseInProgress, eventArgs.IsProgrammatic);
+        if (!updateCloseInProgress && updaterInteraction?.ShouldUpdateOnClose == true)
+        {
+            eventArgs.Cancel = true;
+            updateCloseInProgress = true;
+            _ = CompleteUpdateAndCloseAsync();
+            return;
+        }
+
+        if (allowCloseAfterShutdown)
+        {
+            allowCloseAfterShutdown = false;
+        }
+        else if (shutdownCloseInProgress)
+        {
+            eventArgs.Cancel = true;
+            return;
+        }
+        else if (DataContext is MainViewModel viewModel)
+        {
+            eventArgs.Cancel = true;
+            shutdownCloseInProgress = true;
+            _ = CompleteShutdownAndCloseAsync(viewModel);
+            return;
+        }
+
+        if (!eventArgs.IsProgrammatic) CaptureNormalBounds();
+
+        settings.MainWindowRestoreBounds = normalBounds;
+        settings.MainWindowMaximized = WindowState == WindowState.Maximized;
+        logger.LogInformation("Main window closing; bounds {Bounds}; maximized {Maximized}", normalBounds, settings.MainWindowMaximized);
+        base.OnClosing(eventArgs);
+    }
+
+    private async Task CompleteUpdateAndCloseAsync()
+    {
+        bool canClose = await updaterInteraction!.CompleteUpdateOnCloseAsync();
+        if (canClose)
+        {
+            shutdownCloseInProgress = true;
+            if (DataContext is MainViewModel viewModel)
+                try
+                {
+                    await viewModel.DisposeAsync();
+                }
+                catch (Exception exception)
+                {
+                    App.WriteCrashLog(exception);
+                }
+
+            allowCloseAfterShutdown = true;
+            Close();
+        }
+        else
+        {
+            updateCloseInProgress = false;
+        }
+    }
+
+    private async Task CompleteShutdownAndCloseAsync(MainViewModel viewModel)
+    {
+        try
+        {
+            await viewModel.DisposeAsync();
+        }
+        catch (Exception exception)
+        {
+            App.WriteCrashLog(exception);
+        }
+        finally
+        {
+            allowCloseAfterShutdown = true;
+            Close();
+        }
+    }
+
+    private void RestoreWindowPlacement()
+    {
+        var connected = Screens.All;
+        var areas = connected
+            .Select(ToWorkingArea)
+            .ToList();
+        normalBounds = WindowPlacementCalculator.Restore(
+            settings.MainWindowRestoreBounds,
+            areas,
+            defaultBounds);
+
+        var selectedArea = areas
+                               .OrderByDescending(area => IntersectionArea(normalBounds, area))
+                               .FirstOrDefault(area => IntersectionArea(normalBounds, area) > 0)
+                           ?? areas.FirstOrDefault(area => area.IsPrimary)
+                           ?? areas[0];
+        var screen = connected[
+            areas.FindIndex(area => ReferenceEquals(area, selectedArea) || area == selectedArea)];
+
+        Width = normalBounds.Width;
+        Height = normalBounds.Height;
+        Position = new PixelPoint(
+            (int)Math.Round(normalBounds.X * screen.Scaling),
+            (int)Math.Round(normalBounds.Y * screen.Scaling));
+        restored = true;
+        if (settings.MainWindowMaximized) WindowState = WindowState.Maximized;
+    }
+
+    private void CaptureNormalBounds()
+    {
+        if (!restored || WindowState != WindowState.Normal) return;
+
+        var screen = Screens.ScreenFromWindow(this) ?? Screens.Primary;
+        double scaling = screen?.Scaling ?? 1;
+        normalBounds = new WindowBounds(
+            Position.X / scaling,
+            Position.Y / scaling,
+            Math.Max(MinWidth, Bounds.Width),
+            Math.Max(MinHeight, Bounds.Height));
+    }
+
+    private static DesktopWorkingArea ToWorkingArea(Screen screen)
+    {
+        return new DesktopWorkingArea(
+            screen.WorkingArea.X / screen.Scaling,
+            screen.WorkingArea.Y / screen.Scaling,
+            screen.WorkingArea.Width / screen.Scaling,
+            screen.WorkingArea.Height / screen.Scaling,
+            screen.IsPrimary);
+    }
+
+    private static double IntersectionArea(
+        WindowBounds bounds,
+        DesktopWorkingArea area)
+    {
+        double width = Math.Max(
+            0,
+            Math.Min(bounds.X + bounds.Width, area.X + area.Width) - Math.Max(bounds.X, area.X));
+        double height = Math.Max(
+            0,
+            Math.Min(bounds.Y + bounds.Height, area.Y + area.Height) - Math.Max(bounds.Y, area.Y));
+        return width * height;
+    }
+
+    private void MinimizeWindow(object? sender, RoutedEventArgs eventArgs)
+    {
+        logger.LogInformation("User minimized main window");
+        WindowState = WindowState.Minimized;
+    }
+
+    private void ToggleMaximizeWindow(object? sender, RoutedEventArgs eventArgs)
+    {
+        logger.LogInformation("User toggled maximize; prior state {State}", WindowState);
+        WindowState = WindowState == WindowState.Maximized
+            ? WindowState.Normal
+            : WindowState.Maximized;
+    }
+
+    private void CloseWindow(object? sender, RoutedEventArgs eventArgs)
+    {
+        logger.LogInformation("User clicked Close window");
+        Close();
+    }
+
+    private void CloseWithoutSaving(object? sender, RoutedEventArgs eventArgs)
+    {
+        logger.LogInformation("User chose Exit without saving");
+        if (DataContext is MainViewModel viewModel) viewModel.SuppressProjectAutosave();
+        settingsPersistence?.SuppressSave();
+        Close();
+    }
+
+    private void UpdateWindowChrome()
+    {
+        bool maximized = WindowState == WindowState.Maximized;
+        RootGrid.Margin = maximized ? new Thickness(7) : new Thickness(0);
+        MaximizeIcon.Kind = maximized ? MaterialIconKind.WindowRestore : MaterialIconKind.WindowMaximize;
+    }
+
+    private void HandleWindowKeyDown(object? sender, KeyEventArgs eventArgs)
+    {
+        if (eventArgs.Key != Key.K || eventArgs.KeyModifiers != KeyModifiers.Control) return;
+
+        logger.LogInformation("User pressed Ctrl+K to focus feature search");
+        if (DataContext is MainViewModel viewModel)
+        {
+            viewModel.IsNavigationOpen = true;
+            Dispatcher.UIThread.Post(
+                () => ToolSearchBox.Focus(),
+                DispatcherPriority.Input);
+        }
+
+        eventArgs.Handled = true;
+    }
+
+    private void ReplayHistory(bool undo)
+    {
+        if (DialogHostInteraction.IsDialogOpen)
+        {
+            var history = DialogHostInteraction.CurrentUndoHistory;
+            if (undo) history?.Undo();
+            else history?.Redo();
+            return;
+        }
+
+        if (DataContext is not MainViewModel viewModel) return;
+        var command = undo ? viewModel.UndoCommand : viewModel.RedoCommand;
+        if (command.CanExecute(null)) command.Execute(null);
+    }
+
+    private IProjectUndoHistory? ActiveHistory()
+    {
+        if (DialogHostInteraction.IsDialogOpen) return DialogHostInteraction.CurrentUndoHistory;
+        return (DataContext as MainViewModel)?.ProjectHistory;
+    }
+
+    private void DragCurrentMaps(object? sender, PointerPressedEventArgs eventArgs)
+    {
+        if (eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed) BeginMoveDrag(eventArgs);
+    }
+
+    private void AcceptFileDrop(object? _, DragEventArgs eventArgs)
+    {
+        eventArgs.DragEffects = eventArgs.DataTransfer.Formats.Contains(DataFormat.File)
+            ? DragDropEffects.Copy
+            : DragDropEffects.None;
+        eventArgs.Handled = true;
+    }
+
+    private void OpenDroppedBeatmaps(object? _, DragEventArgs eventArgs)
+    {
+        IReadOnlyList<string> paths = eventArgs.DataTransfer.TryGetFiles()?
+                                          .Select(item => item.TryGetLocalPath())
+                                          .Where(path => !string.IsNullOrWhiteSpace(path))
+                                          .Cast<string>()
+                                          .ToArray()
+                                      ?? [];
+        if (paths.Count > 0 && DataContext is MainViewModel viewModel)
+        {
+            logger.LogInformation("User dropped {Count} beatmap paths: {Paths}", paths.Count, string.Join(" | ", paths));
+            viewModel.Workspace.SetDroppedPaths(paths);
+            eventArgs.DragEffects = DragDropEffects.Copy;
+        }
+        else
+        {
+            eventArgs.DragEffects = DragDropEffects.None;
+        }
+
+        eventArgs.Handled = true;
+    }
+
+    private void LogButtonClick(object? sender, RoutedEventArgs eventArgs)
+    {
+        if (eventArgs.Source is not Button button) return;
+
+        string label = button.Content is string text ? text : button.Name ?? button.GetType().Name;
+        logger.LogInformation("User clicked {Control} ({Label}) in {Context}",
+            button.Name ?? button.GetType().Name, label, button.DataContext?.GetType().Name);
+    }
+}

@@ -1,0 +1,77 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Mapping_Tools.Desktop.Tools.AutoFailDetector.ViewModels"
+             xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:timeline="using:Mapping_Tools.Desktop.Controls.Timeline"
+             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
+             x:Class="Mapping_Tools.Desktop.Tools.AutoFailDetector.Views.AutoFailDetectorView"
+             x:DataType="vm:AutoFailDetectorViewModel">
+    <Grid RowDefinitions="*,Auto,Auto">
+        <Grid>
+            <StackPanel>
+                <controls:ToolViewHeader
+                    Title="Auto-fail Detector"
+                    IsQuickRunSupported="True"
+                    HelpText="{loc:Tr AutoFailDetector_Help}" />
+
+                <CheckBox FontSize="14" Cursor="Hand" Content="{loc:Tr AutoFailDetector_ShowUnloading}"
+                          IsChecked="{Binding ShowUnloadingObjects}"
+                          ToolTip.Tip="{loc:Tr AutoFailDetector_ShowUnloadingTip}" />
+                <CheckBox FontSize="14" Cursor="Hand" Content="{loc:Tr AutoFailDetector_ShowPotentialUnloading}"
+                          IsChecked="{Binding ShowPotentialUnloadingObjects}"
+                          ToolTip.Tip="{loc:Tr AutoFailDetector_ShowPotentialUnloadingTip}" />
+                <CheckBox FontSize="14" Cursor="Hand" Content="{loc:Tr AutoFailDetector_ShowDisruptors}"
+                          IsChecked="{Binding ShowPotentialDisruptors}"
+                          ToolTip.Tip="{loc:Tr AutoFailDetector_ShowDisruptorsTip}" />
+                <CheckBox FontSize="14" Cursor="Hand" Content="{loc:Tr AutoFailDetector_GetFixGuide}"
+                          IsChecked="{Binding GetAutoFailFix}"
+                          ToolTip.Tip="{loc:Tr AutoFailDetector_GetFixGuideTip}" />
+                <CheckBox FontSize="14" Cursor="Hand" Content="{loc:Tr AutoFailDetector_AutoInsertSpinners}"
+                          IsChecked="{Binding AutoPlaceFix}"
+                          ToolTip.Tip="{loc:Tr AutoFailDetector_AutoInsertSpinnersTip}" />
+
+                <TextBox Width="258" Margin="0,10,0,0" HorizontalAlignment="Left"
+                         materialAssists:TextFieldAssist.Label="{loc:Tr AutoFailDetector_ArOverride}"
+                         Text="{ReflectionBinding ApproachRateOverride, Converter={StaticResource InvariantDoubleConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         ToolTip.Tip="{loc:Tr AutoFailDetector_ArOverrideTip}" />
+                <TextBox Width="258" Margin="0,10,0,0" HorizontalAlignment="Left"
+                         materialAssists:TextFieldAssist.Label="{loc:Tr AutoFailDetector_OdOverride}"
+                         Text="{ReflectionBinding OverallDifficultyOverride, Converter={StaticResource InvariantDoubleConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         ToolTip.Tip="{loc:Tr AutoFailDetector_OdOverrideTip}" />
+                <TextBox Width="258" Margin="0,20,0,0" HorizontalAlignment="Left"
+                         materialAssists:TextFieldAssist.Label="{loc:Tr AutoFailDetector_PhysicsLeniency}"
+                         Text="{ReflectionBinding PhysicsUpdateLeniency, Converter={StaticResource InvariantInt32Converter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         ToolTip.Tip="{loc:Tr AutoFailDetector_PhysicsLeniencyTip}" />
+            </StackPanel>
+
+            <controls:ToolRunButton Margin="10"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Bottom"
+                                    RunCommand="{Binding RunCommand}" />
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap" FontWeight="Bold" Opacity="0.58"
+                               Text="{loc:Tr AutoFailDetector_FooterMadeBy}" />
+                </WrapPanel>
+            </Grid>
+
+            <Grid Grid.Column="1">
+                <controls:ToolProgressBar Height="20" Margin="20,0,20,0"
+                                          Background="{x:Null}" BorderBrush="{x:Null}"
+                                          Maximum="100" Value="{Binding Progress}" />
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Row="2">
+            <StackPanel IsVisible="{Binding HasRun}"
+                        ToolTip.Tip="{loc:Tr AutoFailDetector_TimelineTip}">
+                <timeline:TimelineControl Height="66" StartTime="0" EndTime="{Binding EndTime}"
+                                          Markers="{Binding Markers}" NavigateCommand="{Binding NavigateCommand}" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

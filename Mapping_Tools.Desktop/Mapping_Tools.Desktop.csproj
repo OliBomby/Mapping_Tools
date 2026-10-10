@@ -1,0 +1,93 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <RuntimeIdentifiers>win-x86;win-x64;linux-x64;linux-arm64;osx-x64;osx-arm64</RuntimeIdentifiers>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <Version>2.0.0</Version>
+    <AssemblyVersion>2.0.0</AssemblyVersion>
+    <FileVersion>2.0.0</FileVersion>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\mt_icon.ico</ApplicationIcon>
+    <!-- Disable Avalonia's build-time usage statistics task; developer tools remain enabled. -->
+    <UsedAvaloniaProducts/>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\**"/>
+    <Content Include="Assets\mt_logo_256.png" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Localization/Desktop*.resx">
+      <LogicalName>Mapping_Tools.Desktop.Localization.$([System.String]::Copy('%(Filename)').Replace('Desktop', 'DesktopStrings')).resources</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization/Desktop.resx">
+      <Generator>MSBuild:Compile</Generator>
+      <StronglyTypedFileName>$(IntermediateOutputPath)DesktopStrings.Designer.cs</StronglyTypedFileName>
+      <StronglyTypedLanguage>CSharp</StronglyTypedLanguage>
+      <StronglyTypedNamespace>Mapping_Tools.Desktop.Localization</StronglyTypedNamespace>
+      <StronglyTypedClassName>DesktopStrings</StronglyTypedClassName>
+      <PublicClass>true</PublicClass>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia.Markup.Xaml.Loader" Version="12.1.0" PrivateAssets="All" Publish="True"/>
+    <PackageReference Include="HotAvalonia" Version="3.*" PrivateAssets="All" Publish="True"/>
+    <PackageReference Include="Avalonia" Version="12.1.0"/>
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.0"/>
+    <PackageReference Include="ProDataGrid" Version="12.1.0.4"/>
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.0"/>
+    <PackageReference Include="Avalonia.Controls.ColorPicker" Version="12.1.0"/>
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.0"/>
+    <PackageReference Include="Avalonia.Labs.Panels" Version="12.0.999-cibuild-00069693"/>
+    <PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.3">
+      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2"/>
+    <PackageReference Include="DialogHost.Avalonia" Version="0.12.3"/>
+    <PackageReference Include="Material.Avalonia" Version="3.17.0"/>
+    <PackageReference Include="Material.Icons.Avalonia" Version="3.0.2"/>
+    <PackageReference Include="Markdown.Avalonia" Version="12.0.0-a3"/>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.9"/>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.9"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Mapping_Tools.Application\Mapping_Tools.Application.csproj"/>
+    <ProjectReference Include="..\Mapping_Tools.Infrastructure\Mapping_Tools.Infrastructure.csproj"/>
+  </ItemGroup>
+
+  <Target Name="RenamePublishedAppHost" AfterTargets="Publish">
+    <PropertyGroup>
+      <PublishedAppHostSource>$(PublishDir)Mapping_Tools.Desktop</PublishedAppHostSource>
+      <PublishedAppHostDestination>$(PublishDir)Mapping Tools</PublishedAppHostDestination>
+      <PublishedAppHostSource Condition="'$(RuntimeIdentifier)' == 'win-x86' Or '$(RuntimeIdentifier)' == 'win-x64'">$(PublishDir)Mapping_Tools.Desktop.exe</PublishedAppHostSource>
+      <PublishedAppHostDestination Condition="'$(RuntimeIdentifier)' == 'win-x86' Or '$(RuntimeIdentifier)' == 'win-x64'">$(PublishDir)Mapping Tools.exe</PublishedAppHostDestination>
+    </PropertyGroup>
+
+    <Move SourceFiles="$(PublishedAppHostSource)"
+          DestinationFiles="$(PublishedAppHostDestination)"
+          Condition="Exists('$(PublishedAppHostSource)')"/>
+  </Target>
+
+  <!-- These assemblies back Windows-only live-editor and overlay adapters.
+       The shared Infrastructure assembly keeps compile-time references,
+       while Unix bundles omit those unused runtime assets. -->
+  <Target Name="ExcludeWindowsOnlyRuntimeAssets"
+          BeforeTargets="_GetCurrentAndPriorPublishFileWrites;_ComputeResolvedFilesToPublishTypes"
+          Condition="'$(RuntimeIdentifier)' == 'linux-x64' Or
+                     '$(RuntimeIdentifier)' == 'linux-arm64' Or
+                     '$(RuntimeIdentifier)' == 'osx-x64' Or
+                     '$(RuntimeIdentifier)' == 'osx-arm64'">
+    <ItemGroup>
+      <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)"
+                             Condition="'%(ResolvedFileToPublish.Filename)' == 'EditorReader' Or
+                                        '%(ResolvedFileToPublish.Filename)' == 'NAudio.Wasapi'"/>
+    </ItemGroup>
+  </Target>
+</Project>

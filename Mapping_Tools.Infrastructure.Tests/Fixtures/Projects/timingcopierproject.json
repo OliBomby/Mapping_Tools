@@ -1,0 +1,30 @@
+{
+  "$type": "Mapping_Tools.Viewmodels.TimingCopierVm, Mapping Tools",
+  "ImportPath": "%USERPROFILE%\\AppData\\Local\\osu!\\Songs\\beatmap-638754722706392574-09.蜑企勁 - 髮ｶ譎ゅ・髏倥′魑ｴ繧句燕縺ｫ [Cinderella Ball] [PpJPh8G9KrY]\\beatmapbb8b8db92aa44e3180da2fcd5a5bfdd7.osu",
+  "ExportPath": "%USERPROFILE%\\AppData\\Local\\osu!\\Songs\\beatmap-638754722706392574-09.蜑企勁 - 髮ｶ譎ゅ・髏倥′魑ｴ繧句燕縺ｫ [Cinderella Ball] [PpJPh8G9KrY]\\Sakuzyo - Cinderella Ball (OliBomby) [Hitsounds].osu",
+  "ResnapMode": "Just resnap",
+  "BeatDivisors": [
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 3
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 4
+    }
+  ],
+  "ImportLoadCommand": {
+    "$type": "Mapping_Tools.Components.Domain.CommandImplementation, Mapping Tools"
+  },
+  "ImportBrowseCommand": {
+    "$type": "Mapping_Tools.Components.Domain.CommandImplementation, Mapping Tools"
+  },
+  "ExportLoadCommand": {
+    "$type": "Mapping_Tools.Components.Domain.CommandImplementation, Mapping Tools"
+  },
+  "ExportBrowseCommand": {
+    "$type": "Mapping_Tools.Components.Domain.CommandImplementation, Mapping Tools"
+  }
+}

@@ -1,0 +1,12 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:converters="using:Mapping_Tools.Desktop.Converters">
+    <Style Selector="TextBox">
+        <Setter Property="DataValidationErrors.ErrorConverter"
+                Value="{x:Static converters:ValidationErrorMessageConverter.ConvertError}" />
+    </Style>
+    <Style Selector="ComboBox">
+        <Setter Property="DataValidationErrors.ErrorConverter"
+                Value="{x:Static converters:ValidationErrorMessageConverter.ConvertError}" />
+    </Style>
+</Styles>

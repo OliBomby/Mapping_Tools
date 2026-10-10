@@ -1,0 +1,17 @@
+{
+  "$type": "Mapping_Tools.Viewmodels.MapsetMergerVm, Mapping Tools",
+  "ExportPath": "%USERPROFILE%\\AppData\\Local\\Mapping Tools\\Exports",
+  "MoveSbToBeatmap": false,
+  "Mapsets": [
+    {
+      "$type": "Mapping_Tools.Viewmodels.MapsetMergerVm+MapsetItem, Mapping Tools",
+      "Name": "1838134 seatrus - ILLEGAL LEGACY",
+      "Path": "%USERPROFILE%\\AppData\\Local\\osu!\\Songs\\1838134 seatrus - ILLEGAL LEGACY"
+    },
+    {
+      "$type": "Mapping_Tools.Viewmodels.MapsetMergerVm+MapsetItem, Mapping Tools",
+      "Name": "2146761 seatrus - ILLEGAL LEGACY",
+      "Path": "%USERPROFILE%\\AppData\\Local\\osu!\\Songs\\2146761 seatrus - ILLEGAL LEGACY"
+    }
+  ]
+}

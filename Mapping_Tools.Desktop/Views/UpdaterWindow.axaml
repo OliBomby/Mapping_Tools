@@ -1,0 +1,114 @@
+<Window x:Class="Mapping_Tools.Desktop.Views.UpdaterWindow"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:loc="using:Mapping_Tools.Desktop.Localization"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+        xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+        xmlns:md="https://github.com/whistyun/Markdown.Avalonia"
+        xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+        xmlns:viewModels="clr-namespace:Mapping_Tools.Desktop.ViewModels"
+        x:DataType="viewModels:UpdaterViewModel"
+        Title="{loc:Tr Shell_MappingToolsUpdater}"
+        Width="700"
+        Height="500"
+        CanResize="True"
+        ShowInTaskbar="True"
+        WindowStartupLocation="CenterOwner"
+        WindowDecorations="BorderOnly"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="35"
+        Icon="/Assets/mt_icon.ico"
+        Background="{DynamicResource MaterialPaperBrush}"
+        Foreground="{DynamicResource MaterialBodyBrush}"
+        FontFamily="avares://Mapping_Tools.Desktop/Assets/Fonts#Roboto"
+        FontSize="14"
+        FontWeight="Medium">
+    <Grid RowDefinitions="35,*">
+        <controls:WindowChrome Grid.Row="0" Title="{loc:Tr Shell_MappingToolsUpdater}" />
+
+        <Grid Grid.Row="1"
+              Margin="20,10,20,20">
+            <Grid IsVisible="{Binding IsReadyPanelVisible}"
+                  RowDefinitions="Auto,*,Auto"
+                  ColumnDefinitions="*,200">
+                <Grid Grid.Row="0"
+                      Grid.ColumnSpan="2"
+                      ColumnDefinitions="Auto,*">
+                    <Image Source="/Assets/mt_logo_256.png"
+                           Width="64"
+                           Margin="10" />
+                    <TextBlock Grid.Column="1"
+                               Text="{loc:Tr Shell_ANewVersionOfMappingToolsIsReadyToBeInstalled}"
+                               FontSize="18"
+                               VerticalAlignment="Center"
+                               TextWrapping="Wrap" />
+                </Grid>
+
+                <materialControls:Card Grid.Row="1"
+                                       Grid.Column="0"
+                                       materialAssists:ShadowAssist.ShadowDepth="Depth0"
+                                       Margin="0,10,0,0"
+                                       Padding="10">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled">
+                        <StackPanel>
+                            <TextBlock Text="{Binding ReleaseTitle}"
+                                       TextWrapping="Wrap"
+                                       FontSize="18"
+                                       FontWeight="Bold" />
+                            <md:MarkdownScrollViewer Markdown="{Binding ReleaseBody}">
+                                <md:MarkdownScrollViewer.Styles>
+                                    <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/Markdown.axaml" />
+                                </md:MarkdownScrollViewer.Styles>
+                            </md:MarkdownScrollViewer>
+                        </StackPanel>
+                    </ScrollViewer>
+                </materialControls:Card>
+
+                <StackPanel Grid.Row="1"
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            Margin="20,0,0,0">
+                    <Button Content="{loc:Tr Shell_InstallNow}"
+                            Command="{Binding InstallNowCommand}"
+                            Margin="0,0,0,20" />
+                    <Button Content="{loc:Tr Shell_InstallAfterClosing}"
+                            Command="{Binding InstallAfterClosingCommand}"
+                            Classes="light"
+                            Margin="0,0,0,20" />
+                    <Button Content="{loc:Tr Shell_SkipThisVersion}"
+                            Command="{Binding SkipVersionCommand}"
+                            Classes="outline"
+                            Margin="20,20,20,0" />
+                </StackPanel>
+            </Grid>
+
+            <Grid IsVisible="{Binding IsDownloadPanelVisible}"
+                  RowDefinitions="*,Auto">
+                <Grid Grid.Row="0"
+                      Grid.Column="0">
+                    <StackPanel HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                        <Image Source="/Assets/MTcog256.gif"
+                               Width="128"
+                               Height="128"
+                               HorizontalAlignment="Center" />
+                        <TextBlock FontSize="15"
+                                   Text="{loc:Tr Shell_DownloadingNewUpdate}"
+                                   HorizontalAlignment="Center"
+                                   Foreground="{DynamicResource MaterialDarkForegroundBrush}"
+                                   FontWeight="Normal" />
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Row="1"
+                      Grid.Column="0"
+                      Margin="10,0,10,0">
+                    <ProgressBar Height="15"
+                                 Minimum="0"
+                                 Maximum="1"
+                                 Value="{Binding DownloadProgress}" />
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

@@ -1,0 +1,306 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Mapping_Tools.Desktop.ViewModels"
+             xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="800"
+             d:DesignHeight="450"
+             MinWidth="500"
+             MinHeight="600"
+             x:Class="Mapping_Tools.Desktop.Views.PreferencesView"
+             x:DataType="vm:PreferencesViewModel"
+             Foreground="{DynamicResource MaterialBodyBrush}"
+             FontFamily="avares://Mapping_Tools.Desktop/Assets/Fonts#Roboto">
+
+    <Grid>
+        <StackPanel Margin="0,0,100,0">
+            <TextBlock Text="{loc:Tr Shell_Preferences}"
+                       FontSize="32"
+                       FontWeight="Bold"
+                       Foreground="{DynamicResource MaterialPrimaryMidBrush}" />
+
+            <Grid Margin="0,20,0,0"
+                  ColumnDefinitions="*,Auto">
+                <TextBox MinWidth="220"
+                         Margin="0,0,5,0"
+                         materialAssists:TextFieldAssist.Label="{loc:Tr Shell_OsuFolder}"
+                         Text="{Binding OsuPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         ToolTip.Tip="{loc:Tr Shell_SelectThePathToYourOsuFolder}" />
+                <Button Grid.Column="1"
+                        Classes="flat path-picker"
+                        AutomationProperties.Name="{loc:Tr Shell_BrowseOsuFolder}"
+                        Command="{Binding BrowseOsuPathCommand}"
+                        VerticalAlignment="Bottom"
+                        ToolTip.Tip="{loc:Tr Shell_BrowseForTheOsuFolder}">
+                    <materialIcons:MaterialIcon Kind="Folder"
+                                                Width="30"
+                                                Height="30" />
+                </Button>
+            </Grid>
+
+            <Grid Margin="0,10,0,0"
+                  ColumnDefinitions="*,Auto">
+                <TextBox MinWidth="220"
+                         Margin="0,0,5,0"
+                         materialAssists:TextFieldAssist.Label="{loc:Tr Shell_SongsFolder}"
+                         Text="{Binding SongsPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         ToolTip.Tip="{loc:Tr Shell_SelectThePathToYourOsuSongsFolder}" />
+                <Button Grid.Column="1"
+                        Classes="flat path-picker"
+                        AutomationProperties.Name="{loc:Tr Shell_BrowseSongsFolder}"
+                        Command="{Binding BrowseSongsPathCommand}"
+                        VerticalAlignment="Bottom"
+                        ToolTip.Tip="{loc:Tr Shell_BrowseForTheSongsFolder}">
+                    <materialIcons:MaterialIcon Kind="Folder"
+                                                Width="30"
+                                                Height="30" />
+                </Button>
+            </Grid>
+
+            <Grid Margin="0,10,0,0"
+                  ColumnDefinitions="*,Auto">
+                <TextBox MinWidth="220"
+                         Margin="0,0,5,0"
+                         materialAssists:TextFieldAssist.Label="{loc:Tr Shell_OsuUserConfigFile}"
+                         Text="{Binding OsuConfigPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         ToolTip.Tip="{loc:Tr Shell_SelectThePathToYourOsuUserConfigFileThisFileUsuallyContainsTheNameOfYourPcAccount}" />
+                <Button Grid.Column="1"
+                        Classes="flat path-picker"
+                        AutomationProperties.Name="{loc:Tr Shell_BrowseOsuConfiguration}"
+                        Command="{Binding BrowseOsuConfigPathCommand}"
+                        VerticalAlignment="Bottom"
+                        ToolTip.Tip="{loc:Tr Shell_BrowseForTheOsuUserConfigurationFile}">
+                    <materialIcons:MaterialIcon Kind="Folder"
+                                                Width="30"
+                                                Height="30" />
+                </Button>
+            </Grid>
+
+            <Grid Margin="0,10,0,0"
+                  ColumnDefinitions="*,Auto">
+                <TextBox MinWidth="220"
+                         Margin="0,0,5,0"
+                         materialAssists:TextFieldAssist.Label="{loc:Tr Shell_BackupsFolder}"
+                         Text="{Binding BackupsPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         ToolTip.Tip="{loc:Tr Shell_SelectThePathToYourBackupsFolderThisIsWhereMappingToolsWillSaveBackups}" />
+                <Button Grid.Column="1"
+                        Classes="flat path-picker"
+                        AutomationProperties.Name="{loc:Tr Shell_BrowseBackupsFolder}"
+                        Command="{Binding BrowseBackupsPathCommand}"
+                        VerticalAlignment="Bottom"
+                        ToolTip.Tip="{loc:Tr Shell_BrowseForTheBackupsFolder}">
+                    <materialIcons:MaterialIcon Kind="Folder"
+                                                Width="30"
+                                                Height="30" />
+                </Button>
+            </Grid>
+
+            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                <ComboBox MinWidth="150"
+                          HorizontalAlignment="Left"
+                          ItemsSource="{Binding CurrentBeatmapFetchingModes}"
+                          SelectedItem="{Binding CurrentBeatmapFetching, Mode=TwoWay}"
+                          materialAssists:ComboBoxAssist.Label="{loc:Tr Shell_CurrentBeatmapFetching}"
+                          ToolTip.Tip="{loc:Tr Shell_ChooseHowMappingToolsFindsTheBeatmapCurrentlyOpenInOsuGosumemoryModeRequiresGosumemoryRunningLocally}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                        <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <ComboBox MinWidth="150"
+                          Margin="15 0 0 0"
+                          HorizontalAlignment="Left"
+                          ItemsSource="{Binding BeatmapLiveStateReadingModes}"
+                          SelectedItem="{Binding BeatmapLiveStateReading, Mode=TwoWay}"
+                          materialAssists:ComboBoxAssist.Label="{loc:Tr Shell_BeatmapLiveStateReading}"
+                          ToolTip.Tip="{loc:Tr Shell_ChooseHowMappingToolsReadsUnsavedStateFromTheBeatmapEditor}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                        <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <ComboBox MinWidth="150"
+                          Margin="15 0 0 0"
+                          HorizontalAlignment="Left"
+                          ItemsSource="{Binding EditorReloadModes}"
+                          SelectedItem="{Binding EditorReload, Mode=TwoWay}"
+                          materialAssists:ComboBoxAssist.Label="{loc:Tr Shell_EditorReload}"
+                          ToolTip.Tip="{loc:Tr Shell_ChooseHowTheOsuEditorIsReloadedAfterQuickrun}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                        <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </StackPanel>
+
+            <TextBox MinWidth="150"
+                     Margin="0,10,0,0"
+                     HorizontalAlignment="Left"
+                     materialAssists:TextFieldAssist.Label="{loc:Tr Shell_MaxBackupFiles}"
+                     Text="{ReflectionBinding MaxBackupFiles,
+                                              Mode=TwoWay,
+                                              UpdateSourceTrigger=LostFocus,
+                                              Converter={StaticResource InvariantInt32Converter}}"
+                     ToolTip.Tip="{loc:Tr Shell_SelectTheMaximumNumberOfBackupFilesTheOldestBeatmapBackupsInTheBackupsFolderWillAutomaticallyGetRemo}" />
+
+            <StackPanel Margin="5,10,0,0">
+                <CheckBox HorizontalAlignment="Left"
+                          Content="{loc:Tr Shell_MakeAutomaticBackups}"
+                          IsChecked="{Binding MakeBackups, Mode=TwoWay}"
+                          ToolTip.Tip="{loc:Tr Shell_AutomaticallyMakeABackupWheneverYouRunAMappingTool}" />
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox HorizontalAlignment="Left"
+                              Content="{loc:Tr Shell_MakePeriodicBackups}"
+                              IsChecked="{Binding MakePeriodicBackups, Mode=TwoWay}"
+                              ToolTip.Tip="{loc:Tr Shell_PeriodicallyMakeAutomaticBackupsWhenTheEditorIsOpenThisIsUsefulIfYouForgetToSaveOftenOrAccidentallyD}" />
+                    <TextBox MinWidth="100"
+                             Margin="20,0,0,0"
+                             HorizontalAlignment="Left"
+                             IsVisible="{Binding MakePeriodicBackups}"
+                             materialAssists:TextFieldAssist.Label="{loc:Tr Shell_BackupInterval}"
+                             Text="{ReflectionBinding PeriodicBackupInterval,
+                                                      Mode=TwoWay,
+                                                      UpdateSourceTrigger=LostFocus,
+                                                      Converter={StaticResource ConstantTimeSpanConverter}}"
+                             ToolTip.Tip="{loc:Tr Shell_TheTimeBetweenEachAutomaticPeriodicBackupWhileTheEditorIsOpen}" />
+                </StackPanel>
+                <CheckBox HorizontalAlignment="Left"
+                          Content="{loc:Tr Shell_CurrentBeatmapDefaultFolderInAllTools}"
+                          IsChecked="{Binding CurrentBeatmapDefaultFolder, Mode=TwoWay}"
+                          ToolTip.Tip="{loc:Tr Shell_EnableThisToGetTheCurrentBeatmapFolderAsTheDefaultFolderWheneverYouOpenAFileExplorerInAToolWhichDoes}" />
+                <CheckBox HorizontalAlignment="Left"
+                          Content="{loc:Tr Shell_AlwaysUseQuickrun}"
+                          IsChecked="{Binding AlwaysQuickRun, Mode=TwoWay}"
+                          ToolTip.Tip="{loc:Tr Shell_EnableThisToUseQuickrunEvenWhenYouPressTheButtonToRunNormally}" />
+                <CheckBox HorizontalAlignment="Left"
+                          Content="{loc:Tr Shell_OverrideOsuSaveWithBettersave}"
+                          IsChecked="{Binding OverrideOsuSave, Mode=TwoWay}"
+                          ToolTip.Tip="{loc:Tr Shell_AutomaticallyBettersaveAfterEveryOsuSaveAsASideEffectThisWillAlsoOverwriteManualOsuChangesIfYouHaveT}" />
+                <CheckBox HorizontalAlignment="Left"
+                          Content="{loc:Tr Shell_AutoDetectOsuLazerExternalEditing}"
+                          IsChecked="{Binding AutoDetectLazerExternalEdit, Mode=TwoWay}"
+                          ToolTip.Tip="{loc:Tr Shell_SelectTheBeatmapInAnActiveOsuLazerExternalEditFolderAndUseItForCurrentBeatmapActionsUntilTheFolderCl}" />
+            </StackPanel>
+
+            <Grid Margin="5,10,0,0" RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto,Auto,Auto,Auto">
+                <TextBlock Grid.Row="0" Grid.Column="0" MinWidth="120"
+                           Margin="0,0,5,0"
+                           VerticalAlignment="Center"
+                           Text="{loc:Tr Shell_QuickrunHotkey}"
+                           ToolTip.Tip="{loc:Tr Shell_QuickrunLetsYouQuicklyRunAToolOnTheBeatmapYouHaveOpenInTheEditor}" />
+                <controls:HotkeyEditor Grid.Row="0" Grid.Column="1" Width="150"
+                                       Classes="compact"
+                                       Hotkey="{Binding QuickRunHotkey, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+
+                <CheckBox Grid.Row="0" Grid.Column="2" Margin="15,0,0,0"
+                          VerticalAlignment="Center"
+                          IsChecked="{Binding SmartQuickRunEnabled, Mode=TwoWay}"
+                          ToolTip.Tip="{loc:Tr Shell_EnableSmartquickrunToModifyTheBehaviorOfQuickrunBasedOnTheNumberOfObjectsCurrentlySelectedOnTheEdito}" />
+
+                <StackPanel Grid.Row="0" Grid.Column="3" Orientation="Horizontal"
+                            IsEnabled="{Binding SmartQuickRunEnabled}">
+                    <TextBlock Margin="10,0"
+                               Classes="togglable"
+                               VerticalAlignment="Center"
+                               Text="{loc:Tr Shell_None}"
+                               ToolTip.Tip="{loc:Tr Shell_ThisToolGetsQuickrunIfYouHaveNoObjectsSelectedInTheEditor}" />
+                    <ComboBox MinWidth="120"
+                              Classes="compact"
+                              ItemsSource="{Binding NoneQuickRunTools}"
+                              SelectedItem="{Binding NoneQuickRunTool, Mode=TwoWay}"
+                              ToolTip.Tip="{loc:Tr Shell_ThisToolGetsQuickrunIfYouHaveNoObjectsSelectedInTheEditor}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <TextBlock Margin="10,0"
+                               Classes="togglable"
+                               VerticalAlignment="Center"
+                               Text="{loc:Tr Shell_Single}"
+                               ToolTip.Tip="{loc:Tr Shell_ThisToolGetsQuickrunIfYouHaveOneObjectSelectedInTheEditor}" />
+                    <ComboBox MinWidth="120"
+                              Classes="compact"
+                              ItemsSource="{Binding SingleQuickRunTools}"
+                              SelectedItem="{Binding SingleQuickRunTool, Mode=TwoWay}"
+                              ToolTip.Tip="{loc:Tr Shell_ThisToolGetsQuickrunIfYouHaveOneObjectSelectedInTheEditor}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <TextBlock Margin="10,0"
+                               Classes="togglable"
+                               VerticalAlignment="Center"
+                               Text="{loc:Tr Shell_Multiple}"
+                               ToolTip.Tip="{loc:Tr Shell_ThisToolGetsQuickrunIfYouHaveMultipleObjectsSelectedInTheEditor}" />
+                    <ComboBox MinWidth="120"
+                              Classes="compact"
+                              ItemsSource="{Binding MultipleQuickRunTools}"
+                              SelectedItem="{Binding MultipleQuickRunTool, Mode=TwoWay}"
+                              ToolTip.Tip="{loc:Tr Shell_ThisToolGetsQuickrunIfYouHaveMultipleObjectsSelectedInTheEditor}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+
+                <TextBlock Grid.Row="1" Grid.Column="0" MinWidth="120"
+                           Margin="0,0,5,0"
+                           VerticalAlignment="Center"
+                           Text="{loc:Tr Shell_QuickundoHotkey}"
+                           ToolTip.Tip="{loc:Tr Shell_QuicklyLoadsTheLatestBackupIntoTheBeatmapCurrentlyOpenInTheEditor}" />
+                <controls:HotkeyEditor Grid.Row="1" Grid.Column="1" Width="150"
+                                       Classes="compact"
+                                       Hotkey="{Binding QuickUndoHotkey, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+
+                <TextBlock Grid.Row="2" Grid.Column="0" MinWidth="120"
+                           Margin="0,0,5,0"
+                           VerticalAlignment="Center"
+                           Text="{loc:Tr Shell_BettersaveHotkey}"
+                           ToolTip.Tip="{loc:Tr Shell_BettersaveSavesTheCurrentMapWithProperRoundingInsteadOfTruncatingValues}" />
+                <controls:HotkeyEditor Grid.Row="2" Grid.Column="1" Width="150"
+                                       Classes="compact"
+                                       Hotkey="{Binding BetterSaveHotkey, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+            </Grid>
+
+            <ComboBox Margin="0,10,0,0"
+                      MinWidth="220"
+                      HorizontalAlignment="Left"
+                      ItemsSource="{Binding Languages}"
+                      SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}"
+                      materialAssists:ComboBoxAssist.Label="{loc:Tr Shell_Language}"
+                      ToolTip.Tip="{loc:Tr Shell_ChooseTheInterfaceLanguageDatesAndNumbersKeepTheirExistingFormat}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="loc:LanguageOption">
+                        <TextBlock Text="{Binding Name}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+
+            <StackPanel Margin="0,15,0,0"
+                        Orientation="Horizontal">
+                <TextBlock Text="{loc:Tr Shell_Light}" />
+                <ToggleSwitch Margin="10,0"
+                              AutomationProperties.Name="{loc:Tr Shell_DarkTheme}"
+                              IsChecked="{Binding Theme,
+                                                  Mode=TwoWay,
+                                                  Converter={StaticResource DarkThemeConverter}}"
+                              ToolTip.Tip="{loc:Tr Shell_ChangeTheThemeOfMappingTools}" />
+                <TextBlock Text="{loc:Tr Shell_Dark}" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

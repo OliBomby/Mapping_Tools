@@ -1,0 +1,40 @@
+using System.ComponentModel;
+using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
+
+namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettingses;
+
+/// <summary>Settings for the scale-and-rotate generator.</summary>
+public sealed class ScaleRotateGeneratorSettings : GeneratorSettings
+{
+    /// <inheritdoc />
+    public override string Id => "scale-rotate";
+
+    /// <summary>Gets or sets the rotation angle in degrees.</summary>
+    [DisplayName("Angle")]
+    public double Angle { get; set; }
+
+    /// <summary>Gets or sets the uniform scale factor.</summary>
+    [DisplayName("Scalar")]
+    public double Scalar { get; set; } = 1;
+
+    /// <summary>Gets or sets the predicate for origin lines/points.</summary>
+    [DisplayName("Origin Input Selection")]
+    public SelectionPredicateCollection OriginInputPredicate { get; set; } = new();
+
+    /// <summary>Gets or sets the predicate for transformed objects.</summary>
+    [DisplayName("Other Input Selection")]
+    public SelectionPredicateCollection OtherInputPredicate { get; set; } = new();
+
+    /// <inheritdoc />
+    public override object Clone()
+    {
+        return new ScaleRotateGeneratorSettings
+        {
+            Generator = Generator, IsActive = IsActive, IsSequential = IsSequential, IsDeep = IsDeep,
+            RelevancyRatio = RelevancyRatio, GeneratesInheritable = GeneratesInheritable,
+            InputPredicate = (SelectionPredicateCollection)InputPredicate.Clone(), Angle = Angle, Scalar = Scalar,
+            OriginInputPredicate = (SelectionPredicateCollection)OriginInputPredicate.Clone(),
+            OtherInputPredicate = (SelectionPredicateCollection)OtherInputPredicate.Clone(),
+        };
+    }
+}

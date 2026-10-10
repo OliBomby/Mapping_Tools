@@ -1,0 +1,316 @@
+using Mapping_Tools.Desktop.Localization;
+using Mapping_Tools.Application.Localization;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Mapping_Tools.Application.Backups.Contracts;
+using Mapping_Tools.Application.Backups.Models;
+using Mapping_Tools.Application.Execution.UserNotification;
+using Mapping_Tools.Application.Execution.UserNotification.Models;
+using Mapping_Tools.Application.Platform;
+using Mapping_Tools.Application.Platform.FilePicker;
+using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Application.Workspace.Contracts;
+using Mapping_Tools.Application.Workspace.Models;
+using Mapping_Tools.Desktop.Services.Dialogs;
+using Mapping_Tools.Desktop.Shell;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+
+namespace Mapping_Tools.Desktop.ViewModels;
+
+/// <summary>
+///     Presents current-map selection and safety-copy actions in the desktop shell.
+/// </summary>
+public sealed partial class BeatmapWorkspaceViewModel : LocalizedObservableObject, IDisposable
+{
+    private readonly IApplicationDirectories applicationDirectories;
+    private readonly ILogger<BeatmapWorkspaceViewModel> logger;
+    private readonly IBeatmapBackupService backupService;
+    private readonly ICurrentBeatmapDialogService currentBeatmapDialogService;
+    private readonly IDialogService dialogs;
+    private readonly IUiDispatcher dispatcher;
+    private readonly IFilePicker filePicker;
+    private readonly IFileRevealService fileRevealService;
+    private readonly IUserNotificationService notifications;
+    private readonly IQuickUndoCommandService quickUndoService;
+    private readonly ApplicationSettings settings;
+    private readonly IBeatmapWorkspace workspace;
+    private bool disposed;
+
+    /// <summary>
+    ///     Creates shell workspace state over the process-lifetime selection and backup services.
+    /// </summary>
+    /// <param name="workspace">Owns selected paths and recent-map history.</param>
+    /// <param name="backupService">Creates and restores durable safety copies.</param>
+    /// <param name="quickUndoService">Runs the same newest-non-periodic-backup restore used by the global hotkey.</param>
+    /// <param name="filePicker">Presents the native restore-source picker.</param>
+    /// <param name="fileRevealService">Opens application-owned folders in the platform file manager.</param>
+    /// <param name="applicationDirectories">Supplies the Mapping Tools data directory.</param>
+    /// <param name="settings">Supplies the configured backups directory.</param>
+    /// <param name="dialogs">Asks for an explicit override when backup metadata differs.</param>
+    /// <param name="notifications">Publishes completion and recoverable failure outcomes.</param>
+    /// <param name="dispatcher">Marshals workspace notifications onto the UI thread.</param>
+    /// <param name="currentBeatmapDialogService">Fetches the current editor beatmap and presents lookup feedback.</param>
+    /// <param name="logger">Records shell workspace actions and errors.</param>
+    public BeatmapWorkspaceViewModel(
+        IBeatmapWorkspace workspace,
+        IBeatmapBackupService backupService,
+        IQuickUndoCommandService quickUndoService,
+        IFilePicker filePicker,
+        IFileRevealService fileRevealService,
+        IApplicationDirectories applicationDirectories,
+        ApplicationSettings settings,
+        IDialogService dialogs,
+        IUserNotificationService notifications,
+        IUiDispatcher dispatcher,
+        ICurrentBeatmapDialogService currentBeatmapDialogService,
+        ILogger<BeatmapWorkspaceViewModel>? logger = null)
+    {
+        this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        this.backupService = backupService ?? throw new ArgumentNullException(nameof(backupService));
+        this.quickUndoService = quickUndoService ?? throw new ArgumentNullException(nameof(quickUndoService));
+        this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
+        this.fileRevealService = fileRevealService ?? throw new ArgumentNullException(nameof(fileRevealService));
+        this.applicationDirectories = applicationDirectories ?? throw new ArgumentNullException(nameof(applicationDirectories));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
+        this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
+        this.dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
+        this.currentBeatmapDialogService = currentBeatmapDialogService
+                                            ?? throw new ArgumentNullException(nameof(currentBeatmapDialogService));
+        this.logger = logger ?? NullLogger<BeatmapWorkspaceViewModel>.Instance;
+
+        this.workspace.SelectionChanged += OnSelectionChanged;
+        this.workspace.RestoreMostRecent();
+        RefreshSelection(this.workspace.SelectedPaths);
+    }
+
+    /// <summary>Gets selected filenames joined in tool-consumption order.</summary>
+    [ObservableProperty]
+    public partial string SelectedMapNames { get; private set; } = string.Empty;
+
+    /// <summary>Gets full selected paths separated by lines for the shell tooltip.</summary>
+    [ObservableProperty]
+    public partial string SelectedMapToolTip { get; private set; } = string.Empty;
+
+    /// <summary>Gets the legacy singular or plural selected-map count label.</summary>
+    public string SelectedMapCountText => workspace.SelectedPaths.Count == 1
+        ? DesktopStrings.Shell_MapsTotalOne
+        : ApplicationText.Format(DesktopStrings.Shell_MapsTotal, workspace.SelectedPaths.Count);
+
+    /// <summary>Gets whether at least one beatmap is selected.</summary>
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(CreateBackupCommand))]
+    public partial bool HasSelection { get; private set; }
+
+    /// <summary>Gets whether exactly one beatmap is available as a restore destination.</summary>
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(RestoreBackupCommand))]
+    public partial bool HasSingleSelection { get; private set; }
+
+    /// <summary>Stops observing process-lifetime workspace changes.</summary>
+    public void Dispose()
+    {
+        if (disposed) return;
+
+        disposed = true;
+        workspace.SelectionChanged -= OnSelectionChanged;
+    }
+
+    /// <summary>
+    ///     Installs paths supplied by the platform drag-and-drop adapter.
+    /// </summary>
+    /// <param name="paths">Local file or directory paths in drop order.</param>
+    public void SetDroppedPaths(IEnumerable<string> paths)
+    {
+        ArgumentNullException.ThrowIfNull(paths);
+        workspace.SetSelection(paths, BeatmapSelectionSource.DragAndDrop);
+    }
+
+    [RelayCommand]
+    private Task OpenBeatmapAsync()
+    {
+        return RunUserOperationAsync(
+            () => workspace.PickBeatmapsAsync(true),
+            DesktopStrings.Shell_OpenBeatmap);
+    }
+
+    [RelayCommand]
+    private async Task OpenCurrentBeatmapAsync()
+    {
+        await RunUserOperationAsync(async () =>
+        {
+            string? path = await currentBeatmapDialogService.FetchAsync();
+            if (path is not null)
+                workspace.SetSelection([path], BeatmapSelectionSource.CurrentEditor);
+        }, DesktopStrings.Shell_OpenCurrentBeatmap);
+    }
+
+    private bool CanCreateBackup()
+    {
+        return HasSelection;
+    }
+
+    [RelayCommand(CanExecute = nameof(CanCreateBackup))]
+    private Task CreateBackupAsync()
+    {
+        return RunUserOperationAsync(async () =>
+        {
+            var result = await backupService.CreateAsync(
+                workspace.SelectedPaths,
+                BeatmapBackupReason.User,
+                true);
+            int count = result.Artifacts.Count;
+            await PublishAsync(
+                UserNotificationSeverity.Success,
+                DesktopStrings.Shell_BackupCreated,
+                count == 1
+                    ? DesktopStrings.Shell_TheSelectedBeatmapWasCopiedToTheBackupsFolder
+                    : ApplicationText.Format(DesktopStrings.Shell_BackupMany, count));
+        }, DesktopStrings.Shell_GenerateBackup);
+    }
+
+    private bool CanRestoreBackup()
+    {
+        return HasSingleSelection;
+    }
+
+    [RelayCommand(CanExecute = nameof(CanRestoreBackup))]
+    private Task RestoreBackupAsync()
+    {
+        return RunUserOperationAsync(async () =>
+        {
+            var selected = await filePicker.PickOpenFilesAsync(
+                new OpenFilePickerRequest
+                {
+                    Title = DesktopStrings.Shell_LoadBackup,
+                    SuggestedStartLocation = settings.BackupsPath,
+                    AllowMultiple = false,
+                    Filters = [CommonFilePickerFilters.BeatmapBackups],
+                });
+            if (selected.Count == 0) return;
+
+            string destination = workspace.SelectedPaths.Single();
+            try
+            {
+                await RestoreAsync(selected[0], destination, false);
+            }
+            catch (BeatmapBackupIncompatibleException exception)
+            {
+                bool restore = await dialogs.ShowMessageAsync(
+                    new MessageDialogRequest<bool>(
+                        DesktopStrings.Shell_LoadBackup,
+                        DesktopStrings.Shell_TheBackupBelongsToADifferentBeatmapLoadItAnyway,
+                        [
+                            new DialogChoice<bool>(DesktopStrings.Shell_LoadAnyway, true, true),
+                            new DialogChoice<bool>(DesktopStrings.Shell_Cancel, false, IsCancel: true),
+                        ],
+                        false,
+                        ApplicationText.Format(DesktopStrings.Shell_BackupMismatch, exception.BackupFileName, exception.DestinationFileName)));
+                if (!restore) return;
+
+                await RestoreAsync(selected[0], destination, true);
+            }
+
+            await PublishAsync(
+                UserNotificationSeverity.Success,
+                DesktopStrings.Shell_BackupLoaded,
+                DesktopStrings.Shell_TheSelectedBackupReplacedTheCurrentBeatmapSuccessfully);
+        }, DesktopStrings.Shell_LoadBackup);
+    }
+
+    [RelayCommand]
+    private Task QuickUndoAsync()
+    {
+        return RunUserOperationAsync(
+            () => quickUndoService.ExecuteAsync(),
+            "QuickUndo");
+    }
+
+    [RelayCommand]
+    private Task OpenBackupsFolderAsync()
+    {
+        return RevealAsync(settings.BackupsPath, DesktopStrings.Shell_BackupsFolderPhrase);
+    }
+
+    [RelayCommand]
+    private Task OpenApplicationFolderAsync()
+    {
+        return RevealAsync(applicationDirectories.ApplicationData, DesktopStrings.Shell_MappingToolsFolder);
+    }
+
+    private Task RestoreAsync(
+        string backupPath,
+        string destinationPath,
+        bool allowDifferentFilename)
+    {
+        return backupService.RestoreAsync(
+            backupPath,
+            destinationPath,
+            allowDifferentFilename);
+    }
+
+    private async Task RevealAsync(string path, string description)
+    {
+        await RunUserOperationAsync(async () =>
+            {
+                bool accepted = await fileRevealService.RevealAsync(path);
+                if (!accepted)
+                    await PublishAsync(
+                        UserNotificationSeverity.Warning,
+                        DesktopStrings.Shell_CouldNotOpenFolder,
+                        ApplicationText.Format(DesktopStrings.Shell_FolderOpenFailed, description));
+            }, ApplicationText.Format(DesktopStrings.Shell_OpenDestination, description));
+    }
+
+    private async Task RunUserOperationAsync(Func<Task> operation, string title)
+    {
+        logger.LogInformation("Workspace action started: {Action}", title);
+        try
+        {
+            await operation();
+            logger.LogInformation("Workspace action completed: {Action}", title);
+        }
+        catch (OperationCanceledException)
+        {
+            logger.LogInformation("Workspace action cancelled: {Action}", title);
+            // Native picker and dialog cancellation is an ordinary no-op.
+        }
+        catch (Exception exception)
+        {
+            logger.LogError(exception, "Workspace action failed: {Action}", title);
+            await PublishAsync(
+                UserNotificationSeverity.Error,
+                title,
+                ApplicationExceptionText.GetSummary(exception),
+                exception);
+        }
+    }
+
+    private void OnSelectionChanged(
+        object? sender,
+        BeatmapSelectionChangedEventArgs eventArgs)
+    {
+        dispatcher.Post(() => RefreshSelection(eventArgs.Paths));
+    }
+
+    private void RefreshSelection(IReadOnlyList<string> paths)
+    {
+        SelectedMapNames = string.Join("|", paths.Select(Path.GetFileName));
+        SelectedMapToolTip = string.Join(Environment.NewLine, paths);
+        int count = paths.Count;
+        OnPropertyChanged(nameof(SelectedMapCountText));
+        HasSelection = count > 0;
+        HasSingleSelection = count == 1;
+    }
+
+    private Task PublishAsync(
+        UserNotificationSeverity severity,
+        string title,
+        string message,
+        Exception? exception = null)
+    {
+        return notifications.PublishAsync(
+            new UserNotification(severity, title, message, exception));
+    }
+}

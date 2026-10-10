@@ -1,0 +1,181 @@
+using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.BeatmapEditing.Contracts;
+using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Application.Platform;
+using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.HitsoundStuff;
+using Mapping_Tools.Core.Progress;
+using Mapping_Tools.Core.Tools.HitsoundCopier;
+using Mapping_Tools.Core.Tools.HitsoundCopier.Models;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Mapping_Tools.Application.Localization;
+
+namespace Mapping_Tools.Application.Tools.HitsoundCopier;
+
+/// <summary>
+///     Coordinates source and target loading, multi-map transformation, sample ports, and safe saves.
+/// </summary>
+public sealed class HitsoundCopierService : IHitsoundCopierService
+{
+    private readonly IApplicationDirectories directories;
+    private readonly IBeatmapEditingGateway editingGateway;
+    private readonly IFileRevealService reveal;
+    private readonly IHitsoundSampleService samples;
+    private readonly ApplicationSettings settings;
+    private readonly ILogger<HitsoundCopierService> logger;
+
+    /// <summary>Creates the Hitsound Copier application service.</summary>
+    /// <param name="editingGateway">Loads live-aware maps and saves through the backup boundary.</param>
+    /// <param name="samples">Supplies file/audio sample discovery and export.</param>
+    /// <param name="directories">Provides the default sample export directory.</param>
+    /// <param name="reveal">Reveals the completed sample export directory.</param>
+    /// <param name="settings">Supplies the automatic editor reload preference.</param>
+    /// <param name="logger">Records target processing and sample export milestones.</param>
+    public HitsoundCopierService(
+        IBeatmapEditingGateway editingGateway,
+        IHitsoundSampleService samples,
+        IApplicationDirectories directories,
+        IFileRevealService reveal,
+        ApplicationSettings settings,
+        ILogger<HitsoundCopierService>? logger = null)
+    {
+        this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
+        this.samples = samples ?? throw new ArgumentNullException(nameof(samples));
+        this.directories = directories ?? throw new ArgumentNullException(nameof(directories));
+        this.reveal = reveal ?? throw new ArgumentNullException(nameof(reveal));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.logger = logger ?? NullLogger<HitsoundCopierService>.Instance;
+    }
+
+    /// <inheritdoc />
+    public async Task<HitsoundCopierResult> CopyAsync(
+        HitsoundCopierServiceOptions options,
+        bool quickRun = false,
+        IProgress<double>? progress = null,
+        CancellationToken cancellationToken = default)
+    {
+        Validate(options);
+        string[] targetPaths = options.PathTo
+            .Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        logger.LogInformation("Started for {Count} targets; source {SourcePath}; mode {Mode}",
+            targetPaths.Length, options.PathFrom, options.CopyMode);
+        BeatmapEditingSession? sourceSession = null;
+        if (!string.IsNullOrWhiteSpace(options.PathFrom))
+            sourceSession = await editingGateway.OpenBeatmapAsync(
+                options.PathFrom,
+                LiveBeatmapPreference.PreferLive,
+                cancellationToken).ConfigureAwait(false);
+
+        List<string> processed = [];
+        SampleSchema schema = new();
+        int matched = 0;
+        int generated = 0;
+        int muted = 0;
+        for (int index = 0; index < targetPaths.Length; index++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            logger.LogInformation("Processing target {Index}/{Count}: {Path}", index + 1, targetPaths.Length, targetPaths[index]);
+            var targetSession = await editingGateway.OpenBeatmapAsync(
+                targetPaths[index],
+                LiveBeatmapPreference.PreferLive,
+                cancellationToken).ConfigureAwait(false);
+            var source = sourceSession?.Beatmap ?? CreateEmptySource(targetSession.Beatmap);
+            string? targetDirectory = Path.GetDirectoryName(targetPaths[index]);
+            string mapDirectory = string.IsNullOrWhiteSpace(targetDirectory)
+                ? Directory.GetCurrentDirectory()
+                : targetDirectory;
+
+            bool inspectTargetSamples = options.CopyMode == HitsoundCopierCopyMode.OverwriteOnlyDefined
+                                        || options is { CopyStoryboardedSamples: true, IgnoreHitsoundSatisfiedSamples: true };
+            var firstSamples = inspectTargetSamples
+                ? await samples.AnalyzeAsync(mapDirectory, cancellationToken).ConfigureAwait(false)
+                : new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            string sourceDirectory = sourceSession is null
+                ? mapDirectory
+                : GetDirectory(options.PathFrom);
+            var sourceSamples = sourceSession is not null
+                                && options.CopyMode == HitsoundCopierCopyMode.OverwriteOnlyDefined
+                                && (options.CopyToSliderTicks || options.CopyToSliderSlides)
+                ? await samples.AnalyzeAsync(sourceDirectory, cancellationToken).ConfigureAwait(false)
+                : new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var result = HitsoundCopierEngine.Apply(
+                targetSession.Beatmap,
+                source,
+                options,
+                mapDirectory,
+                firstSamples,
+                sourceDirectory,
+                sourceSamples,
+                request => samples.TryCreateAssignment(
+                    sourceDirectory,
+                    request.SourceFilenames,
+                    sourceSamples,
+                    request.Role,
+                    request.SampleSet,
+                    request.StartIndex,
+                    schema),
+                schema,
+                cancellationToken);
+            logger.LogInformation("Transformed {Path}: {MatchedCount} matched, {GeneratedCount} samples generated, {MutedCount} edges muted; saving",
+                targetPaths[index], result.MatchedHitsoundCount, result.GeneratedSampleCount, result.MutedEdgeCount);
+            await editingGateway.SaveAsync(
+                targetSession,
+                AutomaticEditorReloadPolicy.ShouldReloadEditor(
+                    targetSession,
+                    quickRun,
+                    settings),
+                cancellationToken).ConfigureAwait(false);
+            processed.Add(targetPaths[index]);
+            matched += result.MatchedHitsoundCount;
+            generated += result.GeneratedSampleCount;
+            muted += result.MutedEdgeCount;
+            schema.MergeWith(result.SampleSchema);
+            progress?.Report(index + 1, targetPaths.Length);
+        }
+
+        if (schema.Count > 0)
+        {
+            logger.LogInformation("Exporting {SchemaCount} sample assignments", schema.Count);
+            int exportedSampleCount = await samples.ExportAsync(schema, cancellationToken).ConfigureAwait(false);
+            logger.LogInformation("Exported {ExportedCount} samples to {Directory}", exportedSampleCount, directories.Exports);
+            if (exportedSampleCount > 0)
+                await reveal.RevealAsync(directories.Exports, cancellationToken).ConfigureAwait(false);
+        }
+
+        logger.LogInformation("Completed {Count} targets: {MatchedCount} matched, {GeneratedCount} samples generated, {MutedCount} edges muted",
+            processed.Count, matched, generated, muted);
+        return new HitsoundCopierResult(processed, matched, generated, muted, schema);
+    }
+
+    private static Beatmap CreateEmptySource(Beatmap target)
+    {
+        var empty = target.DeepCopy();
+        empty.HitObjects.Clear();
+        empty.BeatmapTiming.Clear();
+        empty.StoryboardSoundSamples.Clear();
+        return empty;
+    }
+
+    private static string GetDirectory(string path)
+    {
+        string? directory = Path.GetDirectoryName(path);
+        return string.IsNullOrWhiteSpace(directory)
+            ? Directory.GetCurrentDirectory()
+            : directory;
+    }
+
+    private static void Validate(HitsoundCopierServiceOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentException.ThrowIfNullOrWhiteSpace(options.PathTo);
+        if (options.PathTo
+                .Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+                .Length
+            == 0)
+            throw new ArgumentException(ApplicationStrings.Tools_TargetBeatmapRequired, nameof(options));
+
+        HitsoundCopierEngine.Validate(options);
+    }
+}

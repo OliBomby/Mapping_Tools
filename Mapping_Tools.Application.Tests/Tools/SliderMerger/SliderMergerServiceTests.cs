@@ -1,0 +1,149 @@
+using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Application.Tests.TestDoubles;
+using Mapping_Tools.Application.Tools.SliderMerger;
+using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace Mapping_Tools.Application.Tests.Tools.SliderMerger;
+
+[TestClass]
+public sealed class SliderMergerServiceTests
+{
+    [TestMethod]
+    public async Task MergeAsync_WithSelectedMode_RequiresLiveStateAndSavesChanges()
+    {
+        // Arrange
+        var gateway = CreateGateway();
+        SliderMergerService service = new(gateway, new ApplicationSettings());
+
+        // Act
+        var result = await service.MergeAsync(
+            ["selected.osu"],
+            new SliderMergerServiceOptions());
+
+        // Assert
+        result.ProcessedPaths.Should().Equal("selected.osu");
+        gateway.OpenRequests.Select(request => request.Preference).Should().ContainSingle()
+            .Which.Should().Be(LiveBeatmapPreference.RequireLive);
+        gateway.SessionSaveRequests.Select(request => request.Session.Path)
+            .Should().Equal("selected.osu");
+    }
+
+    [TestMethod]
+    public async Task MergeAsync_WithEverythingMode_UsesPreferLiveForEachPath()
+    {
+        // Arrange
+        var gateway = CreateGateway();
+        SliderMergerService service = new(gateway, new ApplicationSettings());
+        SliderMergerServiceOptions options = new()
+        {
+            ImportModeSetting = HitObjectSelectionMode.Everything,
+        };
+
+        // Act
+        var result = await service.MergeAsync(
+            ["one.osu", "two.osu"],
+            options);
+
+        // Assert
+        result.ProcessedPaths.Should().Equal("one.osu", "two.osu");
+        gateway.OpenRequests.Select(request => request.Preference)
+            .Should().OnlyContain(preference => preference == LiveBeatmapPreference.PreferLive);
+        gateway.SessionSaveRequests.Select(request => request.Session.Path)
+            .Should().Equal("one.osu", "two.osu");
+        result.ObjectsMerged.Should().Be(4);
+    }
+
+    [TestMethod]
+    public async Task MergeAsync_WithBookmarkedMode_UsesBookmarkedObjects()
+    {
+        // Arrange
+        var gateway = CreateGateway();
+        SliderMergerService service = new(gateway, new ApplicationSettings());
+        SliderMergerServiceOptions options = new()
+        {
+            ImportModeSetting = HitObjectSelectionMode.Bookmarked,
+            Leniency = 100,
+        };
+
+        // Act
+        var result = await service.MergeAsync(["bookmarked.osu"], options);
+
+        // Assert
+        result.ObjectsMerged.Should().Be(2);
+        gateway.OpenRequests.Select(request => request.Preference).Should().ContainSingle()
+            .Which.Should().Be(LiveBeatmapPreference.PreferLive);
+    }
+
+    [TestMethod]
+    public async Task MergeAsync_WithTimeMode_UsesTimeCodeObjects()
+    {
+        // Arrange
+        var gateway = CreateGateway();
+        SliderMergerService service = new(gateway, new ApplicationSettings());
+        SliderMergerServiceOptions options = new()
+        {
+            ImportModeSetting = HitObjectSelectionMode.Time,
+            TimeCode = "00:00:000 (1,2)",
+            Leniency = 100,
+        };
+
+        // Act
+        var result = await service.MergeAsync(["time.osu"], options);
+
+        // Assert
+        result.ObjectsMerged.Should().Be(2);
+        gateway.OpenRequests.Select(request => request.Preference).Should().ContainSingle()
+            .Which.Should().Be(LiveBeatmapPreference.PreferLive);
+    }
+
+    [TestMethod]
+    public async Task MergeAsync_WithoutPaths_ThrowsBeforeOpeningBeatmaps()
+    {
+        // Arrange
+        var gateway = CreateGateway();
+        SliderMergerService service = new(gateway, new ApplicationSettings());
+
+        // Act
+        Func<Task> act = () => service.MergeAsync([], new SliderMergerServiceOptions());
+
+        // Assert
+        await act.Should().ThrowAsync<ArgumentException>();
+        gateway.OpenRequests.Should().BeEmpty();
+    }
+
+    private static RecordingBeatmapEditingGateway CreateGateway()
+    {
+        return new RecordingBeatmapEditingGateway
+        {
+            OpenBeatmapFactory = (path, _) =>
+            {
+                HitObject first = BeatmapEditingSessionTestFactory.DecodeHitObject("64,64,0,1,0");
+                HitObject second = BeatmapEditingSessionTestFactory.DecodeHitObject("164,64,100,1,0");
+                TimingPoint redline = new(
+                    0,
+                    500,
+                    4,
+                    SampleSet.Normal,
+                    0,
+                    100,
+                    true,
+                    false,
+                    false);
+                Beatmap beatmap = BeatmapEditingSessionTestFactory.CloneThroughText(
+                    new Beatmap([first, second], [redline], redline));
+                beatmap.CalculateHitObjectComboStuff();
+                beatmap.SetBookmarks([0, 100]);
+                return BeatmapEditingSessionTestFactory.FromModel(
+                    beatmap,
+                    path,
+                    new NoOpTextFileStore(),
+                    BeatmapEditingSource.Disk,
+                    [beatmap.HitObjects[0]],
+                    liveEditorTime: null);
+            },
+        };
+    }
+}

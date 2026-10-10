@@ -1,0 +1,147 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+        xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+        xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+        xmlns:geometryDashboard="clr-namespace:Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels"
+        xmlns:generatorInputSelection="clr-namespace:Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;assembly=Mapping_Tools.Core"
+        xmlns:loc="using:Mapping_Tools.Desktop.Localization"
+        x:Class="Mapping_Tools.Desktop.Tools.GeometryDashboard.Views.GeometryDashboardGeneratorSettingsWindow"
+        x:DataType="geometryDashboard:GeometryDashboardGeneratorSettingsDialogViewModel"
+        Title="{loc:Tr GeometryDashboard_SettingsWindowTitle}" Width="700" Height="500" MinWidth="700" MinHeight="360"
+        CanResize="True" WindowStartupLocation="CenterOwner" WindowDecorations="BorderOnly"
+        ExtendClientAreaToDecorationsHint="True" ExtendClientAreaTitleBarHeightHint="35"
+        Background="{DynamicResource MaterialPaperBrush}" Foreground="{DynamicResource MaterialBodyBrush}"
+        FontFamily="avares://Mapping_Tools.Desktop/Assets/Fonts#Roboto" FontSize="14" FontWeight="Medium">
+    <Window.Resources>
+        <DataTemplate x:Key="GeneratorSettingRowTemplate"
+                      x:DataType="geometryDashboard:GeometryDashboardGeneratorSettingRowViewModel">
+            <Grid Margin="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" MinWidth="180" SharedSizeGroup="GeneratorLabels" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding Name}"
+                           VerticalAlignment="Center"
+                           ToolTip.Tip="{Binding Description}" />
+                <ToggleSwitch Grid.Column="1" IsChecked="{Binding BooleanValue, Mode=TwoWay}"
+                              OnContent="" OffContent=""
+                              IsVisible="{Binding IsBoolean}" HorizontalAlignment="Left" Cursor="Hand" />
+                <TextBox Grid.Column="1" Classes="compact" Width="100"
+                         Text="{Binding ValueText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         IsVisible="{Binding IsTextEditable}" HorizontalAlignment="Left"
+                         ToolTip.Tip="{Binding ValueTextError}" />
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="GeneratorPredicateRowTemplate"
+                      x:DataType="generatorInputSelection:SelectionPredicate">
+            <StackPanel Orientation="Horizontal" Spacing="4">
+                <ListBox Classes="material-tool-toggle-list" SelectionMode="Multiple,Toggle"
+                         HorizontalAlignment="Left"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBoxItem IsSelected="{Binding NeedSelected, Mode=TwoWay}"
+                                 ToolTip.Tip="{loc:Tr GeometryDashboard_NeedSelected}">
+                        <materialIcons:MaterialIcon Kind="Selection" Width="20" Height="20" />
+                    </ListBoxItem>
+                    <ListBoxItem IsSelected="{Binding NeedLocked, Mode=TwoWay}"
+                                 ToolTip.Tip="{loc:Tr GeometryDashboard_NeedLocked}">
+                        <materialIcons:MaterialIcon Kind="Lock" Width="20" Height="20" />
+                    </ListBoxItem>
+                    <ListBoxItem IsSelected="{Binding NeedGeneratedByThis, Mode=TwoWay}"
+                                 ToolTip.Tip="{loc:Tr GeometryDashboard_NeedGeneratedByThis}">
+                        <materialIcons:MaterialIcon Kind="Equal" Width="20" Height="20" />
+                    </ListBoxItem>
+                    <ListBoxItem IsSelected="{Binding NeedGeneratedNotByThis, Mode=TwoWay}"
+                                 ToolTip.Tip="{loc:Tr GeometryDashboard_NeedGeneratedNotByThis}">
+                        <materialIcons:MaterialIcon Kind="NotEqual" Width="20" Height="20" />
+                    </ListBoxItem>
+                </ListBox>
+                <TextBox Classes="compact" Width="40" Margin="7,0,0,0"
+                         VerticalAlignment="Center"
+                         Text="{Binding MinRelevancy, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
+                         ToolTip.Tip="{loc:Tr GeometryDashboard_MinRelevancyTip}" />
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="GeneratorPredicateGroupTemplate"
+                      x:DataType="geometryDashboard:GeometryDashboardPredicateCollectionViewModel">
+            <Grid Margin="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" MinWidth="180" SharedSizeGroup="GeneratorLabels" />
+                    <ColumnDefinition Width="270" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding Name}"
+                           VerticalAlignment="Top" />
+                <ListBox Grid.Column="1" Width="270" MaxHeight="200"
+                         ItemsSource="{Binding Predicates}" SelectionMode="Multiple"
+                         SelectedItem="{Binding SelectedPredicate, Mode=OneWayToSource}"
+                         SelectionChanged="PredicatesSelectionChanged"
+                         ItemTemplate="{StaticResource GeneratorPredicateRowTemplate}">
+                    <ListBox.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="{loc:Tr GeometryDashboard_Duplicate}" Command="{Binding DuplicateCommand}"
+                                      ToolTip.Tip="{loc:Tr GeometryDashboard_DuplicatePredicateTip}" />
+                            <MenuItem Header="{loc:Tr GeometryDashboard_Remove}" Command="{Binding RemoveSelectedCommand}"
+                                      ToolTip.Tip="{loc:Tr GeometryDashboard_RemovePredicatesTip}" />
+                        </ContextMenu>
+                    </ListBox.ContextMenu>
+                </ListBox>
+                <materialDesign:FloatingButton Grid.Column="2" Classes="mini light no-transitions" Margin="5"
+                                               VerticalAlignment="Bottom" Command="{Binding AddCommand}"
+                                               ToolTip.Tip="{loc:Tr GeometryDashboard_AddPredicateTip}">
+                    <materialIcons:MaterialIcon Kind="Plus" Width="22" Height="22" />
+                </materialDesign:FloatingButton>
+                <materialDesign:FloatingButton Grid.Column="3" Classes="mini light no-transitions" Margin="5"
+                                               VerticalAlignment="Bottom" Command="{Binding RemoveCommand}"
+                                               ToolTip.Tip="{loc:Tr GeometryDashboard_RemovePredicateTip}">
+                    <materialIcons:MaterialIcon Kind="Minus" Width="22" Height="22" />
+                </materialDesign:FloatingButton>
+            </Grid>
+        </DataTemplate>
+    </Window.Resources>
+    <Grid RowDefinitions="Auto,*,Auto">
+        <controls:WindowChrome Grid.Row="0"
+                               Title="{loc:Tr GeometryDashboard_SettingsWindowTitle}"
+                               CloseResult="False" />
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Hidden">
+            <Border Padding="15,10">
+                <StackPanel Grid.IsSharedSizeScope="True">
+                    <materialDesign:Card Margin="10" Padding="0">
+                        <StackPanel>
+                            <ItemsControl ItemsSource="{Binding SharedRows}"
+                                          ItemTemplate="{StaticResource GeneratorSettingRowTemplate}" />
+                            <ItemsControl ItemsSource="{Binding SharedPredicateGroups}"
+                                          ItemTemplate="{StaticResource GeneratorPredicateGroupTemplate}" />
+                        </StackPanel>
+                    </materialDesign:Card>
+                    <materialDesign:Card Margin="10" Padding="0"
+                                         IsVisible="{Binding HasSpecificSettings}">
+                        <StackPanel>
+                            <ItemsControl ItemsSource="{Binding SpecificRows}"
+                                          ItemTemplate="{StaticResource GeneratorSettingRowTemplate}" />
+                            <ItemsControl ItemsSource="{Binding SpecificPredicateGroups}"
+                                          ItemTemplate="{StaticResource GeneratorPredicateGroupTemplate}" />
+                        </StackPanel>
+                    </materialDesign:Card>
+                </StackPanel>
+            </Border>
+        </ScrollViewer>
+        <Border Grid.Row="2" Padding="10">
+            <Grid ColumnDefinitions="*,*">
+                <Button MinWidth="200" Content="{loc:Tr GeometryDashboard_Apply}" CornerRadius="10"
+                        HorizontalAlignment="Center"
+                        Command="{Binding ApplyCommand}" />
+                <Button Grid.Column="1" MinWidth="200" Content="{loc:Tr GeometryDashboard_Cancel}" CornerRadius="10"
+                        HorizontalAlignment="Center"
+                        Command="{Binding CancelCommand}" />
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

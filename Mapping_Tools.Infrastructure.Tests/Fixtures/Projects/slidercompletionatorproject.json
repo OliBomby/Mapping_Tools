@@ -1,0 +1,15 @@
+{
+  "$type": "Mapping_Tools.Viewmodels.SliderCompletionatorVm, Mapping Tools",
+  "ImportModeSetting": 0,
+  "FreeVariableSetting": 0,
+  "TimeCode": "00:02:062 (4) - ",
+  "Duration": 0.125,
+  "EndTime": 820.0,
+  "Length": 1.0,
+  "SliderVelocity": 4.01,
+  "MoveAnchors": false,
+  "UseEndTime": true,
+  "UseCurrentEditorTime": true,
+  "DelegateToBpm": false,
+  "RemoveSliderTicks": true
+}

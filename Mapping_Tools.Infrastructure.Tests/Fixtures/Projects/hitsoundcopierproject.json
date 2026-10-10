@@ -1,0 +1,126 @@
+{
+  "$type": "Mapping_Tools.Viewmodels.HitsoundCopierVm, Mapping Tools",
+  "PathTo": "%USERPROFILE%\\AppData\\Local\\osu!\\Songs\\Kou! & KASOKUKI_Collective - Hatatagami Software - Collab\\Kou! & KASOKUKICollective - Hatatagami Software (OliBomby) [Rabbit Hole Collab].osu",
+  "PathFrom": "%USERPROFILE%\\AppData\\Local\\osu!\\Songs\\Kou! & KASOKUKI_Collective - Hatatagami Software - Collab\\Kou! & KASOKUKICollective - Hatatagami Software (OliBomby) [Hitsounds].osu",
+  "CopyMode": 0,
+  "SmartCopyModeSelected": false,
+  "TemporalLeniency": 5.5,
+  "CopyHitsounds": true,
+  "CopyBodyHitsounds": true,
+  "CopySampleSets": true,
+  "CopyVolumes": true,
+  "AlwaysPreserve5Volume": true,
+  "CopyStoryboardedSamples": true,
+  "IgnoreHitsoundSatisfiedSamples": true,
+  "IgnoreWheneverHitsound": false,
+  "CopyToSliderTicks": false,
+  "CopyToSliderSlides": false,
+  "StartIndexBoxVisible": false,
+  "StartIndex": 300,
+  "MuteSliderends": true,
+  "BeatDivisors": [
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 1
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 2
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 4
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 3
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 8
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 6
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 16
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 12
+    }
+  ],
+  "MutedDivisors": [
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 1
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 2
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 4
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 3
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 8
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 6
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 16
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 12
+    }
+  ],
+  "MinLength": 0.4,
+  "MutedIndex": -1,
+  "MutedSampleSet": 2,
+  "MutedSampleSets": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "ImportLoadCommand": {
+    "$type": "Mapping_Tools.Components.Domain.CommandImplementation, Mapping Tools"
+  },
+  "ImportBrowseCommand": {
+    "$type": "Mapping_Tools.Components.Domain.CommandImplementation, Mapping Tools"
+  },
+  "ExportLoadCommand": {
+    "$type": "Mapping_Tools.Components.Domain.CommandImplementation, Mapping Tools"
+  },
+  "ExportBrowseCommand": {
+    "$type": "Mapping_Tools.Components.Domain.CommandImplementation, Mapping Tools"
+  }
+}

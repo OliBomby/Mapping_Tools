@@ -4,106 +4,594 @@ on:
   push:
     tags:
       - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Three-part version to package for this dry run (for example 1.2.3)
+        required: true
+        type: string
 
 permissions:
-  contents: write   # needed for creating releases
+  contents: read
+
+# A single tagged release is assembled by one publisher job. This prevents the
+# six target jobs from racing while they update the same GitHub Release.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  DOTNET_VERSION: '10.0.x'
+  # Keep this in lockstep with the Velopack NuGet package referenced by the app.
+  VPK_VERSION: '1.2.0'
+  PACK_TITLE: Mapping Tools
 
 jobs:
-  build:
-    runs-on: windows-latest
+  package:
+    name: Package ${{ matrix.rid }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - rid: win-x86
+            runner: windows-latest
+          - rid: win-x64
+            runner: windows-latest
+          - rid: linux-x64
+            runner: ubuntu-latest
+          - rid: linux-arm64
+            runner: ubuntu-latest
+          - rid: osx-x64
+            runner: macos-latest
+          - rid: osx-arm64
+            runner: macos-latest
+
+    env:
+      RID: ${{ matrix.rid }}
+      CHANNEL: ${{ matrix.rid }}
+      PACK_ID: MappingTools
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - name: Determine version from tag
+      - name: Configure package directories
         shell: pwsh
         run: |
-          # e.g. GITHUB_REF_NAME = v1.2.3 -> VERSION = 1.2.3
-          $version = "${env:GITHUB_REF_NAME}".TrimStart('v')
-          "VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Append
-          Write-Host "Version: $version"
+          $paths = @{
+            PUBLISH_DIR = Join-Path $env:RUNNER_TEMP 'mapping-tools-publish'
+            RELEASE_DIR = Join-Path $env:RUNNER_TEMP 'mapping-tools-velopack'
+            ARTIFACT_DIR = Join-Path $env:RUNNER_TEMP 'mapping-tools-velopack-artifact'
+            APP_DIR = Join-Path $env:RUNNER_TEMP 'Mapping Tools.app'
+          }
+
+          foreach ($name in $paths.Keys) {
+            "$name=$($paths[$name])" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          }
+
+      - name: Determine package version
+        env:
+          DRY_RUN_VERSION: ${{ inputs.version }}
+          IS_DRY_RUN: ${{ github.event_name == 'workflow_dispatch' }}
+        shell: pwsh
+        run: |
+          $version = if ($env:IS_DRY_RUN -eq 'true') {
+            $env:DRY_RUN_VERSION
+          }
+          else {
+            "${env:GITHUB_REF_NAME}".TrimStart('v')
+          }
+
+          if ($version -notmatch '^\d+\.\d+\.\d+$') {
+            throw "The package version must be a stable three-part version with no prefix: $version"
+          }
+
+          "VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Cache NuGet
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
-          path: |
-            ~/.nuget/packages
+          path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/packages.lock.json') }}
           restore-keys: |
             ${{ runner.os }}-nuget-
 
       - name: Restore dependencies
-        run: dotnet restore Mapping_Tools
+        run: dotnet restore Mapping_Tools.slnx
 
-      # Update versions in installer scripts and .csproj using PowerShell regex
-      - name: Set version in Inno Setup (x86)
+      - name: Verify pinned Velopack version
         shell: pwsh
         run: |
-          (Get-Content -Raw Installer_Script_x86.iss) `
-            -replace '(?<=#define\s+MyAppVersion\s+")\d+\.\d+\.\d+(?=")', "${env:VERSION}" `
-            | Set-Content Installer_Script_x86.iss -Encoding UTF8
+          $references = Get-ChildItem -Path . -Recurse -File -Include *.csproj,*.props,*.targets |
+            Where-Object FullName -notmatch '[\\/]\.git[\\/]|[\\/]bin[\\/]|[\\/]obj[\\/]' |
+            Select-String -Pattern 'Include="Velopack(?:\.[^"]+)?"[^>]*Version="([^"]+)"'
 
-      - name: Set version in Inno Setup (x64)
+          if ($null -eq $references) {
+            throw "No Velopack package reference was found. The app package and the VPK_VERSION workflow pin must be updated together."
+          }
+
+          $versions = @($references | ForEach-Object { $_.Matches[0].Groups[1].Value } | Select-Object -Unique)
+          if ($versions.Count -ne 1 -or $versions[0] -ne $env:VPK_VERSION) {
+            throw "Velopack package version '$($versions -join ', ')' does not match the pinned vpk version '$env:VPK_VERSION'."
+          }
+
+      - name: Publish self-contained application
         shell: pwsh
         run: |
-          (Get-Content -Raw Installer_Script_x64.iss) `
-            -replace '(?<=#define\s+MyAppVersion\s+")\d+\.\d+\.\d+(?=")', "${env:VERSION}" `
-            | Set-Content Installer_Script_x64.iss -Encoding UTF8
+          $arguments = @(
+            'publish',
+            'Mapping_Tools.Desktop/Mapping_Tools.Desktop.csproj',
+            '-c', 'Release',
+            '-r', $env:RID,
+            '--no-restore',
+            '--self-contained', 'true',
+            '-o', $env:PUBLISH_DIR,
+            "-p:Version=$env:VERSION",
+            "-p:AssemblyVersion=$env:VERSION",
+            "-p:FileVersion=$env:VERSION"
+          )
 
-      - name: Set AssemblyVersion/FileVersion in csproj
+          & dotnet @arguments
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+
+      - name: Install pinned Velopack CLI
         shell: pwsh
         run: |
-          $p = "Mapping_Tools/Mapping_Tools.csproj"
-          $c = Get-Content -Raw $p
-          $c = $c -replace '(?<=<AssemblyVersion>)\d+\.\d+\.\d+', "${env:VERSION}"
-          $c = $c -replace '(?<=<FileVersion>)\d+\.\d+\.\d+', "${env:VERSION}"
-          $c | Set-Content $p -Encoding UTF8
+          $toolDirectory = Join-Path $env:RUNNER_TEMP 'velopack-tool'
+          dotnet tool install --tool-path $toolDirectory vpk --version $env:VPK_VERSION
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
 
-      - name: Publish x86
-        run: dotnet publish Mapping_Tools -c Release -r win-x86 --no-restore --self-contained true
-      
-      - name: Publish x64
-        run: dotnet publish Mapping_Tools -c Release -r win-x64 --no-restore --self-contained true
+          $commandName = if ($IsWindows) { 'vpk.exe' } else { 'vpk' }
+          $commandPath = Join-Path $toolDirectory $commandName
+          if (-not (Test-Path -LiteralPath $commandPath -PathType Leaf)) {
+            throw "The pinned vpk executable was not found at $commandPath"
+          }
 
-      - name: Install Inno Setup
-        shell: pwsh
-        run: choco install innosetup --yes
+          $toolList = (& dotnet tool list --tool-path $toolDirectory vpk | Out-String)
+          if ($LASTEXITCODE -ne 0) {
+            throw "Could not inspect the installed vpk tool: $toolList"
+          }
 
-      - name: Build x86 Installer
-        shell: pwsh
-        run: '& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "Installer_Script_x86.iss"'
+          if ($toolList -notmatch '(?m)^\s*vpk\s+(\S+)\s+') {
+            throw "The vpk tool was not listed among tools installed at $toolDirectory."
+          }
+          $installedVersion = $Matches[1]
+          if ($installedVersion -ne $env:VPK_VERSION) {
+            throw "Installed vpk version '$installedVersion' does not match the pinned version $env:VPK_VERSION."
+          }
 
-      - name: Build x64 Installer
-        shell: pwsh
-        run: '& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "Installer_Script_x64.iss"'
+          "VPK_COMMAND=$commandPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-      - name: Zip x86 app
-        shell: pwsh
-        run: |
-          $outDir = "Mapping_Tools/bin/Release/net10.0-windows/win-x86/publish"
-          Compress-Archive -Path "$outDir/*" -DestinationPath "$outDir/release.zip" -Force
-      
-      - name: Zip x64 app
+      - name: Find previous Velopack feed
         shell: pwsh
         run: |
-          $outDir = "Mapping_Tools/bin/Release/net10.0-windows/win-x64/publish"
-          Compress-Archive -Path "$outDir/*" -DestinationPath "$outDir/release_x64.zip" -Force
+          $headers = @{
+            Accept = 'application/vnd.github+json'
+            Authorization = "Bearer $env:GITHUB_TOKEN"
+            'X-GitHub-Api-Version' = '2022-11-28'
+          }
+          $uri = "https://api.github.com/repos/$env:GITHUB_REPOSITORY/releases?per_page=100"
+          $releases = @(Invoke-RestMethod -Uri $uri -Headers $headers)
+          $channelFeed = "releases.$($env:CHANNEL).json"
+          $previousChannelFeed = @(
+            $releases | ForEach-Object { $_.assets } |
+              Where-Object { $_.name -eq $channelFeed }
+          ).Count -gt 0
+          New-Item -ItemType Directory -Path $env:RELEASE_DIR -Force | Out-Null
+
+          if ($previousChannelFeed) {
+            $env:VPK_TOKEN = $env:GITHUB_TOKEN
+            & $env:VPK_COMMAND download github `
+              --repoUrl "https://github.com/$env:GITHUB_REPOSITORY" `
+              --channel $env:CHANNEL `
+              --outputDir $env:RELEASE_DIR
+            if ($LASTEXITCODE -ne 0) {
+              throw "vpk could not download the previous $env:CHANNEL release. Refusing to publish without delta inputs."
+            }
+          }
+          else {
+            Write-Host "No previous $env:CHANNEL Velopack feed exists; this is an initial package for this channel."
+          }
+
+      - name: Create macOS application bundle
+        if: startsWith(matrix.rid, 'osx-')
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "$APP_DIR"
+          mkdir -p "$APP_DIR/Contents/MacOS" "$APP_DIR/Contents/Resources"
+          cp -R "$PUBLISH_DIR"/. "$APP_DIR/Contents/MacOS/"
+          chmod +x "$APP_DIR/Contents/MacOS/Mapping Tools"
+          cat > "$APP_DIR/Contents/Info.plist" <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>CFBundleDevelopmentRegion</key>
+            <string>en</string>
+            <key>CFBundleDisplayName</key>
+            <string>Mapping Tools</string>
+            <key>CFBundleExecutable</key>
+            <string>Mapping Tools</string>
+            <key>CFBundleIdentifier</key>
+            <string>com.olibomby.mappingtools</string>
+            <key>CFBundleInfoDictionaryVersion</key>
+            <string>6.0</string>
+            <key>CFBundleName</key>
+            <string>Mapping Tools</string>
+            <key>CFBundlePackageType</key>
+            <string>APPL</string>
+            <key>CFBundleShortVersionString</key>
+            <string>${VERSION}</string>
+            <key>CFBundleVersion</key>
+            <string>${VERSION}</string>
+          </dict>
+          </plist>
+          EOF
+          echo "PACK_DIR=$APP_DIR" >> "$GITHUB_ENV"
+
+      - name: Configure non-macOS Velopack input
+        if: ${{ !startsWith(matrix.rid, 'osx-') }}
+        shell: pwsh
+        run: |
+          "PACK_DIR=$env:PUBLISH_DIR" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Sign macOS application bundle with rcodesign
+        if: startsWith(matrix.rid, 'osx-')
+        shell: bash
+        env:
+          APPLE_CODESIGN_VERSION: '0.29.0'
+        run: |
+          set -euo pipefail
+          case "$(uname -m)" in
+            x86_64) target=x86_64-apple-darwin ;;
+            aarch64|arm64) target=aarch64-apple-darwin ;;
+            *) echo "No rcodesign build for $(uname -m)" >&2; exit 1 ;;
+          esac
+
+          name="apple-codesign-${APPLE_CODESIGN_VERSION}-${target}"
+          base="https://github.com/indygreg/apple-platform-rs/releases/download/apple-codesign%2F${APPLE_CODESIGN_VERSION}"
+          archive="$RUNNER_TEMP/rcodesign.tar.gz"
+          checksum="$RUNNER_TEMP/rcodesign.tar.gz.sha256"
+          install_directory="$RUNNER_TEMP/$name"
+
+          curl -fsSL --retry 3 "${base}/${name}.tar.gz" -o "$archive"
+          curl -fsSL --retry 3 "${base}/${name}.tar.gz.sha256" -o "$checksum"
+          expected_checksum="$(awk '{print $1}' "$checksum")"
+          printf '%s  %s\n' "$expected_checksum" "$archive" | shasum -a 256 -c -
+          tar -xzf "$archive" -C "$RUNNER_TEMP"
+
+          rcodesign="$install_directory/rcodesign"
+          chmod +x "$rcodesign"
+          "$rcodesign" sign "$APP_DIR"
+
+      - name: Package Velopack release
+        shell: pwsh
+        run: |
+          $arguments = @(
+            'pack',
+            '--packId', $env:PACK_ID,
+            '--packVersion', $env:VERSION,
+            '--packDir', $env:PACK_DIR,
+            '--outputDir', $env:RELEASE_DIR,
+            '--channel', $env:CHANNEL,
+            '--runtime', $env:RID,
+            '--packTitle', $env:PACK_TITLE,
+            '--packAuthors', 'Mapping Tools contributors',
+            '--mainExe', $(if ($env:RID -like 'win-*') { 'Mapping Tools.exe' } else { 'Mapping Tools' }),
+            '--delta', 'BestSpeed'
+          )
+
+          if ($env:RID -like 'linux-*') {
+            $arguments += @('--icon', 'Mapping_Tools.Desktop/Assets/mt_logo_256.png', '--categories', 'Utility')
+          }
+
+          & $env:VPK_COMMAND @arguments
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+
+      - name: Create Program Files migration bridge
+        if: startsWith(matrix.rid, 'win-')
+        shell: pwsh
+        run: |
+          $setup = Get-ChildItem -LiteralPath $env:RELEASE_DIR -File -Filter '*-Setup.exe' |
+            Select-Object -First 1
+          if ($null -eq $setup) {
+            throw "No Velopack Setup.exe was produced in $env:RELEASE_DIR"
+          }
+
+          $bridgeDirectory = Join-Path $env:RUNNER_TEMP 'mapping-tools-legacy-bridge'
+          Remove-Item -LiteralPath $bridgeDirectory -Recurse -Force -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Path $bridgeDirectory -Force | Out-Null
+
+          # Onova restarts this executable in the old installation directory. The bridge
+          # installs Velopack, uninstalls Inno Setup, launches the new app, and cleans up.
+          dotnet publish tools/LegacyMigrationBridge.cs -c Release -r $env:RID `
+            --self-contained false -o $bridgeDirectory `
+            "-p:Version=$env:VERSION" "-p:AssemblyVersion=$env:VERSION" "-p:FileVersion=$env:VERSION"
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+          Copy-Item -LiteralPath $setup.FullName -Destination (Join-Path $bridgeDirectory 'MappingTools-Setup.exe')
+
+          $legacyAssetName = if ($env:RID -eq 'win-x86') { 'release.zip' } else { 'release_x64.zip' }
+          Compress-Archive -LiteralPath @(
+            (Join-Path $bridgeDirectory 'Mapping Tools.exe'),
+            (Join-Path $bridgeDirectory 'MappingTools-Setup.exe')
+          ) `
+            -DestinationPath (Join-Path $env:RELEASE_DIR $legacyAssetName) -Force
+
+      - name: Stage current Velopack assets
+        shell: pwsh
+        run: |
+          $artifactDirectory = $env:ARTIFACT_DIR
+          Remove-Item -LiteralPath $artifactDirectory -Recurse -Force -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Path $artifactDirectory -Force | Out-Null
+
+          $manifestPath = Join-Path $env:RELEASE_DIR "assets.$($env:CHANNEL).json"
+          $feedPath = Join-Path $env:RELEASE_DIR "releases.$($env:CHANNEL).json"
+          if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) {
+            throw "Missing Velopack assets manifest: $manifestPath"
+          }
+          if (-not (Test-Path -LiteralPath $feedPath -PathType Leaf)) {
+            throw "Missing Velopack release feed: $feedPath"
+          }
+
+          $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+          $manifestFileNames = @($manifest | ForEach-Object {
+            if ($_ -is [string]) {
+              $_
+            }
+            elseif ($_.RelativeFileName) {
+              $_.RelativeFileName
+            }
+            else {
+              $_.FileName
+            }
+          }) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+            ForEach-Object { [System.IO.Path]::GetFileName($_) } |
+            Select-Object -Unique
+
+          $files = @($manifestPath, $feedPath)
+          foreach ($fileName in $manifestFileNames) {
+            $files += Join-Path $env:RELEASE_DIR $fileName
+          }
+          $files += @(Get-ChildItem -LiteralPath $env:RELEASE_DIR -File -Filter 'RELEASES*' |
+            Select-Object -ExpandProperty FullName)
+          $files += @(Get-ChildItem -LiteralPath $env:RELEASE_DIR -File -Filter 'release*.zip' |
+            Select-Object -ExpandProperty FullName)
+
+          foreach ($sourcePath in @($files | Select-Object -Unique)) {
+            if (-not (Test-Path -LiteralPath $sourcePath -PathType Leaf)) {
+              throw "Velopack manifest references a missing output: $sourcePath"
+            }
+            Copy-Item -LiteralPath $sourcePath -Destination (Join-Path $artifactDirectory ([System.IO.Path]::GetFileName($sourcePath)))
+          }
+
+          if ($env:RID -like 'linux-*') {
+            $appImage = Get-ChildItem -LiteralPath $artifactDirectory -File -Filter '*.AppImage' |
+              Select-Object -First 1
+            if ($null -eq $appImage) {
+              throw "No Linux AppImage was staged for $env:RID"
+            }
+            & chmod +x -- $appImage.FullName
+            if ($LASTEXITCODE -ne 0) {
+              exit $LASTEXITCODE
+            }
+          }
+
+          $requireBridge = $env:RID -like 'win-*'
+          & ./tools/validate-release-layout.ps1 `
+            -ExpectedVersion $env:VERSION `
+            -Channel $env:CHANNEL `
+            -RuntimeIdentifier $env:RID `
+            -ReleaseDirectory $artifactDirectory `
+            -RequireLegacyBridge:$requireBridge
+
+      - name: Test release-layout validator
+        shell: pwsh
+        run: ./tools/test-release-layout.ps1
+
+      - name: Archive Velopack artifact with Unix permissions
+        shell: bash
+        run: |
+          set -euo pipefail
+          artifact_directory="$ARTIFACT_DIR"
+          archive_path="$RUNNER_TEMP/velopack-$RID.tar"
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            artifact_directory="$(cygpath --unix "$artifact_directory")"
+            archive_path="$(cygpath --unix "$archive_path")"
+          fi
+          tar -C "$artifact_directory" -cf "$archive_path" .
+
+      - name: Upload Velopack artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: velopack-${{ matrix.rid }}
+          path: ${{ runner.temp }}/velopack-${{ matrix.rid }}.tar
+          if-no-files-found: error
+
+  publish:
+    name: Publish tagged GitHub Release
+    if: github.event_name == 'push'
+    needs: package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Determine version from tag
+        shell: bash
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+      - name: Download Velopack artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: velopack-*
+          path: release-artifacts
+          merge-multiple: false
+      - name: Unpack Velopack artifacts with Unix permissions
+        shell: pwsh
+        run: |
+          $rids = @('win-x86', 'win-x64', 'linux-x64', 'linux-arm64', 'osx-x64', 'osx-arm64')
+          foreach ($rid in $rids) {
+            $artifactDirectory = Join-Path $env:GITHUB_WORKSPACE "release-artifacts/velopack-$rid"
+            $archivePath = Join-Path $artifactDirectory "velopack-$rid.tar"
+            $releaseDirectory = Join-Path $artifactDirectory 'content'
+            if (-not (Test-Path -LiteralPath $archivePath -PathType Leaf)) {
+              throw "Missing downloaded Velopack archive: $archivePath"
+            }
+            New-Item -ItemType Directory -Path $releaseDirectory -Force | Out-Null
+            & tar -xf $archivePath -C $releaseDirectory
+            if ($LASTEXITCODE -ne 0) {
+              exit $LASTEXITCODE
+            }
+          }
+
+      - name: Validate and flatten release assets
+        shell: pwsh
+        env:
+          VERSION: ${{ env.VERSION }}
+        run: |
+          $rids = @('win-x86', 'win-x64', 'linux-x64', 'linux-arm64', 'osx-x64', 'osx-arm64')
+          $flatDirectory = Join-Path $env:GITHUB_WORKSPACE 'release-assets'
+          Remove-Item -LiteralPath $flatDirectory -Recurse -Force -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Path $flatDirectory -Force | Out-Null
+
+          foreach ($rid in $rids) {
+            $artifactDirectory = Join-Path $env:GITHUB_WORKSPACE "release-artifacts/velopack-$rid/content"
+            if (-not (Test-Path -LiteralPath $artifactDirectory -PathType Container)) {
+              throw "Missing unpacked artifact directory: $artifactDirectory"
+            }
+
+            $legacyBridge = $rid -like 'win-*' -and (
+              (Test-Path -LiteralPath (Join-Path $artifactDirectory 'release.zip')) -or
+              (Test-Path -LiteralPath (Join-Path $artifactDirectory 'release_x64.zip')))
+            & ./tools/validate-release-layout.ps1 `
+              -ExpectedVersion $env:VERSION `
+              -Channel $rid `
+              -RuntimeIdentifier $rid `
+              -ReleaseDirectory $artifactDirectory `
+              -RequireLegacyBridge:$legacyBridge
+
+            foreach ($sourceFile in Get-ChildItem -LiteralPath $artifactDirectory -File) {
+              $destination = Join-Path $flatDirectory $sourceFile.Name
+              if (Test-Path -LiteralPath $destination -PathType Leaf) {
+                throw "Two Velopack artifacts have the same GitHub asset name: $($sourceFile.Name)"
+              }
+              Copy-Item -LiteralPath $sourceFile.FullName -Destination $destination
+            }
+          }
+          $feedNames = @(Get-ChildItem -LiteralPath $flatDirectory -File -Filter 'releases.*.json' |
+            Select-Object -ExpandProperty Name)
+          if ($feedNames.Count -ne $rids.Count) {
+            throw "Expected six channel feeds, found $($feedNames.Count)."
+          }
+
+          $bridgePresent = Test-Path -LiteralPath (Join-Path $flatDirectory 'release.zip')
+          $bridgeX64Present = Test-Path -LiteralPath (Join-Path $flatDirectory 'release_x64.zip')
+          if ($bridgePresent -xor $bridgeX64Present) {
+            throw 'The Windows migration bridge must contain both release.zip and release_x64.zip.'
+          }
+
+      - name: Test release-layout validator
+        shell: pwsh
+        run: ./tools/test-release-layout.ps1
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: Release version ${{ env.VERSION }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: Release version ${{ github.ref_name }}
           tag_name: ${{ github.ref_name }}
           draft: false
           prerelease: false
-          files: |
-            Mapping_Tools/bin/Release/net10.0-windows/win-x86/publish/release.zip
-            Mapping_Tools/bin/Release/net10.0-windows/win-x64/publish/release_x64.zip
-            **/mapping_tools_installer_x86.exe
-            **/mapping_tools_installer_x64.exe
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: release-assets/*
+
+  publish-nuget:
+    name: Publish NuGet packages
+    if: github.event_name == 'push'
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Determine version from tag
+        shell: bash
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+
+      - name: Restore dependencies
+        run: dotnet restore Mapping_Tools.Desktop/Mapping_Tools.Desktop.csproj
+
+      - name: Pack application, core, desktop, and infrastructure
+        shell: bash
+        run: |
+          set -euo pipefail
+          package_dir="$RUNNER_TEMP/nuget-packages"
+          mkdir -p "$package_dir"
+
+          for project in Core Application Infrastructure Desktop; do
+            dotnet pack "Mapping_Tools.$project/Mapping_Tools.$project.csproj" \
+              --configuration Release \
+              --no-restore \
+              --output "$package_dir" \
+              -p:Version="$VERSION" \
+              -p:AssemblyVersion="$VERSION" \
+              -p:FileVersion="$VERSION"
+
+            test -f "$package_dir/Mapping_Tools.$project.$VERSION.nupkg"
+          done
+
+      - name: Verify NuGet account
+        shell: bash
+        env:
+          NUGET_USER: ${{ vars.NUGET_USER }}
+        run: |
+          if [[ -z "$NUGET_USER" ]]; then
+            echo 'Set the NUGET_USER repository variable to the NuGet.org account with the trusted publishing policy.' >&2
+            exit 1
+          fi
+
+      - name: Log in to NuGet.org with OIDC
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ vars.NUGET_USER }}
+
+      - name: Push packages to NuGet.org
+        shell: bash
+        env:
+          NUGET_PUBLISH_TOKEN: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: |
+          set -euo pipefail
+          for project in Core Application Infrastructure Desktop; do
+            dotnet nuget push "$RUNNER_TEMP/nuget-packages/Mapping_Tools.$project.$VERSION.nupkg" \
+              --source https://api.nuget.org/v3/index.json \
+              --api-key "$NUGET_PUBLISH_TOKEN" \
+              --skip-duplicate
+          done

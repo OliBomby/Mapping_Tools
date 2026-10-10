@@ -1,0 +1,278 @@
+using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Mapping_Tools.Application.Execution.ToolExecution;
+using Mapping_Tools.Application.Execution.ToolExecution.Models;
+using Mapping_Tools.Application.Execution.UserNotification;
+using Mapping_Tools.Application.Execution.UserNotification.Models;
+using Mapping_Tools.Application.Platform;
+using Mapping_Tools.Application.Projects.Models;
+using Mapping_Tools.Application.Tools.HitsoundPreviewHelper;
+using Mapping_Tools.Application.Workspace.Contracts;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.HitsoundStuff;
+using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Localization;
+using Mapping_Tools.Desktop.Services.Dialogs;
+using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Services.Undo;
+using Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.Models;
+using Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.ViewModels.Adapters;
+using Mapping_Tools.Desktop.Tools.RhythmGuide.Services;
+using Mapping_Tools.Desktop.Tools.RhythmGuide.ViewModels;
+using Mapping_Tools.Desktop.ViewModels;
+
+using Mapping_Tools.Application.Localization;
+
+namespace Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.ViewModels;
+
+/// <summary>
+///     Owns Hitsound Preview Helper zones, projects, ordinary execution,
+///     QuickRun, and the shared Rhythm Guide interaction.
+/// </summary>
+public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewModel,
+    IQuickRun,
+    IShellProjectFeature<HitsoundPreviewHelperProject>
+{
+    /// <inheritdoc />
+    public IProjectUndoHistory? UndoHistory { get; set; }
+
+    private readonly ICurrentBeatmapDialogService currentBeatmapService;
+    private readonly ProjectDefinition<HitsoundPreviewHelperProject> definition;
+    private readonly IUserNotificationService notifications;
+
+    private readonly IHitsoundPreviewHelperService previewService;
+    private readonly RhythmGuideViewModel rhythmGuideViewModel;
+    private readonly IRhythmGuideWindowService rhythmGuideWindow;
+    private readonly DesktopApplicationSettings settings;
+    private readonly IBeatmapWorkspace workspace;
+
+    /// <summary>
+    ///     Creates the Hitsound Preview Helper presentation model.
+    /// </summary>
+    /// <param name="previewService">Runs the framework-independent preview transformation.</param>
+    /// <param name="execution">Coordinates cancellation, backup, notifications, and reload.</param>
+    /// <param name="workspace">Supplies selected beatmap paths for ordinary runs.</param>
+    /// <param name="currentBeatmapService">Fetches the current beatmap and presents lookup feedback.</param>
+    /// <param name="settings">Supplies QuickRun preferences.</param>
+    /// <param name="notifications">Publishes recoverable input and selection messages.</param>
+    /// <param name="rhythmGuideWindow">Opens the shared Rhythm Guide auxiliary surface.</param>
+    /// <param name="rhythmGuideViewModel">Provides the shared Rhythm Guide project state.</param>
+    /// <param name="directories">Supplies the application project location.</param>
+    public HitsoundPreviewHelperViewModel(
+        IHitsoundPreviewHelperService previewService,
+        IToolExecutionService execution,
+        IBeatmapWorkspace workspace,
+        ICurrentBeatmapDialogService currentBeatmapService,
+        DesktopApplicationSettings settings,
+        IUserNotificationService notifications,
+        IRhythmGuideWindowService rhythmGuideWindow,
+        RhythmGuideViewModel rhythmGuideViewModel,
+        IApplicationDirectories directories)
+        : base(execution, HitsoundPreviewHelperToolDefinition.Definition)
+    {
+        this.previewService = previewService ?? throw new ArgumentNullException(nameof(previewService));
+        this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        this.currentBeatmapService = currentBeatmapService
+                                     ?? throw new ArgumentNullException(nameof(currentBeatmapService));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
+        this.rhythmGuideWindow = rhythmGuideWindow ?? throw new ArgumentNullException(nameof(rhythmGuideWindow));
+        this.rhythmGuideViewModel = rhythmGuideViewModel ?? throw new ArgumentNullException(nameof(rhythmGuideViewModel));
+        ArgumentNullException.ThrowIfNull(directories);
+
+        definition = new ProjectDefinition<HitsoundPreviewHelperProject>(
+            "hspreviewproject.json",
+            "Hitsound Preview Projects",
+            static () => new HitsoundPreviewHelperProject(),
+            "hitsound-preview-project.json",
+            ToolConfigSchema.ForTool(HitsoundPreviewHelperToolDefinition.Definition.Id));
+
+    }
+
+    /// <summary>Gets or sets the zones edited by the tool.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial ObservableCollection<ObservableHitsoundZone> Items { get; set; } = [];
+
+    /// <summary>Gets every supported hitsound layer.</summary>
+    public IReadOnlyList<Hitsound> Hitsounds { get; } = Enum.GetValues<Hitsound>();
+
+    /// <summary>Gets every supported sample family.</summary>
+    public IReadOnlyList<SampleSet> SampleSets { get; } = Enum.GetValues<SampleSet>();
+
+    /// <summary>Gets or sets the tri-state select-all value used by the zone list.</summary>
+    public bool? IsAllItemsSelected
+    {
+        get;
+        set
+        {
+            if (field == value) return;
+
+            field = value;
+            if (value.HasValue)
+                foreach (var item in Items)
+                    item.IsSelected = value.Value;
+
+            OnPropertyChanged();
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task RunQuickAsync(CancellationToken cancellationToken)
+    {
+        string path = await workspace
+            .ResolveQuickRunBeatmapAsync(cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+
+        await RunWithStateAsync(() => RunPathsAsync(
+            string.IsNullOrWhiteSpace(path) ? [] : [path],
+            true,
+            cancellationToken));
+    }
+
+    ProjectDefinition<HitsoundPreviewHelperProject> IShellProjectFeature<HitsoundPreviewHelperProject>.ProjectDefinition => definition;
+
+    HitsoundPreviewHelperProject IShellProjectFeature<HitsoundPreviewHelperProject>.Snapshot()
+    {
+        return new HitsoundPreviewHelperProject
+        {
+            Items = Items.Select(item => item.Snapshot()).ToList(),
+        };
+    }
+
+    void IShellProjectFeature<HitsoundPreviewHelperProject>.Install(HitsoundPreviewHelperProject project)
+    {
+        Items = new ObservableCollection<ObservableHitsoundZone>(
+            (project.Items).Select(item => new ObservableHitsoundZone(item.Copy())));
+    }
+
+    /// <inheritdoc />
+    protected override async Task RunCoreAsync()
+    {
+        IReadOnlyList<string> paths = workspace.SelectedPaths;
+        if (settings.AlwaysQuickRun)
+        {
+            string? quickPath = await currentBeatmapService.FetchAsync();
+            paths = quickPath is null ? [] : [quickPath];
+        }
+
+        await RunPathsAsync(paths, settings.AlwaysQuickRun, CancellationToken.None);
+    }
+
+    /// <summary>Adds a new wildcard zone.</summary>
+    [RelayCommand]
+    private void Add()
+    {
+        using var edit = UndoHistory?.BeginEdit();
+        Items.Add(new ObservableHitsoundZone());
+    }
+
+    /// <summary>Adds one zone for each distinct selected editor position.</summary>
+    [RelayCommand]
+    private async Task AddFromSelectionAsync()
+    {
+        using var edit = UndoHistory?.BeginEdit();
+        try
+        {
+            string? path = await currentBeatmapService.FetchAsync();
+            if (path is null) return;
+            var positions =
+                await previewService.GetSelectedZonePositionsAsync(path);
+            if (positions.Count == 0)
+            {
+                await PublishSelectionWarningAsync();
+                return;
+            }
+
+            foreach (var position in positions)
+                Items.Add(new ObservableHitsoundZone(new HitsoundZone
+                {
+                    XPos = position.X,
+                    YPos = position.Y,
+                }));
+        }
+        catch (Exception exception)
+        {
+            await notifications.PublishAsync(new UserNotification(
+                UserNotificationSeverity.Error,
+                DesktopStrings.HitsoundPreviewHelper_ReadSelectionTitle,
+                DesktopStrings.HitsoundPreviewHelper_ReadSelectionError,
+                exception));
+        }
+    }
+
+    /// <summary>Copies every selected zone once.</summary>
+    [RelayCommand]
+    private void Copy()
+    {
+        using var edit = UndoHistory?.BeginEdit();
+        int initialCount = Items.Count;
+        for (int index = 0; index < initialCount; index++)
+            if (Items[index].IsSelected)
+                Items.Add(new ObservableHitsoundZone(Items[index].Snapshot()));
+    }
+
+    /// <summary>Removes every selected zone.</summary>
+    [RelayCommand]
+    private void Remove()
+    {
+        using var edit = UndoHistory?.BeginEdit();
+        Items = new ObservableCollection<ObservableHitsoundZone>(Items.Where(item => !item.IsSelected));
+    }
+
+    /// <summary>Opens the shared modeless Rhythm Guide auxiliary surface.</summary>
+    [RelayCommand]
+    private void OpenRhythmGuide()
+    {
+        rhythmGuideWindow.Show(rhythmGuideViewModel);
+    }
+
+    private async Task RunPathsAsync(
+        IReadOnlyList<string> paths,
+        bool quick,
+        CancellationToken cancellationToken)
+    {
+        if (paths.Count == 0)
+        {
+            await notifications.PublishAsync(new UserNotification(
+                UserNotificationSeverity.Warning,
+                Tool.DisplayName,
+                DesktopStrings.HitsoundPreviewHelper_SelectBeatmap));
+            return;
+        }
+
+        HitsoundPreviewHelperProject options = new()
+        {
+            Items = Items.Select(item => item.Snapshot()).ToList(),
+        };
+        await Execution.ExecuteAsync(
+            new ToolExecutionRequest<HitsoundPreviewHelperResult>(
+                Tool.Id,
+                Tool.DisplayName,
+                async context =>
+                {
+                    var applied = await previewService.ApplyAsync(
+                        paths,
+                        options,
+                        quick,
+                        new Progress<double>(progress => context.ReportProgress(
+                            progress,
+                            DesktopStrings.HitsoundPreviewHelper_Progress)),
+                        context.CancellationToken);
+                    return new ToolExecutionOutput<HitsoundPreviewHelperResult>(
+                        applied,
+                        ApplicationText.Format(DesktopStrings.HitsoundPreviewHelper_Result, applied.UpdatedEventCount));
+                }),
+            CreateProgress(),
+            cancellationToken);
+    }
+
+    private Task PublishSelectionWarningAsync()
+    {
+        return notifications.PublishAsync(new UserNotification(
+            UserNotificationSeverity.Warning,
+            DesktopStrings.HitsoundPreviewHelper_NoSelectionTitle,
+            DesktopStrings.HitsoundPreviewHelper_NoSelectionError));
+    }
+}

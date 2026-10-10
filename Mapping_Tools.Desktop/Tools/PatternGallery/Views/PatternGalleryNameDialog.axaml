@@ -1,0 +1,33 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
+             xmlns:patternGallery="clr-namespace:Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels"
+             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             x:Class="Mapping_Tools.Desktop.Tools.PatternGallery.Views.PatternGalleryNameDialog"
+             x:DataType="patternGallery:PatternGallerySelectedInputViewModel">
+    <Grid Margin="8" RowDefinitions="*,*">
+        <StackPanel Grid.Row="0">
+            <TextBox materialAssists:TextFieldAssist.Label="{loc:Tr PatternGallery_Name}"
+                     Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                     MinWidth="100"
+                     Margin="0,0,0,5"
+                     ToolTip.Tip="{loc:Tr PatternGallery_ImportNameTip}" />
+        </StackPanel>
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    Margin="0,16,0,0">
+            <Button Classes="dialog-action primary"
+                    Theme="{StaticResource MaterialFlatButton}"
+                         Content="{loc:Tr Common_Accept}"
+                    Command="{Binding AcceptCommand}"
+                    IsDefault="True" />
+            <Button Classes="dialog-action primary"
+                    Theme="{StaticResource MaterialFlatButton}"
+                         Content="{loc:Tr Common_CancelUppercase}"
+                    Command="{Binding CancelCommand}"
+                    Margin="8,0,0,0"
+                    IsCancel="True" />
+        </StackPanel>
+    </Grid>
+</UserControl>

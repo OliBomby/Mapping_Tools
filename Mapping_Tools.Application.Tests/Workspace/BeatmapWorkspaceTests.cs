@@ -1,0 +1,435 @@
+using System.Globalization;
+using Mapping_Tools.Application.Execution.UserNotification;
+using Mapping_Tools.Application.Execution.UserNotification.Models;
+using Mapping_Tools.Application.Localization;
+using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Application.Tests.TestDoubles;
+using Mapping_Tools.Application.Workspace;
+using Mapping_Tools.Application.Workspace.Models;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace Mapping_Tools.Application.Tests.Workspace;
+
+[TestClass]
+public sealed class BeatmapWorkspaceTests
+{
+    [TestMethod]
+    public void SetSelection_WithTemporaryLazerBeatmap_DoesNotPersistRecentHistory()
+    {
+        // Arrange
+        ApplicationSettings settings = new();
+        BeatmapWorkspace workspace = CreateWorkspace(settings);
+
+        // Act
+        workspace.SetSelection(["temporary.osu"], BeatmapSelectionSource.LazerExternalEdit);
+
+        // Assert
+        workspace.SelectedPaths.Should().Equal("temporary.osu");
+        workspace.RecentMaps.Should().BeEmpty();
+    }
+
+    [TestMethod]
+    public void SelectedPaths_WhenTemporaryLazerFolderCloses_DoesNotWarnAboutMissingBeatmap()
+    {
+        // Arrange
+        UserNotificationService notifications = new();
+        List<UserNotification> published = [];
+        notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
+        BeatmapWorkspace workspace = CreateWorkspace(
+            new ApplicationSettings(), notifications: notifications);
+        workspace.SetSelection(["removed.osu"], BeatmapSelectionSource.LazerExternalEdit);
+
+        // Act
+        IReadOnlyList<string> selected = workspace.SelectedPaths;
+
+        // Assert
+        selected.Should().Equal("removed.osu");
+        published.Should().BeEmpty();
+    }
+
+    private static readonly DateTimeOffset fixedNow =
+        new(2026, 7, 25, 14, 30, 0, TimeSpan.Zero);
+
+    [TestMethod]
+    public void SetSelection_WithMultiplePaths_PreservesOrderPromotesRecentsAndPublishes()
+    {
+        // Arrange
+        ApplicationSettings settings = new();
+        var workspace = CreateWorkspace(settings);
+        BeatmapSelectionChangedEventArgs? notification = null;
+        workspace.SelectionChanged += (_, args) => notification = args;
+
+        // Act
+        workspace.SetSelection(
+            [@"C:\Maps\first.osu", @"C:\Maps\second.osb"],
+            BeatmapSelectionSource.DragAndDrop);
+
+        // Assert
+        workspace.SelectedPaths.ToArray().Should().Equal(@"C:\Maps\first.osu", @"C:\Maps\second.osb");
+        workspace.RecentMaps.Select(recent => recent.Path).ToArray().Should().Equal(@"C:\Maps\second.osb", @"C:\Maps\first.osu");
+        workspace.RecentMaps.All(recent => recent.DisplayDate == fixedNow.DateTime.ToString(CultureInfo.CurrentCulture)).Should().BeTrue();
+        (notification?.Source).Should().Be(BeatmapSelectionSource.DragAndDrop);
+        (notification?.Paths.ToArray()).Should().Equal(workspace.SelectedPaths.ToArray());
+    }
+
+    [TestMethod]
+    public void SetSelection_WithExistingHistory_DeduplicatesCaseSensitivelyAndCapsAtTwenty()
+    {
+        // Arrange
+        ApplicationSettings settings = new()
+        {
+            RecentMaps = Enumerable.Range(0, 20)
+                .Select(index => new RecentBeatmap($"map-{index}.osu", $"date-{index}"))
+                .ToList(),
+        };
+        var workspace = CreateWorkspace(settings);
+
+        // Act
+        workspace.SetSelection(["map-5.osu", "MAP-5.osu", "new.osu"]);
+
+        // Assert
+        workspace.RecentMaps.Count.Should().Be(20);
+        workspace.RecentMaps.Take(3).Select(recent => recent.Path).ToArray().Should().Equal("new.osu", "MAP-5.osu", "map-5.osu");
+        workspace.RecentMaps.Count(recent => recent.Path == "map-5.osu").Should().Be(1);
+    }
+
+    [TestMethod]
+    public void RestoreMostRecent_WithLegacyJoinedEntry_RestoresAndRefreshesHistory()
+    {
+        // Arrange
+        ApplicationSettings settings = new()
+        {
+            RecentMaps =
+            [
+                new RecentBeatmap("one.osu|two.osu", "legacy date"),
+                new RecentBeatmap("older.osu", "older date"),
+            ],
+        };
+        var workspace = CreateWorkspace(settings);
+        BeatmapSelectionChangedEventArgs? notification = null;
+        workspace.SelectionChanged += (_, args) => notification = args;
+
+        // Act
+        bool restored = workspace.RestoreMostRecent();
+
+        // Assert
+        restored.Should().BeTrue();
+        workspace.SelectedPaths.ToArray().Should().Equal("one.osu", "two.osu");
+        (notification?.Source).Should().Be(BeatmapSelectionSource.Startup);
+    }
+
+    [TestMethod]
+    public void RestoreMostRecent_WithEmptyHistory_DoesNotCreateSelection()
+    {
+        // Arrange
+        ApplicationSettings settings = new();
+        var workspace = CreateWorkspace(settings);
+
+        // Act
+        bool restored = workspace.RestoreMostRecent();
+        workspace.SetSelection(["", "   "]);
+
+        // Assert
+        restored.Should().BeFalse();
+        workspace.SelectedPaths.Count.Should().Be(0);
+        workspace.RecentMaps.Count.Should().Be(0);
+    }
+
+    [TestMethod]
+    public async Task PickBeatmapsAsync_WhenCancelled_LeavesSelectionAndHistoryUnchanged()
+    {
+        // Arrange
+        RecordingFilePicker picker = new() { OpenFiles = [] };
+        ApplicationSettings settings = new() { SongsPath = @"C:\osu!\Songs" };
+        var workspace = CreateWorkspace(settings, picker);
+        workspace.SetSelection([@"C:\Maps\selected.osu"]);
+        var history = workspace.RecentMaps.ToArray();
+
+        // Act
+        bool selected = await workspace.PickBeatmapsAsync(true);
+
+        // Assert
+        selected.Should().BeFalse();
+        workspace.SelectedPaths.ToArray().Should().Equal(@"C:\Maps\selected.osu");
+        workspace.RecentMaps.ToArray().Should().Equal(history);
+        (picker.LastOpenRequest?.SuggestedStartLocation).Should().Be(@"C:\Maps");
+        (picker.LastOpenRequest?.AllowMultiple).Should().BeTrue();
+        (picker.LastOpenRequest?.Filters.Single().Patterns.ToArray()).Should().Equal("*.osu", "*.osb");
+    }
+
+    [TestMethod]
+    public async Task PickBeatmapsAsync_WithMissingSelectedPath_PublishesLegacyWarningBeforePicking()
+    {
+        // Arrange
+        RecordingFilePicker picker = new() { OpenFiles = [] };
+        UserNotificationService notifications = new();
+        List<UserNotification> published = [];
+        notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
+        var workspace = CreateWorkspace(
+            new ApplicationSettings(),
+            picker,
+            notifications: notifications);
+        workspace.SetSelection(["missing.osu"]);
+
+        // Act
+        bool selected = await workspace.PickBeatmapsAsync(true);
+
+        // Assert
+        selected.Should().BeFalse();
+        published.Should().ContainSingle(notification =>
+            notification.Severity == UserNotificationSeverity.Warning
+            && notification.Title == ApplicationStrings.Workspace_MissingBeatmapTitle
+            && notification.Message == ApplicationStrings.Workspace_MissingBeatmapMessage);
+    }
+
+    [TestMethod]
+    public async Task PickBeatmapsAsync_WithSelection_UsesPickerSourceAndSongsFallback()
+    {
+        // Arrange
+        RecordingFilePicker picker = new() { OpenFiles = [@"D:\Songs\picked.osu"] };
+        ApplicationSettings settings = new() { SongsPath = @"D:\Songs" };
+        var workspace = CreateWorkspace(settings, picker);
+        BeatmapSelectionChangedEventArgs? notification = null;
+        workspace.SelectionChanged += (_, args) => notification = args;
+
+        // Act
+        bool selected = await workspace.PickBeatmapsAsync(false);
+
+        // Assert
+        selected.Should().BeTrue();
+        workspace.SelectedPaths.ToArray().Should().Equal(@"D:\Songs\picked.osu");
+        (picker.LastOpenRequest?.SuggestedStartLocation).Should().Be(@"D:\Songs");
+        (notification?.Source).Should().Be(BeatmapSelectionSource.FilePicker);
+    }
+
+    [TestMethod]
+    public async Task PickBeatmapsAsync_WithCurrentFolderDisabled_OmitsStartLocation()
+    {
+        // Arrange
+        RecordingFilePicker picker = new() { OpenFiles = [] };
+        ApplicationSettings settings = new()
+        {
+            SongsPath = @"D:\Songs",
+            CurrentBeatmapDefaultFolder = false,
+        };
+        var workspace = CreateWorkspace(settings, picker);
+        workspace.SetSelection([@"C:\Maps\selected.osu"]);
+
+        // Act
+        await workspace.PickBeatmapsAsync(false);
+
+        // Assert
+        (picker.LastOpenRequest?.SuggestedStartLocation).Should().BeNull();
+    }
+
+    [TestMethod]
+    public void GetBeatmapPickerStartLocation_WithSelectedMap_UsesItsParentDirectory()
+    {
+        // Arrange
+        ApplicationSettings settings = new() { SongsPath = @"D:\Songs" };
+        var workspace = CreateWorkspace(settings);
+        workspace.SetSelection([@"C:\Maps\selected.osu"]);
+
+        // Act
+        string? location = workspace.GetBeatmapPickerStartLocation();
+
+        // Assert
+        location.Should().Be(@"C:\Maps");
+    }
+
+    [TestMethod]
+    public void GetBeatmapPickerStartLocation_WithPreferenceDisabled_UsesNativePickerRestoration()
+    {
+        // Arrange
+        ApplicationSettings settings = new()
+        {
+            SongsPath = @"D:\Songs",
+            CurrentBeatmapDefaultFolder = false,
+        };
+        var workspace = CreateWorkspace(settings);
+        workspace.SetSelection([@"C:\Maps\selected.osu"]);
+
+        // Act
+        string? location = workspace.GetBeatmapPickerStartLocation();
+
+        // Assert
+        location.Should().BeNull();
+    }
+
+    [TestMethod]
+    public void GetBeatmapPickerStartLocation_WithPreferenceDisabled_UsesCurrentDirectory()
+    {
+        // Arrange
+        ApplicationSettings settings = new()
+        {
+            CurrentBeatmapDefaultFolder = false,
+        };
+        var workspace = CreateWorkspace(settings);
+
+        // Act
+        string? location = workspace.GetBeatmapPickerStartLocation(@"D:\Current");
+
+        // Assert
+        location.Should().Be(@"D:\Current");
+    }
+
+    [TestMethod]
+    public void GetMissingSelectedPaths_WithMissingFiles_ReportsWithoutRemoval()
+    {
+        // Arrange
+        RecordingBeatmapFileSystem fileSystem = new();
+        fileSystem.ExistingPaths.Add("present.osu");
+        var workspace = CreateWorkspace(
+            new ApplicationSettings(),
+            fileSystem: fileSystem);
+        workspace.SetSelection(["present.osu", "missing.osu"]);
+
+        // Act
+        var missing = workspace.GetMissingSelectedPaths();
+
+        // Assert
+        missing.ToArray().Should().Equal("missing.osu");
+        workspace.SelectedPaths.ToArray().Should().Equal("present.osu", "missing.osu");
+    }
+
+    [TestMethod]
+    public void SelectedPaths_WithMissingFile_PublishesLegacyWarningAndPreservesSelection()
+    {
+        // Arrange
+        RecordingBeatmapFileSystem fileSystem = new();
+        UserNotificationService notifications = new();
+        List<UserNotification> published = [];
+        notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
+        var workspace = CreateWorkspace(
+            new ApplicationSettings(),
+            fileSystem: fileSystem,
+            notifications: notifications);
+        workspace.SetSelection(["missing.osu"]);
+
+        // Act
+        var selected = workspace.SelectedPaths;
+
+        // Assert
+        selected.Should().Equal("missing.osu");
+        published.Should().ContainSingle(notification =>
+            notification.Severity == UserNotificationSeverity.Warning
+            && notification.Title == ApplicationStrings.Workspace_MissingBeatmapTitle
+            && notification.Message == ApplicationStrings.Workspace_MissingBeatmapMessage);
+    }
+
+    [TestMethod]
+    public async Task ResolveQuickRunBeatmapAsync_WithLiveMap_UsesItAndUpdatesShellSelection()
+    {
+        // Arrange
+        RecordingBeatmapFileSystem fileSystem = new();
+        fileSystem.ExistingPaths.Add("live.osu");
+        RecordingCurrentBeatmapLocator locator = new("live.osu");
+        var workspace = CreateWorkspace(
+            new ApplicationSettings(),
+            fileSystem: fileSystem,
+            locator: locator);
+        workspace.SetSelection(["selected.osu"]);
+
+        // Act
+        string path = await workspace.ResolveQuickRunBeatmapAsync();
+
+        // Assert
+        path.Should().Be("live.osu");
+        workspace.SelectedPaths.ToArray().Should().Equal("live.osu");
+    }
+
+    [TestMethod]
+    public async Task ResolveQuickRunBeatmapAsync_WithoutLiveMap_FallsBackToFirstSelectedPath()
+    {
+        // Arrange
+        var workspace = CreateWorkspace(new ApplicationSettings());
+        workspace.SetSelection(["first.osu", "second.osu"]);
+
+        // Act
+        string path = await workspace.ResolveQuickRunBeatmapAsync();
+
+        // Assert
+        path.Should().Be("first.osu");
+        workspace.SelectedPaths.ToArray().Should().Equal("first.osu", "second.osu");
+    }
+
+    [TestMethod]
+    public async Task ResolveQuickRunBeatmapAsync_WithMissingLiveFile_FallsBackToFirstSelectedPath()
+    {
+        // Arrange
+        RecordingCurrentBeatmapLocator locator = new("stale.osu");
+        var workspace = CreateWorkspace(
+            new ApplicationSettings(),
+            locator: locator);
+        workspace.SetSelection(["first.osu", "second.osu"]);
+
+        // Act
+        string path = await workspace.ResolveQuickRunBeatmapAsync();
+
+        // Assert
+        path.Should().Be("first.osu");
+    }
+
+    [TestMethod]
+    public async Task ResolveQuickRunBeatmapAsync_WithSelectionUpdateDisabled_LeavesShellSelectionUnchanged()
+    {
+        // Arrange
+        RecordingBeatmapFileSystem fileSystem = new();
+        fileSystem.ExistingPaths.Add("live.osu");
+        RecordingCurrentBeatmapLocator locator = new("live.osu");
+        var workspace = CreateWorkspace(
+            new ApplicationSettings(),
+            fileSystem: fileSystem,
+            locator: locator);
+        workspace.SetSelection(["selected.osu"]);
+
+        // Act
+        string path = await workspace.ResolveQuickRunBeatmapAsync(false);
+
+        // Assert
+        path.Should().Be("live.osu");
+        workspace.SelectedPaths.ToArray().Should().Equal("selected.osu");
+    }
+
+    [TestMethod]
+    public void RemoveRecent_WithSelectedEntry_RemovesHistoryOnly()
+    {
+        // Arrange
+        var workspace = CreateWorkspace(new ApplicationSettings());
+        workspace.SetSelection(["keep-selected.osu", "forget.osu"]);
+
+        // Act
+        bool removed = workspace.RemoveRecent("forget.osu");
+
+        // Assert
+        removed.Should().BeTrue();
+        workspace.RecentMaps.Any(recent => recent.Path == "forget.osu").Should().BeFalse();
+        workspace.SelectedPaths.ToArray().Should().Equal("keep-selected.osu", "forget.osu");
+    }
+
+    private static BeatmapWorkspace CreateWorkspace(
+        ApplicationSettings settings,
+        RecordingFilePicker? picker = null,
+        RecordingBeatmapFileSystem? fileSystem = null,
+        RecordingCurrentBeatmapLocator? locator = null,
+        IUserNotificationService? notifications = null)
+    {
+        return new BeatmapWorkspace(
+            settings,
+            picker ?? new RecordingFilePicker(),
+            fileSystem ?? new RecordingBeatmapFileSystem(),
+            locator ?? new RecordingCurrentBeatmapLocator(),
+            new FixedTimeProvider(fixedNow),
+            notifications ?? new UserNotificationService());
+    }
+
+    private sealed class FixedTimeProvider(DateTimeOffset now) : TimeProvider
+    {
+        public override TimeZoneInfo LocalTimeZone => TimeZoneInfo.Utc;
+
+        public override DateTimeOffset GetUtcNow()
+        {
+            return now;
+        }
+    }
+}

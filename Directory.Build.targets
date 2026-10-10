@@ -1,0 +1,18 @@
+<Project>
+  <!-- IDE project models need generated resource sources during evaluation.
+       CoreResGen adds them again during builds, so remove the evaluation entries first. -->
+  <ItemGroup>
+    <Compile Include="@(EmbeddedResource->'%(StronglyTypedFileName)')" AutoGen="true" DesignTime="true"/>
+  </ItemGroup>
+
+  <Target Name="RemoveGeneratedResourceCompileItems" BeforeTargets="CoreResGen">
+    <ItemGroup>
+      <Compile Remove="@(EmbeddedResource->'%(StronglyTypedFileName)')"/>
+    </ItemGroup>
+  </Target>
+
+  <PropertyGroup Condition="'$(IsTestProject)' != 'true'">
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <WarningsAsErrors>$(WarningsAsErrors);CS1591</WarningsAsErrors>
+  </PropertyGroup>
+</Project>

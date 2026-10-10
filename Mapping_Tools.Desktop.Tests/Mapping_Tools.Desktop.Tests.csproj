@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <!-- Keep test builds deterministic and avoid Avalonia's machine-local telemetry task. -->
+    <UsedAvaloniaProducts></UsedAvaloniaProducts>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <MappingToolsRepositoryRoot>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/..'))</MappingToolsRepositoryRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>MappingToolsRepositoryRoot</_Parameter1>
+      <_Parameter2>$(MappingToolsRepositoryRoot)</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia.Headless" Version="12.1.0"/>
+    <PackageReference Include="AwesomeAssertions" Version="9.6.0"/>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0"/>
+    <PackageReference Include="MSTest.TestAdapter" Version="3.5.2"/>
+    <PackageReference Include="MSTest.TestFramework" Version="3.5.2"/>
+    <PackageReference Include="coverlet.collector" Version="10.0.1"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Mapping_Tools.Desktop\Mapping_Tools.Desktop.csproj"/>
+  </ItemGroup>
+
+</Project>

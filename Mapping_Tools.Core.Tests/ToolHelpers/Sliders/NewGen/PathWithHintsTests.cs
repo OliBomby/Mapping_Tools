@@ -1,0 +1,317 @@
+﻿using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
+using Mapping_Tools.Core.ToolHelpers.Sliders.Newgen;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace Mapping_Tools.Core.Tests.ToolHelpers.Sliders.NewGen;
+
+[TestClass]
+public class PathWithHintsTests
+{
+    private const int num_points = 11;
+    private PathWithHints path = null!;
+    private List<LinkedListNode<PathPoint>> points = null!;
+
+    [TestInitialize]
+    public void Initialize()
+    {
+        points = [];
+        path = new PathWithHints();
+        for (int i = 0; i < num_points; i++)
+        {
+            path.Path.AddLast(new PathPoint(new Vector2(i, 0), 0, 0, i));
+            points.Add(path.Path.Last!);
+        }
+
+        path.AddReconstructionHint(CreateHint(path.Path.First!, path.Path.Last!, -1, [
+            new Vector2(0, 0),
+            new Vector2(num_points - 1, 0),
+        ], PathType.Linear));
+    }
+
+    [TestMethod]
+    public void AddReconstructionHint_ZeroLengthHint_ThrowsArgumentException()
+    {
+        // Arrange
+        // Act
+        var act1 = () => path.AddReconstructionHint(CreateHint(points[2], points[2], 0, [
+            new Vector2(2, 0),
+            new Vector2(2, 1),
+            new Vector2(2, 0),
+        ]));
+
+        // Assert
+        act1.Should().Throw<ArgumentException>();
+    }
+
+    [TestMethod]
+    public void AddReconstructionHint_OverlappingLayers_SplitsHintsCorrectly()
+    {
+        // Arrange
+        // Act
+        path.AddReconstructionHint(CreateHint(points[2], points[8], 0, [
+            new Vector2(2, 0),
+            new Vector2(5, 1),
+            new Vector2(8, 0),
+        ]));
+
+        // Assert
+        path.ReconstructionHints.Count.Should().Be(3);
+        path.ReconstructionHints[0].Start.Should().Be(points[0]);
+        path.ReconstructionHints[0].End.Should().Be(points[2]);
+        path.ReconstructionHints[0].StartP.Should().Be(0);
+        path.ReconstructionHints[0].EndP.Should().Be(0.2);
+        path.ReconstructionHints[0].ControlPoints.Should().NotBeNull();
+        path.ReconstructionHints[1].Start.Should().Be(points[2]);
+        path.ReconstructionHints[1].End.Should().Be(points[8]);
+        path.ReconstructionHints[1].StartP.Should().Be(0);
+        path.ReconstructionHints[1].EndP.Should().Be(1);
+        path.ReconstructionHints[1].ControlPoints.Should().NotBeNull();
+        path.ReconstructionHints[2].Start.Should().Be(points[8]);
+        path.ReconstructionHints[2].End.Should().Be(points[10]);
+        path.ReconstructionHints[2].StartP.Should().Be(0.8);
+        path.ReconstructionHints[2].EndP.Should().Be(1);
+        path.ReconstructionHints[2].ControlPoints.Should().NotBeNull();
+
+        path.AddReconstructionHint(CreateHint(points[0], points[1], 0, [
+            new Vector2(0, 0),
+            new Vector2(0.5, 1),
+            new Vector2(1, 0),
+        ]));
+
+        path.ReconstructionHints.Count.Should().Be(4);
+        path.ReconstructionHints[0].Start.Should().Be(points[0]);
+        path.ReconstructionHints[0].End.Should().Be(points[1]);
+        path.ReconstructionHints[0].StartP.Should().Be(0);
+        path.ReconstructionHints[0].EndP.Should().Be(1);
+        path.ReconstructionHints[0].ControlPoints.Should().NotBeNull();
+        path.ReconstructionHints[1].Start.Should().Be(points[1]);
+        path.ReconstructionHints[1].End.Should().Be(points[2]);
+        path.ReconstructionHints[1].StartP.Should().Be(0.1);
+        path.ReconstructionHints[1].EndP.Should().Be(0.2);
+        path.ReconstructionHints[1].ControlPoints.Should().NotBeNull();
+        path.ReconstructionHints[2].Start.Should().Be(points[2]);
+        path.ReconstructionHints[2].End.Should().Be(points[8]);
+        path.ReconstructionHints[2].StartP.Should().Be(0);
+        path.ReconstructionHints[2].EndP.Should().Be(1);
+        path.ReconstructionHints[2].ControlPoints.Should().NotBeNull();
+        path.ReconstructionHints[3].Start.Should().Be(points[8]);
+        path.ReconstructionHints[3].End.Should().Be(points[10]);
+        path.ReconstructionHints[3].StartP.Should().Be(0.8);
+        path.ReconstructionHints[3].EndP.Should().Be(1);
+        path.ReconstructionHints[3].ControlPoints.Should().NotBeNull();
+
+        path.AddReconstructionHint(CreateHint(points[9], points[10], 0, [
+            new Vector2(9, 0),
+            new Vector2(9.5, 1),
+            new Vector2(10, 0),
+        ]));
+
+        path.ReconstructionHints.Count.Should().Be(5);
+        path.ReconstructionHints[0].Start.Should().Be(points[0]);
+        path.ReconstructionHints[0].End.Should().Be(points[1]);
+        path.ReconstructionHints[0].StartP.Should().Be(0);
+        path.ReconstructionHints[0].EndP.Should().Be(1);
+        path.ReconstructionHints[0].ControlPoints.Should().NotBeNull();
+        path.ReconstructionHints[1].Start.Should().Be(points[1]);
+        path.ReconstructionHints[1].End.Should().Be(points[2]);
+        path.ReconstructionHints[1].StartP.Should().Be(0.1);
+        path.ReconstructionHints[1].EndP.Should().Be(0.2);
+        path.ReconstructionHints[1].ControlPoints.Should().NotBeNull();
+        path.ReconstructionHints[2].Start.Should().Be(points[2]);
+        path.ReconstructionHints[2].End.Should().Be(points[8]);
+        path.ReconstructionHints[2].StartP.Should().Be(0);
+        path.ReconstructionHints[2].EndP.Should().Be(1);
+        path.ReconstructionHints[2].ControlPoints.Should().NotBeNull();
+        path.ReconstructionHints[3].Start.Should().Be(points[8]);
+        path.ReconstructionHints[3].End.Should().Be(points[9]);
+        path.ReconstructionHints[3].StartP.Should().Be(0.8);
+        path.ReconstructionHints[3].EndP.Should().Be(0.9);
+        path.ReconstructionHints[3].ControlPoints.Should().NotBeNull();
+        path.ReconstructionHints[4].Start.Should().Be(points[9]);
+        path.ReconstructionHints[4].End.Should().Be(points[10]);
+        path.ReconstructionHints[4].StartP.Should().Be(0);
+        path.ReconstructionHints[4].EndP.Should().Be(1);
+        path.ReconstructionHints[4].ControlPoints.Should().NotBeNull();
+
+        path.AddReconstructionHint(CreateHint(points[1], points[2], 0, null));
+
+        path.ReconstructionHints.Count.Should().Be(5);
+        path.ReconstructionHints[0].Start.Should().Be(points[0]);
+        path.ReconstructionHints[0].End.Should().Be(points[1]);
+        path.ReconstructionHints[0].StartP.Should().Be(0);
+        path.ReconstructionHints[0].EndP.Should().Be(1);
+        path.ReconstructionHints[0].ControlPoints.Should().NotBeNull();
+        path.ReconstructionHints[1].Start.Should().Be(points[1]);
+        path.ReconstructionHints[1].End.Should().Be(points[2]);
+        path.ReconstructionHints[1].StartP.Should().Be(0);
+        path.ReconstructionHints[1].EndP.Should().Be(1);
+        path.ReconstructionHints[1].ControlPoints.Should().BeNull();
+        path.ReconstructionHints[2].Start.Should().Be(points[2]);
+        path.ReconstructionHints[2].End.Should().Be(points[8]);
+        path.ReconstructionHints[2].StartP.Should().Be(0);
+        path.ReconstructionHints[2].EndP.Should().Be(1);
+        path.ReconstructionHints[2].ControlPoints.Should().NotBeNull();
+        path.ReconstructionHints[3].Start.Should().Be(points[8]);
+        path.ReconstructionHints[3].End.Should().Be(points[9]);
+        path.ReconstructionHints[3].StartP.Should().Be(0.8);
+        path.ReconstructionHints[3].EndP.Should().Be(0.9);
+        path.ReconstructionHints[3].ControlPoints.Should().NotBeNull();
+        path.ReconstructionHints[4].Start.Should().Be(points[9]);
+        path.ReconstructionHints[4].End.Should().Be(points[10]);
+        path.ReconstructionHints[4].StartP.Should().Be(0);
+        path.ReconstructionHints[4].EndP.Should().Be(1);
+        path.ReconstructionHints[4].ControlPoints.Should().NotBeNull();
+    }
+
+    [TestMethod]
+    public void AddReconstructionHint_LeftSameLayerOverlap_SplitsHintsCorrectly()
+    {
+        // Arrange
+        path.AddReconstructionHint(CreateHint(points[2], points[8], 0, [
+            new Vector2(2, 0),
+            new Vector2(5, 1),
+            new Vector2(8, 0),
+        ]));
+
+        // Act
+        path.AddReconstructionHint(CreateHint(points[1], points[3], 0, [
+            new Vector2(1, 0),
+            new Vector2(2, 1),
+            new Vector2(3, 0),
+        ]));
+
+        // Assert
+        path.ReconstructionHints.Count.Should().Be(5);
+        path.ReconstructionHints[0].Start.Should().Be(points[0]);
+        path.ReconstructionHints[0].End.Should().Be(points[1]);
+        path.ReconstructionHints[0].StartP.Should().Be(0);
+        path.ReconstructionHints[0].EndP.Should().Be(0.1);
+        path.ReconstructionHints[0].ControlPoints.Should().NotBeNull();
+        path.ReconstructionHints[1].Start.Should().Be(points[1]);
+        path.ReconstructionHints[1].End.Should().Be(points[2]);
+        path.ReconstructionHints[1].StartP.Should().Be(0);
+        path.ReconstructionHints[1].EndP.Should().Be(0.5);
+        path.ReconstructionHints[1].ControlPoints.Should().NotBeNull();
+        path.ReconstructionHints[2].Start.Should().Be(points[2]);
+        path.ReconstructionHints[2].End.Should().Be(points[3]);
+        path.ReconstructionHints[2].StartP.Should().Be(0);
+        path.ReconstructionHints[2].EndP.Should().Be(1);
+        path.ReconstructionHints[2].ControlPoints.Should().BeNull();
+        path.ReconstructionHints[3].Start.Should().Be(points[3]);
+        path.ReconstructionHints[3].End.Should().Be(points[8]);
+        path.ReconstructionHints[3].StartP.Should().BeApproximately(1 / 6d, Precision.DOUBLE_EPSILON);
+        path.ReconstructionHints[3].EndP.Should().Be(1);
+        path.ReconstructionHints[3].ControlPoints.Should().NotBeNull();
+        path.ReconstructionHints[4].Start.Should().Be(points[8]);
+        path.ReconstructionHints[4].End.Should().Be(points[10]);
+        path.ReconstructionHints[4].StartP.Should().Be(0.8);
+        path.ReconstructionHints[4].EndP.Should().Be(1);
+        path.ReconstructionHints[4].ControlPoints.Should().NotBeNull();
+    }
+
+    [TestMethod]
+    public void AddReconstructionHint_RightSameLayerOverlap_SplitsHintsCorrectly()
+    {
+        // Arrange
+        path.AddReconstructionHint(CreateHint(points[2], points[8], 0, [
+            new Vector2(2, 0),
+            new Vector2(5, 1),
+            new Vector2(8, 0),
+        ]));
+
+        // Act
+        path.AddReconstructionHint(CreateHint(points[7], points[9], 0, [
+            new Vector2(7, 0),
+            new Vector2(8, 1),
+            new Vector2(9, 0),
+        ]));
+
+        // Assert
+        path.ReconstructionHints.Count.Should().Be(5);
+        path.ReconstructionHints[0].Start.Should().Be(points[0]);
+        path.ReconstructionHints[0].End.Should().Be(points[2]);
+        path.ReconstructionHints[0].StartP.Should().Be(0);
+        path.ReconstructionHints[0].EndP.Should().Be(0.2);
+        path.ReconstructionHints[0].ControlPoints.Should().NotBeNull();
+        path.ReconstructionHints[1].Start.Should().Be(points[2]);
+        path.ReconstructionHints[1].End.Should().Be(points[7]);
+        path.ReconstructionHints[1].StartP.Should().Be(0);
+        path.ReconstructionHints[1].EndP.Should().BeApproximately(1 - 1 / 6d, Precision.DOUBLE_EPSILON);
+        path.ReconstructionHints[1].ControlPoints.Should().NotBeNull();
+        path.ReconstructionHints[2].Start.Should().Be(points[7]);
+        path.ReconstructionHints[2].End.Should().Be(points[8]);
+        path.ReconstructionHints[2].StartP.Should().Be(0);
+        path.ReconstructionHints[2].EndP.Should().Be(1);
+        path.ReconstructionHints[2].ControlPoints.Should().BeNull();
+        path.ReconstructionHints[3].Start.Should().Be(points[8]);
+        path.ReconstructionHints[3].End.Should().Be(points[9]);
+        path.ReconstructionHints[3].StartP.Should().Be(0.5);
+        path.ReconstructionHints[3].EndP.Should().Be(1);
+        path.ReconstructionHints[3].ControlPoints.Should().NotBeNull();
+        path.ReconstructionHints[4].Start.Should().Be(points[9]);
+        path.ReconstructionHints[4].End.Should().Be(points[10]);
+        path.ReconstructionHints[4].StartP.Should().Be(0.9);
+        path.ReconstructionHints[4].EndP.Should().Be(1);
+        path.ReconstructionHints[4].ControlPoints.Should().NotBeNull();
+    }
+
+    [TestMethod]
+    public void AddReconstructionHint_MiddleSameLayerOverlap_SplitsHintsCorrectly()
+    {
+        // Arrange
+        path.AddReconstructionHint(CreateHint(points[2], points[8], 0, [
+            new Vector2(2, 0),
+            new Vector2(5, 1),
+            new Vector2(8, 0),
+        ]));
+
+        // Act
+        path.AddReconstructionHint(CreateHint(points[3], points[7], 0, [
+            new Vector2(3, 0),
+            new Vector2(5, 1),
+            new Vector2(7, 0),
+        ]));
+
+        // Assert
+        path.ReconstructionHints.Count.Should().Be(5);
+        path.ReconstructionHints[0].Start.Should().Be(points[0]);
+        path.ReconstructionHints[0].End.Should().Be(points[2]);
+        path.ReconstructionHints[0].StartP.Should().Be(0);
+        path.ReconstructionHints[0].EndP.Should().Be(0.2);
+        path.ReconstructionHints[0].ControlPoints.Should().NotBeNull();
+        path.ReconstructionHints[1].Start.Should().Be(points[2]);
+        path.ReconstructionHints[1].End.Should().Be(points[3]);
+        path.ReconstructionHints[1].StartP.Should().Be(0);
+        path.ReconstructionHints[1].EndP.Should().BeApproximately(1 / 6d, Precision.DOUBLE_EPSILON);
+        path.ReconstructionHints[1].ControlPoints.Should().NotBeNull();
+        path.ReconstructionHints[2].Start.Should().Be(points[3]);
+        path.ReconstructionHints[2].End.Should().Be(points[7]);
+        path.ReconstructionHints[2].StartP.Should().Be(0);
+        path.ReconstructionHints[2].EndP.Should().Be(1);
+        path.ReconstructionHints[2].ControlPoints.Should().BeNull();
+        path.ReconstructionHints[3].Start.Should().Be(points[7]);
+        path.ReconstructionHints[3].End.Should().Be(points[8]);
+        path.ReconstructionHints[3].StartP.Should().BeApproximately(1 - 1 / 6d, Precision.DOUBLE_EPSILON);
+        path.ReconstructionHints[3].EndP.Should().Be(1);
+        path.ReconstructionHints[3].ControlPoints.Should().NotBeNull();
+        path.ReconstructionHints[4].Start.Should().Be(points[8]);
+        path.ReconstructionHints[4].End.Should().Be(points[10]);
+        path.ReconstructionHints[4].StartP.Should().Be(0.8);
+        path.ReconstructionHints[4].EndP.Should().Be(1);
+        path.ReconstructionHints[4].ControlPoints.Should().NotBeNull();
+    }
+
+    private static ReconstructionHint CreateHint(
+        LinkedListNode<PathPoint> start,
+        LinkedListNode<PathPoint> end,
+        int layer,
+        List<Vector2>? anchors,
+        PathType pathType = PathType.Bezier)
+    {
+        var controlPoints = anchors?.Select((position, index) =>
+            new PathControlPoint(position, index == 0 ? pathType : null)).ToList();
+        return new ReconstructionHint(start, end, layer, controlPoints);
+    }
+}

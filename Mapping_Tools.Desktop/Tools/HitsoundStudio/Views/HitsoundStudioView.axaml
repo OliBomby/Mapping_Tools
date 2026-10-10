@@ -1,0 +1,499 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels"
+             xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:converters="using:Mapping_Tools.Desktop.Converters"
+             xmlns:hsConverters="using:Mapping_Tools.Desktop.Tools.HitsoundStudio.Converters"
+             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:materialIcons="using:Material.Icons.Avalonia"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
+             x:Class="Mapping_Tools.Desktop.Tools.HitsoundStudio.Views.HitsoundStudioView"
+             x:DataType="vm:HitsoundStudioViewModel">
+    <UserControl.Resources>
+        <converters:BooleanNotConverter x:Key="BooleanNotConverter" />
+        <converters:DoubleArrayToStringConverter x:Key="DoubleArrayToStringConverter" />
+        <hsConverters:HitsoundStudioSampleVolumeConverter x:Key="HitsoundStudioSampleVolumeConverter" />
+    </UserControl.Resources>
+    <Grid ColumnDefinitions="*,300"
+          RowDefinitions="Auto,*,Auto">
+        <controls:ToolViewHeader Grid.ColumnSpan="2"
+                                 Title="Hitsound Studio"
+                                 IsQuickRunSupported="True"
+                                 HelpText="{loc:Tr HitsoundStudio_Help}" />
+
+        <Grid Grid.Row="1"
+              Grid.ColumnSpan="2" Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="{Binding EditorColumnWidth}" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="2*" />
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0"
+                  Margin="0,0,10,0"
+                  RowDefinitions="*,Auto">
+                    <ScrollViewer x:Name="LayerEditorScrollViewer"
+                                  Grid.Row="0"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch"
+                              HorizontalScrollBarVisibility="Disabled"
+                              VerticalScrollBarVisibility="Hidden">
+                    <StackPanel x:Name="LayerEditor"
+                                IsVisible="{Binding HasLayers}"
+                                IsEnabled="{Binding HasLayers}"
+                                Margin="0,0,0,20">
+                        <TextBlock FontSize="14"
+                                   FontWeight="Bold"
+                                   Text="{loc:Tr HitsoundStudio_General}" />
+                        <TextBox x:Name="NameEditor"
+                                 Margin="0,5,0,0"
+                                 Text="{Binding EditName, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                 materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_LayerName}"
+                                 ToolTip.Tip="{loc:Tr HitsoundStudio_LayerNameTip}" />
+                        <ComboBox x:Name="SampleSetEditor"
+                                  Margin="0,5,0,0"
+                                  Cursor="Hand"
+                                  ItemsSource="{Binding SampleSets}"
+                                  SelectedItem="{Binding EditSampleSet, Mode=TwoWay}"
+                                  materialAssists:ComboBoxAssist.Label="{loc:Tr HitsoundStudio_SampleSet}"
+                                  ToolTip.Tip="{loc:Tr HitsoundStudio_SampleSetTip}">
+                            <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" /></DataTemplate></ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <ComboBox Margin="0,5,0,0"
+                                  Cursor="Hand"
+                                  ItemsSource="{Binding Hitsounds}"
+                                  SelectedItem="{Binding EditHitsound, Mode=TwoWay}"
+                                  materialAssists:ComboBoxAssist.Label="{loc:Tr HitsoundStudio_Hitsound}"
+                                  ToolTip.Tip="{loc:Tr HitsoundStudio_HitsoundTip}">
+                            <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" /></DataTemplate></ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <CheckBox Margin="0,5,0,0"
+                                  Content="{loc:Tr HitsoundStudio_ShowTimes}"
+                                  IsChecked="{Binding ShowTimes, Mode=TwoWay}"
+                                  ToolTip.Tip="{loc:Tr HitsoundStudio_ShowTimesTip}" />
+                        <StackPanel IsVisible="{Binding ShowTimes}">
+                            <TextBox
+                                Text="{Binding EditTimes, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource DoubleArrayToStringConverter}}"
+                                TextWrapping="Wrap"
+                                materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Times}"
+                                ToolTip.Tip="{loc:Tr HitsoundStudio_TimesTip}" />
+                        </StackPanel>
+
+                        <TextBlock Margin="0,20,0,0"
+                                   FontSize="14"
+                                   FontWeight="Bold"
+                                   Text="{loc:Tr HitsoundStudio_SampleHeading}" />
+                        <Grid Margin="0,5,0,0"
+                              ColumnDefinitions="*,Auto">
+                            <TextBox Margin="0,0,5,0"
+                                     Text="{Binding EditSamplePath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                     materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_SamplePath}"
+                                     ToolTip.Tip="{loc:Tr HitsoundStudio_SamplePathTip}" />
+                            <Button Grid.Column="1"
+                                    Classes="flat path-picker"
+                                    Cursor="Hand"
+                                    Command="{Binding PickEditSamplePathCommand}"
+                                    VerticalAlignment="Bottom"
+                                    ToolTip.Tip="{loc:Tr HitsoundStudio_ChooseSampleSource}">
+                                <materialIcons:MaterialIcon Width="30"
+                                                            Height="30"
+                                                            Kind="Folder" />
+                            </Button>
+                        </Grid>
+                        <TextBox Margin="0,5,0,0"
+                                 Text="{Binding EditSampleVolume, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource HitsoundStudioSampleVolumeConverter}, ConverterParameter=100}"
+                                 materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Volume}"
+                                 ToolTip.Tip="{loc:Tr HitsoundStudio_VolumeTip}" />
+                        <TextBox Margin="0,5,0,0"
+                                 Text="{Binding EditSamplePanning, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=0}"
+                                 materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Panning}"
+                                 ToolTip.Tip="{loc:Tr HitsoundStudio_PanningTip}" />
+                        <TextBox Margin="0,5,0,0"
+                                 Text="{Binding EditSamplePitchShift, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=0}"
+                                 materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_PitchShift}"
+                                 ToolTip.Tip="{loc:Tr HitsoundStudio_PitchShiftTip}" />
+                        <StackPanel IsVisible="{Binding IsSoundFontSample}">
+                            <TextBox Margin="0,5,0,0"
+                                     Text="{Binding EditSampleBank, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                     materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Bank}"
+                                     ToolTip.Tip="{loc:Tr HitsoundStudio_BankTip}" />
+                            <TextBox Margin="0,5,0,0"
+                                     Text="{Binding EditSamplePatch, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                     materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Patch}"
+                                     ToolTip.Tip="{loc:Tr HitsoundStudio_PatchTip}" />
+                            <TextBox Margin="0,5,0,0"
+                                     Text="{Binding EditSampleInstrument, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                     materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Instrument}"
+                                     ToolTip.Tip="{loc:Tr HitsoundStudio_InstrumentTip}" />
+                            <TextBox Margin="0,5,0,0"
+                                     Text="{Binding EditSampleKey, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                     materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Key}"
+                                     ToolTip.Tip="{loc:Tr HitsoundStudio_KeyTip}" />
+                            <TextBox Margin="0,5,0,0"
+                                     Text="{Binding EditSampleLength, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}"
+                                     materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Length}"
+                                     ToolTip.Tip="{loc:Tr HitsoundStudio_LengthTip}" />
+                            <TextBox Margin="0,5,0,0"
+                                     Text="{Binding EditSampleVelocity, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                     materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Velocity}"
+                                     ToolTip.Tip="{loc:Tr HitsoundStudio_VelocityTip}" />
+                        </StackPanel>
+
+                        <TextBlock Margin="0,20,0,0"
+                                   FontSize="14"
+                                   FontWeight="Bold"
+                                   Text="{loc:Tr HitsoundStudio_ImportInfo}"
+                                   ToolTip.Tip="{loc:Tr HitsoundStudio_ImportInfoTip}" />
+                        <ComboBox Margin="0,5,0,0"
+                                  Cursor="Hand"
+                                  ItemsSource="{Binding ImportTypes}"
+                                  SelectedItem="{Binding EditImportType, Mode=TwoWay}"
+                                  materialAssists:ComboBoxAssist.Label="{loc:Tr HitsoundStudio_ImportType}"
+                                  ToolTip.Tip="{loc:Tr HitsoundStudio_ImportTypeTip}">
+                            <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" /></DataTemplate></ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <StackPanel IsVisible="{Binding HasImport}">
+                            <Grid Margin="0,5,0,0"
+                                  ColumnDefinitions="*,Auto,5,Auto">
+                                <TextBox Margin="0,0,5,0"
+                                         Text="{Binding EditImportPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_SourcePath}"
+                                         ToolTip.Tip="{loc:Tr HitsoundStudio_SourcePathTip}" />
+                                <Button Grid.Column="1"
+                                        Classes="flat path-picker"
+                                        Cursor="Hand"
+                                        Command="{Binding LoadEditImportPathCommand}"
+                                        VerticalAlignment="Bottom"
+                                        ToolTip.Tip="{loc:Tr HitsoundStudio_FetchSelectedBeatmap}">
+                                    <materialIcons:MaterialIcon Width="30"
+                                                                Height="30"
+                                                                Kind="RestoreFromTrash" />
+                                </Button>
+                                <Button Grid.Column="3"
+                                        Classes="flat path-picker"
+                                        Cursor="Hand"
+                                        Command="{Binding PickEditImportPathCommand}"
+                                        VerticalAlignment="Bottom"
+                                        ToolTip.Tip="{loc:Tr HitsoundStudio_PickImportSource}">
+                                    <materialIcons:MaterialIcon Width="30"
+                                                                Height="30"
+                                                                Kind="Folder" />
+                                </Button>
+                            </Grid>
+                            <StackPanel IsVisible="{Binding IsStackImport}">
+                                <Grid Margin="0,5,0,0"
+                                      ColumnDefinitions="*,5,*">
+                                    <TextBox
+                                        Text="{Binding EditImportX, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}"
+                                        materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_XCoordinate}"
+                                        ToolTip.Tip="{loc:Tr HitsoundStudio_XCoordinateTip}" />
+                                    <TextBox Grid.Column="2"
+                                             Text="{Binding EditImportY, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}"
+                                             materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_YCoordinate}"
+                                             ToolTip.Tip="{loc:Tr HitsoundStudio_YCoordinateTip}" />
+                                </Grid>
+                            </StackPanel>
+                            <StackPanel IsVisible="{Binding IsSampleImport}">
+                                <Grid Margin="0,5,0,0"
+                                      ColumnDefinitions="*,Auto">
+                                    <TextBox Margin="0,0,5,0"
+                                             Text="{Binding EditImportSamplePath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                             materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_ImportedSamplePath}"
+                                             ToolTip.Tip="{loc:Tr HitsoundStudio_ImportedSamplePathTip}" />
+                                    <Button Grid.Column="1"
+                                            Classes="flat path-picker"
+                                            Cursor="Hand"
+                                            Command="{Binding PickEditImportSamplePathCommand}"
+                                            VerticalAlignment="Bottom"
+                                            ToolTip.Tip="{loc:Tr HitsoundStudio_ChooseImportedSample}">
+                                        <materialIcons:MaterialIcon Width="30"
+                                                                    Height="30"
+                                                                    Kind="Folder" />
+                                    </Button>
+                                </Grid>
+                                <CheckBox Margin="0,5,0,0"
+                                          IsVisible="{Binding IsHitsoundsImport}"
+                                          Content="{loc:Tr HitsoundStudio_DiscriminateVolumes}"
+                                          IsChecked="{Binding EditImportDiscriminateVolumes, Mode=TwoWay}"
+                                          ToolTip.Tip="{loc:Tr HitsoundStudio_DiscriminateVolumesTip}" />
+                                <CheckBox IsVisible="{Binding IsHitsoundsImport}"
+                                          Content="{loc:Tr HitsoundStudio_DetectDuplicateSamples}"
+                                          IsChecked="{Binding EditImportDetectDuplicates, Mode=TwoWay}"
+                                          ToolTip.Tip="{loc:Tr HitsoundStudio_DetectDuplicateSamplesTip}" />
+                                <CheckBox IsVisible="{Binding IsSampleImport}"
+                                          Content="{loc:Tr HitsoundStudio_RemoveDuplicates}"
+                                          IsChecked="{Binding EditImportRemoveDuplicates, Mode=TwoWay}"
+                                          ToolTip.Tip="{loc:Tr HitsoundStudio_RemoveDuplicatesTip}" />
+                            </StackPanel>
+                            <StackPanel IsVisible="{Binding IsMidiImport}">
+                                <TextBox Margin="0,5,0,0"
+                                         Text="{Binding EditImportBank, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Bank}"
+                                         ToolTip.Tip="{loc:Tr HitsoundStudio_BankFilterTip}" />
+                                <TextBox Margin="0,5,0,0"
+                                         Text="{Binding EditImportPatch, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Patch}"
+                                         ToolTip.Tip="{loc:Tr HitsoundStudio_PatchFilterTip}" />
+                                <TextBox Margin="0,5,0,0"
+                                         Text="{Binding EditImportKey, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Key}"
+                                         ToolTip.Tip="{loc:Tr HitsoundStudio_KeyFilterTip}" />
+                                <TextBox Margin="0,5,0,0"
+                                         Text="{Binding EditImportLength, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}"
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Length}"
+                                         ToolTip.Tip="{loc:Tr HitsoundStudio_LengthFilterTip}" />
+                                <TextBox
+                                    Text="{Binding EditImportLengthRoughness, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=1}"
+                                    materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_LengthRoughness}"
+                                    ToolTip.Tip="{loc:Tr HitsoundStudio_LengthRoughnessTip}" />
+                                <TextBox Margin="0,5,0,0"
+                                         Text="{Binding EditImportVelocity, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Velocity}"
+                                         ToolTip.Tip="{loc:Tr HitsoundStudio_VelocityFilterTip}" />
+                                <TextBox Margin="0,5,0,0"
+                                         Text="{Binding EditImportVelocityRoughness, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=1}"
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_VelocityRoughness}"
+                                         ToolTip.Tip="{loc:Tr HitsoundStudio_VelocityRoughnessTip}" />
+                                <TextBox Margin="0,5,0,0"
+                                         Text="{Binding EditImportOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=0}"
+                                         materialAssists:TextFieldAssist.Label="{loc:Tr HitsoundStudio_Offset}"
+                                         ToolTip.Tip="{loc:Tr HitsoundStudio_OffsetTip}" />
+                            </StackPanel>
+                            <Button x:Name="ReloadButton"
+                                    Margin="0,20,0,0"
+                                    FontSize="16"
+                                    FontWeight="Bold"
+                                    Content="{loc:Tr HitsoundStudio_ReloadFromSource}"
+                                    Command="{Binding ReloadCommand}"
+                                    ToolTip.Tip="{loc:Tr HitsoundStudio_ReloadFromSourceTip}" />
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+
+            <GridSplitter x:Name="LayerEditorSplitter"
+                Grid.Column="1"
+                Width="1"
+                Margin="0,10,0,10"
+                Background="{DynamicResource MaterialDividerBrush}"
+                IsVisible="{Binding HasLayers}"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                ResizeDirection="Columns"
+                ResizeBehavior="PreviousAndNext" />
+
+            <controls:MaterialGridListView x:Name="LayersList"
+                                           Grid.Column="2"
+                                           Margin="10,0,0,0"
+                                           ItemsSource="{Binding Layers}"
+                                           SelectedItems="{Binding SelectedLayers, Mode=TwoWay}"
+                                           SelectionMode="Multiple"
+                                           DoubleTapped="LayersDoubleTapped"
+                                           CanUserResizeColumns="True"
+                                           ScrollViewer.VerticalScrollBarVisibility="Visible"
+                                           ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                <controls:MaterialGridListView.Columns>
+                    <TableViewColumn Header="{loc:Tr HitsoundStudio_ColumnName}" Width="200"
+                                     Binding="{Binding Name}" />
+                    <TableViewColumn Header="{loc:Tr HitsoundStudio_ColumnAmount}" Width="90"
+                                     Binding="{Binding Times.Count}" />
+                    <TableViewColumn Header="{loc:Tr HitsoundStudio_SampleSet}" Width="90"
+                                     Binding="{Binding SampleSet}" />
+                    <TableViewColumn Header="{loc:Tr HitsoundStudio_Hitsound}" Width="90"
+                                     Binding="{Binding Hitsound}" />
+                    <TableViewColumn Header="{loc:Tr HitsoundStudio_SamplePath}" Width="1000"
+                                     Binding="{Binding SampleArgs.Path}" />
+                </controls:MaterialGridListView.Columns>
+            </controls:MaterialGridListView>
+
+            <StackPanel Grid.Column="2"
+                        Width="200"
+                        Margin="0,0,30,0"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom"
+                        IsVisible="{Binding HasLayers, Converter={StaticResource BooleanNotConverter}}">
+                <TextBlock Foreground="{DynamicResource MaterialBodyLightBrush}"
+                           Text="{loc:Tr HitsoundStudio_EmptyLayersHint}"
+                           FontSize="16"
+                           TextAlignment="Center"
+                           TextWrapping="Wrap" />
+                <materialIcons:MaterialIcon Width="24"
+                                            Height="24"
+                                            Margin="0,30,0,0"
+                                            Foreground="{DynamicResource MaterialBodyLightBrush}"
+                                            HorizontalAlignment="Left"
+                                            Kind="Undo"
+                                            RenderTransformOrigin="0.5,0.5">
+                    <materialIcons:MaterialIcon.RenderTransform>
+                        <RotateTransform Angle="-90" />
+                    </materialIcons:MaterialIcon.RenderTransform>
+                </materialIcons:MaterialIcon>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="2"
+              Grid.Column="1">
+            <StackPanel Height="90"
+                        Margin="0,0,5,0"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom"
+                        Orientation="Horizontal">
+                <controls:ToolRunButton Margin="10"
+                                        RunCommand="{Binding RunCommand}" />
+            </StackPanel>
+            <StackPanel Margin="0,5,0,0"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Orientation="Horizontal">
+                <materialDesign:FloatingButton Classes="mini light no-transitions"
+                                               Margin="5"
+                                               Command="{Binding AddCommand}"
+                                               ToolTip.Tip="{loc:Tr HitsoundStudio_AddLayerTip}">
+                    <materialIcons:MaterialIcon Width="24"
+                                                Height="24"
+                                                Kind="Plus" />
+                </materialDesign:FloatingButton>
+                <materialDesign:FloatingButton Classes="mini light no-transitions"
+                                               Margin="5"
+                                               x:Name="RemoveButton"
+                                               Command="{Binding RemoveCommand}"
+                                               ToolTip.Tip="{loc:Tr HitsoundStudio_RemoveLayersTip}">
+                    <materialIcons:MaterialIcon Width="24"
+                                                Height="24"
+                                                Kind="TrashCan" />
+                </materialDesign:FloatingButton>
+                <materialDesign:FloatingButton Classes="mini light no-transitions"
+                                               Margin="5"
+                                               x:Name="RaiseButton"
+                                               Click="RaiseLayers"
+                                               ToolTip.Tip="{loc:Tr HitsoundStudio_RaiseLayersTip}">
+                    <materialIcons:MaterialIcon Width="24"
+                                                Height="24"
+                                                Kind="KeyboardArrowUp" />
+                </materialDesign:FloatingButton>
+                <materialDesign:FloatingButton Classes="mini light no-transitions"
+                                               Margin="5"
+                                               x:Name="LowerButton"
+                                               Click="LowerLayers"
+                                               ToolTip.Tip="{loc:Tr HitsoundStudio_LowerLayersTip}">
+                    <materialIcons:MaterialIcon Width="24"
+                                                Height="24"
+                                                Kind="KeyboardArrowDown" />
+                </materialDesign:FloatingButton>
+            </StackPanel>
+            <Button Margin="0,0,95,30"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
+                    FontSize="16"
+                    FontWeight="Bold"
+                    Content="{loc:Tr HitsoundStudio_ValidateSamples}"
+                    Command="{Binding ValidateSamplesCommand}"
+                    ToolTip.Tip="{loc:Tr HitsoundStudio_ValidateSamplesTip}" />
+        </Grid>
+
+        <Grid Grid.Row="2"
+              Grid.Column="0">
+            <Grid RowDefinitions="*,20">
+                <materialDesign:Card Grid.Row="0"
+                                     Padding="20, 5, 10, 15"
+                                     Margin="0,10">
+                    <StackPanel HorizontalAlignment="Stretch"
+                                VerticalAlignment="Top">
+                        <Grid ColumnDefinitions="Auto,*,Auto,5,Auto">
+                            <TextBlock FontSize="14"
+                                       VerticalAlignment="Bottom"
+                                       Margin="0, 0, 0, 5"
+                                       Text="{loc:Tr HitsoundStudio_BaseBeatmap}"
+                                       ToolTip.Tip="{loc:Tr HitsoundStudio_BaseBeatmapTip}" />
+                            <TextBox x:Name="BaseBeatmapEditor"
+                                     Grid.Column="1"
+                                     Classes="compact"
+                                     Margin="5,14,5,0"
+                                     Text="{Binding BaseBeatmap, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                     ToolTip.Tip="{loc:Tr HitsoundStudio_ChooseBaseBeatmapTip}" />
+                            <Button Grid.Column="2"
+                                    Classes="flat path-picker"
+                                    Cursor="Hand"
+                                    Command="{Binding LoadBaseBeatmapCommand}"
+                                    ToolTip.Tip="{loc:Tr HitsoundStudio_LoadCurrentBeatmapTip}">
+                                <materialIcons:MaterialIcon Width="30"
+                                                            Height="30"
+                                                            Kind="RestoreFromTrash" />
+                            </Button>
+                            <Button Grid.Column="4"
+                                    Classes="flat path-picker"
+                                    Cursor="Hand"
+                                    Command="{Binding PickBaseBeatmapCommand}"
+                                    ToolTip.Tip="{loc:Tr HitsoundStudio_ChooseBaseBeatmapTip}">
+                                <materialIcons:MaterialIcon Width="30"
+                                                            Height="30"
+                                                            Kind="Folder" />
+                            </Button>
+                        </Grid>
+                        <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto">
+                            <TextBlock FontSize="14"
+                                       VerticalAlignment="Bottom"
+                                       Margin="0, 0, 0, 5"
+                                       Text="{loc:Tr HitsoundStudio_DefaultSample}"
+                                       ToolTip.Tip="{loc:Tr HitsoundStudio_DefaultSampleTip}" />
+                            <TextBox Grid.Column="1"
+                                     Classes="compact"
+                                     Margin="5,14,5,0"
+                                     Text="{Binding DefaultSample.SampleArgs.Path, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                     ToolTip.Tip="{loc:Tr HitsoundStudio_ChooseDefaultSampleTip}" />
+                            <ComboBox Grid.Column="2"
+                                      Classes="compact"
+                                      MinWidth="70"
+                                      Margin="0,14,5,-1"
+                                      VerticalAlignment="Bottom"
+                                      Cursor="Hand"
+                                      ItemsSource="{Binding DefaultSampleSets}"
+                                      SelectedItem="{Binding DefaultSample.SampleSet, Mode=TwoWay}"
+                                      ToolTip.Tip="{loc:Tr HitsoundStudio_DefaultSampleSetTip}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate><TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" /></DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <TextBox Grid.Column="3"
+                                     Classes="compact"
+                                     Width="50"
+                                     Margin="0,14,5,0"
+                                     Text="{Binding DefaultSample.SampleArgs.Volume, Mode=TwoWay, UpdateSourceTrigger=LostFocus, ConverterParameter=-1, Converter={StaticResource HitsoundStudioSampleVolumeConverter}}"
+                                     ToolTip.Tip="{loc:Tr HitsoundStudio_DefaultSampleVolumeTip}" />
+                            <Button Grid.Column="4"
+                                    Classes="flat path-picker"
+                                    Cursor="Hand"
+                                    Command="{Binding PickDefaultSampleCommand}"
+                                    ToolTip.Tip="{loc:Tr HitsoundStudio_ChooseDefaultSampleTip}">
+                                <materialIcons:MaterialIcon Width="30"
+                                                            Height="30"
+                                                            Kind="Folder" />
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+                </materialDesign:Card>
+
+                <Grid Grid.Row="1"
+                      ColumnDefinitions="Auto,*">
+                    <Grid Grid.Column="0">
+                        <WrapPanel VerticalAlignment="Bottom">
+                            <TextBlock TextWrapping="NoWrap"
+                                       FontWeight="Bold"
+                                       Opacity="0.58"
+                                       Text="{loc:Tr Common_FooterMadeBy}" />
+                        </WrapPanel>
+                    </Grid>
+                    <Grid Grid.Column="1">
+                        <controls:ToolProgressBar Height="20"
+                                                  Width="220"
+                                                  Margin="5,0,5,0"
+                                                  Background="{x:Null}"
+                                                  BorderBrush="{x:Null}"
+                                                  Maximum="100"
+                                                  Value="{Binding Progress}" />
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

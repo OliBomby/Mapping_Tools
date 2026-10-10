@@ -1,0 +1,423 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms</value>
+  </resheader>
+  <data name="AutoFailDetector_Description" xml:space="preserve">
+    <value>检测重叠物件模式中错误的对象加载。</value>
+    <comment>Tool catalog description for Auto-fail Detector. Explain that it detects overlapping hit-object patterns which can cause incorrect object loading. Keep the tool name and hit-object mapping terminology unchanged.</comment>
+  </data>
+  <data name="AutoFailDetector_SearchTerms" xml:space="preserve">
+    <value>overlap|overlapping|hit object|object loading|auto fail|unloading|重叠|打击物件|对象加载|自动失败|卸载</value>
+    <comment>Additional search terms for Auto-fail Detector. Separate terms with |. Keep canonical English terms and add likely mapper search words; do not translate tool or product names.</comment>
+  </data>
+  <data name="ComboColourStudio_Description" xml:space="preserve">
+    <value>自定义连击颜色序列、爆发式排列和配色技巧。</value>
+    <comment>Tool catalog description for Combo Colour Studio. Combo colours are beatmap object-group colours; bursts are groups of objects; colour haxing is community terminology for unusual combo-colour use. Keep the tool name and technical terms unchanged.</comment>
+  </data>
+  <data name="ComboColourStudio_SearchTerms" xml:space="preserve">
+    <value>combo colour|combo color|colour sequence|color sequence|burst|colour hax|color hax|连击颜色|配色序列|爆发|颜色技巧</value>
+    <comment>Additional search terms for Combo Colour Studio. Separate terms with |. Include common spelling variants and mapper vocabulary; retain all canonical English terms.</comment>
+  </data>
+  <data name="GeometryDashboard_Description" xml:space="preserve">
+    <value>围绕 osu! 打击物件生成、显示、吸附并保存实用的几何图形。</value>
+    <comment>Tool catalog description for Geometry Dashboard. Geometry can be generated around osu! hit objects, shown as an overlay, used for snapping, and saved. Preserve the product name osu! and mapping term hit object.</comment>
+  </data>
+  <data name="GeometryDashboard_SearchTerms" xml:space="preserve">
+    <value>geometry|snap|snapping|virtual objects|overlay|generators|shape|几何|吸附|虚拟物件|叠加层|生成器|形状</value>
+    <comment>Additional search terms for Geometry Dashboard. Separate terms with |. Terms describe generated geometry, snapping and overlays; preserve the canonical English terms already present.</comment>
+  </data>
+  <data name="HitsoundCopier_Description" xml:space="preserve">
+    <value>在谱面之间复制打击音效、采样和故事板音效。</value>
+    <comment>Tool catalog description for Hitsound Copier. It copies hitsounds and their samples, including storyboard audio, from one or more beatmaps to others. Preserve the established osu! terms hitsound, storyboard, and beatmap.</comment>
+  </data>
+  <data name="HitsoundCopier_SearchTerms" xml:space="preserve">
+    <value>hitsound|sample|storyboard sound|audio|mute|multi-map|打击音效|采样|故事板音效|音频|静音|多谱面</value>
+    <comment>Additional search terms for Hitsound Copier. Separate terms with |. Include hitsound, sample, storyboard sound, audio, mute, and multi-map concepts; do not translate canonical product or tool names.</comment>
+  </data>
+  <data name="HitsoundPreviewHelper_Description" xml:space="preserve">
+    <value>根据位置区域放置临时打击音效。</value>
+    <comment>Tool catalog description for Hitsound Preview Helper. It assigns temporary hitsounds according to positional zones on the playfield. Preserve the established mapping term hitsound; provisional means preview/draft assignment, not permanent playback.</comment>
+  </data>
+  <data name="HitsoundPreviewHelper_SearchTerms" xml:space="preserve">
+    <value>hitsound|preview|temporary|provisional|zone|sample|position|打击音效|预览|临时|暂定|区域|采样|位置</value>
+    <comment>Additional search terms for Hitsound Preview Helper. Separate terms with |. Include temporary preview, positional zone, and sample concepts while retaining canonical English terms.</comment>
+  </data>
+  <data name="HitsoundStudio_Description" xml:space="preserve">
+    <value>导入、编辑、预览、生成并导出分层打击音效。</value>
+    <comment>Tool catalog description for Hitsound Studio. It manages layered hitsound data through import, editing, preview, generation, and export. Preserve the tool name and established osu! term hitsound.</comment>
+  </data>
+  <data name="HitsoundStudio_SearchTerms" xml:space="preserve">
+    <value>hitsound|sample|MIDI|SoundFont|export|layer|audio|打击音效|采样|导出|图层|音频</value>
+    <comment>Additional search terms for Hitsound Studio. Separate terms with |. MIDI and SoundFont are technical proper names and must remain unchanged; include the canonical English concepts.</comment>
+  </data>
+  <data name="MapCleaner_Description" xml:space="preserve">
+    <value>重建实用的绿线，并可选择重新吸附谱面内容。</value>
+    <comment>Tool catalog description for Map Cleaner. Greenlines are inherited timing points that change slider velocity; resnapping realigns map content to timing or distance snap. Preserve osu! community terms greenline and resnap.</comment>
+  </data>
+  <data name="MapCleaner_SearchTerms" xml:space="preserve">
+    <value>clean|greenline|green line|inherited timing point|resnap|resnap objects|samples|清理|绿线|继承时间点|重新吸附|重新吸附物件|采样</value>
+    <comment>Additional search terms for Map Cleaner. Separate terms with |. Greenline means an inherited timing point; resnap means realign objects to a snap grid. Keep canonical English search terms.</comment>
+  </data>
+  <data name="MapsetMerger_Description" xml:space="preserve">
+    <value>合并多个谱面组，并解决谱面、音频、图像、故事板和采样文件的冲突。</value>
+    <comment>Tool catalog description for Mapset Merger. A mapset is a collection of related beatmaps and assets; the tool combines mapsets and resolves conflicting files. Preserve beatmap, storyboard, and mapset as established mapping terms.</comment>
+  </data>
+  <data name="MapsetMerger_SearchTerms" xml:space="preserve">
+    <value>mapset|beatmapset|merge|combine|audio|image|storyboard|sample|conflict|谱面组|合并|音频|图像|故事板|采样|冲突</value>
+    <comment>Additional search terms for Mapset Merger. Separate terms with |. Include mapset and beatmapset synonyms plus asset conflict concepts; keep canonical English terms searchable.</comment>
+  </data>
+  <data name="MetadataManager_Description" xml:space="preserve">
+    <value>编辑一次元数据，然后应用到多个谱面。</value>
+    <comment>Tool catalog description for Metadata Manager. Metadata means artist, title, tags, colours, and related beatmap fields; edits can be applied to multiple beatmaps. Preserve beatmap as established terminology.</comment>
+  </data>
+  <data name="MetadataManager_SearchTerms" xml:space="preserve">
+    <value>metadata|artist|title|tags|colours|colors|beatmap information|元数据|艺术家|标题|标签|颜色|谱面信息</value>
+    <comment>Additional search terms for Metadata Manager. Separate terms with |. Include metadata field names and both colour/color spellings; preserve canonical English terms.</comment>
+  </data>
+  <data name="PatternGallery_Description" xml:space="preserve">
+    <value>收集、预览、整理并放置可重复使用的打击物件组合。</value>
+    <comment>Tool catalog description for Pattern Gallery. It stores reusable arrangements of hit objects, lets users preview and organize them, and places them into a beatmap. Preserve the established term hit object.</comment>
+  </data>
+  <data name="PatternGallery_SearchTerms" xml:space="preserve">
+    <value>pattern|gallery|collection|osu|snippet|hit object|object pattern|template|图案|图库|合集|osu|片段|打击物件|物件组合|模板</value>
+    <comment>Additional search terms for Pattern Gallery. Separate terms with |. Include reusable hit-object arrangement and template concepts; preserve canonical English keywords.</comment>
+  </data>
+  <data name="PropertyTransformer_Description" xml:space="preserve">
+    <value>对时间、物件、书签和故事板属性进行乘法和加法运算。</value>
+    <comment>Tool catalog description for Property Transformer. It applies multiplication and addition to numeric properties in timing points, hit objects, bookmarks, and storyboard data. Preserve storyboard and other file-format terminology.</comment>
+  </data>
+  <data name="PropertyTransformer_SearchTerms" xml:space="preserve">
+    <value>properties|transform|timing|offset|multiplier|hit object|bookmark|storyboard|属性|变换|时间|偏移|乘数|打击物件|书签|故事板</value>
+    <comment>Additional search terms for Property Transformer. Separate terms with |. Include affected beatmap data categories and arithmetic concepts; retain all English canonical terms.</comment>
+  </data>
+  <data name="RhythmGuide_Description" xml:space="preserve">
+    <value>根据多个谱面的节奏生成包含打击圈的谱面。</value>
+    <comment>Tool catalog description for Rhythm Guide. It creates hit circles in a new beatmap using rhythmic information from multiple source beatmaps. Preserve beatmap and map as established mapper terms.</comment>
+  </data>
+  <data name="RhythmGuide_SearchTerms" xml:space="preserve">
+    <value>rhythm|hitsound|guide|reference|circles|beatmap|timing|节奏|打击音效|指南|参考|打击圈|谱面|时间</value>
+    <comment>Additional search terms for Rhythm Guide. Separate terms with |. Include rhythm reference, hit circles, beatmap, and timing concepts while keeping English canonical terms.</comment>
+  </data>
+  <data name="Sliderator_Description" xml:space="preserve">
+    <value>通过可编辑的图表创建变速滑条和串流。</value>
+    <comment>Tool catalog description for Sliderator. It creates sliders with changing slider velocity (SV) and streams by drawing an editable graph. Keep Sliderator, slider, stream, and SV unchanged as established names or mapper terms.</comment>
+  </data>
+  <data name="Sliderator_SearchTerms" xml:space="preserve">
+    <value>slider|sliderator|variable velocity|SV|stream|graph|velocity|滑条|可变速度|串流|图表|速度</value>
+    <comment>Additional search terms for Sliderator. Separate terms with |. SV means slider velocity. Keep the proper tool name and canonical English mapper terms.</comment>
+  </data>
+  <data name="SliderCompletionator_Description" xml:space="preserve">
+    <value>调整滑条长度和时长，同时计算滑条速度。</value>
+    <comment>Tool catalog description for Slider Completionator. It adjusts a slider's path length and time duration while calculating the required slider velocity (SV). Preserve the proper tool name and slider/SV terminology.</comment>
+  </data>
+  <data name="SliderCompletionator_SearchTerms" xml:space="preserve">
+    <value>slider|completion|duration|length|velocity|SV|slider velocity|滑条|完成|时长|长度|速度|滑条速度</value>
+    <comment>Additional search terms for Slider Completionator. Separate terms with |. SV means slider velocity; include duration and path-length concepts while preserving canonical English terms.</comment>
+  </data>
+  <data name="SliderMerger_Description" xml:space="preserve">
+    <value>将选中的滑条和打击圈合并为一条连贯的滑条。</value>
+    <comment>Tool catalog description for Slider Merger. It joins selected sliders and hit circles into one continuous slider path. Preserve the proper tool name and established object terms slider and hit circle.</comment>
+  </data>
+  <data name="SliderMerger_SearchTerms" xml:space="preserve">
+    <value>slider|merge|bezier|connection|circle|hit circle|join|combine|滑条|合并|贝塞尔|连接|打击圈|连结</value>
+    <comment>Additional search terms for Slider Merger. Separate terms with |. Include slider, hit-circle, joining, and Bezier concepts; keep canonical English terms.</comment>
+  </data>
+  <data name="SliderPicturator_Description" xml:space="preserve">
+    <value>生成能够复现导入图像的滑条路径。</value>
+    <comment>Tool catalog description for Slider Picturator. It converts an imported image into a slider path in the beatmap. Preserve the proper tool name and established term slider.</comment>
+  </data>
+  <data name="SliderPicturator_SearchTerms" xml:space="preserve">
+    <value>slider|picture|image|picturator|render|trace|path|滑条|图片|图像|渲染|描摹|路径</value>
+    <comment>Additional search terms for Slider Picturator. Separate terms with |. Include image tracing and slider-path concepts while retaining canonical English terms.</comment>
+  </data>
+  <data name="TimingCopier_Description" xml:space="preserve">
+    <value>在谱面之间复制时间设置，并可选择重新吸附物件。</value>
+    <comment>Tool catalog description for Timing Copier. It copies timing points from one beatmap to another and can optionally resnap objects to the copied timing. Preserve timing point, beatmap, and resnap terminology.</comment>
+  </data>
+  <data name="TimingCopier_SearchTerms" xml:space="preserve">
+    <value>timing|copy|resnap|beat divisor|multi-map|timing point|BPM|时间|复制|重新吸附|拍子细分|多谱面|时间点</value>
+    <comment>Additional search terms for Timing Copier. Separate terms with |. BPM means beats per minute; include timing points, beat divisors, and resnapping while retaining English canonical terms.</comment>
+  </data>
+  <data name="TimingHelper_Description" xml:space="preserve">
+    <value>调整 BPM 并添加红线，让选定的标记对齐节拍网格。</value>
+    <comment>Tool catalog description for Timing Helper. BPM is beats per minute. Redlines are uninherited timing points; the tool adjusts timing so selected markers align to the beat snap grid. Preserve BPM and redline mapping terminology.</comment>
+  </data>
+  <data name="TimingHelper_SearchTerms" xml:space="preserve">
+    <value>timing|redline|BPM|marker|beat divisor|snap|timing point|时间|红线|标记|拍子细分|吸附|时间点</value>
+    <comment>Additional search terms for Timing Helper. Separate terms with |. BPM means beats per minute and redline means uninherited timing point; keep the existing canonical English terms searchable.</comment>
+  </data>
+  <data name="TumourGenerator_Description" xml:space="preserve">
+    <value>在滑条上生成大量肿瘤。</value>
+    <comment>Tool catalog description for Tumour Generator 2. Tumours is the tool's playful name for dense layers of repeated slider shapes; retain this wording and the proper tool name exactly.</comment>
+  </data>
+  <data name="TumourGenerator_SearchTerms" xml:space="preserve">
+    <value>tumour|tumor|slider|layers|graph|templates|肿瘤|滑条|图层|图表|模板</value>
+    <comment>Additional search terms for Tumour Generator 2. Separate terms with |. Include British and American spelling of tumour/tumor and slider-layer concepts; do not translate the tool name.</comment>
+  </data>
+  <data name="HitsoundStudio_ExportSummary" xml:space="preserve">
+    <value>样本索引：{0}，样本：{1}，绿线：{2}</value>
+    <comment>Detailed Hitsound Studio export result. {0} is the count of custom sample indices, {1} is the count of sample entries containing a valid sample, and {2} is the count of greenline changes. Preserve each numbered placeholder exactly once; these are counts, not formatted dates or decimal values.</comment>
+  </data>
+  <data name="HitsoundStudio_ImportSummary" xml:space="preserve">
+    <value>样本索引：0，样本：{0}，绿线：0</value>
+    <comment>Detailed Hitsound Studio import result. {0} is the count of distinct sample arguments found across imported samples; the import creates no sample indices or greenlines. Preserve {0} exactly once; this is an integer count.</comment>
+  </data>
+  <data name="HitsoundStudio_MidiSummary" xml:space="preserve">
+    <value>音符：{0}，音量变化：{1}</value>
+    <comment>Detailed Hitsound Studio MIDI export result. {0} is the number of exported notes and {1} is the number of timing points receiving a volume change (zero when that option is disabled). Preserve both numbered placeholders exactly once; they are integer counts.</comment>
+  </data>
+  <data name="QuickUndo_NoCurrentBeatmap" xml:space="preserve">
+    <value>QuickUndo 无法确定当前谱面。请在 osu! 中打开谱面，并检查首选项中的当前谱面设置。</value>
+    <comment>Warning shown when QuickUndo cannot identify the beatmap currently open in the osu! editor. The user can open a beatmap and verify current-beatmap discovery in Preferences. Keep QuickUndo and osu! unchanged; beatmap is established mapper vocabulary.</comment>
+  </data>
+  <data name="QuickUndo_NoBackup" xml:space="preserve">
+    <value>没有可还原的非周期性保留备份。</value>
+    <comment>Warning shown when QuickUndo finds no retained non-periodic backup for the current beatmap. Non-periodic distinguishes user-triggered backups from automatic periodic snapshots.</comment>
+  </data>
+  <data name="QuickUndo_Restored" xml:space="preserve">
+    <value>已成功还原最新的非周期性备份。</value>
+    <comment>Success notification after QuickUndo restores the newest retained non-periodic backup. No placeholders. Keep backup terminology concise.</comment>
+  </data>
+  <data name="QuickRun_EditorUnavailable" xml:space="preserve">
+    <value>QuickRun 无法确定当前在 osu! 编辑器中选中的内容。</value>
+    <comment>Warning shown when QuickRun cannot read the selected hit objects in the currently open osu! editor. Keep QuickRun and osu! unchanged.</comment>
+  </data>
+  <data name="QuickRun_CommandUnavailable" xml:space="preserve">
+    <value>配置的 QuickRun 命令不可用。</value>
+    <comment>Warning shown when the command configured for the current selection size cannot be found. QuickRun is a proper feature name and must remain unchanged.</comment>
+  </data>
+  <data name="QuickRun_NoObjectsSelected" xml:space="preserve">
+    <value>没有选中任何打击物件，且未为未选中物件时配置 QuickRun 命令。请选中打击物件，或在首选项中配置未选中时使用的命令。</value>
+    <comment>Warning shown when QuickRun has read the editor successfully, found zero selected hit objects, and no command is configured for that selection size. Tell the user to select objects or configure the empty-selection command. Keep QuickRun unchanged.</comment>
+  </data>
+  <data name="QuickRun_NamedCommandUnavailable" xml:space="preserve">
+    <value>配置的 QuickRun 工具“{0}”不可用。</value>
+    <comment>Warning shown when the tool named in QuickRun settings is not in the command catalog. {0} is the canonical untranslated tool name; preserve this placeholder exactly once.</comment>
+  </data>
+  <data name="QuickRun_Failed" xml:space="preserve">
+    <value>QuickRun 无法完成该命令。请查看错误详情以获取技术信息。</value>
+    <comment>Error notification after a QuickRun command throws. Preserve technical exception information separately in the exception details; do not insert raw exception text here.</comment>
+  </data>
+  <data name="BetterSave_EditorUnavailable" xml:space="preserve">
+    <value>BetterSave 无法确定当前谱面。请在 osu! 中打开谱面，并检查首选项中的当前谱面设置。</value>
+    <comment>Warning shown when BetterSave cannot identify the beatmap currently open in the osu! editor. The user can open a beatmap and verify current-beatmap discovery in Preferences. Keep BetterSave and osu! unchanged.</comment>
+  </data>
+  <data name="BetterSave_Saved" xml:space="preserve">
+    <value>当前谱面已成功保存。</value>
+    <comment>Success notification after BetterSave writes the currently open beatmap. Keep beatmap as established mapper vocabulary.</comment>
+  </data>
+  <data name="BetterSave_Failed" xml:space="preserve">
+    <value>BetterSave 无法保存当前谱面。请查看错误详情以获取技术信息。</value>
+    <comment>Error notification after BetterSave fails. Preserve the original exception in technical details; do not expose raw exception text as localized UI.</comment>
+  </data>
+  <data name="ToolExecution_Failed" xml:space="preserve">
+    <value>无法完成此操作。请查看错误详情以获取技术信息。</value>
+    <comment>Generic error summary shown when an application tool throws an exception not mapped to a specific expected user-facing message. Technical exception details are available separately; do not include exception text in this string.</comment>
+  </data>
+  <data name="Workspace_MissingBeatmapTitle" xml:space="preserve">
+    <value>找不到所选谱面</value>
+    <comment>Notification title shown when a previously selected beatmap file no longer exists. Keep beatmap as established mapper vocabulary.</comment>
+  </data>
+  <data name="Workspace_MissingBeatmapMessage" xml:space="preserve">
+    <value>找不到其中一个所选谱面。请通过“文件 &gt; 打开谱面”重新选择。</value>
+    <comment>Notification shown when a selected beatmap file has disappeared. The menu command File &gt; Open beatmap is a UI label and will be localized by the Desktop resource owner; this message names the action in plain text.</comment>
+  </data>
+  <data name="Workspace_OpenBeatmapPicker" xml:space="preserve">
+    <value>打开谱面</value>
+    <comment>Title passed to the native beatmap file picker. This is user-visible dialog text and should use the natural imperative for opening one or more beatmap files.</comment>
+  </data>
+  <data name="Exception_OperationFailed" xml:space="preserve">
+    <value>使用当前输入或应用程序状态无法完成此操作。</value>
+    <comment>Fallback user-facing message for recognized expected application exceptions when no more specific localized message exists. This describes invalid input or a prerequisite/state mismatch without exposing exception internals.</comment>
+  </data>
+  <data name="Exception_FileMissing" xml:space="preserve">
+    <value>找不到所需文件或文件夹。请检查所选路径后重试。</value>
+    <comment>User-facing summary for FileNotFoundException or DirectoryNotFoundException. Do not include a path placeholder; the original path remains available in technical details.</comment>
+  </data>
+  <data name="Exception_LiveEditorUnavailable" xml:space="preserve">
+    <value>Mapping Tools 无法读取当前谱面的实时状态。请在 osu! 中打开目标谱面，并检查首选项中的实时状态选项。</value>
+    <comment>Actionable summary for LiveBeatmapUnavailableException, which covers disabled live reading, no readable active editor, a different beatmap being open, or unsafe live data. Keep Mapping Tools and osu! unchanged; do not expose the technical exception message.</comment>
+  </data>
+  <data name="Exception_BackupBeatmapMismatch" xml:space="preserve">
+    <value>此备份属于其他谱面。还原前，请为当前谱面选择一个备份。</value>
+    <comment>Summary for BeatmapBackupIncompatibleException, raised when backup metadata does not match the destination difficulty or mapset. Do not include filenames; they remain in technical details.</comment>
+  </data>
+  <data name="Exception_AccessDenied" xml:space="preserve">
+    <value>应用程序无法访问所选文件或文件夹。请检查其权限后重试。</value>
+    <comment>User-facing summary for UnauthorizedAccessException. Do not include a path placeholder; the original path and diagnostic message remain in technical details.</comment>
+  </data>
+  <data name="Exception_InvalidInput" xml:space="preserve">
+    <value>一个或多个值无效。请检查输入后重试。</value>
+    <comment>User-facing summary for ArgumentException from an operation boundary. This is broad because exception text may be programmer-facing; preserve specific form validation in the owning UI.</comment>
+  </data>
+  <data name="Exception_Prerequisite" xml:space="preserve">
+    <value>当前状态不满足继续操作的条件。请检查操作所需的前置条件后重试。</value>
+    <comment>User-facing summary for InvalidOperationException from an operation boundary. This covers unavailable editor state or unmet prerequisites without exposing diagnostic exception text.</comment>
+  </data>
+  <data name="Exception_UnexpectedFailure" xml:space="preserve">
+    <value>意外错误中断了操作。请查看错误详情以获取技术信息。</value>
+    <comment>Generic user-facing message for unexpected exceptions. Keep technical diagnostic detail in the separate exception field; never interpolate raw exception text here.</comment>
+  </data>
+  <data xml:space="preserve" name="Picker_Beatmaps">
+    <value>osu! 谱面</value>
+    <comment>Native file-picker filter label for .osu beatmaps. Preserve osu!; filenames/extensions/MIME types stay unchanged.</comment>
+  </data>
+  <data xml:space="preserve" name="Picker_BeatmapsAndStoryboards">
+    <value>osu! 谱面和故事板</value>
+    <comment>Native file-picker filter label for .osu maps and .osb storyboards. Preserve osu! and established storyboard term.</comment>
+  </data>
+  <data xml:space="preserve" name="Picker_BeatmapBackups">
+    <value>osu! 谱面备份</value>
+    <comment>Native restore-picker filter label for backup copies of .osu or .osb files. Preserve osu!.</comment>
+  </data>
+  <data xml:space="preserve" name="Picker_MappingToolsProjects">
+    <value>Mapping Tools 项目</value>
+    <comment>Native file-picker filter label for JSON tool-configuration projects, distinct from .osu beatmaps. Preserve Mapping Tools.</comment>
+  </data>
+  <data xml:space="preserve" name="Picker_OsuConfiguration">
+    <value>osu! 用户配置</value>
+    <comment>Native file-picker filter label for osu!.&lt;user&gt;.cfg files. Preserve osu!; matching glob remains invariant.</comment>
+  </data>
+  <data xml:space="preserve" name="Picker_SampleFiles">
+    <value>样本文件</value>
+    <comment>Native audio picker filter label for WAV/OGG audio samples and SF2 SoundFonts; sample means audio asset.</comment>
+  </data>
+  <data xml:space="preserve" name="Picker_SaveProject">
+    <value>保存项目</value>
+    <comment>Native Save As dialog title for saved tool configuration, not beatmap data.</comment>
+  </data>
+  <data xml:space="preserve" name="Picker_OpenProject">
+    <value>打开项目</value>
+    <comment>Native Open dialog title for loading a saved tool configuration project.</comment>
+  </data>
+  <data name="BeatmapObjectSelection_UnknownHitObjectMode" xml:space="preserve">
+    <value>未知的打击物体选择模式。</value>
+    <comment>Diagnostic raised when a beatmap-editing operation receives an unsupported hit-object selection mode. Hit objects are osu! circles, sliders, and spinners.</comment>
+  </data>
+
+  <data name="ToolConfigSchema_MigrationAfterInitialVersion" xml:space="preserve">
+    <value>配置迁移的目标版本必须大于 {0}。</value>
+    <comment>Diagnostic from tool-project configuration schema validation. Placeholder {0} is the initial integer schema version; preserve the number and its meaning.</comment>
+  </data>
+
+  <data name="ToolConfigSchema_MigrationVersionsUnique" xml:space="preserve">
+    <value>配置迁移不能多次以同一版本为目标。</value>
+    <comment>Diagnostic from tool-project configuration schema validation when two migrations target the same integer version.</comment>
+  </data>
+
+  <data name="ToolConfigSchema_MigrationVersionsContiguous" xml:space="preserve">
+    <value>配置迁移的目标版本必须连续。</value>
+    <comment>Diagnostic from tool-project configuration schema validation. Target versions must form an uninterrupted integer sequence.</comment>
+  </data>
+
+  <data name="TumourGenerator_UnknownImportMode" xml:space="preserve">
+    <value>Tumour Generator 中包含未知的导入模式。</value>
+    <comment>Diagnostic from Tumour Generator when a saved or supplied import mode is not supported. Keep the tool name unchanged.</comment>
+  </data>
+
+  <data name="TumourGenerator_BeatmapPathRequired" xml:space="preserve">
+    <value>至少需要一个谱面路径。</value>
+    <comment>Validation diagnostic from Tumour Generator when no beatmap file path is supplied. Keep beatmap as the established mapping term.</comment>
+  </data>
+
+  <data name="FilePicker_PatternRequired" xml:space="preserve">
+    <value>至少需要一个文件模式。</value>
+    <comment>Validation diagnostic for an invalid file-picker filter. A file pattern is a filename glob, not a beatmap pattern.</comment>
+  </data>
+
+  <data name="QuickRun_ToolTargetsNotDeclared" xml:space="preserve">
+    <value>工具定义未声明 QuickRun 目标。</value>
+    <comment>Diagnostic when a QuickRun tool definition does not declare the selection targets it supports. Keep QuickRun unchanged.</comment>
+  </data>
+
+  <data name="QuickRun_SelectionTargetRequired" xml:space="preserve">
+    <value>至少需要一个已知的 SmartQuickRun 选择目标。</value>
+    <comment>Validation diagnostic when SmartQuickRun has no known selection-size target for a registered command. Keep SmartQuickRun unchanged.</comment>
+  </data>
+
+  <data name="QuickRun_ExactlyOneSelectionSizeTargetRequired" xml:space="preserve">
+    <value>当前选择大小必须且只能对应一个目标。</value>
+    <comment>Diagnostic when SmartQuickRun receives a selection target that is not exactly one supported selection-size value. Keep QuickRun unchanged.</comment>
+  </data>
+
+  <data name="BeatmapBackup_EmptySourcePath" xml:space="preserve">
+    <value>备份源路径不能包含空值。</value>
+    <comment>Validation diagnostic when a beatmap backup request contains an empty source path. The path is a filesystem path.</comment>
+  </data>
+
+  <data name="Tools_AtLeastOneBeatmapRequired" xml:space="preserve">
+    <value>请至少选择一个谱面。</value>
+    <comment>Validation diagnostic used by mapping-tool services when the operation requires at least one selected beatmap path.</comment>
+  </data>
+
+  <data name="Tools_AtLeastOneBeatmapOrStoryboardRequired" xml:space="preserve">
+    <value>请至少选择一个谱面或故事板。</value>
+    <comment>Validation diagnostic for Property Transformer when the user must select at least one beatmap or storyboard file.</comment>
+  </data>
+
+  <data name="RhythmGuide_SourceBeatmapRequired" xml:space="preserve">
+    <value>请至少选择一个源谱面。</value>
+    <comment>Validation diagnostic for Rhythm Guide when it needs at least one source beatmap. Keep Rhythm Guide unchanged.</comment>
+  </data>
+
+  <data name="Tools_TargetBeatmapRequired" xml:space="preserve">
+    <value>请至少选择一个目标谱面。</value>
+    <comment>Validation diagnostic for operations that write to target beatmaps. Keep target distinct from source beatmaps.</comment>
+  </data>
+
+  <data name="RhythmGuide_SourceBeatmapPathsCannotBeBlank" xml:space="preserve">
+    <value>源谱面路径不能为空。</value>
+    <comment>Validation diagnostic for Rhythm Guide source paths. A blank path is a whitespace-only filesystem path.</comment>
+  </data>
+
+  <data name="RhythmGuide_UnknownExportMode" xml:space="preserve">
+    <value>未知的 Rhythm Guide 导出模式。</value>
+    <comment>Diagnostic for an unsupported Rhythm Guide export-mode enum value. Keep Rhythm Guide unchanged.</comment>
+  </data>
+
+  <data name="SliderCompletionator_UnknownSelectionMode" xml:space="preserve">
+    <value>Slider Completionator 中包含未知的选择模式。</value>
+    <comment>Diagnostic for an unsupported Slider Completionator selection-mode enum value. Keep the tool name unchanged.</comment>
+  </data>
+
+  <data name="SliderMerger_UnknownImportMode" xml:space="preserve">
+    <value>Slider Merger 中包含未知的导入模式。</value>
+    <comment>Diagnostic for an unsupported Slider Merger import-mode enum value. Keep the tool name unchanged.</comment>
+  </data>
+
+  <data name="Sliderator_UnknownImportMode" xml:space="preserve">
+    <value>Sliderator 中包含未知的导入模式。</value>
+    <comment>Diagnostic for an unsupported Sliderator import-mode enum value. Keep the tool name unchanged.</comment>
+  </data>
+
+  <data name="PatternGallery_FileMustBelongToRecordedCollection" xml:space="preserve">
+    <value>该文件必须属于已记录的集合。</value>
+    <comment>Diagnostic when Pattern Gallery edits a file that is not part of the selected saved collection. A collection is a recorded set of patterns.</comment>
+  </data>
+
+  <data name="SoundFontNoteRequest_SampleMustUseSf2File" xml:space="preserve">
+    <value>采样定义必须指向 .sf2 文件。</value>
+    <comment>Diagnostic when a sound-font note request refers to a sample that is not an .sf2 SoundFont file. Preserve the extension .sf2.</comment>
+  </data>
+
+  <data name="ProjectDefinition_SingleRelativePathSegment" xml:space="preserve">
+    <value>该值必须是单个相对路径段。</value>
+    <comment>Diagnostic for a tool-project path value. A path segment is one relative name, not a path containing directory separators.</comment>
+  </data>
+
+  <data name="ToolExecutionProgress_MustBeFiniteBetweenZeroAndOne" xml:space="preserve">
+    <value>工具进度必须是 0 到 1 之间的有限值。</value>
+    <comment>Diagnostic for invalid tool-execution progress. The numeric value is a fraction in the inclusive range 0–1.</comment>
+  </data>
+
+</root>

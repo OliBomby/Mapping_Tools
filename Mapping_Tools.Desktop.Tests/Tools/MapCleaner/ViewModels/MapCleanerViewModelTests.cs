@@ -1,0 +1,236 @@
+using System.Globalization;
+using Avalonia.Data;
+using Mapping_Tools.Application.Execution.ToolExecution;
+using Mapping_Tools.Application.Execution.UserNotification;
+using Mapping_Tools.Application.Execution.UserNotification.Models;
+using Mapping_Tools.Application.QuickRun;
+using Mapping_Tools.Application.QuickRun.Models;
+using Mapping_Tools.Application.Tools.MapCleaner;
+using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
+using Mapping_Tools.Core.Tools.MapCleaner.Models;
+using Mapping_Tools.Desktop.Controls.Timeline;
+using Mapping_Tools.Desktop.Converters;
+using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Services.Hosted;
+using Mapping_Tools.Desktop.Tests.TestDoubles;
+using Mapping_Tools.Desktop.Tools.MapCleaner.ViewModels;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace Mapping_Tools.Desktop.Tests.Tools.MapCleaner.ViewModels;
+
+[TestClass]
+public sealed class MapCleanerViewModelTests
+{
+    [TestMethod]
+    public async Task RunCommand_WithWorkspaceSelection_PublishesSuccessAndPreservesTimelineKinds()
+    {
+        // Arrange
+        RecordingCleaner cleaner = new();
+        TestBeatmapWorkspace workspace = new();
+        workspace.SetSelection(["map.osu"]);
+        UserNotificationService notifications = new();
+        List<UserNotification> published = [];
+        notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
+        var viewModel = Create(cleaner, workspace, notifications: notifications);
+
+        // Act
+        await viewModel.RunCommand.ExecuteAsync(null);
+
+        // Assert
+        cleaner.Paths.Should().Equal("map.osu");
+        cleaner.QuickRun.Should().BeFalse();
+        published.Where(notification =>
+                notification.Severity == UserNotificationSeverity.Success
+                && notification.Message == "Successfully removed 16 greenlines and resnapped 20 objects!")
+            .Should().ContainSingle();
+        viewModel.Markers.Should().HaveCount(3);
+        viewModel.Markers.Select(marker => marker.Kind)
+            .Should().Equal(
+                TimelineMarkerKind.Added,
+                TimelineMarkerKind.Changed,
+                TimelineMarkerKind.Removed);
+        viewModel.Progress.Should().Be(0);
+        viewModel.HasRun.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task RunCommand_WithMultipleMaps_DoesNotExposeEmptyTimeline()
+    {
+        // Arrange
+        TestBeatmapWorkspace workspace = new();
+        workspace.SetSelection(["first.osu", "second.osu"]);
+        var viewModel = Create(new RecordingCleaner(), workspace);
+
+        // Act
+        await viewModel.RunCommand.ExecuteAsync(null);
+
+        // Assert
+        viewModel.HasRun.Should().BeFalse();
+        viewModel.Markers.Should().BeEmpty();
+    }
+
+    [TestMethod]
+    public void BeatDivisorArrayToStringConverter_ValidFractionsAndNumbers_ReturnsTypedDivisors()
+    {
+        // Arrange
+        BeatDivisorArrayToStringConverter converter = new();
+
+        // Act
+        object converted = converter.ConvertBack(
+            "1/16, 0.25",
+            typeof(IBeatDivisor[]),
+            null,
+            CultureInfo.InvariantCulture);
+
+        // Assert
+        converted.Should().BeOfType<IBeatDivisor[]>()
+            .Which.Should().HaveCount(2);
+        ((IBeatDivisor[])converted)[0].Should().BeOfType<RationalBeatDivisor>();
+        ((IBeatDivisor[])converted)[1].Should().BeOfType<IrrationalBeatDivisor>();
+    }
+
+    [TestMethod]
+    public void BeatDivisorArrayToStringConverter_TypedDivisors_ReturnsLegacyInvariantText()
+    {
+        // Arrange
+        BeatDivisorArrayToStringConverter converter = new();
+        IBeatDivisor[] divisors =
+        [
+            new RationalBeatDivisor(1, 16),
+            new IrrationalBeatDivisor(0.25),
+        ];
+
+        // Act
+        object converted = converter.Convert(
+            divisors,
+            typeof(string),
+            null,
+            new CultureInfo("nl-NL"));
+
+        // Assert
+        converted.Should().Be("1/16, 0.25");
+    }
+
+    [TestMethod]
+    public void BeatDivisorArrayToStringConverter_InvalidEntry_ReturnsValidationError()
+    {
+        // Arrange
+        BeatDivisorArrayToStringConverter converter = new();
+
+        // Act
+        object converted = converter.ConvertBack(
+            "1/16, nope",
+            typeof(IBeatDivisor[]),
+            null,
+            CultureInfo.InvariantCulture);
+
+        // Assert
+        var notification = converted.Should()
+            .BeOfType<BindingNotification>()
+            .Which;
+        notification.ErrorType.Should().Be(BindingErrorType.DataValidationError);
+        notification.Error.Should().NotBeNull();
+        notification.Error!.Message.Should().Be(
+            "Beat divisor 'nope' is not a valid fraction or number.");
+    }
+
+    [TestMethod]
+    public void BeatDivisorArrayToStringConverter_EmptyInput_ReturnsValidationError()
+    {
+        // Arrange
+        BeatDivisorArrayToStringConverter converter = new();
+
+        // Act
+        object converted = converter.ConvertBack(
+            string.Empty,
+            typeof(IBeatDivisor[]),
+            null,
+            CultureInfo.InvariantCulture);
+
+        // Assert
+        converted.Should().BeOfType<BindingNotification>()
+            .Which.ErrorType.Should().Be(BindingErrorType.DataValidationError);
+    }
+
+    [TestMethod]
+    public void BeatDivisorArrayToStringConverter_ZeroDivisor_ReturnsValidationError()
+    {
+        // Arrange
+        BeatDivisorArrayToStringConverter converter = new();
+
+        // Act
+        object converted = converter.ConvertBack(
+            "0",
+            typeof(IBeatDivisor[]),
+            null,
+            CultureInfo.InvariantCulture);
+
+        // Assert
+        converted.Should().BeOfType<BindingNotification>()
+            .Which.ErrorType.Should().Be(BindingErrorType.DataValidationError);
+    }
+
+    [TestMethod]
+    public async Task QuickRunHostedService_WhenStarted_UsesCurrentBeatmapAndAlwaysTarget()
+    {
+        // Arrange
+        RecordingCleaner cleaner = new();
+        QuickRunCommandRegistry registry = new();
+        var viewModel = Create(cleaner, currentPath: "current.osu");
+        MappingToolQuickRunRegistration registration = new(
+            MapCleanerToolDefinition.Definition,
+            viewModel.RunQuickAsync);
+        ImmediateTestDispatcher dispatcher = new();
+        MappingToolQuickRunHostedService hosted = new(
+            registry,
+            [registration],
+            dispatcher);
+
+        // Act
+        await hosted.StartAsync(CancellationToken.None);
+        var command = registry.Commands.Single();
+        await command.Execute(CancellationToken.None);
+
+        // Assert
+        command.DisplayName.Should().Be("Map Cleaner");
+        command.Targets.Should().Be(QuickRunTargets.Always);
+        cleaner.Paths.Should().Equal("current.osu");
+        dispatcher.PostCount.Should().Be(1);
+    }
+
+    private static MapCleanerViewModel Create(
+        RecordingCleaner cleaner,
+        TestBeatmapWorkspace? workspace = null,
+        string? currentPath = null,
+        IUserNotificationService? notifications = null)
+    {
+        var notificationService = notifications ?? new UserNotificationService();
+        DesktopApplicationSettings settings = new();
+        var effectiveWorkspace = workspace ?? new TestBeatmapWorkspace();
+        effectiveWorkspace.QuickRunPath = currentPath;
+        return new MapCleanerViewModel(
+            cleaner,
+            new ToolExecutionService(notificationService, TimeProvider.System),
+            effectiveWorkspace,
+            settings,
+            new RecordingPlatformLauncher(),
+            notificationService);
+    }
+
+    private sealed class RecordingCleaner : IMapCleanerService
+    {
+        public IReadOnlyList<string>? Paths { get; private set; }
+
+        public bool QuickRun { get; private set; }
+
+        public Task<MapCleanerResult> CleanAsync(IReadOnlyList<string> paths, MapCleanerServiceOptions.MapCleanerCleanupOptions options, bool quickRun = false,
+            IProgress<double>? progress = null,
+            CancellationToken cancellationToken = default)
+        {
+            Paths = paths;
+            QuickRun = quickRun;
+            progress?.Report(1);
+            return Task.FromResult(new MapCleanerResult(20, 0, 16, [1000], [2000], [3000], 5000));
+        }
+    }
+}

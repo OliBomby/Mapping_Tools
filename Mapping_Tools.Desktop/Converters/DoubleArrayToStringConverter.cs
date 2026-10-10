@@ -1,0 +1,45 @@
+using Mapping_Tools.Desktop.Localization;
+using System.Globalization;
+using Avalonia.Data;
+using Avalonia.Data.Converters;
+using Mapping_Tools.Core.SystemTools;
+
+namespace Mapping_Tools.Desktop.Converters;
+
+/// <summary>
+///     Formats double arrays as comma-separated text and parses edited text back to double arrays.
+/// </summary>
+public sealed class DoubleArrayToStringConverter : IValueConverter
+{
+    /// <inheritdoc />
+    public object Convert(
+        object? value,
+        Type targetType,
+        object? parameter,
+        CultureInfo culture)
+    {
+        return value is IEnumerable<double> values
+            ? string.Join(", ", values.Select(item => item.ToString("R", CultureInfo.InvariantCulture)))
+            : string.Empty;
+    }
+
+    /// <inheritdoc />
+    public object ConvertBack(
+        object? value,
+        Type targetType,
+        object? parameter,
+        CultureInfo culture)
+    {
+        if (value is not string text || string.IsNullOrWhiteSpace(text)) return Array.Empty<double>();
+
+        string[] parts = text.Split(',');
+        double[] values = new double[parts.Length];
+        for (int index = 0; index < parts.Length; index++)
+            if (!TypeConverters.TryParseDouble(parts[index], out values[index]))
+                return new BindingNotification(
+                    new FormatException(DesktopStrings.Shell_EnterCommaSeparatedNumbers),
+                    BindingErrorType.DataValidationError);
+
+        return values;
+    }
+}

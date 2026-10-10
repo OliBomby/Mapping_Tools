@@ -1,0 +1,221 @@
+{
+  "$type": "Mapping_Tools.Viewmodels.SlideratorVm, Mapping Tools",
+  "LoadedHitObjects": [
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.HitObject, Mapping Tools",
+      "Line": "22,242,422027,6,0,B|71:48|71:48|159:48|165:133|118:169|60:147|60:147|-26:115|-26:115|-4:26|-4:26|4:-7|32:-34|75:-34|113:-24|113:-24|131:-57|181:-80|181:-80|110:-117|4:-135|-67:-67|-84:12|-84:12|-103:90|-103:90|-121:168|-44:193|-44:193|-73:301|-73:301|-93:408|-209:442|-290:299|-213:205|-158:222|27:193|-157:351|72:378|98:261|98:261|106:229|106:229|164:232|180:270|172:309|172:309|154:380|154:380|113:370|113:370|140:464|140:464|207:393|207:393|165:383|165:383|215:178|215:178|282:201|327:153|313:76|225:77|225:77|184:255|184:255|173:302|213:315|213:315|276:324|310:396|262:450|262:450|252:460|252:460|278:455|278:455|362:367|362:367|343:285|278:255|278:255|328:247|414:208|451:9|249:-19|187:7|187:7|253:-54|413:-36|327:20|455:51|525:31|525:31|474:4|456:-51|456:-51|415:-10|430:35|430:35|482:127|444:228|410:266|410:266|470:185|559:192|559:192|486:179|475:113|475:113|542:115|591:105|627:62|609:-16|564:-35|564:-35|525:-56|531:-90|531:-90|583:-106|583:-106|653:-96|732:21|668:120|629:151|629:151|674:337|674:337|657:323|657:323|645:275|645:275|566:277|478:238|509:314|433:342|433:342|582:350|582:350|589:369|605:384|605:384|544:369|544:369|538:448,1,6811.77116393005,6|0,1:2|2:0,2:0:0:0:",
+      "ActualNewCombo": true,
+      "ComboIndex": 1,
+      "ColourIndex": 1,
+      "Colour": {
+        "$type": "Mapping_Tools.Classes.BeatmapHelper.ComboColour, Mapping Tools",
+        "Color": "#FFFF8409"
+      },
+      "TemporalLength": 1538.461538461538,
+      "SliderVelocity": -24.6631890527386,
+      "TimingPoint": {
+        "$type": "Mapping_Tools.Classes.BeatmapHelper.TimingPoint, Mapping Tools",
+        "Offset": 422027.0,
+        "MpB": -24.6631890527386,
+        "Meter": {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.TempoSignature, Mapping Tools",
+          "TempoDenominator": 4,
+          "TempoNumerator": 4,
+          "PartialMeasure": false
+        },
+        "SampleSet": 2,
+        "SampleIndex": 1,
+        "Volume": 100.0,
+        "Uninherited": false,
+        "Kiai": true,
+        "OmitFirstBarLine": false
+      },
+      "HitsoundTimingPoint": {
+        "$type": "Mapping_Tools.Classes.BeatmapHelper.TimingPoint, Mapping Tools",
+        "Offset": 422027.0,
+        "MpB": -24.6631890527386,
+        "Meter": {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.TempoSignature, Mapping Tools",
+          "TempoDenominator": 4,
+          "TempoNumerator": 4,
+          "PartialMeasure": false
+        },
+        "SampleSet": 2,
+        "SampleIndex": 1,
+        "Volume": 100.0,
+        "Uninherited": false,
+        "Kiai": true,
+        "OmitFirstBarLine": false
+      },
+      "UnInheritedTimingPoint": {
+        "$type": "Mapping_Tools.Classes.BeatmapHelper.TimingPoint, Mapping Tools",
+        "Offset": 422027.0,
+        "MpB": 769.230769230769,
+        "Meter": {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.TempoSignature, Mapping Tools",
+          "TempoDenominator": 4,
+          "TempoNumerator": 4,
+          "PartialMeasure": false
+        },
+        "SampleSet": 2,
+        "SampleIndex": 1,
+        "Volume": 100.0,
+        "Uninherited": true,
+        "Kiai": true,
+        "OmitFirstBarLine": false
+      },
+      "IsSelected": true
+    }
+  ],
+  "VisibleHitObjectIndex": 0,
+  "GlobalSv": 2.79999990463257,
+  "BeatSnapDivisor": 8,
+  "ImportModeSetting": 0,
+  "TimeCodeBoxVisibility": 2,
+  "ExportTime": 2500.0,
+  "ExportModeSetting": 0,
+  "GraphModeSetting": 0,
+  "VelocityLimit": 100.0,
+  "ShowRedAnchors": false,
+  "ShowGraphAnchors": false,
+  "ManualVelocity": false,
+  "NewVelocity": 29.972960526435177,
+  "MinDendrite": 1.0,
+  "DistanceTraveled": 6811.77116393005,
+  "ExpectedSegments": 188475,
+  "DelegateToBpm": false,
+  "RemoveSliderTicks": true,
+  "ExportAsNormal": true,
+  "ExportAsStream": false,
+  "ExportAsInvisibleSlider": false,
+  "DoEditorRead": false,
+  "GraphState": {
+    "$type": "Mapping_Tools.Components.Graph.GraphState, Mapping Tools",
+    "Anchors": [
+      {
+        "$type": "Mapping_Tools.Components.Graph.AnchorState, Mapping Tools",
+        "Pos": {
+          "X": 0.0,
+          "Y": 0.0
+        },
+        "Interpolator": {
+          "$type": "Mapping_Tools.Components.Graph.Interpolation.Interpolators.SingleCurveInterpolator, Mapping Tools",
+          "P": 0.0
+        },
+        "Tension": 0.0,
+        "CanFreeze": true,
+        "IsFrozen": true,
+        "DependencyObjectType": {
+          "$type": "System.Windows.DependencyObjectType, WindowsBase",
+          "Id": 238,
+          "SystemType": "Mapping_Tools.Components.Graph.AnchorState, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null",
+          "BaseType": {
+            "$type": "System.Windows.DependencyObjectType, WindowsBase",
+            "Id": 1,
+            "SystemType": "System.Windows.Freezable, WindowsBase, Version=10.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35",
+            "BaseType": {
+              "$type": "System.Windows.DependencyObjectType, WindowsBase",
+              "Id": 0,
+              "SystemType": "System.Windows.DependencyObject, WindowsBase, Version=10.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35",
+              "Name": "DependencyObject"
+            },
+            "Name": "Freezable"
+          },
+          "Name": "AnchorState"
+        },
+        "IsSealed": true
+      },
+      {
+        "$type": "Mapping_Tools.Components.Graph.AnchorState, Mapping Tools",
+        "Pos": {
+          "X": 1.0,
+          "Y": 0.25
+        },
+        "Interpolator": {
+          "$type": "Mapping_Tools.Components.Graph.Interpolation.Interpolators.SingleCurveInterpolator, Mapping Tools",
+          "P": 0.0
+        },
+        "Tension": 0.0,
+        "CanFreeze": true,
+        "IsFrozen": true,
+        "DependencyObjectType": {
+          "$type": "System.Windows.DependencyObjectType, WindowsBase",
+          "Id": 238,
+          "SystemType": "Mapping_Tools.Components.Graph.AnchorState, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null",
+          "BaseType": {
+            "$type": "System.Windows.DependencyObjectType, WindowsBase",
+            "Id": 1,
+            "SystemType": "System.Windows.Freezable, WindowsBase, Version=10.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35",
+            "BaseType": {
+              "$type": "System.Windows.DependencyObjectType, WindowsBase",
+              "Id": 0,
+              "SystemType": "System.Windows.DependencyObject, WindowsBase, Version=10.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35",
+              "Name": "DependencyObject"
+            },
+            "Name": "Freezable"
+          },
+          "Name": "AnchorState"
+        },
+        "IsSealed": true
+      },
+      {
+        "$type": "Mapping_Tools.Components.Graph.AnchorState, Mapping Tools",
+        "Pos": {
+          "X": 2.0,
+          "Y": 1.0
+        },
+        "Interpolator": {
+          "$type": "Mapping_Tools.Components.Graph.Interpolation.Interpolators.SingleCurveInterpolator, Mapping Tools",
+          "P": 0.0
+        },
+        "Tension": 0.0,
+        "CanFreeze": true,
+        "IsFrozen": true,
+        "DependencyObjectType": {
+          "$type": "System.Windows.DependencyObjectType, WindowsBase",
+          "Id": 238,
+          "SystemType": "Mapping_Tools.Components.Graph.AnchorState, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null",
+          "BaseType": {
+            "$type": "System.Windows.DependencyObjectType, WindowsBase",
+            "Id": 1,
+            "SystemType": "System.Windows.Freezable, WindowsBase, Version=10.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35",
+            "BaseType": {
+              "$type": "System.Windows.DependencyObjectType, WindowsBase",
+              "Id": 0,
+              "SystemType": "System.Windows.DependencyObject, WindowsBase, Version=10.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35",
+              "Name": "DependencyObject"
+            },
+            "Name": "Freezable"
+          },
+          "Name": "AnchorState"
+        },
+        "IsSealed": true
+      }
+    ],
+    "MinX": 0.0,
+    "MinY": 0.0,
+    "MaxX": 2.0,
+    "MaxY": 1.0,
+    "CanFreeze": true,
+    "IsFrozen": true,
+    "DependencyObjectType": {
+      "$type": "System.Windows.DependencyObjectType, WindowsBase",
+      "Id": 237,
+      "SystemType": "Mapping_Tools.Components.Graph.GraphState, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null",
+      "BaseType": {
+        "$type": "System.Windows.DependencyObjectType, WindowsBase",
+        "Id": 1,
+        "SystemType": "System.Windows.Freezable, WindowsBase, Version=10.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35",
+        "BaseType": {
+          "$type": "System.Windows.DependencyObjectType, WindowsBase",
+          "Id": 0,
+          "SystemType": "System.Windows.DependencyObject, WindowsBase, Version=10.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35",
+          "Name": "DependencyObject"
+        },
+        "Name": "Freezable"
+      },
+      "Name": "GraphState"
+    },
+    "IsSealed": true
+  }
+}

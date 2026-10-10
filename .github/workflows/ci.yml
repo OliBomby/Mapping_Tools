@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+jobs:
+  build-and-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore Mapping_Tools.slnx
+
+      - name: Build Avalonia frontend and shared layers
+        run: dotnet build Mapping_Tools.slnx --configuration Release --no-restore
+
+      - name: Architecture guardrails
+        run: dotnet test Mapping_Tools.Architecture.Tests/Mapping_Tools.Architecture.Tests.csproj --configuration Release --no-build
+
+      - name: Core tests
+        run: dotnet test Mapping_Tools.Core.Tests/Mapping_Tools.Core.Tests.csproj --configuration Release --no-build
+
+      - name: Application tests
+        run: dotnet test Mapping_Tools.Application.Tests/Mapping_Tools.Application.Tests.csproj --configuration Release --no-build
+
+      - name: Infrastructure tests
+        run: dotnet test Mapping_Tools.Infrastructure.Tests/Mapping_Tools.Infrastructure.Tests.csproj --configuration Release --no-build
+
+      - name: Desktop tests
+        run: dotnet test Mapping_Tools.Desktop.Tests/Mapping_Tools.Desktop.Tests.csproj --configuration Release --no-build
+
+  code-quality:
+    name: Code quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Resolve .NET SDK version
+        id: dotnet-sdk
+        shell: bash
+        run: |
+          echo "version=$(dotnet --version)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache ReSharper analysis
+        uses: actions/cache@v5
+        with:
+          path: artifacts/resharper/cache
+          key: resharper-v5-${{ runner.os }}-${{ steps.dotnet-sdk.outputs.version }}-${{ hashFiles('.config/resharper/dotnet-tools.json', 'Mapping_Tools.slnx', 'Mapping_Tools.sln.DotSettings', '.editorconfig', '**/*.csproj', '**/*.props', '**/*.targets', '**/*.resx') }}-${{ github.sha }}
+          restore-keys: |
+            resharper-v5-${{ runner.os }}-${{ steps.dotnet-sdk.outputs.version }}-${{ hashFiles('.config/resharper/dotnet-tools.json', 'Mapping_Tools.slnx', 'Mapping_Tools.sln.DotSettings', '.editorconfig', '**/*.csproj', '**/*.props', '**/*.targets', '**/*.resx') }}-
+
+      - name: Check ReSharper warnings
+        shell: pwsh
+        run: ./.agents/skills/fix-resharper-warnings/scripts/inspect-code.ps1 -FailOnWarnings
+
+      - name: Upload ReSharper report
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: resharper-report
+          path: |
+            artifacts/resharper/*/warnings.sarif
+            artifacts/resharper/*/logs/**
+          if-no-files-found: warn

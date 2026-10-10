@@ -1,0 +1,507 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:loc="using:Mapping_Tools.Desktop.Localization"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Mapping_Tools.Desktop.ViewModels"
+        xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+        xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+        xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+        xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+        xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:featureLoading="clr-namespace:Mapping_Tools.Desktop.Controls.FeatureLoading"
+        mc:Ignorable="d"
+        d:DesignWidth="1280"
+        d:DesignHeight="800"
+        x:Class="Mapping_Tools.Desktop.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Width="1500"
+        Height="800"
+        MinWidth="500"
+        MinHeight="200"
+        WindowStartupLocation="Manual"
+        WindowDecorations="BorderOnly"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="35"
+        Icon="/Assets/mt_icon.ico"
+        Background="{DynamicResource MaterialPaperBrush}"
+        Foreground="{DynamicResource MaterialBodyBrush}"
+        FontFamily="avares://Mapping_Tools.Desktop/Assets/Fonts#Roboto"
+        FontSize="14"
+        FontWeight="Medium"
+        Title="{Binding Header}"
+        DragDrop.AllowDrop="True"
+        DragDrop.DragOver="AcceptFileDrop"
+        DragDrop.Drop="OpenDroppedBeatmaps">
+
+    <Window.Resources>
+        <ControlTheme x:Key="ChromeButtonTheme"
+                      TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource MaterialDarkForegroundBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}">
+                        <Panel>
+                            <Border x:Name="PART_ChromeButtonHighlighter"
+                                    Background="{DynamicResource MaterialBodyBrush}" />
+                            <ContentPresenter Content="{TemplateBinding Content}"
+                                              HorizontalContentAlignment="Center"
+                                              VerticalContentAlignment="Center" />
+                        </Panel>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+            <Style Selector="^ /template/ Border#PART_ChromeButtonHighlighter">
+                <Setter Property="Opacity" Value="0" />
+            </Style>
+            <Style Selector="^:pointerover /template/ Border#PART_ChromeButtonHighlighter">
+                <Setter Property="Opacity" Value="0.13" />
+            </Style>
+            <Style Selector="^:pressed /template/ Border#PART_ChromeButtonHighlighter">
+                <Setter Property="Opacity" Value="0.13" />
+            </Style>
+        </ControlTheme>
+        <ControlTheme x:Key="ChromeToggleButtonTheme"
+                      TargetType="ToggleButton">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource MaterialDarkForegroundBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}">
+                        <Panel>
+                            <Border x:Name="PART_ChromeButtonHighlighter"
+                                    Background="{DynamicResource MaterialBodyBrush}" />
+                            <ContentPresenter Content="{TemplateBinding Content}"
+                                              HorizontalContentAlignment="Center"
+                                              VerticalContentAlignment="Center" />
+                        </Panel>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+            <Style Selector="^ /template/ Border#PART_ChromeButtonHighlighter">
+                <Setter Property="Opacity" Value="0" />
+            </Style>
+            <Style Selector="^:pointerover /template/ Border#PART_ChromeButtonHighlighter">
+                <Setter Property="Opacity" Value="0.13" />
+            </Style>
+            <Style Selector="^:pressed /template/ Border#PART_ChromeButtonHighlighter">
+                <Setter Property="Opacity" Value="0.13" />
+            </Style>
+        </ControlTheme>
+    </Window.Resources>
+
+    <Window.Styles>
+        <Style Selector="Menu.top-menu">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource MaterialDarkForegroundBrush}" />
+            <Setter Property="Height" Value="35" />
+        </Style>
+        <Style Selector="ToggleButton.navigation-toggle materialIcons|MaterialIcon">
+            <Setter Property="Opacity" Value="0.62" />
+        </Style>
+        <Style Selector="ToggleButton.navigation-toggle:checked materialIcons|MaterialIcon">
+            <Setter Property="Opacity" Value="1" />
+        </Style>
+        <Style Selector="Menu.top-menu > MenuItem">
+            <Setter Property="Foreground" Value="{DynamicResource MaterialDarkForegroundBrush}" />
+            <Setter Property="Height" Value="35" />
+            <Setter Property="Padding" Value="12,0" />
+        </Style>
+        <Style Selector="ListBox.navigation-list">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+        </Style>
+        <Style Selector="ListBox.navigation-list ListBoxItem">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="Separator.navigation-divider">
+            <Setter Property="Height" Value="1" />
+            <Setter Property="Margin" Value="8,10" />
+            <Setter Property="Background" Value="{DynamicResource MaterialDividerBrush}" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+        </Style>
+        <Style Selector="SplitView.navigation-drawer:open /template/ Panel#PART_PaneRoot">
+            <Setter Property="ClipToBounds" Value="False" />
+        </Style>
+    </Window.Styles>
+
+    <Grid x:Name="RootGrid">
+        <dialogHost:DialogHost Identifier="RootDialog"
+                               CloseOnClickAway="True"
+                               Background="{DynamicResource MaterialPaperBrush}"
+                               OverlayBackground="{DynamicResource MappingToolsDialogOverlayBrush}">
+            <Grid>
+                <Grid RowDefinitions="Auto,*">
+                    <materialControls:ColorZone Grid.Row="0"
+                                                Height="35"
+                                                Padding="0"
+                                                Mode="PrimaryMid"
+                                                materialAssists:ShadowAssist.ShadowDepth="Depth2"
+                                                WindowDecorationProperties.ElementRole="TitleBar">
+                        <DockPanel LastChildFill="True">
+                            <StackPanel DockPanel.Dock="Left"
+                                        Orientation="Horizontal"
+                                        WindowDecorationProperties.ElementRole="User">
+                                <ToggleButton Classes="navigation-toggle"
+                                              Theme="{StaticResource ChromeToggleButtonTheme}"
+                                              Width="45"
+                                              Height="35"
+                                              VerticalAlignment="Center"
+                                              AutomationProperties.Name="{loc:Tr Shell_NavigationMenu}"
+                                              IsChecked="{Binding IsNavigationOpen, Mode=TwoWay}"
+                                              ToolTip.Tip="{loc:Tr Shell_UseCtrlKToOpenNavigation}">
+                                    <materialIcons:MaterialIcon Kind="Menu"
+                                                                Width="28"
+                                                                Height="28" />
+                                </ToggleButton>
+
+                                <Menu Classes="top-menu">
+                                    <MenuItem Header="{loc:Tr Shell_MenuFile}"
+                                              Height="35">
+                                        <MenuItem Header="{loc:Tr Shell_MenuOpenBeatmap}"
+                                                  Command="{Binding Workspace.OpenBeatmapCommand}"
+                                                  ToolTip.Tip="{loc:Tr Shell_SelectTheCurrentBeatmapWithFileExplorer}">
+                                            <MenuItem.Icon>
+                                                <materialIcons:MaterialIcon Kind="Folder" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="{loc:Tr Shell_MenuOpenCurrentBeatmap}"
+                                                  Command="{Binding Workspace.OpenCurrentBeatmapCommand}"
+                                                  ToolTip.Tip="{loc:Tr Shell_SetTheCurrentBeatmapToTheSelectedBeatmapInYourOsuClient}">
+                                            <MenuItem.Icon>
+                                                <materialIcons:MaterialIcon Kind="Restore" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="{loc:Tr Shell_MenuGenerateBackup}"
+                                                  Command="{Binding Workspace.CreateBackupCommand}"
+                                                  ToolTip.Tip="{loc:Tr Shell_SaveABackupOfTheCurrentBeatmapToTheBackupsFolder}">
+                                            <MenuItem.Icon>
+                                                <materialIcons:MaterialIcon Kind="Backup" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="{loc:Tr Shell_MenuLoadBackup}"
+                                                  Command="{Binding Workspace.RestoreBackupCommand}"
+                                                  ToolTip.Tip="{loc:Tr Shell_LoadABackupFromTheBackupsFolderIntoTheCurrentBeatmap}">
+                                            <MenuItem.Icon>
+                                                <materialIcons:MaterialIcon Kind="BackupRestore" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="{loc:Tr Shell_MenuQuickundo}"
+                                                  Command="{Binding Workspace.QuickUndoCommand}"
+                                                  ToolTip.Tip="{loc:Tr Shell_RestoreTheNewestNonPeriodicBackupIntoTheBeatmapOpenInOsu}">
+                                            <MenuItem.Icon>
+                                                <materialIcons:MaterialIcon Kind="Undo" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="{loc:Tr Shell_MenuBettersaveCurrentBeatmap}"
+                                                  Command="{Binding BetterSaveCommand}"
+                                                  ToolTip.Tip="{loc:Tr Shell_SaveTheBeatmapWhichIsCurrentlyOpenInYourOsuEditorBettersaveSavesTheBeatmapJustLikeTheVanillaEditorBu}">
+                                            <MenuItem.Icon>
+                                                <materialIcons:MaterialIcon Kind="ContentSave" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                    </MenuItem>
+                                    <MenuItem Header="{loc:Tr Shell_MenuAbout}"
+                                              Height="35">
+                                        <MenuItem Header="{loc:Tr Shell_MenuOpenMappingToolsFolder}"
+                                                  Command="{Binding Workspace.OpenApplicationFolderCommand}"
+                                                  ToolTip.Tip="{loc:Tr Shell_OpenTheMappingToolsFolder}">
+                                            <MenuItem.Icon>
+                                                <materialIcons:MaterialIcon Kind="FolderOpen" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="{loc:Tr Shell_MenuOpenBackupsFolder}"
+                                                  Command="{Binding Workspace.OpenBackupsFolderCommand}"
+                                                  ToolTip.Tip="{loc:Tr Shell_OpenTheBackupsFolder}">
+                                            <MenuItem.Icon>
+                                                <materialIcons:MaterialIcon Kind="FolderOpen" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="{loc:Tr Shell_MenuCheckForUpdates}"
+                                                  Command="{Binding CheckForUpdatesCommand}"
+                                                  ToolTip.Tip="{loc:Tr Shell_CheckIfThereAreUpdatesAvailable}">
+                                            <MenuItem.Icon>
+                                                <materialIcons:MaterialIcon Kind="Update" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="{loc:Tr Shell_MenuWebsite}"
+                                                  Command="{Binding OpenWebsiteCommand}"
+                                                  ToolTip.Tip="{loc:Tr Shell_OpenTheOfficialMappingToolsWebsiteInYourBrowser}">
+                                            <MenuItem.Icon>
+                                                <materialIcons:MaterialIcon Kind="OpenInBrowser" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="{loc:Tr Shell_MenuGithub}"
+                                                  Command="{Binding OpenGitHubCommand}"
+                                                  ToolTip.Tip="{loc:Tr Shell_GoToTheMappingToolsGithub}">
+                                            <MenuItem.Icon>
+                                                <materialIcons:MaterialIcon Kind="Github" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="{loc:Tr Shell_MenuReportAnIssue}"
+                                                  Command="{Binding OpenIssuesCommand}"
+                                                  ToolTip.Tip="{loc:Tr Shell_ReportABugOrRequestAFeatureOnGithub}">
+                                            <MenuItem.Icon>
+                                                <materialIcons:MaterialIcon Kind="BugReport" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="{loc:Tr Shell_MenuDonate}"
+                                                  Command="{Binding OpenDonateCommand}"
+                                                  ToolTip.Tip="{loc:Tr Shell_SupportMappingTools}">
+                                            <MenuItem.Icon>
+                                                <materialIcons:MaterialIcon Kind="Heart" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="{loc:Tr Shell_MenuAbout}"
+                                                  Command="{Binding OpenAboutCommand}">
+                                            <MenuItem.Icon>
+                                                <materialIcons:MaterialIcon Kind="Information" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                    </MenuItem>
+                                    <MenuItem Header="{loc:Tr Shell_MenuProject}"
+                                              MinWidth="67"
+                                              Height="35"
+                                              IsVisible="{Binding HasProjectMenu}"
+                                              IsEnabled="{Binding HasProjectMenu}"
+                                              ItemsSource="{Binding ProjectMenuItems}">
+                                        <MenuItem.ItemContainerTheme>
+                                            <ControlTheme TargetType="MenuItem"
+                                                          BasedOn="{StaticResource {x:Type MenuItem}}">
+                                                <Setter Property="Header" Value="{ReflectionBinding Header}" />
+                                                <Setter Property="Command" Value="{ReflectionBinding Command}" />
+                                                <Setter Property="ToolTip.Tip" Value="{ReflectionBinding ToolTip}" />
+                                                <Setter Property="Icon"
+                                                        Value="{ReflectionBinding Icon, Converter={StaticResource MaterialIconConverter}}" />
+                                            </ControlTheme>
+                                        </MenuItem.ItemContainerTheme>
+                                    </MenuItem>
+                                </Menu>
+                            </StackPanel>
+
+                            <StackPanel DockPanel.Dock="Right"
+                                        Orientation="Horizontal"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Top"
+                                        WindowDecorationProperties.ElementRole="User">
+                                <Button Theme="{StaticResource ChromeButtonTheme}"
+                                        Width="49"
+                                        Height="35"
+                                        AutomationProperties.Name="{loc:Tr Shell_Minimize}"
+                                        Click="MinimizeWindow"
+                                        ToolTip.Tip="{loc:Tr Shell_Minimize}">
+                                    <materialIcons:MaterialIcon Kind="WindowMinimize"
+                                                                Width="16"
+                                                                Height="16" />
+                                </Button>
+                                <Button Theme="{StaticResource ChromeButtonTheme}"
+                                        Width="47"
+                                        Height="35"
+                                        AutomationProperties.Name="{loc:Tr Shell_MaximizeOrRestore}"
+                                        Click="ToggleMaximizeWindow"
+                                        ToolTip.Tip="{loc:Tr Shell_MaximizeOrRestore}">
+                                    <materialIcons:MaterialIcon x:Name="MaximizeIcon"
+                                                                Kind="WindowMaximize"
+                                                                Width="16"
+                                                                Height="16" />
+                                </Button>
+                                <Button Theme="{StaticResource ChromeButtonTheme}"
+                                        Width="49"
+                                        Height="35"
+                                        AutomationProperties.Name="{loc:Tr Shell_Close}"
+                                        Click="CloseWindow"
+                                        ToolTip.Tip="{loc:Tr Shell_Close}">
+                                    <Button.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="{loc:Tr Shell_MenuExitWithoutSaving}"
+                                                      Click="CloseWithoutSaving"
+                                                      ToolTip.Tip="{loc:Tr Shell_ExitsTheProgramWithoutSavingAnyPreferencesOrToolSettings}" />
+                                        </ContextMenu>
+                                    </Button.ContextMenu>
+                                    <materialIcons:MaterialIcon Kind="WindowClose"
+                                                                Width="16"
+                                                                Height="16" />
+                                </Button>
+                            </StackPanel>
+
+                            <materialControls:ColorZone Margin="10,0"
+                                                        Padding="5"
+                                                        CornerRadius="2"
+                                                        Mode="PrimaryDark"
+                                                        VerticalAlignment="Center"
+                                                        AutomationProperties.Name="{loc:Tr Shell_CurrentMaps}"
+                                                        WindowDecorationProperties.ElementRole="User"
+                                                        materialAssists:ShadowAssist.ShadowDepth="Depth0"
+                                                        PointerPressed="DragCurrentMaps"
+                                                        ToolTip.Tip="{Binding Workspace.SelectedMapToolTip}">
+                                <materialControls:ColorZone.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="{loc:Tr Shell_MenuOpenBeatmap}"
+                                                  Command="{Binding Workspace.OpenBeatmapCommand}"
+                                                  ToolTip.Tip="{loc:Tr Shell_SelectTheCurrentBeatmapWithFileExplorer}">
+                                            <MenuItem.Icon>
+                                                <materialIcons:MaterialIcon Kind="Folder" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="{loc:Tr Shell_MenuOpenCurrentBeatmap}"
+                                                  Command="{Binding Workspace.OpenCurrentBeatmapCommand}"
+                                                  ToolTip.Tip="{loc:Tr Shell_SetTheCurrentBeatmapToTheSelectedBeatmapInYourOsuClient}">
+                                            <MenuItem.Icon>
+                                                <materialIcons:MaterialIcon Kind="Restore" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="{loc:Tr Shell_MenuGenerateBackup}"
+                                                  Command="{Binding Workspace.CreateBackupCommand}"
+                                                  ToolTip.Tip="{loc:Tr Shell_SaveABackupOfTheCurrentBeatmapToTheBackupsFolder}">
+                                            <MenuItem.Icon>
+                                                <materialIcons:MaterialIcon Kind="Backup" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="{loc:Tr Shell_MenuLoadBackup}"
+                                                  Command="{Binding Workspace.RestoreBackupCommand}"
+                                                  ToolTip.Tip="{loc:Tr Shell_LoadABackupFromTheBackupsFolderIntoTheCurrentBeatmap}">
+                                            <MenuItem.Icon>
+                                                <materialIcons:MaterialIcon Kind="BackupRestore" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="{loc:Tr Shell_MenuQuickundo}"
+                                                  Command="{Binding Workspace.QuickUndoCommand}"
+                                                  ToolTip.Tip="{loc:Tr Shell_RestoreTheNewestNonPeriodicBackupIntoTheBeatmapOpenInOsu}">
+                                            <MenuItem.Icon>
+                                                <materialIcons:MaterialIcon Kind="Undo" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="{loc:Tr Shell_MenuBettersaveCurrentBeatmap}"
+                                                  Command="{Binding BetterSaveCommand}"
+                                                  ToolTip.Tip="{loc:Tr Shell_SaveTheBeatmapWhichIsCurrentlyOpenInYourOsuEditorBettersaveSavesTheBeatmapJustLikeTheVanillaEditorBu}">
+                                            <MenuItem.Icon>
+                                                <materialIcons:MaterialIcon Kind="ContentSave" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                    </ContextMenu>
+                                </materialControls:ColorZone.ContextMenu>
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Grid.Column="0"
+                                               HorizontalAlignment="Center"
+                                               TextWrapping="NoWrap"
+                                               TextTrimming="None"
+                                               FontWeight="Normal"
+                                               Text="{Binding Workspace.SelectedMapNames}" />
+                                    <TextBlock Grid.Column="1"
+                                               Margin="2,0,0,0"
+                                               Text="{Binding Workspace.SelectedMapCountText}"
+                                               TextWrapping="NoWrap"
+                                               FontStyle="Italic"
+                                               FontWeight="Bold" />
+                                </Grid>
+                            </materialControls:ColorZone>
+                        </DockPanel>
+                    </materialControls:ColorZone>
+
+                    <SplitView Grid.Row="1"
+                               Classes="navigation-drawer"
+                               IsPaneOpen="{Binding IsNavigationOpen}"
+                               DisplayMode="Inline"
+                               OpenPaneLength="200"
+                               CompactPaneLength="0">
+                        <SplitView.Pane>
+                            <Border Width="200"
+                                    MinWidth="200"
+                                    MaxWidth="200"
+                                    Background="{DynamicResource MaterialPaperBrush}"
+                                    materialAssists:ShadowAssist.ShadowDepth="Depth2">
+                                <DockPanel>
+                                    <TextBox x:Name="ToolSearchBox"
+                                             DockPanel.Dock="Top"
+                                             Margin="16,8,12,0"
+                                             Classes="outline clearButton"
+                                             Theme="{StaticResource OutlineTextBox}"
+                                             AutomationProperties.Name="{loc:Tr Shell_ToolSearch}"
+                                             UseFloatingPlaceholder="True"
+                                             materialAssists:TextFieldAssist.Label="{loc:Tr Shell_Search}"
+                                             Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             ToolTip.Tip="{loc:Tr Shell_SearchRegisteredFeatures}">
+                                        <TextBox.KeyBindings>
+                                            <KeyBinding Gesture="Enter"
+                                                        Command="{Binding ActivateHighlightedFeatureCommand}" />
+                                            <KeyBinding Gesture="Up"
+                                                        Command="{Binding SelectPreviousFeatureCommand}" />
+                                            <KeyBinding Gesture="Down"
+                                                        Command="{Binding SelectNextFeatureCommand}" />
+                                        </TextBox.KeyBindings>
+                                    </TextBox>
+
+                                    <controls:NavigationListBox x:Name="ToolList"
+                                                                Classes="navigation-list"
+                                                                Width="200"
+                                                                Margin="0,16"
+                                                                HorizontalAlignment="Left"
+                                                                Padding="0,0,12,0"
+                                                                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                                                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                                                ScrollViewer.AllowAutoHide="False"
+                                                                AutoScrollToSelectedItem="True"
+                                                                AutomationProperties.Name="{loc:Tr Shell_ToolsMenu}"
+                                                                ItemsSource="{Binding NavigationEntries}"
+                                                                SelectedItem="{Binding HighlightedFeature, Mode=TwoWay}">
+                                        <controls:NavigationListBox.KeyBindings>
+                                            <KeyBinding Gesture="Enter"
+                                                        Command="{Binding ActivateHighlightedFeatureCommand}" />
+                                        </controls:NavigationListBox.KeyBindings>
+                                        <controls:NavigationListBox.ItemTemplate>
+                                            <DataTemplate x:DataType="vm:ShellFeatureItemViewModel">
+                                                <Border Classes="navigation-item"
+                                                        Height="{Binding NavigationHeight}"
+                                                        Padding="18,0">
+                                                    <TextBlock VerticalAlignment="Center"
+                                                               FontSize="14"
+                                                               FontWeight="Normal"
+                                                               Foreground="{DynamicResource MaterialBodyBrush}"
+                                                               Text="{Binding DisplayName}" />
+                                                </Border>
+                                            </DataTemplate>
+                                        </controls:NavigationListBox.ItemTemplate>
+                                    </controls:NavigationListBox>
+                                </DockPanel>
+                            </Border>
+                        </SplitView.Pane>
+
+                        <Grid RowDefinitions="*"
+                              Background="{DynamicResource MaterialPaperBrush}">
+                            <ScrollViewer
+                                HorizontalScrollBarVisibility="{Binding ContentHorizontalScrollBarVisibility}"
+                                VerticalScrollBarVisibility="{Binding ContentVerticalScrollBarVisibility}">
+                                <featureLoading:FeatureContentHost Margin="20"
+                                                                   ClipToBounds="False"
+                                                                   ErrorMessage="{Binding FeatureLoadError}"
+                                                                   ErrorDetails="{Binding FeatureLoadDetails}"
+                                                                   Feature="{Binding CurrentFeature}"
+                                                                   HorizontalContentAlignment="Stretch"
+                                                                   VerticalContentAlignment="Stretch" />
+                            </ScrollViewer>
+
+                            <materialControls:SnackbarHost x:Name="SnackbarHost"
+                                                           HostName="Root"
+                                                           SnackbarHorizontalAlignment="Center"
+                                                           SnackbarVerticalAlignment="Bottom" />
+
+                        </Grid>
+                    </SplitView>
+                </Grid>
+            </Grid>
+        </dialogHost:DialogHost>
+    </Grid>
+</Window>

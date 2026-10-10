@@ -1,0 +1,209 @@
+using Mapping_Tools.Application.Execution.ToolExecution;
+using Mapping_Tools.Application.Execution.UserNotification;
+using Mapping_Tools.Application.Execution.UserNotification.Models;
+using Mapping_Tools.Application.Tools.SliderPicturator;
+using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.Images;
+using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Services.Undo;
+using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Tests.TestDoubles;
+using Mapping_Tools.Desktop.Tools.SliderPicturator.Models;
+using Mapping_Tools.Desktop.Tools.SliderPicturator.ViewModels;
+using Mapping_Tools.Infrastructure.Projects;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace Mapping_Tools.Desktop.Tests.Tools.SliderPicturator.ViewModels;
+
+[TestClass]
+public sealed class SliderPicturatorViewModelTests
+{
+    [TestMethod]
+    public void Undo_AfterPreviewCountChanges_RestoresInputsWithoutRestoringDerivedCount()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingPicturator());
+        ProjectUndoHistory<SliderPicturatorProject> history = new(viewModel, new VersionedProjectJsonSerializer());
+        viewModel.UndoHistory = history;
+
+        // Act
+        viewModel.Quality = 2;
+        viewModel.SegmentCount = 42;
+        history.Capture();
+        history.Undo();
+
+        // Assert
+        viewModel.Quality.Should().Be(1);
+        viewModel.SegmentCount.Should().Be(42);
+        history.CanUndo.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public async Task RunQuickAsync_WhenServiceReturnsSegmentCount_UpdatesSegmentCountFromResult()
+    {
+        // Arrange
+        RecordingPicturator service = new() { ResultSegmentCount = 42 };
+        TestBeatmapWorkspace workspace = new() { QuickRunPath = "current.osu" };
+        var viewModel = Create(service, workspace);
+        viewModel.SegmentCount = 3;
+
+        // Act
+        await viewModel.RunQuickAsync(CancellationToken.None);
+
+        // Assert
+        viewModel.SegmentCount.Should().Be(42);
+    }
+
+    [TestMethod]
+    public void Install_WithPersistedSelectedSlider_RestoresSelectedSlider()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingPicturator());
+        HitObject selectedSlider = DecodeHitObject("32,64,100,2,0,L|200:64,1,168");
+        SliderPicturatorProject project = new() { SelectedSlider = selectedSlider };
+        IShellProjectFeature<SliderPicturatorProject> feature = viewModel;
+
+        // Act
+        feature.Install(project);
+
+        // Assert
+        viewModel.SelectedSlider.Should().NotBeNull();
+        EncodeHitObject(viewModel.SelectedSlider!).Should().Be(EncodeHitObject(selectedSlider));
+    }
+
+    [TestMethod]
+    public void Activate_WithoutMapComboColors_DoesNotQueryLiveBeatmap()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingPicturator());
+
+        // Act
+        viewModel.Activate();
+
+        // Assert
+    }
+
+    [TestMethod]
+    public void Activate_WithMapComboColors_UsesSelectedWorkspaceMapWithoutLiveLookup()
+    {
+        // Arrange
+        RgbaColour colour = RgbaColour.FromRgb(255, 0, 0);
+        RecordingPicturator service = new()
+        {
+            AvailableColors = [colour]
+        };
+        TestBeatmapWorkspace workspace = new();
+        workspace.SetSelection(["selected.osu"]);
+        var viewModel = Create(service, workspace);
+        viewModel.UseMapComboColors = true;
+
+        // Act
+        viewModel.Activate();
+
+        // Assert
+        service.ColorPaths.Should().ContainSingle().Which.Should().Be("selected.osu");
+        viewModel.AvailableColors.Should().Equal(colour);
+        viewModel.ComboColor.Should().Be(colour);
+    }
+
+    [TestMethod]
+    public void UseMapComboColors_WhenEnabledWithoutLoadedMap_UsesDefaultPaletteSelection()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingPicturator());
+        RgbaColour defaultColour = ComboColour.GetDefaultComboColours()[0].Color;
+
+        // Act
+        viewModel.UseMapComboColors = true;
+
+        // Assert
+        viewModel.AvailableColors.Should().Equal(ComboColour.GetDefaultComboColours().Select(colour => colour.Color));
+        viewModel.ComboColor.Should().Be(defaultColour);
+    }
+
+    [TestMethod]
+    public void WorkspaceSelectionChanged_WhenSelectionCleared_UsesDefaultPaletteWithoutError()
+    {
+        // Arrange
+        RgbaColour colour = RgbaColour.FromRgb(255, 0, 0);
+        RecordingPicturator service = new() { AvailableColors = [colour] };
+        TestBeatmapWorkspace workspace = new();
+        workspace.SetSelection(["selected.osu"]);
+        UserNotificationService notifications = new();
+        List<UserNotification> published = [];
+        notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
+        var viewModel = Create(service, workspace, notifications);
+        viewModel.UseMapComboColors = true;
+        viewModel.Activate();
+
+        // Act
+        workspace.ClearSelection();
+
+        // Assert
+        service.ColorPaths.Should().ContainSingle().Which.Should().Be("selected.osu");
+        viewModel.AvailableColors.Should().Equal(ComboColour.GetDefaultComboColours().Select(item => item.Color));
+        viewModel.ComboColor.Should().Be(ComboColour.GetDefaultComboColours()[0].Color);
+        published.Should().BeEmpty();
+    }
+
+    private static SliderPicturatorViewModel Create(
+        RecordingPicturator service,
+        TestBeatmapWorkspace? workspace = null,
+        UserNotificationService? notifications = null)
+    {
+        notifications ??= new UserNotificationService();
+        DesktopApplicationSettings settings = new();
+        return new SliderPicturatorViewModel(
+            service,
+            new StubImageFileService(),
+            new TestFilePicker(),
+            new ToolExecutionService(
+                notifications,
+                TimeProvider.System),
+            workspace ?? new TestBeatmapWorkspace(),
+            settings,
+            notifications);
+    }
+
+    private sealed class RecordingPicturator : ISliderPicturatorService
+    {
+        public long ResultSegmentCount { get; init; }
+
+        public List<string> ColorPaths { get; } = [];
+
+        public IReadOnlyList<RgbaColour> AvailableColors { get; init; } = [];
+
+        public Task<SliderPicturatorResult> PicturateAsync(
+            string path,
+            SliderPicturatorServiceOptions options,
+            bool quickRun = false,
+            IProgress<double>? progress = null,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(new SliderPicturatorResult(path, ResultSegmentCount));
+        }
+
+        public Task<IReadOnlyList<RgbaColour>> GetAvailableColorsAsync(
+            string path,
+            CancellationToken cancellationToken = default)
+        {
+            ColorPaths.Add(path);
+            return Task.FromResult(AvailableColors);
+        }
+
+        public Task<HitObject?> GetSelectedSliderAsync(
+            string path,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<HitObject?>(null);
+        }
+    }
+
+    private sealed class StubImageFileService : IImageFileService
+    {
+        public Task<RgbaImage> LoadAsync(string path, CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException();
+        }
+    }
+}

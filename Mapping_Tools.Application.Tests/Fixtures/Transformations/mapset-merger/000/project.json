@@ -1,0 +1,17 @@
+{
+  "$type": "Mapping_Tools.Viewmodels.MapsetMergerVm, Mapping Tools",
+  "ExportPath": "{fixtureRoot}\\Transformations\\mapset-merger-actual",
+  "Mapsets": [
+    {
+      "$type": "Mapping_Tools.Viewmodels.MapsetMergerVm+MapsetItem, Mapping Tools",
+      "Name": "E2E-A",
+      "Path": "{fixtureRoot}\\Transformations\\mapset-merger-sources\\E2E-A"
+    },
+    {
+      "$type": "Mapping_Tools.Viewmodels.MapsetMergerVm+MapsetItem, Mapping Tools",
+      "Name": "E2E-B",
+      "Path": "{fixtureRoot}\\Transformations\\mapset-merger-sources\\E2E-B"
+    }
+  ],
+  "MoveSbToBeatmap": false
+}

@@ -1,0 +1,234 @@
+﻿using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.MathUtil;
+
+namespace Mapping_Tools.Core.BeatmapHelper;
+
+/// <summary>
+///     Models one redline or greenline from an osu! <c>[TimingPoints]</c> section.
+/// </summary>
+public class TimingPoint : IComparable<TimingPoint>
+{
+    /// <summary>
+    ///     Creates a new <see cref="TimingPoint" />
+    /// </summary>
+    /// <param name="offset">The offset from the start of the audio in milliseconds</param>
+    /// <param name="mpb">The milliseconds per beat. (Quarter Note in Music Theory terms.) </param>
+    /// <param name="meter">The time signature in x / 4</param>
+    /// <param name="sampleSet">The <see cref="SampleSet" /> that is used from the timing point</param>
+    /// <param name="sampleIndex"></param>
+    /// <param name="volume"></param>
+    /// <param name="uninherited"></param>
+    /// <param name="kiai"></param>
+    /// <param name="omitFirstBarLine"></param>
+    public TimingPoint(double offset, double mpb, int meter, SampleSet sampleSet, int sampleIndex, double volume, bool uninherited, bool kiai, bool omitFirstBarLine)
+    {
+        Offset = offset;
+        MpB = mpb;
+        Meter = new TempoSignature(meter);
+        SampleSet = sampleSet;
+        SampleIndex = sampleIndex;
+        Volume = volume;
+        Uninherited = uninherited;
+        Kiai = kiai;
+        OmitFirstBarLine = omitFirstBarLine;
+    }
+
+    /// <summary>
+    ///     Creates a new <see cref="TimingPoint" />
+    /// </summary>
+    /// <param name="offset">The offset from the start of the audio in milliseconds</param>
+    /// <param name="mpb">The milliseconds per beat. (Quarter Note in Music Theory terms.) </param>
+    /// <param name="meter">The tempo signature object.</param>
+    /// <param name="sampleSet">The <see cref="SampleSet" /> that is used from the timing point</param>
+    /// <param name="sampleIndex"></param>
+    /// <param name="volume"></param>
+    /// <param name="uninherited"></param>
+    /// <param name="kiai"></param>
+    /// <param name="omitFirstBarLine"></param>
+    public TimingPoint(double offset, double mpb, TempoSignature meter, SampleSet sampleSet, int sampleIndex, double volume, bool uninherited, bool kiai, bool omitFirstBarLine)
+    {
+        Offset = offset;
+        MpB = mpb;
+        Meter = meter;
+        SampleSet = sampleSet;
+        SampleIndex = sampleIndex;
+        Volume = volume;
+        Uninherited = uninherited;
+        Kiai = kiai;
+        OmitFirstBarLine = omitFirstBarLine;
+    }
+
+    /// <summary>
+    ///     Creates the legacy default redline used when no timing data is available.
+    /// </summary>
+    public TimingPoint()
+    {
+        MpB = 60000;
+        Offset = 0;
+        Meter = new TempoSignature(4, 4);
+        SampleSet = new SampleSet();
+        SampleIndex = 0;
+        Volume = 100;
+        Uninherited = false;
+        Kiai = false;
+        OmitFirstBarLine = false;
+    }
+
+    // Offset, Milliseconds per Beat, Meter, Sample Set, Sample Index, Volume, Inherited, Kiai Mode
+    /// <summary>
+    ///     The millisecond value of the timing point.
+    /// </summary>
+    public double Offset { get; set; }
+
+    /// <summary>
+    ///     Milliseconds per Beat
+    /// </summary>
+    public double MpB { get; set; }
+
+    /// <summary>
+    ///     Time signature to x/4
+    /// </summary>
+    public TempoSignature Meter { get; set; }
+
+    /// <summary>
+    ///     The sample set from the <see cref="TimingPoint" />
+    /// </summary>
+    public SampleSet SampleSet { get; set; }
+
+    /// <summary>
+    ///     The custom index number from the <see cref="TimingPoint" />
+    /// </summary>
+    public int SampleIndex { get; set; }
+
+    /// <summary>
+    ///     The volume based from 0 - 100 %
+    /// </summary>
+    public double Volume { get; set; }
+
+    /// <summary>
+    ///     An instance of the <see cref="TimingPoint" />
+    ///     that does not rely on the previous timing point
+    ///     and instead creates a new Bpm, offset, and/or time signature change to the timing section.
+    ///     <para />
+    ///     True for Uninherited control points. False, for Inherited control points.
+    /// </summary>
+    public bool Uninherited { get; set; }
+
+    /// <summary>
+    ///     A special section which represents a chorus or big moment within the song.
+    /// </summary>
+    public bool Kiai { get; set; }
+
+    /// <summary>
+    ///     A taiko implementation that removes the first instance of the bar,
+    ///     it is used when multiple and/or conflicting timing points are used throughout the map.
+    ///     <para />
+    ///     It can also be utilised for the Nightcore mod of standard by removing a finish sample at the timing point.
+    /// </summary>
+    public bool OmitFirstBarLine { get; set; }
+
+    /// <summary>
+    ///     Orders timing points by offset, placing uninherited redlines before greenlines at the same time.
+    /// </summary>
+    /// <param name="other">The timing point to compare, or null.</param>
+    /// <returns>A standard chronological sort value.</returns>
+    public int CompareTo(TimingPoint? other)
+    {
+        if (ReferenceEquals(this, other)) return 0;
+        if (ReferenceEquals(null, other)) return 1;
+        int offsetComparison = Offset.CompareTo(other.Offset);
+        if (offsetComparison != 0) return offsetComparison;
+        return -Uninherited.CompareTo(other.Uninherited);
+    }
+
+
+    /// <summary>
+    ///     Creates a new <see cref="TimingPoint" /> from the selected <see cref="TimingPoint" />.
+    /// </summary>
+    /// <returns>An exact replica of the <see cref="TimingPoint" /></returns>
+    public TimingPoint Copy()
+    {
+        return new TimingPoint(Offset, MpB, Meter, SampleSet, SampleIndex, Volume, Uninherited, Kiai, OmitFirstBarLine);
+    }
+
+    /// <summary>
+    ///     Can clarify if the current timing point should snap to the nearest beat of the previous timing point.
+    /// </summary>
+    /// <param name="timing">The timing context.</param>
+    /// <param name="beatDivisors">The beat divisors to use for snapping.</param>
+    /// <param name="floor">Whether to floor the result to the nearest beat divisor.</param>
+    /// <param name="tp">The timing point to consider.</param>
+    /// <param name="firstTp">The first timing point in the sequence.</param>
+    /// <returns><see langword="true" /> if the timing point was resnapped; otherwise, <see langword="false" />.</returns>
+    public bool ResnapSelf(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint? tp = null, TimingPoint? firstTp = null)
+    {
+        double newTime = timing.Resnap(Offset, beatDivisors, floor, tp, firstTp);
+        double deltaTime = newTime - Offset;
+        Offset += deltaTime;
+        return deltaTime != 0;
+    }
+
+    /// <summary>
+    ///     Compares every serialized timing effect, using numeric tolerance for offsets, beat length, and volume.
+    /// </summary>
+    /// <param name="tp">The timing point to compare.</param>
+    /// <returns><see langword="true" /> when all timing and sample fields match.</returns>
+    public bool Equals(TimingPoint tp)
+    {
+        return Precision.AlmostEquals(Offset, tp.Offset)
+               && Precision.AlmostEquals(MpB, tp.MpB)
+               && Meter == tp.Meter
+               && SampleSet == tp.SampleSet
+               && SampleIndex == tp.SampleIndex
+               && Precision.AlmostEquals(Volume, tp.Volume)
+               && Uninherited == tp.Uninherited
+               && Kiai == tp.Kiai
+               && OmitFirstBarLine == tp.OmitFirstBarLine;
+    }
+
+    /// <summary>
+    ///     Determines whether two points produce the same effective timing after redline/greenline normalization.
+    /// </summary>
+    /// <param name="tp">The point whose effect is compared.</param>
+    /// <returns><see langword="true" /> when their inherited timing and sample behavior is equivalent.</returns>
+    public bool SameEffect(TimingPoint tp)
+    {
+        if (tp.Uninherited && !Uninherited)
+            return Precision.AlmostEquals(MpB, -100)
+                   && Meter == tp.Meter
+                   && SampleSet == tp.SampleSet
+                   && SampleIndex == tp.SampleIndex
+                   && Precision.AlmostEquals(Volume, tp.Volume)
+                   && Kiai == tp.Kiai;
+        return Precision.AlmostEquals(MpB, tp.MpB)
+               && Meter == tp.Meter
+               && SampleSet == tp.SampleSet
+               && SampleIndex == tp.SampleIndex
+               && Precision.AlmostEquals(Volume, tp.Volume)
+               && Kiai == tp.Kiai;
+    }
+
+    /// <summary>
+    ///     Grabs the current Beats Per Minute from the <see cref="TimingPoint" />
+    /// </summary>
+    /// <returns></returns>
+    public double GetBpm()
+    {
+        if (Uninherited) return 60000 / MpB;
+
+        return -100 / MpB;
+    }
+
+    /// <summary>
+    ///     Converts BPM to milliseconds per beat for redlines or negative slider velocity for greenlines.
+    /// </summary>
+    /// <param name="bpm">The bpm.</param>
+    public void SetBpm(double bpm)
+    {
+        if (Uninherited)
+            MpB = 60000 / bpm;
+        else
+            MpB = -100 / bpm;
+    }
+}

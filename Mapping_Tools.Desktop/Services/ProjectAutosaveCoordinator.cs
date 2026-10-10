@@ -1,0 +1,335 @@
+using Mapping_Tools.Desktop.Localization;
+using Mapping_Tools.Application.Localization;
+using Mapping_Tools.Application.Execution.UserNotification;
+using Mapping_Tools.Application.Execution.UserNotification.Models;
+using Mapping_Tools.Application.Projects.Contracts;
+using Mapping_Tools.Desktop.Services.Undo;
+using Mapping_Tools.Desktop.Services.Dialogs;
+using Mapping_Tools.Desktop.Shell;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+
+namespace Mapping_Tools.Desktop.Services;
+
+/// <summary>
+///     Coordinates project menus and automatic recovery during application shutdown.
+/// </summary>
+public sealed class ProjectAutosaveCoordinator
+{
+    private readonly IDialogService dialogs;
+    private readonly ILogger<ProjectAutosaveCoordinator> logger;
+    private readonly Dictionary<IShellProjectFeature, Task> loadTasks = [];
+    private readonly IUserNotificationService notifications;
+    private readonly IProjectService projects;
+    private readonly IProjectSerializer? serializer;
+    private bool saveOnShutdown = true;
+
+    /// <summary>
+    ///     Creates the shared project lifecycle coordinator.
+    /// </summary>
+    /// <param name="projects">Loads, saves, and creates typed project data.</param>
+    /// <param name="dialogs">Confirms destructive New project operations.</param>
+    /// <param name="notifications">Publishes project lifecycle failures.</param>
+    /// <param name="logger">Records project actions and recovery outcomes.</param>
+    /// <param name="serializer">Freezes project states for the in-memory undo history.</param>
+    public ProjectAutosaveCoordinator(
+        IProjectService projects,
+        IDialogService dialogs,
+        IUserNotificationService notifications,
+        ILogger<ProjectAutosaveCoordinator>? logger = null,
+        IProjectSerializer? serializer = null)
+    {
+        this.projects = projects ?? throw new ArgumentNullException(nameof(projects));
+        this.dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
+        this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
+        this.logger = logger ?? NullLogger<ProjectAutosaveCoordinator>.Instance;
+        this.serializer = serializer;
+    }
+
+    /// <summary>
+    ///     Restores a feature's automatic recovery project and initializes its history once.
+    /// </summary>
+    /// <param name="feature">The feature whose state is being activated.</param>
+    /// <returns>The shared task that completes after recovery and history initialization.</returns>
+    public Task ActivateAsync(IShellProjectFeature feature)
+    {
+        ArgumentNullException.ThrowIfNull(feature);
+        if (loadTasks.TryGetValue(feature, out var loadTask)) return loadTask;
+
+        logger.LogInformation("Loading recovery project for {Feature}", feature.GetType().Name);
+        loadTask = LoadAutosaveAsync(feature);
+        loadTasks.Add(feature, loadTask);
+        return loadTask;
+    }
+
+    /// <summary>
+    ///     Saves a feature's current state to its automatic recovery file during
+    ///     application shutdown, after any pending restore has completed.
+    /// </summary>
+    /// <param name="feature">The feature whose state should be saved.</param>
+    /// <returns>A task that completes after the shutdown save attempt.</returns>
+    public Task SaveOnShutdown(IShellProjectFeature feature)
+    {
+        ArgumentNullException.ThrowIfNull(feature);
+        if (!saveOnShutdown) return Task.CompletedTask;
+
+        logger.LogInformation("Saving recovery project for {Feature} on shutdown", feature.GetType().Name);
+        return SaveAutosaveAfterLoadAsync(feature);
+    }
+
+    /// <summary>Prevents project recovery snapshots from being written during shutdown.</summary>
+    public void SuppressSave()
+    {
+        saveOnShutdown = false;
+        logger.LogInformation("Project autosave suppressed for this shutdown");
+    }
+
+    /// <summary>
+    ///     Saves the active feature through its project Save As workflow.
+    /// </summary>
+    /// <param name="feature">The feature whose state should be saved.</param>
+    /// <param name="cancellationToken">Cancels picker result processing or persistence.</param>
+    /// <returns>A task that completes after the save attempt.</returns>
+    public Task SaveAsync(
+        IShellProjectFeature feature,
+        CancellationToken cancellationToken = default)
+    {
+        return RunAsync(
+            () => SaveProjectAsync(feature, cancellationToken),
+            DesktopStrings.Shell_SaveProject, feature);
+    }
+
+    /// <summary>
+    ///     Opens and installs a project selected for the active feature.
+    /// </summary>
+    /// <param name="feature">The feature that owns the project state.</param>
+    /// <param name="cancellationToken">Cancels picker result processing or persistence.</param>
+    /// <returns>A task that completes after the open attempt.</returns>
+    public Task OpenAsync(
+        IShellProjectFeature feature,
+        CancellationToken cancellationToken = default)
+    {
+        return RunAsync(
+            () => OpenProjectAsync(feature, cancellationToken),
+            DesktopStrings.Shell_OpenProject, feature);
+    }
+
+    /// <summary>
+    ///     Confirms and installs a new default project for the active feature.
+    /// </summary>
+    /// <param name="feature">The feature that owns the project state.</param>
+    /// <param name="cancellationToken">Cancels confirmation or project initialization.</param>
+    /// <returns>A task that completes after the confirmation and initialization attempt.</returns>
+    public Task NewAsync(
+        IShellProjectFeature feature,
+        CancellationToken cancellationToken = default)
+    {
+        return RunAsync(
+            () => NewProjectAsync(feature, cancellationToken),
+            DesktopStrings.Shell_NewProject, feature);
+    }
+
+    private async Task LoadAutosaveAsync(IShellProjectFeature feature)
+    {
+        try
+        {
+            await feature.ExecuteProjectOperationAsync(
+                new LoadAutosaveOperation(projects),
+                CancellationToken.None);
+            logger.LogInformation("Recovery project loaded for {Feature}", feature.GetType().Name);
+        }
+        catch (FileNotFoundException)
+        {
+            logger.LogInformation("No recovery project exists for {Feature}", feature.GetType().Name);
+        }
+        catch (DirectoryNotFoundException)
+        {
+            logger.LogInformation("No recovery directory exists for {Feature}", feature.GetType().Name);
+        }
+        catch (Exception exception)
+        {
+            logger.LogError(exception, "Recovery project load failed for {Feature}", feature.GetType().Name);
+            await PublishFailureAsync(DesktopStrings.Shell_ProjectLoadFailed, exception);
+        }
+
+        if (serializer is not null)
+            await feature.ExecuteProjectOperationAsync(
+                new InitializeUndoOperation(serializer),
+                CancellationToken.None);
+    }
+
+    private async Task SaveAutosaveAfterLoadAsync(IShellProjectFeature feature)
+    {
+        await AwaitLoadAsync(feature);
+        try
+        {
+            await feature.ExecuteProjectOperationAsync(
+                new AutoSaveOperation(projects),
+                CancellationToken.None);
+            logger.LogInformation("Recovery project saved for {Feature}", feature.GetType().Name);
+        }
+        catch (Exception exception)
+        {
+            logger.LogError(exception, "Recovery project save failed for {Feature}", feature.GetType().Name);
+            await PublishFailureAsync(DesktopStrings.Shell_ProjectSaveFailed, exception);
+        }
+    }
+
+    private async Task SaveProjectAsync(
+        IShellProjectFeature feature,
+        CancellationToken cancellationToken)
+    {
+        await AwaitLoadAsync(feature);
+        await feature.ExecuteProjectOperationAsync(
+            new SaveAsOperation(projects),
+            cancellationToken);
+    }
+
+    private async Task OpenProjectAsync(
+        IShellProjectFeature feature,
+        CancellationToken cancellationToken)
+    {
+        await AwaitLoadAsync(feature);
+        await feature.ExecuteProjectOperationAsync(
+            new OpenOperation(projects),
+            cancellationToken);
+    }
+
+    private async Task NewProjectAsync(
+        IShellProjectFeature feature,
+        CancellationToken cancellationToken)
+    {
+        bool confirmed = await dialogs.ShowMessageAsync(
+            new MessageDialogRequest<bool>(
+                DesktopStrings.Shell_ConfirmNewProject,
+                DesktopStrings.Shell_ConfirmNewProjectMessage,
+                [
+                    new DialogChoice<bool>(DesktopStrings.Shell_Yes, true, true),
+                    new DialogChoice<bool>(DesktopStrings.Shell_No, false, IsCancel: true),
+                ],
+                false),
+            cancellationToken);
+        logger.LogInformation("New project confirmation for {Feature}: {Confirmed}", feature.GetType().Name, confirmed);
+        if (!confirmed) return;
+
+        await AwaitLoadAsync(feature);
+        await feature.ExecuteProjectOperationAsync(
+            new NewProjectOperation(projects),
+            cancellationToken);
+    }
+
+    private async Task AwaitLoadAsync(IShellProjectFeature feature)
+    {
+        if (loadTasks.TryGetValue(feature, out var loadTask)) await loadTask;
+    }
+
+    private async Task RunAsync(Func<Task> operation, string title, IShellProjectFeature feature)
+    {
+        logger.LogInformation("{Action} started for {Feature}", title, feature.GetType().Name);
+        try
+        {
+            await operation();
+            logger.LogInformation("{Action} completed for {Feature}", title, feature.GetType().Name);
+        }
+        catch (OperationCanceledException)
+        {
+            logger.LogInformation("{Action} cancelled for {Feature}", title, feature.GetType().Name);
+        }
+        catch (Exception exception)
+        {
+            logger.LogError(exception, "{Action} failed for {Feature}", title, feature.GetType().Name);
+            await PublishFailureAsync(title, exception);
+        }
+    }
+
+    private Task PublishFailureAsync(string title, Exception exception)
+    {
+        return notifications.PublishAsync(new UserNotification(
+            UserNotificationSeverity.Error,
+            title,
+            ApplicationExceptionText.GetSummary(exception),
+            exception));
+    }
+
+    private sealed class LoadAutosaveOperation(IProjectService projects) : IProjectFeatureOperation
+    {
+        public async Task ExecuteAsync<TProject>(
+            IShellProjectFeature<TProject> feature,
+            CancellationToken cancellationToken = default)
+        {
+            var project = await projects.LoadAutoSaveAsync(
+                feature.ProjectDefinition,
+                cancellationToken);
+            feature.Install(project);
+        }
+    }
+
+    private sealed class AutoSaveOperation(IProjectService projects) : IProjectFeatureOperation
+    {
+        public Task ExecuteAsync<TProject>(
+            IShellProjectFeature<TProject> feature,
+            CancellationToken cancellationToken = default)
+        {
+            return projects.AutoSaveAsync(
+                feature.ProjectDefinition,
+                feature.Snapshot(),
+                feature.AdditionalAutoSavePaths,
+                cancellationToken);
+        }
+    }
+
+    private sealed class SaveAsOperation(IProjectService projects) : IProjectFeatureOperation
+    {
+        public Task ExecuteAsync<TProject>(
+            IShellProjectFeature<TProject> feature,
+            CancellationToken cancellationToken = default)
+        {
+            return projects.SaveAsAsync(
+                feature.ProjectDefinition,
+                feature.Snapshot(),
+                feature.ProjectDefinition.SuggestedFileName,
+                cancellationToken);
+        }
+    }
+
+    private sealed class OpenOperation(IProjectService projects) : IProjectFeatureOperation
+    {
+        public async Task ExecuteAsync<TProject>(
+            IShellProjectFeature<TProject> feature,
+            CancellationToken cancellationToken = default)
+        {
+            var opened = await projects.OpenAsync(
+                feature.ProjectDefinition,
+                cancellationToken);
+            if (opened is not null)
+            {
+                using (feature.UndoHistory?.BeginEdit()) feature.Install(opened.Project);
+            }
+        }
+    }
+
+    private sealed class NewProjectOperation(IProjectService projects) : IProjectFeatureOperation
+    {
+        public Task ExecuteAsync<TProject>(
+            IShellProjectFeature<TProject> feature,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            using (feature.UndoHistory?.BeginEdit())
+                feature.Install(projects.CreateNew(feature.ProjectDefinition));
+            return Task.CompletedTask;
+        }
+    }
+
+    private sealed class InitializeUndoOperation(IProjectSerializer serializer) : IProjectFeatureOperation
+    {
+        public Task ExecuteAsync<TProject>(
+            IShellProjectFeature<TProject> feature,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            feature.UndoHistory = new ProjectUndoHistory<TProject>(feature, serializer);
+            return Task.CompletedTask;
+        }
+    }
+}

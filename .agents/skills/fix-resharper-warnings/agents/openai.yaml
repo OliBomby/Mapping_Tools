@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fix ReSharper Warnings"
+  short_description: "Check and fix solution warnings after edits"
+  default_prompt: "Use $fix-resharper-warnings to check this solution and fix warnings caused by my edits."

@@ -1,0 +1,267 @@
+using System.ComponentModel.DataAnnotations;
+using CommunityToolkit.Mvvm.ComponentModel;
+using Mapping_Tools.Application.Execution.ToolExecution;
+using Mapping_Tools.Application.Execution.ToolExecution.Models;
+using Mapping_Tools.Application.Projects.Models;
+using Mapping_Tools.Application.Tools.SliderCompletionator;
+using Mapping_Tools.Application.Workspace.Contracts;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.Tools.SliderCompletionator.Models;
+using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Services.Undo;
+using Mapping_Tools.Desktop.Localization;
+using Mapping_Tools.Desktop.Tools.SliderCompletionator.Models;
+using Mapping_Tools.Desktop.ViewModels;
+
+using Mapping_Tools.Application.Localization;
+
+namespace Mapping_Tools.Desktop.Tools.SliderCompletionator.ViewModels;
+
+/// <summary>
+///     Owns Slider Completionator form state, project persistence, ordinary runs,
+///     and the current-editor QuickRun path.
+/// </summary>
+public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewModel,
+    IQuickRun,
+    IShellProjectFeature<SliderCompletionatorProject>
+{
+    /// <inheritdoc />
+    public IProjectUndoHistory? UndoHistory { get; set; }
+
+    private readonly ISliderCompletionatorService completionator;
+
+    private readonly DesktopApplicationSettings settings;
+    private readonly IBeatmapWorkspace workspace;
+
+    /// <summary>
+    ///     Creates a Slider Completionator presentation model.
+    /// </summary>
+    /// <param name="completionator">Runs the framework-independent slider transformation.</param>
+    /// <param name="execution">Coordinates background execution and notifications.</param>
+    /// <param name="workspace">Supplies the shell's selected beatmap paths.</param>
+    /// <param name="settings">Supplies QuickRun preferences.</param>
+    public SliderCompletionatorViewModel(
+        ISliderCompletionatorService completionator,
+        IToolExecutionService execution,
+        IBeatmapWorkspace workspace,
+        DesktopApplicationSettings settings)
+        : base(execution, SliderCompletionatorToolDefinition.Definition)
+    {
+        this.completionator = completionator ?? throw new ArgumentNullException(nameof(completionator));
+        this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+    }
+
+    /// <summary>Gets the import modes in their legacy display order.</summary>
+    public IReadOnlyList<HitObjectSelectionMode> ImportModes { get; } =
+        Enum.GetValues<HitObjectSelectionMode>();
+
+    /// <summary>Gets the calculated-value choices in their legacy display order.</summary>
+    public IReadOnlyList<SliderCompletionatorFreeVariable> FreeVariables { get; } =
+        Enum.GetValues<SliderCompletionatorFreeVariable>();
+
+    /// <summary>Gets or sets the source-object import mode.</summary>
+    [ObservableProperty]
+    [Undoable]
+    [NotifyPropertyChangedFor(nameof(TimeCodeVisible))]
+    public partial HitObjectSelectionMode ImportModeSetting { get; set; } =
+        HitObjectSelectionMode.Selected;
+
+    /// <summary>Gets or sets the value calculated from the other slider inputs.</summary>
+    [ObservableProperty]
+    [Undoable]
+    [NotifyPropertyChangedFor(nameof(DurationVisible))]
+    [NotifyPropertyChangedFor(nameof(EndTimeVisible))]
+    [NotifyPropertyChangedFor(nameof(LengthVisible))]
+    [NotifyPropertyChangedFor(nameof(VelocityVisible))]
+    public partial SliderCompletionatorFreeVariable FreeVariableSetting { get; set; } =
+        SliderCompletionatorFreeVariable.Velocity;
+
+    /// <summary>Gets or sets the legacy time-code query.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial string TimeCode { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets the requested duration in beats, or <c>-1</c> to preserve it.</summary>
+    [ObservableProperty]
+    [Undoable]
+    [NotifyDataErrorInfo]
+    [Range(double.MinValue, double.MaxValue, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.SliderCompletionator_Validation_FiniteDuration))]
+    public partial double Duration { get; set; } = -1;
+
+    /// <summary>Gets or sets the requested end time in milliseconds, or <c>-1</c> to preserve it.</summary>
+    [ObservableProperty]
+    [Undoable]
+    [NotifyDataErrorInfo]
+    [Range(double.MinValue, double.MaxValue, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.SliderCompletionator_Validation_FiniteEndTime))]
+    public partial double EndTime { get; set; } = -1;
+
+    /// <summary>Gets or sets the requested complete-path fraction, or <c>-1</c> to preserve it.</summary>
+    [ObservableProperty]
+    [Undoable]
+    [NotifyDataErrorInfo]
+    [Range(double.MinValue, double.MaxValue, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.SliderCompletionator_Validation_FiniteLength))]
+    public partial double Length { get; set; } = 1;
+
+    /// <summary>Gets or sets the requested slider velocity multiplier, or <c>-1</c> to preserve it.</summary>
+    [ObservableProperty]
+    [Undoable]
+    [NotifyDataErrorInfo]
+    [Range(double.MinValue, double.MaxValue, ErrorMessageResourceType = typeof(DesktopStrings), ErrorMessageResourceName = nameof(DesktopStrings.SliderCompletionator_Validation_FiniteVelocity))]
+    public partial double SliderVelocity { get; set; } = -1;
+
+    /// <summary>Gets or sets whether anchors are moved to the new slider length.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool MoveAnchors { get; set; }
+
+    /// <summary>Gets or sets whether end time replaces duration input.</summary>
+    [ObservableProperty]
+    [Undoable]
+    [NotifyPropertyChangedFor(nameof(DurationVisible))]
+    [NotifyPropertyChangedFor(nameof(EndTimeVisible))]
+    public partial bool UseEndTime { get; set; }
+
+    /// <summary>Gets or sets whether the live editor playhead supplies the end time.</summary>
+    [ObservableProperty]
+    [Undoable]
+    [NotifyPropertyChangedFor(nameof(EndTimeVisible))]
+    public partial bool UseCurrentEditorTime { get; set; }
+
+    /// <summary>Gets or sets whether slider velocity is delegated to BPM timing points.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool DelegateToBpm { get; set; }
+
+    /// <summary>Gets or sets whether delegated sliders remove slider ticks.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool RemoveSliderTicks { get; set; }
+
+    /// <summary>Gets whether the time-code field is visible for the selected import mode.</summary>
+    public bool TimeCodeVisible => ImportModeSetting == HitObjectSelectionMode.Time;
+
+    /// <summary>Gets whether the duration field is visible for the selected free variable.</summary>
+    public bool DurationVisible =>
+        FreeVariableSetting != SliderCompletionatorFreeVariable.Duration && !UseEndTime;
+
+    /// <summary>Gets whether the explicit end-time field is visible.</summary>
+    public bool EndTimeVisible =>
+        FreeVariableSetting != SliderCompletionatorFreeVariable.Duration && UseEndTime && !UseCurrentEditorTime;
+
+    /// <summary>Gets whether the slider length field is visible.</summary>
+    public bool LengthVisible => FreeVariableSetting != SliderCompletionatorFreeVariable.Length;
+
+    /// <summary>Gets whether the slider velocity field is visible.</summary>
+    public bool VelocityVisible => FreeVariableSetting != SliderCompletionatorFreeVariable.Velocity;
+
+    /// <inheritdoc />
+    public async Task RunQuickAsync(CancellationToken cancellationToken)
+    {
+        string path = await workspace
+            .ResolveQuickRunBeatmapAsync(cancellationToken: cancellationToken);
+        await RunWithStateAsync(() => RunPathsAsync(
+            [path],
+            true,
+            cancellationToken));
+    }
+
+    ProjectDefinition<SliderCompletionatorProject> IShellProjectFeature<SliderCompletionatorProject>.ProjectDefinition { get; } = new(
+        "slidercompletionatorproject.json",
+        "Slider Completionator Projects",
+        static () => new SliderCompletionatorProject(),
+        "slider-completionator-project.json",
+        ToolConfigSchema.ForTool(SliderCompletionatorToolDefinition.Definition.Id));
+
+    SliderCompletionatorProject IShellProjectFeature<SliderCompletionatorProject>.Snapshot()
+    {
+        return Snapshot();
+    }
+
+    void IShellProjectFeature<SliderCompletionatorProject>.Install(SliderCompletionatorProject project)
+    {
+        Install(project);
+    }
+
+    /// <inheritdoc />
+    protected override async Task RunCoreAsync()
+    {
+        var paths = ImportModeSetting == HitObjectSelectionMode.Selected
+            ? [await workspace.ResolveQuickRunBeatmapAsync()]
+            : workspace.SelectedPaths;
+        await RunPathsAsync(
+            paths,
+            settings.AlwaysQuickRun,
+            CancellationToken.None);
+    }
+
+    private async Task RunPathsAsync(
+        IReadOnlyList<string> paths,
+        bool quick,
+        CancellationToken cancellationToken)
+    {
+        if (paths.Count == 0) return;
+
+        var options = Snapshot();
+        await Execution.ExecuteAsync(
+                new ToolExecutionRequest<SliderCompletionatorResult>(
+                    Tool.Id,
+                    Tool.DisplayName,
+                    async context =>
+                    {
+                        var result = await completionator.CompleteAsync(
+                            paths,
+                            options,
+                            quick,
+                            new Progress<double>(value => context.ReportProgress(
+                                value,
+                                DesktopStrings.SliderCompletionator_Progress)),
+                            context.CancellationToken);
+                        string message = result.SlidersCompleted == 1
+                            ? ApplicationText.Format(DesktopStrings.SliderCompletionator_ResultOne, result.SlidersCompleted)
+                            : ApplicationText.Format(DesktopStrings.SliderCompletionator_ResultMany, result.SlidersCompleted);
+                        return new ToolExecutionOutput<SliderCompletionatorResult>(
+                            result,
+                            message);
+                    }),
+                CreateProgress(),
+                cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    private SliderCompletionatorProject Snapshot()
+    {
+        return new SliderCompletionatorProject
+        {
+            ImportModeSetting = ImportModeSetting,
+            FreeVariableSetting = FreeVariableSetting,
+            TimeCode = TimeCode,
+            Duration = Duration,
+            EndTime = EndTime,
+            Length = Length,
+            SliderVelocity = SliderVelocity,
+            MoveAnchors = MoveAnchors,
+            UseEndTime = UseEndTime,
+            UseCurrentEditorTime = UseCurrentEditorTime,
+            DelegateToBpm = DelegateToBpm,
+            RemoveSliderTicks = RemoveSliderTicks,
+        };
+    }
+
+    private void Install(SliderCompletionatorProject project)
+    {
+        ImportModeSetting = project.ImportModeSetting;
+        FreeVariableSetting = project.FreeVariableSetting;
+        TimeCode = project.TimeCode;
+        Duration = project.Duration;
+        EndTime = project.EndTime;
+        Length = project.Length;
+        SliderVelocity = project.SliderVelocity;
+        MoveAnchors = project.MoveAnchors;
+        UseEndTime = project.UseEndTime;
+        UseCurrentEditorTime = project.UseCurrentEditorTime;
+        DelegateToBpm = project.DelegateToBpm;
+        RemoveSliderTicks = project.RemoveSliderTicks;
+    }
+}

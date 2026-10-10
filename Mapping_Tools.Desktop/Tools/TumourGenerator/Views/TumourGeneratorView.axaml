@@ -1,0 +1,394 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
+             xmlns:vm="using:Mapping_Tools.Desktop.Tools.TumourGenerator.ViewModels"
+             xmlns:adapter="using:Mapping_Tools.Desktop.Tools.TumourGenerator.ViewModels.Adapters"
+             xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:toolControls="using:Mapping_Tools.Desktop.Tools.TumourGenerator.Controls"
+             xmlns:converters="using:Mapping_Tools.Desktop.Converters"
+             xmlns:toolConverters="using:Mapping_Tools.Desktop.Tools.TumourGenerator.Converters"
+             xmlns:materialIcons="using:Material.Icons.Avalonia"
+             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             ClipToBounds="False"
+             x:Class="Mapping_Tools.Desktop.Tools.TumourGenerator.Views.TumourGeneratorView"
+             x:DataType="vm:TumourGeneratorViewModel"
+             x:CompileBindings="True">
+    <UserControl.Resources>
+        <converters:BooleanNotConverter x:Key="BooleanNotConverter" />
+        <converters:EnumEqualsConverter x:Key="EnumEqualsConverter" />
+        <toolConverters:TumourGeneratorTemplateIconConverter x:Key="TumourGeneratorTemplateIconConverter" />
+        <converters:CircleSizeToThicknessConverter x:Key="CircleSizeToThicknessConverter" />
+    </UserControl.Resources>
+    <Grid RowDefinitions="*,Auto">
+        <Grid Grid.Row="0" RowDefinitions="Auto,*,Auto">
+            <controls:ToolViewHeader Grid.Row="0"
+                    Title="{loc:Tr TumourGenerator_Title}"
+                                     IsQuickRunSupported="True"
+                    HelpText="{loc:Tr TumourGenerator_Help}" />
+
+            <Grid x:Name="TumourMainColumns" Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" MinWidth="100" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="240" MinWidth="100"/>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid x:Name="TumourLayersColumn" Grid.Column="0" RowDefinitions="*,Auto,Auto" Margin="0,0,10,0">
+                    <ListBox x:Name="TumourLayerList" Grid.Row="0" ItemsSource="{Binding TumourLayers}"
+                             VerticalAlignment="Top"
+                             SelectionMode="Single"
+                             SelectedItem="{Binding CurrentLayer, Mode=TwoWay}"
+                             SelectedIndex="{Binding CurrentLayerIndex, Mode=TwoWay}"
+                             ToolTip.Tip="{loc:Tr TumourGenerator_LayerTip}">
+                        <ListBox.ItemContainerTheme>
+                            <ControlTheme TargetType="ListBoxItem"
+                                          BasedOn="{StaticResource MaterialListBoxItem}">
+                                <Setter Property="DockPanel.Dock" Value="Bottom" />
+                            </ControlTheme>
+                        </ListBox.ItemContainerTheme>
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <DockPanel LastChildFill="False" />
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="adapter:ObservableTumourLayer">
+                                <Grid ColumnDefinitions="Auto,Auto,*" HorizontalAlignment="Stretch">
+                                    <ToggleSwitch IsChecked="{Binding IsActive, Mode=TwoWay}"
+                                                  Margin="2,0"
+                                                  VerticalAlignment="Center" />
+                                    <materialIcons:MaterialIcon Grid.Column="1"
+                                                                Kind="{Binding TumourTemplateEnum, Converter={StaticResource TumourGeneratorTemplateIconConverter}}"
+                                                                Width="24" Height="24" Margin="5,0"
+                                                                VerticalAlignment="Center" />
+                                    <TextBox Grid.Column="2"
+                                             Classes="compact"
+                                             Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                             TextWrapping="NoWrap"
+                                             MinWidth="50"
+                                             Margin="5,0"
+                                             PointerPressed="LayerNamePointerPressed"
+                                             ToolTip.Tip="{loc:Tr TumourGenerator_NameTip}" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <CommandBar x:Name="LayerCommandBar" Grid.Row="1"
+                                IsDynamicOverflowEnabled="True"
+                                DefaultLabelPosition="Collapsed">
+                        <CommandBar.PrimaryCommands>
+                            <CommandBarButton x:Name="AddLayerButton" Label="{loc:Tr TumourGenerator_AddLayer}"
+                                              Command="{Binding AddCommand}"
+                                              ToolTip.Tip="{loc:Tr TumourGenerator_AddLayerTip}">
+                                <CommandBarButton.Icon>
+                                    <materialIcons:MaterialIcon Kind="Plus" Width="22" Height="22" />
+                                </CommandBarButton.Icon>
+                            </CommandBarButton>
+                            <CommandBarButton x:Name="RemoveLayerButton" Label="{loc:Tr TumourGenerator_RemoveLayer}"
+                                              Command="{Binding RemoveCommand}"
+                                              ToolTip.Tip="{loc:Tr TumourGenerator_RemoveLayerTip}">
+                                <CommandBarButton.Icon>
+                                    <materialIcons:MaterialIcon Kind="TrashCan" Width="22" Height="22" />
+                                </CommandBarButton.Icon>
+                            </CommandBarButton>
+                            <CommandBarButton x:Name="CopyLayerButton" Label="{loc:Tr TumourGenerator_CopyLayer}"
+                                              Command="{Binding CopyCommand}"
+                                              ToolTip.Tip="{loc:Tr TumourGenerator_CopyLayerTip}">
+                                <CommandBarButton.Icon>
+                                    <materialIcons:MaterialIcon Kind="ContentCopy" Width="22" Height="22" />
+                                </CommandBarButton.Icon>
+                            </CommandBarButton>
+                            <CommandBarButton x:Name="RaiseLayerButton" Label="{loc:Tr TumourGenerator_MoveLayerUp}"
+                                              Command="{Binding RaiseCommand}"
+                                              ToolTip.Tip="{loc:Tr TumourGenerator_MoveLayerUpTip}">
+                                <CommandBarButton.Icon>
+                                    <materialIcons:MaterialIcon Kind="KeyboardArrowUp" Width="22" Height="22" />
+                                </CommandBarButton.Icon>
+                            </CommandBarButton>
+                            <CommandBarButton x:Name="LowerLayerButton" Label="{loc:Tr TumourGenerator_MoveLayerDown}"
+                                              Command="{Binding LowerCommand}"
+                                              ToolTip.Tip="{loc:Tr TumourGenerator_MoveLayerDownTip}">
+                                <CommandBarButton.Icon>
+                                    <materialIcons:MaterialIcon Kind="KeyboardArrowDown" Width="22" Height="22" />
+                                </CommandBarButton.Icon>
+                            </CommandBarButton>
+                        </CommandBar.PrimaryCommands>
+                    </CommandBar>
+
+                    <StackPanel Grid.Row="2" Margin="0,0,0,10">
+                        <Slider Minimum="0" Maximum="1" TickFrequency="0.1" Margin="5,15"
+                                Value="{Binding Scale, Mode=TwoWay}" ToolTip.Tip="{loc:Tr TumourGenerator_ScaleTip}" />
+                        <Slider Minimum="0" Maximum="10" TickFrequency="1" SmallChange="0.1"
+                                LargeChange="1" Margin="5,15"
+                                Classes="Discrete"
+                                TickPlacement="BottomRight"
+                                IsSnapToTickEnabled="True"
+                                Value="{Binding CircleSize, Mode=TwoWay}" ToolTip.Tip="{loc:Tr TumourGenerator_CircleSizeTip}" />
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,15">
+                            <ToggleSwitch x:Name="AdvancedOptionsToggle"
+                                          IsChecked="{Binding AdvancedOptions}"
+                                          Classes="accent"
+                                          ToolTip.Tip="{loc:Tr TumourGenerator_AdvancedTip}" />
+                            <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Text="{loc:Tr TumourGenerator_Advanced}" />
+                        </StackPanel>
+                        <CheckBox Content="{loc:Tr TumourGenerator_DebugConstruction}" IsChecked="{Binding DebugConstruction}"
+                                  ToolTip.Tip="{loc:Tr TumourGenerator_DebugConstructionTip}" />
+                        <CheckBox Content="{loc:Tr TumourGenerator_MiddleAnchors}" IsChecked="{Binding JustMiddleAnchors}"
+                                  ToolTip.Tip="{loc:Tr TumourGenerator_MiddleAnchorsTip}" />
+                        <CheckBox Content="{loc:Tr TumourGenerator_FixSv}" IsChecked="{Binding FixSv}"
+                                  ToolTip.Tip="{loc:Tr TumourGenerator_FixSvTip}" />
+                        <CheckBox Content="{loc:Tr TumourGenerator_DelegateSv}" IsChecked="{Binding DelegateToBpm}"
+                                  IsEnabled="{Binding FixSv}"
+                                  ToolTip.Tip="{loc:Tr TumourGenerator_DelegateSvTip}" />
+                        <CheckBox Content="{loc:Tr TumourGenerator_RemoveTicks}" IsChecked="{Binding RemoveSliderTicks}"
+                                  IsEnabled="{Binding RemoveSliderTicksEnabled}"
+                                  ToolTip.Tip="{loc:Tr TumourGenerator_RemoveTicksTip}" />
+                    </StackPanel>
+                </Grid>
+
+                <GridSplitter Grid.Column="1"
+                              VerticalAlignment="Stretch"
+                              ResizeBehavior="PreviousAndNext"
+                              Width="2"
+                              Background="{DynamicResource MaterialDividerBrush}"
+                              Margin="0,10" />
+
+                <ScrollViewer Grid.Column="2"
+                              HorizontalScrollBarVisibility="Disabled"
+                              VerticalScrollBarVisibility="Hidden"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch">
+                    <StackPanel Margin="10,0">
+                        <TextBlock FontWeight="Bold" Text="{loc:Tr TumourGenerator_Template}" Margin="0,10,0,0" />
+                        <ComboBox ItemsSource="{Binding TumourTemplates}"
+                                  SelectedItem="{Binding CurrentLayer.TumourTemplateEnum, Mode=TwoWay}"
+                                  Classes="compact"
+                                  ToolTip.Tip="{loc:Tr TumourGenerator_TemplateTip}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <TextBlock Margin="0,10,0,0" FontWeight="Bold" Text="{loc:Tr TumourGenerator_Scale}" />
+                        <toolControls:ValueOrGraphControl x:Name="TumourScaleGraphControl"
+                                                          GraphState="{Binding CurrentLayer.TumourScale, Mode=TwoWay}"
+                                                          IsVisible="{Binding AdvancedOptions}"
+                                                          ToolTip.Tip="{loc:Tr TumourGenerator_ScaleDetailTip}" />
+                        <Slider x:Name="TumourScaleValueSlider" Minimum="0" Maximum="500"
+                                Classes="Discrete"
+                                IsSnapToTickEnabled="True"
+                                TickFrequency="1"
+                                Value="{Binding CurrentLayer.TumourScaleValue, Mode=TwoWay}"
+                                ToolTip.Tip="{loc:Tr TumourGenerator_ScaleDetailTip}" />
+                        <TextBlock Margin="0,10,0,0" FontWeight="Bold" Text="{loc:Tr TumourGenerator_Length}" />
+                        <toolControls:ValueOrGraphControl x:Name="TumourLengthGraphControl"
+                                                          GraphState="{Binding CurrentLayer.TumourLength, Mode=TwoWay}"
+                                                          IsVisible="{Binding AdvancedOptions}"
+                                                          ToolTip.Tip="{loc:Tr TumourGenerator_LengthTip}" />
+                        <Slider x:Name="TumourLengthValueSlider" Minimum="0" Maximum="500"
+                                Classes="Discrete"
+                                IsSnapToTickEnabled="True"
+                                TickFrequency="1"
+                                Value="{Binding CurrentLayer.TumourLengthValue, Mode=TwoWay}"
+                                ToolTip.Tip="{loc:Tr TumourGenerator_LengthTip}" />
+                        <TextBlock Margin="0,10,0,0" FontWeight="Bold" Text="{loc:Tr TumourGenerator_Angle}" />
+                        <toolControls:ValueOrGraphControl x:Name="TumourRotationGraphControl"
+                            GraphState="{Binding CurrentLayer.TumourRotation, Mode=TwoWay}"
+                            IsVisible="{Binding AdvancedOptions}"
+                            ToolTip.Tip="{loc:Tr TumourGenerator_AngleTip}" />
+                        <Slider x:Name="TumourRotationValueSlider" Minimum="0" Maximum="360"
+                                Classes="Discrete"
+                                IsSnapToTickEnabled="True"
+                                TickFrequency="1"
+                                Value="{Binding CurrentLayer.TumourRotationValue, Mode=TwoWay}"
+                                ToolTip.Tip="{loc:Tr TumourGenerator_AngleTip}" />
+                        <TextBlock Margin="0,10,0,0" FontWeight="Bold" Text="{loc:Tr TumourGenerator_Parameter}"
+                                   IsVisible="{Binding CurrentLayer.TumourTemplate.NeedsParameter}" />
+                        <toolControls:ValueOrGraphControl
+                            GraphState="{Binding CurrentLayer.TumourParameter, Mode=TwoWay}"
+                            IsVisible="{Binding TumourParameterGraphVisible}"
+                            ToolTip.Tip="{loc:Tr TumourGenerator_ParameterTip}" />
+                        <Slider Minimum="0" Maximum="500"
+                                Classes="Discrete"
+                                IsSnapToTickEnabled="True"
+                                TickFrequency="1"
+                                Value="{Binding CurrentLayer.TumourParameterValue, Mode=TwoWay}"
+                                IsVisible="{Binding CurrentLayer.TumourTemplate.NeedsParameter}"
+                                ToolTip.Tip="{loc:Tr TumourGenerator_ParameterTip}" />
+                        <TextBlock Margin="0,10,0,0" FontWeight="Bold" Text="{loc:Tr TumourGenerator_Wrapping}" />
+                        <ComboBox ItemsSource="{Binding WrappingModes}"
+                                  Classes="compact"
+                                  SelectedItem="{Binding CurrentLayer.WrappingMode, Mode=TwoWay}"
+                                  ToolTip.Tip="{loc:Tr TumourGenerator_WrappingTip}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <TextBlock Margin="0,10,0,0" FontWeight="Bold" Text="{loc:Tr TumourGenerator_Sidedness}" />
+                        <ComboBox ItemsSource="{Binding TumourSides}"
+                                  Classes="compact"
+                                  SelectedItem="{Binding CurrentLayer.TumourSidedness, Mode=TwoWay}"
+                                  ToolTip.Tip="{loc:Tr TumourGenerator_SidednessTip}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <Grid ColumnDefinitions="*,Auto"
+                              Margin="0 1 0 0"
+                              IsVisible="{Binding CurrentLayer.TumourSidedness, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Random}">
+                            <TextBox
+                                Text="{Binding CurrentLayer.RandomSeed, Mode=TwoWay, Converter={StaticResource InvariantInt32Converter}, UpdateSourceTrigger=LostFocus}"
+                                materialAssists:TextFieldAssist.Label="{loc:Tr TumourGenerator_RandomSeed}"
+                                ToolTip.Tip="{loc:Tr TumourGenerator_SeedTip}" />
+                            <Button Grid.Column="1" Command="{Binding RandomizeCommand}" Margin="5,0,0,0"
+                                    VerticalAlignment="Bottom"
+                                    Classes="dark"
+                                    ToolTip.Tip="{loc:Tr TumourGenerator_RandomizeSeedTip}">
+                                <materialIcons:MaterialIcon Kind="DiceMultiple" Width="22" Height="22" />
+                            </Button>
+                        </Grid>
+                        <TextBlock Margin="0,10,0,0" FontWeight="Bold" Text="{loc:Tr TumourGenerator_Distance}" />
+                        <toolControls:ValueOrGraphControl
+                            GraphState="{Binding CurrentLayer.TumourDistance, Mode=TwoWay}"
+                            IsVisible="{Binding AdvancedOptions}"
+                            ToolTip.Tip="{loc:Tr TumourGenerator_DistanceTip}" />
+                        <Slider Minimum="5" Maximum="500"
+                                Classes="Discrete"
+                                IsSnapToTickEnabled="True"
+                                TickFrequency="1"
+                                Value="{Binding CurrentLayer.TumourDistanceValue, Mode=TwoWay}"
+                                IsVisible="{Binding AdvancedOptions, Converter={StaticResource BooleanNotConverter}}"
+                                ToolTip.Tip="{loc:Tr TumourGenerator_DistanceTip}" />
+                        <TextBlock Margin="0,10,0,0" FontWeight="Bold" Text="{loc:Tr TumourGenerator_Count}" />
+                        <TextBox
+                            Text="{Binding CurrentLayer.TumourCount, Mode=TwoWay, Converter={StaticResource InvariantInt32Converter}, UpdateSourceTrigger=LostFocus}"
+                            Classes="compact"
+                            IsVisible="{Binding AdvancedOptions}"
+                            ToolTip.Tip="{loc:Tr TumourGenerator_CountTip}" />
+                        <Slider Minimum="0" Maximum="20" Value="{Binding CurrentLayer.TumourCount, Mode=TwoWay}"
+                                Classes="Discrete"
+                                IsSnapToTickEnabled="True"
+                                TickFrequency="1"
+                                ToolTip.Tip="{loc:Tr TumourGenerator_CountTip}" />
+                        <TextBlock Margin="0,10,0,0" FontWeight="Bold" Text="{loc:Tr TumourGenerator_Start}" />
+                        <TextBox
+                            Text="{Binding CurrentLayer.TumourStart, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
+                            IsVisible="{Binding AdvancedOptions}"
+                            Classes="compact"
+                            ToolTip.Tip="{loc:Tr TumourGenerator_StartTip}" />
+                        <Slider x:Name="TumourStartSlider"
+                                Minimum="{Binding TumourStartSliderMin}"
+                                Maximum="{Binding TumourRangeSliderMax}"
+                                SmallChange="{Binding TumourRangeSliderSmallChange}"
+                                Value="{Binding CurrentLayer.TumourStart, Mode=TwoWay}"
+                                ToolTip.Tip="{loc:Tr TumourGenerator_StartTip}" />
+                        <TextBlock Margin="0,10,0,0" FontWeight="Bold" Text="{loc:Tr TumourGenerator_End}" />
+                        <TextBox
+                            Text="{Binding CurrentLayer.TumourEnd, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}, UpdateSourceTrigger=LostFocus}"
+                            IsVisible="{Binding AdvancedOptions}"
+                            Classes="compact"
+                            ToolTip.Tip="{loc:Tr TumourGenerator_EndTip}" />
+                        <Slider x:Name="TumourEndSlider"
+                                Minimum="0"
+                                Maximum="{Binding TumourRangeSliderMax}"
+                                SmallChange="{Binding TumourRangeSliderSmallChange}"
+                                Value="{Binding CurrentLayer.TumourEnd, Mode=TwoWay}"
+                                ToolTip.Tip="{loc:Tr TumourGenerator_EndTip}" />
+                        <CheckBox Content="{loc:Tr TumourGenerator_AbsoluteRange}" Margin="0,10,0,0"
+                                  IsChecked="{Binding CurrentLayer.UseAbsoluteRange, Mode=TwoWay}"
+                                  ToolTip.Tip="{loc:Tr TumourGenerator_AbsoluteRangeTip}" />
+                        <CheckBox Content="{loc:Tr TumourGenerator_Recalculate}" Margin="0,5,0,0"
+                                  IsChecked="{Binding CurrentLayer.Recalculate, Mode=TwoWay}"
+                                  ToolTip.Tip="{loc:Tr TumourGenerator_RecalculateTip}" />
+                    </StackPanel>
+                </ScrollViewer>
+
+                <GridSplitter Grid.Column="3"
+                              VerticalAlignment="Stretch"
+                              ResizeBehavior="PreviousAndNext"
+                              Width="2"
+                              Background="{DynamicResource MaterialDividerBrush}"
+                              Margin="0,10" />
+
+                <materialDesign:Card Grid.Column="4"
+                                     Padding="10"
+                                     Margin="10,0,0,0"
+                                     ToolTip.Tip="{loc:Tr TumourGenerator_ResultPreview}">
+                    <controls:ObjectVisualiserControl HitObject="{Binding TumouredPreviewHitObject}"
+                                                      ShowAnchors="True"
+                                                      Thickness="{Binding CircleSize, Converter={StaticResource CircleSizeToThicknessConverter}}"
+                                                      AnchorSize="6"
+                                                      BorderThickness="0.1"
+                                                      Fill="DarkSlateGray"
+                                                      Stroke="YellowGreen"
+                                                      SliderBallStroke="White" />
+                </materialDesign:Card>
+                <ProgressBar Grid.Column="4"
+                             Height="4"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Top"
+                             Margin="10,0,0,0"
+                             Maximum="1"
+                             Value="1"
+                             IsIndeterminate="{Binding IsProcessingPreview}"
+                             IsVisible="{Binding IsProcessingPreview}" />
+            </Grid>
+
+            <Grid Grid.Row="2" ColumnDefinitions="*,Auto">
+                <Grid Grid.Column="0" Margin="0,10,10,0" ColumnDefinitions="*,Auto,Auto">
+                    <ComboBox Grid.Column="0"
+                              ItemsSource="{Binding ImportModes}"
+                              SelectedItem="{Binding ImportModeSetting, Mode=TwoWay}"
+                              Margin="0,0,5,0"
+                              VerticalAlignment="Top"
+                              materialAssists:ComboBoxAssist.Label="{loc:Tr TumourGenerator_ImportMode}"
+                              ToolTip.Tip="{loc:Tr TumourGenerator_SliderSelectionTip}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{loc:TranslatedBinding Converter={x:Static loc:ToolChoiceConverter.Instance}}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <TextBox Grid.Column="1"
+                             Width="100"
+                             Margin="5,0,5,2"
+                             VerticalAlignment="Top"
+                             IsVisible="{Binding TimeCodeVisible}"
+                             Text="{Binding TimeCode, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             materialAssists:TextFieldAssist.Label="{loc:Tr TumourGenerator_TimeCode}"
+                             ToolTip.Tip="{loc:Tr TumourGenerator_TimeCodeTip}" />
+                    <Button Grid.Column="2"
+                            Theme="{StaticResource MaterialOutlineButton}"
+                            Classes="primary"
+                            Margin="5,10,0,0"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            Command="{Binding ImportCommand}"
+                            ToolTip.Tip="{loc:Tr TumourGenerator_ImportSlidersTip}">
+                        Preview slider
+                    </Button>
+                </Grid>
+
+                <controls:ToolRunButton Grid.Column="1"
+                                        Margin="10"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Bottom"
+                                        RunCommand="{Binding RunCommand}" />
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+            <TextBlock VerticalAlignment="Bottom" FontWeight="Bold" Opacity="0.58" Text="{loc:Tr TumourGenerator_MadeBy}" />
+            <controls:ToolProgressBar Grid.Column="1" Height="20" Margin="20,0" Maximum="100"
+                                      Value="{Binding Progress}" />
+        </Grid>
+    </Grid>
+</UserControl>

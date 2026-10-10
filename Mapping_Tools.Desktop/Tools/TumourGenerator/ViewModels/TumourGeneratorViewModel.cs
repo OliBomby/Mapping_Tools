@@ -1,0 +1,750 @@
+using Mapping_Tools.Application.Localization;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Mapping_Tools.Application.Execution.ToolExecution;
+using Mapping_Tools.Application.Execution.ToolExecution.Models;
+using Mapping_Tools.Application.Projects.Models;
+using Mapping_Tools.Application.Tools.TumourGenerator;
+using Mapping_Tools.Application.Tools.TumourGenerator.Models;
+using Mapping_Tools.Application.Workspace.Contracts;
+using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.ToolHelpers.Sliders.Newgen;
+using Mapping_Tools.Core.Tools.TumourGenerator;
+using Mapping_Tools.Core.Tools.TumourGenerator.Models;
+using Mapping_Tools.Core.Tools.TumourGenerator.Templates;
+using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Localization;
+using Mapping_Tools.Desktop.Services.Dialogs;
+using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Services.Undo;
+using Mapping_Tools.Desktop.Tools.TumourGenerator.Models;
+using Mapping_Tools.Desktop.Tools.TumourGenerator.ViewModels.Adapters;
+using Mapping_Tools.Desktop.ViewModels;
+
+namespace Mapping_Tools.Desktop.Tools.TumourGenerator.ViewModels;
+
+/// <summary>
+///     Owns Tumour Generator 2 settings, graph-backed layers, preview state,
+///     project persistence, and ordinary or QuickRun execution.
+/// </summary>
+[SuppressMessage("ReSharper", "UnusedParameterInPartialMethod")]
+public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
+    IShellProjectFeature<TumourGeneratorProject>,
+    IQuickRun,
+    IShellFeatureActivation,
+    IDisposable
+{
+    /// <inheritdoc />
+    public IProjectUndoHistory? UndoHistory { get; set; }
+
+    private readonly IDialogService dialogs;
+
+    private readonly ITumourGeneratorService generator;
+    private readonly Lock previewGate = new();
+    private readonly DesktopApplicationSettings settings;
+    private readonly IBeatmapWorkspace workspace;
+    private bool disposed;
+    private bool isActive;
+    private CancellationTokenSource? previewCancellation;
+
+    /// <summary>
+    ///     Creates the Tumour Generator 2 presentation model.
+    /// </summary>
+    /// <param name="generator">Imports maps and runs ordinary Core generation through Application ports.</param>
+    /// <param name="execution">Coordinates cancellation, progress, and reload.</param>
+    /// <param name="workspace">Supplies ordinary-run map selection.</param>
+    /// <param name="settings">Supplies the AlwaysQuickRun preference.</param>
+    /// <param name="dialogs">Presents empty-selection and error messages.</param>
+    public TumourGeneratorViewModel(
+        ITumourGeneratorService generator,
+        IToolExecutionService execution,
+        IBeatmapWorkspace workspace,
+        DesktopApplicationSettings settings,
+        IDialogService dialogs)
+        : base(execution, TumourGeneratorToolDefinition.Definition)
+    {
+        this.generator = generator ?? throw new ArgumentNullException(nameof(generator));
+        this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
+
+        TumourLayers.CollectionChanged += OnLayersChanged;
+        TumourLayers.Add(new ObservableTumourLayer(TumourLayer.GetDefaultLayer()));
+        QueuePreview();
+    }
+
+    /// <summary>Gets the object-selection modes in the legacy display order.</summary>
+    public IReadOnlyList<HitObjectSelectionMode> ImportModes { get; } =
+        Enum.GetValues<HitObjectSelectionMode>();
+
+    /// <summary>Gets the geometric templates in the legacy display order.</summary>
+    public IReadOnlyList<TumourTemplate> TumourTemplates { get; } =
+        Enum.GetValues<TumourTemplate>();
+
+    /// <summary>Gets the path-wrapping modes in the legacy display order.</summary>
+    public IReadOnlyList<WrappingMode> WrappingModes { get; } =
+        Enum.GetValues<WrappingMode>();
+
+    /// <summary>Gets the sidedness modes in the legacy display order.</summary>
+    public IReadOnlyList<TumourSidedness> TumourSides { get; } =
+        Enum.GetValues<TumourSidedness>();
+
+    /// <summary>Gets the editable layers in generation order.</summary>
+    [Undoable]
+    public ObservableCollection<ObservableTumourLayer> TumourLayers { get; } = [];
+
+    /// <summary>Gets or sets the source used when importing or running.</summary>
+    [ObservableProperty]
+    [Undoable]
+    [NotifyPropertyChangedFor(nameof(TimeCodeVisible))]
+    public partial HitObjectSelectionMode ImportModeSetting { get; set; } = HitObjectSelectionMode.Selected;
+
+    /// <summary>Gets or sets the time query used by time-based selection.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial string TimeCode { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets whether only middle anchors are retained.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool JustMiddleAnchors { get; set; }
+
+    /// <summary>Gets or sets the global tumour size scalar.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial double Scale { get; set; } = 1;
+
+    /// <summary>Gets or sets the Circle Size used by the preview visualizer.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial double CircleSize { get; set; } = 4;
+
+    /// <summary>Gets or sets whether slider velocity is corrected after generation.</summary>
+    [ObservableProperty]
+    [Undoable]
+    [NotifyPropertyChangedFor(nameof(RemoveSliderTicksEnabled))]
+    public partial bool FixSv { get; set; } = true;
+
+    /// <summary>Gets or sets whether corrected velocity is delegated to BPM redlines.</summary>
+    [ObservableProperty]
+    [Undoable]
+    [NotifyPropertyChangedFor(nameof(RemoveSliderTicksEnabled))]
+    public partial bool DelegateToBpm { get; set; }
+
+    /// <summary>Gets or sets whether delegated velocity removes slider ticks.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool RemoveSliderTicks { get; set; }
+
+    /// <summary>Gets whether delegated slider-tick removal is currently applicable.</summary>
+    public bool RemoveSliderTicksEnabled => FixSv && DelegateToBpm;
+
+    /// <summary>Gets or sets whether advanced layer controls are visible.</summary>
+    [ObservableProperty]
+    [Undoable]
+    [NotifyPropertyChangedFor(nameof(TumourStartSliderMin))]
+    [NotifyPropertyChangedFor(nameof(TumourRangeSliderMax))]
+    [NotifyPropertyChangedFor(nameof(TumourParameterGraphVisible))]
+    public partial bool AdvancedOptions { get; set; }
+
+    /// <summary>Gets or sets whether reconstruction diagnostics are enabled.</summary>
+    [ObservableProperty]
+    [Undoable]
+    public partial bool DebugConstruction { get; set; }
+
+    /// <summary>Gets whether the time-code field applies to the current import mode.</summary>
+    public bool TimeCodeVisible => ImportModeSetting == HitObjectSelectionMode.Time;
+
+    /// <summary>Gets whether the parameter graph is shown for the current template.</summary>
+    public bool TumourParameterGraphVisible => AdvancedOptions && CurrentLayer?.TumourTemplate.NeedsParameter == true;
+
+    /// <summary>Gets or sets the slider displayed in the preview.</summary>
+    public HitObject PreviewHitObject
+    {
+        get;
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            if (ReferenceEquals(field, value)) return;
+
+            SetProperty(ref field, value);
+            QueuePreview();
+        }
+    } = TumourGeneratorProject.CreatePreviewHitObject();
+
+    /// <summary>Gets the most recently generated preview slider.</summary>
+    public HitObject? TumouredPreviewHitObject
+    {
+        get;
+        private set
+        {
+            if (SetProperty(ref field, value)) IsProcessingPreview = false;
+        }
+    }
+
+    /// <summary>Gets whether the latest preview request is still running.</summary>
+    [ObservableProperty]
+    public partial bool IsProcessingPreview { get; private set; }
+
+    /// <summary>Gets or sets the selected layer index.</summary>
+    public int CurrentLayerIndex
+    {
+        get;
+        set
+        {
+            int normalized = Math.Clamp(value, 0, Math.Max(0, TumourLayers.Count - 1));
+            if (!SetProperty(ref field, normalized)) return;
+
+            OnPropertyChanged(nameof(CurrentLayer));
+            OnPropertyChanged(nameof(TumourParameterGraphVisible));
+            OnPropertyChanged(nameof(TumourStartSliderMin));
+            OnPropertyChanged(nameof(TumourRangeSliderMax));
+            OnPropertyChanged(nameof(TumourRangeSliderSmallChange));
+            QueuePreview();
+        }
+    }
+
+    /// <summary>Gets or sets the layer selected by the details panel.</summary>
+    public ObservableTumourLayer? CurrentLayer
+    {
+        get => CurrentLayerIndex >= 0 && CurrentLayerIndex < TumourLayers.Count
+            ? TumourLayers[CurrentLayerIndex]
+            : null;
+        set
+        {
+            if (value is null) return;
+
+            int index = TumourLayers.IndexOf(value);
+            if (index >= 0) CurrentLayerIndex = index;
+        }
+    }
+
+    /// <summary>Gets the generated maximum range for each layer.</summary>
+    public IReadOnlyList<double> LayerRangeSliderMaxes { get; private set; } = [];
+
+    /// <summary>Gets the current layer's minimum range slider value.</summary>
+    public double TumourStartSliderMin => AdvancedOptions && CurrentLayerIndex >= 0 && CurrentLayerIndex < LayerRangeSliderMaxes.Count && CurrentLayer?.UseAbsoluteRange == true
+        ? -LayerRangeSliderMaxes[CurrentLayerIndex]
+        : AdvancedOptions
+            ? -1
+            : 0;
+
+    /// <summary>Gets the current layer's maximum range slider value.</summary>
+    public double TumourRangeSliderMax
+    {
+        get
+        {
+            if (CurrentLayer is not { UseAbsoluteRange: true } layer) return 1;
+
+            double configuredMaximum = Math.Max(1, layer.TumourEnd);
+            return CurrentLayerIndex >= 0 && CurrentLayerIndex < LayerRangeSliderMaxes.Count
+                ? Math.Max(LayerRangeSliderMaxes[CurrentLayerIndex], configuredMaximum)
+                : configuredMaximum;
+        }
+    }
+
+    /// <summary>Gets the range slider step matching relative or absolute units.</summary>
+    public double TumourRangeSliderSmallChange => CurrentLayer?.UseAbsoluteRange == true ? 1 : 0.0001;
+
+    /// <summary>
+    ///     Stops pending preview work and detaches layer event handlers owned by this view model.
+    /// </summary>
+    public void Dispose()
+    {
+        lock (previewGate)
+        {
+            if (disposed) return;
+
+            disposed = true;
+            isActive = false;
+            previewCancellation?.Cancel();
+            previewCancellation?.Dispose();
+            previewCancellation = null;
+        }
+
+        TumourLayers.CollectionChanged -= OnLayersChanged;
+        foreach (var layer in TumourLayers) layer.PropertyChanged -= OnLayerChanged;
+    }
+
+    /// <summary>Runs the current editor map, falling back to the shell selection.</summary>
+    /// <param name="cancellationToken">Cancels lookup, generation, or saving.</param>
+    public async Task RunQuickAsync(CancellationToken cancellationToken)
+    {
+        string path;
+        try
+        {
+            path = await workspace.ResolveQuickRunBeatmapAsync(
+                cancellationToken: cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception exception)
+        {
+            await ShowMessageAsync(ApplicationExceptionText.GetSummary(exception), exception.ToString());
+            return;
+        }
+
+        await RunWithStateAsync(() => RunPathsAsync(
+            [path],
+            true,
+            cancellationToken));
+    }
+
+    /// <inheritdoc />
+    public void Activate()
+    {
+        if (disposed) return;
+
+        isActive = true;
+        QueuePreview();
+    }
+
+    /// <inheritdoc />
+    public void Deactivate()
+    {
+        CancellationTokenSource? cancellation;
+        lock (previewGate)
+        {
+            isActive = false;
+            cancellation = previewCancellation;
+            previewCancellation = null;
+        }
+
+        cancellation?.Cancel();
+        cancellation?.Dispose();
+        IsProcessingPreview = false;
+    }
+
+    /// <inheritdoc />
+    ProjectDefinition<TumourGeneratorProject> IShellProjectFeature<TumourGeneratorProject>.ProjectDefinition
+    {
+        get;
+    } = new(
+        "tumourgeneratorproject.json",
+        "Tumour Generator Projects",
+        static () => new TumourGeneratorProject(),
+        "tumour-generator-project.json",
+        ToolConfigSchema.ForTool(TumourGeneratorToolDefinition.Definition.Id));
+
+    /// <inheritdoc />
+    TumourGeneratorProject IShellProjectFeature<TumourGeneratorProject>.Snapshot()
+    {
+        return Snapshot();
+    }
+
+    /// <inheritdoc />
+    void IShellProjectFeature<TumourGeneratorProject>.Install(TumourGeneratorProject project)
+    {
+        Install(project);
+    }
+
+    /// <summary>Imports the selected, bookmarked, time-filtered, or complete sliders.</summary>
+    [RelayCommand]
+    private async Task ImportAsync()
+    {
+        using var edit = UndoHistory?.BeginEdit();
+        string? path;
+        try
+        {
+            path = ImportModeSetting == HitObjectSelectionMode.Selected
+                ? await workspace.ResolveQuickRunBeatmapAsync(false)
+                : workspace.SelectedPaths.FirstOrDefault();
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception exception)
+        {
+            await ShowMessageAsync(ApplicationExceptionText.GetSummary(exception), exception.ToString());
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            await ShowMessageAsync(
+                ImportModeSetting == HitObjectSelectionMode.Selected
+                    ? DesktopStrings.TumourGenerator_NoBeatmapOpen
+                    : DesktopStrings.TumourGenerator_SelectBeatmap);
+            return;
+        }
+
+        try
+        {
+            var result = await generator.ImportAsync(
+                path,
+                ImportModeSetting,
+                TimeCode,
+                CancellationToken.None);
+            if (result.Sliders.Count == 0)
+            {
+                await ShowMessageAsync(DesktopStrings.TumourGenerator_NoSlidersFound);
+                return;
+            }
+
+            PreviewHitObject = result.Sliders[0].DeepCopy();
+            CircleSize = result.CircleSize;
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception exception)
+        {
+            await ShowMessageAsync(ApplicationExceptionText.GetSummary(exception), exception.ToString());
+        }
+    }
+
+    /// <summary>Adds a default layer after the current layer.</summary>
+    [RelayCommand]
+    private void Add()
+    {
+        using var edit = UndoHistory?.BeginEdit();
+        ObservableTumourLayer layer = new(TumourLayer.GetDefaultLayer());
+        layer.Name = ApplicationText.Format(DesktopStrings.TumourGenerator_DefaultLayerName, TumourLayers.Count + 1);
+        layer.TumourEnd = LayerRangeSliderMaxes.LastOrDefault(PreviewHitObject.PixelLength);
+        InsertAfterCurrent(layer);
+    }
+
+    /// <summary>Copies the current layer after itself.</summary>
+    [RelayCommand]
+    private void Copy()
+    {
+        using var edit = UndoHistory?.BeginEdit();
+        if (CurrentLayer is null) return;
+
+        ObservableTumourLayer copy = new(CurrentLayer.Snapshot());
+        copy.Name = ApplicationText.Format(DesktopStrings.TumourGenerator_CopiedLayerName, copy.Name);
+        InsertAfterCurrent(copy);
+    }
+
+    /// <summary>Removes the current layer while retaining one minimum layer.</summary>
+    [RelayCommand]
+    private void Remove()
+    {
+        using var edit = UndoHistory?.BeginEdit();
+        if (TumourLayers.Count <= 1 || CurrentLayer is null) return;
+
+        int index = CurrentLayerIndex;
+        CurrentLayerIndex = index == 0 ? 1 : index - 1;
+        TumourLayers.RemoveAt(index);
+    }
+
+    /// <summary>Moves the current layer one position toward the end.</summary>
+    [RelayCommand]
+    private void Raise()
+    {
+        using var edit = UndoHistory?.BeginEdit();
+        int sourceIndex = CurrentLayerIndex;
+        if (sourceIndex < 0 || sourceIndex >= TumourLayers.Count - 1) return;
+
+        ObservableTumourLayer selectedLayer = TumourLayers[sourceIndex];
+        int destinationIndex = sourceIndex + 1;
+        TumourLayers.Move(sourceIndex, destinationIndex);
+        CurrentLayerIndex = destinationIndex;
+        if (ReferenceEquals(TumourLayers[destinationIndex], selectedLayer))
+            OnPropertyChanged(nameof(CurrentLayer));
+    }
+
+    /// <summary>Moves the current layer one position toward the beginning.</summary>
+    [RelayCommand]
+    private void Lower()
+    {
+        using var edit = UndoHistory?.BeginEdit();
+        int sourceIndex = CurrentLayerIndex;
+        if (sourceIndex <= 0 || sourceIndex >= TumourLayers.Count) return;
+
+        ObservableTumourLayer selectedLayer = TumourLayers[sourceIndex];
+        int destinationIndex = sourceIndex - 1;
+        TumourLayers.Move(sourceIndex, destinationIndex);
+        CurrentLayerIndex = destinationIndex;
+        if (ReferenceEquals(TumourLayers[destinationIndex], selectedLayer))
+            OnPropertyChanged(nameof(CurrentLayer));
+    }
+
+    /// <summary>Replaces the current layer's random seed with a new seed.</summary>
+    [RelayCommand]
+    private void Randomize()
+    {
+        using var edit = UndoHistory?.BeginEdit();
+        if (CurrentLayer is not null) CurrentLayer.RandomSeed = Random.Shared.Next();
+    }
+
+    /// <inheritdoc />
+    protected override async Task RunCoreAsync()
+    {
+        if (ImportModeSetting == HitObjectSelectionMode.Selected || settings.AlwaysQuickRun)
+        {
+            string path;
+            try
+            {
+                path = await workspace.ResolveQuickRunBeatmapAsync();
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception exception)
+            {
+                await ShowMessageAsync(ApplicationExceptionText.GetSummary(exception), exception.ToString());
+                return;
+            }
+
+            await RunPathsAsync(
+                [path],
+                settings.AlwaysQuickRun,
+                CancellationToken.None);
+            return;
+        }
+
+        await RunPathsAsync(workspace.SelectedPaths, false, CancellationToken.None);
+    }
+
+    /// <inheritdoc />
+    protected override bool PrepareRun()
+    {
+        if (!base.PrepareRun()) return false;
+
+        return true;
+    }
+
+    partial void OnScaleChanged(double value)
+    {
+        QueuePreview();
+    }
+
+    partial void OnJustMiddleAnchorsChanged(bool value)
+    {
+        QueuePreview();
+    }
+
+    partial void OnDebugConstructionChanged(bool value)
+    {
+        QueuePreview();
+    }
+
+    private void InsertAfterCurrent(ObservableTumourLayer layer)
+    {
+        int index = Math.Clamp(CurrentLayerIndex + 1, 0, TumourLayers.Count);
+        TumourLayers.Insert(index, layer);
+        CurrentLayerIndex = index;
+    }
+
+    private void OnLayersChanged(object? sender, NotifyCollectionChangedEventArgs eventArgs)
+    {
+        if (eventArgs.OldItems is not null)
+            foreach (var layer in eventArgs.OldItems.OfType<ObservableTumourLayer>())
+                layer.PropertyChanged -= OnLayerChanged;
+
+        if (eventArgs.NewItems is not null)
+            foreach (var layer in eventArgs.NewItems.OfType<ObservableTumourLayer>())
+                layer.PropertyChanged += OnLayerChanged;
+
+        CurrentLayerIndex = Math.Clamp(CurrentLayerIndex, 0, Math.Max(0, TumourLayers.Count - 1));
+        OnPropertyChanged(nameof(CurrentLayer));
+        OnPropertyChanged(nameof(TumourParameterGraphVisible));
+        OnPropertyChanged(nameof(TumourStartSliderMin));
+        OnPropertyChanged(nameof(TumourRangeSliderMax));
+        OnPropertyChanged(nameof(TumourRangeSliderSmallChange));
+        QueuePreview();
+    }
+
+    private void OnLayerChanged(object? sender, PropertyChangedEventArgs eventArgs)
+    {
+        if (ReferenceEquals(sender, CurrentLayer) && eventArgs.PropertyName == nameof(TumourLayer.TumourEnd))
+            OnPropertyChanged(nameof(TumourRangeSliderMax));
+
+        if (ReferenceEquals(sender, CurrentLayer) && eventArgs.PropertyName == nameof(TumourLayer.UseAbsoluteRange))
+        {
+            OnPropertyChanged(nameof(TumourStartSliderMin));
+            OnPropertyChanged(nameof(TumourRangeSliderMax));
+            OnPropertyChanged(nameof(TumourRangeSliderSmallChange));
+        }
+
+        if (ReferenceEquals(sender, CurrentLayer) && eventArgs.PropertyName is nameof(TumourLayer.TumourTemplateEnum) or nameof(TumourLayer.TumourTemplate))
+            OnPropertyChanged(nameof(TumourParameterGraphVisible));
+
+        QueuePreview();
+    }
+
+    private void QueuePreview()
+    {
+        CancellationTokenSource cancellation;
+        lock (previewGate)
+        {
+            if (disposed || !isActive) return;
+
+            previewCancellation?.Cancel();
+            previewCancellation?.Dispose();
+            previewCancellation = new CancellationTokenSource();
+            cancellation = previewCancellation;
+        }
+
+        IsProcessingPreview = true;
+        _ = RefreshPreviewAsync(cancellation);
+    }
+
+    private async Task RefreshPreviewAsync(CancellationTokenSource cancellation)
+    {
+        try
+        {
+            var options = SnapshotOptions();
+            var result = await Task.Run(() =>
+            {
+                cancellation.Token.ThrowIfCancellationRequested();
+                var preview = PreviewHitObject.DeepCopy();
+                var tumourGenerator = CreateGenerator(options);
+                tumourGenerator.TumourGenerate(preview, cancellation.Token);
+                return (HitObject: preview, LayerLengths: tumourGenerator.LayerLengths.ToArray());
+            }, cancellation.Token);
+            lock (previewGate)
+            {
+                if (disposed || !isActive || !ReferenceEquals(previewCancellation, cancellation)) return;
+            }
+
+            TumouredPreviewHitObject = result.HitObject;
+            LayerRangeSliderMaxes = result.LayerLengths;
+            OnPropertyChanged(nameof(LayerRangeSliderMaxes));
+            OnPropertyChanged(nameof(TumourStartSliderMin));
+            OnPropertyChanged(nameof(TumourRangeSliderMax));
+            IsProcessingPreview = false;
+        }
+        catch (OperationCanceledException)
+        {
+            // A newer property change owns the next preview request.
+        }
+        catch (Exception)
+        {
+            lock (previewGate)
+            {
+                if (disposed || !isActive || !ReferenceEquals(previewCancellation, cancellation)) return;
+            }
+
+            IsProcessingPreview = false;
+        }
+    }
+
+    private async Task RunPathsAsync(
+        IReadOnlyList<string> paths,
+        bool quick,
+        CancellationToken cancellationToken)
+    {
+        if (paths.Count == 0)
+        {
+            await ShowMessageAsync(DesktopStrings.TumourGenerator_SelectTarget);
+            return;
+        }
+
+        var project = Snapshot();
+        await Execution.ExecuteAsync(
+            new ToolExecutionRequest<TumourRunResult>(
+                Tool.Id,
+                Tool.DisplayName,
+                async context =>
+                {
+                    var result = await generator.RunAsync(
+                        paths,
+                        project,
+                        quick,
+                        new Progress<double>(value => context.ReportProgress(value, DesktopStrings.TumourGenerator_Progress)),
+                        context.CancellationToken);
+                    string summary = result.SlidersTumourated == 1
+                        ? ApplicationText.Format(DesktopStrings.TumourGenerator_ResultOne, result.SlidersTumourated)
+                        : ApplicationText.Format(DesktopStrings.TumourGenerator_ResultMany, result.SlidersTumourated);
+                    return new ToolExecutionOutput<TumourRunResult>(
+                        result,
+                        summary);
+                }),
+            CreateProgress(),
+            cancellationToken);
+    }
+
+    private TumourGeneratorProject Snapshot()
+    {
+        TumourGeneratorProject project = new()
+        {
+            ImportModeSetting = ImportModeSetting,
+            TimeCode = TimeCode,
+            JustMiddleAnchors = JustMiddleAnchors,
+            Scale = Scale,
+            DebugConstruction = DebugConstruction,
+            FixSv = FixSv,
+            DelegateToBpm = DelegateToBpm,
+            RemoveSliderTicks = RemoveSliderTicks,
+            AdvancedOptions = AdvancedOptions,
+            PreviewHitObject = PreviewHitObject.DeepCopy(),
+        };
+        project.TumourLayers = TumourLayers.Select(layer => layer.Snapshot()).ToList();
+        return project;
+    }
+
+    private TumourGeneratorEngineOptions SnapshotOptions()
+    {
+        return new TumourGeneratorEngineOptions
+        {
+            TumourLayers = TumourLayers.Select(layer => layer.Snapshot()).ToList(),
+            JustMiddleAnchors = JustMiddleAnchors,
+            Scale = Scale,
+            DebugConstruction = DebugConstruction,
+        };
+    }
+
+    private static TumourGeneratorEngine CreateGenerator(TumourGeneratorEngineOptions options)
+    {
+        TumourGeneratorEngine.Validate(options);
+        return new TumourGeneratorEngine
+        {
+            TumourLayers = options.TumourLayers,
+            JustMiddleAnchors = options.JustMiddleAnchors,
+            Scalar = options.Scale,
+            Reconstructor = new Reconstructor { DebugConstruction = options.DebugConstruction },
+        };
+    }
+
+    private void Install(TumourGeneratorProject project)
+    {
+        ImportModeSetting = project.ImportModeSetting;
+        TimeCode = project.TimeCode;
+        JustMiddleAnchors = project.JustMiddleAnchors;
+        Scale = project.Scale;
+        DebugConstruction = project.DebugConstruction;
+        FixSv = project.FixSv;
+        DelegateToBpm = project.DelegateToBpm;
+        RemoveSliderTicks = project.RemoveSliderTicks;
+        AdvancedOptions = project.AdvancedOptions;
+        PreviewHitObject = project.PreviewHitObject.DeepCopy();
+
+        TumourLayers.Clear();
+        foreach (var layer in project.TumourLayers)
+        {
+            ObservableTumourLayer observableLayer = new(layer.Copy());
+            TumourLayers.Add(observableLayer);
+
+            // Reapply persisted range values after the collection change so old
+            // two-way slider values cannot overwrite them during CurrentLayer replacement.
+            observableLayer.TumourStart = layer.TumourStart;
+            observableLayer.TumourEnd = layer.TumourEnd;
+        }
+
+        CurrentLayerIndex = 0;
+        QueuePreview();
+    }
+
+    private async Task ShowMessageAsync(string message, string? details = null)
+    {
+        await dialogs.ShowMessageAsync(
+            new MessageDialogRequest<bool>(
+                "Tumour Generator 2",
+                message,
+                [new DialogChoice<bool>(DesktopStrings.Common_Ok, true, true, true)],
+                false,
+                details));
+    }
+}

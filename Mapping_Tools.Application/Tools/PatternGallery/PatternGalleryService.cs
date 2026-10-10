@@ -1,0 +1,415 @@
+using System.Text;
+using System.Text.RegularExpressions;
+using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.BeatmapEditing.Contracts;
+using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Application.Tools.PatternGallery.Contracts;
+using Mapping_Tools.Application.Tools.PatternGallery.Models;
+using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.Progress;
+using Mapping_Tools.Core.Tools.PatternGallery;
+using Mapping_Tools.Core.Tools.PatternGallery.Models;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+
+namespace Mapping_Tools.Application.Tools.PatternGallery;
+
+/// <summary>
+///     Coordinates Pattern Gallery's Core maker/placer with collection files,
+///     Editor Reader state, and safe beatmap saves.
+/// </summary>
+public sealed class PatternGalleryService : IPatternGalleryService
+{
+    private readonly IBeatmapEditingGateway editing;
+    private readonly IPatternGalleryFileService files;
+    private readonly ApplicationSettings settings;
+    private readonly IBeatmapDecoder beatmapDecoder;
+    private readonly IBeatmapEncoder beatmapEncoder;
+    private readonly ILogger<PatternGalleryService> logger;
+
+    /// <summary>Creates the Pattern Gallery application use case.</summary>
+    /// <param name="editing">Loads live or disk beatmaps and saves with backups.</param>
+    /// <param name="files">Resolves collection files and performs file operations.</param>
+    /// <param name="settings">Supplies the automatic editor reload preference.</param>
+    /// <param name="beatmapDecoder">Parses imported object and timing point text.</param>
+    /// <param name="beatmapEncoder">Encodes saved patterns.</param>
+    /// <param name="logger">Records pattern export milestones.</param>
+    public PatternGalleryService(
+        IBeatmapEditingGateway editing,
+        IPatternGalleryFileService files,
+        ApplicationSettings settings,
+        IBeatmapDecoder beatmapDecoder,
+        IBeatmapEncoder beatmapEncoder,
+        ILogger<PatternGalleryService>? logger = null)
+    {
+        this.editing = editing ?? throw new ArgumentNullException(nameof(editing));
+        this.files = files ?? throw new ArgumentNullException(nameof(files));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.beatmapDecoder = beatmapDecoder ?? throw new ArgumentNullException(nameof(beatmapDecoder));
+        this.beatmapEncoder = beatmapEncoder ?? throw new ArgumentNullException(nameof(beatmapEncoder));
+        this.logger = logger ?? NullLogger<PatternGalleryService>.Instance;
+    }
+
+    /// <inheritdoc />
+    public async Task<Beatmap> LoadBeatmapAsync(
+        PatternGalleryPattern pattern,
+        PatternGalleryCollectionPaths paths,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(pattern);
+
+        var session = await editing.OpenBeatmapAsync(
+                files.GetPatternPath(paths, pattern.FileName),
+                LiveBeatmapPreference.DiskOnly,
+                cancellationToken)
+            .ConfigureAwait(false);
+
+        session.Beatmap.UpdateStacking();
+
+        return session.Beatmap;
+    }
+
+    /// <inheritdoc />
+    public Task<PatternGalleryPattern> ImportCodeAsync(
+        string name,
+        string hitObjectText,
+        string timingPointText,
+        double globalSv,
+        GameMode gameMode,
+        PatternGalleryServiceOptions project,
+        PatternGalleryCollectionPaths paths,
+        CancellationToken cancellationToken = default,
+        PatternGalleryFileEdit? fileEdit = null)
+    {
+        ArgumentNullException.ThrowIfNull(project);
+
+        Validate(project);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var hitObjects = ParseLines(
+            hitObjectText,
+            line => beatmapDecoder.Decode(CreateLineDocument("[HitObjects]", line)).HitObjects.Single());
+        var timingPoints = ParseLines(
+            timingPointText,
+            line => beatmapDecoder.Decode(CreateLineDocument("[TimingPoints]", line))
+                .BeatmapTiming.TimingPoints.Single());
+
+        PatternGalleryMaker maker = new() { Padding = project.Padding };
+        var pattern = maker.FromObjects(
+            hitObjects,
+            timingPoints,
+            name,
+            globalSv,
+            gameMode,
+            out var patternBeatmap);
+
+        SavePattern(pattern, patternBeatmap, paths, cancellationToken, fileEdit);
+
+        return Task.FromResult(pattern);
+    }
+
+    /// <inheritdoc />
+    public async Task<PatternGalleryPattern> ImportFileAsync(
+        string sourcePath,
+        string name,
+        string? filter,
+        double startTime,
+        double endTime,
+        PatternGalleryCollectionPaths paths,
+        CancellationToken cancellationToken = default,
+        PatternGalleryFileEdit? fileEdit = null)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(sourcePath);
+
+        var source = await editing.OpenBeatmapAsync(
+                sourcePath,
+                LiveBeatmapPreference.DiskOnly,
+                cancellationToken)
+            .ConfigureAwait(false);
+
+        PatternGalleryMaker maker = new();
+        PatternGalleryPattern pattern;
+
+        if (!string.IsNullOrEmpty(filter) || !Precision.AlmostEquals(startTime, -1) || !Precision.AlmostEquals(endTime, -1))
+        {
+            pattern = maker.FromBeatmapFiltered(
+                source.Beatmap,
+                name,
+                filter,
+                startTime,
+                endTime,
+                out var filtered);
+            SavePattern(pattern, filtered, paths, cancellationToken, fileEdit);
+        }
+        else
+        {
+            pattern = maker.FromBeatmap(source.Beatmap, name);
+            // Save the pattern in the collection folder by copying
+            string destination = files.GetPatternPath(paths, pattern.FileName);
+            fileEdit?.CaptureFile(destination);
+            files.CopyPattern(sourcePath, destination);
+        }
+
+        return pattern;
+    }
+
+    /// <inheritdoc />
+    public async Task<PatternGalleryPattern> ImportSelectedAsync(
+        string sourcePath,
+        string name,
+        PatternGalleryCollectionPaths paths,
+        CancellationToken cancellationToken = default,
+        PatternGalleryFileEdit? fileEdit = null)
+    {
+        var source = await editing.OpenBeatmapAsync(
+                sourcePath,
+                LiveBeatmapPreference.RequireLive,
+                cancellationToken)
+            .ConfigureAwait(false);
+
+        PatternGalleryMaker maker = new();
+
+        var pattern = maker.FromSelected(
+            source.Beatmap,
+            name,
+            source.SelectedHitObjects,
+            out var filtered);
+
+        SavePattern(pattern, filtered, paths, cancellationToken, fileEdit);
+
+        return pattern;
+    }
+
+    /// <inheritdoc />
+    public async Task<PatternGalleryRunResult> ExportAsync(
+        string targetPath,
+        IReadOnlyList<PatternGalleryPattern> patterns,
+        PatternGalleryServiceOptions project,
+        PatternGalleryCollectionPaths paths,
+        bool quickRun,
+        IProgress<double>? progress = null,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(targetPath);
+        ArgumentNullException.ThrowIfNull(patterns);
+        ArgumentNullException.ThrowIfNull(project);
+
+        Validate(project);
+        if (patterns.Count == 0) throw new InvalidOperationException("No pattern has been selected to export.");
+        logger.LogInformation("Exporting {Count} patterns to {Path}; time mode {Mode}",
+            patterns.Count, targetPath, project.ExportTimeMode);
+
+        var preference = project.ExportTimeMode == ExportTimeMode.Current
+            ? LiveBeatmapPreference.RequireLive
+            : LiveBeatmapPreference.PreferLive;
+
+        var target = await editing.OpenBeatmapAsync(
+                targetPath,
+                preference,
+                cancellationToken)
+            .ConfigureAwait(false);
+
+        double exportTime = project.ExportTimeMode switch
+        {
+            ExportTimeMode.Current => target.LiveEditorTime
+                                      ?? throw new InvalidOperationException("Could not fetch the current editor time."),
+            ExportTimeMode.Custom => project.CustomExportTime,
+            ExportTimeMode.Pattern => 0,
+            _ => throw new ArgumentOutOfRangeException(nameof(project.ExportTimeMode)),
+        };
+
+        var placer = project.CreatePlacer();
+        logger.LogInformation("Placing patterns at time {ExportTime} in {Path}", exportTime, targetPath);
+
+        for (int index = 0; index < patterns.Count; index++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var pattern = patterns[index];
+            logger.LogInformation("Placing pattern {Index}/{Count}: {Pattern} in {Path}",
+                index + 1, patterns.Count, pattern.FileName, targetPath);
+            var source = await editing.OpenBeatmapAsync(
+                    files.GetPatternPath(paths, pattern.FileName),
+                    LiveBeatmapPreference.DiskOnly,
+                    cancellationToken)
+                .ConfigureAwait(false);
+
+            if (project.ExportTimeMode == ExportTimeMode.Pattern)
+                placer.PlaceOsuPattern(source.Beatmap, target.Beatmap, protectBeatmapPattern: false);
+            else
+                placer.PlaceOsuPatternAtTime(
+                    source.Beatmap,
+                    target.Beatmap,
+                    exportTime,
+                    false);
+
+            // Increase pattern use count and time
+            pattern.UseCount++;
+            pattern.LastUsedTime = DateTime.Now;
+            progress?.Report(index + 1, patterns.Count);
+        }
+
+        logger.LogInformation("Placed {Count} patterns in {Path}; saving", patterns.Count, targetPath);
+        await editing.SaveAsync(
+                target,
+                AutomaticEditorReloadPolicy.ShouldReloadEditor(
+                    target,
+                    quickRun,
+                    settings),
+                cancellationToken)
+            .ConfigureAwait(false);
+
+        logger.LogInformation("Exported {Count} patterns to {Path}", patterns.Count, targetPath);
+        return new PatternGalleryRunResult(patterns.Count, "Successfully exported pattern!");
+    }
+
+    /// <inheritdoc />
+    public Task DeleteAsync(
+        IReadOnlyList<PatternGalleryPattern> patterns,
+        PatternGalleryCollectionPaths paths,
+        CancellationToken cancellationToken = default,
+        PatternGalleryFileEdit? fileEdit = null)
+    {
+        ArgumentNullException.ThrowIfNull(patterns);
+
+        foreach (var pattern in patterns)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            string path = files.GetPatternPath(paths, pattern.FileName);
+            fileEdit?.CaptureFile(path);
+            files.DeletePattern(path);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    /// <inheritdoc />
+    public void MergeCollection(
+        PatternGalleryServiceOptions project,
+        PatternGalleryServiceOptions imported,
+        IReadOnlyList<PatternGalleryArchiveFile> patternFiles,
+        PatternGalleryCollectionPaths paths,
+        PatternGalleryFileEdit? fileEdit = null)
+    {
+        files.EnsureCollection(paths);
+        var contents = patternFiles.ToDictionary(file => file.FileName, StringComparer.OrdinalIgnoreCase);
+        foreach (var pattern in imported.Patterns)
+            if (contents.TryGetValue(pattern.FileName, out var file))
+            {
+                string path = files.GetPatternPath(paths, pattern.FileName);
+                fileEdit?.CaptureFile(path);
+                files.WritePatternBytes(path, file.Content);
+                project.Patterns.Add(pattern);
+            }
+    }
+
+    /// <inheritdoc />
+    public async Task<PatternGalleryRestoreResult> RestoreAsync(
+        PatternGalleryServiceOptions project,
+        PatternGalleryCollectionPaths paths,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(project);
+
+        Validate(project);
+
+        // Get all the filenames that are currently in the collection
+        string[] actual = files.EnumeratePatternFiles(paths).ToArray();
+        var actualSet = actual.ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        // Remove all patterns that are not in the actual pattern files
+        var removed = project.Patterns
+            .Where(pattern => !actualSet.Contains(pattern.FileName))
+            .ToList();
+        foreach (var pattern in removed) project.Patterns.Remove(pattern);
+
+        var indexed = project.Patterns
+            .Select(pattern => pattern.FileName)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        PatternGalleryMaker maker = new();
+        int added = 0;
+
+        // Add all patterns that are in the actual pattern files but not in the indexed patterns
+        foreach (string filename in actual.Where(name => !indexed.Contains(name)))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var session = await editing.OpenBeatmapAsync(
+                    files.GetPatternPath(paths, filename),
+                    LiveBeatmapPreference.DiskOnly,
+                    cancellationToken)
+                .ConfigureAwait(false);
+
+            var pattern = maker.FromBeatmap(
+                session.Beatmap,
+                Path.GetFileNameWithoutExtension(filename).Split("__").LastOrDefault() ?? filename,
+                filename);
+
+            project.Patterns.Add(pattern);
+            added++;
+        }
+
+        return new PatternGalleryRestoreResult(removed.Count, added);
+    }
+
+    private void SavePattern(
+        PatternGalleryPattern pattern,
+        Beatmap patternBeatmap,
+        PatternGalleryCollectionPaths paths,
+        CancellationToken cancellationToken,
+        PatternGalleryFileEdit? fileEdit)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        string destination = files.GetPatternPath(paths, pattern.FileName);
+        fileEdit?.CaptureFile(destination);
+
+        // Make sure the file handler always uses the right pattern files folder
+        files.EnsureCollection(paths);
+
+        patternBeatmap.Version = 128;
+
+        // Save the modified pattern beatmap in the colleciton folder
+        files.WritePatternBytes(
+            destination,
+            Encoding.UTF8.GetBytes(beatmapEncoder.Encode(patternBeatmap)));
+    }
+
+    private static void Validate(PatternGalleryServiceOptions project)
+    {
+        ArgumentNullException.ThrowIfNull(project);
+        PatternGalleryPlacer.Validate(project);
+    }
+
+    private static List<T> ParseLines<T>(string? text, Func<string, T> parse)
+    {
+        List<T> result = [];
+
+        foreach (string line in Regex.Split(text ?? string.Empty, "\\r?\\n"))
+        {
+            if (string.IsNullOrWhiteSpace(line)) continue;
+
+            try
+            {
+                result.Add(parse(line.Trim()));
+            }
+            catch
+            {
+                // The legacy dialog ignores malformed individual lines and
+                // reports an error only when no usable hit object remains.
+            }
+        }
+
+        return result;
+    }
+
+    private static string CreateLineDocument(string section, string line)
+    {
+        // Preserve the legacy line-parser behavior, then SavePattern upgrades the
+        // complete result to v128 for full-precision output.
+        return $"osu file format v14\r\n\r\n[TimingPoints]\r\n{(section == "[TimingPoints]" ? line : string.Empty)}\r\n[HitObjects]\r\n{(section == "[HitObjects]" ? line : string.Empty)}";
+    }
+}

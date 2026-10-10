@@ -1,0 +1,238 @@
+using Mapping_Tools.Application.Execution.ToolExecution.Models;
+using Mapping_Tools.Application.Execution.UserNotification;
+using Mapping_Tools.Application.Execution.UserNotification.Models;
+using Mapping_Tools.Application.Localization;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+
+namespace Mapping_Tools.Application.Execution.ToolExecution;
+
+/// <summary>
+///     Replaces view-owned BackgroundWorkers with keyed, thread-pool execution and
+///     one process-wide cancellation and completion policy.
+/// </summary>
+public sealed class ToolExecutionService : IToolExecutionService
+{
+    private readonly Lock gate = new();
+    private readonly IUserNotificationService notifications;
+    private readonly ILogger<ToolExecutionService> logger;
+
+    private readonly Dictionary<string, RunningOperation> running =
+        new(StringComparer.Ordinal);
+
+    private readonly CancellationTokenSource stopping = new();
+    private readonly TimeProvider timeProvider;
+
+    /// <summary>
+    ///     Creates the coordinator that owns duplicate-run prevention, application
+    ///     shutdown cancellation, and notifications.
+    /// </summary>
+    /// <param name="notifications">The frontend-neutral outcome stream.</param>
+    /// <param name="timeProvider">Supplies deterministic result timestamps.</param>
+    /// <param name="logger">Records operation lifecycle and failures.</param>
+    public ToolExecutionService(
+        IUserNotificationService notifications,
+        TimeProvider timeProvider,
+        ILogger<ToolExecutionService>? logger = null)
+    {
+        this.notifications = notifications
+                             ?? throw new ArgumentNullException(nameof(notifications));
+        this.timeProvider = timeProvider
+                            ?? throw new ArgumentNullException(nameof(timeProvider));
+        this.logger = logger ?? NullLogger<ToolExecutionService>.Instance;
+    }
+
+    /// <inheritdoc />
+    public Task<ToolExecutionResult<T>> ExecuteAsync<T>(
+        ToolExecutionRequest<T> request,
+        IProgress<ToolExecutionProgress>? progress = null,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        var startedAt = timeProvider.GetUtcNow();
+        var linked = CancellationTokenSource.CreateLinkedTokenSource(
+            cancellationToken,
+            stopping.Token);
+
+        lock (gate)
+        {
+            if (running.ContainsKey(request.OperationId))
+            {
+                logger.LogInformation("Tool {OperationId} ({DisplayName}) was already running", request.OperationId, request.DisplayName);
+                linked.Dispose();
+                return Task.FromResult(
+                    new ToolExecutionResult<T>(
+                        ToolExecutionStatus.AlreadyRunning,
+                        default,
+                        null,
+                        startedAt,
+                        startedAt));
+            }
+
+            var operation = new RunningOperation(linked);
+            running.Add(request.OperationId, operation);
+            logger.LogInformation("Tool {OperationId} ({DisplayName}) started", request.OperationId, request.DisplayName);
+
+            var task = RunAsync(
+                request,
+                progress,
+                linked,
+                startedAt);
+            operation.Task = task;
+            return task;
+        }
+    }
+
+    /// <inheritdoc />
+    public bool Cancel(string operationId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(operationId);
+        RunningOperation operation;
+        lock (gate)
+        {
+            if (!running.TryGetValue(operationId, out operation!)) return false;
+        }
+
+        logger.LogInformation("Cancellation requested for tool {OperationId}", operationId);
+        operation.TryCancel();
+        return true;
+    }
+
+    /// <inheritdoc />
+    public bool IsRunning(string operationId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(operationId);
+        lock (gate)
+        {
+            return running.ContainsKey(operationId);
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task StopAsync(CancellationToken cancellationToken = default)
+    {
+        logger.LogInformation("Stopping tool execution service");
+        await stopping.CancelAsync();
+        Task[] tasks;
+        RunningOperation[] operations;
+        lock (gate)
+        {
+            operations = running.Values.ToArray();
+            tasks = operations.Select(operation => operation.Task).ToArray();
+        }
+
+        foreach (var operation in operations) operation.TryCancel();
+
+        if (tasks.Length > 0)
+            await Task.WhenAll(tasks)
+                .WaitAsync(cancellationToken)
+                .ConfigureAwait(false);
+    }
+
+    private async Task<ToolExecutionResult<T>> RunAsync<T>(
+        ToolExecutionRequest<T> request,
+        IProgress<ToolExecutionProgress>? progress,
+        CancellationTokenSource linked,
+        DateTimeOffset startedAt)
+    {
+        try
+        {
+            ToolExecutionContext context = new(linked.Token, progress);
+            var output = await Task.Run(
+                    () => request.Operation(context),
+                    linked.Token)
+                .ConfigureAwait(false);
+            linked.Token.ThrowIfCancellationRequested();
+
+            if (output.Summary is not null)
+                await PublishSafelyAsync(
+                        new UserNotification.Models.UserNotification(
+                            UserNotificationSeverity.Success,
+                            request.DisplayName,
+                            output.Summary))
+                    .ConfigureAwait(false);
+
+            logger.LogInformation("Tool {OperationId} ({DisplayName}) succeeded in {ElapsedMs} ms. Summary: {Summary}",
+                request.OperationId, request.DisplayName, (timeProvider.GetUtcNow() - startedAt).TotalMilliseconds, output.Summary);
+
+            return new ToolExecutionResult<T>(
+                ToolExecutionStatus.Succeeded,
+                output.Value,
+                null,
+                startedAt,
+                timeProvider.GetUtcNow());
+        }
+        catch (OperationCanceledException) when (linked.IsCancellationRequested)
+        {
+            logger.LogInformation("Tool {OperationId} ({DisplayName}) cancelled after {ElapsedMs} ms",
+                request.OperationId, request.DisplayName, (timeProvider.GetUtcNow() - startedAt).TotalMilliseconds);
+            return new ToolExecutionResult<T>(
+                ToolExecutionStatus.Cancelled,
+                default,
+                null,
+                startedAt,
+                timeProvider.GetUtcNow());
+        }
+        catch (Exception exception)
+        {
+            logger.LogError(exception, "Tool {OperationId} ({DisplayName}) failed after {ElapsedMs} ms",
+                request.OperationId, request.DisplayName, (timeProvider.GetUtcNow() - startedAt).TotalMilliseconds);
+            await PublishSafelyAsync(
+                    new UserNotification.Models.UserNotification(
+                        UserNotificationSeverity.Error,
+                        request.DisplayName,
+                        ApplicationExceptionText.GetSummary(exception),
+                        exception))
+                .ConfigureAwait(false);
+            return new ToolExecutionResult<T>(
+                ToolExecutionStatus.Failed,
+                default,
+                exception,
+                startedAt,
+                timeProvider.GetUtcNow());
+        }
+        finally
+        {
+            lock (gate)
+            {
+                running.Remove(request.OperationId);
+            }
+
+            linked.Dispose();
+        }
+    }
+
+    private async Task PublishSafelyAsync(UserNotification.Models.UserNotification notification)
+    {
+        try
+        {
+            await notifications.PublishAsync(
+                    notification,
+                    CancellationToken.None)
+                .ConfigureAwait(false);
+        }
+        catch
+        {
+            // Presentation subscribers must not change the tool's terminal result.
+        }
+    }
+
+    private sealed class RunningOperation(CancellationTokenSource cancellation)
+    {
+        internal CancellationTokenSource Cancellation { get; } = cancellation;
+
+        internal Task Task { get; set; } = Task.CompletedTask;
+
+        internal void TryCancel()
+        {
+            try
+            {
+                Cancellation.Cancel();
+            }
+            catch (ObjectDisposedException)
+            {
+                // The operation reached its terminal result between lookup and cancellation.
+            }
+        }
+    }
+}

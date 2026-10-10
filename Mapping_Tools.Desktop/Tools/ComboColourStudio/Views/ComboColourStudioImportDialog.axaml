@@ -1,0 +1,55 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:materialIcons="using:Material.Icons.Avalonia"
+             xmlns:loc="using:Mapping_Tools.Desktop.Localization"
+             xmlns:viewModels="clr-namespace:Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels"
+             x:Class="Mapping_Tools.Desktop.Tools.ComboColourStudio.Views.ComboColourStudioImportDialog"
+             x:DataType="viewModels:ComboColourStudioImportDialogViewModel"
+             HorizontalAlignment="Center"
+             VerticalAlignment="Center">
+    <Grid Margin="8" RowDefinitions="Auto,Auto,Auto">
+        <TextBlock Text="{loc:Tr ComboColourStudio_ImportDialogHeading}" TextWrapping="Wrap" />
+
+        <Grid Grid.Row="1" Margin="0,6,0,0" ColumnDefinitions="*,Auto,5,Auto">
+            <TextBox Grid.Column="0"
+                     Width="200"
+                     MaxWidth="200"
+                     materialAssists:TextFieldAssist.Label="{loc:Tr ComboColourStudio_ImportPath}"
+                     Text="{Binding Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <Button Grid.Column="1"
+                    Classes="flat path-picker"
+                    Cursor="Hand"
+                    VerticalAlignment="Bottom"
+                    Command="{Binding UseCurrentCommand}"
+                    ToolTip.Tip="{loc:Tr ComboColourStudio_FetchBeatmap}">
+                <materialIcons:MaterialIcon Width="30" Height="30" Kind="RestoreFromTrash" />
+            </Button>
+            <Button Grid.Column="3"
+                    Classes="flat path-picker"
+                    Cursor="Hand"
+                    VerticalAlignment="Bottom"
+                    Command="{Binding BrowseCommand}"
+                    ToolTip.Tip="{loc:Tr ComboColourStudio_BrowseBeatmaps}">
+                <materialIcons:MaterialIcon Width="30" Height="30" Kind="Folder" />
+            </Button>
+        </Grid>
+
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    Margin="0,16,0,0"
+                    HorizontalAlignment="Center">
+            <Button Classes="dialog-action primary"
+                    Theme="{StaticResource MaterialFlatButton}"
+                    Content="{loc:Tr ComboColourStudio_Accept}"
+                    Command="{Binding AcceptCommand}"
+                    IsDefault="True" />
+            <Button Classes="dialog-action primary"
+                    Theme="{StaticResource MaterialFlatButton}"
+                    Content="{loc:Tr ComboColourStudio_Cancel}"
+                    Command="{Binding CancelCommand}"
+                    Margin="8,0,0,0"
+                    IsCancel="True" />
+        </StackPanel>
+    </Grid>
+</UserControl>

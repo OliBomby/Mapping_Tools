@@ -1,0 +1,24 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Material.Avalonia owns the main palette. These are the few colors
+         specific to Mapping Tools' custom desktop chrome. -->
+    <SolidColorBrush x:Key="MappingToolsDialogOverlayBrush"
+                     Color="#99000000" />
+    <SolidColorBrush x:Key="MappingToolsHelpBadgeBrush" Color="#B2FF00" />
+    <SolidColorBrush x:Key="MappingToolsQuickRunBadgeBrush" Color="#81D4FA" />
+    <SolidColorBrush x:Key="MappingToolsTimelineLineBrush" Color="#FFD6D6D6" />
+    <SolidColorBrush x:Key="MappingToolsTimelineNeutralOuterBrush" Color="#FF787878" />
+    <SolidColorBrush x:Key="MappingToolsTimelineNeutralInnerBrush" Color="#FFC8C8C8" />
+    <SolidColorBrush x:Key="MappingToolsTimelineAddedOuterBrush" Color="#FF58F50F" />
+    <SolidColorBrush x:Key="MappingToolsTimelineAddedInnerBrush" Color="#FF17B41E" />
+    <SolidColorBrush x:Key="MappingToolsTimelineChangedOuterBrush" Color="#FFF9F906" />
+    <SolidColorBrush x:Key="MappingToolsTimelineChangedInnerBrush" Color="#FFF5AD1E" />
+    <SolidColorBrush x:Key="MappingToolsTimelineRemovedOuterBrush" Color="#FFFC4214" />
+    <SolidColorBrush x:Key="MappingToolsTimelineRemovedInnerBrush" Color="#FFF54D23" />
+    <SolidColorBrush x:Key="MappingToolsTimelineAccentOuterBrush" Color="#FFAC38BE" />
+    <SolidColorBrush x:Key="MappingToolsTimelineAccentInnerBrush" Color="#FF9125AF" />
+    <SolidColorBrush x:Key="MappingToolsMaterialToolToggleListBoxBackgroundBrush" Color="#FF212121" />
+    <SolidColorBrush x:Key="MappingToolsStatusErrorBrush" Color="#FFF44336" />
+    <SolidColorBrush x:Key="MappingToolsStatusWaitingBrush" Color="#FFFFC107" />
+    <SolidColorBrush x:Key="MappingToolsStatusRunningBrush" Color="#FF4CAF50" />
+</ResourceDictionary>

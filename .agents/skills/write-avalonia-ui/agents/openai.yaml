@@ -1,0 +1,4 @@
+interface:
+  display_name: "Avalonia UI"
+  short_description: "Write Avalonia UI with sources"
+  default_prompt: "Use $write-avalonia-ui to write a view for Avalonia."
