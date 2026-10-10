@@ -1,4 +1,6 @@
 using System.Text;
+using System.Net;
+using System.Net.Sockets;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Infrastructure.Editor.Mtipc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -8,6 +10,67 @@ namespace Mapping_Tools.Infrastructure.Tests.Editor.Mtipc;
 [TestClass]
 public sealed class MtipcClientTests
 {
+    [TestMethod]
+    public void ConnectSocket_WithMissingUnixSocket_ThrowsSocketException()
+    {
+        // Arrange
+        if (!Socket.OSSupportsUnixDomainSockets) return;
+
+        string path = Path.Combine(Path.GetTempPath(), $"mtipc-{Guid.NewGuid():N}.sock");
+        var endpoint = new UnixDomainSocketEndPoint(path);
+
+        // Act
+        Action act = () => MtipcClient.ConnectSocket(endpoint, CancellationToken.None).Dispose();
+
+        // Assert
+        act.Should().Throw<SocketException>();
+    }
+
+    [TestMethod]
+    public void ConnectSocket_WithCancelledToken_ThrowsOperationCanceledException()
+    {
+        // Arrange
+        using var cancellation = new CancellationTokenSource();
+        cancellation.Cancel();
+        CancellationToken token = cancellation.Token;
+        var endpoint = new IPEndPoint(IPAddress.Loopback, 0);
+
+        // Act
+        Action act = () => MtipcClient.ConnectSocket(endpoint, token).Dispose();
+
+        // Assert
+        act.Should().Throw<OperationCanceledException>();
+    }
+
+    [TestMethod]
+    public void ConnectSocket_WithUnixListener_ExchangesData()
+    {
+        // Arrange
+        if (!Socket.OSSupportsUnixDomainSockets) return;
+
+        string path = Path.Combine(Path.GetTempPath(), $"mtipc-{Guid.NewGuid():N}.sock");
+        try
+        {
+            var endpoint = new UnixDomainSocketEndPoint(path);
+            using var listener = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
+            listener.Bind(endpoint);
+            listener.Listen(1);
+
+            // Act
+            using NetworkStream stream = MtipcClient.ConnectSocket(endpoint, CancellationToken.None);
+            using Socket server = listener.Accept();
+            server.Send(new byte[] { 42 });
+            int actual = stream.ReadByte();
+
+            // Assert
+            actual.Should().Be(42);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
     [TestMethod]
     public void ReadBeatmap_WithFramedSocketResponses_UsesHelloAndReturnsBeatmap()
     {

@@ -212,7 +212,7 @@ internal sealed class MtipcClient
 
     private static MtipcConnection Connect(CancellationToken cancellationToken)
     {
-        Exception? lastException;
+        Exception? localException;
         if (OperatingSystem.IsWindows())
         {
             try
@@ -224,7 +224,7 @@ internal sealed class MtipcClient
             }
             catch (Exception exception) when (exception is IOException or TimeoutException or UnauthorizedAccessException)
             {
-                lastException = exception;
+                localException = exception;
             }
         }
         else
@@ -232,24 +232,27 @@ internal sealed class MtipcClient
             try { return new MtipcConnection(ConnectSocket(new UnixDomainSocketEndPoint("/tmp/mtipc.sock"), cancellationToken), isPipe: false); }
             catch (Exception exception) when (exception is SocketException or IOException or TimeoutException)
             {
-                lastException = exception;
+                localException = exception;
             }
         }
 
         try { return new MtipcConnection(ConnectSocket(new IPEndPoint(IPAddress.Loopback, 41337), cancellationToken), isPipe: false); }
         catch (Exception exception) when (exception is SocketException or IOException or TimeoutException)
         {
-            throw new IOException("MTIPC server is unavailable.", lastException);
+            throw new IOException("MTIPC server is unavailable. Could not connect through local IPC or TCP at 127.0.0.1:41337.",
+                new AggregateException(localException, exception));
         }
     }
 
-    private static NetworkStream ConnectSocket(EndPoint endpoint, CancellationToken cancellationToken)
+    internal static NetworkStream ConnectSocket(EndPoint endpoint, CancellationToken cancellationToken)
     {
-        var socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+        var protocol = endpoint.AddressFamily == AddressFamily.Unix ? ProtocolType.Unspecified : ProtocolType.Tcp;
+        var socket = new Socket(endpoint.AddressFamily, SocketType.Stream, protocol);
         try
         {
-            if (!socket.ConnectAsync(endpoint, cancellationToken).AsTask().Wait(connect_timeout_milliseconds, cancellationToken))
-                throw new TimeoutException("MTIPC connection timed out.");
+            socket.ConnectAsync(endpoint, cancellationToken).AsTask()
+                .WaitAsync(TimeSpan.FromMilliseconds(connect_timeout_milliseconds), cancellationToken)
+                .GetAwaiter().GetResult();
 
             return new NetworkStream(socket, ownsSocket: true);
         }
