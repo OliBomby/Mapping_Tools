@@ -18,7 +18,6 @@ internal sealed class StableEditorMemoryReader(IEditorProcessMemory memory)
     private const int scan_chunk_size = 64 * 1024;
     private static readonly byte[] editorSignature = Convert.FromHexString(
         "230000001400000019000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee0C000000eeeeeeeeeeeeeeeeeeeeeeeeee00");
-    private readonly List<(nint Address, byte[] Header)> collectionHeaders = [];
     private nint editorAddress;
     private CancellationToken cancellationToken;
 
@@ -29,10 +28,9 @@ internal sealed class StableEditorMemoryReader(IEditorProcessMemory memory)
         cancellationToken.ThrowIfCancellationRequested();
 
         // Map switches and edits can invalidate an otherwise readable graph.
-        // Discard the entire attempt instead of mixing old and new collections.
+        // Retry unreadable or structurally invalid state from the editor root.
         for (int attempt = 0; attempt < 2; attempt++)
         {
-            collectionHeaders.Clear();
             if (!IsEditor(editorAddress)) editorAddress = FindEditor();
             if (editorAddress == 0) return null;
 
@@ -84,12 +82,6 @@ internal sealed class StableEditorMemoryReader(IEditorProcessMemory memory)
         var bookmarks = new List<double>();
         for (int offset = 0; offset < bookmarkData.Length; offset += 4)
             bookmarks.Add(BitConverter.ToInt32(bookmarkData, offset));
-
-        foreach (var (address, header) in collectionHeaders)
-        {
-            if (!Read(address, header.Length).AsSpan().SequenceEqual(header))
-                throw new InvalidDataException("An editor collection changed during the snapshot.");
-        }
 
         byte[] currentEditor = Read(editorAddress, 210);
         byte[] currentManager = Read(managerAddress, 80);
@@ -201,18 +193,18 @@ internal sealed class StableEditorMemoryReader(IEditorProcessMemory memory)
 
     private byte[] ReadList(nint address, int elementSize)
     {
-        // CLR List<T>: items at +4, size at +12, version at +16.
+        // CLR List<T>: items at +4, size at +12.
         // CLR array: length at +4, contents at +8 (for this 32-bit target).
-        byte[] header = Read(address, 20);
+        byte[] header = Read(address, 16);
         nint arrayAddress = Pointer(header, 4);
         int count = BitConverter.ToInt32(header, 12);
         int capacity = BitConverter.ToInt32(Read(arrayAddress + 4, 4));
         if (count < 0 || capacity < count)
             throw new InvalidDataException("An editor collection has an inconsistent size.");
 
-        byte[] data = Read(arrayAddress + 8, GetByteLength(count, elementSize));
-        collectionHeaders.Add((address, header));
-        return data;
+        // Capture the current contents. Later list mutations do not invalidate
+        // this copy; requiring an unchanged version rejects normal live edits.
+        return Read(arrayAddress + 8, GetByteLength(count, elementSize));
     }
 
     private string ReadString(nint address)

@@ -210,15 +210,17 @@ public sealed class StableEditorMemoryReaderTests
     }
 
     [TestMethod]
-    public void ReadSnapshot_WithOneCollectionChange_RetriesWholeSnapshot()
+    public void ReadSnapshot_WithContinuouslyChangingCollectionVersion_ReturnsSnapshotWithoutRetry()
     {
         // Arrange
         var memory = new EditorMemoryFixture();
         int headerReads = 0;
+        int version = 0;
         memory.ReadAllowed = (address, length) =>
         {
-            if (address == memory.ObjectListAddress && length == 20 && ++headerReads == 2)
-                memory.SetInt(address + 16, 1);
+            if (address == memory.ObjectListAddress && length == 16) headerReads++;
+            if (address == memory.HitObjectAddress && length == 336)
+                memory.SetInt(memory.ObjectListAddress + 16, ++version);
             return true;
         };
         var sut = new StableEditorMemoryReader(memory);
@@ -228,29 +230,34 @@ public sealed class StableEditorMemoryReaderTests
 
         // Assert
         snapshot!.HitObjects.Should().ContainSingle();
-        headerReads.Should().Be(4);
+        headerReads.Should().Be(1);
+        version.Should().BeGreaterThan(0);
     }
 
     [TestMethod]
-    public void ReadSnapshot_WithContinuouslyChangingCollection_RejectsBothAttempts()
+    public void ReadSnapshot_WithCollectionShrinkingAfterCopy_ReturnsCapturedObjects()
     {
         // Arrange
         var memory = new EditorMemoryFixture();
         int headerReads = 0;
         memory.ReadAllowed = (address, length) =>
         {
-            if (address == memory.ObjectListAddress && length == 20 && ++headerReads % 2 == 0)
-                memory.SetInt(address + 16, headerReads);
+            if (address == memory.ObjectListAddress && length == 16) headerReads++;
+            if (address == memory.HitObjectAddress && length == 336)
+            {
+                memory.SetInt(memory.ObjectListAddress + 12, 0);
+                memory.SetInt(memory.ObjectListAddress + 16, 1);
+            }
             return true;
         };
         var sut = new StableEditorMemoryReader(memory);
 
         // Act
-        Action act = () => sut.ReadSnapshot(Path.GetTempPath());
+        var snapshot = sut.ReadSnapshot(Path.GetTempPath());
 
         // Assert
-        act.Should().Throw<InvalidDataException>();
-        headerReads.Should().Be(4);
+        snapshot!.HitObjects.Should().ContainSingle();
+        headerReads.Should().Be(1);
     }
 
     [TestMethod]
