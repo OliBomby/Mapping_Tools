@@ -488,6 +488,13 @@ jobs:
               -RequireLegacyBridge:$legacyBridge
 
             foreach ($sourceFile in Get-ChildItem -LiteralPath $artifactDirectory -File) {
+              # These are build/deployment metadata and Squirrel compatibility files.
+              # The app updater uses releases.<channel>.json and its package assets;
+              # legacy Onova installs migrate through the bridge ZIPs instead.
+              if ($sourceFile.Name -like 'assets.*.json' -or $sourceFile.Name -like 'RELEASES*') {
+                continue
+              }
+
               $destination = Join-Path $flatDirectory $sourceFile.Name
               if (Test-Path -LiteralPath $destination -PathType Leaf) {
                 throw "Two Velopack artifacts have the same GitHub asset name: $($sourceFile.Name)"
