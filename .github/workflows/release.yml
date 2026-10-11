@@ -495,10 +495,16 @@ jobs:
               Copy-Item -LiteralPath $sourceFile.FullName -Destination $destination
             }
           }
-          $feedNames = @(Get-ChildItem -LiteralPath $flatDirectory -File -Filter 'releases.*.json' |
-            Select-Object -ExpandProperty Name)
-          if ($feedNames.Count -ne $rids.Count) {
-            throw "Expected six channel feeds, found $($feedNames.Count)."
+          foreach ($rid in $rids) {
+            $feedPath = Join-Path $flatDirectory "releases.$rid.json"
+            if (-not (Test-Path -LiteralPath $feedPath -PathType Leaf)) {
+              throw "Missing flattened Velopack channel feed for '$rid': $feedPath"
+            }
+          }
+          $feedFiles = @(Get-ChildItem -LiteralPath $flatDirectory -File |
+            Where-Object { $_.Name.StartsWith('releases.') -and $_.Name.EndsWith('.json') })
+          if ($feedFiles.Count -ne $rids.Count) {
+            throw "Expected six channel feeds, found $($feedFiles.Count)."
           }
 
           $bridgePresent = Test-Path -LiteralPath (Join-Path $flatDirectory 'release.zip')
