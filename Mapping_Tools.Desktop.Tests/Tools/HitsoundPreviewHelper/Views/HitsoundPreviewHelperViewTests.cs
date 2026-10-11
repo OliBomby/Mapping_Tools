@@ -66,8 +66,9 @@ public sealed class HitsoundPreviewHelperViewTests
         bool zoneSelectedAfterClick = zone.IsSelected;
         TextBox editor = nameCell.GetVisualDescendants().OfType<TextBox>()
             .First(textBox => textBox.IsVisible && textBox.Bounds.Width > 0);
-        bool editorFocused = editor.Focus();
-        host.PressKey(Key.A, RawInputModifiers.Control, PhysicalKey.A, "a");
+        bool editorFocused = editor.IsFocused;
+        host.Window.KeyPress(Key.A, RawInputModifiers.Control, PhysicalKey.A, "a");
+        host.Window.KeyRelease(Key.A, RawInputModifiers.Control, PhysicalKey.A, "a");
         host.TypeText("edited from the grid");
         host.Click(rowCells[1]);
 
@@ -98,9 +99,8 @@ public sealed class HitsoundPreviewHelperViewTests
         host.Click(hitsoundCell);
         ComboBox editor = hitsoundCell.GetVisualDescendants().OfType<ComboBox>()
             .Single(comboBox => comboBox.IsVisible && comboBox.Bounds.Width > 0);
-        bool editorFocused = editor.Focus();
-        host.PressKey(Key.F4, RawInputModifiers.None, PhysicalKey.F4, "");
-        bool dropDownOpenedWithF4 = editor.IsDropDownOpen;
+        bool editorFocused = editor.IsFocused;
+        bool dropDownOpenedWithPointerClick = editor.IsDropDownOpen;
         Popup dropdownPopup = editor.GetVisualDescendants().OfType<Popup>().Single();
         Control dropdownContent = dropdownPopup.Child
                                    ?? throw new InvalidOperationException("The hitsound dropdown has no content.");
@@ -124,8 +124,48 @@ public sealed class HitsoundPreviewHelperViewTests
 
         // Assert
         editorFocused.Should().BeTrue();
-        dropDownOpenedWithF4.Should().BeTrue();
+        dropDownOpenedWithPointerClick.Should().BeTrue();
         zone.Hitsound.Should().NotBe(originalHitsound);
+    }
+
+    [TestMethod]
+    public void NameCell_TabMovesToNextEditableCellInsideGrid()
+    {
+        // Arrange
+        HitsoundPreviewHelperViewModel viewModel = CreateViewModel(new RecordingPreviewService());
+        ObservableHitsoundZone zone = new() { Name = "zone" };
+        viewModel.Items.Add(zone);
+        HitsoundPreviewHelperView view = new() { DataContext = viewModel };
+        using HeadlessViewHost host = HeadlessViewHost.Show(view);
+        DataGrid grid = view.GetVisualDescendants().OfType<DataGrid>().Single();
+        DataGridCell[] cells = grid.GetVisualDescendants().OfType<DataGridCell>()
+            .Where(cell => ReferenceEquals(cell.DataContext, zone) && cell.IsVisible && cell.Bounds.Width > 0)
+            .OrderBy(cell => cell.Bounds.X)
+            .ToArray();
+        TextBlock nameDisplay = cells[0].GetVisualDescendants().OfType<TextBlock>()
+            .Single(textBlock => textBlock.Text == "zone");
+
+        // Act
+        host.Click(nameDisplay);
+        host.Window.KeyPress(Key.A, RawInputModifiers.Control, PhysicalKey.A, "a");
+        host.Window.KeyRelease(Key.A, RawInputModifiers.Control, PhysicalKey.A, "a");
+        host.TypeText("name committed by tab");
+        host.Window.KeyPress(Key.Tab, RawInputModifiers.None, PhysicalKey.Tab, "\t");
+        host.Window.KeyRelease(Key.Tab, RawInputModifiers.None, PhysicalKey.Tab, "\t");
+        HeadlessViewHost.RunDispatcherJobs();
+        TextBox? filenameEditor = cells[1].GetVisualDescendants().OfType<TextBox>()
+            .FirstOrDefault(textBox => textBox.IsVisible && textBox.Bounds.Width > 0);
+        host.Window.KeyPress(Key.A, RawInputModifiers.Control, PhysicalKey.A, "a");
+        host.Window.KeyRelease(Key.A, RawInputModifiers.Control, PhysicalKey.A, "a");
+        host.TypeText("edited from tab");
+
+        // Assert
+        zone.Name.Should().Be("name committed by tab");
+        grid.IsKeyboardFocusWithin.Should().BeTrue();
+        grid.CurrentColumn.Should().Be(grid.Columns[1]);
+        filenameEditor.Should().NotBeNull();
+        filenameEditor.IsFocused.Should().BeTrue();
+        filenameEditor.Text.Should().Be("edited from tab");
     }
 
     [TestMethod]
@@ -154,8 +194,7 @@ public sealed class HitsoundPreviewHelperViewTests
             host.Click(sampleSetCell);
             ComboBox editor = sampleSetCell.GetVisualDescendants().OfType<ComboBox>()
                 .Single(comboBox => comboBox.IsVisible && comboBox.Bounds.Width > 0);
-            editor.Focus();
-            host.PressKey(Key.F4, RawInputModifiers.None, PhysicalKey.F4, "");
+            bool editorFocused = editor.IsFocused;
             Popup dropdownPopup = editor.GetVisualDescendants().OfType<Popup>().Single();
             Control dropdownContent = dropdownPopup.Child
                                        ?? throw new InvalidOperationException("The sample-set dropdown has no content.");
@@ -179,6 +218,7 @@ public sealed class HitsoundPreviewHelperViewTests
 
             // Assert
             inheritedChoiceText.Should().Be("Auto");
+            editorFocused.Should().BeTrue();
             selectedValue.Should().Be(SampleSet.Normal);
             zone.SampleSet.Should().Be(SampleSet.Normal);
             zone.Model.SampleSet.Should().Be(SampleSet.Normal);

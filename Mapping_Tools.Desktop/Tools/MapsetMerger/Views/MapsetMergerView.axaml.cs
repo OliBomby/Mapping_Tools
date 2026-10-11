@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.VisualTree;
 using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Tools.MapsetMerger.ViewModels;
 
@@ -19,6 +20,32 @@ public partial class MapsetMergerView : UserControl
     {
         InitializeComponent();
         addMapsetButtonModifiers = new ButtonModifierCapture(AddMapsetButton);
+    }
+
+    private void DataGridPreparingCellForEdit(object? sender, DataGridPreparingCellForEditEventArgs e)
+    {
+        if (e.EditingElement is TextBox textBox)
+        {
+            textBox.Focus();
+            return;
+        }
+
+        if (e.EditingElement.GetVisualDescendants().OfType<TextBox>().FirstOrDefault() is { } childTextBox)
+            childTextBox.Focus();
+    }
+
+    private void DataGridKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (sender is DataGrid grid)
+            DataGridTabNavigation.HandleKeyDown(grid, e);
+    }
+
+    private void DataGridPointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        if (sender is not DataGrid grid || e.InitialPressMouseButton != MouseButton.Left) return;
+        if (e.Source is not Control source || source.FindAncestorOfType<DataGridCell>() is null) return;
+
+        grid.BeginEdit();
     }
 
     private async void AddMapsetButtonClick(object? sender, RoutedEventArgs eventArgs)

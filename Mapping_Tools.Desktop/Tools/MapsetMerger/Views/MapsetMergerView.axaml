@@ -22,7 +22,10 @@
                           CanUserAddRows="False"
                           SelectionMode="Extended"
                           IsReadOnly="False"
-                          EditTriggers="CellClick"
+                          EditTriggers="TextInput"
+                          PreparingCellForEdit="DataGridPreparingCellForEdit"
+                          PointerReleased="DataGridPointerReleased"
+                          KeyDown="DataGridKeyDown"
                           UseLogicalScrollable="True"
                           ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <DataGrid.Styles>

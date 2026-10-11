@@ -1,5 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Utils;
+using Avalonia.Input;
+using Avalonia.Interactivity;
 
 namespace Mapping_Tools.Desktop.Controls;
 
@@ -46,5 +48,21 @@ public sealed class CompactDataGridComboBoxColumn : DataGridComboBoxColumn
         }
 
         return element;
+    }
+
+    /// <summary>
+    ///     Opens the dropdown when a pointer click begins editing the cell.
+    /// </summary>
+    /// <param name="editingElement">The combo-box editor for the cell.</param>
+    /// <param name="editingEventArgs">The input that began editing.</param>
+    /// <returns>The value before editing began.</returns>
+    protected override object PrepareCellForEdit(Control editingElement, RoutedEventArgs editingEventArgs)
+    {
+        object uneditedValue = base.PrepareCellForEdit(editingElement, editingEventArgs);
+
+        if (editingElement is ComboBox comboBox && editingEventArgs is PointerEventArgs)
+            comboBox.IsDropDownOpen = true;
+
+        return uneditedValue;
     }
 }

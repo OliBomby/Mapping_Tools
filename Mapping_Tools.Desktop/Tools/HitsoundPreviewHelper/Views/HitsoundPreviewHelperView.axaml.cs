@@ -22,13 +22,19 @@ public sealed partial class HitsoundPreviewHelperView : UserControl
         addButtonModifiers = new ButtonModifierCapture(AddButton);
     }
 
+    private void DataGridKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (sender is DataGrid grid)
+            DataGridTabNavigation.HandleKeyDown(grid, e);
+    }
+
     private void DataGridPointerReleased(object? sender, PointerReleasedEventArgs e)
     {
         if (sender is not DataGrid grid || e.InitialPressMouseButton != MouseButton.Left
             || grid.DataContext is not HitsoundPreviewHelperViewModel) return;
         if (e.Source is not Control source || source.FindAncestorOfType<DataGridCell>() is null) return;
 
-        grid.BeginEdit();
+        grid.BeginEdit(e);
     }
 
     private void AddButtonClick(object? sender, RoutedEventArgs e)
