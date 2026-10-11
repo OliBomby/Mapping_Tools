@@ -217,7 +217,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         Report(progress, 0.6);
 
         string detailedSummary = ApplicationText.Format(
-            "HitsoundStudio_ExportSummary",
+            ApplicationStrings.HitsoundStudio_ExportSummary,
             standard.Schema.GetCustomIndices(comparer).Count,
             standard.Schema.Count(entry => entry.Value.Any(isValid)),
             CountIndexChanges(standard.Events));
@@ -326,7 +326,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         Report(progress, 0.5);
 
         string detailedSummary = ApplicationText.Format(
-            "HitsoundStudio_ImportSummary",
+            ApplicationStrings.HitsoundStudio_ImportSummary,
             packages.SelectMany(package => package.Samples).Select(sample => sample.SampleArgs).Distinct(comparer).Count());
 
         bool writesFiles = project.ExportSamples || project.ExportMap;
@@ -380,7 +380,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         var beatmap = session.Beatmap;
 
         string detailedSummary = ApplicationText.Format(
-            "HitsoundStudio_MidiSummary",
+            ApplicationStrings.HitsoundStudio_MidiSummary,
             packages.Sum(package => package.Samples.Count),
             project.AddGreenLineVolumeToMidi ? beatmap.BeatmapTiming.TimingPoints.Count : 0);
         Report(progress, 0.2);
