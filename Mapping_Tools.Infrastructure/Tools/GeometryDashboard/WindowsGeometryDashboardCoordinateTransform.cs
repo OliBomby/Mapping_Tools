@@ -30,7 +30,6 @@ internal sealed class WindowsGeometryDashboardCoordinateTransform
         this.editorBoxOffset = editorBoxOffset;
         clientBox = window.ClientBounds;
         dpiMultiplier = window.DpiScale;
-        DpiSourceAvailable = window.DpiSourceAvailable;
         OsuFillsScreen = display.Fullscreen;
         letterboxing = display.Letterboxing;
         letterboxingPosition = display.LetterboxingPosition;
@@ -44,8 +43,6 @@ internal sealed class WindowsGeometryDashboardCoordinateTransform
     internal Vector2 EditorGridResolution => new(512, 384);
 
     internal Box2 EditorBox => GetEditorBox();
-
-    internal bool DpiSourceAvailable { get; }
 
     private double FilebarHeight => 24 * dpiMultiplier.Y;
 
@@ -91,21 +88,6 @@ internal sealed class WindowsGeometryDashboardCoordinateTransform
         return new Vector2(
             value.X * editorGridBox.Width / EditorGridResolution.X,
             value.Y * editorGridBox.Height / EditorGridResolution.Y);
-    }
-
-    internal Vector2 ToDpi(Vector2 coordinate)
-    {
-        return !DpiSourceAvailable
-            ? coordinate
-            : new Vector2(
-                  coordinate.X / dpiMultiplier.X,
-                  coordinate.Y / dpiMultiplier.Y)
-              + new Vector2(0.1, 0.1);
-    }
-
-    internal Vector2 GetDpiMultiplier()
-    {
-        return dpiMultiplier;
     }
 
     private Box2 GetOsuWindowBox()

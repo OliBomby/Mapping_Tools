@@ -94,10 +94,7 @@ public sealed class WindowsGeometryDashboardOverlayService : IGeometryDashboardO
                 host.SetScene(scene, snapshot.Transform);
                 host.SetBorder(options.ShowDebugBorder);
                 host.Enable();
-                host.Update(
-                    snapshot.Transform.EditorBox,
-                    snapshot.Transform.GetDpiMultiplier(),
-                    snapshot.Transform.DpiSourceAvailable);
+                host.Update(snapshot.Transform.EditorBox);
             });
         }
     }

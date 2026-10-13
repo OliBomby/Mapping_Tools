@@ -13,7 +13,7 @@ namespace Mapping_Tools.Infrastructure.Tools.GeometryDashboard;
 
 /// <summary>
 ///     Owns a click-through, non-activating native popup window that follows the
-///     active osu! window and retains the legacy overlay coordinate conversion.
+///     active osu! window and renders in physical desktop pixels.
 /// </summary>
 internal sealed class WindowsGeometryDashboardOverlayHost
 {
@@ -126,10 +126,7 @@ internal sealed class WindowsGeometryDashboardOverlayHost
         HideNativeWindow();
     }
 
-    internal void Update(
-        Box2 physicalBounds,
-        Vector2 dpiMultiplier,
-        bool dpiSourceAvailable)
+    internal void Update(Box2 physicalBounds)
     {
         ThrowIfDisposed();
         if (!isWindows() || !enabled || window == 0 || TargetWindow is null) return;
@@ -141,11 +138,7 @@ internal sealed class WindowsGeometryDashboardOverlayHost
             return;
         }
 
-        if (!TryConvertBounds(
-                physicalBounds,
-                dpiMultiplier,
-                dpiSourceAvailable,
-                out var nativeBounds))
+        if (!TryConvertBounds(physicalBounds, out var nativeBounds))
         {
             HideNativeWindow();
             return;
@@ -241,43 +234,18 @@ internal sealed class WindowsGeometryDashboardOverlayHost
         }
     }
 
-    private static Vector2 ToDpi(
-        Vector2 coordinate,
-        Vector2 dpiMultiplier,
-        bool dpiSourceAvailable)
-    {
-        return !dpiSourceAvailable
-            ? coordinate
-            : new Vector2(
-                  coordinate.X / dpiMultiplier.X,
-                  coordinate.Y / dpiMultiplier.Y)
-              + new Vector2(0.1, 0.1);
-    }
-
     internal static bool TryConvertBounds(
         Box2 physicalBounds,
-        Vector2 dpiMultiplier,
-        bool dpiSourceAvailable,
         out NativeBounds bounds)
     {
         bounds = default;
         if (!AreFinite(physicalBounds)) return false;
 
-        if (dpiSourceAvailable && (!double.IsFinite(dpiMultiplier.X) || !double.IsFinite(dpiMultiplier.Y) || dpiMultiplier.X <= 0 || dpiMultiplier.Y <= 0))
-            return false;
-
-        var topLeft = ToDpi(
-            new Vector2(physicalBounds.Left, physicalBounds.Top),
-            dpiMultiplier,
-            dpiSourceAvailable);
-        var bottomRight = ToDpi(
-            new Vector2(physicalBounds.Right, physicalBounds.Bottom),
-            dpiMultiplier,
-            dpiSourceAvailable);
-        if (!TryRoundToInt(topLeft.X, out int left)
-            || !TryRoundToInt(topLeft.Y, out int top)
-            || !TryRoundToInt(Math.Abs(bottomRight.X - topLeft.X), out int width)
-            || !TryRoundToInt(Math.Abs(bottomRight.Y - topLeft.Y), out int height))
+        // Native window placement and the Skia bitmap both use physical pixels.
+        if (!TryRoundToInt(physicalBounds.Left, out int left)
+            || !TryRoundToInt(physicalBounds.Top, out int top)
+            || !TryRoundToInt(Math.Abs(physicalBounds.Width), out int width)
+            || !TryRoundToInt(Math.Abs(physicalBounds.Height), out int height))
             return false;
 
         bounds = new NativeBounds(left, top, width, height);
@@ -454,7 +422,8 @@ internal sealed class WindowsGeometryDashboardOverlayHost
             {
                 var canvas = surface.Canvas;
                 canvas.Clear(SKColors.Transparent);
-                if (state is not null) DrawFrame(canvas, state);
+                if (state?.Transform is { } transform)
+                    DrawFrame(canvas, state.Scene, transform, state.PhysicalBounds);
                 if (drawBorder) DrawBorder(canvas, width, height);
                 surface.Flush();
             }
@@ -502,9 +471,13 @@ internal sealed class WindowsGeometryDashboardOverlayHost
         }
     }
 
-    private static void DrawFrame(SKCanvas canvas, OverlayPaintState state)
+    internal static void DrawFrame(
+        SKCanvas canvas,
+        GeometryDashboardOverlayScene scene,
+        WindowsGeometryDashboardCoordinateTransform transform,
+        Box2 physicalBounds)
     {
-        foreach (var shape in state.Scene.Shapes)
+        foreach (var shape in scene.Shapes)
         {
             using var pathEffect = ToPathEffect(shape.DashStyle);
             using SKPaint paint = new();
@@ -514,7 +487,7 @@ internal sealed class WindowsGeometryDashboardOverlayHost
             paint.StrokeWidth = (float)Math.Max(0.1, shape.Thickness);
             paint.PathEffect = pathEffect;
 
-            var start = ToClientPoint(shape.Start, state);
+            var start = ToClientPoint(shape.Start, transform, physicalBounds);
             switch (shape.Kind)
             {
                 case GeometryDashboardOverlayShapeKind.Point:
@@ -527,9 +500,7 @@ internal sealed class WindowsGeometryDashboardOverlayHost
                         paint);
                     break;
                 case GeometryDashboardOverlayShapeKind.Circle:
-                    double radius = state.Transform is null
-                        ? 0
-                        : state.Transform.ToDpi(state.Transform.ScaleByRatio(new Vector2(shape.Radius, 0))).X;
+                    double radius = transform.ScaleByRatio(new Vector2(shape.Radius, 0)).X;
                     canvas.DrawOval(
                         new SKRect(
                             start.X - (float)radius,
@@ -539,15 +510,15 @@ internal sealed class WindowsGeometryDashboardOverlayHost
                         paint);
                     break;
                 case GeometryDashboardOverlayShapeKind.Line:
-                    canvas.DrawLine(start, ToClientPoint(shape.End, state), paint);
+                    canvas.DrawLine(start, ToClientPoint(shape.End, transform, physicalBounds), paint);
                     break;
                 case GeometryDashboardOverlayShapeKind.Box:
                     canvas.DrawRect(
                         new SKRect(
                             start.X,
                             start.Y,
-                            ToClientPoint(shape.End, state).X,
-                            ToClientPoint(shape.End, state).Y),
+                            ToClientPoint(shape.End, transform, physicalBounds).X,
+                            ToClientPoint(shape.End, transform, physicalBounds).Y),
                         paint);
                     break;
             }
@@ -569,16 +540,16 @@ internal sealed class WindowsGeometryDashboardOverlayHost
         }
     }
 
-    private static SKPoint ToClientPoint(Vector2 point, OverlayPaintState state)
+    private static SKPoint ToClientPoint(
+        Vector2 point,
+        WindowsGeometryDashboardCoordinateTransform transform,
+        Box2 physicalBounds)
     {
-        if (state.Transform is null) return default;
-
-        var overlayPoint = state.Transform.EditorToOverlayCoordinate(point);
+        var overlayPoint = transform.EditorToOverlayCoordinate(point);
         Vector2 relative = new(
-            overlayPoint.X - state.PhysicalBounds.Left,
-            overlayPoint.Y - state.PhysicalBounds.Top);
-        var logical = state.Transform.ToDpi(relative);
-        return new SKPoint((float)logical.X, (float)logical.Y);
+            overlayPoint.X - physicalBounds.Left,
+            overlayPoint.Y - physicalBounds.Top);
+        return new SKPoint((float)relative.X, (float)relative.Y);
     }
 
     private static SKColor ToSkiaColor(RgbaColour colour, double opacity)

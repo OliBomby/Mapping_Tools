@@ -406,7 +406,7 @@ public sealed class GeometryDashboardWindowsAdapterTests
     }
 
     [TestMethod]
-    public void OverlayBounds_WithLiveDpi_PreservesLegacyScaleOffsetAndRounding()
+    public void TryConvertBounds_WithNegativeMonitorOrigin_PreservesPhysicalCoordinates()
     {
         // Arrange
         Box2 physicalBounds = new(-1920, 100, 0, 1100);
@@ -414,27 +414,6 @@ public sealed class GeometryDashboardWindowsAdapterTests
         // Act
         bool converted = WindowsGeometryDashboardOverlayHost.TryConvertBounds(
             physicalBounds,
-            new Vector2(2, 2),
-            true,
-            out var nativeBounds);
-
-        // Assert
-        converted.Should().BeTrue();
-        nativeBounds.Should().Be(
-            new WindowsGeometryDashboardOverlayHost.NativeBounds(-960, 50, 960, 500));
-    }
-
-    [TestMethod]
-    public void OverlayBounds_WithUnavailableDpiSource_UsesPhysicalCoordinates()
-    {
-        // Arrange
-        Box2 physicalBounds = new(-1920, 100, 0, 1100);
-
-        // Act
-        bool converted = WindowsGeometryDashboardOverlayHost.TryConvertBounds(
-            physicalBounds,
-            Vector2.Zero,
-            false,
             out var nativeBounds);
 
         // Assert
@@ -444,26 +423,39 @@ public sealed class GeometryDashboardWindowsAdapterTests
     }
 
     [TestMethod]
-    public void OverlayBounds_WithInvalidDpiOrCoordinates_IsRejected()
+    public void TryConvertBounds_WithFractionalBounds_RoundsToPhysicalPixels()
     {
         // Arrange
-        Box2 validBounds = new(0, 0, 100, 100);
+        Box2 physicalBounds = new(-1919.75, 100.25, 0.25, 1100.25);
 
         // Act
-        bool invalidDpi = WindowsGeometryDashboardOverlayHost.TryConvertBounds(
-            validBounds,
-            new Vector2(0, 1),
-            true,
-            out _);
-        bool invalidCoordinates = WindowsGeometryDashboardOverlayHost.TryConvertBounds(
-            new Box2(double.NaN, 0, 100, 100),
-            Vector2.One,
-            false,
+        bool converted = WindowsGeometryDashboardOverlayHost.TryConvertBounds(
+            physicalBounds,
+            out var nativeBounds);
+
+        // Assert
+        converted.Should().BeTrue();
+        nativeBounds.Should().Be(
+            new WindowsGeometryDashboardOverlayHost.NativeBounds(-1920, 100, 1920, 1000));
+    }
+
+    [TestMethod]
+    [DataRow(double.NaN)]
+    [DataRow(double.PositiveInfinity)]
+    [DataRow(double.NegativeInfinity)]
+    [DataRow(double.MaxValue)]
+    public void TryConvertBounds_WithInvalidCoordinates_IsRejected(double left)
+    {
+        // Arrange
+        Box2 physicalBounds = new(left, 0, 100, 100);
+
+        // Act
+        bool converted = WindowsGeometryDashboardOverlayHost.TryConvertBounds(
+            physicalBounds,
             out _);
 
         // Assert
-        invalidDpi.Should().BeFalse();
-        invalidCoordinates.Should().BeFalse();
+        converted.Should().BeFalse();
     }
 
     [TestMethod]
