@@ -26,6 +26,7 @@ using Mapping_Tools.Application.Workspace.Models;
 using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Localization;
 using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Plugin;
 using Mapping_Tools.Desktop.Services;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Services.Notifications;
@@ -51,6 +52,56 @@ namespace Mapping_Tools.Desktop.Tests.Shell;
 [TestClass]
 public sealed class DesktopShellTests
 {
+    [TestMethod]
+    public async Task MainWindow_ShellMenusAfterFailedActivation_RemainsAvailable()
+    {
+        // Arrange
+        ShellMenuContribution contribution = new(ShellMenuLocation.MenuBar,
+            new ShellMenuItem("Plugin action", new RelayCommand(() => { })));
+        await using var viewModel = CreateMainViewModel(
+            [Registration("broken", "Broken", () => throw new InvalidOperationException("Failed activation."))],
+            initialize: false, shellMenuContributions: [contribution]);
+        MainWindow window = new() { DataContext = viewModel };
+        var menu = window.FindControl<Menu>("ShellMenuBar")!;
+        var pluginItem = (MenuItem)menu.Items.Last()!;
+
+        // Act
+        await viewModel.InitializeAsync();
+
+        // Assert
+        viewModel.FeatureLoadError.Should().NotBeNullOrEmpty();
+        viewModel.HasProjectMenu.Should().BeFalse();
+        menu.Items.Last().Should().BeSameAs(pluginItem);
+        pluginItem.Header.Should().Be("Plugin action");
+        pluginItem.IsVisible.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task MainWindow_ShellMenusDuringNavigation_RemainsAvailableWithoutProjectMenu()
+    {
+        // Arrange
+        ShellMenuContribution contribution = new(ShellMenuLocation.File,
+            new ShellMenuItem("Plugin action", new RelayCommand(() => { })));
+        await using var viewModel = CreateMainViewModel(
+            [Registration("home", "Home"), Registration("other", "Other")],
+            initialize: false, shellMenuContributions: [contribution]);
+        MainWindow window = new() { DataContext = viewModel };
+        var fileMenu = window.FindControl<MenuItem>("ShellFileMenu")!;
+        var pluginItem = (MenuItem)fileMenu.Items.Last()!;
+
+        // Act
+        await viewModel.InitializeAsync();
+        viewModel.SelectedFeature = viewModel.FeatureItems[1];
+        HeadlessViewHost.RunDispatcherJobs();
+
+        // Assert
+        viewModel.HasProjectMenu.Should().BeFalse();
+        fileMenu.Items.Last().Should().BeSameAs(pluginItem);
+        pluginItem.Header.Should().Be("Plugin action");
+        pluginItem.IsVisible.Should().BeTrue();
+        viewModel.ShellMenuContributions.Should().ContainSingle().Which.Should().BeSameAs(contribution);
+    }
+
     [DataTestMethod]
     [DataRow(0)]
     [DataRow(1)]
@@ -1516,7 +1567,8 @@ public sealed class DesktopShellTests
         IApplicationDataMigrationService? migrationService = null,
         ICurrentBeatmapDialogService? currentBeatmapDialog = null,
         TestBeatmapWorkspace? beatmapWorkspace = null,
-        bool initialize = true)
+        bool initialize = true,
+        IEnumerable<ShellMenuContribution>? shellMenuContributions = null)
     {
         var resolvedSettings = settings ?? new DesktopApplicationSettings();
         var resolvedNotifications = notifications ?? new UserNotificationService();
@@ -1553,7 +1605,8 @@ public sealed class DesktopShellTests
                 serializer: projectSerializer),
             dispatcher ?? workspaceDispatcher,
             null,
-            migrationService);
+            migrationService,
+            shellMenuContributions: shellMenuContributions);
         if (initialize) viewModel.InitializeAsync().GetAwaiter().GetResult();
         return viewModel;
     }

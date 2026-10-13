@@ -168,8 +168,8 @@
                                                                 Height="28" />
                                 </ToggleButton>
 
-                                <Menu Classes="top-menu">
-                                    <MenuItem Header="{loc:Tr Shell_MenuFile}"
+                                <Menu x:Name="ShellMenuBar" Classes="top-menu">
+                                    <MenuItem x:Name="ShellFileMenu" Header="{loc:Tr Shell_MenuFile}"
                                               Height="35">
                                         <MenuItem Header="{loc:Tr Shell_MenuOpenBeatmap}"
                                                   Command="{Binding Workspace.OpenBeatmapCommand}"
@@ -214,7 +214,7 @@
                                             </MenuItem.Icon>
                                         </MenuItem>
                                     </MenuItem>
-                                    <MenuItem Header="{loc:Tr Shell_MenuAbout}"
+                                    <MenuItem x:Name="ShellAboutMenu" Header="{loc:Tr Shell_MenuAbout}"
                                               Height="35">
                                         <MenuItem Header="{loc:Tr Shell_MenuOpenMappingToolsFolder}"
                                                   Command="{Binding Workspace.OpenApplicationFolderCommand}"

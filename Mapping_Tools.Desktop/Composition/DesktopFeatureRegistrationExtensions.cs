@@ -40,9 +40,12 @@ internal static class DesktopFeatureRegistrationExtensions
             translatedDescriptionGetter: static () => DesktopStrings.Shell_PreferencesDescription,
             translatedSearchTermsGetter: static () => DesktopStrings.Shell_PreferencesSearchTerms);
 
-        var catalog = ToolDefinitionCatalog.Discover(toolAssemblies);
+        var assemblies = toolAssemblies.ToArray();
+        var catalog = ToolDefinitionCatalog.Discover(assemblies);
         catalog.RegisterServices(services);
         services.AddSingleton(catalog);
+
+        ShellPluginCatalog.Discover(assemblies).RegisterServices(services);
 
         services.AddSingleton<IShellFeatureRegistry>(provider =>
             new ShellFeatureRegistry(

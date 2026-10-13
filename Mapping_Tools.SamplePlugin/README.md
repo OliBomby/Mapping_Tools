@@ -39,3 +39,60 @@ then pass the same schema to the tool's `ProjectDefinition<T>`. The host writes 
 
 The plugin references the host's public `Mapping_Tools.Desktop.Plugin` API and the host's Avalonia/MVVM assemblies.
 Build it against the same Mapping Tools source revision as the executable that will load it.
+
+## Shell plugins
+
+Plugins can extend shell menus without defining a mapping tool. Mark a public, parameterless `IShellPlugin`
+implementation with `[ShellPlugin]`. Its `RegisterServices` method registers plugin services and singleton
+`ShellMenuContribution` factories. The host discovers it in the same `Plugins` folder as tool definitions.
+One DLL can contain either kind of entry point or both; a shell-only plugin needs no tool metadata, view,
+view model, project configuration, or QuickRun registration.
+
+`SampleShellPlugin.cs` adds a Sample Plugin menu with folder-opening actions. It is independent of
+`SampleToolRegistration` and remains available on Get started, Preferences, and every mapping tool,
+including while a tool is loading or fails to load.
+
+For example, this is a complete shell-only entry point using an existing shell command:
+
+```csharp
+using Mapping_Tools.Desktop.Plugin;
+using Mapping_Tools.Desktop.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
+
+[ShellPlugin]
+public sealed class FolderPlugin : IShellPlugin
+{
+    public void RegisterServices(IServiceCollection services)
+    {
+        services.AddSingleton(provider => new ShellMenuContribution(
+            ShellMenuLocation.File,
+            new ShellMenuItem("Open Mapping Tools folder",
+                provider.GetRequiredService<BeatmapWorkspaceViewModel>().OpenApplicationFolderCommand)));
+    }
+}
+```
+
+`ShellMenuLocation.File` and `About` append to the corresponding built-in menu. `MenuBar` appends a new
+top-level action or submenu after the built-in menus. Locations do not depend on translated labels.
+Assemblies load in filename order, entry points in type-name order, and contributions retain service-registration
+order. Multiple plugins can contribute to the same menu.
+
+A `ShellMenuItem` supplies either an `ICommand` action or non-empty `items` for a nested submenu. Optional
+Material icons, tooltips, and underscore access keys are supported. Avalonia observes the command's
+`CanExecute` and `CanExecuteChanged`, so context-sensitive commands can stay visible and become disabled
+when their prerequisites are missing. Use `RelayCommand` or `AsyncRelayCommand` for plugin-owned actions.
+Resolve dependencies inside contribution factories after service registration is complete. Singleton services
+that implement `IDisposable` or `IAsyncDisposable` are disposed by the host at shutdown.
+
+Plugins can resolve `IBeatmapWorkspace` for selected maps, `IPlatformLauncher` to open folders, files, or URLs,
+and `IDialogService` or plugin-owned Avalonia windows for other interfaces. For launching a particular third-party
+executable, register a plugin-owned platform adapter. Commands should handle expected failures and report
+them through `IUserNotificationService`, as the existing shell commands do.
+
+For localization, pass `translatedHeaderGetter` and `translatedToolTipGetter`, and register plugin resources with
+`TranslationManager.RegisterResources`. The host refreshes these getters on language changes. Contributions
+are built once for the session; updating a plugin requires a restart. Menu contributions add actions and submenus;
+they do not expose the shell's visual tree as a supported mutation API.
+
+The host uses Avalonia's standard [menu behavior](https://docs.avaloniaui.net/controls/menus/menu)
+and command handling verified against the [12.1.0 MenuItem source](https://raw.githubusercontent.com/AvaloniaUI/Avalonia/12.1.0/src/Avalonia.Controls/MenuItem.cs).
