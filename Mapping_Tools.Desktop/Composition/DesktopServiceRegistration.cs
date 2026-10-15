@@ -58,7 +58,7 @@ internal static class DesktopServiceRegistration
     ///     singletons.
     /// </summary>
     /// <param name="services">The collection that owns the desktop composition root.</param>
-    /// <param name="toolAssemblies">The assemblies that contain the tools to be registered.</param>
+    /// <param name="toolAssemblies">The assemblies containing mapping tool definitions and shell extensions to register.</param>
     /// <param name="localUpdatePackagePath">An optional local update package used instead of GitHub.</param>
     /// <returns>The same collection for registration chaining.</returns>
     public static IServiceCollection AddMappingToolsDesktop(

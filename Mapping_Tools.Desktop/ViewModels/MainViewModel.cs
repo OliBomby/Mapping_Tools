@@ -14,6 +14,7 @@ using Mapping_Tools.Application.Migration.Contracts;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Plugin;
 using Mapping_Tools.Desktop.Services;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Services.Updates;
@@ -76,6 +77,7 @@ public sealed partial class MainViewModel : LocalizedObservableObject, IDisposab
     /// </param>
     /// <param name="migrationService">Provides the result of migration completed during settings loading.</param>
     /// <param name="logger">Records shell actions, run settings, and activation failures.</param>
+    /// <param name="shellMenuRegistrations">Supplies plugin menus available independently of feature activation.</param>
     public MainViewModel(
         IShellFeatureRegistry registry,
         IQuickRunCommandRegistry quickRunRegistry,
@@ -89,7 +91,8 @@ public sealed partial class MainViewModel : LocalizedObservableObject, IDisposab
         IUiDispatcher dispatcher,
         IUpdaterInteractionService? updaterInteraction = null,
         IApplicationDataMigrationService? migrationService = null,
-        ILogger<MainViewModel>? logger = null)
+        ILogger<MainViewModel>? logger = null,
+        IEnumerable<ShellMenuRegistration>? shellMenuRegistrations = null)
     {
         this.registry = registry ?? throw new ArgumentNullException(nameof(registry));
         this.quickRunRegistry = quickRunRegistry ?? throw new ArgumentNullException(nameof(quickRunRegistry));
@@ -104,6 +107,7 @@ public sealed partial class MainViewModel : LocalizedObservableObject, IDisposab
         this.updaterInteraction = updaterInteraction;
         this.migrationService = migrationService;
         this.logger = logger ?? NullLogger<MainViewModel>.Instance;
+        ShellMenuRegistrations = shellMenuRegistrations?.ToArray() ?? [];
 
         FeatureItems = registry.Features
             .Select(registration => new ShellFeatureItemViewModel(
@@ -144,6 +148,9 @@ public sealed partial class MainViewModel : LocalizedObservableObject, IDisposab
 
     /// <summary>Gets the active feature's standard and additional project-menu commands.</summary>
     public IReadOnlyList<ShellProjectMenuItem> ProjectMenuItems { get; private set; } = [];
+
+    /// <summary>Gets plugin menus that remain available across navigation and feature loading.</summary>
+    public IReadOnlyList<ShellMenuRegistration> ShellMenuRegistrations { get; }
 
     /// <summary>Gets or sets the case-insensitive feature search query.</summary>
     public string SearchText
