@@ -7,8 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Mapping_Tools.SamplePlugin;
 
 /// <summary>Demonstrates an always-available shell menu, independently of the sample mapping tool.</summary>
-[ShellPlugin]
-public sealed class SampleShellPlugin : IShellPlugin
+[ShellExtension]
+public sealed class SampleShellExtension : IShellExtension
 {
     /// <inheritdoc />
     public void RegisterServices(IServiceCollection services)
@@ -17,7 +17,7 @@ public sealed class SampleShellPlugin : IShellPlugin
         services.AddSingleton(provider =>
         {
             var workspace = provider.GetRequiredService<BeatmapWorkspaceViewModel>();
-            return new ShellMenuContribution(ShellMenuLocation.MenuBar, new ShellMenuItem(
+            return new ShellMenuRegistration(ShellMenuLocation.MenuBar, new ShellMenuItem(
                 "_Sample Plugin",
                 items:
                 [

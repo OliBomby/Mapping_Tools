@@ -45,7 +45,7 @@ internal static class DesktopFeatureRegistrationExtensions
         catalog.RegisterServices(services);
         services.AddSingleton(catalog);
 
-        ShellPluginCatalog.Discover(assemblies).RegisterServices(services);
+        ShellExtensionCatalog.Discover(assemblies).RegisterServices(services);
 
         services.AddSingleton<IShellFeatureRegistry>(provider =>
             new ShellFeatureRegistry(

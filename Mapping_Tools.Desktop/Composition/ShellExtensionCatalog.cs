@@ -5,21 +5,21 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Mapping_Tools.Desktop.Composition;
 
-internal sealed class ShellPluginCatalog
+internal sealed class ShellExtensionCatalog
 {
-    private ShellPluginCatalog(IReadOnlyList<IShellPlugin> plugins)
+    private ShellExtensionCatalog(IReadOnlyList<IShellExtension> extensions)
     {
-        Plugins = plugins;
+        Extensions = extensions;
     }
 
-    internal IReadOnlyList<IShellPlugin> Plugins { get; }
+    internal IReadOnlyList<IShellExtension> Extensions { get; }
 
-    internal static ShellPluginCatalog Discover(
+    internal static ShellExtensionCatalog Discover(
         IEnumerable<Assembly> assemblies,
         Action<Assembly, Exception>? logFailure = null)
     {
         ArgumentNullException.ThrowIfNull(assemblies);
-        List<IShellPlugin> plugins = [];
+        List<IShellExtension> extensions = [];
         foreach (var assembly in assemblies.Distinct())
         {
             try
@@ -27,30 +27,30 @@ internal sealed class ShellPluginCatalog
                 // Materialize first so a broken assembly cannot leave partial contributions.
                 var discovered = assembly.GetTypes()
                     .Where(type => !type.IsAbstract && !type.ContainsGenericParameters
-                                   && type.IsDefined(typeof(ShellPluginAttribute), false)
-                                   && typeof(IShellPlugin).IsAssignableFrom(type))
+                                   && type.IsDefined(typeof(ShellExtensionAttribute), false)
+                                   && typeof(IShellExtension).IsAssignableFrom(type))
                     .OrderBy(type => type.FullName, StringComparer.Ordinal)
                     .Select(type => type.GetConstructor(Type.EmptyTypes) is not null
-                        ? (IShellPlugin)Activator.CreateInstance(type)!
+                        ? (IShellExtension)Activator.CreateInstance(type)!
                         : throw new InvalidOperationException(
-                            $"Shell plugin '{type.FullName}' must have a parameterless constructor."))
+                            $"Shell extension '{type.FullName}' must have a parameterless constructor."))
                     .ToArray();
-                plugins.AddRange(discovered);
+                extensions.AddRange(discovered);
             }
-            catch (Exception exception) when (assembly != typeof(ShellPluginCatalog).Assembly)
+            catch (Exception exception) when (assembly != typeof(ShellExtensionCatalog).Assembly)
             {
                 if (logFailure is not null) logFailure(assembly, exception);
-                else Trace.TraceError("Could not load shell plugins from assembly '{0}': {1}",
+                else Trace.TraceError("Could not load shell extensions from assembly '{0}': {1}",
                     assembly.GetName().Name, exception);
             }
         }
 
-        return new ShellPluginCatalog(plugins);
+        return new ShellExtensionCatalog(extensions);
     }
 
     internal void RegisterServices(IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);
-        foreach (var plugin in Plugins) plugin.RegisterServices(services);
+        foreach (var extension in Extensions) extension.RegisterServices(services);
     }
 }

@@ -93,8 +93,8 @@ public partial class MainWindow : Window, INotificationSurface
         this.logger = logger ?? NullLogger<MainWindow>.Instance;
         InitializeComponent();
         var shellMenus = new ShellMenuHost(ShellMenuBar, ShellFileMenu, ShellAboutMenu);
-        DataContextChanged += (_, _) => shellMenus.SetContributions(
-            DataContext is MainViewModel viewModel ? viewModel.ShellMenuContributions : []);
+        DataContextChanged += (_, _) => shellMenus.SetRegistrations(
+            DataContext is MainViewModel viewModel ? viewModel.ShellMenuRegistrations : []);
         AddHandler(KeyDownEvent, HandleWindowKeyDown, RoutingStrategies.Tunnel);
         ProjectUndoWindowInput.Attach(
             this,

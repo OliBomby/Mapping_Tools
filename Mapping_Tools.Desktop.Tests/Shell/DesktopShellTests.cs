@@ -56,11 +56,11 @@ public sealed class DesktopShellTests
     public async Task MainWindow_ShellMenusAfterFailedActivation_RemainsAvailable()
     {
         // Arrange
-        ShellMenuContribution contribution = new(ShellMenuLocation.MenuBar,
+        ShellMenuRegistration registration = new(ShellMenuLocation.MenuBar,
             new ShellMenuItem("Plugin action", new RelayCommand(() => { })));
         await using var viewModel = CreateMainViewModel(
             [Registration("broken", "Broken", () => throw new InvalidOperationException("Failed activation."))],
-            initialize: false, shellMenuContributions: [contribution]);
+            initialize: false, shellMenuRegistrations: [registration]);
         MainWindow window = new() { DataContext = viewModel };
         var menu = window.FindControl<Menu>("ShellMenuBar")!;
         var pluginItem = (MenuItem)menu.Items.Last()!;
@@ -80,11 +80,11 @@ public sealed class DesktopShellTests
     public async Task MainWindow_ShellMenusDuringNavigation_RemainsAvailableWithoutProjectMenu()
     {
         // Arrange
-        ShellMenuContribution contribution = new(ShellMenuLocation.File,
+        ShellMenuRegistration registration = new(ShellMenuLocation.File,
             new ShellMenuItem("Plugin action", new RelayCommand(() => { })));
         await using var viewModel = CreateMainViewModel(
             [Registration("home", "Home"), Registration("other", "Other")],
-            initialize: false, shellMenuContributions: [contribution]);
+            initialize: false, shellMenuRegistrations: [registration]);
         MainWindow window = new() { DataContext = viewModel };
         var fileMenu = window.FindControl<MenuItem>("ShellFileMenu")!;
         var pluginItem = (MenuItem)fileMenu.Items.Last()!;
@@ -99,7 +99,7 @@ public sealed class DesktopShellTests
         fileMenu.Items.Last().Should().BeSameAs(pluginItem);
         pluginItem.Header.Should().Be("Plugin action");
         pluginItem.IsVisible.Should().BeTrue();
-        viewModel.ShellMenuContributions.Should().ContainSingle().Which.Should().BeSameAs(contribution);
+        viewModel.ShellMenuRegistrations.Should().ContainSingle().Which.Should().BeSameAs(registration);
     }
 
     [DataTestMethod]
@@ -1568,7 +1568,7 @@ public sealed class DesktopShellTests
         ICurrentBeatmapDialogService? currentBeatmapDialog = null,
         TestBeatmapWorkspace? beatmapWorkspace = null,
         bool initialize = true,
-        IEnumerable<ShellMenuContribution>? shellMenuContributions = null)
+        IEnumerable<ShellMenuRegistration>? shellMenuRegistrations = null)
     {
         var resolvedSettings = settings ?? new DesktopApplicationSettings();
         var resolvedNotifications = notifications ?? new UserNotificationService();
@@ -1606,7 +1606,7 @@ public sealed class DesktopShellTests
             dispatcher ?? workspaceDispatcher,
             null,
             migrationService,
-            shellMenuContributions: shellMenuContributions);
+            shellMenuRegistrations: shellMenuRegistrations);
         if (initialize) viewModel.InitializeAsync().GetAwaiter().GetResult();
         return viewModel;
     }

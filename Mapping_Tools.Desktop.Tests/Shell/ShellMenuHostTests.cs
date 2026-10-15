@@ -16,7 +16,7 @@ namespace Mapping_Tools.Desktop.Tests.Shell;
 public sealed class ShellMenuHostTests
 {
     [TestMethod]
-    public void SetContributions_AllLocations_PreservesBuiltInsAndRendersNestedCommands()
+    public void SetRegistrations_AllLocations_PreservesBuiltInsAndRendersNestedCommands()
     {
         // Arrange
         MenuItem file = new() { Header = "File" };
@@ -32,7 +32,7 @@ public sealed class ShellMenuHostTests
         RelayCommand command = new(() => executed++);
 
         // Act
-        shell.SetContributions(
+        shell.SetRegistrations(
         [
             new(ShellMenuLocation.File, new ShellMenuItem("Folder", command,
                 icon: MaterialIconKind.FolderOpen, toolTip: "Open a folder")),
@@ -59,7 +59,7 @@ public sealed class ShellMenuHostTests
 
     [TestMethod]
     [SuppressMessage("ReSharper", "AccessToModifiedClosure", Justification = "The command deliberately observes changing context while its menu is open.")]
-    public void SetContributions_CommandAvailabilityChanges_UpdatesEnabledState()
+    public void SetRegistrations_CommandAvailabilityChanges_UpdatesEnabledState()
     {
         // Arrange
         MenuItem file = new() { Header = "File" };
@@ -70,7 +70,7 @@ public sealed class ShellMenuHostTests
         ShellMenuHost shell = new(menu, file, about);
         bool available = false;
         RelayCommand command = new(() => { }, () => available);
-        shell.SetContributions([new(ShellMenuLocation.File, new ShellMenuItem("Open folder", command))]);
+        shell.SetRegistrations([new(ShellMenuLocation.File, new ShellMenuItem("Open folder", command))]);
         using var host = HeadlessViewHost.Show(menu);
         host.Click(file);
         var item = (MenuItem)file.Items[0]!;
@@ -87,7 +87,7 @@ public sealed class ShellMenuHostTests
     }
 
     [TestMethod]
-    public void SetContributions_ReplacedOrCleared_RemovesOnlyPreviousPluginItems()
+    public void SetRegistrations_ReplacedOrCleared_RemovesOnlyPreviousPluginItems()
     {
         // Arrange
         MenuItem file = new();
@@ -98,14 +98,14 @@ public sealed class ShellMenuHostTests
         menu.Items.Add(file);
         menu.Items.Add(about);
         ShellMenuHost shell = new(menu, file, about);
-        ShellMenuContribution contribution = new(ShellMenuLocation.File,
+        ShellMenuRegistration registration = new(ShellMenuLocation.File,
             new ShellMenuItem("Folder", new RelayCommand(() => { })));
-        shell.SetContributions([contribution]);
-        shell.SetContributions([contribution]);
+        shell.SetRegistrations([registration]);
+        shell.SetRegistrations([registration]);
         int itemCountAfterReplacement = file.Items.Count;
 
         // Act
-        shell.SetContributions([]);
+        shell.SetRegistrations([]);
 
         // Assert
         itemCountAfterReplacement.Should().Be(2);
@@ -114,7 +114,7 @@ public sealed class ShellMenuHostTests
     }
 
     [TestMethod]
-    public void SetContributions_LanguageChanges_RefreshesExistingLabelsAndTooltips()
+    public void SetRegistrations_LanguageChanges_RefreshesExistingLabelsAndTooltips()
     {
         // Arrange
         string? previous = TranslationManager.Language;
@@ -125,7 +125,7 @@ public sealed class ShellMenuHostTests
         menu.Items.Add(file);
         menu.Items.Add(about);
         ShellMenuHost shell = new(menu, file, about);
-        shell.SetContributions([new(ShellMenuLocation.File, new ShellMenuItem("Folder",
+        shell.SetRegistrations([new(ShellMenuLocation.File, new ShellMenuItem("Folder",
             new RelayCommand(() => { }),
             translatedHeaderGetter: () => TranslationManager.Language == "nl" ? "Map" : "Folder",
             translatedToolTipGetter: () => TranslationManager.Language == "nl" ? "Open map" : "Open folder"))]);

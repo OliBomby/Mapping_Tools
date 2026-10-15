@@ -77,7 +77,7 @@ public sealed partial class MainViewModel : LocalizedObservableObject, IDisposab
     /// </param>
     /// <param name="migrationService">Provides the result of migration completed during settings loading.</param>
     /// <param name="logger">Records shell actions, run settings, and activation failures.</param>
-    /// <param name="shellMenuContributions">Supplies plugin menus available independently of feature activation.</param>
+    /// <param name="shellMenuRegistrations">Supplies plugin menus available independently of feature activation.</param>
     public MainViewModel(
         IShellFeatureRegistry registry,
         IQuickRunCommandRegistry quickRunRegistry,
@@ -92,7 +92,7 @@ public sealed partial class MainViewModel : LocalizedObservableObject, IDisposab
         IUpdaterInteractionService? updaterInteraction = null,
         IApplicationDataMigrationService? migrationService = null,
         ILogger<MainViewModel>? logger = null,
-        IEnumerable<ShellMenuContribution>? shellMenuContributions = null)
+        IEnumerable<ShellMenuRegistration>? shellMenuRegistrations = null)
     {
         this.registry = registry ?? throw new ArgumentNullException(nameof(registry));
         this.quickRunRegistry = quickRunRegistry ?? throw new ArgumentNullException(nameof(quickRunRegistry));
@@ -107,7 +107,7 @@ public sealed partial class MainViewModel : LocalizedObservableObject, IDisposab
         this.updaterInteraction = updaterInteraction;
         this.migrationService = migrationService;
         this.logger = logger ?? NullLogger<MainViewModel>.Instance;
-        ShellMenuContributions = shellMenuContributions?.ToArray() ?? [];
+        ShellMenuRegistrations = shellMenuRegistrations?.ToArray() ?? [];
 
         FeatureItems = registry.Features
             .Select(registration => new ShellFeatureItemViewModel(
@@ -150,7 +150,7 @@ public sealed partial class MainViewModel : LocalizedObservableObject, IDisposab
     public IReadOnlyList<ShellProjectMenuItem> ProjectMenuItems { get; private set; } = [];
 
     /// <summary>Gets plugin menus that remain available across navigation and feature loading.</summary>
-    public IReadOnlyList<ShellMenuContribution> ShellMenuContributions { get; }
+    public IReadOnlyList<ShellMenuRegistration> ShellMenuRegistrations { get; }
 
     /// <summary>Gets or sets the case-insensitive feature search query.</summary>
     public string SearchText

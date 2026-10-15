@@ -10,22 +10,22 @@ internal sealed class ShellMenuHost(Menu menuBar, MenuItem fileMenu, MenuItem ab
 {
     private readonly List<(ItemsControl Parent, MenuItem Item)> addedItems = [];
 
-    internal void SetContributions(IEnumerable<ShellMenuContribution> contributions)
+    internal void SetRegistrations(IEnumerable<ShellMenuRegistration> registrations)
     {
         foreach (var (parent, item) in addedItems) parent.Items.Remove(item);
         addedItems.Clear();
 
-        foreach (var contribution in contributions)
+        foreach (var registration in registrations)
         {
-            ItemsControl parent = contribution.Location switch
+            ItemsControl parent = registration.Location switch
             {
                 ShellMenuLocation.MenuBar => menuBar,
                 ShellMenuLocation.File => fileMenu,
                 ShellMenuLocation.About => aboutMenu,
-                _ => throw new ArgumentOutOfRangeException(nameof(contributions)),
+                _ => throw new ArgumentOutOfRangeException(nameof(registrations)),
             };
-            var item = CreateItem(contribution.Item);
-            if (contribution.Location == ShellMenuLocation.MenuBar) item.Height = 35;
+            var item = CreateItem(registration.Item);
+            if (registration.Location == ShellMenuLocation.MenuBar) item.Height = 35;
             parent.Items.Add(item);
             addedItems.Add((parent, item));
         }
