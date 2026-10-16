@@ -1,5 +1,6 @@
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.SliderMerger;
@@ -11,6 +12,53 @@ namespace Mapping_Tools.Core.Tests.Tools.SliderMerger;
 [TestClass]
 public sealed class SliderMergerEngineTests
 {
+    [DataTestMethod]
+    [DataRow(SliderMergerConnectionMode.Move, false)]
+    [DataRow(SliderMergerConnectionMode.Move, true)]
+    [DataRow(SliderMergerConnectionMode.Linear, false)]
+    [DataRow(SliderMergerConnectionMode.Linear, true)]
+    public void Merge_ThreePerfectCurvesInV14_SavesStableBezierWithMatchingGeometry(
+        SliderMergerConnectionMode connectionMode, bool linearOnLinear)
+    {
+        // Arrange
+        HitObject first = BeatmapTestData.DecodeHitObject("64,128,0,2,0,P|114:78|164:128,1,150");
+        HitObject second = BeatmapTestData.DecodeHitObject("164,128,1000,2,0,P|214:178|264:128,1,150");
+        HitObject third = BeatmapTestData.DecodeHitObject("264,128,2000,2,0,P|314:78|364:128,1,150");
+        Beatmap beatmap = CreateBeatmap(first, second, third);
+        beatmap.Version = 14;
+        foreach (HitObject slider in beatmap.HitObjects)
+            slider.PixelLength = slider.GetSliderPath(true).Distance;
+
+        double expectedLength = beatmap.HitObjects.Sum(slider => slider.PixelLength);
+        SliderMergerEngineOptions options = new()
+        {
+            ConnectionModeSetting = connectionMode,
+            Leniency = 2,
+            LinearOnLinear = linearOnLinear,
+            MergeOnSliderEnd = true,
+        };
+
+        // Act
+        int merged = SliderMergerEngine.Merge(beatmap, beatmap.HitObjects, options);
+        string encoded = new BeatmapEncoder().Encode(beatmap);
+        Beatmap savedBeatmap = new BeatmapDecoder().Decode(encoded);
+
+        // Assert
+        merged.Should().Be(3);
+        encoded.Should().StartWith("osu file format v14\r\n");
+        HitObject savedSlider = savedBeatmap.HitObjects.Should().ContainSingle().Subject;
+        savedSlider.ControlPoints[0].Type.Should().Be(PathType.Bezier);
+        savedSlider.PixelLength.Should().Be(expectedLength);
+        savedSlider.Repeat.Should().Be(1);
+        savedSlider.GetAbsoluteControlPointPositions().Should().Contain(new Vector2(164, 128));
+        savedSlider.GetAbsoluteControlPointPositions().Should().Contain(new Vector2(264, 128));
+        var expectedPath = beatmap.HitObjects.Single().GetSliderPath();
+        var savedPath = savedSlider.GetSliderPath();
+        for (int index = 0; index <= 100; index++)
+            Vector2.Distance(savedPath.PositionAt(index / 100d), expectedPath.PositionAt(index / 100d))
+                .Should().BeLessThan(2);
+    }
+
     [TestMethod]
     public void Merge_TwoCircles_CreatesSliderAndPreservesEndpointEdges()
     {

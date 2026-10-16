@@ -210,13 +210,21 @@ internal static class HitObjectTextCodec
         if (hitObject.IsSlider)
         {
             var builder = new StringBuilder();
-            bool mixedTypes = hitObject.ControlPoints.Any(
-                point => point.Type.HasValue && point.Type != hitObject.ControlPoints[0].Type);
+            PathType pathType = hitObject.ControlPoints[0].Type ?? PathType.Linear;
+            bool stableCompatible = pathType switch
+            {
+                PathType.Bezier or PathType.Linear => hitObject.ControlPoints.All(
+                    point => point.Type is null || point.Type == pathType),
+                PathType.PerfectCurve or PathType.Catmull => hitObject.ControlPoints.Skip(1).All(
+                    point => point.Type is null),
+                _ => false,
+            };
+
             // Keep ordinary Bezier red anchors readable by stable even when the source header is v128.
             bool repeatedBoundaries = formatVersion < 128 ||
-                                      !mixedTypes && hitObject.ControlPoints[0].Type == PathType.Bezier;
+                                      stableCompatible && pathType == PathType.Bezier;
 
-            if (formatVersion < 128 && (mixedTypes || hitObject.ControlPoints[0].Type == PathType.BSpline))
+            if (formatVersion < 128 && !stableCompatible)
             {
                 var bezier = BezierConverter.ConvertToBezierAnchors(hitObject.ControlPoints);
                 builder.Append('B');
