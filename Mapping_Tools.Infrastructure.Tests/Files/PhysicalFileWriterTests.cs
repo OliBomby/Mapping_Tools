@@ -84,7 +84,7 @@ public sealed class PhysicalFileWriterTests : IDisposable
     [DataRow("lines", 225)]
     [DataRow("copy", 20)]
     [DataRow("copy", 225)]
-    public async Task Write_ExistingDestination_NotifiesOnlyDestinationWithoutCreatingOrRenamingFiles(
+    public async Task Write_ExistingDestination_DoesNotNotifyTemporaryPaths(
         string operation, int fileNameLength)
     {
         // Arrange
@@ -95,18 +95,27 @@ public sealed class PhysicalFileWriterTests : IDisposable
         await File.WriteAllTextAsync(source, "complete");
         ConcurrentQueue<(WatcherChangeTypes Type, string? Name)> events = new();
         TaskCompletionSource sentinelCreated = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        TaskCompletionSource destinationNotified = new(TaskCreationOptions.RunContinuationsAsynchronously);
         using FileSystemWatcher watcher = new(root);
         watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.Size;
-        watcher.Changed += (_, args) => events.Enqueue((args.ChangeType, args.Name));
-        watcher.Deleted += (_, args) => events.Enqueue((args.ChangeType, args.Name));
-        watcher.Renamed += (_, args) => events.Enqueue((args.ChangeType, args.Name));
-        watcher.Created += (_, args) =>
+        watcher.Changed += recordEvent;
+        watcher.Deleted += recordEvent;
+        watcher.Created += recordEvent;
+        watcher.Renamed += (sender, args) =>
         {
-            events.Enqueue((args.ChangeType, args.Name));
-            if (args.Name == "sentinel") sentinelCreated.TrySetResult();
+            events.Enqueue((args.ChangeType, args.OldName));
+            recordEvent(sender, args);
         };
         watcher.Error += (_, args) => sentinelCreated.TrySetException(args.GetException());
         watcher.EnableRaisingEvents = true;
+
+        void recordEvent(object _, FileSystemEventArgs args)
+        {
+            events.Enqueue((args.ChangeType, args.Name));
+            if (args.Name == "sentinel" && args.ChangeType == WatcherChangeTypes.Created)
+                sentinelCreated.TrySetResult();
+            if (args.Name == fileName) destinationNotified.TrySetResult();
+        }
 
         // Act
         switch (operation)
@@ -125,15 +134,19 @@ public sealed class PhysicalFileWriterTests : IDisposable
                 break;
         }
 
-        // Wait for a subsequent directory notification so earlier temporary-file events are observed too.
+        // Wait for both paths: macOS can coalesce and reorder notifications within a batch.
         await File.WriteAllTextAsync(Path.Combine(root, "sentinel"), "");
-        await sentinelCreated.Task.WaitAsync(TimeSpan.FromSeconds(10));
+        await Task.WhenAll(sentinelCreated.Task, destinationNotified.Task).WaitAsync(TimeSpan.FromSeconds(10));
 
         // Assert
         File.ReadAllText(destination).Should().Be(operation == "lines" ? "complete\r\n" : "complete");
         var writeEvents = events.Where(item => item.Name != "sentinel").ToArray();
         writeEvents.Should().NotBeEmpty();
-        writeEvents.Should().OnlyContain(item => item.Type == WatcherChangeTypes.Changed && item.Name == fileName);
+        // FSEvents can include delayed setup events and report existing files as Created.
+        // Every reported path must still belong to a real input or destination, never a temporary sibling.
+        writeEvents.Should().OnlyContain(item => item.Name == fileName || item.Name == "source.osu");
+        if (OperatingSystem.IsWindows())
+            writeEvents.Should().OnlyContain(item => item.Type == WatcherChangeTypes.Changed && item.Name == fileName);
     }
 
     [TestMethod]
