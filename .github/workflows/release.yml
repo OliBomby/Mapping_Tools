@@ -21,7 +21,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  DOTNET_VERSION: '10.0.x'
+  DOTNET_VERSION: '10.0.402'
   # Keep this in lockstep with the Velopack NuGet package referenced by the app.
   VPK_VERSION: '1.2.0'
   PACK_TITLE: Mapping Tools
