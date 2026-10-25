@@ -8,7 +8,7 @@ namespace Mapping_Tools.Infrastructure.Tests.Backups;
 public sealed class FileSystemBeatmapBackupStoreTests
 {
     [TestMethod]
-    public async Task CopyAndWriteLinesAsync_WithExistingDestination_ReplacesAtomicallyWithoutTemporaryFiles()
+    public async Task CopyAndWriteLinesAsync_WithExistingDestination_ReplacesWithoutTemporaryFiles()
     {
         // Arrange
         string directory = Path.Combine(

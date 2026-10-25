@@ -43,7 +43,7 @@ public interface IBeatmapBackupStore
     /// </summary>
     /// <param name="sourcePath">The existing file to read.</param>
     /// <param name="destinationPath">The file to create or replace.</param>
-    /// <param name="cancellationToken">Cancels before opening either file and during stream copying.</param>
+    /// <param name="cancellationToken">Cancels reading before the destination write begins.</param>
     /// <returns>A task that completes only after the destination stream has been flushed.</returns>
     Task CopyAsync(
         string sourcePath,
@@ -55,7 +55,7 @@ public interface IBeatmapBackupStore
     /// </summary>
     /// <param name="destinationPath">The generated backup path.</param>
     /// <param name="lines">The complete osu! document in serialization order.</param>
-    /// <param name="cancellationToken">Cancels before or during the write.</param>
+    /// <param name="cancellationToken">Cancels preparation before the destination write begins.</param>
     /// <returns>A task that completes only after all lines have been flushed.</returns>
     Task WriteLinesAsync(
         string destinationPath,

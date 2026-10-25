@@ -502,7 +502,7 @@ public sealed class ProjectPersistenceTests
     }
 
     [TestMethod]
-    public async Task SaveAsync_RoundTrip_OverwritesAtomicallyWithoutTemporaryFiles()
+    public async Task SaveAsync_RoundTrip_OverwritesWithoutTemporaryFiles()
     {
         // Arrange
         using TestDirectory test = new();

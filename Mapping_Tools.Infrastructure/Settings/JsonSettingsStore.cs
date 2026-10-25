@@ -12,7 +12,7 @@ using Mapping_Tools.Infrastructure.Settings.Migrations;
 namespace Mapping_Tools.Infrastructure.Settings;
 
 /// <summary>
-///     Reads versioned Mapping Tools settings and atomically writes the current
+///     Reads versioned Mapping Tools settings and directly writes the current
 ///     model-shaped JSON representation.
 /// </summary>
 public sealed class JsonSettingsStore : ISettingsStore
@@ -139,10 +139,10 @@ public sealed class JsonSettingsStore : ISettingsStore
         document["$version"] = SettingsMigrationCatalog.CurrentVersion;
 
         string json = document.ToJsonString(canonicalOptions);
-        PhysicalAtomicFileWriter.WriteText(
+        PhysicalFileWriter.WriteText(
             directories.ConfigurationFile,
             json,
-            PhysicalAtomicFileWriter.Utf8WithoutBom);
+            PhysicalFileWriter.Utf8WithoutBom);
     }
 
     private static JsonObject ParseObject(string json)

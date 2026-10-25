@@ -29,10 +29,10 @@ public sealed class PhysicalBeatmapsetFileSystem : IBeatmapsetFileSystem
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         ArgumentNullException.ThrowIfNull(text);
 
-        PhysicalAtomicFileWriter.WriteText(
+        PhysicalFileWriter.WriteText(
             path,
             text,
-            PhysicalAtomicFileWriter.Utf8WithoutBom);
+            PhysicalFileWriter.Utf8WithoutBom);
     }
 
     /// <inheritdoc />

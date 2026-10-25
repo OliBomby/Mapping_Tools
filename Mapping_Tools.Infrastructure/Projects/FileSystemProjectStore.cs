@@ -6,8 +6,8 @@ using Mapping_Tools.Infrastructure.Files;
 namespace Mapping_Tools.Infrastructure.Projects;
 
 /// <summary>
-///     Persists project JSON through a same-directory temporary file so an
-///     interrupted save cannot truncate the previous project.
+///     Serializes project JSON before writing directly to its destination
+///     without temporary sibling files.
 /// </summary>
 public sealed class FileSystemProjectStore : IProjectStore
 {
@@ -37,14 +37,15 @@ public sealed class FileSystemProjectStore : IProjectStore
     }
 
     /// <summary>
-    ///     Serializes before touching the destination, writes a unique sibling
-    ///     temporary file, then atomically moves the complete document into place.
+    ///     Serializes and encodes before touching the destination, then writes
+    ///     the complete document directly without temporary sibling files.
     /// </summary>
     /// <typeparam name="TProject">The feature-specific project model.</typeparam>
     /// <param name="path">The local destination JSON file.</param>
     /// <param name="project">The complete non-null project snapshot.</param>
     /// <param name="cancellationToken">
-    ///     Prevents replacement when cancellation is observed before the final move.
+    ///     Cancels preparation before the destination is opened. Once started,
+    ///     the destination write completes without cancellation.
     /// </param>
     public async Task SaveAsync<TProject>(
         string path,
@@ -63,7 +64,7 @@ public sealed class FileSystemProjectStore : IProjectStore
                         ?? throw new ArgumentException("The project path has no parent directory.", nameof(path));
         Directory.CreateDirectory(parent);
 
-        await PhysicalAtomicFileWriter
+        await PhysicalFileWriter
             .WriteTextAsync(
                 fullPath,
                 json,
@@ -92,7 +93,7 @@ public sealed class FileSystemProjectStore : IProjectStore
                         ?? throw new ArgumentException("The project path has no parent directory.", nameof(path));
         Directory.CreateDirectory(parent);
 
-        await PhysicalAtomicFileWriter
+        await PhysicalFileWriter
             .WriteTextAsync(
                 fullPath,
                 json,

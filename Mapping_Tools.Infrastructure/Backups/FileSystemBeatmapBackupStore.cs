@@ -5,8 +5,8 @@ using Mapping_Tools.Infrastructure.Files;
 namespace Mapping_Tools.Infrastructure.Backups;
 
 /// <summary>
-///     Persists backup copies with sibling temporary files so cancellation or an
-///     interrupted write cannot leave a partially replaced beatmap.
+///     Writes backups and restores directly to their destinations, preparing
+///     contents before writing and creating no temporary sibling files.
 /// </summary>
 public sealed class FileSystemBeatmapBackupStore : IBeatmapBackupStore
 {
@@ -42,7 +42,7 @@ public sealed class FileSystemBeatmapBackupStore : IBeatmapBackupStore
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(sourcePath);
         ArgumentException.ThrowIfNullOrWhiteSpace(destinationPath);
-        await PhysicalAtomicFileWriter
+        await PhysicalFileWriter
             .CopyAsync(sourcePath, destinationPath, cancellationToken)
             .ConfigureAwait(false);
     }
@@ -55,11 +55,11 @@ public sealed class FileSystemBeatmapBackupStore : IBeatmapBackupStore
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(destinationPath);
         ArgumentNullException.ThrowIfNull(lines);
-        await PhysicalAtomicFileWriter
+        await PhysicalFileWriter
             .WriteLinesAsync(
                 destinationPath,
                 lines,
-                PhysicalAtomicFileWriter.Utf8WithoutBom,
+                PhysicalFileWriter.Utf8WithoutBom,
                 "\r\n",
                 cancellationToken)
             .ConfigureAwait(false);
