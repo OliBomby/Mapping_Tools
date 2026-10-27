@@ -11,6 +11,32 @@ namespace Mapping_Tools.Core.Tests.Tools.HitsoundPreviewHelper;
 [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
 public sealed class HitsoundPreviewHelperEngineTests
 {
+    [DataTestMethod]
+    [DataRow(128, "custom.wav", SampleSet.Normal, SampleSet.None, SampleSet.Normal)]
+    [DataRow(128, "custom.wav", SampleSet.Soft, SampleSet.None, SampleSet.Soft)]
+    [DataRow(128, "custom.wav", SampleSet.Drum, SampleSet.None, SampleSet.Drum)]
+    [DataRow(14, "custom.wav", SampleSet.Drum, SampleSet.None, SampleSet.None)]
+    [DataRow(128, "", SampleSet.Drum, SampleSet.None, SampleSet.None)]
+    [DataRow(128, "custom.wav", SampleSet.None, SampleSet.None, SampleSet.None)]
+    [DataRow(128, "custom.wav", SampleSet.Drum, SampleSet.Soft, SampleSet.Soft)]
+    public void Apply_WithCustomFilenameAndAutoAdditions_ResolvesAdditionsOnlyForV128ExplicitSampleSet(
+        int version, string filename, SampleSet sampleSet, SampleSet additionsSet, SampleSet expectedAdditionsSet)
+    {
+        // Arrange
+        HitObject hitObject = BeatmapTestData.DecodeHitObject("64,96,1000,1,0,0:0:0:0:");
+        Beatmap beatmap = new([hitObject], [], globalSv: 1.4) { Version = version };
+        HitsoundZone zone = new("zone", filename, 64, 96, Hitsound.Clap, sampleSet, additionsSet, 1);
+
+        // Act
+        HitsoundPreviewHelperEngine.Apply(beatmap, [zone]);
+
+        // Assert
+        hitObject.AdditionSet.Should().Be(expectedAdditionsSet);
+        hitObject.SampleSet.Should().Be(sampleSet);
+        hitObject.Filename.Should().Be(filename);
+        zone.AdditionsSet.Should().Be(additionsSet);
+    }
+
     [TestMethod]
     public void Apply_WithNearestZones_UpdatesOriginHitsoundsAndSampleFields()
     {

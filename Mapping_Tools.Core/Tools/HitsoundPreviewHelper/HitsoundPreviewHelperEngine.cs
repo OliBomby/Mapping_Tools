@@ -1,4 +1,5 @@
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Core.Progress;
 
@@ -49,6 +50,13 @@ public static class HitsoundPreviewHelperEngine
             timelineObject.Filename = closest.Filename;
             timelineObject.SampleSet = closest.SampleSet;
             timelineObject.AdditionSet = closest.AdditionsSet;
+            // Lazer cannot recover the normal sample set from a custom filename in v128 maps.
+            if (beatmap.Version == 128
+                && !string.IsNullOrEmpty(closest.Filename)
+                && closest.SampleSet != SampleSet.None
+                && closest.AdditionsSet == SampleSet.None)
+                timelineObject.AdditionSet = closest.SampleSet;
+
             timelineObject.CustomIndex = closest.CustomIndex;
             timelineObject.SampleVolume = 0;
             timelineObject.SetHitsound(closest.Hitsound);
