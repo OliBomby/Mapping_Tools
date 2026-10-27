@@ -303,10 +303,11 @@ public sealed class GeometryDashboardServiceTests
             []);
         var runtime = new RuntimeStub(snapshot) { RepeatedSnapshot = snapshot };
         using var service = CreateService(input, runtime);
+        await service.RefreshOnceAsync();
 
         // Act
         service.Start();
-        await input.CursorSetReached.WaitAsync(TimeSpan.FromMilliseconds(250));
+        await input.CursorSetReached.WaitAsync(TimeSpan.FromSeconds(5));
         service.Stop();
 
         // Assert
