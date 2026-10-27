@@ -111,7 +111,7 @@ public static partial class MapsetMergerEngine
         // All hitsound files with custom indices
         foreach (var hitObject in beatmap.HitObjects)
             references.HitSoundFiles.UnionWith(
-                hitObject.GetPlayingBodyFilenames(sliderTickRate, false));
+                hitObject.GetPlayingBodyFilenames(beatmap.BeatmapTiming, sliderTickRate, false));
 
         var mode = (GameMode)beatmap.General["Mode"].IntValue;
         var timeline = beatmap.GetTimeline();

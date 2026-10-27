@@ -112,7 +112,9 @@ public sealed class PhysicalMapCleanerSampleService : IMapCleanerSampleService
         double tickRate = beatmap.Difficulty["SliderTickRate"].DoubleValue;
         anyStandardSpinner |= mode == GameMode.Standard && beatmap.HitObjects.Any(item => item.IsSpinner);
         used.Add(Path.GetFileNameWithoutExtension(beatmap.General["AudioFilename"].Value.Trim()));
-        foreach (var item in beatmap.HitObjects) used.UnionWith(item.GetPlayingBodyFilenames(tickRate, false).Select(Path.GetFileNameWithoutExtension).OfType<string>());
+        foreach (var item in beatmap.HitObjects)
+            used.UnionWith(item.GetPlayingBodyFilenames(beatmap.BeatmapTiming, tickRate, false)
+                .Select(Path.GetFileNameWithoutExtension).OfType<string>());
 
         foreach (var item in beatmap.GetTimeline().TimelineObjects) used.UnionWith(item.GetPlayingFilenames(mode, false).Select(Path.GetFileNameWithoutExtension).OfType<string>());
         used.UnionWith(beatmap.StoryboardSoundSamples.Select(sample =>

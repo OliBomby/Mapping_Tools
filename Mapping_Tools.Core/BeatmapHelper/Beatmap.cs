@@ -525,8 +525,7 @@ public class Beatmap
             ho.TimingPoint = BeatmapTiming.GetTimingPointAtTime(ho.Time);
             ho.HitsoundTimingPoint = BeatmapTiming.GetTimingPointAtTime(ho.Time + 5);
             ho.UnInheritedTimingPoint = BeatmapTiming.GetRedlineAtTime(ho.Time);
-            ho.BodyHitsounds = BeatmapTiming.GetTimingPointsInRange(ho.Time, ho.EndTime, false);
-            foreach (double time in ho.GetAllTloTimes(BeatmapTiming)) ho.BodyHitsounds.RemoveAll(o => Math.Abs(time - o.Offset) <= 5);
+            ho.BodyHitsounds = BeatmapTiming.GetTimingPointsInRange(ho.Time + 5, ho.EndTime + 5);
         }
     }
 

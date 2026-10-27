@@ -518,10 +518,12 @@ public class HitObjectTests
         HitObject slider = CreateSlider();
         slider.Whistle = true;
         slider.TimingPoint = CreateTimingPoint(0, -100, SampleSet.Soft, 0, false);
+        slider.HitsoundTimingPoint = slider.TimingPoint;
         slider.BodyHitsounds.Add(CreateTimingPoint(1100, -100, SampleSet.Drum, 3, false));
+        Timing timing = new([slider.TimingPoint, slider.BodyHitsounds[0]], 1.4);
 
         // Act
-        List<string> filenames = slider.GetPlayingBodyFilenames(2, includeDefaults: false);
+        List<string> filenames = slider.GetPlayingBodyFilenames(timing, 2, includeDefaults: false);
 
         // Assert
         filenames.Should().Equal(
@@ -529,6 +531,146 @@ public class HitObjectTests
             "drum-sliderwhistle3.wav",
             "drum-slidertick3.wav",
             "drum-slidertick3.wav");
+    }
+
+    [TestMethod]
+    public void GetPlayingBodyFilenames_WithSampleChangeAtSliderRepeat_IncludesBodySamples()
+    {
+        // Arrange
+        HitObject slider = CreateSlider();
+        slider.Whistle = true;
+        Timing timing = new(
+            [
+                CreateTimingPoint(0, 500, SampleSet.Normal, 1, true),
+                CreateTimingPoint(1500, -100, SampleSet.Soft, 2, false),
+                CreateTimingPoint(1800, -100, SampleSet.Normal, 1, false),
+            ], 1.4);
+        Beatmap beatmap = new() { BeatmapTiming = timing, HitObjects = [slider] };
+        beatmap.GiveObjectsGreenlines();
+
+        // Act
+        List<string> filenames = slider.GetPlayingBodyFilenames(timing, 2, includeDefaults: false);
+
+        // Assert
+        filenames.Should().Equal(
+            "normal-sliderslide.wav",
+            "normal-sliderwhistle.wav",
+            "soft-sliderslide2.wav",
+            "soft-sliderwhistle2.wav",
+            "normal-sliderslide.wav",
+            "normal-sliderwhistle.wav",
+            "normal-slidertick.wav",
+            "soft-slidertick2.wav");
+    }
+
+    [TestMethod]
+    [DataRow(0, false)]
+    [DataRow(1, false)]
+    [DataRow(5, false)]
+    [DataRow(6, true)]
+    public void GetPlayingBodyFilenames_WithSampleChangeNearHead_UsesFiveMillisecondLoopOffset(
+        int offsetFromHead,
+        bool initialSamplePlays)
+    {
+        // Arrange
+        HitObject slider = CreateSlider();
+        slider.Whistle = true;
+        Timing timing = new(
+            [
+                CreateTimingPoint(0, 500, SampleSet.Normal, 1, true),
+                CreateTimingPoint(slider.Time + offsetFromHead, -100, SampleSet.Soft, 2, false),
+            ], 1.4);
+        Beatmap beatmap = new() { BeatmapTiming = timing, HitObjects = [slider] };
+        beatmap.GiveObjectsGreenlines();
+
+        // Act
+        List<string> filenames = slider.GetPlayingBodyFilenames(timing, 2, includeDefaults: false);
+
+        // Assert
+        filenames.Should().Contain("soft-sliderslide2.wav").And.Contain("soft-sliderwhistle2.wav");
+        filenames.Contains("normal-sliderslide.wav").Should().Be(initialSamplePlays);
+        filenames.Contains("normal-sliderwhistle.wav").Should().Be(initialSamplePlays);
+    }
+
+    [TestMethod]
+    [DataRow(1, "soft-slidertick2.wav")]
+    [DataRow(2, "soft-slidertick2.wav")]
+    [DataRow(3, "normal-slidertick.wav")]
+    public void GetPlayingBodyFilenames_WithSampleChangeNearTick_UsesTwoMillisecondTickOffset(
+        int offsetFromTick,
+        string firstTickFilename)
+    {
+        // Arrange
+        HitObject slider = CreateSlider();
+        Timing timing = new(
+            [
+                CreateTimingPoint(0, 500, SampleSet.Normal, 1, true),
+                CreateTimingPoint(1250 + offsetFromTick, -100, SampleSet.Soft, 2, false),
+                CreateTimingPoint(1260, -100, SampleSet.Normal, 1, false),
+            ], 1.4);
+        Beatmap beatmap = new() { BeatmapTiming = timing, HitObjects = [slider] };
+        beatmap.GiveObjectsGreenlines();
+
+        // Act
+        List<string> filenames = slider.GetPlayingBodyFilenames(timing, 2, includeDefaults: false);
+
+        // Assert
+        filenames.Where(filename => filename.Contains("slidertick"))
+            .Should().Equal(firstTickFilename, "normal-slidertick.wav");
+    }
+
+    [TestMethod]
+    [DataRow(1001, "soft-slidertick2.wav")]
+    [DataRow(1003, "soft-slidertick2.wav")]
+    [DataRow(1004, "normal-slidertick.wav")]
+    public void GetPlayingBodyFilenames_WithTickInHeadLeniencyWindow_ResolvesTickSeparatelyFromLoop(
+        int sampleChangeTime,
+        string tickFilename)
+    {
+        // Arrange
+        HitObject slider = CreateSlider();
+        slider.Repeat = 1;
+        slider.TemporalLength = 12;
+        Timing timing = new(
+            [
+                CreateTimingPoint(0, 500, SampleSet.Normal, 1, true),
+                CreateTimingPoint(sampleChangeTime, -100, SampleSet.Soft, 2, false),
+            ], 1.4);
+        Beatmap beatmap = new() { BeatmapTiming = timing, HitObjects = [slider] };
+        beatmap.GiveObjectsGreenlines();
+
+        // Act
+        List<string> filenames = slider.GetPlayingBodyFilenames(timing, 500, includeDefaults: false);
+
+        // Assert
+        filenames.Should().Equal("soft-sliderslide2.wav", tickFilename);
+    }
+
+    [TestMethod]
+    [DataRow(-1, true)]
+    [DataRow(0, true)]
+    [DataRow(4, true)]
+    [DataRow(5, true)]
+    [DataRow(6, false)]
+    public void GetPlayingBodyFilenames_WithSampleChangeNearTail_UsesFiveMillisecondLoopOffset(
+        int offsetFromTail,
+        bool changedSamplePlays)
+    {
+        // Arrange
+        HitObject slider = CreateSlider();
+        Timing timing = new(
+            [
+                CreateTimingPoint(0, 500, SampleSet.Normal, 1, true),
+                CreateTimingPoint(slider.EndTime + offsetFromTail, -100, SampleSet.Soft, 2, false),
+            ], 1.4);
+        Beatmap beatmap = new() { BeatmapTiming = timing, HitObjects = [slider] };
+        beatmap.GiveObjectsGreenlines();
+
+        // Act
+        List<string> filenames = slider.GetPlayingBodyFilenames(timing, 2, includeDefaults: false);
+
+        // Assert
+        filenames.Contains("soft-sliderslide2.wav").Should().Be(changedSamplePlays);
     }
 
     [TestMethod]
@@ -570,6 +712,7 @@ public class HitObjectTests
         slider.TemporalLength = 500;
         slider.SliderVelocity = -100;
         slider.TimingPoint = CreateTimingPoint(0, -100, SampleSet.Normal, 0, false);
+        slider.HitsoundTimingPoint = slider.TimingPoint;
         slider.UnInheritedTimingPoint = CreateTimingPoint(0, 500, SampleSet.Normal, 0, true);
         return slider;
     }

@@ -446,23 +446,26 @@ public class HitObject : IComparable<HitObject>
     /// <summary>
     ///     Enumerates slider-body slide, whistle, and tick filenames that can play.
     /// </summary>
+    /// <param name="timing">The complete beatmap timing used to resolve tick samples independently of body timing.</param>
     /// <param name="sliderTickRate">The beat subdivisions per span used to place ticks.</param>
     /// <param name="includeDefaults">Whether inherited index-zero filenames are included.</param>
     /// <returns>Filenames in playback occurrence order; duplicates are retained.</returns>
-    public List<string> GetPlayingBodyFilenames(double sliderTickRate, bool includeDefaults = true)
+    public List<string> GetPlayingBodyFilenames(Timing timing, double sliderTickRate, bool includeDefaults = true)
     {
+        ArgumentNullException.ThrowIfNull(timing);
+
         var samples = new List<string>();
         if (IsSlider)
         {
-            var timingPoint = TimingPoint ?? throw new InvalidOperationException("Slider timing must be resolved before collecting body samples.");
+            var loopTimingPoint = HitsoundTimingPoint ?? throw new InvalidOperationException("Slider hitsound timing must be resolved before collecting body samples.");
 
-            // Get sliderslide hitsounds for every timingpoint in the slider
-            if (includeDefaults || timingPoint.SampleIndex != 0)
+            // Stable's looping samples use the active audio timing point, five milliseconds ahead.
+            if (includeDefaults || loopTimingPoint.SampleIndex != 0)
             {
-                var firstSampleSet = SampleSet == SampleSet.None ? timingPoint.SampleSet : SampleSet;
-                samples.Add(GetSliderFilename(firstSampleSet, "slide", timingPoint.SampleIndex));
+                var firstSampleSet = SampleSet == SampleSet.None ? loopTimingPoint.SampleSet : SampleSet;
+                samples.Add(GetSliderFilename(firstSampleSet, "slide", loopTimingPoint.SampleIndex));
                 if (Whistle)
-                    samples.Add(GetSliderFilename(firstSampleSet, "whistle", timingPoint.SampleIndex));
+                    samples.Add(GetSliderFilename(firstSampleSet, "whistle", loopTimingPoint.SampleIndex));
             }
 
             foreach (var bodyTp in BodyHitsounds)
@@ -474,11 +477,10 @@ public class HitObject : IComparable<HitObject>
                         samples.Add(GetSliderFilename(sampleSet, "whistle", bodyTp.SampleIndex));
                 }
 
-            // Add tick samples
-            // 10 ms over tick time is tick
+            // Ticks use a separate two-millisecond lookup, including ticks in the head's five-millisecond window.
             foreach (double t in GetSliderTickTimes(sliderTickRate))
             {
-                var bodyTp = Timing.GetTimingPointAtTime(t, BodyHitsounds, timingPoint);
+                var bodyTp = timing.GetTimingPointAtTime(t + 2);
                 if (includeDefaults || bodyTp.SampleIndex != 0)
                 {
                     var sampleSet = SampleSet == SampleSet.None ? bodyTp.SampleSet : SampleSet;

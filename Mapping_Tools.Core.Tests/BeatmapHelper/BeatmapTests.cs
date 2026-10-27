@@ -9,6 +9,32 @@ namespace Mapping_Tools.Core.Tests.BeatmapHelper;
 public class BeatmapTests
 {
     [TestMethod]
+    [DataRow("64,96,1000,2,0,L|164:96,2,100,0|0|0,0:0|0:0|0:0,0:0:0:0:")]
+    [DataRow("256,192,1000,8,0,2000,0:0:0:0:")]
+    [DataRow("128,192,1000,128,0,2000:0:0:0:0:")]
+    public void GiveObjectsGreenlines_WithDurationObject_UsesShiftedInclusiveBodyRange(string objectLine)
+    {
+        // Arrange
+        HitObject hitObject = BeatmapTestData.DecodeHitObject(objectLine);
+        hitObject.EndTime = 2000;
+        Timing timing = new(
+            [
+                BeatmapTestData.DecodeTimingPoint("0,500,4,1,1,100,1,0"),
+                BeatmapTestData.DecodeTimingPoint("1004,-100,4,1,2,100,0,0"),
+                BeatmapTestData.DecodeTimingPoint("1005,-100,4,1,3,100,0,0"),
+                BeatmapTestData.DecodeTimingPoint("2005,-100,4,1,4,100,0,0"),
+                BeatmapTestData.DecodeTimingPoint("2006,-100,4,1,5,100,0,0"),
+            ], 1);
+        Beatmap beatmap = new() { BeatmapTiming = timing, HitObjects = [hitObject] };
+
+        // Act
+        beatmap.GiveObjectsGreenlines();
+
+        // Assert
+        hitObject.BodyHitsounds.Select(point => point.Offset).Should().Equal(1005, 2005);
+    }
+
+    [TestMethod]
     public void Encode_WithMixedSlider_UsesBeatmapFormatVersion()
     {
         // Arrange
