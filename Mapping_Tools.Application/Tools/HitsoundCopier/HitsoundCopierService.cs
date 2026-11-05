@@ -21,7 +21,6 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
 {
     private readonly IApplicationDirectories directories;
     private readonly IBeatmapEditingGateway editingGateway;
-    private readonly IFileRevealService reveal;
     private readonly IHitsoundSampleService samples;
     private readonly ApplicationSettings settings;
     private readonly ILogger<HitsoundCopierService> logger;
@@ -30,21 +29,18 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
     /// <param name="editingGateway">Loads live-aware maps and saves through the backup boundary.</param>
     /// <param name="samples">Supplies file/audio sample discovery and export.</param>
     /// <param name="directories">Provides the default sample export directory.</param>
-    /// <param name="reveal">Reveals the completed sample export directory.</param>
     /// <param name="settings">Supplies the automatic editor reload preference.</param>
     /// <param name="logger">Records target processing and sample export milestones.</param>
     public HitsoundCopierService(
         IBeatmapEditingGateway editingGateway,
         IHitsoundSampleService samples,
         IApplicationDirectories directories,
-        IFileRevealService reveal,
         ApplicationSettings settings,
         ILogger<HitsoundCopierService>? logger = null)
     {
         this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
         this.samples = samples ?? throw new ArgumentNullException(nameof(samples));
         this.directories = directories ?? throw new ArgumentNullException(nameof(directories));
-        this.reveal = reveal ?? throw new ArgumentNullException(nameof(reveal));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         this.logger = logger ?? NullLogger<HitsoundCopierService>.Instance;
     }
@@ -73,6 +69,7 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
         int matched = 0;
         int generated = 0;
         int muted = 0;
+        string? outputDirectory = null;
         for (int index = 0; index < targetPaths.Length; index++)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -141,12 +138,15 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
             int exportedSampleCount = await samples.ExportAsync(schema, cancellationToken).ConfigureAwait(false);
             logger.LogInformation("Exported {ExportedCount} samples to {Directory}", exportedSampleCount, directories.Exports);
             if (exportedSampleCount > 0)
-                await reveal.RevealAsync(directories.Exports, cancellationToken).ConfigureAwait(false);
+                outputDirectory = directories.Exports;
         }
 
         logger.LogInformation("Completed {Count} targets: {MatchedCount} matched, {GeneratedCount} samples generated, {MutedCount} edges muted",
             processed.Count, matched, generated, muted);
-        return new HitsoundCopierResult(processed, matched, generated, muted, schema);
+        return new HitsoundCopierResult(processed, matched, generated, muted, schema)
+        {
+            OutputDirectory = outputDirectory,
+        };
     }
 
     private static Beatmap CreateEmptySource(Beatmap target)

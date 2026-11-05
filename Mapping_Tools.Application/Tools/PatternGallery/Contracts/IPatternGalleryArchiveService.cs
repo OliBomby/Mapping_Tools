@@ -12,13 +12,15 @@ public interface IPatternGalleryArchiveService
     /// <param name="projectJson">The serialized project document.</param>
     /// <param name="patternFiles">The pattern files to include.</param>
     /// <param name="cancellationToken">Cancels before the archive is committed.</param>
+    /// <param name="overwrite">Whether the destination archive may already exist.</param>
     Task ExportAsync(
         string archivePath,
         string collectionFolderName,
         string projectFileName,
         string projectJson,
         IReadOnlyList<PatternGalleryArchiveFile> patternFiles,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default,
+        bool overwrite = true);
 
     /// <summary>Reads and validates a collection ZIP without extracting it.</summary>
     /// <param name="archivePath">The existing ZIP path.</param>

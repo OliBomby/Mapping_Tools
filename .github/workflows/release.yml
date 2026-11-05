@@ -15,7 +15,7 @@ permissions:
   contents: read
 
 # A single tagged release is assembled by one publisher job. This prevents the
-# six target jobs from racing while they update the same GitHub Release.
+# target jobs from racing while they update the same GitHub Release.
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
@@ -33,6 +33,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        rid: [win-x86, win-x64, linux-x64, linux-arm64, osx-x64, osx-arm64]
         include:
           - rid: win-x86
             runner: windows-latest
@@ -51,6 +52,8 @@ jobs:
       RID: ${{ matrix.rid }}
       CHANNEL: ${{ matrix.rid }}
       PACK_ID: MappingTools
+      MAIN_EXE: Mapping Tools
+      BUNDLE_ID: com.olibomby.mappingtools
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
@@ -64,7 +67,7 @@ jobs:
             PUBLISH_DIR = Join-Path $env:RUNNER_TEMP 'mapping-tools-publish'
             RELEASE_DIR = Join-Path $env:RUNNER_TEMP 'mapping-tools-velopack'
             ARTIFACT_DIR = Join-Path $env:RUNNER_TEMP 'mapping-tools-velopack-artifact'
-            APP_DIR = Join-Path $env:RUNNER_TEMP 'Mapping Tools.app'
+            APP_DIR = Join-Path $env:RUNNER_TEMP "$($env:PACK_TITLE).app"
           }
 
           foreach ($name in $paths.Keys) {
@@ -143,6 +146,36 @@ jobs:
             exit $LASTEXITCODE
           }
 
+      - name: Bundle CLI with Desktop using shared runtime and libraries
+        shell: pwsh
+        run: |
+          dotnet publish Mapping_Tools.Cli/Mapping_Tools.Cli.csproj -c Release -r $env:RID `
+            --no-restore --self-contained true -o $env:PUBLISH_DIR `
+            "-p:Version=$env:VERSION" "-p:AssemblyVersion=$env:VERSION" "-p:FileVersion=$env:VERSION"
+
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+
+      - name: Verify bundled Desktop and CLI executables
+        shell: pwsh
+        run: |
+          $desktop = Join-Path $env:PUBLISH_DIR $(if ($IsWindows) { 'Mapping Tools.exe' } else { 'Mapping Tools' })
+          $executable = Join-Path $env:PUBLISH_DIR $(if ($IsWindows) { 'mapping-tools.exe' } else { 'mapping-tools' })
+          foreach ($path in @($desktop, $executable)) {
+            if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+              throw "Missing bundled executable: $path"
+            }
+          }
+
+          if ([System.Runtime.InteropServices.RuntimeInformation]::RuntimeIdentifier -eq $env:RID) {
+            & $executable --help
+
+            if ($LASTEXITCODE -ne 0) {
+              exit $LASTEXITCODE
+            }
+          }
+
       - name: Install pinned Velopack CLI
         shell: pwsh
         run: |
@@ -212,7 +245,7 @@ jobs:
           rm -rf "$APP_DIR"
           mkdir -p "$APP_DIR/Contents/MacOS" "$APP_DIR/Contents/Resources"
           cp -R "$PUBLISH_DIR"/. "$APP_DIR/Contents/MacOS/"
-          chmod +x "$APP_DIR/Contents/MacOS/Mapping Tools"
+          chmod +x "$APP_DIR/Contents/MacOS/$MAIN_EXE" "$APP_DIR/Contents/MacOS/mapping-tools"
           cat > "$APP_DIR/Contents/Info.plist" <<EOF
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -221,15 +254,15 @@ jobs:
             <key>CFBundleDevelopmentRegion</key>
             <string>en</string>
             <key>CFBundleDisplayName</key>
-            <string>Mapping Tools</string>
+            <string>${PACK_TITLE}</string>
             <key>CFBundleExecutable</key>
-            <string>Mapping Tools</string>
+            <string>${MAIN_EXE}</string>
             <key>CFBundleIdentifier</key>
-            <string>com.olibomby.mappingtools</string>
+            <string>${BUNDLE_ID}</string>
             <key>CFBundleInfoDictionaryVersion</key>
             <string>6.0</string>
             <key>CFBundleName</key>
-            <string>Mapping Tools</string>
+            <string>${PACK_TITLE}</string>
             <key>CFBundlePackageType</key>
             <string>APPL</string>
             <key>CFBundleShortVersionString</key>
@@ -289,7 +322,7 @@ jobs:
             '--runtime', $env:RID,
             '--packTitle', $env:PACK_TITLE,
             '--packAuthors', 'Mapping Tools contributors',
-            '--mainExe', $(if ($env:RID -like 'win-*') { 'Mapping Tools.exe' } else { 'Mapping Tools' }),
+            '--mainExe', $(if ($env:RID -like 'win-*') { "$($env:MAIN_EXE).exe" } else { $env:MAIN_EXE }),
             '--delta', 'BestSpeed'
           )
 
@@ -409,7 +442,7 @@ jobs:
         run: |
           set -euo pipefail
           artifact_directory="$ARTIFACT_DIR"
-          archive_path="$RUNNER_TEMP/velopack-$RID.tar"
+          archive_path="$RUNNER_TEMP/velopack-$CHANNEL.tar"
           if [[ "$RUNNER_OS" == "Windows" ]]; then
             artifact_directory="$(cygpath --unix "$artifact_directory")"
             archive_path="$(cygpath --unix "$archive_path")"
@@ -419,8 +452,8 @@ jobs:
       - name: Upload Velopack artifact
         uses: actions/upload-artifact@v6
         with:
-          name: velopack-${{ matrix.rid }}
-          path: ${{ runner.temp }}/velopack-${{ matrix.rid }}.tar
+          name: velopack-${{ env.CHANNEL }}
+          path: ${{ runner.temp }}/velopack-${{ env.CHANNEL }}.tar
           if-no-files-found: error
 
   publish:
@@ -511,7 +544,7 @@ jobs:
           $feedFiles = @(Get-ChildItem -LiteralPath $flatDirectory -File |
             Where-Object { $_.Name.StartsWith('releases.') -and $_.Name.EndsWith('.json') })
           if ($feedFiles.Count -ne $rids.Count) {
-            throw "Expected six channel feeds, found $($feedFiles.Count)."
+            throw "Expected $($rids.Count) channel feeds, found $($feedFiles.Count)."
           }
 
           $bridgePresent = Test-Path -LiteralPath (Join-Path $flatDirectory 'release.zip')

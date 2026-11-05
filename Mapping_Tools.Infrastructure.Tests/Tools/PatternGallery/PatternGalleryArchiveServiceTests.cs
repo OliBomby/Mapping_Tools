@@ -9,6 +9,57 @@ namespace Mapping_Tools.Infrastructure.Tests.Tools.PatternGallery;
 public sealed class PatternGalleryArchiveServiceTests
 {
     [TestMethod]
+    public async Task ExportAsync_OverwriteDisabled_PreservesExistingArchive()
+    {
+        // Arrange
+        string root = Path.Combine(Path.GetTempPath(), "MappingToolsPatternGallery", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        string archivePath = Path.Combine(root, "collection.zip");
+        await File.WriteAllTextAsync(archivePath, "original");
+        PatternGalleryArchiveService service = new();
+
+        try
+        {
+            // Act
+            Func<Task> act = () => service.ExportAsync(
+                archivePath, "Collection_01", "project.json", "{}", [], overwrite: false);
+
+            // Assert
+            await act.Should().ThrowAsync<IOException>();
+            (await File.ReadAllTextAsync(archivePath)).Should().Be("original");
+        }
+        finally
+        {
+            Directory.Delete(root, true);
+        }
+    }
+
+    [TestMethod]
+    public async Task ExportAsync_OverwriteEnabled_ReplacesExistingArchive()
+    {
+        // Arrange
+        string root = Path.Combine(Path.GetTempPath(), "MappingToolsPatternGallery", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        string archivePath = Path.Combine(root, "collection.zip");
+        await File.WriteAllTextAsync(archivePath, "original");
+        PatternGalleryArchiveService service = new();
+
+        try
+        {
+            // Act
+            await service.ExportAsync(archivePath, "Collection_01", "project.json", "{}", [], overwrite: true);
+
+            // Assert
+            var archive = await service.ReadAsync(archivePath);
+            archive.ProjectJson.Should().Be("{}");
+        }
+        finally
+        {
+            Directory.Delete(root, true);
+        }
+    }
+
+    [TestMethod]
     public async Task ExportAsync_ThenReadAsync_PreservesProjectAndPatternBytes()
     {
         // Arrange

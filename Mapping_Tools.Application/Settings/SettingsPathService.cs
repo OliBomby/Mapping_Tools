@@ -59,6 +59,7 @@ public sealed class SettingsPathService : ISettingsPathService
         if (string.IsNullOrWhiteSpace(settings.BackupsPath)) settings.BackupsPath = Path.Combine(directories.ApplicationData, "Backups");
 
         environment.EnsureDirectoryExists(settings.BackupsPath);
+
         return new SettingsPathResult(usedFallbackOsuPath);
     }
 }

@@ -10,6 +10,7 @@ internal sealed class PhysicalMapsetFileTransaction : IBeatmapsetFileTransaction
     private readonly string rollbackDirectory;
     private readonly string targetDirectory;
     private bool committed;
+    private IReadOnlyList<string> outputFiles = [];
     private bool disposed;
 
     public PhysicalMapsetFileTransaction(string targetDirectory)
@@ -54,20 +55,45 @@ internal sealed class PhysicalMapsetFileTransaction : IBeatmapsetFileTransaction
     }
 
     /// <inheritdoc />
-    public Task CommitAsync(CancellationToken cancellationToken = default)
+    public Task<IReadOnlyList<string>> CommitAsync(
+        CancellationToken cancellationToken = default,
+        bool overwrite = true,
+        bool clearExisting = false)
     {
         EnsureNotDisposed();
-        if (committed) return Task.CompletedTask;
+        if (committed) return Task.FromResult(outputFiles);
+
+        if (clearExisting && (!overwrite || Path.GetPathRoot(targetDirectory) == targetDirectory))
+            throw new ArgumentException("Clearing output files requires overwrite permission and a non-root destination.", nameof(clearExisting));
+
+        string[] stagedFiles = Directory.EnumerateFiles(StagingDirectory, "*", SearchOption.AllDirectories)
+            .Where(path => !IsRollbackPath(path))
+            .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(path => path, StringComparer.Ordinal)
+            .ToArray();
+
+        if (!overwrite)
+            foreach (string stagedPath in stagedFiles)
+            {
+                string targetPath = Path.Combine(targetDirectory, Path.GetRelativePath(StagingDirectory, stagedPath));
+
+                if (File.Exists(targetPath))
+                    throw new IOException($"Output already exists: {targetPath}.");
+            }
 
         try
         {
-            foreach (string stagedPath in Directory.EnumerateFiles(
-                             StagingDirectory,
-                             "*",
-                             SearchOption.AllDirectories)
-                         .Where(path => !IsRollbackPath(path))
-                         .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
-                         .ThenBy(path => path, StringComparer.Ordinal))
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (clearExisting && Directory.Exists(targetDirectory))
+                foreach (string path in Directory.EnumerateFiles(targetDirectory, "*", SearchOption.AllDirectories))
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    BackupFile(path);
+                    File.Delete(path);
+                }
+
+            foreach (string stagedPath in stagedFiles)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 string relativePath = Path.GetRelativePath(StagingDirectory, stagedPath);
@@ -76,28 +102,39 @@ internal sealed class PhysicalMapsetFileTransaction : IBeatmapsetFileTransaction
 
                 if (File.Exists(targetPath) && !createdFiles.Contains(targetPath) && !backups.ContainsKey(targetPath))
                 {
-                    string backupPath = Path.Combine(rollbackDirectory, relativePath);
-                    Directory.CreateDirectory(Path.GetDirectoryName(backupPath)!);
-                    File.Copy(targetPath, backupPath, true);
-                    backups[targetPath] = backupPath;
-                }
-                else
-                {
-                    createdFiles.Add(targetPath);
+                    if (!overwrite)
+                        throw new IOException($"Output already exists: {targetPath}.");
+
+                    BackupFile(targetPath);
                 }
 
-                File.Copy(stagedPath, targetPath, true);
+                File.Copy(stagedPath, targetPath, overwrite);
+
+                if (!backups.ContainsKey(targetPath))
+                    createdFiles.Add(targetPath);
             }
 
             DeleteStagingDirectory();
             committed = true;
-            return Task.CompletedTask;
         }
         catch
         {
             Rollback();
             throw;
         }
+
+        outputFiles = stagedFiles.Select(stagedPath =>
+            Path.Combine(targetDirectory, Path.GetRelativePath(StagingDirectory, stagedPath))).ToArray();
+
+        return Task.FromResult(outputFiles);
+    }
+
+    private void BackupFile(string path)
+    {
+        string backupPath = Path.Combine(rollbackDirectory, Path.GetRelativePath(targetDirectory, path));
+        Directory.CreateDirectory(Path.GetDirectoryName(backupPath)!);
+        File.Copy(path, backupPath, true);
+        backups[path] = backupPath;
     }
 
     /// <inheritdoc />

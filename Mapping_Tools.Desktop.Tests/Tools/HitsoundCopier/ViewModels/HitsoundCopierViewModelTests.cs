@@ -80,7 +80,8 @@ public sealed class HitsoundCopierViewModelTests
             filePicker,
             new TestCurrentBeatmapDialogService(),
             workspace,
-            new UserNotificationService());
+            new UserNotificationService(),
+            new TestFileRevealService());
     }
 
     private sealed class TestHitsoundCopier : IHitsoundCopierService

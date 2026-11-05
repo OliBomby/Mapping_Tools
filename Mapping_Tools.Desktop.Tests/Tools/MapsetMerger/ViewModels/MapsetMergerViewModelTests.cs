@@ -101,10 +101,12 @@ public sealed class MapsetMergerViewModelTests
         public Task<MapsetMergerResult> MergeAsync(
             MapsetMergerServiceOptions project,
             IProgress<double>? progress = null,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default,
+            bool overwrite = true,
+            bool clearExisting = false)
         {
             Project = project;
-            return Task.FromResult(new MapsetMergerResult(2, 0, 0, 0));
+            return Task.FromResult(new MapsetMergerResult(2, 0, 0, 0, []));
         }
     }
 }

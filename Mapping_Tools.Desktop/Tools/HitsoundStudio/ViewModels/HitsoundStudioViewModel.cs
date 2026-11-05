@@ -60,6 +60,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     private readonly IUserNotificationService notifications;
     private readonly Func<Window> owner;
     private readonly IAudioPlaybackService playback;
+    private readonly IFileRevealService fileRevealService;
     private readonly SemaphoreSlim previewGate = new(1, 1);
     private readonly IProjectStore projectStore;
 
@@ -86,6 +87,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     /// <param name="filePicker">Presents source and folder pickers.</param>
     /// <param name="files">Checks the export directory before the legacy create prompt.</param>
     /// <param name="projectStore">Loads standalone sample schemas.</param>
+    /// <param name="fileRevealService">Opens the completed export directory.</param>
     /// <param name="settings">Supplies QuickRun preferences.</param>
     /// <param name="directories">Provides the default application export directory.</param>
     /// <param name="owner">Returns the shell window that owns the import dialog.</param>
@@ -101,6 +103,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         IFilePicker filePicker,
         IBeatmapsetFileSystem files,
         IProjectStore projectStore,
+        IFileRevealService fileRevealService,
         DesktopApplicationSettings settings,
         IApplicationDirectories directories,
         Func<Window> owner)
@@ -117,6 +120,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         this.files = files ?? throw new ArgumentNullException(nameof(files));
         this.projectStore = projectStore ?? throw new ArgumentNullException(nameof(projectStore));
+        this.fileRevealService = fileRevealService ?? throw new ArgumentNullException(nameof(fileRevealService));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         this.owner = owner ?? throw new ArgumentNullException(nameof(owner));
         directories = directories ?? throw new ArgumentNullException(nameof(directories));
@@ -1348,6 +1352,9 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
             cancellationToken);
         if (result is { Status: ToolExecutionStatus.Succeeded, Value: not null })
         {
+            if (result.Value.OutputDirectory is { } outputDirectory)
+                await fileRevealService.RevealAsync(outputDirectory);
+
             if (HitsoundExportModeSetting != HitsoundStudioExportMode.Midi) PreviousSampleSchema = result.Value.Schema;
             if (snapshot.ShowResults)
                 await messageDialogs.ShowMessageAsync(new MessageDialogRequest<bool>(

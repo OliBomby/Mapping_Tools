@@ -1,4 +1,3 @@
-using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Tests.Execution;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.HitsoundStudio;
@@ -43,7 +42,7 @@ public sealed class HitsoundStudioFixtureTests : TransformationFixtureTestBase
         return new HitsoundStudioService(
             gateway, new EmptyMapCleanerSampleService(), generator,
             new NaudioAudioExporter(), new NaudioAudioClipMixer(), new NaudioMidiService(),
-            new PhysicalBeatmapsetFileSystem(), new NoopFileRevealService(), new HitsoundStudioEngine());
+            new PhysicalBeatmapsetFileSystem(), new HitsoundStudioEngine());
     }
 
     private sealed class EmptyMapCleanerSampleService : IMapCleanerSampleService
@@ -64,14 +63,6 @@ public sealed class HitsoundStudioFixtureTests : TransformationFixtureTestBase
             CancellationToken cancellationToken = default)
         {
             return Task.FromResult(0);
-        }
-    }
-
-    private sealed class NoopFileRevealService : IFileRevealService
-    {
-        public Task<bool> RevealAsync(string path, CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(true);
         }
     }
 }

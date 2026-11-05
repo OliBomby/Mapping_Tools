@@ -45,4 +45,7 @@ public sealed class HitsoundStudioExportResult
 
     /// <summary>Gets the legacy detailed completion text.</summary>
     public string DetailedSummary { get; }
+
+    /// <summary>Gets the directory containing exported files, or <see langword="null"/> when no files were written.</summary>
+    public string? OutputDirectory { get; init; }
 }

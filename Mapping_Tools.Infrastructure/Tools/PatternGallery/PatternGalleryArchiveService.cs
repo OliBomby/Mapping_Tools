@@ -18,7 +18,8 @@ public sealed class PatternGalleryArchiveService : IPatternGalleryArchiveService
         string projectFileName,
         string projectJson,
         IReadOnlyList<PatternGalleryArchiveFile> patternFiles,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        bool overwrite = true)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(archivePath);
         ValidateSegment(collectionFolderName, nameof(collectionFolderName));
@@ -27,7 +28,7 @@ public sealed class PatternGalleryArchiveService : IPatternGalleryArchiveService
         ArgumentNullException.ThrowIfNull(patternFiles);
         cancellationToken.ThrowIfCancellationRequested();
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(archivePath))!);
-        using FileStream stream = new(archivePath, FileMode.Create, FileAccess.Write, FileShare.None);
+        using FileStream stream = new(archivePath, overwrite ? FileMode.Create : FileMode.CreateNew, FileAccess.Write, FileShare.None);
         using ZipArchive archive = new(stream, ZipArchiveMode.Create);
         var projectEntry = archive.CreateEntry($"{collectionFolderName}/{projectFileName}");
         using (var projectStream = projectEntry.Open())

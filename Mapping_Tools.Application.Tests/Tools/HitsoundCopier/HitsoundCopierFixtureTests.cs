@@ -1,4 +1,3 @@
-using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tests.Execution;
 using Mapping_Tools.Application.Tools.HitsoundCopier;
@@ -24,7 +23,6 @@ public sealed class HitsoundCopierFixtureTests : TransformationFixtureTestBase
             fixture.Gateway,
             new EmptyHitsoundSampleService(),
             new ApplicationDirectories(Path.GetTempPath()),
-            new NoopFileRevealService(),
             new ApplicationSettings());
 
         // Act
@@ -61,14 +59,6 @@ public sealed class HitsoundCopierFixtureTests : TransformationFixtureTestBase
         public Task<int> ExportAsync(SampleSchema schema, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(0);
-        }
-    }
-
-    private sealed class NoopFileRevealService : IFileRevealService
-    {
-        public Task<bool> RevealAsync(string path, CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(true);
         }
     }
 }

@@ -1,7 +1,17 @@
 [CmdletBinding()]
 param()
 
+$ErrorActionPreference = 'Stop'
+
 $testRoot = Join-Path ([System.IO.Path]::GetTempPath()) "mapping-tools-release-layout-$([Guid]::NewGuid())"
+$testRoot = [System.IO.Path]::GetFullPath($testRoot)
+$temporaryRoot = [System.IO.Path]::GetFullPath([System.IO.Path]::GetTempPath())
+$temporaryRoot = $temporaryRoot.TrimEnd([System.IO.Path]::DirectorySeparatorChar) + [System.IO.Path]::DirectorySeparatorChar
+
+if (-not $testRoot.StartsWith($temporaryRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
+    throw "Release-layout fixture path escaped the temporary directory: $testRoot"
+}
+
 $validator = Join-Path $PSScriptRoot 'validate-release-layout.ps1'
 $version = '1.2.3'
 $rids = @('win-x86', 'win-x64', 'linux-x64', 'linux-arm64', 'osx-x64', 'osx-arm64')
@@ -90,6 +100,18 @@ try {
             -RequireLegacyBridge:($rid -like 'win-*')
     }
 
+    # CLI executables share the Desktop packages and must not have their own release channels.
+    foreach ($rid in $rids) {
+        try {
+            & $validator -Channel "cli-$rid" -RuntimeIdentifier $rid `
+                -ExpectedVersion $version -ReleaseDirectory (Join-Path $testRoot "velopack-$rid")
+            throw "Validator accepted a separate CLI channel for '$rid'."
+        }
+        catch [System.Management.Automation.ParameterBindingException] {
+            # ValidateSet rejects the retired channel before inspecting package files.
+        }
+    }
+
     # A legacy installer renamed to Mapping Tools.exe is no longer a complete bridge.
     $windowsDirectory = Join-Path $testRoot 'velopack-win-x64'
     $bridgePath = Join-Path $windowsDirectory 'release_x64.zip'
@@ -139,7 +161,7 @@ try {
         }
     }
 
-    Write-Host 'Velopack release-layout fixture tests passed for all six channels.'
+    Write-Host 'Velopack release-layout fixture tests passed for all six shared Desktop and CLI channels.'
 }
 finally {
     if (Test-Path -LiteralPath $testRoot) {

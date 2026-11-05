@@ -15,4 +15,18 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <WarningsAsErrors>$(WarningsAsErrors);CS1591</WarningsAsErrors>
   </PropertyGroup>
+
+  <!-- Desktop and CLI share these distribution rules, including when their
+       publish outputs are merged into one installation. -->
+  <Target Name="ExcludeDistributionRuntimeAssets"
+          BeforeTargets="_GetCurrentAndPriorPublishFileWrites;_ComputeResolvedFilesToPublishTypes"
+          Condition="'$(MSBuildProjectName)' == 'Mapping_Tools.Desktop' Or '$(MSBuildProjectName)' == 'Mapping_Tools.Cli'">
+    <ItemGroup>
+      <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)"
+                             Condition="'$(Configuration)' == 'Release' And '%(ResolvedFileToPublish.Extension)' == '.pdb'" />
+      <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)"
+                             Condition="($([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('linux-')) Or $([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('osx-'))) And
+                                        '%(ResolvedFileToPublish.Filename)' == 'NAudio.Wasapi'" />
+    </ItemGroup>
+  </Target>
 </Project>

@@ -222,6 +222,28 @@ public sealed class BeatmapEditingGatewayTests
     }
 
     [TestMethod]
+    public async Task SaveAsync_WithFileSavedObserver_ReportsTheWrittenFileBeforeReloading()
+    {
+        // Arrange
+        var store = CreateStore();
+        RecordingEditorReloadService reload = new();
+        var gateway = CreateGateway(
+            store,
+            new RecordingLiveBeatmapReader((LiveBeatmapSnapshot?)null),
+            reloadService: reload);
+        var session = await gateway.OpenBeatmapAsync(map_path, LiveBeatmapPreference.DiskOnly);
+        List<(string Path, int Writes, int Reloads)> notifications = [];
+        gateway.FileSaved += path => notifications.Add((path, store.WriteCount, reload.ReloadCount));
+
+        // Act
+        await gateway.SaveAsync(session, true);
+
+        // Assert
+        notifications.Should().Equal((map_path, 1, 0));
+        reload.ReloadCount.Should().Be(1);
+    }
+
+    [TestMethod]
     public async Task SaveAsync_WhenAutomaticBackupsDisabled_SavesWithoutBackup()
     {
         // Arrange
@@ -268,6 +290,9 @@ public sealed class BeatmapEditingGatewayTests
             map_path,
             LiveBeatmapPreference.DiskOnly);
 
+        List<string> savedPaths = [];
+        gateway.FileSaved += savedPaths.Add;
+
         // Act
         var act3 = () => gateway.SaveAsync((EditingSession)session, true);
 
@@ -277,6 +302,7 @@ public sealed class BeatmapEditingGatewayTests
         exception.Should().BeSameAs(failure);
         store.WriteCount.Should().Be(0);
         reload.ReloadCount.Should().Be(0);
+        savedPaths.Should().BeEmpty();
     }
 
     [TestMethod]

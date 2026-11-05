@@ -1,7 +1,8 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet('win-x86', 'win-x64', 'linux-x64', 'linux-arm64', 'osx-x64', 'osx-arm64')]
+    [ValidateSet(
+        'win-x86', 'win-x64', 'linux-x64', 'linux-arm64', 'osx-x64', 'osx-arm64')]
     [string]$Channel,
 
     [Parameter(Mandatory = $true)]
@@ -18,7 +19,7 @@ param(
 )
 
 if ($Channel -cne $RuntimeIdentifier) {
-    throw "The Velopack channel '$Channel' must equal the runtime identifier '$RuntimeIdentifier'."
+    throw "The Velopack channel '$Channel' must match the runtime identifier '$RuntimeIdentifier'."
 }
 
 if (-not (Test-Path -LiteralPath $ReleaseDirectory -PathType Container)) {

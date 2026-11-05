@@ -30,6 +30,12 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
     private readonly ILogger<BeatmapEditingGateway> logger;
 
     /// <summary>
+    ///     Reports the saved path after a file is written and before any requested editor reload.
+    /// </summary>
+    /// <remarks>Observers run synchronously and should not throw or perform additional edits.</remarks>
+    public event Action<string>? FileSaved;
+
+    /// <summary>
     ///     Creates the application service that arbitrates between durable files
     ///     and the newer, potentially unsaved state held by osu!.
     /// </summary>
@@ -223,6 +229,7 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
         logger.LogInformation("Backup completed for {Path}; writing file", editingSession.Path);
         cancellationToken.ThrowIfCancellationRequested();
         editingSession.SaveFile();
+        FileSaved?.Invoke(editingSession.Path);
         logger.LogInformation("Saved {Path}", editingSession.Path);
 
         if (reloadEditor)

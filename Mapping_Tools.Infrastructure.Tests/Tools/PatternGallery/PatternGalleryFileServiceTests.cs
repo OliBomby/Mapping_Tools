@@ -8,6 +8,33 @@ namespace Mapping_Tools.Infrastructure.Tests.Tools.PatternGallery;
 public sealed class PatternGalleryFileServiceTests
 {
     [TestMethod]
+    public void DeleteCollection_TargetOutsideTheOwningLibrary_PreservesTheDirectory()
+    {
+        // Arrange
+        string root = Path.Combine(Path.GetTempPath(), "mapping-tools-gallery-tests-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        string library = Path.Combine(root, "library");
+        string unrelated = Path.Combine(root, "unrelated");
+        Directory.CreateDirectory(unrelated);
+        PatternGalleryFileService service = new();
+        PatternGalleryCollectionPaths paths = new(library, unrelated, unrelated, Path.Combine(unrelated, "project.json"));
+
+        try
+        {
+            // Act
+            Action act = () => service.DeleteCollection(paths);
+
+            // Assert
+            act.Should().Throw<ArgumentException>();
+            Directory.Exists(unrelated).Should().BeTrue();
+        }
+        finally
+        {
+            Directory.Delete(root, true);
+        }
+    }
+
+    [TestMethod]
     public void ApplyCollectionFileChanges_UndoAndRedo_RestoresPatternBytes()
     {
         // Arrange

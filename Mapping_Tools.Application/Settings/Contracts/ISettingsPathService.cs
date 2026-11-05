@@ -8,7 +8,7 @@ namespace Mapping_Tools.Application.Settings.Contracts;
 public interface ISettingsPathService
 {
     /// <summary>
-    ///     Mutates only blank path properties, then ensures the backup directory exists.
+    ///     Mutates only blank path properties and ensures the backup directory exists.
     /// </summary>
     /// <param name="settings">The settings document to complete.</param>
     /// <returns>Information about fallbacks used while resolving paths.</returns>

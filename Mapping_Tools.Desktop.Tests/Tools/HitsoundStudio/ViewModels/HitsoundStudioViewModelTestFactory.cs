@@ -76,6 +76,7 @@ internal static class HitsoundStudioViewModelTestFactory
             filePicker ?? new TestFilePicker(),
             new StubHitsoundStudioFileSystem(),
             new StubProjectStore(),
+            new TestFileRevealService(),
             new DesktopApplicationSettings(),
             new TestApplicationDirectories(),
             owner ?? (static () => null!));

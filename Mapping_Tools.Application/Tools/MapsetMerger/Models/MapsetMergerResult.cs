@@ -5,8 +5,10 @@ namespace Mapping_Tools.Application.Tools.MapsetMerger.Models;
 /// <param name="BeatmapsWritten">Number of merged <c>.osu</c> files written.</param>
 /// <param name="StoryboardsWritten">Number of external <c>.osb</c> files written.</param>
 /// <param name="AssetsCopied">Number of binary asset files copied.</param>
+/// <param name="OutputFiles">Final absolute paths of the files written by the committed export.</param>
 public sealed record MapsetMergerResult(
     int MapsetsMerged,
     int BeatmapsWritten,
     int StoryboardsWritten,
-    int AssetsCopied);
+    int AssetsCopied,
+    IReadOnlyList<string> OutputFiles);

@@ -17,4 +17,7 @@ public sealed record HitsoundCopierResult(
 {
     /// <summary>Gets the number of target maps written.</summary>
     public int ProcessedCount => ProcessedPaths.Count;
+
+    /// <summary>Gets the directory containing exported samples, or <see langword="null"/> when no samples were written.</summary>
+    public string? OutputDirectory { get; init; }
 }

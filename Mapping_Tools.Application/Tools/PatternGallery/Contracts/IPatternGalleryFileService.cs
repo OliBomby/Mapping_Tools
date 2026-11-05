@@ -6,6 +6,15 @@ namespace Mapping_Tools.Application.Tools.PatternGallery.Contracts;
 /// <summary>Abstracts collection-file operations from Pattern Gallery use cases.</summary>
 public interface IPatternGalleryFileService
 {
+    /// <summary>Lists immediate collection directory names in ordinal order without creating the library.</summary>
+    /// <param name="libraryPath">The library directory.</param>
+    /// <returns>The collection directory identifiers.</returns>
+    IReadOnlyList<string> EnumerateCollections(string libraryPath);
+
+    /// <summary>Deletes an explicitly selected immediate child collection and its contents.</summary>
+    /// <param name="paths">The collection paths, including the owning library.</param>
+    void DeleteCollection(PatternGalleryCollectionPaths paths);
+
     /// <summary>Resolves a collection's root, pattern directory, and project file.</summary>
     /// <param name="basePath">The feature's collection root.</param>
     /// <param name="metadata">The persisted collection-folder identity.</param>

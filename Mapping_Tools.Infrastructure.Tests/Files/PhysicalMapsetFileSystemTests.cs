@@ -57,6 +57,103 @@ public sealed class PhysicalBeatmapsetFileSystemTests : IDisposable
     }
 
     [TestMethod]
+    public async Task CommitAsync_LateOutputCollision_PublishesNoFilesAndPreservesExistingContents()
+    {
+        // Arrange
+        string destination = Path.Combine(root, "export");
+        Directory.CreateDirectory(destination);
+        await File.WriteAllTextAsync(Path.Combine(destination, "z-existing.txt"), "original");
+        using var transaction = new PhysicalBeatmapsetFileSystem().BeginTransaction(destination);
+        await File.WriteAllTextAsync(transaction.GetStagedPath("a-new.txt"), "new");
+        await File.WriteAllTextAsync(transaction.GetStagedPath("z-existing.txt"), "replacement");
+
+        // Act
+        Func<Task> act = () => transaction.CommitAsync(overwrite: false);
+
+        // Assert
+        await act.Should().ThrowAsync<IOException>();
+        File.Exists(Path.Combine(destination, "a-new.txt")).Should().BeFalse();
+        (await File.ReadAllTextAsync(Path.Combine(destination, "z-existing.txt"))).Should().Be("original");
+    }
+
+    [TestMethod]
+    public async Task CommitAsync_OverwriteEnabled_ReplacesGeneratedFilesAndPreservesUnrelatedFiles()
+    {
+        // Arrange
+        string destination = Path.Combine(root, "export");
+        Directory.CreateDirectory(destination);
+        await File.WriteAllTextAsync(Path.Combine(destination, "generated.txt"), "original");
+        await File.WriteAllTextAsync(Path.Combine(destination, "unrelated.txt"), "keep");
+        using var transaction = new PhysicalBeatmapsetFileSystem().BeginTransaction(destination);
+        await File.WriteAllTextAsync(transaction.GetStagedPath("generated.txt"), "replacement");
+
+        // Act
+        var outputFiles = await transaction.CommitAsync(overwrite: true);
+
+        // Assert
+        outputFiles.Should().Equal(Path.Combine(destination, "generated.txt"));
+        (await File.ReadAllTextAsync(Path.Combine(destination, "generated.txt"))).Should().Be("replacement");
+        (await File.ReadAllTextAsync(Path.Combine(destination, "unrelated.txt"))).Should().Be("keep");
+    }
+
+    [TestMethod]
+    public async Task CommitAsync_CleanupEnabled_RemovesExistingFilesIncludingNestedFiles()
+    {
+        // Arrange
+        string destination = Path.Combine(root, "export");
+        Directory.CreateDirectory(Path.Combine(destination, "nested"));
+        await File.WriteAllTextAsync(Path.Combine(destination, "nested", "unrelated.txt"), "old");
+        using var transaction = new PhysicalBeatmapsetFileSystem().BeginTransaction(destination);
+        await File.WriteAllTextAsync(transaction.GetStagedPath("generated.txt"), "new");
+
+        // Act
+        var outputFiles = await transaction.CommitAsync(overwrite: true, clearExisting: true);
+
+        // Assert
+        outputFiles.Should().Equal(Path.Combine(destination, "generated.txt"));
+        Directory.GetFiles(destination, "*", SearchOption.AllDirectories).Should()
+            .Equal(Path.Combine(destination, "generated.txt"));
+    }
+
+    [TestMethod]
+    public async Task CommitAsync_CleanupWithoutOverwritePermission_PreservesExistingFiles()
+    {
+        // Arrange
+        string destination = Path.Combine(root, "export");
+        Directory.CreateDirectory(destination);
+        await File.WriteAllTextAsync(Path.Combine(destination, "existing.txt"), "original");
+        using var transaction = new PhysicalBeatmapsetFileSystem().BeginTransaction(destination);
+
+        // Act
+        Func<Task> act = () => transaction.CommitAsync(overwrite: false, clearExisting: true);
+
+        // Assert
+        await act.Should().ThrowAsync<ArgumentException>();
+        (await File.ReadAllTextAsync(Path.Combine(destination, "existing.txt"))).Should().Be("original");
+    }
+
+    [TestMethod]
+    public async Task CommitAsync_FailureAfterCleanup_RestoresDeletedFilesAndRemovesNewFiles()
+    {
+        // Arrange
+        string destination = Path.Combine(root, "export");
+        Directory.CreateDirectory(Path.Combine(destination, "z-failure.txt"));
+        await File.WriteAllTextAsync(Path.Combine(destination, "existing.txt"), "original");
+        using var transaction = new PhysicalBeatmapsetFileSystem().BeginTransaction(destination);
+        await File.WriteAllTextAsync(transaction.GetStagedPath("a-new.txt"), "new");
+        await File.WriteAllTextAsync(transaction.GetStagedPath("z-failure.txt"), "blocked");
+
+        // Act
+        Func<Task> act = () => transaction.CommitAsync(overwrite: true, clearExisting: true);
+
+        // Assert
+        var exception = await act.Should().ThrowAsync<Exception>();
+        (exception.Which is IOException or UnauthorizedAccessException).Should().BeTrue();
+        (await File.ReadAllTextAsync(Path.Combine(destination, "existing.txt"))).Should().Be("original");
+        File.Exists(Path.Combine(destination, "a-new.txt")).Should().BeFalse();
+    }
+
+    [TestMethod]
     public async Task CommitAsync_WhenReplacementFails_RestoresOriginalDuplicateTarget()
     {
         // Arrange

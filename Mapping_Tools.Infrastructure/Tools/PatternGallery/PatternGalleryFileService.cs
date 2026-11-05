@@ -8,6 +8,26 @@ namespace Mapping_Tools.Infrastructure.Tools.PatternGallery;
 public sealed class PatternGalleryFileService : IPatternGalleryFileService
 {
     /// <inheritdoc />
+    public IReadOnlyList<string> EnumerateCollections(string libraryPath) => Directory.Exists(libraryPath)
+        ? Directory.EnumerateDirectories(libraryPath)
+            .Select(directory => Path.GetFileName(directory))
+            .Order(StringComparer.Ordinal)
+            .ToArray()
+        : [];
+
+    /// <inheritdoc />
+    public void DeleteCollection(PatternGalleryCollectionPaths paths)
+    {
+        string library = Path.TrimEndingDirectorySeparator(Path.GetFullPath(paths.Root));
+        string collection = Path.TrimEndingDirectorySeparator(Path.GetFullPath(paths.Collection));
+
+        if (!string.Equals(Path.GetDirectoryName(collection), library,
+                OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal))
+            throw new ArgumentException("The collection must be an immediate child of its library.", nameof(paths));
+
+        Directory.Delete(collection, true);
+    }
+    /// <inheritdoc />
     public PatternGalleryCollectionPaths Resolve(
         string basePath,
         PatternGalleryCollectionMetadata metadata)

@@ -33,8 +33,13 @@ public interface IBeatmapsetFileTransaction : IDisposable
     ///     Commits all staged files and restores prior output on failure.
     /// </summary>
     /// <param name="cancellationToken">Cancels between staged file replacements.</param>
-    /// <returns>A task completed after the commit is durable.</returns>
-    Task CommitAsync(CancellationToken cancellationToken = default);
+    /// <param name="overwrite">Whether staged files may replace existing output files.</param>
+    /// <param name="clearExisting">Whether to remove existing output files before committing; requires overwrite permission.</param>
+    /// <returns>The final absolute paths of the committed files in deterministic order.</returns>
+    Task<IReadOnlyList<string>> CommitAsync(
+        CancellationToken cancellationToken = default,
+        bool overwrite = true,
+        bool clearExisting = false);
 
     /// <summary>
     ///     Discards staged output and restores an interrupted commit.

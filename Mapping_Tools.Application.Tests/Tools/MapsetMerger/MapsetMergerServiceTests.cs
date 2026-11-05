@@ -23,6 +23,55 @@ public sealed class MapsetMergerServiceTests : IDisposable
     }
 
     [TestMethod]
+    public async Task MergeAsync_OverwriteDisabled_PreservesExistingGeneratedFiles()
+    {
+        // Arrange
+        string source = fixture.CreateMapset("source");
+        MapsetMergerServiceOptions project = new()
+        {
+            ExportPath = Path.Combine(fixture.Root, "export"),
+            Mapsets = [new MapsetMergerServiceOptions.MapsetItem { Name = "Pack", Path = source }],
+        };
+        var service = CreateService();
+        await service.MergeAsync(project);
+        string existing = Directory.GetFiles(project.ExportPath, "*.osu").Single();
+        await File.WriteAllTextAsync(existing, "original");
+
+        // Act
+        Func<Task> act = () => service.MergeAsync(project, overwrite: false);
+
+        // Assert
+        await act.Should().ThrowAsync<IOException>();
+        (await File.ReadAllTextAsync(existing)).Should().Be("original");
+    }
+
+    [TestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public async Task MergeAsync_ExistingUnrelatedFile_AppliesExplicitCleanupPolicy(bool clearExisting)
+    {
+        // Arrange
+        string source = fixture.CreateMapset("source");
+        string exportPath = Path.Combine(fixture.Root, "export");
+        Directory.CreateDirectory(exportPath);
+        string unrelated = Path.Combine(exportPath, "unrelated.txt");
+        await File.WriteAllTextAsync(unrelated, "keep");
+        MapsetMergerServiceOptions project = new()
+        {
+            ExportPath = exportPath,
+            Mapsets = [new MapsetMergerServiceOptions.MapsetItem { Name = "Pack", Path = source }],
+        };
+
+        // Act
+        await CreateService().MergeAsync(project, overwrite: true, clearExisting: clearExisting);
+
+        // Assert
+        File.Exists(unrelated).Should().Be(!clearExisting);
+        Directory.GetFiles(exportPath, "*.osu").Should().ContainSingle();
+        project.ExportPath.Should().Be(exportPath);
+    }
+
+    [TestMethod]
     public async Task MergeAsync_WithDuplicateNamesAndReferences_CommitsResolvedExport()
     {
         // Arrange
@@ -46,6 +95,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
         // Assert
         result.MapsetsMerged.Should().Be(2);
         result.BeatmapsWritten.Should().Be(2);
+        result.OutputFiles.Should().BeEquivalentTo(Directory.GetFiles(exportPath, "*", SearchOption.AllDirectories));
         Directory.GetFiles(exportPath, "*.osu").Should().HaveCount(2);
         Directory.GetFiles(exportPath, "*.osb").Should().HaveCount(2);
         string audioReference = Path.Combine("Pack", "audio.mp3");
@@ -208,7 +258,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
         var result = await service.MergeAsync(project);
 
         // Assert
-        result.Should().Be(new MapsetMergerResult(0, 0, 0, 0));
+        result.Should().BeEquivalentTo(new MapsetMergerResult(0, 0, 0, 0, []));
         Directory.Exists(exportPath).Should().BeFalse();
     }
 

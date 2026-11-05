@@ -26,6 +26,7 @@ public sealed class VelopackUpdateGateway : IUpdateGateway
     private readonly string channel;
     private readonly HttpClient httpClient;
     private readonly UpdateManager updateManager;
+    private readonly bool silent;
     private bool disposed;
     private UpdateInfo? pendingUpdate;
 
@@ -38,13 +39,16 @@ public sealed class VelopackUpdateGateway : IUpdateGateway
     ///     An optional path to any file in a local Velopack feed directory,
     ///     normally a <c>*.nupkg</c> package or <c>releases.*.json</c> file.
     /// </param>
+    /// <param name="silent">Whether the native updater should run without a progress window.</param>
     public VelopackUpdateGateway(
         HttpClient httpClient,
-        string? localUpdatePackagePath = null)
+        string? localUpdatePackagePath = null,
+        bool silent = false)
         : this(
             CreateUpdateSource(localUpdatePackagePath),
             GetUpdateChannel(),
-            httpClient)
+            httpClient,
+            silent)
     {
     }
 
@@ -54,16 +58,19 @@ public sealed class VelopackUpdateGateway : IUpdateGateway
     /// <param name="updateSource">The Velopack feed source.</param>
     /// <param name="channel">The platform and architecture-specific feed channel.</param>
     /// <param name="httpClient">The HTTP client used for release-notes requests.</param>
+    /// <param name="silent">Whether the native updater should run without a progress window.</param>
     public VelopackUpdateGateway(
         IUpdateSource updateSource,
         string channel,
-        HttpClient httpClient)
+        HttpClient httpClient,
+        bool silent = false)
     {
         ArgumentNullException.ThrowIfNull(updateSource);
         ArgumentException.ThrowIfNullOrWhiteSpace(channel);
         ArgumentNullException.ThrowIfNull(httpClient);
 
         this.channel = channel;
+        this.silent = silent;
         this.httpClient = httpClient;
         if (!this.httpClient.DefaultRequestHeaders.UserAgent.Any())
             this.httpClient.DefaultRequestHeaders.TryAddWithoutValidation(
@@ -169,6 +176,7 @@ public sealed class VelopackUpdateGateway : IUpdateGateway
 
         updateManager.WaitExitThenApplyUpdates(
             update.TargetFullRelease,
+            silent: silent,
             restart: restartAfterUpdate,
             restartArgs: restartAfterUpdate
                 ? Environment.GetCommandLineArgs().Skip(1).ToArray()

@@ -5,7 +5,6 @@ using Mapping_Tools.Application.Audio.Contracts;
 using Mapping_Tools.Application.Audio.Models;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
-using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Tools.HitsoundStudio.Contracts;
 using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
 using Mapping_Tools.Application.Localization;
@@ -37,7 +36,6 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
     private readonly IAudioGenerator generator;
     private readonly IMidiService midi;
     private readonly IAudioClipMixer mixer;
-    private readonly IFileRevealService reveal;
     private readonly IMapCleanerSampleService sampleAnalyzer;
     private readonly ILogger<HitsoundStudioService> logger;
 
@@ -49,7 +47,6 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
     /// <param name="mixer">Mixes owned neutral clips.</param>
     /// <param name="midi">Imports and exports neutral MIDI events.</param>
     /// <param name="files">Performs export-directory mutations.</param>
-    /// <param name="reveal">Opens the completed export directory.</param>
     /// <param name="engine">Applies framework-neutral layer and schema rules.</param>
     /// <param name="logger">Records export stages and output counts.</param>
     public HitsoundStudioService(
@@ -60,7 +57,6 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         IAudioClipMixer mixer,
         IMidiService midi,
         IBeatmapsetFileSystem files,
-        IFileRevealService reveal,
         HitsoundStudioEngine engine,
         ILogger<HitsoundStudioService>? logger = null)
     {
@@ -71,7 +67,6 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         this.mixer = mixer ?? throw new ArgumentNullException(nameof(mixer));
         this.midi = midi ?? throw new ArgumentNullException(nameof(midi));
         this.files = files ?? throw new ArgumentNullException(nameof(files));
-        this.reveal = reveal ?? throw new ArgumentNullException(nameof(reveal));
         this.engine = engine ?? throw new ArgumentNullException(nameof(engine));
         this.logger = logger ?? NullLogger<HitsoundStudioService>.Instance;
     }
@@ -248,7 +243,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         logger.LogInformation("Exported {SampleCount} standard samples", sampleCount);
         Report(progress, 0.99);
 
-        return await ShowResultsAsync(
+        return CompleteExport(
             project,
             writesFiles,
             mapPath,
@@ -256,8 +251,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             standard.Schema,
             standard.Events.Count,
             detailedSummary,
-            progress,
-            cancellationToken).ConfigureAwait(false);
+            progress);
     }
 
     private Task<HitsoundStudioExportResult> ExportCoincidingAsync(
@@ -353,7 +347,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             : 0;
         logger.LogInformation("Exported {SampleCount} named samples", sampleCount);
 
-        return await ShowResultsAsync(
+        return CompleteExport(
             project,
             writesFiles,
             mapPath,
@@ -361,8 +355,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             named.Schema,
             named.Events.Count,
             detailedSummary,
-            progress,
-            cancellationToken).ConfigureAwait(false);
+            progress);
     }
 
     private async Task<HitsoundStudioExportResult> ExportMidiProjectAsync(
@@ -402,7 +395,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
                 cancellationToken).ConfigureAwait(false);
         }
 
-        return await ShowResultsAsync(
+        return CompleteExport(
             project,
             writesFiles,
             mapPath,
@@ -410,11 +403,10 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             project.PreviousSampleSchema ?? new SampleSchema(),
             packages.Sum(package => package.Samples.Count),
             detailedSummary,
-            progress,
-            cancellationToken).ConfigureAwait(false);
+            progress);
     }
 
-    private async Task<HitsoundStudioExportResult> ShowResultsAsync(
+    private HitsoundStudioExportResult CompleteExport(
         HitsoundStudioServiceOptions project,
         bool writesFiles,
         string? mapPath,
@@ -422,12 +414,8 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         SampleSchema schema,
         int eventCount,
         string detailedSummary,
-        IProgress<double>? progress,
-        CancellationToken cancellationToken)
+        IProgress<double>? progress)
     {
-        if (writesFiles)
-            await reveal.RevealAsync(project.ExportFolder, cancellationToken).ConfigureAwait(false);
-
         Report(progress, 1);
         logger.LogInformation("Export completed: map {MapPath}, {SampleCount} samples, {EventCount} events; {Summary}",
             mapPath, sampleCount, eventCount, detailedSummary);
@@ -437,7 +425,10 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             project.HitsoundLayers.Count,
             eventCount,
             schema,
-            detailedSummary);
+            detailedSummary)
+        {
+            OutputDirectory = writesFiles ? project.ExportFolder : null,
+        };
     }
 
     private void DeleteExportFilesIfRequested(

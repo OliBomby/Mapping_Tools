@@ -24,12 +24,13 @@ internal static class PhysicalFileWriter
         string destinationPath,
         string contents,
         Encoding encoding,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        bool overwrite = true)
     {
         ArgumentNullException.ThrowIfNull(contents);
         ArgumentNullException.ThrowIfNull(encoding);
         cancellationToken.ThrowIfCancellationRequested();
-        return WriteBytesAsync(destinationPath, Encode(contents, encoding), cancellationToken);
+        return WriteBytesAsync(destinationPath, Encode(contents, encoding), cancellationToken, overwrite);
     }
 
     public static Task WriteLinesAsync(
@@ -77,20 +78,25 @@ internal static class PhysicalFileWriter
     private static async Task WriteBytesAsync(
         string destinationPath,
         byte[] bytes,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        bool overwrite = true)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        await using var stream = OpenDestination(destinationPath);
+        await using var stream = OpenDestination(destinationPath, overwrite);
         // Once the destination is open, finish the write even if cancellation arrives.
         await stream.WriteAsync(bytes, CancellationToken.None).ConfigureAwait(false);
         CompleteWrite(stream, bytes.Length);
     }
 
-    private static FileStream OpenDestination(string path)
+    private static FileStream OpenDestination(string path, bool overwrite = true)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         // Avoid truncating on open: write once, then trim any previous trailing bytes.
-        return new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None);
+        return new FileStream(
+            path,
+            overwrite ? FileMode.OpenOrCreate : FileMode.CreateNew,
+            FileAccess.Write,
+            FileShare.None);
     }
 
     private static void CompleteWrite(FileStream stream, int length)

@@ -26,6 +26,27 @@ public sealed class FileSystemProjectStore : IProjectStore
         this.serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
     }
 
+    /// <summary>Reads a project document while retaining additional host-owned metadata.</summary>
+    /// <param name="path">The existing project document.</param>
+    /// <param name="cancellationToken">Cancels reading the document.</param>
+    /// <returns>The original serialized document.</returns>
+    public Task<string> LoadDocumentAsync(string path, CancellationToken cancellationToken = default) =>
+        File.ReadAllTextAsync(Path.GetFullPath(path), utf8WithoutByteOrderMark, cancellationToken);
+
+    /// <summary>Persists an already serialized project document, including additional host-owned metadata.</summary>
+    /// <param name="path">The destination project file.</param>
+    /// <param name="document">The complete serialized document.</param>
+    /// <param name="overwrite">Whether an existing destination may be replaced.</param>
+    /// <param name="cancellationToken">Cancels before opening the destination.</param>
+    /// <returns>A task that completes after the document is written.</returns>
+    public Task SaveDocumentAsync(string path, string document, bool overwrite, CancellationToken cancellationToken = default)
+    {
+        string destination = Path.GetFullPath(path);
+        Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
+
+        return PhysicalFileWriter.WriteTextAsync(destination, document, utf8WithoutByteOrderMark, cancellationToken, overwrite);
+    }
+
     /// <summary>
     ///     Creates the requested local directory and any absent parents.
     /// </summary>
@@ -59,18 +80,7 @@ public sealed class FileSystemProjectStore : IProjectStore
         string json = serializer.Serialize(project);
         cancellationToken.ThrowIfCancellationRequested();
 
-        string fullPath = Path.GetFullPath(path);
-        string parent = Path.GetDirectoryName(fullPath)
-                        ?? throw new ArgumentException("The project path has no parent directory.", nameof(path));
-        Directory.CreateDirectory(parent);
-
-        await PhysicalFileWriter
-            .WriteTextAsync(
-                fullPath,
-                json,
-                utf8WithoutByteOrderMark,
-                cancellationToken)
-            .ConfigureAwait(false);
+        await SaveDocumentAsync(path, json, true, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -88,18 +98,7 @@ public sealed class FileSystemProjectStore : IProjectStore
         string json = serializer.Serialize(schema, project);
         cancellationToken.ThrowIfCancellationRequested();
 
-        string fullPath = Path.GetFullPath(path);
-        string parent = Path.GetDirectoryName(fullPath)
-                        ?? throw new ArgumentException("The project path has no parent directory.", nameof(path));
-        Directory.CreateDirectory(parent);
-
-        await PhysicalFileWriter
-            .WriteTextAsync(
-                fullPath,
-                json,
-                utf8WithoutByteOrderMark,
-                cancellationToken)
-            .ConfigureAwait(false);
+        await SaveDocumentAsync(path, json, true, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -115,10 +114,7 @@ public sealed class FileSystemProjectStore : IProjectStore
         CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
-        string json = await File.ReadAllTextAsync(
-            Path.GetFullPath(path),
-            utf8WithoutByteOrderMark,
-            cancellationToken);
+        string json = await LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false);
         cancellationToken.ThrowIfCancellationRequested();
         return serializer.Deserialize<TProject>(json);
     }
@@ -131,10 +127,7 @@ public sealed class FileSystemProjectStore : IProjectStore
     {
         ArgumentNullException.ThrowIfNull(schema);
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
-        string json = await File.ReadAllTextAsync(
-            Path.GetFullPath(path),
-            utf8WithoutByteOrderMark,
-            cancellationToken);
+        string json = await LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false);
         cancellationToken.ThrowIfCancellationRequested();
         return serializer.Deserialize<TProject>(schema, json);
     }

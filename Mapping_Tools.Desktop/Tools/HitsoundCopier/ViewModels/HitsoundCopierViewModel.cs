@@ -5,6 +5,7 @@ using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
+using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Application.Tools.HitsoundCopier;
@@ -33,6 +34,7 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
 
     private readonly IHitsoundCopierService copier;
     private readonly ICurrentBeatmapDialogService currentBeatmapService;
+    private readonly IFileRevealService fileRevealService;
 
     private readonly IFilePicker filePicker;
     private readonly IUserNotificationService notifications;
@@ -45,13 +47,15 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     /// <param name="currentBeatmapService">Fetches the current beatmap and presents lookup feedback.</param>
     /// <param name="workspace">Supplies the shell's selected beatmap for QuickRun fallback.</param>
     /// <param name="notifications">Supplies the user notification service.</param>
+    /// <param name="fileRevealService">Opens the completed sample export directory.</param>
     public HitsoundCopierViewModel(
         IHitsoundCopierService copier,
         IToolExecutionService execution,
         IFilePicker filePicker,
         ICurrentBeatmapDialogService currentBeatmapService,
         IBeatmapWorkspace workspace,
-        IUserNotificationService notifications)
+        IUserNotificationService notifications,
+        IFileRevealService fileRevealService)
         : base(execution, HitsoundCopierToolDefinition.Definition)
     {
         this.copier = copier ?? throw new ArgumentNullException(nameof(copier));
@@ -60,6 +64,7 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
                                      ?? throw new ArgumentNullException(nameof(currentBeatmapService));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
+        this.fileRevealService = fileRevealService ?? throw new ArgumentNullException(nameof(fileRevealService));
     }
 
     /// <summary>Gets or sets the optional source beatmap path.</summary>
@@ -345,7 +350,7 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
 
     private async Task RunOptionsAsync(HitsoundCopierProject options, bool quick)
     {
-        await Execution.ExecuteAsync(
+        var result = await Execution.ExecuteAsync(
             new ToolExecutionRequest<HitsoundCopierResult>(
                 Tool.Id,
                 Tool.DisplayName,
@@ -363,6 +368,9 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
                             : ApplicationText.Format(DesktopStrings.HitsoundCopier_ResultMany, result.ProcessedCount));
                 }),
             CreateProgress());
+
+        if (result is { Status: ToolExecutionStatus.Succeeded, Value: { OutputDirectory: { } outputDirectory } })
+            await fileRevealService.RevealAsync(outputDirectory);
     }
 
     private async Task SetCurrentPathAsync(Action<string> setter)

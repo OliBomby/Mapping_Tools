@@ -1,0 +1,1677 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root>
+  <data name="NegatedOptionHelp" xml:space="preserve">
+    <value>Disable {0}.</value>
+    <comment>Help for a generated boolean negation. {0} is the corresponding option name; preserve it.</comment>
+  </data>
+  <data name="RootDescription" xml:space="preserve">
+    <value>Mapping Tools for the command line.</value>
+    <comment>Short description below the Mapping Tools logo in root command-line help. Preserve Mapping Tools.</comment>
+  </data>
+  <data name="Usage" xml:space="preserve">
+    <value>Usage: mapping-tools {0} [options] [beatmap paths]</value>
+  </data>
+  <data name="Commands" xml:space="preserve">
+    <value>Commands:</value>
+  </data>
+  <data name="Options" xml:space="preserve">
+    <value>Options:</value>
+  </data>
+  <data name="ToolOptions" xml:space="preserve">
+    <value>Tool options:</value>
+    <comment>Command-line help heading above settings specific to the selected mapping tool.</comment>
+  </data>
+  <data name="Notes" xml:space="preserve">
+    <value>Notes:</value>
+    <comment>Command-line help heading above explanatory paragraphs about arguments, projects, and runtime settings.</comment>
+  </data>
+  <data name="Subcommands" xml:space="preserve">
+    <value>Subcommands:</value>
+  </data>
+  <data name="RootHelp" xml:space="preserve">
+    <value>Relative paths use the current working directory. Numbers use a decimal point. Set NO_COLOR to disable colors.</value>
+    <comment>Root help notes about general argument conventions and terminal presentation. Preserve the NO_COLOR environment-variable name.</comment>
+  </data>
+  <data name="CompoundHelp" xml:space="preserve">
+    <value>Nested values use TOML inline tables and arrays; dotted option names address individual members.</value>
+    <comment>Help note shown only for tools with structured options. Preserve TOML and the meaning of dotted option names.</comment>
+  </data>
+  <data name="ListHelp" xml:space="preserve">
+    <value>List options replace existing lists. Repeat an option to supply multiple items, or use --append-&lt;option&gt; to append.</value>
+    <comment>Help note shown only for tools with list settings. Preserve the --append- prefix and option placeholder syntax.</comment>
+  </data>
+  <data name="Config.Description" xml:space="preserve">
+    <value>Inspect or persist global path, backup, and editor-interaction defaults.</value>
+    <comment>Description of the config command in root help. Saved defaults are independent of Desktop preferences.</comment>
+  </data>
+  <data name="Config.Usage" xml:space="preserve">
+    <value>Usage: mapping-tools config {0} [options]</value>
+    <comment>Config help usage. {0} is a subcommand with its argument placeholders, or the command placeholder. Preserve CLI syntax.</comment>
+  </data>
+  <data name="Config.Settings" xml:space="preserve">
+    <value>Persistable settings:</value>
+    <comment>Config help heading above the allowed global setting keys.</comment>
+  </data>
+  <data name="Config.OptionHelp" xml:space="preserve">
+    <value>Use this CLI TOML configuration file instead of the default application-data cli.toml.</value>
+    <comment>Help for --config, which takes a file path. Preserve CLI, TOML, and cli.toml.</comment>
+  </data>
+  <data name="Config.NoConfigHelp" xml:space="preserve">
+    <value>Ignore saved global defaults for this tool invocation. Cannot be combined with --config.</value>
+    <comment>Help for --no-config. Preserve --config.</comment>
+  </data>
+  <data name="Config.MakeBackupsHelp" xml:space="preserve">
+    <value>Create automatic backups before map edits (true/false; default true). Overrides saved backup preferences.</value>
+    <comment>Help for the make-backups setting and --make-backups flag. Preserve boolean values true/false.</comment>
+  </data>
+  <data name="Config.LazerHelp" xml:space="preserve">
+    <value>Prefer an active osu!lazer external-edit mount for explicitly requested current-beatmap actions (true/false).</value>
+    <comment>Help for auto-detect-lazer-external-edit. It never selects a target without an explicit current-beatmap request. Preserve osu!lazer and true/false.</comment>
+  </data>
+  <data name="Config.DefaultsHelp" xml:space="preserve">
+    <value>Empty paths are discovered when a tool runs.</value>
+    <comment>Config show/get help and show output explaining empty path values.</comment>
+  </data>
+  <data name="Config.EditingHelp" xml:space="preserve">
+    <value>Relative paths passed to config set are made absolute before saving. Paths entered manually in the file are relative to that file's directory.</value>
+    <comment>Config parent/set help explaining path resolution. Preserve config set.</comment>
+  </data>
+  <data name="Config.Command.show" xml:space="preserve">
+    <value>List defaults and mark each value as saved or built-in. This is the default config subcommand.</value>
+    <comment>Help for config show. It does not run a mapping tool or create a file.</comment>
+  </data>
+  <data name="Config.Command.get" xml:space="preserve">
+    <value>Print one value as TOML.</value>
+    <comment>Help description for config get. Preserve TOML.</comment>
+  </data>
+  <data name="Config.Command.set" xml:space="preserve">
+    <value>Validate and save one default.</value>
+    <comment>Help description for config set, which accepts a setting key and value.</comment>
+  </data>
+  <data name="Config.Command.unset" xml:space="preserve">
+    <value>Remove a saved value and restore its built-in default.</value>
+    <comment>Help description for config unset, which accepts a setting key.</comment>
+  </data>
+  <data name="Config.Command.reset" xml:space="preserve">
+    <value>Clear all saved defaults, including an invalid configuration.</value>
+    <comment>Help for config reset. This explicit command replaces the CLI configuration with an empty TOML document.</comment>
+  </data>
+  <data name="Config.Command.path" xml:space="preserve">
+    <value>Print the configuration file path, even if the file is absent or invalid.</value>
+    <comment>Help for config path. Does not create or parse the file.</comment>
+  </data>
+  <data name="Config.Examples" xml:space="preserve">
+    <value>  mapping-tools config set osu-path "./osu!"
+  mapping-tools config set editor-reader mtipc
+  mapping-tools config set make-backups false
+  mapping-tools config show
+  mapping-tools config unset make-backups</value>
+    <comment>Config command examples. Preserve all commands, keys, values, paths, and CLI syntax.</comment>
+  </data>
+  <data name="Config.Example.set" xml:space="preserve">
+    <value>  mapping-tools config set osu-path "./osu!"
+  mapping-tools config set editor-reader mtipc
+  mapping-tools config set make-backups false</value>
+    <comment>Examples shown only in config set help. Preserve all command syntax, setting keys, values, and paths.</comment>
+  </data>
+  <data name="Config.Example.get" xml:space="preserve">
+    <value>  mapping-tools config get editor-reader</value>
+    <comment>Example shown only in config get help. Preserve the complete command.</comment>
+  </data>
+  <data name="Config.Example.show" xml:space="preserve">
+    <value>  mapping-tools config show</value>
+    <comment>Example shown only in config show help. Preserve the complete command.</comment>
+  </data>
+  <data name="Config.Example.unset" xml:space="preserve">
+    <value>  mapping-tools config unset make-backups</value>
+    <comment>Example shown only in config unset help. Preserve the complete command.</comment>
+  </data>
+  <data name="Config.Example.reset" xml:space="preserve">
+    <value>  mapping-tools config reset</value>
+    <comment>Example shown only in config reset help. Preserve the complete command.</comment>
+  </data>
+  <data name="Config.Example.path" xml:space="preserve">
+    <value>  mapping-tools config path</value>
+    <comment>Example shown only in config path help. Preserve the complete command.</comment>
+  </data>
+  <data name="Config.File" xml:space="preserve">
+    <value>Configuration: {0}</value>
+    <comment>Config show heading. {0} is the absolute CLI configuration file path.</comment>
+  </data>
+  <data name="Config.SourceSaved" xml:space="preserve">
+    <value>saved</value>
+    <comment>Config show TOML comment indicating that a value comes from the saved configuration.</comment>
+  </data>
+  <data name="Config.SourceDefault" xml:space="preserve">
+    <value>built-in</value>
+    <comment>Config show TOML comment indicating that a value comes from the CLI's built-in defaults.</comment>
+  </data>
+  <data name="Config.Saved" xml:space="preserve">
+    <value>Saved global defaults to {0}.</value>
+    <comment>Confirmation after config set, unset, or reset. {0} is the absolute configuration file path.</comment>
+  </data>
+  <data name="Config.InvalidFile" xml:space="preserve">
+    <value>Cannot load CLI configuration {0}: {1} Use config path to edit it or config reset to clear it; --no-config bypasses it for one tool invocation.</value>
+    <comment>Configuration error. {0} is a file path; {1} is the validation or TOML parsing message. Preserve command and flag syntax.</comment>
+  </data>
+  <data name="Config.InvalidType" xml:space="preserve">
+    <value>Setting {0} requires a {1} value.</value>
+    <comment>Configuration type error. {0} is a setting key; {1} is the expected runtime type name.</comment>
+  </data>
+  <data name="Config.UnknownSetting" xml:space="preserve">
+    <value>Setting {0} cannot be saved globally. Use config show to list the allowed settings.</value>
+    <comment>Configuration key error. {0} is the unknown or non-persistable key. Preserve config show.</comment>
+  </data>
+  <data name="Config.ArgumentCount" xml:space="preserve">
+    <value>Invalid arguments for config {0}. Use config {0} --help for its syntax.</value>
+    <comment>Config command usage error. {0} is the subcommand name. Preserve CLI syntax.</comment>
+  </data>
+  <data name="Config.ConflictingBackups" xml:space="preserve">
+    <value>Choose either --make-backups or --no-backups for this invocation.</value>
+    <comment>Argument error when both explicit backup switches are supplied. Preserve flag names.</comment>
+  </data>
+  <data name="Config.ConflictingSources" xml:space="preserve">
+    <value>Choose either --config or --no-config for this invocation.</value>
+    <comment>Argument error when selecting and bypassing configuration together. Preserve flag names.</comment>
+  </data>
+  <data name="UpdateCheckHelp" xml:space="preserve">
+    <value>Check for an update without downloading or installing it.</value>
+    <comment>Description of the command-line update check subcommand.</comment>
+  </data>
+  <data name="UnknownOption" xml:space="preserve">
+    <value>Unknown option --{0}. Use --help for available options.</value>
+  </data>
+  <data name="MissingValue" xml:space="preserve">
+    <value>Option --{0} requires a value.</value>
+  </data>
+  <data name="RepeatedOption" xml:space="preserve">
+    <value>Option --{0} was supplied more than once.</value>
+  </data>
+  <data name="RequiredOption" xml:space="preserve">
+    <value>Option --{0} is required.</value>
+  </data>
+  <data name="InvalidEnum" xml:space="preserve">
+    <value>Invalid value for {0}. Choose: {1}.</value>
+  </data>
+  <data name="InvalidObject" xml:space="preserve">
+    <value>Option --{0} requires a TOML inline table.</value>
+  </data>
+  <data name="NotCollection" xml:space="preserve">
+    <value>Option --{0} is not a collection.</value>
+  </data>
+  <data name="UnknownMember" xml:space="preserve">
+    <value>Unknown member {0} in {1}.</value>
+  </data>
+  <data name="InvalidToml" xml:space="preserve">
+    <value>Invalid TOML: {0}</value>
+  </data>
+  <data name="UnknownCommand" xml:space="preserve">
+    <value>Unknown command: {0}. Use mapping-tools --help.</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error: {0}</value>
+  </data>
+  <data name="Cancelled" xml:space="preserve">
+    <value>Cancelled. Previously completed edits remain saved.</value>
+  </data>
+  <data name="Done" xml:space="preserve">
+    <value>Completed: {0}</value>
+  </data>
+  <data name="Processed" xml:space="preserve">
+    <value>Processed {0}</value>
+  </data>
+  <data name="SavedProject" xml:space="preserve">
+    <value>Saved project: {0}</value>
+  </data>
+  <data name="TargetsRequired" xml:space="preserve">
+    <value>Choose beatmap paths with --path, positional paths, --current, or --project.</value>
+  </data>
+  <data name="SelectionRequired" xml:space="preserve">
+    <value>Choose an object selection explicitly with --selection, or load it from --project.</value>
+  </data>
+  <data name="OutputExists" xml:space="preserve">
+    <value>Output already exists: {0}. Supply --overwrite to replace it.</value>
+  </data>
+  <data name="NoRunRequiresSave" xml:space="preserve">
+    <value>--no-run requires --save-project.</value>
+  </data>
+  <data name="InteractiveTerminal" xml:space="preserve">
+    <value>--interactive requires terminal input. Use --fix first for unattended fixing.</value>
+  </data>
+  <data name="AutoFailDetected" xml:space="preserve">
+    <value>Auto-fail detected in {0}. Unloading objects: {1}. Potential unloading objects: {2}.</value>
+  </data>
+  <data name="AutoFailClear" xml:space="preserve">
+    <value>No auto-fail detected in {0}.</value>
+  </data>
+  <data name="AutoFailChoice" xml:space="preserve">
+    <value>Apply this solution? [y] apply, [n] next, [c] cancel: </value>
+  </data>
+  <data name="AutoFailFixed" xml:space="preserve">
+    <value>Applied the selected fix to {0}.</value>
+  </data>
+  <data name="NoFix" xml:space="preserve">
+    <value>No further solutions are available.</value>
+  </data>
+  <data name="GeometryRunning" xml:space="preserve">
+    <value>Geometry Dashboard is running. Press Ctrl+C to stop.</value>
+  </data>
+  <data name="GeometryUnsupported" xml:space="preserve">
+    <value>Geometry Dashboard overlay is unavailable on this platform.</value>
+  </data>
+  <data name="UpdateDescription" xml:space="preserve">
+    <value>Check for or install a Mapping Tools update. Desktop and CLI are updated together.</value>
+    <comment>Description of the update command. Preserve Desktop and CLI.</comment>
+  </data>
+  <data name="UpdateUsage" xml:space="preserve">
+    <value>Usage: mapping-tools update [check] [options]</value>
+    <comment>Usage shown only for the update command. Preserve the complete command syntax.</comment>
+  </data>
+  <data name="UpdateAvailable" xml:space="preserve">
+    <value>Update available: {0}</value>
+  </data>
+  <data name="UpToDate" xml:space="preserve">
+    <value>Already up to date.</value>
+  </data>
+  <data name="UpdateStarted" xml:space="preserve">
+    <value>The updater will install version {0} after this process exits. No command will be rerun.</value>
+  </data>
+  <data name="UpdateNotInstalled" xml:space="preserve">
+    <value>This build is not installed in an updateable package. Install a published Mapping Tools package to use self-updates.</value>
+  </data>
+  <data name="CollectionRequired" xml:space="preserve">
+    <value>Choose a collection with --collection.</value>
+  </data>
+  <data name="PatternRequired" xml:space="preserve">
+    <value>Choose patterns with --pattern, or explicitly choose --all-patterns.</value>
+  </data>
+  <data name="NotFound" xml:space="preserve">
+    <value>Not found: {0}</value>
+  </data>
+  <data name="UnexpectedPositionals" xml:space="preserve">
+    <value>Unexpected positional arguments: {0}</value>
+  </data>
+  <data name="DefaultValue" xml:space="preserve">
+    <value>{0} (built-in default: {1})</value>
+    <comment>Option or nested field help with its built-in value. A loaded project or explicit command option can override it. {0} is the description; {1} is a readable TOML value.</comment>
+  </data>
+  <data name="ValueField" xml:space="preserve">
+    <value>{0} ({1})</value>
+    <comment>Nested option field help. {0} is a literal field name; {1} is its value type or enum choices.</comment>
+  </data>
+  <data name="ValueFieldDescription" xml:space="preserve">
+    <value>{0} ({1}): {2}</value>
+    <comment>Nested option field help. {0} is a literal field name; {1} is its value type or enum choices; {2} explains its behavior.</comment>
+  </data>
+  <data name="DefaultListSize" xml:space="preserve">
+    <value>Built-in item count: {0}.</value>
+    <comment>Number of items supplied by default for a list option. {0} is the count.</comment>
+  </data>
+  <data name="UnsetDefault" xml:space="preserve">
+    <value>not set</value>
+    <comment>Displayed when an option or field has no built-in value.</comment>
+  </data>
+  <data name="ValueType" xml:space="preserve">
+    <value>Value type: {0}.</value>
+  </data>
+  <data name="ValueFields" xml:space="preserve">
+    <value>Fields: {0}</value>
+    <comment>Option help listing accepted fields in a TOML inline table or list item. {0} contains literal field names and their value types or enum choices.</comment>
+  </data>
+  <data name="TextValueType" xml:space="preserve">
+    <value>text</value>
+    <comment>Human-readable value type in command-line help.</comment>
+  </data>
+  <data name="NumberValueType" xml:space="preserve">
+    <value>number</value>
+    <comment>Human-readable numeric value type in command-line help.</comment>
+  </data>
+  <data name="TableValueType" xml:space="preserve">
+    <value>TOML inline table</value>
+    <comment>Human-readable structured value type. Preserve TOML.</comment>
+  </data>
+  <data name="ListValueType" xml:space="preserve">
+    <value>list of {0}</value>
+    <comment>Human-readable collection value type. {0} is the element value type.</comment>
+  </data>
+  <data name="GraphValueType" xml:space="preserve">
+    <value>number for a constant graph, or a graph inline table</value>
+    <comment>Accepted graph input forms in command-line help; a numeric value creates a flat graph.</comment>
+  </data>
+  <data name="TargetMissing" xml:space="preserve">
+    <value>Beatmap target does not exist: {0}. No target maps were edited.</value>
+    <comment>Preflight error before tool execution when any resolved beatmap target is missing. {0} is its absolute file path. This check does not run for project-only --no-run invocations.</comment>
+  </data>
+  <data name="PathHelp" xml:space="preserve">
+    <value>Beatmap target path. Repeat for multiple targets.</value>
+  </data>
+  <data name="CurrentHelp" xml:space="preserve">
+    <value>Use the beatmap currently open in osu! as the target path.</value>
+  </data>
+  <data name="ProjectOptionHelp" xml:space="preserve">
+    <value>Load the specified Desktop-compatible JSON project; explicit tool options override it.</value>
+    <comment>Help for --project, including precedence of explicit tool arguments. Preserve Desktop and JSON.</comment>
+  </data>
+  <data name="SaveProjectHelp" xml:space="preserve">
+    <value>Save the prepared project to this JSON file.</value>
+  </data>
+  <data name="NoRunHelp" xml:space="preserve">
+    <value>Save the project after imports without editing beatmaps or exporting.</value>
+  </data>
+  <data name="OverwriteHelp" xml:space="preserve">
+    <value>Permit replacing generated output/project files. Unrelated files are retained.</value>
+  </data>
+  <data name="NoBackupsHelp" xml:space="preserve">
+    <value>Disable automatic backups for this invocation.</value>
+  </data>
+  <data name="BackupPathHelp" xml:space="preserve">
+    <value>Override the backup directory.</value>
+  </data>
+  <data name="OsuPathHelp" xml:space="preserve">
+    <value>Override the osu! installation directory.</value>
+  </data>
+  <data name="SongsPathHelp" xml:space="preserve">
+    <value>Override the osu! Songs directory.</value>
+  </data>
+  <data name="OsuConfigHelp" xml:space="preserve">
+    <value>Override the osu! configuration file.</value>
+  </data>
+  <data name="ReloadEditorHelp" xml:space="preserve">
+    <value>Request an editor reload after saving, using the tool’s automatic reload policy.</value>
+  </data>
+  <data name="HelpHelp" xml:space="preserve">
+    <value>Show usage, options, defaults, and examples without running a tool.</value>
+  </data>
+  <data name="VersionHelp" xml:space="preserve">
+    <value>Print the CLI version.</value>
+  </data>
+  <data name="ImportHelp" xml:space="preserve">
+    <value>Import one source with a TOML table; repeat to combine sources in order. Members match the Desktop import dialog, including type and paths. A nested layer table overrides properties on each imported layer, e.g. layer = {sample-args = {volume = 0.5}}.</value>
+  </data>
+  <data name="ReloadHelp" xml:space="preserve">
+    <value>Reimport saved Hitsound Studio layers from their original sources.</value>
+  </data>
+  <data name="FromHelp" xml:space="preserve">
+    <value>Import settings from this source beatmap before applying explicit overrides.</value>
+  </data>
+  <data name="ImportColourHaxHelp" xml:space="preserve">
+    <value>Import the palette and infer colour-hax points from a source map.</value>
+  </data>
+  <data name="FixHelp" xml:space="preserve">
+    <value>Auto-fail handling: none (default) or first.</value>
+  </data>
+  <data name="InteractiveHelp" xml:space="preserve">
+    <value>Review auto-fail solutions in the terminal: apply, next, or cancel.</value>
+  </data>
+  <data name="FailOnAutoFailHelp" xml:space="preserve">
+    <value>Return exit code 3 if the initial analysis detects auto-fail, including when a fix is applied.</value>
+  </data>
+  <data name="LibraryHelp" xml:space="preserve">
+    <value>Library directory (defaults to the Desktop Pattern Gallery library).</value>
+    <comment>Help for --library. Preserve Desktop and Pattern Gallery.</comment>
+  </data>
+  <data name="CollectionHelp" xml:space="preserve">
+    <value>Explicit collection ID (directory name).</value>
+  </data>
+  <data name="PatternHelp" xml:space="preserve">
+    <value>Pattern ID (filename); repeat to choose multiple patterns.</value>
+  </data>
+  <data name="AllPatternsHelp" xml:space="preserve">
+    <value>Explicitly choose every pattern in the collection.</value>
+  </data>
+  <data name="NameHelp" xml:space="preserve">
+    <value>Display name for an imported/renamed pattern or collection.</value>
+  </data>
+  <data name="OutputHelp" xml:space="preserve">
+    <value>Export destination path.</value>
+  </data>
+  <data name="SourceHelp" xml:space="preserve">
+    <value>Source beatmap, archive, or object-code file.</value>
+  </data>
+  <data name="MergeHelp" xml:space="preserve">
+    <value>Merge the imported archive into the explicitly chosen collection.</value>
+  </data>
+  <data name="ObjectCodeHelp" xml:space="preserve">
+    <value>Read newline-separated osu! hit-object code from this file.</value>
+  </data>
+  <data name="TimingCodeHelp" xml:space="preserve">
+    <value>Read newline-separated timing-point code from this file.</value>
+  </data>
+  <data name="CleanHelp" xml:space="preserve">
+    <value>Explicitly remove existing export files before publishing. Requires --overwrite.</value>
+  </data>
+  <data name="ReaderHelp" xml:space="preserve">
+    <value>Live state reader: editor-reader, mtipc, or disabled.</value>
+  </data>
+  <data name="LocatorHelp" xml:space="preserve">
+    <value>Current beatmap locator: memory-read (default), mtipc, gosumemory, or disabled. Lazer external-edit discovery is also supported.</value>
+  </data>
+  <data name="SlideratorHelp" xml:space="preserve">
+    <value>Each selected slider supplies its start time, BPM, length, and duration; explicit source-value options override them. The graph scales to each slider's duration.</value>
+    <comment>Sliderator help note explaining how batch generation derives per-slider values. Preserve BPM.</comment>
+  </data>
+  <data name="SubcommandHelp" xml:space="preserve">
+    <value>Choose a subcommand, then use --help for its options.</value>
+  </data>
+  <data name="GeometryHelp" xml:space="preserve">
+    <value>The Windows overlay runs until Ctrl+C.</value>
+    <comment>Geometry Dashboard help note about the overlay platform and lifetime. Preserve Windows and Ctrl+C.</comment>
+  </data>
+  <data name="CollectionConflict" xml:space="preserve">
+    <value>Collection already exists: {0}. Choose a different ID or explicitly merge an archive.</value>
+  </data>
+  <data name="CollectionMissing" xml:space="preserve">
+    <value>Collection does not exist: {0}. Use collection create or collection import first.</value>
+  </data>
+  <data name="CannotDeleteLibrary" xml:space="preserve">
+    <value>A collection operation must name a single collection directory.</value>
+  </data>
+  <data name="NoInteractiveFix" xml:space="preserve">
+    <value>--interactive cannot be combined with --fix first.</value>
+  </data>
+  <data name="OneTarget" xml:space="preserve">
+    <value>This operation requires exactly one beatmap target.</value>
+  </data>
+  <data name="CleanRequiresOverwrite" xml:space="preserve">
+    <value>--clean-output requires --overwrite.</value>
+  </data>
+  <data name="SelectionOptionHelp" xml:space="preserve">
+    <value>Choose selected (live editor selection), bookmarked, time, or everything. Required unless supplied by --project.</value>
+  </data>
+  <data name="TimeCodeHelp" xml:space="preserve">
+    <value>osu! time-code query used with time selection.</value>
+  </data>
+  <data name="UseSelectedSliderHelp" xml:space="preserve">
+    <value>Import the first currently selected slider as the Picturator motion source.</value>
+  </data>
+  <data name="GalleryBookmarks" xml:space="preserve">
+    <value>Pattern Gallery file imports accept selected, time, or everything selection.</value>
+  </data>
+  <data name="CollectionIdentity" xml:space="preserve">
+    <value>The collection document does not match its directory identity.</value>
+  </data>
+  <data name="Examples" xml:space="preserve">
+    <value>Examples:</value>
+  </data>
+  <data name="Choices" xml:space="preserve">
+    <value>Choices: {0}.</value>
+  </data>
+  <data name="ReloadModeHelp" xml:space="preserve">
+    <value>Reload adapter used with --reload-editor: simulated-keypress, mtipc, or disabled. Defaults to simulated-keypress on Windows and mtipc elsewhere.</value>
+  </data>
+  <data name="FolderNameHelp" xml:space="preserve">
+    <value>New physical collection directory ID, used with collection rename.</value>
+  </data>
+  <data name="GroupHelp" xml:space="preserve">
+    <value>Group assigned to imported or renamed patterns.</value>
+  </data>
+  <data name="GlobalSvImportHelp" xml:space="preserve">
+    <value>Global slider multiplier for object-code imports (default: 1.4).</value>
+  </data>
+  <data name="GameModeImportHelp" xml:space="preserve">
+    <value>Game mode for object-code imports: standard (default), taiko, catch, or mania.</value>
+  </data>
+  <data name="StartTimeHelp" xml:space="preserve">
+    <value>Optional lower time bound in milliseconds for a pattern file import.</value>
+  </data>
+  <data name="EndTimeHelp" xml:space="preserve">
+    <value>Optional upper time bound in milliseconds for a pattern file import.</value>
+  </data>
+  <data name="InvalidSamples" xml:space="preserve">
+    <value>Invalid sample sources: {0}</value>
+  </data>
+  <data name="FromCurrentHelp" xml:space="preserve">
+    <value>Explicitly resolve the current beatmap as the import/copy source.</value>
+  </data>
+  <data name="ConflictingSource" xml:space="preserve">
+    <value>Choose either --from or --from-current.</value>
+  </data>
+  <data name="HitsoundSummary" xml:space="preserve">
+    <value>Exported {0} layers, {1} events, and {2} samples.</value>
+  </data>
+  <data name="OutputDirectory" xml:space="preserve">
+    <value>Output directory: {0}</value>
+  </data>
+  <data name="GeneratorsHelp" xml:space="preserve">
+    <value>Use generator IDs as table keys and $kind to choose settings types, e.g. --generator-settings '{"scale-rotate" = {"$kind" = "scale-rotate", scalar = 2}}'.</value>
+    <comment>Geometry Dashboard help for typed generator settings. Preserve IDs, $kind, and the full command-line example syntax.</comment>
+  </data>
+  <data name="Generators" xml:space="preserve">
+    <value>Generators:</value>
+    <comment>Geometry Dashboard help heading above generator IDs and their settings type identifiers.</comment>
+  </data>
+  <data name="MaxBackupsHelp" xml:space="preserve">
+    <value>Maximum retained backup files (default: 1000). Files created by the current save are protected from pruning.</value>
+  </data>
+  <data name="ToolDescription.hitsound-studio" xml:space="preserve">
+    <value>Import, configure, generate, and export hitsound layers.</value>
+  </data>
+  <data name="ToolDescription.pattern-gallery" xml:space="preserve">
+    <value>Collect, organize, and place reusable hit-object patterns.</value>
+  </data>
+  <data name="ToolDescription.sliderator" xml:space="preserve">
+    <value>Apply a position or velocity graph to sliders and generate sliders or streams.</value>
+  </data>
+  <data name="Example.root" xml:space="preserve">
+    <value>  mapping-tools slider-merger --current --selection selected
+  mapping-tools hitsound-studio --help
+  mapping-tools update check</value>
+  </data>
+  <data name="Example.auto-fail-detector" xml:space="preserve">
+    <value>  mapping-tools auto-fail-detector map.osu
+  mapping-tools auto-fail-detector --current --interactive</value>
+  </data>
+  <data name="Example.sliderator" xml:space="preserve">
+    <value>  mapping-tools sliderator --current --selection selected --graph '{min-x = 0, min-y = 0, max-x = 1, max-y = 1, anchors = [{pos = {x = 0, y = 0}}, {pos = {x = 1, y = 1}}]}'</value>
+  </data>
+  <data name="Example.hitsound-studio" xml:space="preserve">
+    <value>  mapping-tools hitsound-studio --import '{type = "midi", paths = ["song.mid"]}' --base-beatmap base.osu --output out
+  mapping-tools hitsound-studio --import '{type = "hitsounds", paths = ["source.osu"]}' --save-project studio.json --no-run</value>
+  </data>
+  <data name="Example.pattern-gallery" xml:space="preserve">
+    <value>  mapping-tools pattern-gallery collection list
+  mapping-tools pattern-gallery collection create --collection streams
+  mapping-tools pattern-gallery import --collection streams --source map.osu --selection everything --name "Stream"
+  mapping-tools pattern-gallery export --collection streams --pattern pattern.osu --path target.osu</value>
+  </data>
+  <data name="Example.pattern-gallery.collection" xml:space="preserve">
+    <value>  mapping-tools pattern-gallery collection list
+  mapping-tools pattern-gallery collection create --collection streams</value>
+  </data>
+  <data name="Example.pattern-gallery.collection.list" xml:space="preserve">
+    <value>  mapping-tools pattern-gallery collection list</value>
+  </data>
+  <data name="Example.pattern-gallery.collection.create" xml:space="preserve">
+    <value>  mapping-tools pattern-gallery collection create --collection streams --name "Streams"</value>
+  </data>
+  <data name="Example.pattern-gallery.collection.rename" xml:space="preserve">
+    <value>  mapping-tools pattern-gallery collection rename --collection streams --name "Favourite streams"</value>
+  </data>
+  <data name="Example.pattern-gallery.collection.delete" xml:space="preserve">
+    <value>  mapping-tools pattern-gallery collection delete --collection streams</value>
+  </data>
+  <data name="Example.pattern-gallery.collection.import" xml:space="preserve">
+    <value>  mapping-tools pattern-gallery collection import --source streams.zip --collection streams</value>
+  </data>
+  <data name="Example.pattern-gallery.collection.export" xml:space="preserve">
+    <value>  mapping-tools pattern-gallery collection export --collection streams --output streams.zip</value>
+  </data>
+  <data name="Example.pattern-gallery.collection.merge" xml:space="preserve">
+    <value>  mapping-tools pattern-gallery collection merge --collection streams --source additional-patterns.zip</value>
+  </data>
+  <data name="Example.pattern-gallery.collection.restore" xml:space="preserve">
+    <value>  mapping-tools pattern-gallery collection restore --collection streams</value>
+  </data>
+  <data name="Example.pattern-gallery.list" xml:space="preserve">
+    <value>  mapping-tools pattern-gallery list --collection streams</value>
+  </data>
+  <data name="Example.pattern-gallery.show" xml:space="preserve">
+    <value>  mapping-tools pattern-gallery show --collection streams --pattern pattern.osu</value>
+  </data>
+  <data name="Example.pattern-gallery.import" xml:space="preserve">
+    <value>  mapping-tools pattern-gallery import --collection streams --source map.osu --selection everything --name "Stream"</value>
+  </data>
+  <data name="Example.pattern-gallery.rename" xml:space="preserve">
+    <value>  mapping-tools pattern-gallery rename --collection streams --pattern pattern.osu --name "Long stream"</value>
+  </data>
+  <data name="Example.pattern-gallery.delete" xml:space="preserve">
+    <value>  mapping-tools pattern-gallery delete --collection streams --pattern pattern.osu</value>
+  </data>
+  <data name="Example.pattern-gallery.export" xml:space="preserve">
+    <value>  mapping-tools pattern-gallery export --collection streams --pattern pattern.osu target.osu --export-time-mode custom --custom-export-time 1000</value>
+  </data>
+  <data name="Example.metadata-manager" xml:space="preserve">
+    <value>  mapping-tools metadata-manager --from source.osu --path target.osu
+  mapping-tools metadata-manager --from source.osu --save-project metadata.json --no-run</value>
+  </data>
+  <data name="Example.combo-colour-studio" xml:space="preserve">
+    <value>  mapping-tools combo-colour-studio --from source.osu --path target.osu</value>
+  </data>
+  <data name="Example.geometry-dashboard" xml:space="preserve">
+    <value>  mapping-tools geometry-dashboard --current
+  mapping-tools geometry-dashboard --project geometry.json --current</value>
+  </data>
+  <data name="Example.mapset-merger" xml:space="preserve">
+    <value>  mapping-tools mapset-merger --mapset '{name = "First", path = "set1"}' --mapset '{name = "Second", path = "set2"}' --output merged</value>
+  </data>
+  <data name="Example.rhythm-guide" xml:space="preserve">
+    <value>  mapping-tools rhythm-guide source.osu --output guide.osu</value>
+  </data>
+  <data name="Example.hitsound-copier" xml:space="preserve">
+    <value>  mapping-tools hitsound-copier --from source.osu --to target.osu</value>
+  </data>
+  <data name="Example.timing-copier" xml:space="preserve">
+    <value>  mapping-tools timing-copier --from source.osu --to target.osu</value>
+  </data>
+  <data name="Example.slider-merger" xml:space="preserve">
+    <value>  mapping-tools slider-merger --current --selection selected</value>
+  </data>
+  <data name="Example.slider-completionator" xml:space="preserve">
+    <value>  mapping-tools slider-completionator --current --selection selected</value>
+  </data>
+  <data name="Example.tumour-generator" xml:space="preserve">
+    <value>  mapping-tools tumour-generator --current --selection selected --layer '{tumour-template-enum = "circle", tumour-length = 125, tumour-scale = 64, tumour-count = 1}'</value>
+  </data>
+  <data name="Example.slider-picturator" xml:space="preserve">
+    <value>  mapping-tools slider-picturator --path map.osu --picture-file picture.png</value>
+  </data>
+  <data name="Example.map-cleaner" xml:space="preserve">
+    <value>  mapping-tools map-cleaner --path map.osu</value>
+  </data>
+  <data name="Example.property-transformer" xml:space="preserve">
+    <value>  mapping-tools property-transformer --path map.osu --save-project transform.json</value>
+  </data>
+  <data name="Example.timing-helper" xml:space="preserve">
+    <value>  mapping-tools timing-helper --path map.osu</value>
+  </data>
+  <data name="Example.hitsound-preview-helper" xml:space="preserve">
+    <value>  mapping-tools hitsound-preview-helper --path map.osu</value>
+  </data>
+  <data name="ConflictingTargets" xml:space="preserve">
+    <value>Choose either --path/--current/positional targets or the tool's target option (--to, --export-path, --base-beatmap, or --paths), rather than both.</value>
+  </data>
+  <data name="ComboColourStudio_ColourPointsHelp" xml:space="preserve">
+    <value>Gets or sets points in their current editing order.</value>
+    <comment>Shown in combo-colour-studio command help for --colour-points. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="ComboColourStudio_ComboColoursHelp" xml:space="preserve">
+    <value>Gets or sets the named palette, in editor order.</value>
+    <comment>Shown in combo-colour-studio command help for --combo-colours. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="ComboColourStudio_MaxBurstLengthHelp" xml:space="preserve">
+    <value>Gets or sets the largest combo eligible for burst points.</value>
+    <comment>Shown in combo-colour-studio command help for --max-burst-length. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="GeometryDashboard_CurrentPreferencesHelp" xml:space="preserve">
+    <value>Gets or sets the active preference state.</value>
+    <comment>Shown in geometry-dashboard command help for --current-preferences. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="GeometryDashboard_CurrentPreferences_AcceptableDifferenceHelp" xml:space="preserve">
+    <value>Gets or sets the duplicate-distance tolerance in editor pixels.</value>
+    <comment>Shown in geometry-dashboard command help for --current-preferences.acceptable-difference. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="GeometryDashboard_CurrentPreferences_DebugEnabledHelp" xml:space="preserve">
+    <value>Gets or sets whether platform debugging visuals are enabled.</value>
+    <comment>Shown in geometry-dashboard command help for --current-preferences.debug-enabled. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="GeometryDashboard_CurrentPreferences_GeneratorSettingsHelp" xml:space="preserve">
+    <value>Gets or sets generator settings keyed by concrete generator type.</value>
+    <comment>Shown in geometry-dashboard command help for --current-preferences.generator-settings. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="GeometryDashboard_CurrentPreferences_InceptionLevelHelp" xml:space="preserve">
+    <value>Gets or sets the number of generated layers, including the root layer.</value>
+    <comment>Shown in geometry-dashboard command help for --current-preferences.inception-level. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="GeometryDashboard_CurrentPreferences_InheritHotkeyHelp" xml:space="preserve">
+    <value>Gets or sets the inheritability key.</value>
+    <comment>Shown in geometry-dashboard command help for --current-preferences.inherit-hotkey. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="GeometryDashboard_CurrentPreferences_KeyDownViewModeHelp" xml:space="preserve">
+    <value>Gets or sets the graph shown while the snap key is down.</value>
+    <comment>Shown in geometry-dashboard command help for --current-preferences.key-down-view-mode. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="GeometryDashboard_CurrentPreferences_KeyUpViewModeHelp" xml:space="preserve">
+    <value>Gets or sets the graph shown while the snap key is up.</value>
+    <comment>Shown in geometry-dashboard command help for --current-preferences.key-up-view-mode. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="GeometryDashboard_CurrentPreferences_LockHotkeyHelp" xml:space="preserve">
+    <value>Gets or sets the lock/unlock key.</value>
+    <comment>Shown in geometry-dashboard command help for --current-preferences.lock-hotkey. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="GeometryDashboard_CurrentPreferences_OffsetBottomHelp" xml:space="preserve">
+    <value>Gets or sets the bottom editor-box correction in pixels.</value>
+    <comment>Shown in geometry-dashboard command help for --current-preferences.offset-bottom. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="GeometryDashboard_CurrentPreferences_OffsetLeftHelp" xml:space="preserve">
+    <value>Gets or sets the left editor-box correction in pixels.</value>
+    <comment>Shown in geometry-dashboard command help for --current-preferences.offset-left. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="GeometryDashboard_CurrentPreferences_OffsetRightHelp" xml:space="preserve">
+    <value>Gets or sets the right editor-box correction in pixels.</value>
+    <comment>Shown in geometry-dashboard command help for --current-preferences.offset-right. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="GeometryDashboard_CurrentPreferences_OffsetTopHelp" xml:space="preserve">
+    <value>Gets or sets the top editor-box correction in pixels.</value>
+    <comment>Shown in geometry-dashboard command help for --current-preferences.offset-top. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="GeometryDashboard_CurrentPreferences_RefreshHotkeyHelp" xml:space="preserve">
+    <value>Gets or sets the refresh key.</value>
+    <comment>Shown in geometry-dashboard command help for --current-preferences.refresh-hotkey. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="GeometryDashboard_CurrentPreferences_RelevantObjectPreferencesHelp" xml:space="preserve">
+    <value>Gets or sets appearance settings by stable preference-group name.</value>
+    <comment>Shown in geometry-dashboard command help for --current-preferences.relevant-object-preferences. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="GeometryDashboard_CurrentPreferences_SelectHotkeyHelp" xml:space="preserve">
+    <value>Gets or sets the selection key.</value>
+    <comment>Shown in geometry-dashboard command help for --current-preferences.select-hotkey. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="GeometryDashboard_CurrentPreferences_SelectedHitObjectModeHelp" xml:space="preserve">
+    <value>Gets or sets the rule for selecting root hit objects.</value>
+    <comment>Shown in geometry-dashboard command help for --current-preferences.selected-hit-object-mode. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="GeometryDashboard_CurrentPreferences_SnapHotkeyHelp" xml:space="preserve">
+    <value>Gets or sets the activation/snap key.</value>
+    <comment>Shown in geometry-dashboard command help for --current-preferences.snap-hotkey. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="GeometryDashboard_CurrentPreferences_UpdateModeHelp" xml:space="preserve">
+    <value>Gets or sets the refresh trigger.</value>
+    <comment>Shown in geometry-dashboard command help for --current-preferences.update-mode. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="GeometryDashboard_CurrentPreferences_VisiblePlayfieldBoundaryHelp" xml:space="preserve">
+    <value>Gets or sets whether the osu! playfield boundary is displayed.</value>
+    <comment>Shown in geometry-dashboard command help for --current-preferences.visible-playfield-boundary. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="GeometryDashboard_SaveSlotsHelp" xml:space="preserve">
+    <value>Gets the saved slots in their persisted order.</value>
+    <comment>Shown in geometry-dashboard command help for --save-slots. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundCopier_AlwaysPreserve5VolumeHelp" xml:space="preserve">
+    <value>Gets or sets whether target five-percent inherited volume is protected.</value>
+    <comment>Shown in hitsound-copier command help for --always-preserve5-volume. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundCopier_BeatDivisorsHelp" xml:space="preserve">
+    <value>Gets or sets the ordered beat divisors accepted by the muting filter.</value>
+    <comment>Shown in hitsound-copier command help for --beat-divisors. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundCopier_CopyBodyHitsoundsHelp" xml:space="preserve">
+    <value>Gets or sets whether slider-body timing hitsounds are copied.</value>
+    <comment>Shown in hitsound-copier command help for --copy-body-hitsounds. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundCopier_CopyHitsoundsHelp" xml:space="preserve">
+    <value>Gets or sets whether object and edge hitsounds are copied.</value>
+    <comment>Shown in hitsound-copier command help for --copy-hitsounds. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundCopier_CopyModeHelp" xml:space="preserve">
+    <value>Gets or sets which target values are replaced during copying.</value>
+    <comment>Shown in hitsound-copier command help for --copy-mode. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundCopier_CopySampleSetsHelp" xml:space="preserve">
+    <value>Gets or sets whether sample-set and custom-index timing values are copied.</value>
+    <comment>Shown in hitsound-copier command help for --copy-sample-sets. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundCopier_CopyStoryboardedSamplesHelp" xml:space="preserve">
+    <value>Gets or sets whether storyboard sound samples are copied.</value>
+    <comment>Shown in hitsound-copier command help for --copy-storyboarded-samples. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundCopier_CopyToSliderSlidesHelp" xml:space="preserve">
+    <value>Gets or sets whether unmatched source hitsounds may target slider slides.</value>
+    <comment>Shown in hitsound-copier command help for --copy-to-slider-slides. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundCopier_CopyToSliderTicksHelp" xml:space="preserve">
+    <value>Gets or sets whether unmatched source hitsounds may target slider ticks.</value>
+    <comment>Shown in hitsound-copier command help for --copy-to-slider-ticks. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundCopier_CopyVolumesHelp" xml:space="preserve">
+    <value>Gets or sets whether timing-point volume values are copied.</value>
+    <comment>Shown in hitsound-copier command help for --copy-volumes. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundCopier_IgnoreHitsoundSatisfiedSamplesHelp" xml:space="preserve">
+    <value>Gets or sets whether samples already satisfied by hitsounds are skipped.</value>
+    <comment>Shown in hitsound-copier command help for --ignore-hitsound-satisfied-samples. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundCopier_IgnoreWheneverHitsoundHelp" xml:space="preserve">
+    <value>Gets or sets whether any hitsound suppresses a storyboard sample.</value>
+    <comment>Shown in hitsound-copier command help for --ignore-whenever-hitsound. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundCopier_MinLengthHelp" xml:space="preserve">
+    <value>Gets or sets the minimum slider duration in beats eligible for muting.</value>
+    <comment>Shown in hitsound-copier command help for --min-length. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundCopier_MuteSliderendsHelp" xml:space="preserve">
+    <value>Gets or sets whether eligible target slider ends are muted.</value>
+    <comment>Shown in hitsound-copier command help for --mute-sliderends. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundCopier_MutedDivisorsHelp" xml:space="preserve">
+    <value>Gets or sets beat divisors classified as muted by the filter.</value>
+    <comment>Shown in hitsound-copier command help for --muted-divisors. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundCopier_MutedIndexHelp" xml:space="preserve">
+    <value>Gets or sets the optional custom index used for muted ends.</value>
+    <comment>Shown in hitsound-copier command help for --muted-index. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundCopier_MutedSampleSetHelp" xml:space="preserve">
+    <value>Gets or sets the sample family used for muted ends.</value>
+    <comment>Shown in hitsound-copier command help for --muted-sample-set. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundCopier_PathFromHelp" xml:space="preserve">
+    <value>Gets or sets the optional source beatmap path.</value>
+    <comment>Shown in hitsound-copier command help for --path-from. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundCopier_PathToHelp" xml:space="preserve">
+    <value>Gets or sets vertical-bar-separated target beatmap paths.</value>
+    <comment>Shown in hitsound-copier command help for --path-to. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundCopier_StartIndexHelp" xml:space="preserve">
+    <value>Gets or sets the first generated custom sample index.</value>
+    <comment>Shown in hitsound-copier command help for --start-index. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundCopier_TemporalLeniencyHelp" xml:space="preserve">
+    <value>Gets or sets the maximum rounded millisecond matching distance.</value>
+    <comment>Shown in hitsound-copier command help for --temporal-leniency. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundPreviewHelper_ItemsHelp" xml:space="preserve">
+    <value>Gets or sets the positional rules applied to each selected timeline event.</value>
+    <comment>Shown in hitsound-preview-helper command help for --items. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundStudio_AddCoincidingRegularHitsoundsHelp" xml:space="preserve">
+    <value>Gets or sets whether named modes retain regular hitsound flags.</value>
+    <comment>Shown in hitsound-studio command help for --add-coinciding-regular-hitsounds. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundStudio_AddGreenLineVolumeToMidiHelp" xml:space="preserve">
+    <value>Gets or sets whether greenline volumes become MIDI volume changes.</value>
+    <comment>Shown in hitsound-studio command help for --add-green-line-volume-to-midi. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundStudio_AllowGrowthPreviousSampleSchemaHelp" xml:space="preserve">
+    <value>Gets or sets whether an old schema can receive new entries.</value>
+    <comment>Shown in hitsound-studio command help for --allow-growth-previous-sample-schema. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundStudio_BaseBeatmapHelp" xml:space="preserve">
+    <value>Gets or sets the base beatmap used for export and MIDI timing.</value>
+    <comment>Shown in hitsound-studio command help for --base-beatmap. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundStudio_DefaultSampleHelp" xml:space="preserve">
+    <value>Gets or sets the normal fallback sample.</value>
+    <comment>Shown in hitsound-studio command help for --default-sample. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundStudio_ExportFolderHelp" xml:space="preserve">
+    <value>Gets or sets the output directory.</value>
+    <comment>Shown in hitsound-studio command help for --export-folder. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundStudio_ExportMapHelp" xml:space="preserve">
+    <value>Gets or sets whether the map file is exported.</value>
+    <comment>Shown in hitsound-studio command help for --export-map. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundStudio_ExportSamplesHelp" xml:space="preserve">
+    <value>Gets or sets whether generated samples are exported.</value>
+    <comment>Shown in hitsound-studio command help for --export-samples. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundStudio_FirstCustomIndexHelp" xml:space="preserve">
+    <value>Gets or sets the first custom index assigned to new schemas.</value>
+    <comment>Shown in hitsound-studio command help for --first-custom-index. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundStudio_HitsoundDiffNameHelp" xml:space="preserve">
+    <value>Gets or sets the version name written to the exported map.</value>
+    <comment>Shown in hitsound-studio command help for --hitsound-diff-name. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundStudio_HitsoundExportGameModeHelp" xml:space="preserve">
+    <value>Gets or sets the target osu! game mode.</value>
+    <comment>Shown in hitsound-studio command help for --hitsound-export-game-mode. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundStudio_HitsoundExportModeSettingHelp" xml:space="preserve">
+    <value>Gets or sets the selected export mode.</value>
+    <comment>Shown in hitsound-studio command help for --hitsound-export-mode. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundStudio_HitsoundLayersHelp" xml:space="preserve">
+    <value>Gets or sets editable layer data.</value>
+    <comment>Shown in hitsound-studio command help for --hitsound-layers. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundStudio_MixedSampleExportFormatHelp" xml:space="preserve">
+    <value>Gets or sets the mixed-source export format.</value>
+    <comment>Shown in hitsound-studio command help for --mixed-sample-export-format. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundStudio_SingleSampleExportFormatHelp" xml:space="preserve">
+    <value>Gets or sets the single-source export format.</value>
+    <comment>Shown in hitsound-studio command help for --single-sample-export-format. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundStudio_UsePreviousSampleSchemaHelp" xml:space="preserve">
+    <value>Gets or sets whether the previous schema is the standard-mode schema.</value>
+    <comment>Shown in hitsound-studio command help for --use-previous-sample-schema. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="HitsoundStudio_ZipLayersLeniencyHelp" xml:space="preserve">
+    <value>Gets or sets the grouping leniency in milliseconds.</value>
+    <comment>Shown in hitsound-studio command help for --zip-layers-leniency. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="MapCleaner_MapCleanerArgsHelp" xml:space="preserve">
+    <value>Gets or sets the cleanup options stored by the project.</value>
+    <comment>Shown in map-cleaner command help for --map-cleaner-args. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="MapCleaner_MapCleanerArgs_AnalyzeSamplesHelp" xml:space="preserve">
+    <value>Gets or sets whether mapset samples are inspected before rebuilding timing points.</value>
+    <comment>Shown in map-cleaner command help for --map-cleaner-args.analyze-samples. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="MapCleaner_MapCleanerArgs_BeatDivisorsHelp" xml:space="preserve">
+    <value>Gets or sets the beat divisors accepted while resnapping.</value>
+    <comment>Shown in map-cleaner command help for --map-cleaner-args.beat-divisors. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="MapCleaner_MapCleanerArgs_RemoveHitsoundsHelp" xml:space="preserve">
+    <value>Gets or sets whether every object hitsound is cleared.</value>
+    <comment>Shown in map-cleaner command help for --map-cleaner-args.remove-hitsounds. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="MapCleaner_MapCleanerArgs_RemoveMutingHelp" xml:space="preserve">
+    <value>Gets or sets whether muting volume values are removed from object ends.</value>
+    <comment>Shown in map-cleaner command help for --map-cleaner-args.remove-muting. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="MapCleaner_MapCleanerArgs_RemoveUnclickableHitsoundsHelp" xml:space="preserve">
+    <value>Gets or sets whether unclickable slider and spinner ends are muted.</value>
+    <comment>Shown in map-cleaner command help for --map-cleaner-args.remove-unclickable-hitsounds. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="MapCleaner_MapCleanerArgs_RemoveUnusedSamplesHelp" xml:space="preserve">
+    <value>Gets or sets whether unused samples are moved to recoverable storage.</value>
+    <comment>Shown in map-cleaner command help for --map-cleaner-args.remove-unused-samples. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="MapCleaner_MapCleanerArgs_ResnapBookmarksHelp" xml:space="preserve">
+    <value>Gets or sets whether editor bookmarks are resnapped.</value>
+    <comment>Shown in map-cleaner command help for --map-cleaner-args.resnap-bookmarks. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="MapCleaner_MapCleanerArgs_ResnapObjectsHelp" xml:space="preserve">
+    <value>Gets or sets whether hit objects and slider ends are resnapped.</value>
+    <comment>Shown in map-cleaner command help for --map-cleaner-args.resnap-objects. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="MapCleaner_MapCleanerArgs_SampleSetSlidersHelp" xml:space="preserve">
+    <value>Gets or sets whether slider sample-set changes must be preserved.</value>
+    <comment>Shown in map-cleaner command help for --map-cleaner-args.sample-set-sliders. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="MapCleaner_MapCleanerArgs_VolumeSlidersHelp" xml:space="preserve">
+    <value>Gets or sets whether slider volume changes must be preserved.</value>
+    <comment>Shown in map-cleaner command help for --map-cleaner-args.volume-sliders. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="MapCleaner_MapCleanerArgs_VolumeSpinnersHelp" xml:space="preserve">
+    <value>Gets or sets whether spinner volume changes must be preserved.</value>
+    <comment>Shown in map-cleaner command help for --map-cleaner-args.volume-spinners. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="MapsetMerger_ExportPathHelp" xml:space="preserve">
+    <value>Gets or sets the destination directory for merged files.</value>
+    <comment>Shown in mapset-merger command help for --export-path. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="MapsetMerger_MapsetsHelp" xml:space="preserve">
+    <value>Gets or sets the source mapsets in their merge order.</value>
+    <comment>Shown in mapset-merger command help for --mapsets. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="MapsetMerger_MoveSbToBeatmapHelp" xml:space="preserve">
+    <value>Gets or sets whether the first external storyboard is copied into every beatmap.</value>
+    <comment>Shown in mapset-merger command help for --move-sb-to-beatmap. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="MetadataManager_ArtistHelp" xml:space="preserve">
+    <value>Gets or sets the Unicode artist name.</value>
+    <comment>Shown in metadata-manager command help for --artist. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="MetadataManager_BeatmapCreatorHelp" xml:space="preserve">
+    <value>Gets or sets the mapper name.</value>
+    <comment>Shown in metadata-manager command help for --beatmap-creator. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="MetadataManager_ComboColoursHelp" xml:space="preserve">
+    <value>Gets or sets the ordered combo-colour palette.</value>
+    <comment>Shown in metadata-manager command help for --combo-colours. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="MetadataManager_DoRemoveDuplicateTagsHelp" xml:space="preserve">
+    <value>Gets or sets whether duplicate tags are removed before export.</value>
+    <comment>Shown in metadata-manager command help for --do-remove-duplicate-tags. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="MetadataManager_ExportPathHelp" xml:space="preserve">
+    <value>Gets or sets the vertical-bar-separated target beatmap paths.</value>
+    <comment>Shown in metadata-manager command help for --export-path. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="MetadataManager_PreviewTimeHelp" xml:space="preserve">
+    <value>Gets or sets the preview timestamp in milliseconds.</value>
+    <comment>Shown in metadata-manager command help for --preview-time. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="MetadataManager_ResetIdsHelp" xml:space="preserve">
+    <value>Gets or sets whether online beatmap and mapset IDs are reset.</value>
+    <comment>Shown in metadata-manager command help for --reset-ids. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="MetadataManager_RomanisedArtistHelp" xml:space="preserve">
+    <value>Gets or sets the ASCII artist name used in filenames.</value>
+    <comment>Shown in metadata-manager command help for --romanised-artist. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="MetadataManager_RomanisedTitleHelp" xml:space="preserve">
+    <value>Gets or sets the ASCII title used in filenames.</value>
+    <comment>Shown in metadata-manager command help for --romanised-title. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="MetadataManager_SourceHelp" xml:space="preserve">
+    <value>Gets or sets the source text recorded in the beatmap.</value>
+    <comment>Shown in metadata-manager command help for --source. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="MetadataManager_SpecialColoursHelp" xml:space="preserve">
+    <value>Gets or sets the named special colours.</value>
+    <comment>Shown in metadata-manager command help for --special-colours. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="MetadataManager_TagsHelp" xml:space="preserve">
+    <value>Gets or sets the space-separated beatmap tags.</value>
+    <comment>Shown in metadata-manager command help for --tags. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="MetadataManager_TitleHelp" xml:space="preserve">
+    <value>Gets or sets the Unicode title.</value>
+    <comment>Shown in metadata-manager command help for --title. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="MetadataManager_UseComboColoursHelp" xml:space="preserve">
+    <value>Gets or sets whether the configured combo and special colours are exported.</value>
+    <comment>Shown in metadata-manager command help for --use-combo-colours. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PatternGallery_BeatDivisorsHelp" xml:space="preserve">
+    <value>Gets or sets the beat divisors used by target-timing resnapping.</value>
+    <comment>Shown in pattern-gallery command help for --beat-divisors. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PatternGallery_CollectionNameHelp" xml:space="preserve">
+    <value>Gets or sets the user-visible collection name.</value>
+    <comment>Shown in pattern-gallery command help for --collection-name. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PatternGallery_CustomExportTimeHelp" xml:space="preserve">
+    <value>Gets or sets the custom export time in milliseconds.</value>
+    <comment>Shown in pattern-gallery command help for --custom-export-time. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PatternGallery_CustomRotateHelp" xml:space="preserve">
+    <value>Rotate clockwise in degrees around the playfield centre (256, 192). Exported coordinates are rounded to integers.</value>
+    <comment>Shown in pattern-gallery command help for --custom-rotate. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PatternGallery_CustomScaleHelp" xml:space="preserve">
+    <value>Gets or sets the optional spatial scale multiplier.</value>
+    <comment>Shown in pattern-gallery command help for --custom-scale. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PatternGallery_ExportTimeModeHelp" xml:space="preserve">
+    <value>current places the first object at the live editor playhead and requires editor access. custom uses --custom-export-time in milliseconds. pattern preserves the pattern's saved object times.</value>
+    <comment>Shown in pattern-gallery command help for --export-time-mode. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PatternGallery_FileHandlerHelp" xml:space="preserve">
+    <value>Gets or sets the collection-folder metadata.</value>
+    <comment>Shown in pattern-gallery command help for --file-handler. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PatternGallery_FileHandler_CollectionFolderNameHelp" xml:space="preserve">
+    <value>Gets or sets the unique directory name for this collection.</value>
+    <comment>Shown in pattern-gallery command help for --file-handler.collection-folder-name. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PatternGallery_FileHandler_PatternFilesFolderNameHelp" xml:space="preserve">
+    <value>Gets or sets the collection's fixed pattern-files directory name.</value>
+    <comment>Shown in pattern-gallery command help for --file-handler.pattern-files-folder-name. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PatternGallery_FixBpmSvHelp" xml:space="preserve">
+    <value>Gets or sets whether BPM-dependent slider velocity is compensated.</value>
+    <comment>Shown in pattern-gallery command help for --fix-bpm-sv. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PatternGallery_FixColourHaxHelp" xml:space="preserve">
+    <value>Gets or sets whether combo colour skips are repaired.</value>
+    <comment>Shown in pattern-gallery command help for --fix-colour-hax. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PatternGallery_FixGlobalSvHelp" xml:space="preserve">
+    <value>Gets or sets whether global slider velocity is compensated.</value>
+    <comment>Shown in pattern-gallery command help for --fix-global-sv. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PatternGallery_FixStackLeniencyHelp" xml:space="preserve">
+    <value>Gets or sets whether osu! stacks are converted to manual positions.</value>
+    <comment>Shown in pattern-gallery command help for --fix-stack-leniency. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PatternGallery_FixTickRateHelp" xml:space="preserve">
+    <value>Gets or sets whether slider tick rate is compensated.</value>
+    <comment>Shown in pattern-gallery command help for --fix-tick-rate. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PatternGallery_IncludeHitsoundsHelp" xml:space="preserve">
+    <value>Gets or sets whether pattern hitsounds are included.</value>
+    <comment>Shown in pattern-gallery command help for --include-hitsounds. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PatternGallery_IncludeKiaiHelp" xml:space="preserve">
+    <value>Gets or sets whether pattern kiai state is included.</value>
+    <comment>Shown in pattern-gallery command help for --include-kiai. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PatternGallery_PaddingHelp" xml:space="preserve">
+    <value>Gets or sets the extra deletion margin in milliseconds.</value>
+    <comment>Shown in pattern-gallery command help for --padding. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PatternGallery_PartingDistanceHelp" xml:space="preserve">
+    <value>Gets or sets the minimum beat gap used for partitioning.</value>
+    <comment>Shown in pattern-gallery command help for --parting-distance. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PatternGallery_PatternOverwriteModeHelp" xml:space="preserve">
+    <value>no-overwrite retains existing objects. partitioned-overwrite removes objects within dense pattern sections, leaving gaps between sections intact. complete-overwrite removes objects throughout the pattern's time span.</value>
+    <comment>Shown in pattern-gallery command help for --pattern-overwrite-mode. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PatternGallery_PatternsHelp" xml:space="preserve">
+    <value>Gets the indexed patterns in their persisted order.</value>
+    <comment>Shown in pattern-gallery command help for --patterns. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PatternGallery_ScaleToNewCircleSizeHelp" xml:space="preserve">
+    <value>Gets or sets whether spacing is scaled to the target Circle Size.</value>
+    <comment>Shown in pattern-gallery command help for --scale-to-new-circle-size. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PatternGallery_ScaleToNewTimingHelp" xml:space="preserve">
+    <value>Gets or sets whether pattern timing is scaled to the target timing.</value>
+    <comment>Shown in pattern-gallery command help for --scale-to-new-timing. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PatternGallery_SnapToNewTimingHelp" xml:space="preserve">
+    <value>Gets or sets whether objects are resnapped to target timing.</value>
+    <comment>Shown in pattern-gallery command help for --snap-to-new-timing. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PatternGallery_TimingOverwriteModeHelp" xml:space="preserve">
+    <value>Gets or sets the timing overwrite mode.</value>
+    <comment>Shown in pattern-gallery command help for --timing-overwrite-mode. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_BookmarkTimeMultiplierHelp" xml:space="preserve">
+    <value>Gets or sets the bookmark time multiplier.</value>
+    <comment>Shown in property-transformer command help for --bookmark-time-multiplier. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_BookmarkTimeOffsetHelp" xml:space="preserve">
+    <value>Gets or sets the bookmark time addition in milliseconds.</value>
+    <comment>Shown in property-transformer command help for --bookmark-time-offset. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_BreakTimeMultiplierHelp" xml:space="preserve">
+    <value>Gets or sets the break time multiplier.</value>
+    <comment>Shown in property-transformer command help for --break-time-multiplier. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_BreakTimeOffsetHelp" xml:space="preserve">
+    <value>Gets or sets the break time addition in milliseconds.</value>
+    <comment>Shown in property-transformer command help for --break-time-offset. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_ClipPropertiesHelp" xml:space="preserve">
+    <value>Gets or sets whether transformed values are constrained to their legacy bounds.</value>
+    <comment>Shown in property-transformer command help for --clip-properties. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_EnableFiltersHelp" xml:space="preserve">
+    <value>Gets or sets whether match, mismatch, and time-range filters are active.</value>
+    <comment>Shown in property-transformer command help for --enable-filters. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_HitObjectTimeMultiplierHelp" xml:space="preserve">
+    <value>Gets or sets the hit-object time multiplier.</value>
+    <comment>Shown in property-transformer command help for --hit-object-time-multiplier. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_HitObjectTimeOffsetHelp" xml:space="preserve">
+    <value>Gets or sets the hit-object time addition in milliseconds.</value>
+    <comment>Shown in property-transformer command help for --hit-object-time-offset. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_HitObjectVolumeMultiplierHelp" xml:space="preserve">
+    <value>Gets or sets the hit-object volume multiplier.</value>
+    <comment>Shown in property-transformer command help for --hit-object-volume-multiplier. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_HitObjectVolumeOffsetHelp" xml:space="preserve">
+    <value>Gets or sets the hit-object volume addition.</value>
+    <comment>Shown in property-transformer command help for --hit-object-volume-offset. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_MatchFilterHelp" xml:space="preserve">
+    <value>Gets or sets the values allowed by the match filter.</value>
+    <comment>Shown in property-transformer command help for --match-filter. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_MaxTimeFilterHelp" xml:space="preserve">
+    <value>Gets or sets the inclusive upper time filter, or -1 for no upper bound.</value>
+    <comment>Shown in property-transformer command help for --max-time-filter. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_MinTimeFilterHelp" xml:space="preserve">
+    <value>Gets or sets the inclusive lower time filter, or -1 for no lower bound.</value>
+    <comment>Shown in property-transformer command help for --min-time-filter. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_PreviewTimeMultiplierHelp" xml:space="preserve">
+    <value>Gets or sets the preview-point time multiplier.</value>
+    <comment>Shown in property-transformer command help for --preview-time-multiplier. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_PreviewTimeOffsetHelp" xml:space="preserve">
+    <value>Gets or sets the preview-point time addition in milliseconds.</value>
+    <comment>Shown in property-transformer command help for --preview-time-offset. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_SbEventTimeMultiplierHelp" xml:space="preserve">
+    <value>Gets or sets the storyboard event time multiplier.</value>
+    <comment>Shown in property-transformer command help for --sb-event-time-multiplier. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_SbEventTimeOffsetHelp" xml:space="preserve">
+    <value>Gets or sets the storyboard event time addition in milliseconds.</value>
+    <comment>Shown in property-transformer command help for --sb-event-time-offset. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_SbSampleTimeMultiplierHelp" xml:space="preserve">
+    <value>Gets or sets the storyboard sample time multiplier.</value>
+    <comment>Shown in property-transformer command help for --sb-sample-time-multiplier. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_SbSampleTimeOffsetHelp" xml:space="preserve">
+    <value>Gets or sets the storyboard sample time addition in milliseconds.</value>
+    <comment>Shown in property-transformer command help for --sb-sample-time-offset. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_SbSampleVolumeMultiplierHelp" xml:space="preserve">
+    <value>Gets or sets the storyboard sample volume multiplier.</value>
+    <comment>Shown in property-transformer command help for --sb-sample-volume-multiplier. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_SbSampleVolumeOffsetHelp" xml:space="preserve">
+    <value>Gets or sets the storyboard sample volume addition.</value>
+    <comment>Shown in property-transformer command help for --sb-sample-volume-offset. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_TimingpointBpmMultiplierHelp" xml:space="preserve">
+    <value>Gets or sets the uninherited timing-point BPM multiplier.</value>
+    <comment>Shown in property-transformer command help for --timingpoint-bpm-multiplier. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_TimingpointBpmOffsetHelp" xml:space="preserve">
+    <value>Gets or sets the uninherited timing-point BPM addition.</value>
+    <comment>Shown in property-transformer command help for --timingpoint-bpm-offset. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_TimingpointIndexMultiplierHelp" xml:space="preserve">
+    <value>Gets or sets the timing-point custom-index multiplier.</value>
+    <comment>Shown in property-transformer command help for --timingpoint-index-multiplier. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_TimingpointIndexOffsetHelp" xml:space="preserve">
+    <value>Gets or sets the timing-point custom-index addition.</value>
+    <comment>Shown in property-transformer command help for --timingpoint-index-offset. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_TimingpointOffsetMultiplierHelp" xml:space="preserve">
+    <value>Gets or sets the timing-point offset multiplier.</value>
+    <comment>Shown in property-transformer command help for --timingpoint-offset-multiplier. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_TimingpointOffsetOffsetHelp" xml:space="preserve">
+    <value>Gets or sets the timing-point offset addition in milliseconds.</value>
+    <comment>Shown in property-transformer command help for --timingpoint-offset-offset. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_TimingpointSvMultiplierHelp" xml:space="preserve">
+    <value>Gets or sets the inherited timing-point slider-velocity multiplier.</value>
+    <comment>Shown in property-transformer command help for --timingpoint-sv-multiplier. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_TimingpointSvOffsetHelp" xml:space="preserve">
+    <value>Gets or sets the inherited timing-point slider-velocity addition.</value>
+    <comment>Shown in property-transformer command help for --timingpoint-sv-offset. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_TimingpointVolumeMultiplierHelp" xml:space="preserve">
+    <value>Gets or sets the timing-point volume multiplier.</value>
+    <comment>Shown in property-transformer command help for --timingpoint-volume-multiplier. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_TimingpointVolumeOffsetHelp" xml:space="preserve">
+    <value>Gets or sets the timing-point volume addition.</value>
+    <comment>Shown in property-transformer command help for --timingpoint-volume-offset. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_UnmatchFilterHelp" xml:space="preserve">
+    <value>Gets or sets the values rejected by the mismatch filter.</value>
+    <comment>Shown in property-transformer command help for --unmatch-filter. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_VideoTimeMultiplierHelp" xml:space="preserve">
+    <value>Gets or sets the video start-time multiplier.</value>
+    <comment>Shown in property-transformer command help for --video-time-multiplier. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="PropertyTransformer_VideoTimeOffsetHelp" xml:space="preserve">
+    <value>Gets or sets the video start-time addition in milliseconds.</value>
+    <comment>Shown in property-transformer command help for --video-time-offset. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="RhythmGuide_GuideGeneratorArgsHelp" xml:space="preserve">
+    <value>Gets or sets the generator and application options stored by the project.</value>
+    <comment>Shown in rhythm-guide command help for --guide-generator-args. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="RhythmGuide_GuideGeneratorArgs_BeatDivisorsHelp" xml:space="preserve">
+    <value>Gets or sets the snapping divisors used while expanding source rhythms.</value>
+    <comment>Shown in rhythm-guide command help for --guide-generator-args.beat-divisors. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="RhythmGuide_GuideGeneratorArgs_ExportModeHelp" xml:space="preserve">
+    <value>Gets or sets whether generation creates a map or appends to a target.</value>
+    <comment>Shown in rhythm-guide command help for --guide-generator-args.export-mode. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="RhythmGuide_GuideGeneratorArgs_ExportPathHelp" xml:space="preserve">
+    <value>Gets or sets the destination beatmap path.</value>
+    <comment>Shown in rhythm-guide command help for --guide-generator-args.export-path. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="RhythmGuide_GuideGeneratorArgs_NcEverythingHelp" xml:space="preserve">
+    <value>Gets or sets whether every generated object uses night-core timing.</value>
+    <comment>Shown in rhythm-guide command help for --guide-generator-args.nc-everything. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="RhythmGuide_GuideGeneratorArgs_OutputGameModeHelp" xml:space="preserve">
+    <value>Gets or sets the game mode assigned to newly generated beatmaps.</value>
+    <comment>Shown in rhythm-guide command help for --guide-generator-args.output-game-mode. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="RhythmGuide_GuideGeneratorArgs_OutputNameHelp" xml:space="preserve">
+    <value>Gets or sets the difficulty name assigned to a new guide beatmap.</value>
+    <comment>Shown in rhythm-guide command help for --guide-generator-args.output-name. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="RhythmGuide_GuideGeneratorArgs_PathsHelp" xml:space="preserve">
+    <value>Gets or sets the source beatmap paths whose rhythm is copied.</value>
+    <comment>Shown in rhythm-guide command help for --guide-generator-args.paths. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="RhythmGuide_GuideGeneratorArgs_SelectionModeHelp" xml:space="preserve">
+    <value>Gets or sets which source rhythm events become guide objects.</value>
+    <comment>Shown in rhythm-guide command help for --guide-generator-args.selection-mode. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderCompletionator_DelegateToBpmHelp" xml:space="preserve">
+    <value>Gets or sets whether slider velocity is delegated to BPM timing points.</value>
+    <comment>Shown in slider-completionator command help for --delegate-to-bpm. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderCompletionator_DurationHelp" xml:space="preserve">
+    <value>Gets or sets the requested slider duration in beats, or -1 to preserve it.</value>
+    <comment>Shown in slider-completionator command help for --duration. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderCompletionator_EndTimeHelp" xml:space="preserve">
+    <value>Gets or sets the requested slider end time in milliseconds, or -1 to preserve it.</value>
+    <comment>Shown in slider-completionator command help for --end-time. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderCompletionator_FreeVariableSettingHelp" xml:space="preserve">
+    <value>Gets or sets the value calculated by the transformation.</value>
+    <comment>Shown in slider-completionator command help for --free-variable. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderCompletionator_ImportModeSettingHelp" xml:space="preserve">
+    <value>Choose the objects to complete. selected uses live editor selection. Supply --selection explicitly or load it from --project.</value>
+    <comment>Shown in slider-completionator command help for --import-mode. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderCompletionator_LengthHelp" xml:space="preserve">
+    <value>Fraction of the complete slider path: 1 uses the full path; -1 preserves the current length.</value>
+    <comment>Shown in slider-completionator command help for --length. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderCompletionator_MoveAnchorsHelp" xml:space="preserve">
+    <value>Gets or sets whether all slider anchors are moved to the new path length.</value>
+    <comment>Shown in slider-completionator command help for --move-anchors. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderCompletionator_RemoveSliderTicksHelp" xml:space="preserve">
+    <value>Gets or sets whether delegated sliders suppress slider ticks with NaN velocity.</value>
+    <comment>Shown in slider-completionator command help for --remove-slider-ticks. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderCompletionator_SliderVelocityHelp" xml:space="preserve">
+    <value>Gets or sets the requested inherited slider velocity multiplier, or -1 to preserve it.</value>
+    <comment>Shown in slider-completionator command help for --slider-velocity. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderCompletionator_TimeCodeHelp" xml:space="preserve">
+    <value>Gets or sets the legacy time-code query used by Time mode.</value>
+    <comment>Shown in slider-completionator command help for --time-code. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderCompletionator_UseCurrentEditorTimeHelp" xml:space="preserve">
+    <value>Gets or sets whether the live editor time supplies the end time.</value>
+    <comment>Shown in slider-completionator command help for --use-current-editor-time. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderCompletionator_UseEndTimeHelp" xml:space="preserve">
+    <value>Gets or sets whether replaces duration input.</value>
+    <comment>Shown in slider-completionator command help for --use-end-time. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderMerger_ConnectionModeSettingHelp" xml:space="preserve">
+    <value>How to connect slider paths: move translates the next slider to the join; linear adds a straight connector without moving it.</value>
+    <comment>Shown in slider-merger command help for --connection-mode. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderMerger_ImportModeSettingHelp" xml:space="preserve">
+    <value>Choose the objects to merge. selected uses live editor selection. Supply --selection explicitly or load it from --project.</value>
+    <comment>Shown in slider-merger command help for --import-mode. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderMerger_LeniencyHelp" xml:space="preserve">
+    <value>Maximum distance between adjacent objects allowed for merging, in osu! pixels.</value>
+    <comment>Shown in slider-merger command help for --leniency. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderMerger_LinearOnLinearHelp" xml:space="preserve">
+    <value>Gets or sets whether a fully linear result uses the linear path type without red anchors.</value>
+    <comment>Shown in slider-merger command help for --linear-on-linear. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderMerger_MergeOnSliderEndHelp" xml:space="preserve">
+    <value>Join at the playable endpoint. Use --no-merge-on-slider-end to join at the final control-point anchor instead.</value>
+    <comment>Shown in slider-merger command help for --merge-on-slider-end. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderMerger_TimeCodeHelp" xml:space="preserve">
+    <value>Gets or sets the legacy time-code query used by Time mode.</value>
+    <comment>Shown in slider-merger command help for --time-code. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderPicturator_AlphaOnHelp" xml:space="preserve">
+    <value>Gets or sets whether the source alpha channel participates in matching.</value>
+    <comment>Shown in slider-picturator command help for --alpha-on. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderPicturator_BlackOnHelp" xml:space="preserve">
+    <value>Gets or sets whether black may be represented by transparent slider space.</value>
+    <comment>Shown in slider-picturator command help for --black-on. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderPicturator_BlueOnHelp" xml:space="preserve">
+    <value>Gets or sets whether the source blue channel participates in matching.</value>
+    <comment>Shown in slider-picturator command help for --blue-on. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderPicturator_BorderColorHelp" xml:space="preserve">
+    <value>Gets or sets the slider border colour.</value>
+    <comment>Shown in slider-picturator command help for --border-color. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderPicturator_BorderOnHelp" xml:space="preserve">
+    <value>Gets or sets whether the border colour may be used.</value>
+    <comment>Shown in slider-picturator command help for --border-on. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderPicturator_CurrentTrackColorHelp" xml:space="preserve">
+    <value>Gets or sets the effective track colour used by the engine.</value>
+    <comment>Shown in slider-picturator command help for --current-track-color. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderPicturator_DurationHelp" xml:space="preserve">
+    <value>Gets or sets the generated duration in milliseconds.</value>
+    <comment>Shown in slider-picturator command help for --duration. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderPicturator_GreenOnHelp" xml:space="preserve">
+    <value>Gets or sets whether the source green channel participates in matching.</value>
+    <comment>Shown in slider-picturator command help for --green-on. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderPicturator_ImageStartXHelp" xml:space="preserve">
+    <value>Gets or sets the image's top-left X position.</value>
+    <comment>Shown in slider-picturator command help for --image-start-x. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderPicturator_ImageStartYHelp" xml:space="preserve">
+    <value>Gets or sets the image's top-left Y position.</value>
+    <comment>Shown in slider-picturator command help for --image-start-y. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderPicturator_PictureFileHelp" xml:space="preserve">
+    <value>Gets or sets the image file path.</value>
+    <comment>Shown in slider-picturator command help for --picture-file. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderPicturator_QualityHelp" xml:space="preserve">
+    <value>Gets or sets the image quality from one through 101.</value>
+    <comment>Shown in slider-picturator command help for --quality. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderPicturator_RedOnHelp" xml:space="preserve">
+    <value>Gets or sets whether the source red channel participates in matching.</value>
+    <comment>Shown in slider-picturator command help for --red-on. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderPicturator_SetBeatmapColorsHelp" xml:space="preserve">
+    <value>Gets or sets whether generated colours are written to the beatmap.</value>
+    <comment>Shown in slider-picturator command help for --set-beatmap-colors. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderPicturator_SetTrackColorOverrideHelp" xml:space="preserve">
+    <value>Gets or sets whether the generated track colour is written as a beatmap override.</value>
+    <comment>Shown in slider-picturator command help for --set-track-color-override. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderPicturator_SliderStartXHelp" xml:space="preserve">
+    <value>Gets or sets the generated slider start X coordinate.</value>
+    <comment>Shown in slider-picturator command help for --slider-start-x. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderPicturator_SliderStartYHelp" xml:space="preserve">
+    <value>Gets or sets the generated slider start Y coordinate.</value>
+    <comment>Shown in slider-picturator command help for --slider-start-y. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderPicturator_TimeCodeHelp" xml:space="preserve">
+    <value>Gets or sets the generated slider start time in milliseconds.</value>
+    <comment>Shown in slider-picturator command help for --time-code. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderPicturator_ViewportSizeHelp" xml:space="preserve">
+    <value>Gets or sets the GPU viewport-size choice.</value>
+    <comment>Shown in slider-picturator command help for --viewport-size. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="SliderPicturator_YResolutionHelp" xml:space="preserve">
+    <value>Gets or sets the image's vertical resolution.</value>
+    <comment>Shown in slider-picturator command help for --y-resolution. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="Sliderator_BeatSnapDivisorHelp" xml:space="preserve">
+    <value>Gets or sets the timeline divisor used for stream output.</value>
+    <comment>Shown in sliderator command help for --beat-snap-divisor. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="Sliderator_BeatsPerMinuteHelp" xml:space="preserve">
+    <value>Gets or sets the redline BPM applied to the graph duration.</value>
+    <comment>Shown in sliderator command help for --beats-per-minute. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="Sliderator_DelegateToBpmHelp" xml:space="preserve">
+    <value>Gets or sets whether SV is delegated to BPM timing points.</value>
+    <comment>Shown in sliderator command help for --delegate-to-bpm. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="Sliderator_ExportAsInvisibleSliderHelp" xml:space="preserve">
+    <value>Gets or sets whether the result is written as an invisible slider.</value>
+    <comment>Shown in sliderator command help for --export-as-invisible-slider. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="Sliderator_ExportAsNormalHelp" xml:space="preserve">
+    <value>Gets or sets whether the result is written as a normal slider.</value>
+    <comment>Shown in sliderator command help for --export-as-normal. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="Sliderator_ExportAsStreamHelp" xml:space="preserve">
+    <value>Gets or sets whether the result is written as a stream of circles.</value>
+    <comment>Shown in sliderator command help for --export-as-stream. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="Sliderator_ExportModeSettingHelp" xml:space="preserve">
+    <value>Gets or sets whether export adds or replaces an object.</value>
+    <comment>Shown in sliderator command help for --export-mode. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="Sliderator_ExportTimeHelp" xml:space="preserve">
+    <value>Gets or sets the export timestamp in milliseconds.</value>
+    <comment>Shown in sliderator command help for --export-time. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="Sliderator_GlobalSvHelp" xml:space="preserve">
+    <value>Gets or sets the map's global slider multiplier.</value>
+    <comment>Shown in sliderator command help for --global-sv. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="Sliderator_GraphBeatsHelp" xml:space="preserve">
+    <value>Gets or sets the requested graph duration in beats.</value>
+    <comment>Shown in sliderator command help for --graph-beats. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="Sliderator_GraphModeSettingHelp" xml:space="preserve">
+    <value>Gets or sets whether the graph is evaluated as position or velocity.</value>
+    <comment>Shown in sliderator command help for --graph-mode. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="Sliderator_GraphStateHelp" xml:space="preserve">
+    <value>Gets or sets the graph state evaluated by the engine.</value>
+    <comment>Shown in sliderator command help for --graph-state. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="Sliderator_MinDendriteHelp" xml:space="preserve">
+    <value>Gets or sets the minimum dendrite length used by slideration.</value>
+    <comment>Shown in sliderator command help for --min-dendrite. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="Sliderator_NewVelocityHelp" xml:space="preserve">
+    <value>Gets or sets the manually entered velocity in SV units.</value>
+    <comment>Shown in sliderator command help for --new-velocity. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="Sliderator_PixelLengthHelp" xml:space="preserve">
+    <value>Gets or sets the source slider's effective pixel length.</value>
+    <comment>Shown in sliderator command help for --pixel-length. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="Sliderator_RemoveSliderTicksHelp" xml:space="preserve">
+    <value>Gets or sets whether slider ticks are removed from delegated output.</value>
+    <comment>Shown in sliderator command help for --remove-slider-ticks. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="Sliderator_VelocityLimitHelp" xml:space="preserve">
+    <value>Gets or sets the maximum allowed SV value for normal output.</value>
+    <comment>Shown in sliderator command help for --velocity-limit. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="TimingCopier_BeatDivisorsHelp" xml:space="preserve">
+    <value>Gets or sets the positive snap intervals expressed as fractions of one beat.</value>
+    <comment>Shown in timing-copier command help for --beat-divisors. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="TimingCopier_ExportPathHelp" xml:space="preserve">
+    <value>Gets or sets vertical-bar-separated beatmap targets.</value>
+    <comment>Shown in timing-copier command help for --export-path. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="TimingCopier_ImportPathHelp" xml:space="preserve">
+    <value>Gets or sets the beatmap whose timing is copied.</value>
+    <comment>Shown in timing-copier command help for --import-path. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="TimingCopier_ResnapModeHelp" xml:space="preserve">
+    <value>Gets or sets how target markers are positioned after timing is copied.</value>
+    <comment>Shown in timing-copier command help for --resnap-mode. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="TimingHelper_BeatDivisorsHelp" xml:space="preserve">
+    <value>Gets or sets the beat fractions considered while resnapping markers.</value>
+    <comment>Shown in timing-helper command help for --beat-divisors. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="TimingHelper_BeatsBetweenHelp" xml:space="preserve">
+    <value>Gets or sets the requested beat distance between markers, or -1 to infer the distance from the existing marker positions.</value>
+    <comment>Shown in timing-helper command help for --beats-between. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="TimingHelper_BookmarksHelp" xml:space="preserve">
+    <value>Gets or sets whether editor bookmarks are used as timing markers.</value>
+    <comment>Shown in timing-helper command help for --bookmarks. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="TimingHelper_GreenlinesHelp" xml:space="preserve">
+    <value>Gets or sets whether inherited timing points are used as markers.</value>
+    <comment>Shown in timing-helper command help for --greenlines. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="TimingHelper_LeniencyHelp" xml:space="preserve">
+    <value>Gets or sets the maximum marker timing error tolerated in milliseconds.</value>
+    <comment>Shown in timing-helper command help for --leniency. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="TimingHelper_ObjectsHelp" xml:space="preserve">
+    <value>Gets or sets whether hit objects are used as timing markers.</value>
+    <comment>Shown in timing-helper command help for --objects. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="TimingHelper_OmitBarlineHelp" xml:space="preserve">
+    <value>Gets or sets whether inserted redlines omit their first barline.</value>
+    <comment>Shown in timing-helper command help for --omit-barline. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="TimingHelper_RedlinesHelp" xml:space="preserve">
+    <value>Gets or sets whether red timing points are used as markers and retained during processing.</value>
+    <comment>Shown in timing-helper command help for --redlines. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="TumourGenerator_DebugConstructionHelp" xml:space="preserve">
+    <value>Gets or sets whether intelligent path reconstruction is skipped.</value>
+    <comment>Shown in tumour-generator command help for --debug-construction. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="TumourGenerator_DelegateToBpmHelp" xml:space="preserve">
+    <value>Gets or sets whether corrected velocity is delegated to BPM redlines.</value>
+    <comment>Shown in tumour-generator command help for --delegate-to-bpm. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="TumourGenerator_FixSvHelp" xml:space="preserve">
+    <value>Correct slider velocity after changing the path length, preserving slider duration. May change timing points; --no-fix-sv disables this correction.</value>
+    <comment>Shown in tumour-generator command help for --fix-sv. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="TumourGenerator_ImportModeSettingHelp" xml:space="preserve">
+    <value>Choose the objects to process. selected uses live editor selection. Supply --selection explicitly or load it from --project.</value>
+    <comment>Shown in tumour-generator command help for --import-mode. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="TumourGenerator_JustMiddleAnchorsHelp" xml:space="preserve">
+    <value>Keep a simplified linear path through interior construction anchors, plus the original start and end. This does not extract or trim a generated loop.</value>
+    <comment>Shown in tumour-generator command help for --just-middle-anchors. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="TumourGenerator_RemoveSliderTicksHelp" xml:space="preserve">
+    <value>Gets or sets whether delegated velocity removes slider ticks.</value>
+    <comment>Shown in tumour-generator command help for --remove-slider-ticks. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="TumourGenerator_ScaleHelp" xml:space="preserve">
+    <value>Gets or sets the global tumour size scalar.</value>
+    <comment>Shown in tumour-generator command help for --scale. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="TumourGenerator_TimeCodeHelp" xml:space="preserve">
+    <value>Gets or sets the time-code expression used in time mode.</value>
+    <comment>Shown in tumour-generator command help for --time-code. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="TumourGenerator_TumourLayersHelp" xml:space="preserve">
+    <value>Apply layers in order. Omitted fields in a supplied layer use the built-in field defaults below. Graphs accept a number for a constant value or a graph table; graph X runs from 0 to 1 across the layer's placement range. Unaffected portions of the original slider are retained.</value>
+    <comment>Shown in tumour-generator command help for --tumour-layers. Preserve the option name and any literal syntax.</comment>
+  </data>
+  <data name="TumourGenerator_TumourLayers_TumourTemplateEnumHelp" xml:space="preserve">
+    <value>triangle has a midpoint peak; square has a plateau with sloped ends; circle is an arc through the start, midpoint height, and end; parabola is a quadratic arch. Only square uses tumour-parameter.</value>
+    <comment>Tumour layer template field help. Preserve the literal template and field names.</comment>
+  </data>
+  <data name="TumourGenerator_TumourLayers_WrappingModeHelp" xml:space="preserve">
+    <value>simple uses the straight chord between the interval endpoints; wrap follows the reference path and its local tangents; absolute follows the reference path with fixed playfield axes. These control how the template deforms the source path.</value>
+    <comment>Tumour layer wrapping field help. Preserve the literal mode names.</comment>
+  </data>
+  <data name="TumourGenerator_TumourLayers_TumourSidednessHelp" xml:space="preserve">
+    <value>Choose the side relative to the path direction, alternate sides, or choose randomly. random-seed controls repeatability for random sides.</value>
+    <comment>Tumour layer side field help. Preserve random-seed.</comment>
+  </data>
+  <data name="TumourGenerator_TumourLayers_TumourLengthHelp" xml:space="preserve">
+    <value>Length of the source-path interval being deformed, rather than the resulting curve length. A circle with length 0 inserts a full loop and retains the remaining source path. Units follow use-absolute-range.</value>
+    <comment>Tumour layer length graph help. Preserve use-absolute-range.</comment>
+  </data>
+  <data name="TumourGenerator_TumourLayers_TumourScaleHelp" xml:space="preserve">
+    <value>Perpendicular height, multiplied by the global --scale. Negative values mirror the shape. Units follow use-absolute-range.</value>
+    <comment>Tumour layer scale graph help. Preserve --scale and use-absolute-range.</comment>
+  </data>
+  <data name="TumourGenerator_TumourLayers_TumourRotationHelp" xml:space="preserve">
+    <value>Rotate the template displacement in degrees relative to the wrapping orientation. This deforms the shape; it is not a rigid rotation of the entire slider.</value>
+    <comment>Tumour layer rotation graph help.</comment>
+  </data>
+  <data name="TumourGenerator_TumourLayers_TumourParameterHelp" xml:space="preserve">
+    <value>For square, the horizontal run of each sloped end, limited to half the template span. Other templates ignore this value.</value>
+    <comment>Tumour layer template parameter graph help. Preserve square.</comment>
+  </data>
+  <data name="TumourGenerator_TumourLayers_TumourDistanceHelp" xml:space="preserve">
+    <value>Start-to-start spacing between tumours, rather than the gap between their ends. Values below 1 are treated as 1 before relative scaling. Units follow use-absolute-range.</value>
+    <comment>Tumour layer spacing graph help. Preserve use-absolute-range.</comment>
+  </data>
+  <data name="TumourGenerator_TumourLayers_TumourCountHelp" xml:space="preserve">
+    <value>Maximum number of tumours. 0 fills the placement range using tumour-distance. A positive count still stops at the range or source-path end.</value>
+    <comment>Tumour layer count help. Preserve tumour-distance.</comment>
+  </data>
+  <data name="TumourGenerator_TumourLayers_TumourStartHelp" xml:space="preserve">
+    <value>Start of the placement range: distance along the source path in pixels, or a fraction of its length when use-absolute-range is false.</value>
+    <comment>Tumour layer placement start help. Preserve use-absolute-range and false.</comment>
+  </data>
+  <data name="TumourGenerator_TumourLayers_TumourEndHelp" xml:space="preserve">
+    <value>End of the placement range, in the same units as tumour-start and clipped to the available source path. The remaining slider is retained.</value>
+    <comment>Tumour layer placement end help. Preserve tumour-start.</comment>
+  </data>
+  <data name="TumourGenerator_TumourLayers_RandomSeedHelp" xml:space="preserve">
+    <value>A nonzero seed makes random side choices repeatable. 0 uses the shared random sequence.</value>
+    <comment>Tumour layer random seed help.</comment>
+  </data>
+  <data name="TumourGenerator_TumourLayers_RecalculateHelp" xml:space="preserve">
+    <value>Refresh reference positions, tangents, and distances before applying this layer, so it follows earlier layers' changes. false retains the previous reference.</value>
+    <comment>Tumour layer reference recalculation help. Preserve false.</comment>
+  </data>
+  <data name="TumourGenerator_TumourLayers_UseAbsoluteRangeHelp" xml:space="preserve">
+    <value>true uses pixels for the range, length, scale, and spacing. false uses path-length fractions for the range (start clamped to -1..1, end to 0..1) and scales length, scale, and spacing by the original slider length divided by 256. The built-in 0-to-256-pixel placement interval is a default, not a limit.</value>
+    <comment>Tumour layer units help. Preserve true and false and the numeric ranges.</comment>
+  </data>
+  <data name="TumourGenerator_TumourLayers_IsActiveHelp" xml:space="preserve">
+    <value>false skips this layer.</value>
+    <comment>Tumour layer activation help. Preserve false.</comment>
+  </data>
+  <data name="TumourGenerator_TumourLayers_NameHelp" xml:space="preserve">
+    <value>Layer label; it has no effect on the generated shape.</value>
+    <comment>Tumour layer display name help.</comment>
+  </data>
+</root>

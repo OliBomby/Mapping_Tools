@@ -53,7 +53,9 @@ public sealed class MapsetMergerService : IMapsetMergerService
     public async Task<MapsetMergerResult> MergeAsync(
         MapsetMergerServiceOptions project,
         IProgress<double>? progress = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        bool overwrite = true,
+        bool clearExisting = false)
     {
         ArgumentNullException.ThrowIfNull(project);
         var inputs = CreateInputs(project);
@@ -182,13 +184,14 @@ public sealed class MapsetMergerService : IMapsetMergerService
 
         logger.LogInformation("Committing output {OutputPath}: {BeatmapCount} beatmaps, {StoryboardCount} storyboards, {AssetCount} assets",
             project.ExportPath, beatmapsWritten, storyboardsWritten, assetsCopied);
-        await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+        var outputFiles = await transaction.CommitAsync(cancellationToken, overwrite, clearExisting).ConfigureAwait(false);
         logger.LogInformation("Committed output {OutputPath}", project.ExportPath);
         return new MapsetMergerResult(
             inputs.Count,
             beatmapsWritten,
             storyboardsWritten,
-            assetsCopied);
+            assetsCopied,
+            outputFiles);
     }
 
     private int CopyReferences(

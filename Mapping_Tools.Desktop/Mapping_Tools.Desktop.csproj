@@ -75,18 +75,4 @@
           Condition="Exists('$(PublishedAppHostSource)')"/>
   </Target>
 
-  <!-- These assemblies back Windows-only audio adapters.
-       The shared Infrastructure assembly keeps compile-time references,
-       while Unix bundles omit those unused runtime assets. -->
-  <Target Name="ExcludeWindowsOnlyRuntimeAssets"
-          BeforeTargets="_GetCurrentAndPriorPublishFileWrites;_ComputeResolvedFilesToPublishTypes"
-          Condition="'$(RuntimeIdentifier)' == 'linux-x64' Or
-                     '$(RuntimeIdentifier)' == 'linux-arm64' Or
-                     '$(RuntimeIdentifier)' == 'osx-x64' Or
-                     '$(RuntimeIdentifier)' == 'osx-arm64'">
-    <ItemGroup>
-      <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)"
-                             Condition="'%(ResolvedFileToPublish.Filename)' == 'NAudio.Wasapi'"/>
-    </ItemGroup>
-  </Target>
 </Project>

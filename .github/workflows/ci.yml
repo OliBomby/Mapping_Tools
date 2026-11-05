@@ -23,7 +23,7 @@ jobs:
       - name: Restore
         run: dotnet restore Mapping_Tools.slnx
 
-      - name: Build Avalonia frontend and shared layers
+      - name: Build Desktop, CLI, and shared layers
         run: dotnet build Mapping_Tools.slnx --configuration Release --no-restore
 
       - name: Architecture guardrails
@@ -40,6 +40,9 @@ jobs:
 
       - name: Desktop tests
         run: dotnet test Mapping_Tools.Desktop.Tests/Mapping_Tools.Desktop.Tests.csproj --configuration Release --no-build
+
+      - name: CLI tests
+        run: dotnet test Mapping_Tools.Cli.Tests/Mapping_Tools.Cli.Tests.csproj --configuration Release --no-build
 
   code-quality:
     name: Code quality

@@ -14,9 +14,13 @@ public interface IMapsetMergerService
     /// <param name="project">The validated merge project.</param>
     /// <param name="progress">Optional aggregate normalized progress reporting.</param>
     /// <param name="cancellationToken">Cancels parsing, staging, or commit.</param>
-    /// <returns>Counts for the committed output.</returns>
+    /// <param name="overwrite">Whether generated files may replace existing output files.</param>
+    /// <param name="clearExisting">Whether to remove existing output files; requires overwrite permission.</param>
+    /// <returns>Counts and final file paths for the committed output.</returns>
     Task<MapsetMergerResult> MergeAsync(
         MapsetMergerServiceOptions project,
         IProgress<double>? progress = null,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default,
+        bool overwrite = true,
+        bool clearExisting = false);
 }

@@ -25,7 +25,6 @@ public sealed class HitsoundCopierServiceTests
             gateway,
             new StubSampleService(),
             new TestDirectories(),
-            new RecordingFileRevealService(),
             new ApplicationSettings());
         HitsoundCopierServiceOptions options = new()
         {
@@ -45,7 +44,7 @@ public sealed class HitsoundCopierServiceTests
     }
 
     [TestMethod]
-    public async Task CopyAsync_WhenSampleExporterReportsExports_RevealsExportDirectory()
+    public async Task CopyAsync_WhenSampleExporterReportsExports_ReturnsExportDirectory()
     {
         // Arrange
         TimingPoint sourceTiming = new(0, 1000, 4, SampleSet.Normal, 0, 100, true, false, false);
@@ -61,12 +60,11 @@ public sealed class HitsoundCopierServiceTests
             targetTiming);
         RecordingBeatmapEditingGateway gateway = CreateGateway(source, target);
         RecordingSampleService samples = new();
-        RecordingFileRevealService reveal = new();
+        TestDirectories directories = new();
         HitsoundCopierService service = new(
             gateway,
             samples,
-            new TestDirectories(),
-            reveal,
+            directories,
             new ApplicationSettings());
         HitsoundCopierServiceOptions options = new()
         {
@@ -78,15 +76,15 @@ public sealed class HitsoundCopierServiceTests
         };
 
         // Act
-        await service.CopyAsync(options);
+        var result = await service.CopyAsync(options);
 
         // Assert
         samples.ExportCalls.Should().Be(1);
-        reveal.Paths.Should().ContainSingle().Which.Should().Be(new TestDirectories().Exports);
+        result.OutputDirectory.Should().Be(directories.Exports);
     }
 
     [TestMethod]
-    public async Task CopyAsync_WhenSampleExporterReportsNoExports_DoesNotRevealExportDirectory()
+    public async Task CopyAsync_WhenSampleExporterReportsNoExports_ReturnsNullOutputDirectory()
     {
         // Arrange
         TimingPoint sourceTiming = new(0, 1000, 4, SampleSet.Normal, 0, 100, true, false, false);
@@ -102,12 +100,11 @@ public sealed class HitsoundCopierServiceTests
             targetTiming);
         RecordingBeatmapEditingGateway gateway = CreateGateway(source, target);
         RecordingSampleService samples = new() { ExportedCount = 0 };
-        RecordingFileRevealService reveal = new();
+        TestDirectories directories = new();
         HitsoundCopierService service = new(
             gateway,
             samples,
-            new TestDirectories(),
-            reveal,
+            directories,
             new ApplicationSettings());
         HitsoundCopierServiceOptions options = new()
         {
@@ -119,11 +116,11 @@ public sealed class HitsoundCopierServiceTests
         };
 
         // Act
-        await service.CopyAsync(options);
+        var result = await service.CopyAsync(options);
 
         // Assert
         samples.ExportCalls.Should().Be(1);
-        reveal.Paths.Should().BeEmpty();
+        result.OutputDirectory.Should().BeNull();
     }
 
     private sealed class StubSampleService : IHitsoundSampleService
@@ -186,17 +183,6 @@ public sealed class HitsoundCopierServiceTests
         {
             ExportCalls++;
             return Task.FromResult(ExportedCount);
-        }
-    }
-
-    private sealed class RecordingFileRevealService : IFileRevealService
-    {
-        public List<string> Paths { get; } = [];
-
-        public Task<bool> RevealAsync(string path, CancellationToken cancellationToken = default)
-        {
-            Paths.Add(path);
-            return Task.FromResult(true);
         }
     }
 
