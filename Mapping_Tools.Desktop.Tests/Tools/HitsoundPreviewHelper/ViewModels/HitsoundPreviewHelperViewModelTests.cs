@@ -1,11 +1,14 @@
+using Avalonia.Threading;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Tools.HitsoundPreviewHelper;
 using Mapping_Tools.Application.Tools.RhythmGuide;
 using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
+using Mapping_Tools.Desktop.Tests.TestHelpers;
 using Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.ViewModels;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.Services;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.ViewModels;
@@ -86,6 +89,50 @@ public sealed class HitsoundPreviewHelperViewModelTests
                 notification.Severity == UserNotificationSeverity.Success
                 && notification.Message == "Placed 1 preview hitsounds.")
             .Should().ContainSingle();
+    }
+
+    [TestMethod]
+    public void RunQuickAsync_WithAsynchronousBeatmapResolution_KeepsBoundRunStateOnUiThreadAcrossRepeatedRuns()
+    {
+        // Arrange
+        SynchronizationContext? previousContext = SynchronizationContext.Current;
+        AvaloniaSynchronizationContext.InstallIfNeeded();
+        try
+        {
+            TestBeatmapWorkspace workspace = new();
+            RecordingPreviewService preview = new();
+            var viewModel = CreateViewModel(preview, workspace);
+            ToolRunButton button = new() { RunCommand = viewModel.RunCommand };
+            using HeadlessViewHost host = HeadlessViewHost.Show(button);
+            List<(bool Running, bool OnUiThread)> states = [];
+            viewModel.PropertyChanged += (_, args) =>
+            {
+                if (args.PropertyName == nameof(viewModel.IsRunning))
+                    states.Add((viewModel.IsRunning, Dispatcher.UIThread.CheckAccess()));
+            };
+
+            // Act
+            for (int runIndex = 0; runIndex < 2; runIndex++)
+            {
+                TaskCompletionSource<string> resolvedPath = new(TaskCreationOptions.RunContinuationsAsynchronously);
+                workspace.QuickRunResolver = _ => resolvedPath.Task;
+                Task run = viewModel.RunQuickAsync(CancellationToken.None);
+                resolvedPath.SetResult("current.osu");
+                HeadlessViewHost.PumpDispatcherUntil(() => run.IsCompleted);
+                run.GetAwaiter().GetResult();
+            }
+
+            // Assert
+            states.Should().Equal((true, true), (false, true), (true, true), (false, true));
+            preview.Paths.Should().Equal("current.osu");
+            viewModel.IsRunning.Should().BeFalse();
+            viewModel.Progress.Should().Be(0);
+            viewModel.RunCommand.CanExecute(null).Should().BeTrue();
+        }
+        finally
+        {
+            SynchronizationContext.SetSynchronizationContext(previousContext);
+        }
     }
 
     [TestMethod]

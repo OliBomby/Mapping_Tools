@@ -103,7 +103,8 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
                 .ConfigureAwait(false);
             List<BeatmapBackupArtifact> artifacts = [disk];
 
-            if (session.Source == BeatmapEditingSource.LiveEditor && !HasSameContentsAsDisk(session.Path, session.InitialBeatmapText))
+            // Compare the completed backup: osu! may lock or change the source after the copy.
+            if (session.Source == BeatmapEditingSource.LiveEditor && !HasSameContentsAsDisk(disk.Path, session.InitialBeatmapText))
                 // Save second copy with newest version if possible
                 artifacts.Add(
                     await WriteSnapshotAsync(

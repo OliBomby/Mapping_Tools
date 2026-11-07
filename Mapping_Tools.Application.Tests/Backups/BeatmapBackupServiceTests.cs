@@ -187,6 +187,54 @@ public sealed class BeatmapBackupServiceTests
     }
 
     [TestMethod]
+    public async Task CreateAsync_WithSourceLockedAfterCopy_ComparesBackupWithoutReopeningSource()
+    {
+        // Arrange
+        var store = CreateStore();
+        BeatmapEditingSession session = BeatmapEditingSessionTestFactory.FromPath(
+            map_path,
+            store,
+            BeatmapEditingSource.LiveEditor);
+        store.WriteAllText(map_path, new BeatmapEncoder().Encode(session.Beatmap));
+        store.AfterCopy = () => store.LockedPaths.Add(map_path);
+        var service = CreateService(store, CreateSettings());
+
+        // Act
+        var result = await service.CreateAsync(session, BeatmapBackupReason.Automatic, true);
+
+        // Assert
+        result.Artifacts.Should().ContainSingle();
+        result.Artifacts[0].ContainsUnsavedState.Should().BeFalse();
+        store.WriteOperations.Should().BeEmpty();
+    }
+
+    [TestMethod]
+    public async Task CreateAsync_WithSourceChangedAfterCopy_PreservesLiveStateMissingFromBackup()
+    {
+        // Arrange
+        var store = CreateStore();
+        Beatmap beatmap = BeatmapEditingSessionTestFactory.DecodeText(store.ReadAllText(map_path));
+        beatmap.Metadata["Version"] = new StringValue("Unsaved");
+        BeatmapEditingSession session = BeatmapEditingSessionTestFactory.FromModel(
+            beatmap,
+            map_path,
+            store,
+            BeatmapEditingSource.LiveEditor,
+            []);
+        store.AfterCopy = () => store.WriteAllText(map_path, new BeatmapEncoder().Encode(session.Beatmap));
+        var service = CreateService(store, CreateSettings());
+
+        // Act
+        var result = await service.CreateAsync(session, BeatmapBackupReason.Automatic, true);
+
+        // Assert
+        result.Artifacts.Should().HaveCount(2);
+        store.Files[result.Artifacts[0].Path].Should().NotContain("Version:Unsaved");
+        store.Files[result.Artifacts[1].Path].Should().Contain("Version:Unsaved");
+        result.Artifacts[1].ContainsUnsavedState.Should().BeTrue();
+    }
+
+    [TestMethod]
     public async Task CreatePeriodicIfChangedAsync_WithMultipleMaps_SkipsUnchangedAndTracksSeparately()
     {
         // Arrange
@@ -492,6 +540,10 @@ public sealed class BeatmapBackupServiceTests
 
         public List<string> DeletedPaths { get; } = [];
 
+        public HashSet<string> LockedPaths { get; } = new(StringComparer.Ordinal);
+
+        public Action? AfterCopy { get; set; }
+
         public bool FileExists(string path)
         {
             return Files.ContainsKey(path);
@@ -522,6 +574,7 @@ public sealed class BeatmapBackupServiceTests
             Files[destinationPath] = Files[sourcePath].ToList();
             CreationTimes[destinationPath] =
                 now.AddMinutes(++creationSequence);
+            AfterCopy?.Invoke();
             return Task.CompletedTask;
         }
 
@@ -567,6 +620,8 @@ public sealed class BeatmapBackupServiceTests
 
         public string ReadAllText(string path)
         {
+            if (LockedPaths.Contains(path)) throw new IOException("The beatmap is locked by another process.");
+
             return string.Join("\r\n", Files[path]) + "\r\n";
         }
 

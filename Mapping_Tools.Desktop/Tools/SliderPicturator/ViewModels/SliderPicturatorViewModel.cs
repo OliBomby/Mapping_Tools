@@ -247,8 +247,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
         try
         {
             path = await workspace
-                .ResolveQuickRunBeatmapAsync(cancellationToken: cancellationToken)
-                .ConfigureAwait(false);
+                .ResolveQuickRunBeatmapAsync(cancellationToken: cancellationToken);
         }
         catch (OperationCanceledException)
         {

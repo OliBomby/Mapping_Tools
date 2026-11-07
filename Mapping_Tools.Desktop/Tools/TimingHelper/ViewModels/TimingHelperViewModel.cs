@@ -103,8 +103,7 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
         string path = await workspace
-            .ResolveQuickRunBeatmapAsync(cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
+            .ResolveQuickRunBeatmapAsync(cancellationToken: cancellationToken);
 
         await RunWithStateAsync(() => RunPathsAsync(
             string.IsNullOrWhiteSpace(path) ? [] : [path],
