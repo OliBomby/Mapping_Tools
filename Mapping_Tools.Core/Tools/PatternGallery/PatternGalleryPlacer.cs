@@ -231,12 +231,12 @@ public class PatternGalleryPlacer
         // Sliderends and object timingpoints get recalculated.
         PreparePattern(patternBeatmap, beatmap, hasOverwriteBounds, out var parts, out var timingPointsChanges);
 
-        // Keep just the timing point changes which are inside the parts.
-        // These timing point changes have everything that is necessary for inside the parts of the pattern. (even timing)
+        // Keep changes inside the parts and BPM restores just beyond a rounded slider end.
         timingPointsChanges =
         [
             .. timingPointsChanges.Where(tpc => parts.Any(part =>
-                part.StartTime <= tpc.TimingPoint.Offset && part.EndTime >= tpc.TimingPoint.Offset)),
+                ReferenceEquals(part.BpmRestore, tpc.TimingPoint) ||
+                (part.StartTime <= tpc.TimingPoint.Offset && part.EndTime >= tpc.TimingPoint.Offset))),
         ];
 
         if (PatternOverwriteMode != PatternOverwriteMode.NoOverwrite)
@@ -525,13 +525,22 @@ public class PatternGalleryPlacer
         var newTiming = new Timing(transformOriginalTiming.SliderMultiplier);
 
         double lastEndTime = double.NegativeInfinity;
-        foreach (var part in parts)
+        for (int i = 0; i < parts.Count; i++)
         {
+            var part = parts[i];
             double startTime = part.StartTime;
             double endTime = part.EndTime;
 
             // Add the redlines in between patterns
             newTiming.AddRange(transformOriginalTiming.GetRedlinesInRange(lastEndTime, startTime, false));
+
+            // A point-only part has no interval in which to apply a different BPM.
+            if (startTime == endTime && part.HitObjects.All(ho => !ho.IsSlider))
+            {
+                newTiming.AddRange(transformOriginalTiming.GetRedlinesInRange(startTime, endTime));
+                lastEndTime = endTime;
+                continue;
+            }
 
             var startOriginalRedline = transformOriginalTiming.GetRedlineAtTime(startTime);
 
@@ -676,16 +685,33 @@ public class PatternGalleryPlacer
             endTime = part.HitObjects.Max(o => o.GetEndTime(!scaleToNewTiming));
             part.EndTime = endTime;
 
+            // A sub-millisecond slider can round down to its start. Keep the restore separate from the overwrite end.
+            double restoreTime = endTime;
+            if (!scaleToNewTiming && !SnapToNewTiming && endTime <= startTime)
+            {
+                double sliderEnd = part.HitObjects.Where(ho => ho.IsSlider)
+                    .Select(ho => ho.GetEndTime(false)).DefaultIfEmpty(startTime).Max();
+                if (sliderEnd > startTime + Precision.DOUBLE_EPSILON)
+                {
+                    double nextPartStart = i + 1 < parts.Count ? parts[i + 1].StartTime : double.PositiveInfinity;
+                    restoreTime = beatmap.Version < 128 && endTime == startTime && nextPartStart > startTime + 1
+                        ? startTime + 1
+                        : sliderEnd;
+                }
+            }
+
             // Add a redline at the end of the pattern to make sure the BPM goes back to normal after the pattern.
-            var endOriginalRedline = transformOriginalTiming.GetRedlineAtTime(endTime);
+            var endOriginalRedline = transformOriginalTiming.GetRedlineAtTime(restoreTime);
             var endPartRedline = inPartRedlines.LastOrDefault() ?? startPartRedline;
             if (Math.Abs(endPartRedline.MpB * bpmMultiplier - endOriginalRedline.MpB) > Precision.DOUBLE_EPSILON)
                 // We dont have to add the redline again if its already during the parts in between parts.
-                if (Math.Abs(endOriginalRedline.Offset - endTime) > Precision.DOUBLE_EPSILON)
+                if (Math.Abs(endOriginalRedline.Offset - restoreTime) > Precision.DOUBLE_EPSILON)
                 {
                     var copy = endOriginalRedline.Copy();
-                    copy.Offset = endTime;
+                    copy.Offset = restoreTime;
                     newTiming.Add(copy);
+                    if (restoreTime > endTime)
+                        part.BpmRestore = copy;
                 }
 
             lastEndTime = endTime;
@@ -879,6 +905,7 @@ public class PatternGalleryPlacer
         public readonly List<HitObject> HitObjects;
         public double EndTime;
         public double StartTime;
+        public TimingPoint? BpmRestore;
 
         public Part(double startTime, double endTime, List<HitObject> hitObjects)
         {

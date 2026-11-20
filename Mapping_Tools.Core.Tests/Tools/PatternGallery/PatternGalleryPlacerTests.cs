@@ -2,6 +2,7 @@ using Mapping_Tools.Core.Tools.PatternGallery;
 using Mapping_Tools.Core.Tools.PatternGallery.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.MathUtil;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -258,6 +259,62 @@ public sealed class PatternGalleryPlacerTests
         target.BeatmapTiming.GetMpBAtTime(1501).Should().Be(400);
     }
 
+    [TestMethod]
+    [DataRow(PatternOverwriteMode.PartitionedOverwrite, false)]
+    [DataRow(PatternOverwriteMode.CompleteOverwrite, true)]
+    public void PlaceOsuPattern_WithZeroDurationPart_PreservesTargetBpm(
+        PatternOverwriteMode overwriteMode, bool targetHasRedlineAtPlacement)
+    {
+        // Arrange
+        Beatmap pattern = CreateBeatmap(64, 1000);
+        pattern.BeatmapTiming.Add(new TimingPoint(1000, 400, 4, SampleSet.Normal, 0, 100, true, false, false));
+        Beatmap target = CreateBeatmap(256, 2000);
+        if (targetHasRedlineAtPlacement)
+            target.BeatmapTiming.Add(new TimingPoint(1000, 600, 4, SampleSet.Normal, 0, 100, true, false, false));
+        double expectedBeatLength = targetHasRedlineAtPlacement ? 600 : 500;
+        PatternGalleryPlacer placer = CreateUnsnappedPlacer(overwriteMode);
+        placer.TimingOverwriteMode = TimingOverwriteMode.PatternTimingOnly;
+        placer.Padding = 0;
+
+        // Act
+        placer.PlaceOsuPattern(pattern, target);
+
+        // Assert
+        target.HitObjects.Select(item => item.Time).Should().Equal(1000, 2000);
+        target.BeatmapTiming.GetMpBAtTime(1000).Should().Be(expectedBeatLength);
+        target.BeatmapTiming.GetMpBAtTime(2000).Should().Be(expectedBeatLength);
+    }
+
+    [DataTestMethod]
+    [DataRow(PatternOverwriteMode.PartitionedOverwrite, 14, 1001d, 1001d)]
+    [DataRow(PatternOverwriteMode.CompleteOverwrite, 14, 1001d, 1001d)]
+    [DataRow(PatternOverwriteMode.PartitionedOverwrite, 128, 1000.4d, 1000.75d)]
+    [DataRow(PatternOverwriteMode.CompleteOverwrite, 128, 1000.4d, 1000.75d)]
+    public void PlaceOsuPattern_WithSubMillisecondSlider_RestoresTargetBpmBeforeNextSlider(
+        PatternOverwriteMode overwriteMode, int version, double restoreTime, double nextSliderStart)
+    {
+        // Arrange
+        TimingPoint patternRedline = new(0, 0.4, 4, SampleSet.Normal, 0, 100, true, false, false);
+        Beatmap pattern = new(
+            [BeatmapTestData.DecodeHitObject("64,192,1000,2,0,L|204:192,1,140")], [patternRedline]);
+        TimingPoint targetRedline = new(0, 500, 4, SampleSet.Normal, 0, 100, true, false, false);
+        string nextSlider = FormattableString.Invariant($"256,192,{nextSliderStart},2,0,L|396:192,1,140");
+        Beatmap target = new([BeatmapTestData.DecodeHitObject(nextSlider, version)], [targetRedline]) { Version = version };
+        PatternGalleryPlacer placer = CreateUnsnappedPlacer(overwriteMode);
+        placer.TimingOverwriteMode = TimingOverwriteMode.PatternTimingOnly;
+        placer.Padding = 0;
+
+        // Act
+        placer.PlaceOsuPattern(pattern, target);
+
+        // Assert
+        Beatmap result = new BeatmapDecoder().Decode(new BeatmapEncoder().Encode(target));
+        result.HitObjects.Select(item => item.Time).Should().Equal(1000, nextSliderStart);
+        result.HitObjects[0].TemporalLength.Should().BeApproximately(0.4, 1e-8);
+        result.HitObjects[1].TemporalLength.Should().BeApproximately(500, 1e-8);
+        result.BeatmapTiming.GetRedlineAtTime(nextSliderStart).Offset.Should().Be(restoreTime);
+    }
+
     [DataTestMethod]
     [DataRow(false, 1)]
     [DataRow(true, 2)]
@@ -276,6 +333,35 @@ public sealed class PatternGalleryPlacerTests
         // Assert
         target.HitObjects[0].Hitsounds.Should().Be(expectedHitsound);
         pattern.HitObjects[0].Hitsounds.Should().Be(2);
+    }
+
+    [TestMethod]
+    public void PlaceOsuPattern_WithAdjacentLegacySubMillisecondParts_RestoresTargetBpmAfterBothSliders()
+    {
+        // Arrange
+        TimingPoint patternRedline = new(0, 0.1, 4, SampleSet.Normal, 0, 100, true, false, false);
+        Beatmap pattern = new(
+            [
+                BeatmapTestData.DecodeHitObject("64,192,1000,2,0,L|204:192,1,140"),
+                BeatmapTestData.DecodeHitObject("96,192,1001,2,0,L|236:192,1,140"),
+            ],
+            [patternRedline]);
+        TimingPoint targetRedline = new(0, 500, 4, SampleSet.Normal, 0, 100, true, false, false);
+        Beatmap target = new(
+            [BeatmapTestData.DecodeHitObject("256,192,1002,2,0,L|396:192,1,140")], [targetRedline]) { Version = 14 };
+        var placer = CreateUnsnappedPlacer(PatternOverwriteMode.PartitionedOverwrite);
+        placer.TimingOverwriteMode = TimingOverwriteMode.PatternTimingOnly;
+        placer.Padding = 0;
+
+        // Act
+        placer.PlaceOsuPattern(pattern, target);
+
+        // Assert
+        Beatmap result = new BeatmapDecoder().Decode(new BeatmapEncoder().Encode(target));
+        result.HitObjects.Select(item => item.Time).Should().Equal(1000, 1001, 1002);
+        result.HitObjects[0].TemporalLength.Should().BeApproximately(0.1, 1e-8);
+        result.HitObjects[1].TemporalLength.Should().BeApproximately(0.1, 1e-8);
+        result.HitObjects[2].TemporalLength.Should().BeApproximately(500, 1e-8);
     }
 
     private static Beatmap CreateBeatmap(int x, params int[] times)
