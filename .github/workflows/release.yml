@@ -7,8 +7,16 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: Three-part version to package for this dry run (for example 1.2.3)
+        description: Release version (for example 2.0.9 for a dry run or v2.0.9.1 for NuGet)
         required: true
+        type: string
+      nuget_projects:
+        description: Publish to NuGet.org (comma-separated Core, Application, Infrastructure, Desktop). Leave blank for a dry run.
+        required: false
+        type: string
+      dependency_version:
+        description: Published version for unselected NuGet dependencies. Defaults to the three-part base of a four-part version, or the project versions.
+        required: false
         type: string
 
 permissions:
@@ -29,6 +37,7 @@ env:
 jobs:
   package:
     name: Package ${{ matrix.rid }}
+    if: github.event_name == 'push' || inputs.nuget_projects == ''
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
@@ -538,7 +547,7 @@ jobs:
 
   publish-nuget:
     name: Publish NuGet packages
-    if: github.event_name == 'push'
+    if: ${{ !cancelled() && (needs.publish.result == 'success' || (github.event_name == 'workflow_dispatch' && inputs.nuget_projects != '')) }}
     needs: publish
     runs-on: ubuntu-latest
     permissions:
@@ -548,34 +557,74 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - name: Select projects and versions
+        shell: pwsh
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
+          REQUESTED_PROJECTS: ${{ inputs.nuget_projects }}
+          REQUESTED_DEPENDENCY_VERSION: ${{ inputs.dependency_version }}
+        run: |
+          function Read-PackageVersion([string]$value) {
+            $value = $value.Trim() -replace '^v', ''
+            if ($value -notmatch '^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(\.[1-9][0-9]*)?$') {
+              throw "Enter a stable NuGet version such as 2.0.9 or 2.0.9.1. Received '$value'."
+            }
+
+            return $value
+          }
+
+          $allProjects = 'Core', 'Application', 'Infrastructure', 'Desktop'
+          $projects = $allProjects
+          $dependencyVersion = ''
+
+          if ($env:GITHUB_EVENT_NAME -eq 'workflow_dispatch') {
+            $version = Read-PackageVersion $env:REQUESTED_VERSION
+            $requested = $env:REQUESTED_PROJECTS.Trim() -split '[,\s]+'
+            if ($requested.Where({ $_ -notin $allProjects }).Count -gt 0) {
+              throw "Select one or more NuGet projects from $($allProjects -join ', '). Received '$env:REQUESTED_PROJECTS'."
+            }
+
+            $projects = $allProjects | Where-Object { $_ -in $requested }
+            if ($env:REQUESTED_DEPENDENCY_VERSION) {
+              $dependencyVersion = Read-PackageVersion $env:REQUESTED_DEPENDENCY_VERSION
+            }
+            elseif ($version.Split('.').Count -eq 4) {
+              $dependencyVersion = ([version]$version).ToString(3)
+            }
+          }
+          else {
+            $version = Read-PackageVersion $env:GITHUB_REF_NAME
+          }
+
+          $projectNames = $projects | ForEach-Object { "Mapping_Tools.$_" }
+          "VERSION=$version" >> $env:GITHUB_ENV
+          "NUGET_PROJECTS=$($projects -join ' ')" >> $env:GITHUB_ENV
+          "NUGET_RELEASE_PROJECTS=/$($projectNames -join '/')/" >> $env:GITHUB_ENV
+          "NUGET_DEPENDENCY_VERSION=$dependencyVersion" >> $env:GITHUB_ENV
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Determine version from tag
-        shell: bash
-        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
-
-      - name: Restore dependencies
-        run: dotnet restore Mapping_Tools.Desktop/Mapping_Tools.Desktop.csproj
-
-      - name: Pack application, core, desktop, and infrastructure
+      - name: Pack selected projects
         shell: bash
         run: |
           set -euo pipefail
           package_dir="$RUNNER_TEMP/nuget-packages"
           mkdir -p "$package_dir"
+          read -ra projects <<< "$NUGET_PROJECTS"
 
-          for project in Core Application Infrastructure Desktop; do
+          for project in "${projects[@]}"; do
             dotnet pack "Mapping_Tools.$project/Mapping_Tools.$project.csproj" \
               --configuration Release \
-              --no-restore \
               --output "$package_dir" \
-              -p:Version="$VERSION" \
-              -p:AssemblyVersion="$VERSION" \
-              -p:FileVersion="$VERSION"
+              -p:NuGetReleaseProjects="$NUGET_RELEASE_PROJECTS" \
+              -p:NuGetReleaseVersion="$VERSION" \
+              -p:NuGetDependencyVersion="$NUGET_DEPENDENCY_VERSION"
 
             test -f "$package_dir/Mapping_Tools.$project.$VERSION.nupkg"
           done
@@ -602,7 +651,8 @@ jobs:
           NUGET_PUBLISH_TOKEN: ${{ steps.login.outputs.NUGET_API_KEY }}
         run: |
           set -euo pipefail
-          for project in Core Application Infrastructure Desktop; do
+          read -ra projects <<< "$NUGET_PROJECTS"
+          for project in "${projects[@]}"; do
             dotnet nuget push "$RUNNER_TEMP/nuget-packages/Mapping_Tools.$project.$VERSION.nupkg" \
               --source https://api.nuget.org/v3/index.json \
               --api-key "$NUGET_PUBLISH_TOKEN" \

@@ -11,6 +11,15 @@
     </ItemGroup>
   </Target>
 
+  <!-- A pack command builds project references too. Only selected projects get the new release version. -->
+  <PropertyGroup Condition="'$(NuGetReleaseVersion)' != ''">
+    <NuGetBuildVersion>$(NuGetDependencyVersion)</NuGetBuildVersion>
+    <NuGetBuildVersion Condition="$(NuGetReleaseProjects.Contains('/$(MSBuildProjectName)/'))">$(NuGetReleaseVersion)</NuGetBuildVersion>
+    <Version Condition="'$(NuGetBuildVersion)' != ''">$(NuGetBuildVersion)</Version>
+    <AssemblyVersion Condition="'$(NuGetBuildVersion)' != ''">$(NuGetBuildVersion)</AssemblyVersion>
+    <FileVersion Condition="'$(NuGetBuildVersion)' != ''">$(NuGetBuildVersion)</FileVersion>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(IsTestProject)' != 'true'">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <WarningsAsErrors>$(WarningsAsErrors);CS1591</WarningsAsErrors>
