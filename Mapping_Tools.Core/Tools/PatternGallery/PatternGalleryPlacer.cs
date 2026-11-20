@@ -153,8 +153,22 @@ public class PatternGalleryPlacer
     /// </param>
     public void PlaceOsuPatternAtTime(Beatmap patternBeatmap, Beatmap beatmap, double time = double.NaN, bool protectBeatmapPattern = true)
     {
+        PlaceOsuPatternAtTime(patternBeatmap, beatmap, null, null, time, protectBeatmapPattern);
+    }
+
+    /// <summary>Places a pattern at a selected time and overrides the target removal window.</summary>
+    /// <param name="patternBeatmap">The source pattern.</param>
+    /// <param name="beatmap">The destination beatmap.</param>
+    /// <param name="overwriteStartTime">The inclusive source-time start of removal before padding, or null for the placed pattern's start.</param>
+    /// <param name="overwriteEndTime">The inclusive source-time end of removal before padding, or null for the placed pattern's end.</param>
+    /// <param name="time">The time where the first source object is placed, or NaN to keep its current time.</param>
+    /// <param name="protectBeatmapPattern">Whether to copy the source before changing it.</param>
+    public void PlaceOsuPatternAtTime(Beatmap patternBeatmap, Beatmap beatmap, double? overwriteStartTime,
+        double? overwriteEndTime, double time = double.NaN, bool protectBeatmapPattern = true)
+    {
+        ArgumentNullException.ThrowIfNull(patternBeatmap);
         double offset = double.IsNaN(time) ? 0 : time - patternBeatmap.GetHitObjectStartTime();
-        PlaceOsuPattern(patternBeatmap, beatmap, offset, protectBeatmapPattern);
+        PlaceOsuPattern(patternBeatmap, beatmap, overwriteStartTime, overwriteEndTime, offset, protectBeatmapPattern);
     }
 
     /// <summary>
@@ -171,20 +185,51 @@ public class PatternGalleryPlacer
     /// </param>
     public void PlaceOsuPattern(Beatmap patternBeatmap, Beatmap beatmap, double offset = 0, bool protectBeatmapPattern = true)
     {
+        PlaceOsuPattern(patternBeatmap, beatmap, null, null, offset, protectBeatmapPattern);
+    }
+
+    /// <summary>
+    ///     Places all pattern objects and optionally uses a single explicit removal window for target objects and timing.
+    ///     Explicit bounds are shifted by the placement offset. Resnapping and timing scaling affect the pattern only.
+    ///     <see cref="PatternOverwriteMode.NoOverwrite" /> disables removal even when bounds are set.
+    /// </summary>
+    /// <param name="patternBeatmap">The source pattern.</param>
+    /// <param name="beatmap">The destination beatmap.</param>
+    /// <param name="overwriteStartTime">The inclusive source-time start of removal before padding, or null for the placed pattern's start.</param>
+    /// <param name="overwriteEndTime">The inclusive source-time end of removal before padding, or null for the placed pattern's end.</param>
+    /// <param name="offset">The time shift in milliseconds applied to the pattern and any explicit bounds.</param>
+    /// <param name="protectBeatmapPattern">Whether to copy the source before changing it.</param>
+    public void PlaceOsuPattern(Beatmap patternBeatmap, Beatmap beatmap, double? overwriteStartTime,
+        double? overwriteEndTime, double offset = 0, bool protectBeatmapPattern = true)
+    {
         ArgumentNullException.ThrowIfNull(patternBeatmap);
         ArgumentNullException.ThrowIfNull(beatmap);
         Validate();
+
+        if (overwriteStartTime is double start && !double.IsFinite(start))
+            throw new ArgumentOutOfRangeException(nameof(overwriteStartTime), "The overwrite start must be finite.");
+        if (overwriteEndTime is double end && !double.IsFinite(end))
+            throw new ArgumentOutOfRangeException(nameof(overwriteEndTime), "The overwrite end must be finite.");
+        if (overwriteStartTime > overwriteEndTime)
+            throw new ArgumentException("The overwrite start must be no later than the overwrite end.", nameof(overwriteStartTime));
+
+        bool hasOverwriteBounds = overwriteStartTime.HasValue || overwriteEndTime.HasValue;
         if (protectBeatmapPattern)
             // Copy so the original pattern doesnt get changed
             patternBeatmap = patternBeatmap.DeepCopy();
 
         // Do the offset
-        if (Math.Abs(offset) > Precision.DOUBLE_EPSILON) patternBeatmap.OffsetTime(offset);
+        if (Math.Abs(offset) > Precision.DOUBLE_EPSILON)
+        {
+            patternBeatmap.OffsetTime(offset);
+            overwriteStartTime += offset;
+            overwriteEndTime += offset;
+        }
 
         // We adjust the pattern first so it alligns with the beatmap.
         // The right timing is applied and optional pre-processing is applied.
         // Sliderends and object timingpoints get recalculated.
-        PreparePattern(patternBeatmap, beatmap, out var parts, out var timingPointsChanges);
+        PreparePattern(patternBeatmap, beatmap, hasOverwriteBounds, out var parts, out var timingPointsChanges);
 
         // Keep just the timing point changes which are inside the parts.
         // These timing point changes have everything that is necessary for inside the parts of the pattern. (even timing)
@@ -194,10 +239,21 @@ public class PatternGalleryPlacer
                 part.StartTime <= tpc.TimingPoint.Offset && part.EndTime >= tpc.TimingPoint.Offset)),
         ];
 
-        // Remove stuff
         if (PatternOverwriteMode != PatternOverwriteMode.NoOverwrite)
-            foreach (var part in parts)
-                RemovePartOfBeatmap(beatmap, part.StartTime - Padding, part.EndTime + Padding);
+        {
+            if (hasOverwriteBounds)
+            {
+                var part = parts.Single();
+                double removalStart = (overwriteStartTime ?? part.StartTime) - Padding;
+                double removalEnd = (overwriteEndTime ?? part.EndTime) + Padding;
+                RemoveBoundedPartOfBeatmap(beatmap, removalStart, removalEnd, part.EndTime);
+            }
+            else
+            {
+                foreach (var part in parts)
+                    RemovePartOfBeatmap(beatmap, part.StartTime - Padding, part.EndTime + Padding);
+            }
+        }
 
         // Add timingpoint changes for each hitobject to make sure they still have the wanted SV and hitsounds (especially near the edges of parts)
         // It is possible for the timingpoint of a hitobject at the start of a part to be outside of the part, so this fixes issues related to that
@@ -278,6 +334,26 @@ public class PatternGalleryPlacer
         beatmap.BeatmapTiming.RemoveAll(tp => tp.Offset >= startTime && tp.Offset <= endTime);
     }
 
+    private static void RemoveBoundedPartOfBeatmap(Beatmap beatmap, double startTime, double endTime, double placedEndTime)
+    {
+        double lastChangedTime = Math.Max(endTime, placedEndTime);
+        double resumeTime = beatmap.Version < 128 ? Math.Floor(lastChangedTime) + 1 : Math.BitIncrement(lastChangedTime);
+        var timing = beatmap.BeatmapTiming;
+        var redline = timing.GetRedlineAtTime(resumeTime);
+        var activePoint = timing.GetTimingPointAtTime(resumeTime);
+
+        RemovePartOfBeatmap(beatmap, startTime, endTime);
+
+        // An explicit removal can delete the timing still in effect after the placed pattern.
+        foreach (var point in new[] { redline, activePoint }.Distinct())
+        {
+            if (point.Offset < startTime || point.Offset > endTime) continue;
+            var restored = point.Copy();
+            restored.Offset = resumeTime;
+            timing.Add(restored);
+        }
+    }
+
     private static TimingPointChange GetSvChange(HitObject ho)
     {
         var tp = (ho.TimingPoint ?? throw new InvalidOperationException("Hit object timing must be resolved before placing a pattern.")).Copy();
@@ -301,9 +377,11 @@ public class PatternGalleryPlacer
     /// </summary>
     /// <param name="patternBeatmap"></param>
     /// <param name="beatmap"></param>
+    /// <param name="hasOverwriteBounds">Whether placement uses a single explicit removal window.</param>
     /// <param name="parts"></param>
     /// <param name="timingPointsChanges"></param>
-    private void PreparePattern(Beatmap patternBeatmap, Beatmap beatmap, out List<Part> parts, out List<TimingPointChange> timingPointsChanges)
+    private void PreparePattern(Beatmap patternBeatmap, Beatmap beatmap, bool hasOverwriteBounds,
+        out List<Part> parts, out List<TimingPointChange> timingPointsChanges)
     {
         double patternStartTime = patternBeatmap.GetHitObjectStartTime();
 
@@ -431,7 +509,7 @@ public class PatternGalleryPlacer
         }
 
         // Partition the pattern based on the timing in the pattern
-        if (PatternOverwriteMode == PatternOverwriteMode.PartitionedOverwrite)
+        if (PatternOverwriteMode == PatternOverwriteMode.PartitionedOverwrite && !hasOverwriteBounds)
             parts = PartitionBeatmap(patternBeatmap, scaleToNewTiming);
         else
             parts =

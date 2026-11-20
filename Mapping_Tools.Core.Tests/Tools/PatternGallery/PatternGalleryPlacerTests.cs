@@ -93,6 +93,43 @@ public sealed class PatternGalleryPlacerTests
     }
 
     [TestMethod]
+    public void PlaceOsuPattern_WithExplicitOverwriteBounds_RemovesOnlyTargetEntriesInTheSpecifiedRange()
+    {
+        // Arrange
+        Beatmap pattern = CreateBeatmap(64, 995, 1500, 2005);
+        Beatmap target = CreateBeatmap(256, 1000, 1005, 1800, 1995, 2000);
+        target.BeatmapTiming.Add(new TimingPoint(1900, 375, 4, SampleSet.Normal, 0, 100, true, false, false));
+        PatternGalleryPlacer placer = CreateUnsnappedPlacer(PatternOverwriteMode.PartitionedOverwrite);
+
+        placer.Padding = 0;
+        placer.TimingOverwriteMode = TimingOverwriteMode.PatternTimingOnly;
+
+        // Act
+        placer.PlaceOsuPattern(pattern, target, overwriteStartTime: 1005, overwriteEndTime: 1995);
+
+        // Assert
+        target.HitObjects.Where(item => item.Pos.X == 256).Select(item => item.Time).Should().Equal(1000, 2000);
+        target.HitObjects.Where(item => item.Pos.X == 64).Select(item => item.Time).Should().Equal(995, 1500, 2005);
+        target.BeatmapTiming.Redlines.Should().NotContain(point => point.Offset == 1900);
+        target.BeatmapTiming.GetMpBAtTime(2010).Should().Be(375);
+    }
+
+    [TestMethod]
+    public void PlaceOsuPatternAtTime_WithExplicitOverwriteBounds_ShiftsBothBoundsWithThePattern()
+    {
+        // Arrange
+        Beatmap pattern = CreateBeatmap(64, 1000, 1500);
+        Beatmap target = CreateBeatmap(256, 4800, 4900, 5200, 5600, 5700);
+        PatternGalleryPlacer placer = CreateUnsnappedPlacer(PatternOverwriteMode.CompleteOverwrite);
+
+        // Act
+        placer.PlaceOsuPatternAtTime(pattern, target, overwriteStartTime: 900, overwriteEndTime: 1600, time: 5000);
+
+        // Assert
+        target.HitObjects.Select(item => item.Time).Should().Equal(4800, 5000, 5500, 5700);
+    }
+
+    [TestMethod]
     public void PlaceOsuPattern_WithTargetTwiceAsFast_ConvertsPatternBeatSpacing()
     {
         // Arrange
