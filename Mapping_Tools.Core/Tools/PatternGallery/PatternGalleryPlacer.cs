@@ -206,9 +206,9 @@ public class PatternGalleryPlacer
         ArgumentNullException.ThrowIfNull(beatmap);
         Validate();
 
-        if (overwriteStartTime is double start && !double.IsFinite(start))
+        if (overwriteStartTime is not null && !double.IsFinite(overwriteStartTime.Value))
             throw new ArgumentOutOfRangeException(nameof(overwriteStartTime), "The overwrite start must be finite.");
-        if (overwriteEndTime is double end && !double.IsFinite(end))
+        if (overwriteEndTime is not null && !double.IsFinite(overwriteEndTime.Value))
             throw new ArgumentOutOfRangeException(nameof(overwriteEndTime), "The overwrite end must be finite.");
         if (overwriteStartTime > overwriteEndTime)
             throw new ArgumentException("The overwrite start must be no later than the overwrite end.", nameof(overwriteStartTime));

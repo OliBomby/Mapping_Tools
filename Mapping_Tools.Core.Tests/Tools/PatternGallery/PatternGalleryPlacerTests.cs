@@ -108,9 +108,11 @@ public sealed class PatternGalleryPlacerTests
         placer.PlaceOsuPattern(pattern, target, overwriteStartTime: 1005, overwriteEndTime: 1995);
 
         // Assert
-        target.HitObjects.Where(item => item.Pos.X == 256).Select(item => item.Time).Should().Equal(1000, 2000);
-        target.HitObjects.Where(item => item.Pos.X == 64).Select(item => item.Time).Should().Equal(995, 1500, 2005);
-        target.BeatmapTiming.Redlines.Should().NotContain(point => point.Offset == 1900);
+        target.HitObjects.Where(item => Precision.AlmostEquals(item.Pos.X, 256))
+            .Select(item => item.Time).Should().Equal(1000, 2000);
+        target.HitObjects.Where(item => Precision.AlmostEquals(item.Pos.X, 64))
+            .Select(item => item.Time).Should().Equal(995, 1500, 2005);
+        target.BeatmapTiming.Redlines.Should().NotContain(point => Precision.AlmostEquals(point.Offset, 1900));
         target.BeatmapTiming.GetMpBAtTime(2010).Should().Be(375);
     }
 
