@@ -269,10 +269,10 @@ public class Beatmap
     /// </remarks>
     public void FixBreakPeriods()
     {
-        const double maxBreakMargin = 5000;
-        const double minStartMargin = 200;
-        const double minBreakDuration = 650;
-        const double autoBreakGap = 5000;
+        const double max_break_margin = 5000;
+        const double min_start_margin = 200;
+        const double min_break_duration = 650;
+        const double auto_break_gap = 5000;
 
         double approachTime = GetApproachTime(Difficulty["ApproachRate"].DoubleValue);
         List<Break> breaks = [];
@@ -294,17 +294,17 @@ public class Beatmap
 
             if (existing != null)
             {
-                existing.StartTime = MathHelper.Clamp(existing.StartTime, previousEnd + minStartMargin, previousEnd + maxBreakMargin);
-                existing.EndTime = MathHelper.Clamp(existing.EndTime, nextStart - maxBreakMargin, nextStart - approachTime);
-                if (!Precision.DefinitelyBigger(minBreakDuration, existing.EndTime - existing.StartTime))
+                existing.StartTime = MathHelper.Clamp(existing.StartTime, previousEnd + min_start_margin, previousEnd + max_break_margin);
+                existing.EndTime = MathHelper.Clamp(existing.EndTime, nextStart - max_break_margin, nextStart - approachTime);
+                if (!Precision.DefinitelyBigger(min_break_duration, existing.EndTime - existing.StartTime))
                     breaks.Add(existing);
             }
-            else if (!Precision.DefinitelyBigger(autoBreakGap, nextStart - previousEnd))
+            else if (!Precision.DefinitelyBigger(auto_break_gap, nextStart - previousEnd))
             {
                 breaks.Add(new Break
                 {
                     EventType = "2",
-                    StartTime = previousEnd + minStartMargin,
+                    StartTime = previousEnd + min_start_margin,
                     EndTime = nextStart - approachTime,
                 });
             }

@@ -535,7 +535,7 @@ public class PatternGalleryPlacer
             newTiming.AddRange(transformOriginalTiming.GetRedlinesInRange(lastEndTime, startTime, false));
 
             // A point-only part has no interval in which to apply a different BPM.
-            if (startTime == endTime && part.HitObjects.All(ho => !ho.IsSlider))
+            if (startTime.Equals(endTime) && part.HitObjects.All(ho => !ho.IsSlider))
             {
                 newTiming.AddRange(transformOriginalTiming.GetRedlinesInRange(startTime, endTime));
                 lastEndTime = endTime;
@@ -694,7 +694,7 @@ public class PatternGalleryPlacer
                 if (sliderEnd > startTime + Precision.DOUBLE_EPSILON)
                 {
                     double nextPartStart = i + 1 < parts.Count ? parts[i + 1].StartTime : double.PositiveInfinity;
-                    restoreTime = beatmap.Version < 128 && endTime == startTime && nextPartStart > startTime + 1
+                    restoreTime = beatmap.Version < 128 && startTime.Equals(endTime) && nextPartStart > startTime + 1
                         ? startTime + 1
                         : sliderEnd;
                 }
