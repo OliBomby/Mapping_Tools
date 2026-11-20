@@ -1,5 +1,6 @@
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.BeatmapHelper.Events;
 using Mapping_Tools.Core.BeatmapHelper.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -8,6 +9,75 @@ namespace Mapping_Tools.Core.Tests.BeatmapHelper;
 [TestClass]
 public class BeatmapTests
 {
+    [TestMethod]
+    [DataRow(6_999, false)]
+    [DataRow(7_000, true)]
+    public void FixBreakPeriods_WithGapAfterSlider_AddsBreakAtFiveSeconds(int nextStart, bool addBreak)
+    {
+        // Arrange
+        var slider = BeatmapTestData.DecodeHitObject("64,96,1000,2,0,L|164:96,1,100");
+        slider.EndTime = 2_000;
+        var circle = BeatmapTestData.DecodeHitObject("64,96,7000,1,0,0:0:0:0:");
+        circle.Time = nextStart;
+        Beatmap beatmap = new() { HitObjects = [slider, circle] };
+        (double Start, double End)[] expected = addBreak ? [(2_200, 5_800)] : [];
+
+        // Act
+        beatmap.FixBreakPeriods();
+
+        // Assert
+        beatmap.BreakPeriods.Select(period => (period.StartTime, period.EndTime)).Should().Equal(expected);
+    }
+
+    [TestMethod]
+    public void FixBreakPeriods_WithExistingBreaks_AdjustsFittingBreakAndDiscardsOthers()
+    {
+        // Arrange
+        Beatmap beatmap = new()
+        {
+            HitObjects =
+            [
+                BeatmapTestData.DecodeHitObject("64,96,1000,1,0,0:0:0:0:"),
+                BeatmapTestData.DecodeHitObject("64,96,4000,1,0,0:0:0:0:"),
+                BeatmapTestData.DecodeHitObject("64,96,5500,1,0,0:0:0:0:"),
+            ],
+        };
+        beatmap.BreakPeriods.AddRange([
+            new Break { EventType = "2", StartTime = 100, EndTime = 900 },
+            new Break { EventType = "Break", StartTime = 1_100, EndTime = 3_900 },
+            new Break { EventType = "2", StartTime = 4_050, EndTime = 5_300 },
+        ]);
+
+        // Act
+        beatmap.FixBreakPeriods();
+
+        // Assert
+        beatmap.BreakPeriods.Select(period => (period.EventType, period.StartTime, period.EndTime))
+            .Should().Equal(("Break", 1_200d, 2_800d));
+    }
+
+    [TestMethod]
+    public void FixBreakPeriods_WithOverlappingHitObjects_StartsBreakAfterTheLongestObject()
+    {
+        // Arrange
+        Beatmap beatmap = new()
+        {
+            HitObjects =
+            [
+                BeatmapTestData.DecodeHitObject("256,192,1000,8,0,9000,0:0:0:0:"),
+                BeatmapTestData.DecodeHitObject("64,96,2000,1,0,0:0:0:0:"),
+                BeatmapTestData.DecodeHitObject("64,96,14000,1,0,0:0:0:0:"),
+            ],
+        };
+
+        // Act
+        beatmap.FixBreakPeriods();
+
+        // Assert
+        beatmap.BreakPeriods.Select(period => (period.StartTime, period.EndTime))
+            .Should().Equal((9_200d, 12_800d));
+    }
+
     [TestMethod]
     [DataRow("64,96,1000,2,0,L|164:96,2,100,0|0|0,0:0|0:0|0:0,0:0:0:0:")]
     [DataRow("256,192,1000,8,0,2000,0:0:0:0:")]

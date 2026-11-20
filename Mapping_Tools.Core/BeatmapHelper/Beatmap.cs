@@ -260,6 +260,61 @@ public class Beatmap
     }
 
     /// <summary>
+    ///     Fits existing gameplay breaks between hit objects, discards breaks shorter than 650 ms,
+    ///     and adds breaks in gaps of at least 5000 ms.
+    /// </summary>
+    /// <remarks>
+    ///     Uses the current difficulty settings for the next object's approach time.
+    ///     Hit objects must be sorted by start time and their end times must be up to date.
+    /// </remarks>
+    public void FixBreakPeriods()
+    {
+        const double maxBreakMargin = 5000;
+        const double minStartMargin = 200;
+        const double minBreakDuration = 650;
+        const double autoBreakGap = 5000;
+
+        double approachTime = GetApproachTime(Difficulty["ApproachRate"].DoubleValue);
+        List<Break> breaks = [];
+        double previousEnd = double.NegativeInfinity;
+
+        for (int i = 0; i < HitObjects.Count - 1; i++)
+        {
+            var previous = HitObjects[i];
+            previousEnd = Math.Max(previousEnd, Math.Max(previous.Time, previous.GetEndTime(false)));
+            double nextStart = HitObjects[i + 1].Time;
+            if (nextStart <= previousEnd)
+                continue;
+
+            var existing = BreakPeriods.FirstOrDefault(period =>
+            {
+                double middle = (period.StartTime + period.EndTime) / 2;
+                return middle >= previousEnd && middle <= nextStart;
+            });
+
+            if (existing != null)
+            {
+                existing.StartTime = MathHelper.Clamp(existing.StartTime, previousEnd + minStartMargin, previousEnd + maxBreakMargin);
+                existing.EndTime = MathHelper.Clamp(existing.EndTime, nextStart - maxBreakMargin, nextStart - approachTime);
+                if (!Precision.DefinitelyBigger(minBreakDuration, existing.EndTime - existing.StartTime))
+                    breaks.Add(existing);
+            }
+            else if (!Precision.DefinitelyBigger(autoBreakGap, nextStart - previousEnd))
+            {
+                breaks.Add(new Break
+                {
+                    EventType = "2",
+                    StartTime = previousEnd + minStartMargin,
+                    EndTime = nextStart - approachTime,
+                });
+            }
+        }
+
+        BreakPeriods.Clear();
+        BreakPeriods.AddRange(breaks);
+    }
+
+    /// <summary>
     ///     Calculates the end position for all hit objects.
     /// </summary>
     public void CalculateEndPositions()
